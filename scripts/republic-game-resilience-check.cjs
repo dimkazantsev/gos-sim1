@@ -71,6 +71,25 @@ function harness({effects=false,compiledCode=code}={}){
    requests++;
    started.set('rpc:'+name,(started.get('rpc:'+name)||0)+1);
    if(rpcFailures.has(name))return{data:null,error:{code:rpcFailures.get(name),message:'simulated RPC failure '+name}};
+   if(name==='get_game_bootstrap_v2'){
+    const snapshot={revision,user,gameId,memberKind},id=args.p_game_id;
+    const num=(counts.get('games')||0)+1;counts.set('games',num);
+    await holds.get('games:'+num)?.promise;
+    const bundled=['games','state_metrics','game_events','chat_channels','game_stages','game_votes','game_evaluations','game_crises','game_documents','game_profiles','formal_documents'];
+    const broken=bundled.find(table=>failures.has(table));
+    if(broken)return{data:null,error:{message:'simulated read outage '+broken,code:failureCodes.get(broken)||'PGRST123'},status:400};
+    const game={id,current_round:snapshot.revision,title:'revision-'+snapshot.revision};
+    return{data:{
+     game,metrics:[{id:'metric',game_id:id,value:snapshot.revision}],events:[],
+     channels:[{id:'channel-a',game_id:id,name:'Общий чат',kind:'public'}],
+     stages:[],votes:withBallots?[{id:'vote',game_id:id}]:[],
+     evaluations:withBallots?[{id:'evaluation-'+snapshot.revision,user_id:snapshot.user}]:[],
+     crises:withBallots?[{id:'crisis-'+snapshot.revision,game_id:id}]:[],
+     documents:withBallots?[{id:'document-'+snapshot.revision,game_id:id,created_by:snapshot.user}]:[],
+     profiles:assetPaths?[{game_id:id,user_id:snapshot.user,avatar_path:'teacher-assets/'+snapshot.user+'/avatar-fixture.webp',signature_path:'teacher-assets/'+snapshot.user+'/signature-fixture.png'}]:[],
+     formal_documents:[]
+    },error:null,status:200};
+   }
    if(name==='get_my_game_identity'){
     const snapshot={revision,user,gameId,memberKind};
     const gameNumber=(counts.get('games')||0)+1;counts.set('games',gameNumber);
@@ -174,17 +193,41 @@ async function main(){
   assert.equal(h.assetStats().signed,first.signed,'Unchanged Storage paths must reuse session-scoped signed URLs');
   h.dispose();
  });
- await check('Initial game hydration caps its fifteen core requests at four parallel requests per client',async()=>{
+ await check('Initial game hydration makes five direct reads plus one bundled RPC under four-slot limit',async()=>{
   const source=fs.readFileSync(path.join(root,'components/game/useRepublicGame.ts'),'utf8');
   const start=source.indexOf('async function loadCoreSections()'),end=source.indexOf('async function hydrateActiveView(',start);
   assert(start>=0&&end>start);
-  assert.equal((source.slice(start,end).match(/limitedCoreRead\(/g)||[]).length,13);
+  assert.equal((source.slice(start,end).match(/limitedCoreRead\\(/g)||[]).length,3);
+  assert(source.includes("supabase.rpc('get_game_bootstrap_v2'"),'Server-side RLS bundle replaces eleven HTTP requests');
+  assert(source.includes("function readLegacyBootstrap()"),'Absent-schema fallback remains available');
+  assert(source.includes(".eq('user_id',uid).maybeSingle()"),'Personal membership stays independent of full roster');
   assert(source.slice(start,end).includes('loadCachedParties()'),'One core table uses a shared cache, with its query still queue-limited');
   assert(source.includes("const request=limitedCoreRead(supabase.from('game_parties')"),'Party reads preserve four-slot limiter');
-  assert(source.slice(start,end).includes('loadMemberRoster()'),'The fifteenth core request uses the shared, concurrency-limited roster reader');
+  assert(source.slice(start,end).includes('loadMemberRoster()'),'The separately authorised roster remains shared and concurrency limited');
   assert(source.includes('coreReadQueue.current.active<4'));
  });
- await check('100 simulated players submit one presence plus one navigation event in one network call',async()=>{
+ await check('40 simultaneous synthetic clients hydrate 11 table groups with 40 rather than 440 REST operations',async()=>{
+  const clients=Array.from({length:40},()=>harness({effects:true}));
+  try{
+   await Promise.all(clients.map(h=>h.settle()));
+   for(const h of clients){
+    assert.equal(h.rpcCount('get_game_bootstrap_v2'),1,'One grouped read per client');
+    assert.equal(h.readCount('state_metrics'),0,'Legacy metrics read is skipped');
+    assert.equal(h.readCount('formal_documents'),0,'Legacy document feed read is skipped');
+    assert.equal(h.render().teacher,true);
+    assert.equal(h.render().game.id,'game-a');
+    assert.equal(h.render().metrics.length,1);
+   }
+  }finally{clients.forEach(h=>h.dispose());}
+ });
+ await check('Unavailable new RPC uses RLS-preserving legacy selects, without dropping the identity',async()=>{
+  const h=harness();h.failRpc('get_game_bootstrap_v2','PGRST202');
+  await h.render().refresh();
+  assert(h.readCount('state_metrics')>0,'Older backend uses the existing RLS table read');
+  assert.equal(h.render().teacher,true);
+  h.dispose();
+ });
+  await check('100 simulated players submit one presence plus one navigation event in one network call',async()=>{
   const clients=Array.from({length:100},()=>harness());
   try{
    await Promise.all(clients.map(async h=>{
