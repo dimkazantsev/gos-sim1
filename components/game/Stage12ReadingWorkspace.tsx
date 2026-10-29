@@ -1,6 +1,6 @@
 'use client';
 
-import {useEffect,useState} from 'react';
+import {useEffect,useRef,useState} from 'react';
 import {ArrowRight,CalendarDays,Check,FileText,MessagesSquare,Vote} from 'lucide-react';
 import LegislativeSessionLab from './LegislativeSessionLab';
 import Stage12BillPackages from './Stage12BillPackages';
@@ -29,7 +29,8 @@ export default function Stage12ReadingWorkspace({g,stage,subjects,filingRequest=
  const [reading,setReading]=useState<Reading>(1),[selectedBill,setSelectedBill]=useState('');
  const [packagesOpen,setPackagesOpen]=useState(false);
  const [meetingOpen,setMeetingOpen]=useState(false);
- useEffect(()=>{setMeetingOpen(false)},[reading]);
+ const previousReading=useRef(reading);
+ useEffect(()=>{if(previousReading.current!==reading){previousReading.current=reading;setMeetingOpen(false)}},[reading]);
  const [wasAutoExpanded,setWasAutoExpanded]=useState(false);
  useEffect(()=>{
   if(filingRequest>0){setReading(1);setPackagesOpen(true);}
