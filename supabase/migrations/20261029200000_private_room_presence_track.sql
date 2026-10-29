@@ -6,7 +6,7 @@ on realtime.messages
 for insert
 to authenticated
 with check (
-  (select auth.uid()) is not null
+  auth.uid() is not null
   and extension = 'presence'
   and case
     when realtime.topic() ~ '^gos-id-live:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$'
