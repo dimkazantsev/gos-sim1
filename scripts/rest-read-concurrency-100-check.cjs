@@ -9,7 +9,7 @@ function tab(index){
  const transport=async input=>{
   const href=typeof input==='string'?input:input.url;
   if(href.includes('/auth/v1/')){count.auth++;return new Response('{}',{status:200})}
-  if(href.includes('rpc/cast_vote')){count.writes++;return new Response('{}',{status:201})}
+  if(/rpc\/(?:cast_vote|get_budget_pulse|get_fiscal_context|blitz_inbox_counts)(?:\?|$)/.test(href)){count.writes++;return new Response('{}',{status:201})}
   count.readStarted++;count.readActive++;count.peakRead=Math.max(count.peakRead,count.readActive);
   if(!hold){count.readActive--;return new Response('{}',{status:200})}
   return new Promise(resolve=>{pending.push(()=>{count.readActive--;resolve(new Response('{}',{status:200}))})});
@@ -58,6 +58,13 @@ async function exercise(index){
  assert.equal(denied.status,503,'Bounded waiting queue rejects excess work locally');
  assert.equal(denied.headers.get('x-gos-local-limit'),'1');
  assert.equal(c.count.readStarted,4,'Overload must not cause extra network traffic');
+ // These procedures really write to PostgreSQL despite their get_* names.
+ const changing=['get_budget_pulse','get_fiscal_context','blitz_inbox_counts'];
+ for(const name of changing){
+  const response=await c.fetch(origin+'/rest/v1/rpc/'+name,{method:'POST'});
+  assert.equal(response.status,201,'State-changing '+name+' must bypass the read gate');
+ }
+ assert.equal(c.count.writes,3);
  abort.abort();await settle();
  assert.equal((await canceled).status,503,'Queued, aborted read must not start');
  c.unhold();
