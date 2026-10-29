@@ -370,7 +370,7 @@ export function useRepublicGame(gameId:string){
      (dirtyCore||dirtyTables.size>0||dirtyPartyDocuments||dirtyChat||dirtyPins||dirtyOverview))schedule();
   };
   document.addEventListener('visibilitychange',resumePending);
-  const channel=supabase.channel('gos-id-live:'+gameId+':'+me.user_id);
+  const channel=supabase.channel('gos-id-live:'+gameId,{config:{private:true}});
   // State pulse: reuse the existing game channel. One UPDATE notification
   // replaces a 15-query core reload for all connected classroom clients.
   // The source payload is still scoped by game_id and Realtime RLS.
@@ -479,7 +479,11 @@ export function useRepublicGame(gameId:string){
     schedule();
    });
   }
-  channel.on('postgres_changes',{event:'*',schema:'public',table:'party_documents',filter:'game_id=eq.'+gameId},()=>{
+  // Metadata-only Broadcast replaces one per-row Postgres Changes handler.
+  // The private topic is authorised with game membership in realtime.messages RLS.
+  // Never trust Broadcast as data: existing RLS queries supply document content.
+  channel.on('broadcast',{event:'party_documents_changed'},payload=>{
+   if(!currentConnection()||payload.payload?.table!=='party_documents')return;
    dirtyPartyDocuments=true;schedule();
   });
   // KSRF proposals use this existing authorised game socket, not five widget channels.
@@ -492,12 +496,21 @@ export function useRepublicGame(gameId:string){
   }
   liveRef.current=channel;
   setRealtimeState('connecting');
-  channel.subscribe(status=>{
-   if(disposed)return;
-   liveConnected=status==='SUBSCRIBED';
-   setGameRealtimeConnection(gameId,liveConnected);
-   if(liveConnected)lastPollAt=Date.now();
-   setRealtimeState(liveConnected?'connected':'disconnected');
+  // A private Realtime topic needs the user's current JWT before joining.
+  // Keep the original single game channel and its offline/visible-tab recovery.
+  void supabase.realtime.setAuth().then(()=>{
+   if(!currentConnection())return;
+   channel.subscribe(status=>{
+    if(disposed)return;
+    liveConnected=status==='SUBSCRIBED';
+    setGameRealtimeConnection(gameId,liveConnected);
+    if(liveConnected)lastPollAt=Date.now();
+    setRealtimeState(liveConnected?'connected':'disconnected');
+   });
+  }).catch(()=>{
+   // A failed private join never authorises a public fallback.
+   // The existing bounded visible-tab poll remains the recovery path.
+   if(currentConnection()){setGameRealtimeConnection(gameId,false);setRealtimeState('disconnected')}
   });
   // Visible-tab recovery works even when a WebSocket cannot connect.
   // Deterministic jitter prevents 40 simultaneous clients from polling in lockstep.
