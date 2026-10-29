@@ -166,3 +166,11 @@
  line-height:1.6;
 }
 @media(max-width:420px){.civicParties .partyRegistrationEarlyHint{margin:10px 8px 14px;padding:11px 12px}}
+
+/* Teacher-only document deletion uses the existing dossier controls and modal. */
+.teacherPartyDossiers .partyDossierDocDelete{display:grid;place-items:center;flex:none;width:36px;height:36px;min-width:36px;min-height:36px;padding:0;border:1px solid #edcdd1;border-radius:9px;color:#a33b4a;background:#fff6f7;cursor:pointer}
+.teacherPartyDossiers .partyDossierDocDelete:hover:not(:disabled){background:#ffe8eb;border-color:#dca2aa}
+.teacherPartyDossiers .partyDossierDocDelete:focus-visible{outline:2px solid #315c9c;outline-offset:2px}
+.teacherPartyDossiers .partyDossierDocDelete:disabled{opacity:.45;cursor:not-allowed}
+.partyDossierDocControls .partyDossierDocDelete{order:2;flex:none}
+@media(max-width:420px){.partyDossierDocControls{flex-wrap:wrap}.partyDossierDocControls .partyDossierDocDelete{margin-left:0}}
