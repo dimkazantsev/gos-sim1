@@ -3,7 +3,7 @@ import {createPortal} from 'react-dom';
 import {userError} from '@/lib/userError';
 import {useEffect,useRef,useState} from 'react';
 import {supabase} from '@/lib/supabase';
-import {useGameTableSync} from './useGameTableSync';
+import {notifyGameDataRefresh,useGameTableSync} from './useGameTableSync';
 import {isStageWorkOpen} from './stageWorkStatus';
 import type {ReturnTypeRepublic} from './viewTypes';
 import StyledSelect from '../ui/StyledSelect';
@@ -23,13 +23,15 @@ function meetingErrorMessage(message:string):string{
 }
 export default function InstitutionRegistrationPanel({g,readOnly=false,freshAttendance=false,onUnitsChange,stageNo,initialBody,allowedBodies,defaultOpen=false,sessionId,onOpenDocument,onMeetingReadyChange,onRegistrationChange}:{g:ReturnTypeRepublic;readOnly?:boolean;freshAttendance?:boolean;onUnitsChange?:(units:VotingUnit[])=>void;stageNo?:number;initialBody?:string;allowedBodies?:string[];defaultOpen?:boolean;sessionId?:string;onOpenDocument?:(id:string)=>void;onMeetingReadyChange?:(ready:boolean)=>void;onRegistrationChange?:()=>void}){
  const [rows,setRows]=useState<Entry[]>([]),[units,setUnits]=useState<VotingUnit[]>([]),[assignments,setAssignments]=useState<Assignment[]>([]),[offices,setOffices]=useState<Office[]>([]);
- const [body,setBody]=useState(initialBody||'gd'),[busy,setBusy]=useState(false),[notice,setNotice]=useState(''),[newTitle,setNewTitle]=useState(''),[users,setUsers]=useState<string[]>([]),[head,setHead]=useState('');
+ const [body,setBody]=useState(initialBody||'gd'),[busyScope,setBusyScope]=useState<Set<string>|null>(null),[notice,setNotice]=useState(''),[newTitle,setNewTitle]=useState(''),[users,setUsers]=useState<string[]>([]),[head,setHead]=useState('');
  const [seats,setSeats]=useState('1'),[editing,setEditing]=useState<string|null>(null);
  const [meetingRows,setMeetingRows]=useState<MeetingRecord[]>([]);
  const [agendaText,setAgendaText]=useState(''),[minutesText,setMinutesText]=useState(''),[delegateUser,setDelegateUser]=useState('');
  const [meetingError,setMeetingError]=useState('');
  const [permission,setPermission]=useState<{key:string;rights:MeetingPermissions}|null>(null);
  const [rightsVersion,setRightsVersion]=useState(0);
+ const [readyScope,setReadyScope]=useState<{key:string}|null>(null);
+ const [panelVisible,setPanelVisible]=useState(()=>typeof document==='undefined'||document.visibilityState==='visible');
  const [gdPresence,setGdPresence]=useState<{my_capacity:number;registered:GdPresence[]}|null>(null);
  const [presenceDraft,setPresenceDraft]=useState('');
  const [agendaEditorOpen,setAgendaEditorOpen]=useState(false);
@@ -37,61 +39,98 @@ export default function InstitutionRegistrationPanel({g,readOnly=false,freshAtte
  const [stage12Text,setStage12Text]=useState('');
  const [stage12InitialText,setStage12InitialText]=useState('');
  const [stage12Reason,setStage12Reason]=useState('');
- const [stage12Saving,setStage12Saving]=useState(false);
+ const [stage12SavingScope,setStage12SavingScope]=useState<Set<string>|null>(null);
  const dirtyMeetingDraftRef=useRef({agenda:false,minutes:false,stage12:false});
+ const meetingDraftVersion=useRef({agenda:0,minutes:0,stage12:0});
  const [minutesTarget,setMinutesTarget]=useState<HTMLElement|null>(null);
  useEffect(()=>{
   setMinutesTarget(document.getElementById('stage-meeting-minutes-'+g.game?.id+'-'+(stageNo||g.game?.current_round||1)));
  },[g.game?.id,stageNo,g.game?.current_round]);
  async function loadStage12Editor(){
-  if(!g.game)return;
+  if(!g.game||!currentScope())return;
   setMeetingError('');
+  try{
   let sessionQuery=supabase.from('duma_sessions').select('id,status,agenda_document_id')
     .eq('game_id',g.game.id).eq('stage_no',12);
    sessionQuery=sessionId?sessionQuery.eq('id',sessionId):sessionQuery.order('session_no',{ascending:false}).limit(1);
    const s=await sessionQuery.maybeSingle();
+  if(!currentScope())return;
   if(s.error){setMeetingError(meetingErrorMessage(userError(s.error)));return;}
   if(!s.data?.agenda_document_id){setStage12Session(null);return;}
   const doc=await supabase.from('formal_documents').select('body_text')
    .eq('game_id',g.game.id).eq('id',s.data.agenda_document_id).maybeSingle();
+  if(!currentScope())return;
   if(doc.error){setMeetingError(meetingErrorMessage(userError(doc.error)));return;}
   if(!doc.data)return;
   setStage12Session({id:s.data.id,status:s.data.status});
   // Keep keystrokes when the read began before the user started typing.
   if(!dirtyMeetingDraftRef.current.stage12){setStage12InitialText(doc.data.body_text||'');setStage12Text(doc.data.body_text||'');}
+  }catch(error){if(currentScope())setMeetingError(meetingErrorMessage(userError(error)))}
  }
  async function saveStage12Editor(){
-  if(!g.game||!stage12Session||!verifiedRights?.can_coordinate||readOnly||stage12Saving
+  if(!g.game||!currentScope()||!stage12Session||!verifiedRights?.can_coordinate||readOnly||stage12Saving
    ||stage12Text.trim().length<80||stage12Text.length>20000
    ||stage12Text.trim()===stage12InitialText.trim())return;
   if(stage12Session.status==='open'&&stage12Reason.trim().length<10)return;
+  const submittedVersion=meetingDraftVersion.current.stage12;
   setStage12Saving(true);setMeetingError('');
+  try{
   const result=await supabase.rpc('edit_stage12_duma_agenda_text',{
    p_session_id:stage12Session.id,p_body:stage12Text,
    p_expected_body:stage12InitialText,
    p_reason:stage12Session.status==='open'?stage12Reason.trim():null
   });
+  if(!currentScope()){if(!result.error)reconcileStaleWrite('formal_documents');return}
   if(result.error){setMeetingError(meetingErrorMessage(userError(result.error)));}
   else{
-   dirtyMeetingDraftRef.current.stage12=false;
-   setAgendaEditorOpen(false);setStage12Reason('');
+   if(meetingDraftVersion.current.stage12===submittedVersion){dirtyMeetingDraftRef.current.stage12=false;setAgendaEditorOpen(false);setStage12Reason('')}
+   else setStage12InitialText(stage12Text);
    setNotice('Текст повестки обновлён в едином документе НПА.');
    await load();
   }
-  setStage12Saving(false);
+  }catch(error){if(currentScope())setMeetingError(meetingErrorMessage(userError(error)))}
+  finally{setStage12Saving(false)}
  }
  const detailsRef=useRef<HTMLDetailsElement>(null);
  const lastMeetingDraftRef=useRef<{scope:string;agenda:string;minutes:string;delegate:string}|null>(null);
  const stage=stageNo||g.game?.current_round||1,students=g.members.filter(m=>m.kind==='student');
- async function load(){if(!g.game)return;const [r,u,a,b,o,meeting]=await Promise.all([supabase.from('institution_session_registrations').select('user_id,institution_key,stage_no,present_mandates,presence_updated_at').eq('game_id',g.game.id).eq('stage_no',stage),supabase.from('institution_units').select('id,title,unit_kind,head_user_id,unit_key,mandate_capacity').eq('game_id',g.game.id),supabase.from('institution_assignments').select('unit_id,user_id').eq('game_id',g.game.id),supabase.from('game_voting_body_members').select('unit_id,user_id').eq('game_id',g.game.id),supabase.from('game_office_assignments').select('user_id,role_title').eq('game_id',g.game.id).eq('status','active'),
+ const panelScope=JSON.stringify([g.game?.id,stage,g.me?.user_id,g.me?.kind,g.me?.role_title,g.me?.team,g.me?.group_name,g.me?.roster_archived_at,g.teacher]);
+ const scopeRef=useRef({key:panelScope}),readVersion=useRef(0),mounted=useRef(false);
+ if(scopeRef.current.key!==panelScope)scopeRef.current={key:panelScope};
+ const scope=scopeRef.current;
+ const actionRef=useRef({key:panelScope,body});
+ if(actionRef.current.key!==panelScope||actionRef.current.body!==body)actionRef.current={key:panelScope,body};
+ const actionScope=actionRef.current;
+ const actionKey=JSON.stringify([g.game?.id,stage,g.me?.user_id,body]);
+ const actionGameId=g.game?.id,currentGameStageRef=useRef({gameId:actionGameId,stage});currentGameStageRef.current={gameId:actionGameId,stage};
+ function currentScope(){return mounted.current&&scopeRef.current===scope&&actionRef.current===actionScope}
+ function reconcileStaleWrite(table:string){if(mounted.current&&actionGameId&&currentGameStageRef.current.gameId===actionGameId&&currentGameStageRef.current.stage===stage)notifyGameDataRefresh(actionGameId,table)}
+ const busy=busyScope?.has(actionKey)??false,stage12Saving=stage12SavingScope?.has(actionKey)??false;
+ function setBusy(value:boolean){if(value&&!currentScope())return;setBusyScope(previous=>{const next=new Set(previous);if(value)next.add(actionKey);else next.delete(actionKey);return next.size?next:null})}
+ function setStage12Saving(value:boolean){if(value&&!currentScope())return;setStage12SavingScope(previous=>{const next=new Set(previous);if(value)next.add(actionKey);else next.delete(actionKey);return next.size?next:null})}
+ const presenceKey=JSON.stringify([g.game?.id,g.me?.user_id,stage]);
+ const presenceEdit=useRef({key:presenceKey,dirty:false,version:0});
+ if(presenceEdit.current.key!==presenceKey)presenceEdit.current={key:presenceKey,dirty:false,version:0};
+ const initialSnapshotReady=readyScope===scope;
+ useEffect(()=>{mounted.current=true;return()=>{mounted.current=false;readVersion.current++}},[]);
+ useEffect(()=>{const sync=()=>setPanelVisible(document.visibilityState==='visible');document.addEventListener('visibilitychange',sync);sync();return()=>document.removeEventListener('visibilitychange',sync)},[]);
+ useEffect(()=>{setPresenceDraft('');setStage12Session(null);setAgendaEditorOpen(false);setStage12Text('');setStage12InitialText('');setStage12Reason('')},[presenceKey]);
+ useEffect(()=>{
+  setRows([]);setUnits([]);onUnitsChange?.([]);setAssignments([]);setOffices([]);setMeetingRows([]);setGdPresence(null);setPermission(null);setMeetingError('');setNotice('');
+ },[scope]);
+ useEffect(()=>{if(!panelVisible)return;const timer=setTimeout(()=>setReadyScope(scope),1500);return()=>clearTimeout(timer)},[scope,panelVisible]);
+ async function load(){if(!g.game||!mounted.current||scopeRef.current!==scope)return;const requestedScope=scope,version=++readVersion.current;const [r,u,a,b,o,meeting]=await Promise.all([supabase.from('institution_session_registrations').select('user_id,institution_key,stage_no,present_mandates,presence_updated_at').eq('game_id',g.game.id).eq('stage_no',stage),supabase.from('institution_units').select('id,title,unit_kind,head_user_id,unit_key,mandate_capacity').eq('game_id',g.game.id),supabase.from('institution_assignments').select('unit_id,user_id').eq('game_id',g.game.id),supabase.from('game_voting_body_members').select('unit_id,user_id').eq('game_id',g.game.id),supabase.from('game_office_assignments').select('user_id,role_title').eq('game_id',g.game.id).eq('status','active'),
   supabase.from('institution_meeting_records').select('game_id,stage_no,institution_key,agenda_document_id,agenda_body,agenda_approved_at,minutes_document_id,minutes_body,minutes_approved_at,delegate_user_id').eq('game_id',g.game.id).eq('stage_no',stage)]);
-  const failure=[r,u,a,b,o,meeting].find(x=>x.error);if(failure?.error){setMeetingError('Не удалось загрузить сведения о заседании. '+meetingErrorMessage(userError(failure.error)));return;}
-  if(!r.error)setRows(r.data||[]);if(!u.error){setUnits(u.data||[]);onUnitsChange?.(u.data||[])}setAssignments([...(a.data||[]),...(b.data||[])]);if(!o.error)setOffices(o.data||[]);if(!meeting.error)setMeetingRows((meeting.data||[]) as MeetingRecord[]);setRightsVersion(v=>v+1);
+  if(!mounted.current||scopeRef.current!==requestedScope||version!==readVersion.current)return;
+  const failure=[r,u,a,b,o,meeting].find(x=>x.error);if(failure?.error){setMeetingError('Не удалось загрузить сведения о заседании. '+meetingErrorMessage(userError(failure.error)));setReadyScope(requestedScope);return;}
+  setMeetingError(value=>value.startsWith('Не удалось загрузить сведения о заседании.')?'':value);
+  if(!r.error)setRows(r.data||[]);if(!u.error){setUnits(u.data||[]);onUnitsChange?.(u.data||[])}setAssignments([...(a.data||[]),...(b.data||[])]);if(!o.error)setOffices(o.data||[]);if(!meeting.error)setMeetingRows((meeting.data||[]) as MeetingRecord[]);setRightsVersion(v=>v+1);setReadyScope(requestedScope);
  }
  useEffect(()=>{if(initialBody)setBody(initialBody)},[initialBody]);
- useEffect(()=>{if(defaultOpen&&detailsRef.current)detailsRef.current.open=true},[defaultOpen,stage,initialBody]);
- useGameTableSync(g.game?.id,['institution_session_registrations','institution_units','institution_assignments','game_voting_body_members','game_office_assignments','institution_meeting_records','formal_documents','office_elections','office_candidates','party_member_mandates','game_members'],load,String(stage));
+ useEffect(()=>{if(defaultOpen&&detailsRef.current)detailsRef.current.open=true},[defaultOpen,stage,initialBody,initialSnapshotReady]);
+ useGameTableSync(g.game?.id,['institution_session_registrations','institution_units','institution_assignments','game_voting_body_members','game_office_assignments','institution_meeting_records','formal_documents','office_elections','office_candidates','party_member_mandates','game_members'],load,panelScope);
  useEffect(()=>{
+  if(!initialSnapshotReady||!panelVisible)return;
   if(body!=='gd'||!g.game){setGdPresence(null);return}
   let active=true;
   void Promise.resolve(supabase.rpc('get_gd_session_attendance',{p_game_id:g.game.id,p_stage_no:stage}))
@@ -102,29 +141,29 @@ export default function InstitutionRegistrationPanel({g,readOnly=false,freshAtte
     if(!state||!Array.isArray(state.registered)){setMeetingError('Сведения о депутатской явке недоступны.');return}
     setGdPresence(state);
     const mine=state.registered.find(row=>row.user_id===g.me?.user_id);
-    setPresenceDraft(mine?.declared==null?String(state.my_capacity):String(mine.declared));
+    if(!presenceEdit.current.dirty)setPresenceDraft(mine?.declared==null?String(state.my_capacity):String(mine.declared));
    }).catch(()=>{if(active)setMeetingError('Не удалось загрузить данные о явке депутатов.')});
   return()=>{active=false};
- },[g.game?.id,g.me?.user_id,stage,body,rightsVersion]);
+ },[g.game?.id,g.me?.user_id,stage,body,rightsVersion,initialSnapshotReady,panelVisible]);
  // Refresh only when the persisted meeting document or selected scope really changes.
  // Unrelated table subscriptions must not overwrite a participant's unsaved draft.
  useEffect(()=>{
   const row=meetingRows.find(m=>m.institution_key===body);
-  const snapshot={scope:[g.game?.id||'',stage,body].join(':'),agenda:row?.agenda_body||'',minutes:row?.minutes_body||'',delegate:row?.delegate_user_id||''};
+  const snapshot={scope:JSON.stringify([g.game?.id,stage,body,g.me?.user_id]),agenda:row?.agenda_body||'',minutes:row?.minutes_body||'',delegate:row?.delegate_user_id||''};
   const previous=lastMeetingDraftRef.current;
   if(previous?.scope!==snapshot.scope){dirtyMeetingDraftRef.current.agenda=false;dirtyMeetingDraftRef.current.minutes=false;dirtyMeetingDraftRef.current.stage12=false;}
   if(previous?.scope!==snapshot.scope||previous.agenda!==snapshot.agenda&&!dirtyMeetingDraftRef.current.agenda)setAgendaText(snapshot.agenda);
   if(previous?.scope!==snapshot.scope||previous.minutes!==snapshot.minutes&&!dirtyMeetingDraftRef.current.minutes)setMinutesText(snapshot.minutes);
   if(previous?.scope!==snapshot.scope||previous.delegate!==snapshot.delegate)setDelegateUser(snapshot.delegate);
   lastMeetingDraftRef.current=snapshot;
- },[meetingRows,body,g.game?.id,stage]);
- const permissionKey=[g.game?.id,g.me?.user_id,stage,body].join(':');
+ },[meetingRows,body,g.game?.id,g.me?.user_id,stage]);
+ const permissionKey=JSON.stringify([panelScope,body]);
  const currentDelegate=meetingRows.find(m=>m.institution_key===body)?.delegate_user_id;
  useEffect(()=>{
-  if(!g.game||!g.me)return;
+  if(!initialSnapshotReady||!panelVisible||!g.game||!g.me)return;
   let active=true;
   setPermission(null);
-  setMeetingError('');
+  setMeetingError(value=>value.startsWith('Не удалось загрузить сведения о заседании.')?value:'');
   void Promise.resolve(supabase.rpc('get_my_institution_meeting_permissions',{p_game_id:g.game.id,p_stage_no:stage,p_institution:body}))
    .then(({data,error})=>{
     if(!active)return;
@@ -135,14 +174,16 @@ export default function InstitutionRegistrationPanel({g,readOnly=false,freshAtte
     setPermission({key:permissionKey,rights:{can_coordinate:data.can_coordinate,can_prepare:data.can_prepare,can_attend:data.can_attend}});
    }).catch(()=>{if(active)setMeetingError('Не удалось проверить полномочия. Проверьте соединение и повторите попытку.')});
   return()=>{active=false};
- },[permissionKey,currentDelegate,rightsVersion]);
+ },[permissionKey,currentDelegate,rightsVersion,initialSnapshotReady,panelVisible]);
  useEffect(()=>{
   if(body!=='ksrf'||(stage!==2&&stage!==3))return;
+  if(!initialSnapshotReady){onMeetingReadyChange?.(false);return}
   const ready=!!meetingRows.find(m=>m.institution_key==='ksrf')?.agenda_approved_at
     &&rows.some(r=>r.institution_key==='ksrf'&&r.user_id===g.me?.user_id);
   onMeetingReadyChange?.(ready);
- },[body,stage,rows,meetingRows,g.me?.user_id,onMeetingReadyChange]);
+ },[body,stage,rows,meetingRows,g.me?.user_id,onMeetingReadyChange,initialSnapshotReady]);
  if(!g.game||!g.me)return null;
+ if(!initialSnapshotReady)return <p role="status">Загружаем сведения о заседании…</p>;
  const availableBodies=VOTING_BODIES.filter(item=>!allowedBodies||allowedBodies.includes(item.key));
  const config=VOTING_BODIES.find(b=>b.key===body),unit=units.find(u=>'unit:'+u.id===body);
  function eligible(uid:string){const m=g.members.find(x=>x.user_id===uid);if(!m||m.kind==='observer')return false;if(unit)return assignments.some(a=>a.unit_id===unit.id&&a.user_id===uid);if(body==='ksrf')return m.kind==='student'||g.parties.some(p=>p.leader_user_id===uid);if(body==='gd'&&m.kind==='student')return !m.roster_archived_at;return !!config&&(config.role.test(m.role_title||'')||(m.kind==='student'&&offices.some(o=>o.user_id===uid&&config.role.test(o.role_title))))}
@@ -178,53 +219,80 @@ export default function InstitutionRegistrationPanel({g,readOnly=false,freshAtte
  const canWriteAgenda=!gdStage12CanonicalAgenda&&(!agendaHasDocument||!hasSessionRegistrations);
  const canApproveAgenda=meetingCoordinator&&agendaDraft&&(meetingRecord?.agenda_body?.trim().length||0)>=30;
  async function saveMeetingDocument(kind:'agenda'|'minutes'){
-  if(!g.game||busy||!canPrepare||readOnly||meetingActionsLocked||(kind==='agenda'&&!canWriteAgenda))return;
+  if(!g.game||!currentScope()||busy||!canPrepare||readOnly||meetingActionsLocked||(kind==='agenda'&&!canWriteAgenda))return;
+  const submittedVersion=meetingDraftVersion.current[kind];
   setMeetingError('');setNotice('');setBusy(true);
+  try{
   const r=await supabase.rpc('save_institution_meeting_document',{p_game_id:g.game.id,p_stage_no:stage,p_institution:body,p_kind:kind,p_body:kind==='agenda'?agendaText:minutesText});
-  if(r.error)setMeetingError(meetingErrorMessage(userError(r.error)));else{dirtyMeetingDraftRef.current[kind]=false;await load();setNotice(kind==='agenda'?(meetingCoordinator?'Повестка сохранена в реестре НПА и утверждена.':'Проект повестки сохранён. Ожидается утверждение председателем.'):'Протокол сохранён в реестре НПА.')}
-  setBusy(false);
+  if(!currentScope()){if(!r.error)reconcileStaleWrite('institution_meeting_records');return}
+  if(r.error)setMeetingError(meetingErrorMessage(userError(r.error)));else{if(meetingDraftVersion.current[kind]===submittedVersion)dirtyMeetingDraftRef.current[kind]=false;await load();if(currentScope())setNotice(kind==='agenda'?(meetingCoordinator?'Повестка сохранена в реестре НПА и утверждена.':'Проект повестки сохранён. Ожидается утверждение председателем.'):'Протокол сохранён в реестре НПА.')}
+  }catch(error){if(currentScope())setMeetingError(meetingErrorMessage(userError(error)))}
+  finally{setBusy(false)}
  }
  async function approveMeeting(kind:'agenda'|'minutes'){
-  if(!g.game||busy||!meetingCoordinator||readOnly||meetingActionsLocked)return;setMeetingError('');setNotice('');setBusy(true);
+  if(!g.game||!currentScope()||busy||!meetingCoordinator||readOnly||meetingActionsLocked)return;setMeetingError('');setNotice('');setBusy(true);
+  try{
   const r=await supabase.rpc(kind==='agenda'?'approve_institution_meeting_agenda':'approve_institution_meeting_minutes',{p_game_id:g.game.id,p_stage_no:stage,p_institution:body});
-  if(r.error)setMeetingError(meetingErrorMessage(userError(r.error)));else{await load();setNotice(kind==='agenda'?'Повестка утверждена. Регистрация доступна.':'Протокол утверждён.')}
-  setBusy(false);
+  if(!currentScope()){if(!r.error)reconcileStaleWrite('institution_meeting_records');return}
+  if(r.error)setMeetingError(meetingErrorMessage(userError(r.error)));else{await load();if(currentScope())setNotice(kind==='agenda'?'Повестка утверждена. Регистрация доступна.':'Протокол утверждён.')}
+  }catch(error){if(currentScope())setMeetingError(meetingErrorMessage(userError(error)))}
+  finally{setBusy(false)}
  }
  async function publishMeetingMinutes(){
-  if(!g.game||busy||!meetingCoordinator||readOnly||meetingActionsLocked)return;
+  if(!g.game||!currentScope()||busy||!meetingCoordinator||readOnly||meetingActionsLocked)return;
   setMeetingError('');setNotice('');setBusy(true);
   try{
    const r=await supabase.rpc('publish_institution_meeting_minutes_automatically',{
     p_game_id:g.game.id,p_stage_no:stage,p_institution:body
    });
+   if(!currentScope()){if(!r.error)reconcileStaleWrite('institution_meeting_records');return}
    if(r.error)throw r.error;
    await load();
-   setNotice('Протокол сформирован, удостоверен системой ГОС.ID и опубликован в реестре НПА.');
-  }catch(error){setMeetingError(meetingErrorMessage(userError(error)))}
+   if(currentScope())setNotice('Протокол сформирован, удостоверен системой ГОС.ID и опубликован в реестре НПА.');
+  }catch(error){if(currentScope())setMeetingError(meetingErrorMessage(userError(error)))}
   finally{setBusy(false)}
  }
  async function assignMeetingDelegate(){
-  if(!g.game||!meetingCoordinator||readOnly||meetingActionsLocked||busy)return;setMeetingError('');setNotice('');setBusy(true);
+  if(!g.game||!currentScope()||!meetingCoordinator||readOnly||meetingActionsLocked||busy)return;setMeetingError('');setNotice('');setBusy(true);
+  try{
   const r=await supabase.rpc('assign_institution_meeting_secretary',{p_game_id:g.game.id,p_stage_no:stage,p_institution:body,p_delegate:delegateUser||null});
-  if(r.error)setMeetingError(meetingErrorMessage(userError(r.error)));else{await load();setNotice('Ответственный исполнитель сохранён.')}
-  setBusy(false);
+  if(!currentScope()){if(!r.error)reconcileStaleWrite('institution_meeting_records');return}
+  if(r.error)setMeetingError(meetingErrorMessage(userError(r.error)));else{await load();if(currentScope())setNotice('Ответственный исполнитель сохранён.')}
+  }catch(error){if(currentScope())setMeetingError(meetingErrorMessage(userError(error)))}
+  finally{setBusy(false)}
  }
- async function register(){if(!g.game||!canAttend||!agendaReady||readOnly||meetingActionsLocked||busy)return;setMeetingError('');setNotice('');setBusy(true);const r=await supabase.rpc('register_institution_session_at_stage',{p_game_id:g.game.id,p_institution:body,p_stage_no:stage});if(r.error)setMeetingError(meetingErrorMessage(userError(r.error)));else{onRegistrationChange?.();await load();setNotice('Вы зарегистрированы на заседание.')}setBusy(false)}
+ async function register(){
+  const current=currentScope;
+  if(!g.game||!current()||!canAttend||!agendaReady||readOnly||meetingActionsLocked||busy)return;
+  setMeetingError('');setNotice('');setBusy(true);
+  try{
+   const r=await supabase.rpc('register_institution_session_at_stage',{p_game_id:g.game.id,p_institution:body,p_stage_no:stage});
+   if(!current()){if(!r.error)reconcileStaleWrite('institution_session_registrations');return}
+   if(r.error)setMeetingError(meetingErrorMessage(userError(r.error)));
+   else{onRegistrationChange?.();await load();if(current())setNotice('Вы зарегистрированы на заседание.')}
+  }catch(error){if(current())setMeetingError(meetingErrorMessage(userError(error)))}
+  finally{setBusy(false)}
+ }
  async function saveGdPresence(){
-  if(!g.game||busy||readOnly||meetingActionsLocked||!agendaReady||!canAttend||!gdPresence)return;
+  const current=currentScope;
+  if(!g.game||!current()||busy||readOnly||meetingActionsLocked||!agendaReady||!canAttend||!gdPresence)return;
   const number=Number(presenceDraft),capacity=Number(gdPresence.my_capacity||0);
   if(presenceDraft.trim()===''||!Number.isInteger(number)||number<0||number>capacity){
    setMeetingError('Укажите целое количество присутствующих депутатов от 0 до '+capacity+'.');return;
   }
+  const submittedEdit=presenceEdit.current,submittedVersion=submittedEdit.version;
   setBusy(true);setMeetingError('');setNotice('');
-  const {error}=await supabase.rpc('set_gd_session_attendance',{
-   p_game_id:g.game.id,p_stage_no:stage,p_present:number
-  });
-  if(error)setMeetingError(meetingErrorMessage(error.message));
-  else{onRegistrationChange?.();await load();setNotice('Явка депутатов сохранена. Кворум пересчитан.')}
-  setBusy(false);
+  try{
+   const {error}=await supabase.rpc('set_gd_session_attendance',{
+    p_game_id:g.game.id,p_stage_no:stage,p_present:number
+   });
+   if(!current()){if(!error)reconcileStaleWrite('institution_session_registrations');return}
+   if(error)setMeetingError(meetingErrorMessage(error.message));
+   else{if(presenceEdit.current===submittedEdit&&submittedEdit.version===submittedVersion)submittedEdit.dirty=false;onRegistrationChange?.();await load();if(current())setNotice('Явка депутатов сохранена. Кворум пересчитан.')}
+  }catch(error){if(current())setMeetingError(meetingErrorMessage(userError(error)))}
+  finally{setBusy(false)}
  }
- async function createBody(){if(!g.game)return;setBusy(true);const r=await supabase.rpc('save_civic_voting_body',{p_game_id:g.game.id,p_title:newTitle.trim(),p_seats:Number(seats),p_users:users,p_head:head||null,p_unit:editing});if(r.error)g.setError(userError(r.error));else{await load();setBody('unit:'+r.data);setNewTitle('');setUsers([]);setHead('');setSeats('1');setEditing(null);setNotice('Состав органа сохранён. Его можно выбрать при открытии голосования.')}setBusy(false)}
+ async function createBody(){if(!g.game||!currentScope()||busy)return;setBusy(true);try{const r=await supabase.rpc('save_civic_voting_body',{p_game_id:g.game.id,p_title:newTitle.trim(),p_seats:Number(seats),p_users:users,p_head:head||null,p_unit:editing});if(!currentScope()){if(!r.error)reconcileStaleWrite('institution_units');return}if(r.error)g.setError(userError(r.error));else{await load();if(!currentScope())return;setBody('unit:'+r.data);setNewTitle('');setUsers([]);setHead('');setSeats('1');setEditing(null);setNotice('Состав органа сохранён. Его можно выбрать при открытии голосования.')}}catch(error){if(currentScope())g.setError(userError(error))}finally{setBusy(false)}}
  return <><details ref={detailsRef} className="institutionRegistrationPanel civicRegistration civicDisclosure projectDisclosure" aria-label="Регистрация на заседания"><DisclosureSummary icon={ClipboardCheck} title="Регистрация на заседание" description={'Этап '+stage+' · Регистрация в органе власти'}/><div className="civicDisclosureBody"><p>{body==='ksrf'?'До внесения предложений и голосования необходимо зарегистрироваться на заседание КСРФ. Участвовать могут все участники, но один голос от фракции подаёт её избранный представитель.':body==='gd'&&stage===4?'До формирования руководства Государственной Думы повестку готовят председатели зарегистрированных политических партий. После избрания Председателя Думы и формирования Совета Думы полномочия переходят руководству палаты. Для участия в заседании после утверждения повестки необходима регистрация.':'Перед участием в заседании и голосовании необходимо зарегистрироваться в соответствующем органе после утверждения повестки.'}</p>
   <div className="civicRegistrationSelectors"><StyledSelect label="Орган" value={body} onChange={setBody} options={[...availableBodies.map(b=>({value:b.key,label:b.title})),...units.filter(u=>!allowedBodies||allowedBodies.includes('unit:'+u.id)).map(u=>({value:'unit:'+u.id,label:u.title}))]}/></div>
   <section className="civicMeetingDocuments" aria-label="Документы заседания" data-agenda-state={agendaReady?'approved':agendaDraft?'draft':'pending'}>
@@ -243,7 +311,7 @@ export default function InstitutionRegistrationPanel({g,readOnly=false,freshAtte
      <p>Измените непосредственно текст повестки заседания Государственной Думы. Состав законопроектов и голосования остаются прежними. Реестровые номера документов необходимо сохранить.</p>
      <label>Полный текст повестки
       <textarea className="civicAgendaTextEditor" rows={15} maxLength={20000}
-       value={stage12Text} onChange={e=>{dirtyMeetingDraftRef.current.stage12=true;setStage12Text(e.target.value)}}
+       value={stage12Text} onChange={e=>{dirtyMeetingDraftRef.current.stage12=true;meetingDraftVersion.current.stage12++;setStage12Text(e.target.value)}}
        placeholder="Текст повестки заседания Государственной Думы"/>
      </label>
      {stage12Session?.status==='open'&&<label>Основание корректировки после открытия
@@ -259,7 +327,7 @@ export default function InstitutionRegistrationPanel({g,readOnly=false,freshAtte
       onClick={()=>void saveStage12Editor()}>{stage12Saving?'Сохранение…':'Сохранить текст повестки'}</button>
     </div>}
    </section>}
-   {canPrepare&&!readOnly&&!agendaReady&&canWriteAgenda&&<label>Содержание повестки<textarea aria-label="Текст повестки заседания" value={agendaText} rows={4} onChange={event=>{dirtyMeetingDraftRef.current.agenda=true;setAgendaText(event.target.value)}} placeholder="Вопросы заседания, порядок рассмотрения, выступающие и регламент"/></label>}
+   {canPrepare&&!readOnly&&!agendaReady&&canWriteAgenda&&<label>Содержание повестки<textarea aria-label="Текст повестки заседания" value={agendaText} rows={4} onChange={event=>{dirtyMeetingDraftRef.current.agenda=true;meetingDraftVersion.current.agenda++;setAgendaText(event.target.value)}} placeholder="Вопросы заседания, порядок рассмотрения, выступающие и регламент"/></label>}
    {canPrepare&&!readOnly&&!agendaReady&&canWriteAgenda&&<div className="civicAgendaComposer"><small>{agendaTextLength<30?'Для сохранения укажите ещё '+(30-agendaTextLength)+' символов.':'Повестка готова к сохранению в реестре НПА.'}</small><button type="button" className={meetingCoordinator?'primary':'secondary'} disabled={busy||readOnly||agendaTextLength<30} onClick={()=>void saveMeetingDocument('agenda')}>{meetingCoordinator?'Сохранить и утвердить повестку':'Сохранить проект повестки в реестре НПА'}</button></div>}
    {canApproveAgenda&&!readOnly&&<button type="button" className="primary" disabled={busy||readOnly} onClick={()=>void approveMeeting('agenda')}>Утвердить подготовленный проект повестки</button>}
    {meetingCoordinator&&!readOnly&&!automatedSessionMinutes&&<div className="civicMeetingDelegate"><StyledSelect label="Поручить оформление повестки" value={delegateUser} onChange={setDelegateUser} options={[{value:'',label:'Без поручения'},...participants.map(p=>({value:p.user_id,label:p.full_name||'Участник'}))]}/><button type="button" disabled={busy} onClick={()=>void assignMeetingDelegate()}>Сохранить поручение</button></div>}
@@ -269,7 +337,7 @@ export default function InstitutionRegistrationPanel({g,readOnly=false,freshAtte
   {body==='gd'?<div className="civicGdPresenceForm">
    <div><strong>Явка депутатов</strong><p>По умолчанию присутствуют все <b>{gdPresence?.my_capacity??'…'}</b> депутатов, которых Вы представляете. Если пришли не все, укажите фактическое число. Гоствойтинг и ограничения мандатов учитываются автоматически.</p></div>
    <label>Присутствуют депутаты
-    <input type="number" min={0} max={gdPresence?.my_capacity??0} step={1} inputMode="numeric" value={presenceDraft} onChange={e=>setPresenceDraft(e.target.value)} disabled={!canAttend||!agendaReady||busy||readOnly||meetingActionsLocked||!gdPresence} aria-label="Количество присутствующих депутатов"/>
+    <input type="number" min={0} max={gdPresence?.my_capacity??0} step={1} inputMode="numeric" value={presenceDraft} onChange={e=>{presenceEdit.current.dirty=true;presenceEdit.current.version++;setPresenceDraft(e.target.value)}} disabled={!canAttend||!agendaReady||busy||readOnly||meetingActionsLocked||!gdPresence} aria-label="Количество присутствующих депутатов"/>
    </label>
    <button type="button" className="primary" disabled={!agendaReady||!canAttend||busy||readOnly||meetingActionsLocked||!gdPresence||presenceDraft.trim()===''||!Number.isInteger(Number(presenceDraft))||Number(presenceDraft)<0||Number(presenceDraft)>(gdPresence.my_capacity||0)} onClick={()=>void saveGdPresence()}>{mine?'Изменить явку':'Зарегистрироваться на заседание'}</button>
   </div>:<button type="button" className="primary" disabled={mine||!agendaReady||!canAttend||busy||readOnly||meetingActionsLocked} onClick={()=>void register()}>{mine?'Вы зарегистрированы':meetingActionsLocked?'Этап закрыт':!agendaReady?'Ожидается повестка':!verifiedRights?'Проверяем полномочия':canAttend?'Зарегистрироваться':'Нет назначения в этот орган'}</button>}</div>

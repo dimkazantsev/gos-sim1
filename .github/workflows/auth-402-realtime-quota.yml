@@ -18,6 +18,7 @@ on:
       - 'scripts/election-panels-load-check.cjs'
       - 'scripts/duma-ballot-targeted-load-check.cjs'
       - 'scripts/votes-registration-load-check.cjs'
+      - 'scripts/institution-registration-initial-load-check.cjs'
       - 'scripts/presidential-panel-load-check.cjs'
       - 'scripts/profile-results-load-check.cjs'
       - 'scripts/participants-analytics-performance-check.cjs'
@@ -97,6 +98,7 @@ on:
       - 'scripts/election-panels-load-check.cjs'
       - 'scripts/duma-ballot-targeted-load-check.cjs'
       - 'scripts/votes-registration-load-check.cjs'
+      - 'scripts/institution-registration-initial-load-check.cjs'
       - 'scripts/presidential-panel-load-check.cjs'
       - 'scripts/profile-results-load-check.cjs'
       - 'scripts/participants-analytics-performance-check.cjs'
@@ -193,6 +195,7 @@ jobs:
       - run: node scripts/election-panels-load-check.cjs
       - run: node scripts/duma-ballot-targeted-load-check.cjs
       - run: node scripts/votes-registration-load-check.cjs
+      - run: node scripts/institution-registration-initial-load-check.cjs
       - run: node scripts/presidential-panel-load-check.cjs
       - run: node scripts/profile-results-load-check.cjs
       - run: node scripts/participants-analytics-performance-check.cjs
