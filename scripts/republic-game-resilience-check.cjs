@@ -33,7 +33,8 @@ function harness({effects=false,compiledCode=code}={}){
    onAuthStateChange(callback){authCallback=callback;return{data:{subscription:{unsubscribe(){if(authCallback===callback)authCallback=undefined;}}}};},
    signOut:async()=>{user=null;authCallback?.('SIGNED_OUT',null);return{error:null};}
   },
-  channel(){const handlers=[];const channel={on(kind,filter,callback){handlers.push({filter,callback});return this;},subscribe(callback){callback?.('SUBSCRIBED');return this;},handlers};channels.push(channel);return channel;},
+  realtime:{setAuth:async()=>{}},
+  channel(topic,options){const handlers=[];const channel={topic,options,on(kind,filter,callback){handlers.push({kind,filter,callback});return this;},subscribe(callback){callback?.('SUBSCRIBED');return this;},handlers};channels.push(channel);return channel;},
   removeChannel:async channel=>{const index=channels.indexOf(channel);if(index!==-1)channels.splice(index,1);},
   from(table){
    requests++;const number=(counts.get(table)||0)+1;counts.set(table,number);
@@ -227,8 +228,15 @@ function harness({effects=false,compiledCode=code}={}){
   enableBallots(){withBallots=true;},readCount:table=>counts.get(table)||0,
   setRevision:value=>{revision=value;},setUser:value=>{user=value;},setMemberKind:value=>{memberKind=value;},setAssetPaths:value=>{assetPaths=value;},assetStats:()=>({signed,peakSigns}),failTable(table,code){failures.add(table);failureCodes.set(table,code);},setAuthError:value=>{authError=value;},
   hold(table,number=(counts.get(table)||0)+1){const pending=deferred();holds.set(table+':'+number,pending);return pending;},
-  emit(table,row,eventType){for(const channel of [...channels])for(const {filter,callback} of channel.handlers)if(filter.table===table&&filter.event!=='DELETE')callback({eventType:eventType||(table==='chat_messages'?'UPDATE':'INSERT'),new:{game_id:gameId,...row}});},
+  emit(table,row,eventType){for(const channel of [...channels])for(const {kind,filter,callback} of channel.handlers){
+   if(table==='party_documents'&&kind==='broadcast'&&filter.event==='party_documents_changed'&&channel.topic==='gos-id-live:'+gameId)
+    callback({event:'party_documents_changed',payload:{table:'party_documents'}});
+   if(kind==='postgres_changes'&&filter.table===table&&filter.event!=='DELETE')
+    callback({eventType:eventType||(table==='chat_messages'?'UPDATE':'INSERT'),new:{game_id:gameId,...row}});
+  }},
   callbacks(table){return channels.flatMap(channel=>channel.handlers.filter(item=>item.filter.table===table).map(item=>item.callback))},
+  broadcast(topic,event,payload){for(const channel of [...channels])if(channel.topic===topic)for(const handler of channel.handlers)if(handler.kind==='broadcast'&&handler.filter.event===event)handler.callback({event,payload});},
+  channelsInfo(){return channels.map(channel=>({topic:channel.topic,private:channel.options?.config?.private===true,handlers:channel.handlers.map(item=>({kind:item.kind,event:item.filter.event,table:item.filter.table}))}))},
   auth(event,nextUser){user=nextUser;const before=requests;authCallback?.(event,nextUser?{user:{id:nextUser}}:null);assert.equal(requests,before,'Auth callback must schedule Supabase I/O outside its synchronous callback.');},
   runTimers(){for(const [id,timer] of [...timers]){if(timer.interval)continue;timers.delete(id);timer.fn();}},
   async advance(ms){await settle();const end=virtualNow+ms;let turns=0;while(true){const next=[...timers].filter(([,t])=>t.at<=end).sort((a,b)=>a[1].at-b[1].at)[0];if(!next)break;assert(++turns<10000,'Timers must remain bounded');virtualNow=next[1].at;if(next[1].interval)next[1].at+=next[1].interval;else timers.delete(next[0]);next[1].fn();await settle();}virtualNow=end;await settle();},
