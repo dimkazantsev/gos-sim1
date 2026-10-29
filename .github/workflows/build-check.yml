@@ -376,6 +376,7 @@ jobs:
       - run: node scripts/chat-pins-projection-rls-check.cjs
       - run: node scripts/private-game-broadcast-rls-check.cjs
       - run: node scripts/game-parties-broadcast-100-clients-check.cjs
+      - run: node scripts/private-game-presence-100-clients-check.cjs
       - run: node scripts/editor-async-resilience-check.cjs
       - run: node scripts/readiness-matrix-check.cjs
       - run: node scripts/budget-change-registry-check.cjs
