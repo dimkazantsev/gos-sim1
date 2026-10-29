@@ -41,7 +41,7 @@
 .gosPartyElectionFeedback{margin:0;font-size:12px;line-height:1.6;color:#335f8b}
 .gradesPage,.gradesPage .surface,.gradeModal,.gradeModal>*{box-sizing:border-box;min-width:0}
 .gradesPage .gradesMatrixWrap{max-width:100%;overflow:hidden}
-.gradesPage .gradesMatrix{max-width:100%;width:100%;min-width:0;overflow-x:auto;overflow-y:auto;overscroll-behavior-inline:contain;border:1px solid #dce5f1;border-radius:16px;background:#fff}
+.gradesPage .gradesMatrix{max-width:100%;width:100%;min-width:0;overflow-x:auto;overflow-y:auto;overscroll-behavior-inline:contain;overscroll-behavior-y:auto;touch-action:pan-x pan-y;border:1px solid #dce5f1;border-radius:16px;background:#fff}
 .gradesPage .gradesMatrixHead,.gradesPage .gradesMatrixRow{display:grid;box-sizing:border-box;width:max(1420px,100%);min-width:1420px;grid-template-columns:minmax(260px,1fr) 74px 80px repeat(16,56px);gap:6px;align-items:center;margin:0;padding:10px 12px}
 .gradesPage .gradesMatrixHead{position:sticky;top:0;z-index:3;background:#f5f8fd;color:#7187a4;font-size:12px;border-bottom:1px solid #dce5f1;min-height:49px}
 .gradesPage .gradesMatrixHead>*,.gradesPage .gradesMatrixRow>*{min-width:0;min-height:0;box-sizing:border-box;margin:0;text-align:center;justify-self:stretch}
