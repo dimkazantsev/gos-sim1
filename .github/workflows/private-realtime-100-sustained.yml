@@ -1,4 +1,4 @@
-name: ГОС.ID · Шаг 9: 100 приватных Auth/Realtime-сессий 20 минут
+name: 'ГОС.ID · Шаг 9: 100 приватных Auth/Realtime-сессий 20 минут'
 on:
   pull_request:
     paths:
