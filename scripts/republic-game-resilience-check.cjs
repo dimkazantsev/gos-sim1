@@ -261,8 +261,8 @@ async function main(){
   await h.settle();
   const coreBefore=h.readCount('games'),documentsBefore=h.readCount('party_documents');
   h.emit('party_documents');
-  await h.settle();
-  assert(h.readCount('party_documents')>documentsBefore,'New document metadata must reach the party screen');
+  await h.advance(650);
+  assert(h.readCount('party_documents')>documentsBefore,'New document metadata must reach the party screen after bounded Broadcast coalescing');
   assert.equal(h.readCount('games'),coreBefore,'Uploading one file must not reload the full game');
  });
  await check('Storage signatures are cached and never exceed four parallel requests per client',async()=>{

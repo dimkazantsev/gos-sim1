@@ -1,5 +1,5 @@
 /* ГОС.ID Step 3: private room Broadcast + tenant isolation.
- * Isolated PGlite model and 40 synthetic hook clients; no production writes. */
+ * Isolated PGlite RLS model and 100 synthetic hook clients; no production writes. */
 const assert=require('node:assert/strict');
 const fs=require('node:fs'),path=require('node:path');
 const {PGlite}=require('@electric-sql/pglite');
@@ -67,7 +67,7 @@ async function sqlTest(){
 }
 
 async function hookTest(){
- const clients=Array.from({length:40},(_,i)=>{const h=harness({effects:true});h.setUser('student-'+i);return h});
+ const clients=Array.from({length:100},(_,i)=>{const h=harness({effects:true});h.setUser('student-'+i);return h});
  try{
   await Promise.all(clients.map(async h=>{await h.settle();h.render().setActiveView('parties');await h.settle()}));
   for(const h of clients){
@@ -84,12 +84,34 @@ async function hookTest(){
   assert(clients.every((h,i)=>h.readCount('party_documents')===before[i]),'Cross-room Broadcast ignored');
   clients.forEach(h=>h.broadcast('gos-id-live:game-a','party_documents_changed',{table:'party_documents'}));
   await Promise.all(clients.map(h=>h.settle()));
-  assert(clients.every((h,i)=>h.readCount('party_documents')>before[i]),'Every active party screen reconciles authorised rows');
+  assert(clients.every((h,i)=>h.readCount('party_documents')===before[i]),'No premature 100-client reads before the 600ms coalescing window');
+  await Promise.all(clients.map(h=>h.advance(650)));
+  assert(clients.every((h,i)=>h.readCount('party_documents')===before[i]+1),'Every party screen reconciles exactly once after the first delta');
   const snapshot=clients.map(h=>h.readCount('party_documents'));
   clients.forEach(h=>h.broadcast('gos-id-live:game-a','party_documents_changed',{table:'unexpected_table'}));
   await Promise.all(clients.map(h=>h.settle()));
   assert(clients.every((h,i)=>h.readCount('party_documents')===snapshot[i]),'Unknown Broadcast payload ignored');
-  console.log('PASS: 40 isolated synthetic clients; one private room channel; wrong-room ignored; targeted party refresh; no legacy subscription');
+  // Eight separate events 50ms apart (<600ms) previously could trigger
+  // 8 reads per interested client. Bounded coalescing must issue exactly one.
+  const burstBaseline=clients.map(h=>h.readCount('party_documents'));
+  for(let n=0;n<8;n++){
+   clients.forEach(h=>h.broadcast('gos-id-live:game-a','party_documents_changed',{table:'party_documents'}));
+   await Promise.all(clients.map(h=>h.advance(50)));
+  }
+  assert(clients.every((h,i)=>h.readCount('party_documents')===burstBaseline[i]),'Eight events remain queued until first broadcast window');
+  await Promise.all(clients.map(h=>h.advance(250)));
+  const burstReads=clients.reduce((total,h,i)=>total+h.readCount('party_documents')-burstBaseline[i],0);
+  assert.equal(burstReads,100,'8 broadcasts across 100 viewers need only 100 document reads, not 800');
+  // A pending flag must survive visibility changes; a suspended tab never
+  // reads in the background and returns to an up-to-date party view.
+  const one=clients[0],hiddenBefore=one.readCount('party_documents');
+  one.visible('hidden');
+  one.broadcast('gos-id-live:game-a','party_documents_changed',{table:'party_documents'});
+  await one.advance(800);
+  assert.equal(one.readCount('party_documents'),hiddenBefore,'Hidden party screen may not load documents');
+  one.visible('visible');await one.settle();
+  assert.equal(one.readCount('party_documents'),hiddenBefore+1,'Visibility recovery reconciles pending broadcast');
+  console.log(JSON.stringify({status:'PASS',clients:100,burstEventsPerClient:8,expectedUnbatchedReads:800,measuredSyntheticReads:burstReads,reductionPct:87.5,wrongRoomReads:0,hiddenRecovered:true,transport:'synthetic; not a 100-JWT real network load test'}));
  }finally{clients.forEach(h=>h.dispose())}
 }
 (async()=>{await sqlTest();await hookTest()})().catch(e=>{console.error(e);process.exitCode=1});
