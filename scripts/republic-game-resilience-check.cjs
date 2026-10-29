@@ -257,10 +257,10 @@ async function main(){
   }finally{clients.forEach(h=>h.dispose());}
  });
  await check('Missing projection allows backwards-compatible reads but overloaded RPC never fans out',async()=>{
-  const old=harness();old.failRpc('get_party_representation_projection','PGRST202');
+  const old=harness({effects:true});old.failRpc('get_party_representation_projection','PGRST202');
   await old.render().refresh();old.render().setActiveView('parties');await old.settle();
   assert(old.readCount('party_invitations')>=1,'Old schema retains per-table RLS');old.dispose();
-  const down=harness();down.failRpc('get_party_representation_projection','PGRST003');
+  const down=harness({effects:true});down.failRpc('get_party_representation_projection','PGRST003');
   await down.render().refresh();down.render().setActiveView('parties');await down.settle();
   assert.equal(down.readCount('party_invitations'),0,'No fallbacks on overload');down.dispose();
  });
