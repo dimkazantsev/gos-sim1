@@ -25,6 +25,9 @@ async function actions(){
    setError:e=>errors.push(String(e)),setPartyDocuments:fn=>{rows=typeof fn==='function'?fn(rows):fn},
    readCurrent:t=>t.version===version,requireSuccessful:rs=>{const e=rs.find(r=>r.error)?.error;if(e)throw e},
    readSafely:async(_,fn)=>fn({version:++version}),notifyGameDataRefresh:()=>{},kickTelegramDispatch:async()=>{},
+   // Test the original delayed Storage boundary while the production batch
+   // helper is exercised separately by batch-document-signed-urls-100-check.
+   signedDocumentLinks:async sourceRows=>{await signing.promise;return sourceRows.map(row=>({id:row.id,path:row.path,url:'https://files.invalid/'+row.path}))},
    supabase:{storage:{from:()=>({upload:async()=>({error:backend.storageError}),createSignedUrl:async path=>{await signing.promise;return{data:{signedUrl:'https://files.invalid/'+path}}}})},from:()=>{
     const q={eqs:{},select(){return this},order(){return this},eq(k,v){this.eqs[k]=v;return this},in(k,v){this.allowed={k,v};return this},update(v){this.updateValue=v;return this},insert(v){this.insertValue=v;return this},single(){this.singleRow=true;return this},maybeSingle(){this.singleRow=true;return this},then(resolve,reject){try{
      let data=structuredClone(backend.docs.filter(d=>Object.entries(this.eqs).every(([k,v])=>d[k]===v)));
