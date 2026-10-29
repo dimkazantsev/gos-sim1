@@ -71,6 +71,22 @@ function harness({effects=false,compiledCode=code}={}){
    requests++;
    started.set('rpc:'+name,(started.get('rpc:'+name)||0)+1);
    if(rpcFailures.has(name))return{data:null,error:{code:rpcFailures.get(name),message:'simulated RPC failure '+name}};
+   if(name==='get_political_wall_projection'){
+    const snapshot={revision,user,gameId},id=args.p_game_id;
+    const n=(counts.get('political_wall')||0)+1;counts.set('political_wall',n);
+    await holds.get('political_wall:'+n)?.promise;
+    const fixtureRows=(table,defaults)=>fixtures.has(table)
+     ?JSON.parse(JSON.stringify(fixtures.get(table))).filter(row=>row.game_id===id)
+     :defaults;
+    return{data:{
+     posts:fixtureRows('political_posts',[{id:'post-'+snapshot.revision,game_id:id,title:'post-'+snapshot.revision}]),
+     media:fixtureRows('political_post_media',[]),
+     formal_links:fixtureRows('political_post_formal_links',[]),
+     metric_history:fixtureRows('state_metric_history',[]),
+     support_history:fixtureRows('party_support_history',[]),
+     metrics:fixtureRows('state_metrics',[{id:'metric',game_id:id,value:snapshot.revision}])
+    },error:null,status:200};
+   }
    if(name==='get_party_representation_projection'){
     const id=args.p_game_id;
     const rows=table=>fixtures.has(table)
@@ -256,6 +272,24 @@ async function main(){
    }
   }finally{clients.forEach(h=>h.dispose());}
  });
+ await check('40 political wall clients each receive one projection and no six direct reads',async()=>{
+  const clients=Array.from({length:40},()=>harness({effects:true}));
+  try{
+   await Promise.all(clients.map(h=>h.settle()));
+   for(const h of clients){
+    assert(h.rpcCount('get_political_wall_projection')>=1,'Political wall uses new invoker RPC');
+    for(const table of ['political_posts','political_post_media','political_post_formal_links','state_metric_history','party_support_history']){
+     assert.equal(h.readCount(table),0,'No direct '+table+' reads');
+    }
+   }
+  }finally{clients.forEach(h=>h.dispose());}
+ });
+ await check('Missing political projection falls back under RLS; 402 never fans out',async()=>{
+  const old=harness({effects:true});old.failRpc('get_political_wall_projection','PGRST202');
+  await old.settle();assert(old.readCount('political_posts')>=1);old.dispose();
+  const stop=harness({effects:true});stop.failRpc('get_political_wall_projection','PGRST003');
+  await stop.settle();assert.equal(stop.readCount('political_posts'),0);stop.dispose();
+ });
  await check('Missing projection allows backwards-compatible reads but overloaded RPC never fans out',async()=>{
   const old=harness({effects:true});old.failRpc('get_party_representation_projection','PGRST202');
   await old.render().refresh();old.render().setActiveView('parties');await old.settle();
@@ -385,8 +419,8 @@ async function main(){
   const h=harness({effects:true});h.setAuthError(new Error('simulated auth network rejection'));await h.settle();assert.equal(h.render().loading,false);assert.match(h.render().error,/simulated auth network rejection/);h.dispose();
  });
  await check('Partial realtime reads coalesce behind one request and retain the trailing version',async()=>{
-  const h=harness({effects:true});await h.settle();const olderWall=h.hold('political_posts');h.setRevision(2);h.emit('political_posts');await h.advance(1000);
-  const before=h.readCount('political_posts');h.setRevision(3);h.emit('political_posts');await h.advance(1000);assert.equal(h.readCount('political_posts'),before,'An in-flight read is not duplicated');
+  const h=harness({effects:true});await h.settle();const olderWall=h.hold('political_wall');h.setRevision(2);h.emit('political_posts');await h.advance(1000);
+  const before=h.rpcCount('get_political_wall_projection');h.setRevision(3);h.emit('political_posts');await h.advance(1000);assert.equal(h.rpcCount('get_political_wall_projection'),before,'An in-flight read is not duplicated');
   olderWall.resolve();await h.settle();await h.advance(3000);assert.equal(h.render().politicalPosts[0].id,'post-3');
   const full=h.hold('games');h.setRevision(4);const refresh=h.render().refresh();await tick();h.setRevision(5);h.emit('political_posts');await h.advance(1000);full.resolve();await refresh;assert.equal(h.render().game.current_round,5);assert.equal(h.render().metrics[0].value,5);h.dispose();
  });
@@ -397,7 +431,7 @@ async function main(){
   const h=harness({effects:true});await h.settle();const newChannel=h.hold('chat_messages');h.setRevision(2);h.render().setChannelId('channel-b');h.render();await tick();await h.render().sendText('earlier message','channel-a');newChannel.resolve();await h.settle();assert.equal(h.render().messages[0].channel_id,'channel-b');assert.equal(h.render().chatLoading,false);h.dispose();
  });
  await check('An older partial response cannot restore data from another game',async()=>{
-  const h=harness({effects:true});await h.settle();const old=h.hold('political_posts');h.setRevision(2);h.emit('political_posts');await tick();h.setRevision(3);h.render('game-b');await h.settle();assert.equal(h.render().game.id,'game-b');old.resolve();await h.settle();assert.equal(h.render().politicalPosts[0].game_id,'game-b');assert.equal(h.render().politicalPosts[0].id,'post-3');h.dispose();
+  const h=harness({effects:true});await h.settle();const old=h.hold('political_wall');h.setRevision(2);h.emit('political_posts');await tick();h.setRevision(3);h.render('game-b');await h.settle();assert.equal(h.render().game.id,'game-b');old.resolve();await h.settle();assert.equal(h.render().politicalPosts[0].game_id,'game-b');assert.equal(h.render().politicalPosts[0].id,'post-3');h.dispose();
  });
  await check('Same-user auth events retain accepted state',async()=>{
   const h=harness({effects:true});await h.settle();h.auth('SIGNED_IN','teacher-a');h.auth('TOKEN_REFRESHED','teacher-a');assert.equal(h.render().me.user_id,'teacher-a');assert.equal(h.render().game.current_round,1);assert.equal(h.render().teacher,true);h.dispose();
