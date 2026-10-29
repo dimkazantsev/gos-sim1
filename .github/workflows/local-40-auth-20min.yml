@@ -1,5 +1,13 @@
 name: ГОС.ID · Blitz на 40–100 Auth-сессиях (локальный Supabase, 20 минут)
 on:
+  # An isolated 100-user acceptance run is triggered only when this workflow
+  # or its explicit local fixture changes. Normal gameplay PRs never run it.
+  pull_request:
+    paths:
+      - '.github/workflows/local-40-auth-20min.yml'
+      - 'supabase/tests/gos_40_authenticated_20min.cjs'
+      - 'supabase/tests/blitz_supabase_setup.sql'
+      - 'supabase/tests/blitz_disposable_guard.sql'
   workflow_dispatch:
     inputs:
       clients:
@@ -8,15 +16,21 @@ on:
         type: choice
         options: ['40', '100']
         default: '40'
+permissions:
+  contents: read
+concurrency:
+  group: gos-local-auth-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 jobs:
-  isolated-40-auth:
+  isolated-auth-40-or-100:
     runs-on: ubuntu-latest
     timeout-minutes: 50
     permissions:
       contents: read
     env:
       QA_DURATION_SECONDS: '1200'
-      QA_CLIENTS: ${{ inputs.clients || '40' }}
+      QA_CLIENTS: ${{ github.event_name == 'pull_request' && '100' || inputs.clients || '40' }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -69,7 +83,7 @@ jobs:
           psql "$DB_URL" -v ON_ERROR_STOP=1 -f "$GITHUB_WORKSPACE/supabase/tests/blitz_disposable_guard.sql"
           psql "$DB_URL" -v ON_ERROR_STOP=1 -c "NOTIFY pgrst, 'reload schema';"
           sleep 2
-      - name: Run real local Auth sessions and Realtime for 20 minutes
+      - name: Run 100 isolated Auth sessions, Realtime and sustained reads for 20 minutes
         run: node supabase/tests/gos_40_authenticated_20min.cjs
       - name: Stop isolated Supabase without backups
         if: always()

@@ -23,14 +23,28 @@ async function verifyGuardSql(){
  }
 }
 async function run(clients,scenario='healthy'){
- let time=0,subscriptions=0,removed=0;const rows=[],out=[];
+ let time=0,subscriptions=0,removed=0;const rows=[],out=[],realtimeChannels=[];
  const id=email=>'user-'+Number(email.match(/blitz-qa-(\d+)@/)[1]);
  function createClient(_,key){
   let user=null;
   const client={auth:{admin:{async listUsers(){return {data:{users:scenario==='existingUser'?[{id:'existing'}]:[]},error:null}},async createUser({email}){if(scenario!=='healthy')throw Error('Write attempted before isolation check');return {data:{user:{id:id(email)}},error:null}}},
    async signInWithPassword({email}){user=id(email);return {data:{user:{id:user},session:{access_token:'synthetic'}},error:null}}},
-   realtime:{async setAuth(){}},channel(){return {subscribe(fn){subscriptions++;fn('SUBSCRIBED')}}},
-   async removeChannel(){removed++;return 'ok'},
+   realtime:{async setAuth(){}},channel(){
+    const channel={
+     active:false,handler:null,
+     on(type,filter,fn){assert.equal(type,'broadcast');assert.equal(filter.event,'qa_probe');this.handler=fn;return this},
+     subscribe(fn){subscriptions++;this.active=true;realtimeChannels.push(this);fn('SUBSCRIBED')},
+     async send(message){
+      assert.equal(message.event,'qa_probe');
+      for(const receiver of realtimeChannels){
+       if(receiver.active&&receiver.handler)receiver.handler({payload:message.payload});
+      }
+      return 'ok';
+     }
+    };
+    return channel;
+   },
+   async removeChannel(channel){removed++;channel.active=false;return 'ok'},
    from(table){const filters=[];const builder={
     async insert(data){if(table==='blitz_assignments')rows.push(...(Array.isArray(data)?data:[data]));return {error:null}},
     select(){return this},eq(field,value){filters.push([field,value]);return this},limit(){return this},
@@ -56,14 +70,18 @@ async function run(clients,scenario='healthy'){
  assert.equal(subscriptions,clients+clients/2,'Removed channels must really subscribe again');
  assert.equal(metrics.reads,clients*19,'Two outage minutes omit half the clients');assert.equal(metrics.latency_samples,metrics.reads);
  assert.equal(metrics.latency_scope,'Blitz assignment REST reads');
- assert.match(metrics.realtime_scope,/no event delivery or underlying socket closure/);
+ assert.match(metrics.realtime_scope,/public local Realtime channels/);
+ assert.equal(metrics.received_broadcasts,clients*2,'One Broadcast reaches every client before and after reconnect');
+ assert.equal(typeof metrics.p50_ms,'number');
  assert.equal(metrics.duration_seconds,1200);assert.equal(typeof metrics.p95_ms,'number');assert.equal(typeof metrics.p99_ms,'number');
  return {clients,subscriptions,removed,reads:metrics.reads};
 }
 (async()=>{
  const workflow=fs.readFileSync(path.join(__dirname,'../.github/workflows/local-40-auth-20min.yml'),'utf8');
- assert.match(workflow,/\bon:\s*\r?\n  workflow_dispatch:/,'The sustained job must be manual only');
- assert.doesNotMatch(workflow,/^  (?:push|pull_request|schedule):/m,'No automatic 20-minute load');
+ assert.match(workflow,/^  pull_request:\s*\n    paths:/m,'100-client acceptance runs only on explicitly scoped PR paths');
+ assert.match(workflow,/^  workflow_dispatch:/m,'40/100 manual test option must remain');
+ assert.match(workflow,/github\.event_name == 'pull_request' && '100'/,'PR must select exactly 100 clients');
+ assert.doesNotMatch(workflow,/^  (?:push|schedule):/m,'No broad automatic 20-minute load');
  assert.match(workflow,/blitz_disposable_guard\.sql/,'The manual job must install the disposable marker');
  const invalid={require:name=>name==='@supabase/supabase-js'?{createClient(){throw Error('No connection should be created for invalid input')}}:require(name),process:{env:{SUPABASE_URL:'http://localhost:54321',SUPABASE_ANON_KEY:'anon',SUPABASE_SERVICE_ROLE_KEY:'service',QA_DURATION_SECONDS:'invalid'}},URL};
  assert.throws(()=>vm.runInNewContext(source,{...invalid}),/20 real minutes/,'Invalid duration must fail before creating a client');

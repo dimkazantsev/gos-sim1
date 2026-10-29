@@ -23,6 +23,15 @@ async function createUser(i){
  if(made.error)throw made.error;
  return {i,email,id:made.data.user.id};
 }
+// Provision local GoTrue users in bounded groups; the actual game RPC waves
+// below still run with 100 concurrent independent JWT sessions.
+async function inBatches(items,batchSize,work){
+ const values=[];
+ for(let i=0;i<items.length;i+=batchSize){
+  values.push(...await Promise.all(items.slice(i,i+batchSize).map(work)));
+ }
+ return values;
+}
 async function login(u){
  const client=createClient(url,anon,{auth:{persistSession:false,autoRefreshToken:false}});
  const s=await client.auth.signInWithPassword({email:u.email,password});
@@ -40,7 +49,7 @@ async function main(){
  const existingGames=await admin.from('games').select('id').limit(1);
  if(existingGames.error||!Array.isArray(existingGames.data)||existingGames.data.length)throw new Error('Disposable game database must be empty before the test');
  const teacher=await createUser(0);
- const students=await Promise.all(Array.from({length:clientCount},(_,k)=>createUser(k+1)));
+ const students=await inBatches(Array.from({length:clientCount},(_,k)=>k+1),10,createUser);
  let r=await admin.from('games').insert({id:gameId,title:'Blitz local QA',game_code:'BLITZQA',owner_id:teacher.id});
  if(r.error)throw r.error;
  r=await admin.from('game_members').insert([
@@ -52,7 +61,7 @@ async function main(){
  r=await admin.from('blitz_questions').insert(questions);if(r.error)throw r.error;
  r=await admin.from('blitz_assignments').insert(students.map((u,k)=>({id:`20000000-0000-4000-8000-${String(k+1).padStart(12,'0')}`,game_id:gameId,user_id:u.id,question_id:k+1,stage_no:1,available_at:new Date(Date.now()-60000).toISOString()})));if(r.error)throw r.error;
 
- const sessions=await Promise.all(students.map(login));
+ const sessions=await inBatches(students,10,login);
 
  const opened=await Promise.all(sessions.map(s=>s.client.rpc('blitz_open',{p_game:gameId})));
  for(const [i,x] of opened.entries()){if(x.error)throw new Error(`open ${i+1}: ${x.error.message}`);assert(x.data?.id,'RPC did not return assignment')}
@@ -82,10 +91,15 @@ async function main(){
 
  // Sustained, wall-clock 20-minute authenticated run against disposable local Supabase.
  // One bounded request per visible session each minute. No production URL is allowed.
- const latency=[],audit={reads:0,bytes:0,reconnects:0,failures:0,skipped:0};
+ const latency=[],audit={reads:0,bytes:0,reconnects:0,failures:0,skipped:0,receivedProbes:0};
+ const probeId='qa-'+gameId+'-'+clientCount;
  const sleep=ms=>new Promise(resolve=>setTimeout(resolve,ms));
  async function subscribe(s){
   const channel=s.client.channel('gos-qa-load-rooms',{config:{broadcast:{self:true}}});
+  s.receivedProbeCount=0;
+  channel.on('broadcast',{event:'qa_probe'},message=>{
+   if(message.payload?.id===probeId){s.receivedProbeCount++;audit.receivedProbes++}
+  });
   await new Promise((resolve,reject)=>{
    const timer=setTimeout(()=>reject(new Error('Realtime subscription timeout for session '+s.i)),20000);
    channel.subscribe(status=>{
@@ -97,6 +111,24 @@ async function main(){
  }
  const sessionsWithConnection=sessions;
  await Promise.all(sessionsWithConnection.map(subscribe));
+ // Verify delivery to EVERY independent WebSocket, not merely SUBSCRIBED.
+ // The message contains no game answers, names, JWTs or other private data.
+ async function verifyBroadcastFanout(targetSessions){
+  targetSessions.forEach(s=>{s.receivedProbeCount=0});
+  const sent=await sessionsWithConnection[0].channel.send({
+   type:'broadcast',event:'qa_probe',payload:{id:probeId}
+  });
+  assert.equal(sent,'ok','Local Realtime must confirm one broadcast');
+  const deadline=Date.now()+15000;
+  while(Date.now()<deadline){
+   if(targetSessions.every(s=>s.receivedProbeCount>0))return;
+   await sleep(100);
+  }
+  const missing=targetSessions.filter(s=>!s.receivedProbeCount).length;
+  throw new Error('Local Realtime broadcast did not reach '+missing+' of '+targetSessions.length+' authenticated channels');
+ }
+ await verifyBroadcastFanout(sessionsWithConnection);
+ console.log('PASS: '+clientCount+' local authenticated WebSockets received one Broadcast');
  const since=performance.now();
  // Every authenticated client has a genuine WebSocket subscription.
  console.log('PASS: '+clientCount+' real local authenticated Realtime subscriptions established');
@@ -137,6 +169,7 @@ async function main(){
     return true;
    }));
    audit.reconnects+=resumed.length;
+   await verifyBroadcastFanout(sessionsWithConnection);
   }
   const responses=await Promise.all(active.map(async s=>{
    const begun=performance.now();
@@ -162,6 +195,7 @@ async function main(){
  assert.equal(audit.gameplayWrites,clientCount,'Second concurrent Blitz round completed');
  assert(audit.reads<=clientCount*20,'Request budget: no more than one sustained REST read per session per minute');
  const p95=latency.sort((a,b)=>a-b)[Math.max(0,Math.ceil(latency.length*.95)-1)];
+ const p50=latency[Math.max(0,Math.ceil(latency.length*.50)-1)];
  const p99=latency[Math.max(0,Math.ceil(latency.length*.99)-1)];
  // Verify confirmed answer was not altered by repeated queries or reconnections.
  const verified=await Promise.all(sessionsWithConnection.map(s=>s.client.from('blitz_assignments').select('id,chosen_index,is_correct').eq('user_id',s.id).eq('stage_no',1)));
@@ -173,7 +207,7 @@ async function main(){
  }
  await Promise.all(sessionsWithConnection.map(s=>s.client.removeChannel(s.channel)));
  console.log('PASS: 20 REAL minutes, '+clientCount+' distinct authenticated local clients; '+clientCount+' Realtime subscriptions, '+audit.reconnects+' auth renewals and channel resubscriptions, '+audit.reads+' bounded REST reads; zero lost results');
- console.log(JSON.stringify({environment:'isolated local Supabase',scope:'Blitz-only',latency_scope:'Blitz assignment REST reads',latency_samples:latency.length,realtime_scope:'Channel subscription status only; no event delivery or underlying socket closure measured',duration_seconds:Math.round(elapsedMs/1000),clients:clientCount,subscriptions:clientCount,reconnects:audit.reconnects,reads:audit.reads,second_round_writes:audit.gameplayWrites,skipped_inactive_reads:audit.skipped,response_bytes:audit.bytes,p95_ms:Math.round(p95),p99_ms:Math.round(p99),failures:audit.failures}));
+ console.log(JSON.stringify({environment:'isolated local Supabase',scope:'Blitz-only',latency_scope:'Blitz assignment REST reads',latency_samples:latency.length,realtime_scope:'100 public local Realtime channels with one initial and one post-reconnect Broadcast delivery check; no private-channel RLS or full application Presence test',duration_seconds:Math.round(elapsedMs/1000),clients:clientCount,subscriptions:clientCount,reconnects:audit.reconnects,reads:audit.reads,second_round_writes:audit.gameplayWrites,skipped_inactive_reads:audit.skipped,response_bytes:audit.bytes,received_broadcasts:audit.receivedProbes,p50_ms:Math.round(p50),p95_ms:Math.round(p95),p99_ms:Math.round(p99),failures:audit.failures}));
 
  console.log('PASS: '+clientCount+' independent local Supabase Auth sessions, persisted Blitz answers, RLS isolation and serialized repeated opens');
 }
