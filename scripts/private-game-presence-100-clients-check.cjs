@@ -51,6 +51,16 @@ async function verifyRls(){
    const fullPattern='^gos-id-live:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}'+String.fromCharCode(36);
    const expression=await db.query("select realtime.topic() ~ $1 as valid_topic, case when realtime.topic() ~ $1 then private.is_game_member(substring(realtime.topic() from 13)::uuid) else false end as topic_authorized, $2::text = 'presence' as extension_authorized",[fullPattern,'presence']);
    console.error('Synthetic RLS diagnostics',details.rows,predicate.rows,expression.rows,policies.rows);
+   // Isolate the failing RLS policy from PGlite INSERT behavior.
+   await db.exec('reset role');
+   await db.exec("create policy diagnostic_insert_allow on realtime.messages for insert to authenticated with check (true)");
+   await db.exec('set role authenticated');
+   try{
+    await db.query('insert into realtime.messages(topic,event,payload,extension,private) values($1,$2,$3,$4,true)',[topic,'presence',JSON.stringify({connected:true}),'presence']);
+    console.error('Synthetic permissive INSERT succeeded; scoped WITH CHECK is involved');
+   }catch(second){
+    console.error('Synthetic permissive INSERT still denied',second.code);
+   }
    throw error;
   }
   for(let n=2;n<=102;n++)await send(n,topic,'presence');
