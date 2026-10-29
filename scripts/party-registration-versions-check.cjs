@@ -37,7 +37,7 @@ assert(student.includes('Регистрационные документы')&&st
 assert(!student.includes('partyRegistrationUpdates'),'Do not duplicate the document list in a second status feed');
 assert(!student.includes('civicPartyUploadMain'),'Do not duplicate per-document upload with another upload form');
 assert(student.includes('uploadInputs.current[kind.kind]?.click()'),'Each row has its own upload action');
-assert(student.includes("const canUpload=selected.registration_status!=='registered'&&(teacher||me?.kind==='student'"),'Uploads remain possible for active party members before registration even without an elected chair');
+assert(student.includes("const canUpload=teacher||(partyFormationOpen&&selected.registration_status!=='registered'"),'Teacher may update registered party files; students remain restricted to the open formation stage');
 assert(student.includes('void upload(selected.id,kind.kind,kind.title,file)'),'Chosen file must upload directly for its document kind');
 assert(student.includes('partyRegistrationHiddenInput')&&student.includes('uploadInFlight.current'),'Guard concurrent submissions');
 assert(student.includes('partyRegistrationRevisionNote')&&student.includes('Предыдущие версии ('),'Previous versions and revision grounds must remain accessible');
@@ -65,8 +65,10 @@ assert(student.includes('Документы партии можно загруж
  'Members must see that documents can be uploaded before chair election ends');
 assert(student.includes('!!selected.leader_user_id&&partyFormationOpen'),
  'Submitting the full registration package must still wait for a chair');
-assert(student.includes('disabled={busy||!partyFormationOpen}'),
- 'Uploads must remain blocked when stage one is unavailable');
+assert(student.includes('disabled={busy||(!teacher&&!partyFormationOpen)}'),
+ 'Stage closure blocks student uploads but must not block teacher corrections');
+assert(teacher.includes('disabled={!!reviewingId||deletingDocument}'),'Teacher delete action must remain enabled for registered parties');
+assert(teacher.includes("const canReview=latest?.id===d.id&&['submitted','draft'].includes(d.status)"),'Teacher must review replacement versions even after registration');
 assert(server.includes(".in('status',['submitted','draft'])"));
 assert(registrar.includes('latestPartyDocuments(docs)'));
 const sql=fs.readFileSync('supabase/migrations/20261015211500_party_registration_versions_and_privacy.sql','utf8');
