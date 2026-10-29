@@ -14,6 +14,52 @@ const publishableKey =
 let restQuotaBlocked=false,restRetryAt=0;
 let restFailures=0,restFailureWindow=0,restOverloadUntil=0;
 const restPrefix=url.replace(/\/$/,'')+'/rest/v1/';
+// Per-tab HTTP concurrency guard. The supabase-js browser client talks to
+// PostgREST, not directly to Postgres: port 6543 is never a browser endpoint.
+// Limit only low-priority reads. Votes, other writes, and Auth bypass the gate.
+const READ_CONCURRENCY=4, READ_BACKLOG=48, READ_QUEUE_WAIT_MS=12000;
+let activeRestReads=0;
+const waitingRestReads:Array<()=>void>=[];
+function acquireReadSlot(signal?:AbortSignal):Promise<boolean>{
+ if(signal?.aborted)return Promise.resolve(false);
+ if(typeof window==='undefined')return Promise.resolve(true);
+ if(activeRestReads<READ_CONCURRENCY&&waitingRestReads.length===0){
+  activeRestReads++;return Promise.resolve(true);
+ }
+ if(waitingRestReads.length>=READ_BACKLOG)return Promise.resolve(false);
+ return new Promise<boolean>(resolve=>{
+  let finished=false;
+  let timer:ReturnType<typeof setTimeout>;
+  const cleanup=()=>{clearTimeout(timer);signal?.removeEventListener('abort',cancel)};
+  const cancel=()=>{
+   if(finished)return;
+   finished=true;cleanup();
+   const index=waitingRestReads.indexOf(grant);
+   if(index>=0)waitingRestReads.splice(index,1);
+   resolve(false);
+  };
+  const grant=()=>{
+   if(finished)return;
+   finished=true;cleanup();activeRestReads++;resolve(true);
+  };
+  waitingRestReads.push(grant);
+  signal?.addEventListener('abort',cancel,{once:true});
+  timer=setTimeout(cancel,READ_QUEUE_WAIT_MS);
+ });
+}
+function releaseReadSlot(){
+ if(typeof window==='undefined')return;
+ activeRestReads=Math.max(0,activeRestReads-1);
+ while(activeRestReads<READ_CONCURRENCY&&waitingRestReads.length){
+  waitingRestReads.shift()?.();
+ }
+}
+function busyReadResponse(){
+ return new Response(JSON.stringify({code:'CLIENT_READ_BUSY',
+  message:'Слишком много одновременных запросов игровых данных. Повторите загрузку раздела.'
+ }),{status:503,headers:{'content-type':'application/json',
+  'retry-after':'3','x-gos-local-limit':'1'}});
+}
 type RequestDiagnostic={at:string;operation:string;method:string;status:number;duration_ms:number;source:'network'|'local_limit'};
 const diagnostics:RequestDiagnostic[]=[];
 let diagnosticsGeneration=0;
@@ -53,7 +99,7 @@ function safeRestRead(href:string,method:string){
  const path=href.slice(restPrefix.length).split('?')[0];
  // Explicitly read-only procedures. Writes, votes, and login identity are
  // never blocked by an overload circuit.
- return /^rpc\/(?:get_section_updates|blitz_inbox_counts|get_budget_pulse|get_teacher_overview|get_fiscal_context|get_signed_state_program_budget|telegram_status)$/.test(path);
+ return /^rpc\/(?:get_section_updates|blitz_inbox_counts|get_budget_pulse|get_teacher_overview|get_fiscal_context|get_signed_state_program_budget|telegram_status|get_process_actors|get_game_achievements|get_achievement_catalog_counts)$/.test(path);
 }
 function pausedRestResponse(status:402|429){
  const headers:Record<string,string>={'content-type':'application/json','x-gos-local-limit':'1'};
@@ -72,7 +118,20 @@ export const supabase = createClient(url, publishableKey, {
    if(rest&&restQuotaBlocked)return pausedRestResponse(402);
    if(rest&&Date.now()<restRetryAt)return pausedRestResponse(429);
    if(safeRead&&Date.now()<restOverloadUntil)return overloadedReadResponse();
-   let response:Response;try{response=await (isAuthVerificationRequest(input,init)?fetchWithAuthTimeout(input,init):fetchWithBoundedSessionRefresh(input,init))}catch(error){throw new Error(userError(error))}
+   // Hold a slot only for actual transport; reject stale queued reads locally.
+   // POST mutations and Auth never wait behind the classroom read queue.
+   const signal=init?.signal||(typeof input==='object'&&'signal' in input?input.signal:undefined);
+   const admitted=!safeRead||await acquireReadSlot(signal??undefined);
+   if(!admitted)return busyReadResponse();
+   let response:Response;
+   try{
+    // Recheck the circuit after queueing: another request may have seen HTTP 402/429.
+    if(rest&&restQuotaBlocked)return pausedRestResponse(402);
+    if(rest&&Date.now()<restRetryAt)return pausedRestResponse(429);
+    if(safeRead&&Date.now()<restOverloadUntil)return overloadedReadResponse();
+    response=await (isAuthVerificationRequest(input,init)?fetchWithAuthTimeout(input,init):fetchWithBoundedSessionRefresh(input,init));
+   }catch(error){throw new Error(userError(error))}
+   finally{if(safeRead)releaseReadSlot()}
    if(rest&&response.status===402)restQuotaBlocked=true;
    if(safeRead&&[502,503,504].includes(response.status)){
     const now=Date.now();
