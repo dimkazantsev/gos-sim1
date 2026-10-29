@@ -56,10 +56,18 @@ export default function PoliticalWallView({g,onOpenVotes,onOpenDocument,onNaviga
   if(!game?.id)return;const requestedScope=actorScope;
   const r=await supabase.rpc('get_process_actors',{p_game_id:game.id});
   if(requestedScope===activeActorScope.current&&!r.error&&Array.isArray(r.data))setServerActors(r.data);
- },actorScope,undefined,750,30000);
+ },actorScope,undefined,750,120000);
  // The obsolete system publisher must not appear, even while RPC data loads.
- const actors=(readOnly?availableActors():serverActors??(me?[{key:'participant',label:me.full_name}]:[])).filter(x=>x.key!=='teacher'&&
+ const candidateActors=(readOnly?availableActors():serverActors??(me?[{key:'participant',label:me.full_name}]:[])).filter(x=>x.key!=='teacher'&&
   !/^(?:GOS\/\/SIMS|GOSSIMS)$/i.test(x.label.trim()));
+ // One publisher choice per official role: dozens of KSRF appointments
+ // must not appear as dozens of identical rows.
+ const seenActorLabels=new Set<string>();
+ const actors=candidateActors.filter(item=>{
+  const normalized=item.label.trim().toLocaleLowerCase('ru-RU');
+  if(!normalized||seenActorLabels.has(normalized))return false;
+  seenActorLabels.add(normalized);return true;
+ });
  const actor=actors.find(x=>x.key===actorKey)||actors.find(x=>x.key==='participant')||actors[0];
  const actorSearchQuery=actorSearch.trim().toLocaleLowerCase('ru-RU');
  const searchedActors=actorSearchQuery
