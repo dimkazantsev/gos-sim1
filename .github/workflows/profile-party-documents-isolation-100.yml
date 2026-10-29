@@ -1,0 +1,32 @@
+name: ГОС.ID · Разгрузка документов в профиле (100 сеансов)
+on:
+  pull_request:
+    paths:
+      - 'components/game/useRepublicGame.ts'
+      - 'scripts/profile-party-documents-isolation-100-check.cjs'
+      - '.github/workflows/profile-party-documents-isolation-100.yml'
+permissions:
+  contents: read
+concurrency:
+  group: profile-documents-100-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+jobs:
+  isolated-profile-100:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci --no-audit --no-fund
+      - name: Check TypeScript contract
+        run: npm run typecheck
+      - name: Verify profile, student and teacher document reads at 100 simulated clients
+        run: node scripts/profile-party-documents-isolation-100-check.cjs
+      - name: Check party document access, versions and teacher maintenance
+        run: |
+          node scripts/party-document-visibility-check.cjs
+          node scripts/party-registration-versions-check.cjs
+          node scripts/registered-party-document-admin-check.cjs
