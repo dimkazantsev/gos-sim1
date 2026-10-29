@@ -338,12 +338,18 @@ export function useRepublicGame(gameId:string){
   const dirtyTables=new Set<string>();
   const reconcileTables=new Set<string>();
   let timer:ReturnType<typeof setTimeout>|undefined;
+  let partyDocumentBurstTimer:ReturnType<typeof setTimeout>|undefined;
   function flush(){
    if(!currentConnection()||document.visibilityState==='hidden')return;
    const core=dirtyCore,partyDocs=dirtyPartyDocuments,chat=dirtyChat,pins=dirtyPins,overview=dirtyOverview;
    const tables=[...dirtyTables];dirtyTables.clear();
    const reconcile=[...reconcileTables];reconcileTables.clear();
    dirtyCore=false;dirtyPartyDocuments=false;dirtyChat=false;dirtyPins=false;dirtyOverview=false;
+   // Another pushed table may have flushed a queued document delta already.
+   // Cancel the burst timer so it cannot trigger an extra redundant read.
+   if(partyDocs&&partyDocumentBurstTimer!==undefined){
+    clearTimeout(partyDocumentBurstTimer);partyDocumentBurstTimer=undefined;
+   }
    // Coalesce dependent reads; read tickets reject stale results after a delta.
    if(core)scheduleRealtimeReload(1000,['*']);
    else if(reconcile.length)scheduleRealtimeReload(1000,reconcile);
@@ -484,7 +490,16 @@ export function useRepublicGame(gameId:string){
   // Never trust Broadcast as data: existing RLS queries supply document content.
   channel.on('broadcast',{event:'party_documents_changed'},payload=>{
    if(!currentConnection()||payload.payload?.table!=='party_documents')return;
-   dirtyPartyDocuments=true;schedule();
+   dirtyPartyDocuments=true;
+   // One changed document can reach 100 clients; several uploads or status
+   // updates must not cause one REST read per individual Broadcast message.
+   // Cap the delay from the *first* change, not from the last (no starvation).
+   // Hidden tabs keep the dirty flag for the existing visibility recovery.
+   if(document.visibilityState!=='visible'||partyDocumentBurstTimer!==undefined)return;
+   partyDocumentBurstTimer=setTimeout(()=>{
+    partyDocumentBurstTimer=undefined;
+    if(currentConnection())schedule();
+   },600);
   });
   // KSRF proposals use this existing authorised game socket, not five widget channels.
   // Only interested stage views refresh their proposal lists.
@@ -569,7 +584,7 @@ export function useRepublicGame(gameId:string){
    chatRecovery=setInterval(recoverVisibleChatAndBallots,6000);
   },initialRecoveryDelay);
   return()=>{
-   disposed=true;clearTimeout(timer);clearInterval(poll);clearTimeout(startChatRecovery);
+   disposed=true;clearTimeout(timer);clearTimeout(partyDocumentBurstTimer);clearInterval(poll);clearTimeout(startChatRecovery);
    if(chatRecovery!==null)clearInterval(chatRecovery);
    document.removeEventListener('visibilitychange',resumePending);
    setGameRealtimeConnection(gameId,false);
