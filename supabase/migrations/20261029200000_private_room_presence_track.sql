@@ -8,9 +8,5 @@ to authenticated
 with check (
   auth.uid() is not null
   and extension = 'presence'
-  and case
-    when realtime.topic() ~ '^gos-id-live:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$'
-      then private.is_game_member(substring(realtime.topic() from 13)::uuid)
-    else false
-  end
+  and private.is_game_member(substring(realtime.topic() from '^gos-id-live:([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})$')::uuid)
 );
