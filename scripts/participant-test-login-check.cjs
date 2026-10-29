@@ -14,7 +14,8 @@ function harness(initialSession,changeIdentity=false,signupError=null,teacherAcc
  const react={
   useState(initial){const index=cursor++;if(!values[index])values[index]={value:initial};
    return [values[index].value,v=>values[index].value=typeof v==='function'?v(values[index].value):v];},
-  useEffect(){cursor++;},useMemo(fn){cursor++;return fn()}
+  useEffect(){cursor++;},useMemo(fn){cursor++;return fn()},
+  useRef(initial){const i=cursor++;if(!values[i])values[i]={value:{current:initial}};return values[i].value}
  };
  const api={from(table){assert.equal(table,'teacher_profiles');return{select:()=>({eq:()=>({maybeSingle:async()=>({data:teacherAccount?{user_id:initialSession?.user?.id}:null,error:null})})})}},auth:{
   async getSession(){calls.push('getSession');return{data:{session:initialSession},error:null}},
@@ -62,6 +63,10 @@ function harness(initialSession,changeIdentity=false,signupError=null,teacherAcc
  await student.submit();
  assert(student.calls.includes('rpc:join_game_as_role')&&!student.calls.includes('signOut:local'),
    'A registered student can rejoin as student');
+ const twoTaps=harness(null,false);
+ await Promise.all([twoTaps.submit(),twoTaps.submit()]);
+ assert.equal(twoTaps.calls.filter(c=>c==='signInAnonymously').length,1,'Two fast clicks must not create two anonymous accounts');
+ assert.equal(twoTaps.calls.filter(c=>c==='rpc:join_game_as_role').length,1,'Two fast clicks must not join the game twice');
  const first=harness(null,false);await first.submit();
  assert(first.calls.includes('signInAnonymously')&&!first.calls.includes('signOut:local'));
  const anonymous=harness({user:{id:'old-anonymous',is_anonymous:true,user_metadata:{full_name:'Предыдущее Имя'}}},false);
