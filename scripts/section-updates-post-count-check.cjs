@@ -11,6 +11,7 @@ assert(original.includes("section_key='dashboard'"),'Baseline must retain all ei
 assert(candidate.includes('post_actions bigint; post_dashboard bigint;'),'Optimized badge function must count both cutoffs together');
 assert(candidate.includes('where game_id=p_game_id and deleted_at is null'),'Deleted posts must never be counted');
 assert(!candidate.includes("'dashboard',(select count(*) from political_posts"),'Dashboard must not scan posts twice');
+const sections=['documents','votes','events','actions','parties','stages','teacher','dashboard'];
 const id=n=>'00000000-0000-4000-8000-'+String(n).padStart(12,'0');
 const game=id(1000),foreignGame=id(1001),teacher=id(41),observer=id(42);
 async function main(){
