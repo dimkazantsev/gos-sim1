@@ -371,6 +371,7 @@ jobs:
       - run: node scripts/game-identity-access-check.cjs
       - run: node scripts/classroom-telemetry-projection-rls-check.cjs
       - run: node scripts/formal-registry-projection-rls-check.cjs
+      - run: node scripts/chat-pins-projection-rls-check.cjs
       - run: node scripts/editor-async-resilience-check.cjs
       - run: node scripts/readiness-matrix-check.cjs
       - run: node scripts/budget-change-registry-check.cjs

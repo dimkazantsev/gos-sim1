@@ -71,6 +71,35 @@ function harness({effects=false,compiledCode=code}={}){
    requests++;
    started.set('rpc:'+name,(started.get('rpc:'+name)||0)+1);
    if(rpcFailures.has(name))return{data:null,error:{code:rpcFailures.get(name),message:'simulated RPC failure '+name}};
+   if(name==='get_formal_registry_projection'){
+    // The server-side snapshot is captured before a synthetic delayed response.
+    // This lets recovery tests exercise stale responses and per-ID invalidation.
+    const id=args.p_game_id,ids=args.p_document_ids;
+    const read=table=>fixtures.has(table)
+     ?JSON.parse(JSON.stringify(fixtures.get(table))).filter(row=>row.game_id===id&&
+       (ids===null||ids===undefined||ids.includes(table==='formal_documents'?row.id:row.document_id)))
+     :[];
+    const documents=read('formal_documents').sort((a,b)=>String(b.updated_at).localeCompare(String(a.updated_at)));
+    const history=read('formal_document_history').sort((a,b)=>String(b.created_at).localeCompare(String(a.created_at)));
+    const number=(counts.get('formal_registry')||0)+1;counts.set('formal_registry',number);
+    queryLog.push({table:'rpc:get_formal_registry_projection',eqs:{game_id:id},ins:{document_ids:ids}});
+    await holds.get('formal_registry:'+number)?.promise;
+    const broken=['formal_documents','formal_document_history'].find(table=>failures.has(table));
+    if(broken)return{data:null,error:{message:'simulated read outage '+broken,code:failureCodes.get(broken)||'PGRST123'},status:400};
+    return{data:{documents,history},error:null,status:200};
+   }
+   if(name==='get_chat_pins_projection'){
+    // Model a bounded, joined RPC response so the 100-client test observes
+    // exactly the transport used by the actual hook, not a legacy table read.
+    const rows=fixtures.has('chat_pins')?JSON.parse(JSON.stringify(fixtures.get('chat_pins'))):[];
+    const pins=rows.filter(row=>row.channel_id===args.p_channel_id)
+     .sort((a,b)=>String(b.pinned_at).localeCompare(String(a.pinned_at))).slice(0,12);
+    const ids=new Set(pins.map(row=>row.message_id));
+    const allMessages=fixtures.has('chat_messages')?JSON.parse(JSON.stringify(fixtures.get('chat_messages')))
+     :[{id:'message-'+revision,game_id:gameId,channel_id:args.p_channel_id,text:'message-'+revision,created_at:'2026-10-08T10:00:00Z'}];
+    const messages=allMessages.filter(row=>row.channel_id===args.p_channel_id&&ids.has(row.id));
+    return{data:{pins,messages},error:null,status:200};
+   }
    if(name==='get_impact_engine_projection'){
     const id=args.p_game_id;
     const read=(table,defaultRows)=>fixtures.has(table)
