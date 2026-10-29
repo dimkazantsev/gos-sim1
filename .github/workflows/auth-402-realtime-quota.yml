@@ -9,6 +9,7 @@ on:
       - 'scripts/performance-modules-check.cjs'
       - 'scripts/realtime-targeted-load-check.cjs'
       - 'scripts/chat-overview-100-clients-check.cjs'
+      - 'scripts/classroom-100-read-budget-check.cjs'
       - 'scripts/event-workspace-load-check.cjs'
       - 'scripts/election-panels-load-check.cjs'
       - 'scripts/duma-ballot-targeted-load-check.cjs'
@@ -83,6 +84,7 @@ on:
       - 'scripts/performance-modules-check.cjs'
       - 'scripts/realtime-targeted-load-check.cjs'
       - 'scripts/chat-overview-100-clients-check.cjs'
+      - 'scripts/classroom-100-read-budget-check.cjs'
       - 'scripts/event-workspace-load-check.cjs'
       - 'scripts/election-panels-load-check.cjs'
       - 'scripts/duma-ballot-targeted-load-check.cjs'
@@ -167,6 +169,7 @@ jobs:
       - run: node scripts/performance-modules-check.cjs
       - run: node scripts/realtime-targeted-load-check.cjs
       - run: node scripts/chat-overview-100-clients-check.cjs
+      - run: node scripts/classroom-100-read-budget-check.cjs
       - run: node scripts/republic-game-resilience-check.cjs
       - run: node scripts/turn-clock-isolation-check.cjs
       - run: node scripts/crisis-clock-isolation-check.cjs
