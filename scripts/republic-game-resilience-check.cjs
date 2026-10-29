@@ -14,7 +14,7 @@ function deferred(){let resolve;const promise=new Promise(done=>resolve=done);re
 
 function harness({effects=false,compiledCode=code}={}){
  const slots=[],pendingEffects=[],channels=[],timers=new Map(),listeners=new Map(),counts=new Map(),holds=new Map(),failures=new Set(),failureCodes=new Map();
- let cursor=0,dirty=false,revision=1,user='teacher-a',memberKind='teacher',gameId='game-a',authCallback,authError=null,clock=0,requests=0,disposed=false,recorders=0,stoppedTracks=0,withBallots=false,assetPaths=false,signed=0,activeSigns=0,peakSigns=0;
+ let cursor=0,dirty=false,revision=1,user='teacher-a',memberKind='teacher',gameId='game-a',authCallback,authError=null,clock=0,requests=0,disposed=false,recorders=0,stoppedTracks=0,withBallots=false,assetPaths=false,signed=0,activeSigns=0,peakSigns=0,batchCalls=0;
  let virtualNow=Date.parse('2026-10-26T00:00:00Z'),responseBytes=0,aborted=0,ignoreAbort=false,failFuturePresenceTrack=false;
  const started=new Map(),notices=[],docListeners=new Map(),fixtures=new Map(),queryLog=[],rpcFailures=new Map();
  class ClockDate extends Date{constructor(...args){super(...(args.length?args:[virtualNow]));}static now(){return virtualNow;}}
@@ -181,7 +181,7 @@ function harness({effects=false,compiledCode=code}={}){
    }
    return{data:name==='has_seen_my_intro'?true:name==='get_my_chat_overview'?[{channel_id:'channel-a',unread_count:0}]:[],error:null};
   },
-  storage:{from:()=>({createSignedUrl:async()=>{signed++;activeSigns++;peakSigns=Math.max(peakSigns,activeSigns);await tick();activeSigns--;return{data:{signedUrl:'https://example.invalid/media'},error:null}}})}
+  storage:{from:()=>({createSignedUrl:async()=>{signed++;activeSigns++;peakSigns=Math.max(peakSigns,activeSigns);await tick();activeSigns--;return{data:{signedUrl:'https://example.invalid/media'},error:null}},createSignedUrls:async paths=>{batchCalls++;signed+=paths.length;activeSigns++;peakSigns=Math.max(peakSigns,activeSigns);await tick();activeSigns--;return{data:paths.map(path=>({path,signedUrl:'https://example.invalid/media',error:null})),error:null}}})}
  };
  const win={addEventListener:(key,fn)=>listeners.set(key,fn),removeEventListener:(key,fn)=>{if(listeners.get(key)===fn)listeners.delete(key);},localStorage:{getItem:()=>null,setItem:()=>{}}};
  const doc={visibilityState:'visible',addEventListener:(name,fn)=>{const values=docListeners.get(name)||new Set();values.add(fn);docListeners.set(name,values);},removeEventListener:(name,fn)=>docListeners.get(name)?.delete(fn)};
@@ -202,7 +202,7 @@ function harness({effects=false,compiledCode=code}={}){
   if(name==='./useGameTableSync')return{notifyGameDataRefresh:(gameId,table)=>notices.push({gameId,table}),notifySectionUpdates:()=>{},setGameRealtimeConnection:()=>{}};
   if(name==='./useBudgetPulse')return{useBudgetPulse:()=>({budgetPulse:null,budgetPulseError:'',refreshBudgetPulse:async()=>{}}),withBudgetIncome:rows=>rows};
   if(name==='./gameRoster')return{currentGameMembers:(rows,id)=>rows.filter(row=>row.game_id===id),currentGameProfiles:(rows,_,id)=>rows.filter(row=>row.game_id===id)};
-  if(name==='./chatChannelSelection'||name==='./chatRealtime'||name==='./coalesceInFlight'){
+  if(name==='./chatChannelSelection'||name==='./chatRealtime'||name==='./coalesceInFlight'||name==='./signDocumentAssetBatch'){
    const source=fs.readFileSync(path.join(root,'components/game',name.slice(2)+'.ts'),'utf8');
    const compiled=ts.transpileModule(source,{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}}).outputText;
    const child={exports:{}};
@@ -226,7 +226,7 @@ function harness({effects=false,compiledCode=code}={}){
   render,settle,redirects,
   rpcCount:name=>started.get('rpc:'+name)||0,writeCount:table=>started.get('write:'+table)||0,failRpc:(name,code)=>rpcFailures.set(name,code),
   enableBallots(){withBallots=true;},readCount:table=>counts.get(table)||0,
-  setRevision:value=>{revision=value;},setUser:value=>{user=value;},setMemberKind:value=>{memberKind=value;},setAssetPaths:value=>{assetPaths=value;},assetStats:()=>({signed,peakSigns}),failTable(table,code){failures.add(table);failureCodes.set(table,code);},setAuthError:value=>{authError=value;},
+  setRevision:value=>{revision=value;},setUser:value=>{user=value;},setMemberKind:value=>{memberKind=value;},setAssetPaths:value=>{assetPaths=value;},assetStats:()=>({signed,peakSigns,batchCalls}),failTable(table,code){failures.add(table);failureCodes.set(table,code);},setAuthError:value=>{authError=value;},
   hold(table,number=(counts.get(table)||0)+1){const pending=deferred();holds.set(table+':'+number,pending);return pending;},
   emit(table,row,eventType){for(const channel of [...channels])for(const {kind,filter,callback} of channel.handlers){
    if(table==='party_documents'&&kind==='broadcast'&&filter.event==='party_documents_changed'&&channel.topic==='gos-id-live:'+gameId)
@@ -278,6 +278,7 @@ async function main(){
   const first=h.assetStats();
   assert(first.signed>=12,'Asset fixture must exercise document, avatar and emblem signatures');
   assert(first.peakSigns<=4,'Client must not launch more than four simultaneous Storage sign requests');
+  assert(first.batchCalls>=1,'Party document file URLs must use the new bounded Storage batch');
   await h.render().refresh();await h.settle();
   assert.equal(h.assetStats().signed,first.signed,'Unchanged Storage paths must reuse session-scoped signed URLs');
   h.dispose();
