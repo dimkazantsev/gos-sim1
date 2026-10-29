@@ -231,6 +231,8 @@ function harness({effects=false,compiledCode=code}={}){
   emit(table,row,eventType){for(const channel of [...channels])for(const {kind,filter,callback} of channel.handlers){
    if(table==='party_documents'&&kind==='broadcast'&&filter.event==='party_documents_changed'&&channel.topic==='gos-id-live:'+gameId)
     callback({event:'party_documents_changed',payload:{table:'party_documents'}});
+   if(table==='game_parties'&&kind==='broadcast'&&filter.event==='game_parties_changed'&&channel.topic==='gos-id-live:'+gameId)
+    callback({event:'game_parties_changed',payload:{table:'game_parties'}});
    if(kind==='postgres_changes'&&filter.table===table&&filter.event!=='DELETE')
     callback({eventType:eventType||(table==='chat_messages'?'UPDATE':'INSERT'),new:{game_id:gameId,...row}});
   }},

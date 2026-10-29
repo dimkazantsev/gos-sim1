@@ -475,12 +475,11 @@ export function useRepublicGame(gameId:string){
    }
    return false;
   }
-  for(const table of ['game_stages','game_parties','party_invitations','party_chair_ballots','formal_documents','political_posts','game_votes','blitz_assignments','stage_deadline_rules']){
+  for(const table of ['game_stages','party_invitations','party_chair_ballots','formal_documents','political_posts','game_votes','blitz_assignments','stage_deadline_rules']){
    channel.on('postgres_changes',{event:'*',schema:'public',table,filter:'game_id=eq.'+gameId},payload=>{
     if(!currentConnection())return;
     if('game_id' in payload.new&&payload.new.game_id!==gameId)return;
     dirtyTables.add(table);
-    if(table==='game_parties')invalidatePartyRows();
     if(!acceptCoreDelta(table,payload))reconcileTables.add(table);
     schedule();
    });
@@ -488,6 +487,16 @@ export function useRepublicGame(gameId:string){
   // Metadata-only Broadcast replaces one per-row Postgres Changes handler.
   // The private topic is authorised with game membership in realtime.messages RLS.
   // Never trust Broadcast as data: existing RLS queries supply document content.
+  // All game members can already SELECT game_parties under RLS. Its former
+  // Postgres Changes handler used only invalidation, never the full row.
+  // Keep the same immediate refresh semantics and existing RLS read path.
+  channel.on('broadcast',{event:'game_parties_changed'},payload=>{
+   if(!currentConnection()||payload.payload?.table!=='game_parties')return;
+   invalidatePartyRows();
+   dirtyTables.add('game_parties');
+   reconcileTables.add('game_parties');
+   schedule();
+  });
   channel.on('broadcast',{event:'party_documents_changed'},payload=>{
    if(!currentConnection()||payload.payload?.table!=='party_documents')return;
    dirtyPartyDocuments=true;
