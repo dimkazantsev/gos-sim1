@@ -6,7 +6,7 @@ const vm=require('node:vm');
 const ts=require('typescript');
 const source=fs.readFileSync('components/game/useRepublicGame.ts','utf8');
 const from=source.indexOf(' function invalidatePartyRows(){');
-const to=source.indexOf(' const lastPresenceWrite=',from);
+const to=source.indexOf(' const assetSignatures=',from);
 assert(from>0&&to>from,'Scoped party cache must be present');
 const compiled=ts.transpileModule(source.slice(from,to),{
  compilerOptions:{module:ts.ModuleKind.None,target:ts.ScriptTarget.ES2022}
