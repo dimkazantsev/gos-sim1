@@ -33,6 +33,10 @@ async function within<T>(promise:PromiseLike<T>,ms=BOOTSTRAP_TIMEOUT_MS,label='�
  finally{if(timer)clearTimeout(timer)}
 }
 
+export function shouldReconcileOpenBallots(now:number,lastReadAt:number,memberKind:string|undefined,openVoteCount:number):boolean{
+ return openVoteCount>0&&now-lastReadAt>=(memberKind==='teacher'?6000:30000);
+}
+
 export function useRepublicGame(gameId:string){
  const router=useRouter();
  const setError=(value:unknown)=>setErrorRaw(userError(value));
@@ -117,6 +121,7 @@ export function useRepublicGame(gameId:string){
   });
  }
  const lastPresenceWrite=useRef({scope:'',view:'',at:0});
+ const officeReadState=useRef({scope:'',lastSuccessAt:0,inflight:null as Promise<void>|null});
  const assetSignatures=useRef(new Map<string,{expiresAt:number;promise:Promise<string|null>}>());
  const assetSignQueue=useRef({active:0,waiting:[] as Array<()=>void>});
  function signedAssetUrl(bucket:'game-assets'|'game-media',path:string,force=false):Promise<string|null>{
@@ -206,6 +211,7 @@ export function useRepublicGame(gameId:string){
   if(readReceipt.current.timer!==null)clearTimeout(readReceipt.current.timer);
   readReceipt.current={scope:'',timer:null,running:false,queued:false,lastAt:0};
   assetSignatures.current.clear();lastCoreSuccessAt.current=0;
+  officeReadState.current={scope:'',lastSuccessAt:0,inflight:null};
   if(overviewRealtimeTimer.current!==null){clearTimeout(overviewRealtimeTimer.current);overviewRealtimeTimer.current=null}
   lastRealtimeOverviewAt.current=0;
   setGame(null);setMe(null);setMetrics([]);setEvents([]);setMembers([]);setOfficeRows([]);
@@ -496,17 +502,21 @@ export function useRepublicGame(gameId:string){
   },30000+pollJitter);
   // Realtime handles unread counters while chat is closed. Full chat recovery
   // runs only for an actively open conversation.
-  let lastChatRecoveryAt=Date.now();
+  let lastChatRecoveryAt=Date.now(),lastBallotRecoveryAt=Date.now();
   const recoverVisibleChatAndBallots=()=>{
    if(document.visibilityState!=='visible'||!currentConnection())return;
    // Ordinary ballots are outside Realtime publication; reconcile only open
    // procedures on their visible screens, using the existing six-second timer.
-   if(Date.now()>=backendRecoveryAfter.current&&['votes','stages','teacher'].includes(activeViewRef.current)){
+   const now=Date.now();
+   if(now>=backendRecoveryAfter.current&&['votes','stages','teacher'].includes(activeViewRef.current)){
     const openVotes=votesRef.current.filter(vote=>vote.status==='open');
-    if(openVotes.length){for(const vote of openVotes)changedVoteIds.current.add(vote.id);scheduleRealtimeReload(0,['vote_ballots'])}
+    if(shouldReconcileOpenBallots(now,lastBallotRecoveryAt,me.kind,openVotes.length)){
+     lastBallotRecoveryAt=now;
+     for(const vote of openVotes)changedVoteIds.current.add(vote.id);
+     scheduleRealtimeReload(0,['vote_ballots']);
+    }
    }
    if(!chatOpenRef.current)return;
-   const now=Date.now();
    // Incoming messages update from the existing authorised Realtime payload.
    // When that socket is healthy, a full chat recovery once per minute is
    // sufficient; when disconnected, preserve the 6s recovery cadence.
@@ -692,7 +702,7 @@ export function useRepublicGame(gameId:string){
    if(!readCurrent(ticket))return;
    requireSuccessful([pa]);acceptPartyRows((pa.data||[]) as Party[],ticket);
   }));
-  if(tables.has('game_office_assignments'))jobs.push(loadRepublicOffices());
+  if(tables.has('game_office_assignments'))jobs.push(loadRepublicOffices(true));
   if(tables.has('formal_document_changes')){
    const ids=[...changedFormalIds.current];
    if(view==='documents'&&ids.length)jobs.push(loadFormalRegistry(ids));
@@ -801,10 +811,10 @@ export function useRepublicGame(gameId:string){
   if(!intro.error)setIntroAccountSeen(!!intro.data);
  }
 
- async function hydrateActiveView(allowFreshCore=false){
+ async function hydrateActiveView(allowFreshCore=false,forceOffices=false){
   // Rapid view navigation can reuse recently updated common data.
   // Realtime, recovery and explicit refresh still force the core read.
-  const jobs:Promise<unknown>[]=[loadRepublicOffices()];
+  const jobs:Promise<unknown>[]=[loadRepublicOffices(forceOffices)];
   if(!allowFreshCore||Date.now()-lastCoreSuccessAt.current>60000)jobs.unshift(loadCoreSections());
   const view=activeViewRef.current;
   if(view==='parties'||view==='profile')jobs.push(loadPartyAssets());
@@ -818,13 +828,24 @@ export function useRepublicGame(gameId:string){
   await Promise.allSettled(jobs);
  }
 
- async function loadRepublicOffices(){
-  await readSafely(['offices'],async ticket=>{
-  const result=await supabase.from('game_office_assignments').select('id,game_id,user_id,role_title,status,created_at').eq('game_id',gameId).order('created_at');
-  if(!readCurrent(ticket))return;
-  requireSuccessful([result]);
-  setOfficeRows((result.data||[]) as GameOfficeAssignment[]);
+ async function loadRepublicOffices(force=false):Promise<void>{
+  // Share only presentation reads inside one authorised browser; auth and
+  // role decisions continue through the authoritative game identity RPC.
+  const scope=gameId+':'+(authUser.current||'')+':'+readEpoch.current;
+  const cache=officeReadState.current;
+  if(cache.scope!==scope){cache.scope=scope;cache.lastSuccessAt=0;cache.inflight=null}
+  if(cache.inflight){await cache.inflight;return}
+  if(!force&&cache.lastSuccessAt&&Date.now()-cache.lastSuccessAt<30000)return;
+  const request=readSafely(['offices'],async ticket=>{
+   const result=await supabase.from('game_office_assignments').select('id,game_id,user_id,role_title,status,created_at').eq('game_id',gameId).order('created_at');
+   if(!readCurrent(ticket))return;
+   requireSuccessful([result]);
+   setOfficeRows((result.data||[]) as GameOfficeAssignment[]);
+   if(cache.scope===scope)cache.lastSuccessAt=Date.now();
   });
+  cache.inflight=request;
+  try{await request}
+  finally{if(cache.scope===scope&&cache.inflight===request)cache.inflight=null}
  }
 
  async function loadClassroomTelemetry(){
@@ -1210,7 +1231,7 @@ export function useRepublicGame(gameId:string){
    return true;
   }catch(e){setChatPins(original);setError(e instanceof Error?e.message:'Не удалось изменить закрепление');return false}
  }
- async function refresh(){await loadAll(false);await Promise.all([hydrateActiveView(),refreshBudgetPulse()]);notifyGameDataRefresh(gameId);if(channelRef.current)await loadMessages(channelRef.current)}
+ async function refresh(){await loadAll(false);await Promise.all([hydrateActiveView(false,true),refreshBudgetPulse()]);notifyGameDataRefresh(gameId);if(channelRef.current)await loadMessages(channelRef.current)}
  async function refreshDocuments(id:string){await loadFormalRegistry([id]);notifyGameDataRefresh(gameId,'formal_documents')}
  async function refreshEventEffects(){await Promise.all([loadPoliticalWall(),refreshBudgetPulse()]);notifyGameDataRefresh(gameId,'event_decisions')}
 
