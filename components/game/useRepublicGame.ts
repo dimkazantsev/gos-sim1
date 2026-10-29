@@ -788,7 +788,7 @@ export function useRepublicGame(gameId:string){
    return [row('game'),m,row('metrics'),row('events'),mb,row('channels'),
     row('stages'),pa,row('votes'),row('evaluations'),row('crises'),
     row('documents'),row('profiles'),row('formal_documents'),intro];
-  })()catch(error=>{
+  })().catch(error=>{
    if(readCurrent(ticket,'core')){backendRecoveryAfter.current=Date.now()+90000;setError(error)}
    return null;
   });
