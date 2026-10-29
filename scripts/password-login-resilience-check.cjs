@@ -15,7 +15,8 @@ function harness({responses=[ok],adoption=[{error:null}],rpc=[{data:'fixture-gam
  const slots=[],calls={password:0,adopt:0,resume:0,navigation:[],saved:[]};let cursor=0,tree;
  const react={
   useState(initial){const i=cursor++;if(!slots[i])slots[i]={value:initial};return[slots[i].value,value=>{slots[i].value=typeof value==='function'?value(slots[i].value):value;}];},
-  useEffect(){cursor++;},useMemo(fn){cursor++;return fn();}
+  useEffect(){cursor++;},useMemo(fn){cursor++;return fn();},
+  useRef(initial){const i=cursor++;if(!slots[i])slots[i]={value:{current:initial}};return slots[i].value;}
  };
  const jsx=(type,props)=>({type,props:props||{}});
  const supabase={auth:{getSession(){throw Error('Explicit password login must not refresh the stored session');},async setSession(session){assert.equal(session.access_token,'fixture-access');return adoption[Math.min(calls.adopt++,adoption.length-1)];}},async rpc(name,args){assert.equal(name,'resume_member_game_as_role');assert.equal(args.p_expected_kind,'student');assert.equal(args.p_game_code,'FIXTURE');return rpc[Math.min(calls.resume++,rpc.length-1)];}};
@@ -85,6 +86,16 @@ async function main(){
  });
  await check('Offline device makes no authentication request',async()=>{
   const h=harness({online:false});await h.submit();assert.equal(h.calls.password,0);assert.equal(h.calls.resume,0);assert.match(h.error(),/не подключено к интернету/);
+ });
+ await check('Duplicate password submit in the same React frame sends only one Auth request',async()=>{
+  const h=harness();
+  await Promise.all([h.submit(),h.submit(),h.submit()]);
+  assert.equal(h.calls.password,1);
+  assert.equal(h.calls.adopt,1);
+  assert.equal(h.calls.resume,1);
+  assert.deepEqual(h.calls.navigation,['/game/fixture-game']);
+  await h.submit(); // A later deliberate attempt must not stay locked.
+  assert.equal(h.calls.password,2);
  });
  await check('40 simultaneous simulated entrants each open the game exactly once',async()=>{
   const entrants=Array.from({length:40},()=>harness({responses:[{data:{session:null},error:{message:'Нет ответа от сервера.',status:0}},ok]}));await Promise.all(entrants.map(h=>h.submit()));for(const h of entrants){assert.equal(h.calls.password,2);assert.equal(h.calls.adopt,1);assert.equal(h.calls.resume,1);assert.equal(h.calls.navigation.length,1);}
