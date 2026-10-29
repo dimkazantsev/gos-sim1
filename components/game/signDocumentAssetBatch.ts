@@ -25,7 +25,7 @@ export async function signDocumentAssetBatch(rows:readonly DocumentPath[],option
   if(!row.path)continue;
   const target=resolveStoredAsset('game-assets',row.path);
   const key=target.bucket+':'+target.path;
-  if(!unique.has(key))unique.set(key,{original:row.path,bucket:target.bucket,objectPath:target.path,key});
+  if(!unique.has(key))unique.set(key,{original:row.path,bucket:target.bucket==='teacher-assets'?'teacher-assets':'game-assets',objectPath:target.path,key});
  }
  const urls=new Map<string,string|null>();
  const groups=new Map<AssetBucket,Array<{original:string;bucket:AssetBucket;objectPath:string;key:string}>>();
