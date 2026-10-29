@@ -11,7 +11,10 @@ assert(from>0&&to>from,'Scoped party cache must be present');
 const compiled=ts.transpileModule(source.slice(from,to),{
  compilerOptions:{module:ts.ModuleKind.None,target:ts.ScriptTarget.ES2022}
 }).outputText;
-assert(source.includes("if(table==='game_parties')invalidatePartyRows()"),'Live party changes must invalidate cached rows');
+assert(source.includes("channel.on('broadcast',{event:'game_parties_changed'}")&&
+ source.includes("if(!currentConnection()||payload.payload?.table!=='game_parties')return;")&&
+ source.includes("invalidatePartyRows();\n   dirtyTables.add('game_parties');"),
+ 'Authorised game-party Broadcast must invalidate cached rows without full-row push');
 assert(source.includes('async function refresh(){invalidatePartyRows()'),'Manual refresh invalidates presentation cache');
 assert(source.includes("if(openVotes.length){for(const vote of openVotes)changedVoteIds.current.add(vote.id);scheduleRealtimeReload(0,['vote_ballots'])}"),'Votes retain six-second reconciliation');
 const simulate=async i=>{
