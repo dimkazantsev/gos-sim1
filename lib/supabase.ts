@@ -97,9 +97,11 @@ function safeRestRead(href:string,method:string){
  if(method==='GET'||method==='HEAD')return true;
  if(method!=='POST')return false;
  const path=href.slice(restPrefix.length).split('?')[0];
- // Explicitly read-only procedures. Writes, votes, and login identity are
- // never blocked by an overload circuit.
- return /^rpc\/(?:get_section_updates|blitz_inbox_counts|get_budget_pulse|get_teacher_overview|get_fiscal_context|get_signed_state_program_budget|telegram_status|get_process_actors|get_game_achievements|get_achievement_catalog_counts)$/.test(path);
+ // Explicitly read-only procedures. A few misleadingly named get_* RPCs
+ // INSERT/UPDATE state (get_budget_pulse, get_fiscal_context,
+ // blitz_inbox_counts) and must never be queued or suppressed.
+ // Writes, votes, and login identity are never blocked by an overload circuit.
+ return /^rpc\/(?:get_section_updates|get_teacher_overview|get_signed_state_program_budget|telegram_status|get_process_actors|get_game_achievements|get_achievement_catalog_counts)$/.test(path);
 }
 function pausedRestResponse(status:402|429){
  const headers:Record<string,string>={'content-type':'application/json','x-gos-local-limit':'1'};
