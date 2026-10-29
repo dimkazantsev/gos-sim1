@@ -34,7 +34,7 @@ function harness({effects=false,compiledCode=code}={}){
    signOut:async()=>{user=null;authCallback?.('SIGNED_OUT',null);return{error:null};}
   },
   realtime:{setAuth:async()=>{}},
-  channel(topic,options){const handlers=[];const channel={topic,options,on(kind,filter,callback){handlers.push({kind,filter,callback});return this;},subscribe(callback){callback?.('SUBSCRIBED');return this;},handlers};channels.push(channel);return channel;},
+  channel(topic,options){const handlers=[],presence={tracks:0,untracks:0,payloads:[],result:'ok'};const channel={topic,options,presence,on(kind,filter,callback){handlers.push({kind,filter,callback});return this;},subscribe(callback){this.statusCallback=callback;callback?.('SUBSCRIBED');return this;},track:async payload=>{presence.tracks++;presence.payloads.push(payload);return presence.result;},untrack:async()=>{presence.untracks++;return 'ok';},handlers};channels.push(channel);return channel;},
   removeChannel:async channel=>{const index=channels.indexOf(channel);if(index!==-1)channels.splice(index,1);},
   from(table){
    requests++;const number=(counts.get(table)||0)+1;counts.set(table,number);
@@ -238,7 +238,9 @@ function harness({effects=false,compiledCode=code}={}){
   }},
   callbacks(table){return channels.flatMap(channel=>channel.handlers.filter(item=>item.filter.table===table).map(item=>item.callback))},
   broadcast(topic,event,payload){for(const channel of [...channels])if(channel.topic===topic)for(const handler of channel.handlers)if(handler.kind==='broadcast'&&handler.filter.event===event)handler.callback({event,payload});},
-  channelsInfo(){return channels.map(channel=>({topic:channel.topic,private:channel.options?.config?.private===true,handlers:channel.handlers.map(item=>({kind:item.kind,event:item.filter.event,table:item.filter.table}))}))},
+  channelsInfo(){return channels.map(channel=>({topic:channel.topic,private:channel.options?.config?.private===true,tracked:channel.presence.tracks,untracked:channel.presence.untracks,presencePayloads:channel.presence.payloads,handlers:channel.handlers.map(item=>({kind:item.kind,event:item.filter.event,table:item.filter.table}))}))},
+  channelStatus(status){for(const channel of channels)channel.statusCallback?.(status)},
+  failPresenceTrack(){for(const channel of channels)channel.presence.result='error'},
   auth(event,nextUser){user=nextUser;const before=requests;authCallback?.(event,nextUser?{user:{id:nextUser}}:null);assert.equal(requests,before,'Auth callback must schedule Supabase I/O outside its synchronous callback.');},
   runTimers(){for(const [id,timer] of [...timers]){if(timer.interval)continue;timers.delete(id);timer.fn();}},
   async advance(ms){await settle();const end=virtualNow+ms;let turns=0;while(true){const next=[...timers].filter(([,t])=>t.at<=end).sort((a,b)=>a[1].at-b[1].at)[0];if(!next)break;assert(++turns<10000,'Timers must remain bounded');virtualNow=next[1].at;if(next[1].interval)next[1].at+=next[1].interval;else timers.delete(next[0]);next[1].fn();await settle();}virtualNow=end;await settle();},
