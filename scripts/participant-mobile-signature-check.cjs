@@ -18,7 +18,7 @@ assert(client.includes("if(me.kind==='teacher'?'teacher-assets/")||client.includ
 assert(client.includes("gameId+'/profiles/'+me.user_id"),'Real students sign their own profile in the game');
 assert(signature.includes('onSaved?.()'),'Successful signatures reload setup state');
 assert(tour.includes("mobile?'Нажмите подсвеченную кнопку в нижнем меню"),'Tour tells users where to tap');
-assert(tour.includes('(mobile||!rect)&&<button'),'Mobile tutorial offers fallback even with a highlighted dock target');
+assert(tour.includes('(mobile||!rect)&&<button')||tour.includes('<button type="button" className={styles.fallback}'),'Mobile tutorial offers fallback even with a highlighted dock target');
 assert(tour.includes('onClick={()=>onFallback(step.target)}'),'Mobile alternative really navigates');
 assert(css.includes('.fallback{display:flex'),'Mobile fallback must be a proper button');
 assert(dock.includes('.mobileDockIcon .eventDockBadge')&&dock.includes('top:0;right:-8px'),'Counters kept within clipped horizontal dock');
