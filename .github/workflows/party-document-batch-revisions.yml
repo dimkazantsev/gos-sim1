@@ -1,0 +1,27 @@
+name: ГОС.ID · Версии партийных документов и пакетный Storage
+on:
+  pull_request:
+    paths:
+      - 'scripts/party-document-revision-flow-check.cjs'
+      - 'scripts/batch-document-signed-urls-100-check.cjs'
+      - '.github/workflows/party-document-batch-revisions.yml'
+permissions:
+  contents: read
+concurrency:
+  group: party-batch-regression-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+jobs:
+  party-document-revisions:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci --no-audit --no-fund
+      - name: Verify student and teacher document version workflow and RLS
+        run: node scripts/party-document-revision-flow-check.cjs
+      - name: Verify batch Storage 100-file scope and fallback
+        run: node scripts/batch-document-signed-urls-100-check.cjs
