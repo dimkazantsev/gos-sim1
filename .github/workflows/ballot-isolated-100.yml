@@ -1,0 +1,40 @@
+name: Ballot isolated PostgreSQL 40–100 concurrency (simplified)
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - '.github/workflows/ballot-isolated-100.yml'
+      - 'scripts/ballot-concurrency-fixture-check.cjs'
+      - 'scripts/ballot-concurrency-postgres-check.cjs'
+permissions:
+  contents: read
+jobs:
+  ballot-concurrency:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci --no-audit --no-fund
+      - name: Verify simplified fixture and SQL functions in PGlite
+        run: node scripts/ballot-concurrency-fixture-check.cjs
+      - name: Start isolated disposable PostgreSQL
+        run: |
+          docker run --rm -d --name gos-ballot-disposable -p 127.0.0.1:5432:5432 \
+            -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=ci-only-password \
+            -e POSTGRES_DB=gos_vote_concurrency_fixture postgres:17 -c max_connections=160
+          for attempt in $(seq 1 60); do
+            if docker exec gos-ballot-disposable pg_isready -U postgres -d gos_vote_concurrency_fixture; then exit 0; fi
+            sleep 1
+          done
+          exit 1
+      - name: Exercise 40 and 100 ballots, retries and close race
+        env:
+          GOS_BALLOT_DISPOSABLE: 'YES'
+          PGHOST: 127.0.0.1
+          PGDATABASE: gos_vote_concurrency_fixture
+          PGPASSWORD: ci-only-password
+        run: node scripts/ballot-concurrency-postgres-check.cjs
