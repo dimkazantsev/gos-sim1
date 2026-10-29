@@ -1,0 +1,73 @@
+name: 'ГОС.ID · Приёмка 100 JWT: конкурентное голосование'
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/ballot-auth-100-local.yml'
+      - 'scripts/ballot-auth-100-local.cjs'
+      - 'scripts/ballot-concurrency-postgres-check.cjs'
+permissions:
+  contents: read
+concurrency:
+  group: ballot-auth-100-qa
+  cancel-in-progress: true
+jobs:
+  ballot-auth-100:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    env:
+      GOS_BALLOT_AUTH_QA: LOCAL-100
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci --no-audit --no-fund
+      - name: Verify test syntax and original isolated SQL contract
+        run: |
+          node --check scripts/ballot-auth-100-local.cjs
+          node --check scripts/ballot-concurrency-postgres-check.cjs
+          node scripts/ballot-auth-100-local.cjs --schema > /tmp/gos-ballot-local-schema.sql
+          grep -q 'create table public.game_ballots' /tmp/gos-ballot-local-schema.sql
+          grep -q 'revoke all on public.game_votes' /tmp/gos-ballot-local-schema.sql
+      - uses: supabase/setup-cli@v3
+        with:
+          version: latest
+      - name: Start empty, disposable Supabase on loopback
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/gos-ballot-auth-100
+          cd /tmp/gos-ballot-auth-100
+          supabase init
+          supabase start -x storage-api,imgproxy,mailpit,postgres-meta,studio,edge-runtime,logflare,vector,supavisor
+      - name: Export LOCAL temporary credentials only
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd /tmp/gos-ballot-auth-100
+          while IFS='=' read -r key value; do
+            value="$(printf '%s' "$value" | sed 's/^"//;s/"$//')"
+            printf '%s=%s\n' "$key" "$value" >> "$GITHUB_ENV"
+          done < <(
+            supabase status -o env \
+              --override-name api.url=SUPABASE_URL \
+              --override-name auth.anon_key=SUPABASE_ANON_KEY \
+              --override-name auth.service_role_key=SUPABASE_SERVICE_ROLE_KEY
+          )
+      - name: Install actual ballot RPC bodies and disposable guarded fixture
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd /tmp/gos-ballot-auth-100
+          DB_URL="$(supabase status -o env | sed -n 's/^DB_URL="\([^"]*\)"$/\1/p')"
+          test -n "$DB_URL"
+          psql "$DB_URL" -v ON_ERROR_STOP=1 -f /tmp/gos-ballot-local-schema.sql
+          psql "$DB_URL" -v ON_ERROR_STOP=1 -c "NOTIFY pgrst, 'reload schema';"
+          sleep 2
+      - name: 100 independent JWTs, 100 concurrent ballots, duplicates and close race
+        run: node scripts/ballot-auth-100-local.cjs
+      - name: Destroy disposable Supabase without saving data
+        if: always()
+        run: |
+          cd /tmp/gos-ballot-auth-100 || exit 0
+          supabase stop --no-backup
