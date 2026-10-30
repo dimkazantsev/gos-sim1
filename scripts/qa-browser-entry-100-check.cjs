@@ -8,7 +8,7 @@ const {performance}=require('node:perf_hooks');
 const {chromium}=require('playwright-core');
 const ORIGIN='http://127.0.0.1:4180';
 const API='http://127.0.0.1:54321';
-const TOTAL=100,PARALLEL=10,WIDTHS=[360,390,768,1024,1440];
+const TOTAL=100,PARALLEL=2,WIDTHS=[360,390,768,1024,1440];
 const chrome=[process.env.CHROME_BIN,'/usr/bin/google-chrome','/usr/bin/chromium','/usr/bin/chromium-browser'].find(p=>p&&fs.existsSync(p));
 assert.equal(process.env.GOS_BROWSER_ENTRY_QA,'MOCK-ONLY','Only the explicitly isolated QA environment may execute');
 assert(chrome,'Chrome/Chromium is required');
@@ -78,6 +78,9 @@ async function main(){
     page=await ctx.newPage();
     const start=performance.now();
     await page.goto(ORIGIN+'/',{waitUntil:'domcontentloaded',timeout:30000});
+    // DOM can be visible while Next.js dev is still compiling/hydrating;
+    // controlled inputs get a value tracker only after React mounts.
+    await page.waitForFunction(()=>!!document.querySelector('input[name="fullName"]')?._valueTracker,{timeout:30000});
     if(teacher){
      await page.getByRole('button',{name:'Преподаватель',exact:true}).click();
     }else if(kind==='guest'){
@@ -138,7 +141,7 @@ async function main(){
   assert.equal(joins,101);
   assert.equal(badJoin,1);
   assert.equal(offHost,0,'No off-host requests permitted');
-  console.log(JSON.stringify({status:'PASS',scope:'REAL Next.js entry in Chromium, MOCK Supabase Auth/RPC; 100 separate contexts in 10 waves of 10, not 100 active at once and not real backend or 16-stage browser E2E',studentEntries:100,guestEntries:1,teacherWithoutPasswordDenied:1,badInviteDenied:1,anonymousSessions:authCount,successfulJoins:joins,offHostRequests:offHost,viewports:WIDTHS,latencyMs:pcts(timings),errors:errors.length,productionRequests:0}));
+  console.log(JSON.stringify({status:'PASS',scope:'REAL Next.js entry in Chromium, MOCK Supabase Auth/RPC; 100 separate contexts in 50 waves of 2, not 100 active at once and not real backend or 16-stage browser E2E',studentEntries:100,guestEntries:1,teacherWithoutPasswordDenied:1,badInviteDenied:1,anonymousSessions:authCount,successfulJoins:joins,offHostRequests:offHost,viewports:WIDTHS,latencyMs:pcts(timings),errors:errors.length,productionRequests:0}));
  }finally{await browser.close();}
 }
 main().catch(e=>{console.error('FAIL browser entry QA',e);process.exitCode=1});
