@@ -63,7 +63,8 @@ async function main(){
  }));
  ok(await admin.from('impact_rules').insert([...rules,{
   id:id(1000),game_id:FOREIGN,rule_key:'foreign-secret',label:'Foreign QA',
-  event_type:'stage',effects:{foreign:'not for this game'}
+  event_type:'stage',conditions:{},effects:{foreign:'not for this game'},
+  priority:100,enabled:true,auto_apply:true
  }]),'Rules');
  const firstTime=Date.parse('2026-10-30T00:00:00.000Z');
  const ledger=students.flatMap((s,i)=>Array.from({length:16},(_,stage)=>({
