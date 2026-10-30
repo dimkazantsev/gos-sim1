@@ -49,6 +49,7 @@ export function useRepublicGame(gameId:string){
  const [hasOlderChatMessages,setHasOlderChatMessages]=useState(false);
  const [olderChatLoading,setOlderChatLoading]=useState(false);
  const oldestChatCursor=useRef<Pick<Message,'created_at'|'id'>|null>(null);
+ const chatChannelVersion=useRef(0);
  const loadingOlderChatRef=useRef(false);
  const requestedHistoryCount=useRef(CHAT_HISTORY_PAGE_SIZE);
  // The ordinary live view keeps its existing cap; older pages stay in memory
@@ -684,6 +685,7 @@ export function useRepublicGame(gameId:string){
  },[]);
 
  useEffect(()=>{
+  chatChannelVersion.current++;
   channelRef.current=channelId;messageRowsRef.current=[];setMessages([]);
   oldestChatCursor.current=null;requestedHistoryCount.current=CHAT_HISTORY_PAGE_SIZE;
   setHasOlderChatMessages(false);setOlderChatLoading(false);
@@ -1453,7 +1455,7 @@ export function useRepublicGame(gameId:string){
   });
  }
  async function loadOlderChatMessages():Promise<boolean>{
-  const cid=channelRef.current,cursor=oldestChatCursor.current;
+  const cid=channelRef.current,cursor=oldestChatCursor.current,version=chatChannelVersion.current;
   if(!cid||!cursor||loadingOlderChatRef.current||!hasOlderChatMessages)return false;
   loadingOlderChatRef.current=true;setOlderChatLoading(true);
   const ticket:ReadTicket={gameId,epoch:readEpoch.current,versions:{}};
@@ -1462,7 +1464,7 @@ export function useRepublicGame(gameId:string){
     .or(chatHistoryCursorFilter(cursor))
     .order('created_at',{ascending:false}).order('id',{ascending:false})
     .limit(CHAT_HISTORY_PAGE_SIZE);
-   if(!readActive(ticket)||channelRef.current!==cid||r.error){
+   if(!readActive(ticket)||channelRef.current!==cid||chatChannelVersion.current!==version||r.error){
     if(r.error&&channelRef.current===cid)setError(userError(r.error));
     return false;
    }
@@ -1480,7 +1482,7 @@ export function useRepublicGame(gameId:string){
    if(media.length)void Promise.all(media.map(async m=>({
     id:m.id,path:m.storage_path,url:await signedAssetUrl('game-media',m.storage_path!)
    }))).then(links=>{
-    if(!readActive(ticket)||channelRef.current!==cid)return;
+    if(!readActive(ticket)||channelRef.current!==cid||chatChannelVersion.current!==version)return;
     const byId=new Map(links.map(link=>[link.id,link]));
     setMessages(previous=>previous.map(m=>{
      const link=byId.get(m.id);
@@ -1491,7 +1493,7 @@ export function useRepublicGame(gameId:string){
   }catch(error){
    if(channelRef.current===cid)setError(userError(error));
    return false;
-  }finally{loadingOlderChatRef.current=false;if(channelRef.current===cid)setOlderChatLoading(false)}
+  }finally{if(channelRef.current===cid&&chatChannelVersion.current===version){loadingOlderChatRef.current=false;setOlderChatLoading(false)}}
  }
  async function loadRecentChatMessages(cid:string){
   if(recentChatRecoveryRunning.current||channelRef.current!==cid)return;
