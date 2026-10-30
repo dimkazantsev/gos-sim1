@@ -16,7 +16,7 @@ function make(deps){
  new Function(...Object.keys(env),compiled)(...Object.values(env));return out.load;
 }
 const tick=()=>new Promise(resolve=>setImmediate(resolve));
-function pendingQuery(pending){return{select(){return this;},eq(){return this;},order(){return this;},abortSignal(){return this;},then(resolve){return new Promise(done=>pending.push(value=>{resolve(value);done();}));}};}
+function pendingQuery(pending){return{select(){return this;},eq(){return this;},order(){return this;},range(){return this;},abortSignal(){return this;},then(resolve){return new Promise(done=>pending.push(value=>{resolve(value);done();}));}};}
 (async()=>{
  {
   const pending=[],seen=[],loadRequest={current:0};
