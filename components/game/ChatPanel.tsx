@@ -107,10 +107,10 @@ export default function ChatPanel({g,draft:text,onDraftChange:setText,previewCha
  const pinnedMessages=useMemo(()=>allPinnedMessages.filter(m=>m.channel_id===channelId&&visibleChatMedia(m,retentionClock)),[allPinnedMessages,channelId,retentionClock]);
  const channelMessages=useMemo(()=>messages.filter(m=>m.channel_id===channelId&&visibleChatMedia(m,retentionClock)),[messages,channelId,retentionClock]);
  const filtered=useMemo(()=>channelMessages.filter(m=>matchChatMessage(m,search,names[m.author_id]||'Система',onlyFiles)),[channelMessages,search,names,onlyFiles]);
- // A search never silently scans older, as-yet-unloaded messages.
- const canLoadHistory=hasOlderChatMessages&&!hasFilter;
  const entries=useMemo(()=>buildChatEntries(filtered,me?.user_id||''),[filtered,me?.user_id]);
  const hasFilter=!!search.trim()||onlyFiles;
+ // Search applies to loaded messages; history reads remain explicit.
+ const canLoadHistory=hasOlderChatMessages&&!hasFilter;
  const handles=chatHandles(g.members).filter(x=>x.member.user_id!==me?.user_id);
  const mentionMatch=text.match(/(?:^|\s)@([а-яёa-z0-9_-]*)$/i);
  const mentionQuery=(mentionMatch?.[1]||'').toLocaleLowerCase('ru-RU');
