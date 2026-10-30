@@ -111,18 +111,6 @@ create function private.record_metric_change(uuid,text,numeric,text,text,uuid,te
 returns void language plpgsql as $f$begin
  update public.state_metrics set value=$3 where game_id=$1 and metric_key=$2;
 end$f$;
--- Production document requirement and production stage completion trigger
--- are loaded separately. ONLY unrelated readiness conditions are mocked.
-create or replace function private.stage_readiness_json(p_game uuid,p_stage integer)
-returns jsonb language sql stable security definer set search_path='public','private','pg_temp'
-as $ready$
- select jsonb_build_object('ready',not exists(
-   select 1 from jsonb_array_elements(private.stage_required_final_documents(p_game,p_stage)) row
-   where not coalesce((row->>'fulfilled')::boolean,false)),
-   'blockers',jsonb_build_array('Отсутствуют обязательные документы')) $ready$;
-create trigger stage_final_document_readiness_guard
- before update of status on public.game_stages
- for each row execute function private.guard_stage_finalization();
 create table public.qa_unified_chain_guard(marker text primary key);
 insert into public.qa_unified_chain_guard values('gos-id-disposable-100x16-jwt-chain-20261030');
 revoke all on public.qa_unified_chain_guard from public,anon,authenticated;
