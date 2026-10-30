@@ -688,6 +688,7 @@ export function useRepublicGame(gameId:string){
   chatChannelVersion.current++;
   channelRef.current=channelId;messageRowsRef.current=[];setMessages([]);
   oldestChatCursor.current=null;requestedHistoryCount.current=CHAT_HISTORY_PAGE_SIZE;
+  loadingOlderChatRef.current=false;
   setHasOlderChatMessages(false);setOlderChatLoading(false);
   setChatPins([]);setPinnedMessages([]);
   // Don't load message bodies for a closed panel.
