@@ -88,7 +88,7 @@ async function main(){
     }
     await page.locator('input[name="fullName"]').fill('Тестовый Участник '+n);
     await page.locator('input[name="gameCode"]').fill('QA100');
-    if(kind==='student')await page.locator('input[name="group"]').fill('ГМУ-100');
+    if(kind==='student'&&!teacher)await page.locator('input[name="group"]').fill('ГМУ-100');
     await page.locator('#invite-code').fill(teacher?'TCH-LOCAL-100':kind==='guest'?'GST-LOCAL-100':'STD-LOCAL-100');
     const geometry=await page.evaluate(()=>({
      screen:document.documentElement.clientWidth,
@@ -105,12 +105,12 @@ async function main(){
     }
     await page.locator('.entrySubmit').click();
     if(teacher){
-     const error=page.getByRole('alert');
+     const error=page.locator('.entryForm .errorBox[role="alert"]');
      await error.waitFor({timeout:10000});
      assert.match(await error.innerText(),/подтверждённой почте|личный пароль/i);
      assert.deepEqual(calls,[],'A teacher must never enter anonymously or join through invite alone');
     }else if(denyJoin){
-     const error=page.getByRole('alert');await error.waitFor({timeout:10000});
+     const error=page.locator('.entryForm .errorBox[role="alert"]');await error.waitFor({timeout:10000});
      assert.match(await error.innerText(),/Код игры|приглашение/i);
      assert.deepEqual(calls,['signup','join'],'A rejected invite must not navigate');
      assert.equal(new URL(page.url()).pathname,'/');
