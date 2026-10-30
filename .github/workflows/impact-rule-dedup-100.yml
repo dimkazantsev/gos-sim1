@@ -1,0 +1,41 @@
+name: ГОС.ID · 100 конкурентных автоматических последствий
+on:
+  pull_request:
+    paths:
+      - 'scripts/impact-rule-dedup-100-postgres-check.cjs'
+      - 'supabase/migrations/20261030090000_serialize_same_source_impact_rule.sql'
+      - '.github/workflows/impact-rule-dedup-100.yml'
+permissions:
+  contents: read
+concurrency:
+  group: gos-impact-rule-100-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+jobs:
+  qa:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - run: node --check scripts/impact-rule-dedup-100-postgres-check.cjs
+      - name: Start local disposable PostgreSQL
+        run: |
+          docker run --rm -d --name gos-impact-100 -p 127.0.0.1:5432:5432 \
+            -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=ci-only-password \
+            -e POSTGRES_DB=a07_fixture postgres:17 -c max_connections=160
+          for attempt in $(seq 1 60); do
+            if docker exec gos-impact-100 pg_isready -U postgres -d a07_fixture; then exit 0; fi
+            sleep 1
+          done
+          exit 1
+      - name: Execute 100 distinct and 100 duplicate source calls
+        env:
+          PGHOST: 127.0.0.1
+          PGPORT: '5432'
+          PGUSER: postgres
+          PGPASSWORD: ci-only-password
+          PGDATABASE: a07_fixture
+          GOS_RULE_QA: LOCAL-100
+        run: node scripts/impact-rule-dedup-100-postgres-check.cjs
+      - name: Remove disposable DB
+        if: always()
+        run: docker rm -f gos-impact-100 || true
