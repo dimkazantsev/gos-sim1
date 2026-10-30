@@ -179,7 +179,7 @@ function harness({effects=false,compiledCode=code}={}){
      member:{game_id:snapshot.gameId,user_id:snapshot.user,full_name:snapshot.user,kind:snapshot.user==='teacher-a'?snapshot.memberKind:'student'}
     },error:null};
    }
-   return{data:name==='has_seen_my_intro'?true:name==='get_my_chat_overview'?[{channel_id:'channel-a',unread_count:0}]:[],error:null};
+   return{data:name==='has_seen_my_intro'?true:name==='get_my_chat_overview'?(fixtures.get('chat_overview')||[{channel_id:'channel-a',unread_count:0}]):[],error:null};
   },
   storage:{from:()=>({createSignedUrl:async()=>{signed++;activeSigns++;peakSigns=Math.max(peakSigns,activeSigns);await tick();activeSigns--;return{data:{signedUrl:'https://example.invalid/media'},error:null}},createSignedUrls:async paths=>{batchCalls++;signed+=paths.length;activeSigns++;peakSigns=Math.max(peakSigns,activeSigns);await tick();activeSigns--;return{data:paths.map(path=>({path,signedUrl:'https://example.invalid/media',error:null})),error:null}}})}
  };
@@ -530,6 +530,7 @@ async function main(){
    {id:'channel-a',game_id:'game-a',name:'Общий чат',kind:'public'},
    {id:'channel-b',game_id:'game-a',name:'Другой чат',kind:'public'}
   ]);
+  h.fixture('chat_overview',[{channel_id:'channel-a',unread_count:0},{channel_id:'channel-b',unread_count:0}]);
   await h.settle();h.render().setChatOpen(true);await h.settle();const newChannel=h.hold('chat_messages');h.setRevision(2);h.render().setChannelId('channel-b');h.render();await tick();await h.render().sendText('earlier message','channel-a');newChannel.resolve();await h.settle();assert.equal(h.render().messages[0].channel_id,'channel-b');assert.equal(h.render().chatLoading,false);h.dispose();
  });
  await check('An older partial response cannot restore data from another game',async()=>{
