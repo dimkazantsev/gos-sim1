@@ -54,7 +54,7 @@ export function useRepublicGame(gameId:string){
  const requestedHistoryCount=useRef(CHAT_HISTORY_PAGE_SIZE);
  // The ordinary live view keeps its existing cap; older pages stay in memory
  // only after the reader explicitly requests them.
- const chatWindowLimit=()=>Math.max(150,requestedHistoryCount.current+75);
+ const chatWindowLimit=()=>requestedHistoryCount.current===CHAT_HISTORY_PAGE_SIZE?150:Math.max(150,requestedHistoryCount.current+200);
  useEffect(()=>{messageRowsRef.current=messages},[messages]);
  const [stages,setStages]=useState<Stage[]>([]),[parties,setParties]=useState<Party[]>([]),[votes,setVotes]=useState<Vote[]>([]),[ballots,setBallots]=useState<Ballot[]>([]),[evaluations,setEvaluations]=useState<Evaluation[]>([]),[crises,setCrises]=useState<Crisis[]>([]),[documents,setDocuments]=useState<GameDocument[]>([]),[activities,setActivities]=useState<Activity[]>([]),[presence,setPresence]=useState<Presence[]>([]),[profileRows,setProfiles]=useState<GameProfile[]>([]),[partyDocuments,setPartyDocuments]=useState<PartyDocument[]>([]),[partyInvitations,setPartyInvitations]=useState<PartyInvitation[]>([]),[partyMandates,setPartyMandateRows]=useState<PartyMandateAllocation[]>([]),[partyAgreements,setPartyAgreements]=useState<PartyAgreement[]>([]),[formalDocuments,setFormalDocuments]=useState<FormalDocument[]>([]),[formalHistory,setFormalHistory]=useState<FormalHistory[]>([]),[politicalPosts,setPoliticalPosts]=useState<PoliticalPost[]>([]),[politicalMedia,setPoliticalMedia]=useState<PoliticalPostMedia[]>([]),[postFormalLinks,setPostFormalLinks]=useState<PoliticalPostFormalLink[]>([]),[metricHistory,setMetricHistory]=useState<MetricHistory[]>([]),[partySupportHistory,setPartySupportHistory]=useState<PartySupportHistory[]>([]),[impactRules,setImpactRules]=useState<ImpactRule[]>([]),[impactLedger,setImpactLedger]=useState<ImpactLedger[]>([]);
  const votesRef=useRef(votes);votesRef.current=votes;
@@ -447,11 +447,11 @@ export function useRepublicGame(gameId:string){
    if(payload.eventType==='INSERT'){
     const row=payload.new as unknown as Message;
     if(row?.id&&row.game_id===gameId&&row.channel_id===channelRef.current){
-     setMessages(previous=>mergeChatMessages(previous,[row]));
+     setMessages(previous=>mergeChatMessages(previous,[row],chatWindowLimit()));
      if(row.storage_path){
       void signedAssetUrl('game-media',row.storage_path).then(url=>{
        if(currentConnection()&&channelRef.current===row.channel_id&&url)
-        setMessages(previous=>mergeChatMessages(previous,[{...row,url}]));
+        setMessages(previous=>mergeChatMessages(previous,[{...row,url}],chatWindowLimit()));
       }).catch(()=>{/* A later media URL refresh can retry. */});
      }
     }
@@ -1525,7 +1525,7 @@ export function useRepublicGame(gameId:string){
     const url=await signedAssetUrl('game-media',m.storage_path);
     return {...m,url};
    }));
-   if(readActive(ticket)&&channelRef.current===cid)setMessages(previous=>mergeChatMessages(previous,rows));
+   if(readActive(ticket)&&channelRef.current===cid)setMessages(previous=>mergeChatMessages(previous,rows,chatWindowLimit()));
   }catch{
    // Polling is a best-effort fallback; an intermittent request must not
    // overwrite the chat with a global game error or break Realtime delivery.
