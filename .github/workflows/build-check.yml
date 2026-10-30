@@ -304,6 +304,8 @@ on:
       - 'scripts/party-grades-layout-browser-check.cjs'
       - 'components/game/chatRealtime.ts'
       - 'scripts/chat-realtime-check.cjs'
+      - 'components/game/chatHistoryPaging.ts'
+      - 'scripts/chat-history-pagination-check.cjs'
       - 'components/game/ChatPanel.tsx'
       - 'components/game/ChatChannelDropdown.tsx'
       - 'components/game/chatChannelSelection.ts'
@@ -430,6 +432,7 @@ jobs:
       - run: node scripts/vote-office-grants-check.cjs
       - run: node scripts/chat-channel-selection-check.cjs
       - run: node scripts/chat-realtime-check.cjs
+      - run: node scripts/chat-history-pagination-check.cjs
       - run: node scripts/chat-media-transport-check.cjs
       - run: node scripts/telegram-onboarding-check.cjs
       - run: node scripts/telegram-activation-verification-check.cjs
