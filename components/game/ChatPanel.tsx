@@ -1,5 +1,5 @@
 'use client';
-import {useEffect,useMemo,useRef,useState} from 'react';
+import {useEffect,useLayoutEffect,useMemo,useRef,useState} from 'react';
 import type {ReactNode} from 'react';
 import {ArrowDown,AtSign,Download,FileText,Mic,Paperclip,Pin,PinOff,Search,Send,Square,Trash2,UserRound,Video,X} from 'lucide-react';
 import {CHAT_MAX_FILE_BYTES,formatRecordingDuration} from './recordingMedia';
@@ -53,7 +53,7 @@ function ChatAttachment({message:m,onRefresh}:{message:Message;onRefresh?:(messa
 }
 
 export default function ChatPanel({g,draft:text,onDraftChange:setText,previewChannelOpen=false,previewPinsOpen=false,onOpenMember,readOnly=false}:{g:ReturnTypeRepublic;draft:string;onDraftChange:(next:string)=>void;previewChannelOpen?:boolean;previewPinsOpen?:boolean;onOpenMember?:(userId:string)=>void;readOnly?:boolean}){
- const {channels,channelId,setChannelId,messages,chatPins:allPins,pinnedMessages:allPinnedMessages,setChatPin,refreshChatMediaUrl,chatLoading,names,recording,recordingPreview,recordingSaving,chatMediaError,chatMediaPhase,recordingStartedAt,recordingStream,discardRecording,sendRecordingPreview,setChatOpen,sendText,sendChatFile,toggleRecording,me,teacher,chatOverview,setChatChannelPinned}=g;
+ const {channels,channelId,setChannelId,messages,chatPins:allPins,pinnedMessages:allPinnedMessages,setChatPin,refreshChatMediaUrl,chatLoading,hasOlderChatMessages,olderChatLoading,loadOlderChatMessages,names,recording,recordingPreview,recordingSaving,chatMediaError,chatMediaPhase,recordingStartedAt,recordingStream,discardRecording,sendRecordingPreview,setChatOpen,sendText,sendChatFile,toggleRecording,me,teacher,chatOverview,setChatChannelPinned}=g;
  useEffect(()=>{setSelectedMessages([])},[channelId]);
  useEffect(()=>()=>{if(selectHoldTimer.current)clearTimeout(selectHoldTimer.current)},[]);
   const socialChannelsReady=g.channels.some(c=>c.kind==='public'&&c.name==='Публичная политика')&&g.channels.some(c=>c.kind==='public'&&c.name==='Вне игры');
@@ -86,6 +86,7 @@ export default function ChatPanel({g,draft:text,onDraftChange:setText,previewCha
  const [jumpVisible,setJumpVisible]=useState(false);
  const [localError,setLocalError]=useState('');
  const list=useRef<HTMLDivElement>(null);
+ const restoreHistoryScroll=useRef<{channel:string;height:number;top:number;oldest:string;created:string}|null>(null);
  const composer=useRef<HTMLTextAreaElement>(null);
  const liveCamera=useRef<HTMLVideoElement>(null);
  const mediaHoldTimer=useRef<ReturnType<typeof setTimeout>|null>(null);
@@ -106,6 +107,8 @@ export default function ChatPanel({g,draft:text,onDraftChange:setText,previewCha
  const pinnedMessages=useMemo(()=>allPinnedMessages.filter(m=>m.channel_id===channelId&&visibleChatMedia(m,retentionClock)),[allPinnedMessages,channelId,retentionClock]);
  const channelMessages=useMemo(()=>messages.filter(m=>m.channel_id===channelId&&visibleChatMedia(m,retentionClock)),[messages,channelId,retentionClock]);
  const filtered=useMemo(()=>channelMessages.filter(m=>matchChatMessage(m,search,names[m.author_id]||'Система',onlyFiles)),[channelMessages,search,names,onlyFiles]);
+ // A search never silently scans older, as-yet-unloaded messages.
+ const canLoadHistory=hasOlderChatMessages&&!hasFilter;
  const entries=useMemo(()=>buildChatEntries(filtered,me?.user_id||''),[filtered,me?.user_id]);
  const hasFilter=!!search.trim()||onlyFiles;
  const handles=chatHandles(g.members).filter(x=>x.member.user_id!==me?.user_id);
@@ -177,7 +180,7 @@ export default function ChatPanel({g,draft:text,onDraftChange:setText,previewCha
  },[]);
  useEffect(()=>{
   if(channelId!==lastChannel.current){
-   lastChannel.current=channelId;follow.current=true;
+   lastChannel.current=channelId;restoreHistoryScroll.current=null;follow.current=true;
    setSearch('');setOnlyFiles(false);setSearchOpen(false);setAttachOpen(false);setPinsOpen(false);
    setLocalError('');setJumpVisible(false);
   }
@@ -187,6 +190,26 @@ export default function ChatPanel({g,draft:text,onDraftChange:setText,previewCha
   const el=list.current;
   if(el&&follow.current){el.scrollTop=el.scrollHeight;setJumpVisible(false)}
  },[messages,channelId,hasFilter]);
+ useLayoutEffect(()=>{
+  const anchor=restoreHistoryScroll.current,el=list.current;
+  if(!anchor||!el||anchor.channel!==channelId)return;
+  const addedOlder=messages.some(m=>m.channel_id===channelId&&
+   (m.created_at<anchor.created||(m.created_at===anchor.created&&m.id<anchor.oldest)));
+  if(!addedOlder)return;
+  el.scrollTop=anchor.top+el.scrollHeight-anchor.height;
+  restoreHistoryScroll.current=null;
+ },[messages,channelId]);
+ async function loadEarlierHistory(){
+  if(!canLoadHistory||olderChatLoading||!channelId)return;
+  const el=list.current,oldest=channelMessages[0];
+  if(el&&oldest)restoreHistoryScroll.current={
+   channel:channelId,height:el.scrollHeight,top:el.scrollTop,
+   oldest:oldest.id,created:oldest.created_at
+  };
+  follow.current=false;setJumpVisible(false);
+  const loaded=await loadOlderChatMessages();
+  if(!loaded)restoreHistoryScroll.current=null;
+ }
  useEffect(()=>{
   if(!composer.current)return;
   const node=composer.current;
@@ -353,6 +376,9 @@ export default function ChatPanel({g,draft:text,onDraftChange:setText,previewCha
    {peopleResults.length>0&&<div className="chatPeopleResults" aria-label="Найденные участники"><small>Люди</small>{peopleResults.map(x=><button type="button" key={x.member.user_id} disabled={sending} onClick={()=>void openPersonChat(x.member.user_id)}><span className="chatPersonAvatar"><UserRound size={16} aria-hidden="true"/></span><span><b>{x.member.full_name}</b><small>{x.member.role_title||x.member.team||'Участник'}</small></span><em>Написать</em></button>)}</div>}
   </div>}
   <div className="chatMessages" ref={list} role="log" aria-label="Сообщения" aria-live={hasFilter?'off':'polite'} aria-relevant="additions" onScroll={()=>{const el=list.current;if(!el)return;const nearBottom=el.scrollHeight-el.scrollTop-el.clientHeight<85;follow.current=nearBottom;setJumpVisible(!nearBottom&&!hasFilter&&channelMessages.length>0)}}>
+   {canLoadHistory&&<button type="button" className="chatHistoryMore" disabled={olderChatLoading||chatLoading} aria-busy={olderChatLoading} onClick={()=>void loadEarlierHistory()}>
+    {olderChatLoading?'Загружаем…':'Загрузить предыдущие сообщения'}
+   </button>}
    {chatLoading?<div className="chatEmpty" role="status"><span className="chatLoadingSpinner" aria-hidden="true"/><b>Загружаем сообщения…</b></div>:!entries.length?<div className="chatEmpty"><span className="chatEmptyIcon"><Search aria-hidden="true"/></span><b>{hasFilter?'Ничего не найдено':'Пока нет сообщений'}</b><p>{hasFilter?'Измените запрос или отключите фильтр.':'Начните обсуждение: сообщения увидят участники этого канала.'}</p></div>:
     entries.map(({message:m,startsDay,startsGroup,own,day,dayLabel})=>{
      const name=names[m.author_id]||'Система';
