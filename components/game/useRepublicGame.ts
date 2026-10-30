@@ -19,6 +19,7 @@ import {currentGameMembers,currentGameProfiles} from './gameRoster';
 import {coalesceInFlight} from './coalesceInFlight';
 import {resolveChatChannelId,visibleChatChannels} from './chatChannelSelection';
 import {mergeChatMessages} from './chatRealtime';
+import {CHAT_HISTORY_PAGE_SIZE,chatHistoryCursorFilter} from './chatHistoryPaging';
 import type {GameOfficeAssignment,ChatOverview} from './types';
 import type {PendingMediaUpload,MediaUploadPhase} from './chatMediaTransport';
 export type RecordingPreview={kind:ChatMediaKind;blob:Blob;url:string;mime:string;fileName:string;channelId:string;duration:number;waveform?:number[]};
@@ -45,6 +46,14 @@ export function useRepublicGame(gameId:string){
  const members=useMemo(()=>currentGameMembers(memberRows,gameId),[memberRows,gameId]);
  const [channels,setChannels]=useState<Channel[]>([]),[channelId,setChannelId]=useState(''),[messages,setMessages]=useState<Message[]>([]),[chatPins,setChatPins]=useState<ChatPin[]>([]),[pinnedMessages,setPinnedMessages]=useState<Message[]>([]),[chatOverview,setChatOverview]=useState<ChatOverview[]>([]),[chatLoading,setChatLoading]=useState(false);
  const messageRowsRef=useRef<Message[]>([]),recentChatRecoveryRunning=useRef(false);
+ const [hasOlderChatMessages,setHasOlderChatMessages]=useState(false);
+ const [olderChatLoading,setOlderChatLoading]=useState(false);
+ const oldestChatCursor=useRef<Pick<Message,'created_at'|'id'>|null>(null);
+ const loadingOlderChatRef=useRef(false);
+ const requestedHistoryCount=useRef(CHAT_HISTORY_PAGE_SIZE);
+ // The ordinary live view keeps its existing cap; older pages stay in memory
+ // only after the reader explicitly requests them.
+ const chatWindowLimit=()=>Math.max(150,requestedHistoryCount.current+75);
  useEffect(()=>{messageRowsRef.current=messages},[messages]);
  const [stages,setStages]=useState<Stage[]>([]),[parties,setParties]=useState<Party[]>([]),[votes,setVotes]=useState<Vote[]>([]),[ballots,setBallots]=useState<Ballot[]>([]),[evaluations,setEvaluations]=useState<Evaluation[]>([]),[crises,setCrises]=useState<Crisis[]>([]),[documents,setDocuments]=useState<GameDocument[]>([]),[activities,setActivities]=useState<Activity[]>([]),[presence,setPresence]=useState<Presence[]>([]),[profileRows,setProfiles]=useState<GameProfile[]>([]),[partyDocuments,setPartyDocuments]=useState<PartyDocument[]>([]),[partyInvitations,setPartyInvitations]=useState<PartyInvitation[]>([]),[partyMandates,setPartyMandateRows]=useState<PartyMandateAllocation[]>([]),[partyAgreements,setPartyAgreements]=useState<PartyAgreement[]>([]),[formalDocuments,setFormalDocuments]=useState<FormalDocument[]>([]),[formalHistory,setFormalHistory]=useState<FormalHistory[]>([]),[politicalPosts,setPoliticalPosts]=useState<PoliticalPost[]>([]),[politicalMedia,setPoliticalMedia]=useState<PoliticalPostMedia[]>([]),[postFormalLinks,setPostFormalLinks]=useState<PoliticalPostFormalLink[]>([]),[metricHistory,setMetricHistory]=useState<MetricHistory[]>([]),[partySupportHistory,setPartySupportHistory]=useState<PartySupportHistory[]>([]),[impactRules,setImpactRules]=useState<ImpactRule[]>([]),[impactLedger,setImpactLedger]=useState<ImpactLedger[]>([]);
  const votesRef=useRef(votes);votesRef.current=votes;
@@ -254,7 +263,10 @@ export function useRepublicGame(gameId:string){
   if(overviewRealtimeTimer.current!==null){clearTimeout(overviewRealtimeTimer.current);overviewRealtimeTimer.current=null}
   lastRealtimeOverviewAt.current=0;
   setGame(null);setMe(null);setMetrics([]);setEvents([]);setMembers([]);setOfficeRows([]);
-  setChannels([]);channelRef.current='';setChannelId('');setMessages([]);setChatPins([]);setPinnedMessages([]);setChatOverview([]);setChatLoading(false);setChatOpen(false);
+  setChannels([]);channelRef.current='';setChannelId('');setMessages([]);
+  oldestChatCursor.current=null;requestedHistoryCount.current=CHAT_HISTORY_PAGE_SIZE;
+  loadingOlderChatRef.current=false;setHasOlderChatMessages(false);setOlderChatLoading(false);
+  setChatPins([]);setPinnedMessages([]);setChatOverview([]);setChatLoading(false);setChatOpen(false);
   setStages([]);setParties([]);setVotes([]);setBallots([]);setEvaluations([]);setCrises([]);setDocuments([]);setActivities([]);setPresence([]);setProfiles([]);
   setPartyDocuments([]);setPartyInvitations([]);setPartyMandateRows([]);setPartyAgreements([]);setFormalDocuments([]);setFormalHistory([]);
   setPoliticalPosts([]);setPoliticalMedia([]);setPostFormalLinks([]);setMetricHistory([]);setPartySupportHistory([]);setImpactRules([]);setImpactLedger([]);
@@ -671,9 +683,24 @@ export function useRepublicGame(gameId:string){
   if(previewRef.current)URL.revokeObjectURL(previewRef.current.url);
  },[]);
 
- useEffect(()=>{channelRef.current=channelId;messageRowsRef.current=[];setMessages([]);setChatPins([]);setPinnedMessages([]);if(channelId){void loadMessages(channelId,true);void loadChatPins(channelId);if(chatOpen)void markChatRead(channelId)}else setChatLoading(false)},[channelId]);
+ useEffect(()=>{
+  channelRef.current=channelId;messageRowsRef.current=[];setMessages([]);
+  oldestChatCursor.current=null;requestedHistoryCount.current=CHAT_HISTORY_PAGE_SIZE;
+  setHasOlderChatMessages(false);setOlderChatLoading(false);
+  setChatPins([]);setPinnedMessages([]);
+  // Don't load message bodies for a closed panel.
+  if(channelId&&chatOpen){
+   void loadMessages(channelId,true);void loadChatPins(channelId);void markChatRead(channelId);
+  }else setChatLoading(false);
+ },[channelId]);
  // Reconcile changes missed while closed. Switching channels already loads history.
- useEffect(()=>{if(chatOpen&&channelRef.current)void loadMessages(channelRef.current);if(chatOpen&&channelRef.current)void loadChatPins(channelRef.current)},[chatOpen]);
+ useEffect(()=>{
+  if(chatOpen&&channelRef.current&&oldestChatCursor.current===null)
+   void loadMessages(channelRef.current,true);
+  else if(chatOpen&&channelRef.current)
+   void loadMessages(channelRef.current);
+  if(chatOpen&&channelRef.current)void loadChatPins(channelRef.current);
+ },[chatOpen]);
  useEffect(()=>{if(chatOpen&&channelId)void markChatRead(channelId)},[chatOpen,channelId,messages.length]);
  useEffect(()=>{
   // The chat header and composer must reflect exactly the same selected ID.
@@ -1381,17 +1408,36 @@ export function useRepublicGame(gameId:string){
   if(initial)setChatLoading(true);
   await readSafely(['messages'],async ticket=>{
    try{
-    const r=await supabase.from('chat_messages').select('*').eq('channel_id',cid).order('created_at',{ascending:false}).limit(150);
+    // Always fetch only the latest ten rows. Previously loaded older pages
+    // must not be re-requested on new messages, refresh or reconnect.
+    const r=await supabase.from('chat_messages').select('*').eq('channel_id',cid)
+     .order('created_at',{ascending:false}).order('id',{ascending:false})
+     .limit(CHAT_HISTORY_PAGE_SIZE);
     if(!readCurrent(ticket)||channelRef.current!==cid)return;
     requireSuccessful([r]);
-    // Render text before potentially slow private Storage signatures.
     const cached=new Map(messageRowsRef.current.filter(m=>m.channel_id===cid).map(m=>[m.id,m]));
     const rows=((r.data||[]) as Message[]).map(m=>{
      const old=cached.get(m.id);
      return {...m,url:m.storage_path&&old?.storage_path===m.storage_path?old.url||null:null};
     });
-    const ordered=[...rows].reverse(),latest=ordered.at(-1)?.created_at||'';
-    setMessages(previous=>ordered.length?mergeChatMessages(ordered,previous.filter(m=>m.channel_id===cid&&m.created_at>latest)):[]);
+    const ordered=[...rows].reverse();
+    if(initial||!oldestChatCursor.current){
+     oldestChatCursor.current=rows.length?{created_at:rows[rows.length-1].created_at,id:rows[rows.length-1].id}:null;
+     setHasOlderChatMessages(rows.length===CHAT_HISTORY_PAGE_SIZE);
+    }
+    const newest=rows[0];
+    const oldest=rows[rows.length-1];
+    setMessages(previous=>{
+     // Keep historical pages deliberately requested by the reader, but
+     // replace the fetched recent window so missed deletions stay deleted.
+     const retained=previous.filter(m=>m.channel_id===cid&&(
+      newest&&(m.created_at>newest.created_at||(m.created_at===newest.created_at&&m.id>newest.id))||
+      oldest&&requestedHistoryCount.current>CHAT_HISTORY_PAGE_SIZE&&
+      (m.created_at<oldest.created_at||(m.created_at===oldest.created_at&&m.id<oldest.id))
+     ));
+     return mergeChatMessages(retained,ordered,chatWindowLimit());
+    });
+    // Sign only the newly fetched media; historical signed URLs are cached.
     const pending=rows.filter(m=>m.storage_path&&!m.url);
     if(pending.length)void Promise.all(pending.map(async m=>({
      id:m.id,path:m.storage_path,url:await signedAssetUrl('game-media',m.storage_path!)
@@ -1406,6 +1452,47 @@ export function useRepublicGame(gameId:string){
    }finally{if(readCurrent(ticket)&&channelRef.current===cid)setChatLoading(false)}
   });
  }
+ async function loadOlderChatMessages():Promise<boolean>{
+  const cid=channelRef.current,cursor=oldestChatCursor.current;
+  if(!cid||!cursor||loadingOlderChatRef.current||!hasOlderChatMessages)return false;
+  loadingOlderChatRef.current=true;setOlderChatLoading(true);
+  const ticket:ReadTicket={gameId,epoch:readEpoch.current,versions:{}};
+  try{
+   const r=await supabase.from('chat_messages').select('*').eq('channel_id',cid)
+    .or(chatHistoryCursorFilter(cursor))
+    .order('created_at',{ascending:false}).order('id',{ascending:false})
+    .limit(CHAT_HISTORY_PAGE_SIZE);
+   if(!readActive(ticket)||channelRef.current!==cid||r.error){
+    if(r.error&&channelRef.current===cid)setError(userError(r.error));
+    return false;
+   }
+   const rows=(r.data||[]) as Message[];
+   setHasOlderChatMessages(rows.length===CHAT_HISTORY_PAGE_SIZE);
+   if(!rows.length)return false;
+   const last=rows[rows.length-1];
+   oldestChatCursor.current={created_at:last.created_at,id:last.id};
+   requestedHistoryCount.current+=rows.length;
+   const cached=new Map(messageRowsRef.current.map(m=>[m.id,m]));
+   const page=rows.map(m=>({...m,url:cached.get(m.id)?.url||null}));
+   setMessages(previous=>mergeChatMessages(previous,page,chatWindowLimit()));
+   // Don't delay text display for media URL signatures.
+   const media=page.filter(m=>m.storage_path&&!m.url);
+   if(media.length)void Promise.all(media.map(async m=>({
+    id:m.id,path:m.storage_path,url:await signedAssetUrl('game-media',m.storage_path!)
+   }))).then(links=>{
+    if(!readActive(ticket)||channelRef.current!==cid)return;
+    const byId=new Map(links.map(link=>[link.id,link]));
+    setMessages(previous=>previous.map(m=>{
+     const link=byId.get(m.id);
+     return link&&link.path===m.storage_path?{...m,url:link.url||m.url||null}:m;
+    }));
+   }).catch(()=>{/* An older attachment can be refreshed on demand. */});
+   return true;
+  }catch(error){
+   if(channelRef.current===cid)setError(userError(error));
+   return false;
+  }finally{loadingOlderChatRef.current=false;if(channelRef.current===cid)setOlderChatLoading(false)}
+ }
  async function loadRecentChatMessages(cid:string){
   if(recentChatRecoveryRunning.current||channelRef.current!==cid)return;
   // A recovery poll must not invalidate an in-flight initial history load.
@@ -1413,6 +1500,7 @@ export function useRepublicGame(gameId:string){
   recentChatRecoveryRunning.current=true;
   try{
    const latest=messageRowsRef.current.filter(m=>m.channel_id===cid).at(-1)?.created_at;
+   if(!latest)return; // The first fetch is strictly ten messages.
    let query=supabase.from('chat_messages').select('*').eq('channel_id',cid)
     .order('created_at',{ascending:!!latest}).limit(75);
    if(latest)query=query.gte('created_at',latest);
@@ -2295,6 +2383,6 @@ export function useRepublicGame(gameId:string){
   finally{mediaOperationRef.current=false;setRecordingSaving(false)}
  }
 
- return {gdMandateCapacity,gdEffectivePresence,game:game?.id===gameId?game:null,me:visibleMe,metrics:sharedMetrics,budgetPulse,budgetPulseError,refreshBudgetPulse,activeView,setActiveView,events,members,officeAssignments,channels,channelId,setChannelId,messages,chatPins,pinnedMessages,chatOverview,chatUnreadCount:chatOverview.reduce((sum,row)=>sum+Number(row.unread_count||0),0),chatMentionCount:chatOverview.reduce((sum,row)=>sum+Number(row.mention_count||0),0),setChatChannelPinned,markChatRead,chatLoading,stages,parties,votes,ballots,evaluations,crises,documents,activities,presence,profiles,profilesLoaded:profileGameId===gameId,introAccountSeen,partyDocuments,partyInvitations,partyMandates,partyAgreements,politicalPosts,politicalMedia,postFormalLinks,metricHistory:sharedMetricHistory,partySupportHistory,impactRules,impactLedger,formalDocuments,formalHistory,loading,error,setError,chatOpen,setChatOpen,recording,recordingPreview,recordingSaving,chatMediaError,chatMediaPhase,recordingStartedAt,recordingStream:recordingStream.current,realtimeState,teacher,names,currentStage,myEvaluations,averageVsn,
+ return {gdMandateCapacity,gdEffectivePresence,game:game?.id===gameId?game:null,me:visibleMe,metrics:sharedMetrics,budgetPulse,budgetPulseError,refreshBudgetPulse,activeView,setActiveView,events,members,officeAssignments,channels,channelId,setChannelId,messages,hasOlderChatMessages,olderChatLoading,loadOlderChatMessages,chatPins,pinnedMessages,chatOverview,chatUnreadCount:chatOverview.reduce((sum,row)=>sum+Number(row.unread_count||0),0),chatMentionCount:chatOverview.reduce((sum,row)=>sum+Number(row.mention_count||0),0),setChatChannelPinned,markChatRead,chatLoading,stages,parties,votes,ballots,evaluations,crises,documents,activities,presence,profiles,profilesLoaded:profileGameId===gameId,introAccountSeen,partyDocuments,partyInvitations,partyMandates,partyAgreements,politicalPosts,politicalMedia,postFormalLinks,metricHistory:sharedMetricHistory,partySupportHistory,impactRules,impactLedger,formalDocuments,formalHistory,loading,error,setError,chatOpen,setChatOpen,recording,recordingPreview,recordingSaving,chatMediaError,chatMediaPhase,recordingStartedAt,recordingStream:recordingStream.current,realtimeState,teacher,names,currentStage,myEvaluations,averageVsn,
   refresh,refreshDocuments,refreshEventEffects,logout,touchPresence,logActivity,setTurn,setTurnMinutes,openStage,manageStage,nextStage,resetStageProgress,configureStageDeadline,setStageDeadline,availableActors,createPoliticalPost,updatePoliticalPost,addMediaToPoliticalPost,acceptPoliticalPost,rejectPoliticalPost,approvePostImpact,createVoteFromPost,updateImpactRule,revertImpactEntry,createParty,voteForPartyChair,updateParty,renameParty,setPartyLeader,setPartyMandates,updatePartyStatistics,inviteToParty,respondPartyInvitation,cancelPartyInvitation,removePartyMember,proposePartyAgreement,respondPartyAgreement,submitPartyRegistration,reviewPartyRegistration,applyPartyGhostLoss,drawGhostVoting,clearPartyGhostLoss,applyGhostVotingBatch,deleteParty,updateMember,createVote,canVote,ballotWeight,castVote,castVoteAllocation,setStudentMandates,closeVote,deleteVote,tally,quorum,setEvaluation,publishEvent,triggerCrisis,ghostVoting,createDocument,updateMetric,saveProfile,saveSignature,savePartyIdentity,uploadPartyDocument,reviewPartyDocument,deletePartyDocument,createFormalDocument,deleteFormalDocument,advanceFormalDocument,updateFormalDraft,vetoFormalDocument,resolveBudgetConciliation,startBudgetRejectionBranch,sendText,sendChatFile,setChatPin,refreshChatMediaUrl,toggleRecording,discardRecording,sendRecordingPreview};
 }
