@@ -33,9 +33,9 @@ function realm(kind='profile',{old=false,hidden=false,user='student-0',teacher=f
   if(Array.isArray(data)){data=data.filter(row=>Object.entries(filters).every(([k,v])=>row[k]===v));if(columns&&columns!=='*')data=data.map(row=>Object.fromEntries(columns.split(',').map(k=>[k,row[k]])));if(limit)data=data.slice(0,limit);}
   return{data:failures.has(name)?null:data,error:failures.has(name)?{message:'synthetic failure '+name}:null};
  }
- function query(name,args){const filters={};let columns,limit,signal,promise;
-  const builder={select(value){columns=value;return this;},eq(k,v){filters[k]=v;return this;},order(){return this;},limit(n){limit=n;return this;},abortSignal(v){signal=v;return this;},then(resolve,reject){
-   if(!promise){const reply=response(name,args,filters,columns,limit);reads++;inflight++;maxInflight=Math.max(maxInflight,inflight);calls.push({name,args,filters:{...filters},at:now,signal});
+ function query(name,args){const filters={};let columns,limit,signal,promise,rangeStart,rangeEnd;
+  const builder={select(value){columns=value;return this;},eq(k,v){filters[k]=v;return this;},order(){return this;},limit(n){limit=n;return this;},range(from,to){rangeStart=from;rangeEnd=to;return this;},abortSignal(v){signal=v;return this;},then(resolve,reject){
+   if(!promise){const reply=response(name,args,filters,columns,limit);if(Array.isArray(reply.data)&&rangeStart!==undefined)reply.data=reply.data.slice(rangeStart,rangeEnd+1);reads++;inflight++;maxInflight=Math.max(maxInflight,inflight);calls.push({name,args,filters:{...filters},at:now,signal});
     promise=new Promise(done=>{let settled=false;const finish=value=>{if(settled)return;settled=true;signal?.removeEventListener('abort',abort);inflight--;const size=Buffer.byteLength(JSON.stringify(value));bytes+=size;if(name==='get_public_stage_scores'){publicRows+=value.data?.length||0;publicBytes+=size;}done(value);};const abort=()=>{if(!ignoreAbort)finish({data:null,error:{message:'aborted'}});};if(signal?.aborted)abort();else signal?.addEventListener('abort',abort,{once:true});if(holds)held.push(()=>finish(reply));else Promise.resolve().then(()=>finish(reply));});
    }return promise.then(resolve,reject);
   }};return builder;

@@ -1,0 +1,70 @@
+name: 'ГОС.ID · 100 JWT: Публичные оценки 16 этапов'
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/public-scores-auth-100.yml'
+      - 'supabase/tests/public_scores_100_local.cjs'
+      - 'supabase/tests/public_scores_100_local_setup.sql'
+      - 'supabase/migrations/20260930013000_public_grade_privacy.sql'
+permissions:
+  contents: read
+concurrency:
+  group: gos-scores-auth-100-qa
+  cancel-in-progress: true
+jobs:
+  public-scores-100:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    env:
+      GOS_SCORES_QA: LOCAL-100
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci --no-audit --no-fund
+      - run: node --check supabase/tests/public_scores_100_local.cjs
+      - uses: supabase/setup-cli@v3
+        with:
+          version: latest
+      - name: Start isolated ephemeral local Supabase
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/gos-scores-100
+          cd /tmp/gos-scores-100
+          supabase init
+          supabase start -x storage-api,imgproxy,mailpit,postgres-meta,studio,edge-runtime,logflare,vector,supavisor
+      - name: Export only disposable loopback auth configuration
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd /tmp/gos-scores-100
+          while IFS='=' read -r key value; do
+            value="$(printf '%s' "$value" | sed 's/^"//;s/"$//')"
+            printf '%s=%s\n' "$key" "$value" >> "$GITHUB_ENV"
+          done < <(
+            supabase status -o env \
+              --override-name api.url=SUPABASE_URL \
+              --override-name auth.anon_key=SUPABASE_ANON_KEY \
+              --override-name auth.service_role_key=SUPABASE_SERVICE_ROLE_KEY
+          )
+      - name: Load reduced local RLS and unchanged production public score RPC
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd /tmp/gos-scores-100
+          DB_URL="$(supabase status -o env | sed -n 's/^DB_URL="\([^"]*\)"$/\1/p')"
+          test -n "$DB_URL"
+          psql "$DB_URL" -v ON_ERROR_STOP=1 -f "$GITHUB_WORKSPACE/supabase/tests/blitz_supabase_setup.sql"
+          psql "$DB_URL" -v ON_ERROR_STOP=1 -f "$GITHUB_WORKSPACE/supabase/tests/public_scores_100_local_setup.sql"
+          psql "$DB_URL" -v ON_ERROR_STOP=1 -f "$GITHUB_WORKSPACE/supabase/migrations/20260930013000_public_grade_privacy.sql"
+          psql "$DB_URL" -v ON_ERROR_STOP=1 -c "NOTIFY pgrst, 'reload schema';"
+          sleep 2
+      - name: Verify 100 independently authenticated scoring clients
+        run: node supabase/tests/public_scores_100_local.cjs
+      - name: Destroy local environment without backup
+        if: always()
+        run: |
+          cd /tmp/gos-scores-100 || exit 0
+          supabase stop --no-backup
