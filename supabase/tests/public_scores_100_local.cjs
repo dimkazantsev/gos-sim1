@@ -61,9 +61,16 @@ async function main(){
     status:'final',evidence_summary:{private:'OTHER GAME'}
   }),'Foreign game assessment');
   const fetch=async(p,g=GAME)=>{
-    const start=performance.now();
-    const r=await p.db.rpc('get_public_stage_scores',{p_game_id:g});
-    return{...r,ms:performance.now()-start,bytes:Buffer.byteLength(JSON.stringify(r.data??[]))};
+    const start=performance.now(),rows=[];
+    let calls=0;
+    for(let from=0;from<16000;from+=1000){
+      const page=await p.db.rpc('get_public_stage_scores',{p_game_id:g}).range(from,from+999);
+      calls++;
+      if(page.error)return{...page,ms:performance.now()-start,bytes:0,calls};
+      rows.push(...(page.data||[]));
+      if((page.data||[]).length<1000)break;
+    }
+    return{data:rows,error:null,ms:performance.now()-start,bytes:Buffer.byteLength(JSON.stringify(rows)),calls};
   };
   const denied=await Promise.all([
     fetch(outsider),fetch(teacher,OTHER),make(u.origin,anon).rpc('get_public_stage_scores',{p_game_id:GAME})
@@ -74,6 +81,7 @@ async function main(){
   assert.equal(teacherRead.data.length,1600);
   assert.equal(guestRead.data.length,1600,'Public scores are game-visible, not teacher-only');
   const first=await Promise.all(students.map(s=>fetch(s)));
+  assert(first.every(r=>r.calls===2),'Each 1600-row public score snapshot needs two range requests');
   assert(first.every(r=>!r.error&&r.data.length===1600),
     'All 100 concurrent JWT projections must succeed and contain 16 scores per player');
   for(const r of first)assert(r.data.every(a=>a.stage_no>=1&&a.stage_no<=16&&
@@ -109,7 +117,7 @@ async function main(){
     students:100,stages:16,rowsPerPublicProjection:1600,initialReads:100,refreshedReads:100,reauthenticated:50,
     teacherFinalOverridesDraft:true,privateAssessmentRowsExposedToOtherStudent:0,
     guestPrivateRows:0,outsiderPrivateRows:0,forbiddenRPCsDenied:3,
-    requestErrors:0,rpcLatencyMs:percentiles(both.map(x=>x.ms)),
+    requestErrors:0,rpcCalls:both.reduce((v,x)=>v+x.calls,0),rpcLatencyMs:percentiles(both.map(x=>x.ms)),
     returnedJsonBytes:both.reduce((v,x)=>v+x.bytes,0),productionRequests:0,
     limitations:'Synthetic clients, simplified fixture; not 100 live humans or full stage transition/playback, full production RLS or network egress'}));
 }
