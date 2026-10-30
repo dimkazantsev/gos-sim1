@@ -174,8 +174,34 @@ async function main(){
    await event.getByRole('button',{name:'Начать событие',exact:true}).click();await event.getByRole('button',{name:'Подготовить заявку',exact:true}).waitFor();
    await event.getByRole('button',{name:'Подготовить заявку',exact:true}).click();const requestForm=sim.getByRole('region',{name:'Заявка по региональному событию'});
    assert.equal(await requestForm.getByLabel('Запрашиваемая сумма, ₽').inputValue(),'1250000000','The event estimate is translated to rubles for the author');
-   await requestForm.getByLabel('Ожидаемый результат заявки').fill('');await requestForm.getByRole('button',{name:'Направить заявку в расходы',exact:true}).click();
-   await sim.getByRole('alert').waitFor();assert.equal(f.calls.filter(c=>c.rpc==='create_budget_event_transfer_request').length,0,'An incomplete event outcome is rejected before mutation');
+   const outcome=requestForm.getByLabel('Ожидаемый результат заявки');
+   const submitRequest=requestForm.getByRole('button',{name:'Направить заявку в расходы',exact:true});
+   await outcome.fill('');
+   assert.equal(await outcome.inputValue(),'','The invalid result must reach the controlled textarea at '+width+'px');
+   await submitRequest.click();
+   try{
+    await sim.getByRole('alert').waitFor();
+   }catch(cause){
+    // #495 diagnostic only, triggered on test failure with synthetic QA inputs.
+    const diagnostic=await page.evaluate(()=>{
+     const root=document.querySelector('[aria-label="Федеральный бюджетный симулятор"]');
+     const region=document.querySelector('[aria-label="Заявка по региональному событию"]');
+     const btn=[...(region?.querySelectorAll('button')||[])].find(x=>x.textContent?.includes('Направить заявку в расходы'));
+     const input=[...(region?.querySelectorAll('textarea')||[])].at(-1);
+     return {activeTab:document.querySelector('[role="tab"][aria-selected="true"]')?.textContent,
+      regionFound:!!region,alerts:[...(root?.querySelectorAll('[role="alert"]')||[])].map(x=>({text:x.textContent?.slice(0,300),rectCount:x.getClientRects().length})),
+      textareaValueLength:input?.value?.length,textareaDisabled:input?.disabled,
+      submitFound:!!btn,submitDisabled:btn?.disabled,buttonText:btn?.textContent?.slice(0,100),
+      mainExists:!!root,documentWidth:document.documentElement.scrollWidth};
+    });
+    const screenshot=path.join(output,'issue495-failure-'+width+'.png');
+    await page.screenshot({path:screenshot,fullPage:true}).catch(()=>{});
+    const evidence={width,diagnostic,qaMutationCalls:f.calls.filter(c=>c.rpc==='create_budget_event_transfer_request').length,
+     pageErrors:errors.slice(-5),screenshot,reason:String(cause)};
+    console.error('ISSUE495_DIAGNOSTIC '+JSON.stringify(evidence));
+    throw Error('Budget validation alert not displayed: '+JSON.stringify(evidence));
+   }
+   assert.equal(f.calls.filter(c=>c.rpc==='create_budget_event_transfer_request').length,0,'An incomplete event outcome is rejected before mutation');
    await requestForm.getByLabel('Ожидаемый результат заявки').fill(f.regional_events[0].budget_request.expected_result);
    await layout(page,'event request form '+width);await requestForm.screenshot({path:path.join(output,'event-request-'+width+'.png')});
    await requestForm.getByRole('button',{name:'Направить заявку в расходы',exact:true}).click();await event.getByText('Заявка подана',{exact:true}).waitFor();
