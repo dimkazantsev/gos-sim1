@@ -14,6 +14,53 @@ create table public.games(
 );
 alter table public.game_members add column full_name text;
 alter table public.game_members add column team text;
+-- Make the 100-client sign-in test use the actual production join_game_as_role
+-- function signature. This enum and all supporting tables exist only in the
+-- disposable QA database; they are NOT application migrations.
+create type public.member_kind as enum ('student','teacher','observer');
+alter table public.game_members alter column kind type public.member_kind
+ using kind::public.member_kind;
+alter table public.game_members add column group_name text;
+create extension if not exists pgcrypto with schema extensions;
+create table public.invite_codes(
+ id uuid primary key default gen_random_uuid(),
+ game_id uuid not null references public.games(id),
+ kind public.member_kind not null,
+ code_hash text not null,
+ active boolean not null default true
+);
+create table private.game_group_access_codes(
+ game_id uuid not null references public.games(id),
+ invite_id uuid not null references public.invite_codes(id),
+ group_name text not null
+);
+create table public.platform_admins(user_id uuid primary key);
+create table public.teacher_profiles(user_id uuid primary key);
+create table public.audit_log(
+ id bigint generated always as identity primary key,
+ game_id uuid not null references public.games(id),
+ actor_id uuid not null references auth.users(id),
+ action text not null,entity_type text not null,
+ payload jsonb not null default '{}'::jsonb
+);
+-- Only service_role prepares disposable invitations. Clients still use the
+-- exact production join RPC with real locally signed Auth/JWT.
+create or replace function public.qa_unified_seed_invitations(p_game_id uuid)
+returns void language plpgsql security definer set search_path='' as $seed$
+begin
+ if not exists(select 1 from public.qa_unified_chain_guard
+   where marker='gos-id-disposable-100x16-jwt-chain-20261030')
+ then raise exception 'Disposable QA marker missing'; end if;
+ insert into public.invite_codes(game_id,kind,code_hash,active)
+ values
+ (p_game_id,'student',extensions.crypt('STD-LOCAL-100',extensions.gen_salt('bf',6)),true),
+ (p_game_id,'observer',extensions.crypt('GST-LOCAL-100',extensions.gen_salt('bf',6)),true),
+ (p_game_id,'teacher',extensions.crypt('TCH-LOCAL-100',extensions.gen_salt('bf',6)),true);
+end;$seed$;
+revoke all on function public.qa_unified_seed_invitations(uuid) from public,anon,authenticated;
+grant execute on function public.qa_unified_seed_invitations(uuid) to service_role;
+revoke all on public.invite_codes,public.platform_admins,public.teacher_profiles,public.audit_log from public,anon,authenticated;
+revoke all on private.game_group_access_codes from public,anon,authenticated;
 create or replace function private.is_game_member(g uuid)
 returns boolean language sql stable security definer set search_path='' as $f$
  select auth.uid() is not null and exists(select 1 from public.game_members
