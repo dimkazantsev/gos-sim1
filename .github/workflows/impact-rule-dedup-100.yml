@@ -19,8 +19,8 @@ jobs:
       - run: node --check scripts/impact-rule-dedup-100-postgres-check.cjs
       - name: Start local disposable PostgreSQL
         run: |
-          docker run --rm -d --name gos-impact-100 -p 127.0.0.1:5432:5432 \\
-            -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=ci-only-password \\
+          docker run --rm -d --name gos-impact-100 -p 127.0.0.1:5432:5432 \
+            -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=ci-only-password \
             -e POSTGRES_DB=a07_fixture postgres:17 -c max_connections=160
           for attempt in $(seq 1 60); do
             if docker exec gos-impact-100 pg_isready -U postgres -d a07_fixture; then exit 0; fi
