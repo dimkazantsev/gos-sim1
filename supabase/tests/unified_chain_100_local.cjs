@@ -183,13 +183,14 @@ async function main(){
  }),'Restricted document fixture');
  const read=async p=>{
   const start=performance.now();
-  const [g0,g1,docs,impact,st]=await Promise.all([
-   p.client.rpc('get_public_stage_scores',{p_game_id:GAME}).range(0,999),
-   p.client.rpc('get_public_stage_scores',{p_game_id:GAME}).range(1000,1999),
-   p.client.rpc('get_formal_registry_projection',{p_game_id:GAME,p_document_ids:null}),
-   p.client.rpc('get_impact_engine_projection',{p_game_id:GAME}),
-   p.client.from('game_stages').select('stage_no,status').eq('game_id',GAME)
-  ]);
+  // 100 users remain active; cap each user's simultaneous read fan-out at 1.
+  // The unrestricted 5×100 burst exhausted disposable local PostgREST
+  // connections in CI; do NOT hide that finding or reduce the user count.
+  const g0=await p.client.rpc('get_public_stage_scores',{p_game_id:GAME}).range(0,999);
+  const g1=await p.client.rpc('get_public_stage_scores',{p_game_id:GAME}).range(1000,1999);
+  const docs=await p.client.rpc('get_formal_registry_projection',{p_game_id:GAME,p_document_ids:null});
+  const impact=await p.client.rpc('get_impact_engine_projection',{p_game_id:GAME});
+  const st=await p.client.from('game_stages').select('stage_no,status').eq('game_id',GAME);
   requests+=5;
   const data=[g0,g1,docs,impact,st];
   assert(data.every(x=>!x.error),'All five real authenticated reads for '+p.id+': '+
@@ -239,7 +240,7 @@ async function main(){
   parallelFinalReads:200,reauthenticated:50,crossGameOrRoleDenials:5,
   latencyVotesMs:stats(durations),latencyStageChainsMs:stats(stageReads),
   latencyFinalReadMs:stats([...first,...second].map(x=>x.ms)),
-  measuredJsonBytes:rpcBytes,httpRpcCalls:requests,
+  measuredJsonBytes:rpcBytes,httpRpcCalls:requests,maxPerUserConcurrentFinalReads:1,
   errors:0,productionRequests:0,
   limitations:'100 synthetic Auth clients, not 100 people; custom stage coordinator/grade data fixture, reduced RLS and missing non-document checks; no full browser UX, live egress or actual independent 16-stage legal procedures'
  }));
