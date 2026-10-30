@@ -229,8 +229,11 @@ async function main(){
  assert.equal(Number(metric.value),36,'Exactly 16 effects applied from 20 baseline');
  const ledger=ok(await admin.from('impact_ledger').select('rule_key').eq('game_id',GAME),'Impact ledger');
  assert.equal(ledger.length,16);
- const ballots=ok(await admin.from('game_ballots').select('vote_id,voter_id'),'All ballots');
- assert.equal(ballots.length,1600,'16 × 100 unique votes, no losses');
+ // Exact count avoids PostgREST's 1000-row response cap; each stage was
+ // independently checked for 100 unique voters before its transition.
+ const ballotTotal=await admin.from('game_ballots').select('vote_id',{count:'exact',head:true});
+ ok(ballotTotal,'Count all ballots without transferring 1600 rows');
+ assert.equal(ballotTotal.count,1600,'16 × 100 unique votes, no losses');
  console.log(JSON.stringify({
   status:'PASS',
   scope:'ONE disposable local Supabase game; real Auth/JWT, PostgREST, production vote/close and grade/formal/impact read RPCs, stage doc guard and automatic-effect function bodies; simplified fixtures for stage-specific mechanics, document creation, grading and other readiness checks. Not full-game E2E.',
