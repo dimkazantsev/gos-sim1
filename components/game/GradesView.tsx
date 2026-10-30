@@ -107,17 +107,36 @@ export default function GradesView({g,compact=false,onOpenProfile,onPublicScores
   try{
    await Promise.race([(async()=>{
    if(teacher){
-    const r=await supabase.from('stage_assessments').select('*').eq('game_id',game.id).order('stage_no').abortSignal(signal);
-    if(!current())return;
-    if(r.error)g.setError(r.error.message);else{acceptedRowsScope.current=requestedScope;setRows((r.data||[]) as Assessment[])}
+    // PostgREST caps a single result at 1000 rows. 100 players × 16 stages
+    // need two ordered pages; never accept a truncated teacher journal.
+    const collected:Assessment[]=[];
+    let failed=false;
+    for(let page=0;page<50;page++){
+     const offset=page*1000;
+     const r=await supabase.from('stage_assessments').select('*').eq('game_id',game.id).order('stage_no').order('user_id').range(offset,offset+999).abortSignal(signal);
+     if(!current())return;
+     if(r.error){g.setError(r.error.message);failed=true;break}
+     collected.push(...((r.data||[]) as Assessment[]));
+     if((r.data||[]).length<1000)break;
+     if(page===49){g.setError('Превышен безопасный лимит загрузки оценок.');failed=true}
+    }
+    if(!failed&&current()){acceptedRowsScope.current=requestedScope;setRows(collected)}
    }else{
     // A profile needs one participant; the full journal still shows every public score.
-    let query=supabase.rpc('get_public_stage_scores',{p_game_id:game.id});
-    if(compact&&me)query=query.eq('user_id',me.user_id);
-    const publicResult=await query.abortSignal(signal);
-    if(!current())return;
-    if(publicResult.error){g.setError(publicResult.error.message);return}
-    const publicRows:PublicGradeScore[]=((publicResult.data||[]) as PublicGradeScore[]).map(a=>({user_id:a.user_id,stage_no:a.stage_no,auto_score:a.auto_score,final_score:a.final_score,status:a.status}));
+    const publicRows:PublicGradeScore[]=[];
+    // A compact personal journal is one short query; a full 100-person
+    // journal requires ordered, bounded PostgREST pages (1000-row cap).
+    for(let page=0;page<50;page++){
+     let query=supabase.rpc('get_public_stage_scores',{p_game_id:game.id});
+     if(compact&&me)query=query.eq('user_id',me.user_id);
+     const offset=page*1000;
+     const publicResult=await query.range(offset,offset+999).abortSignal(signal);
+     if(!current())return;
+     if(publicResult.error){g.setError(publicResult.error.message);return}
+     publicRows.push(...((publicResult.data||[]) as PublicGradeScore[]).map(a=>({user_id:a.user_id,stage_no:a.stage_no,auto_score:a.auto_score,final_score:a.final_score,status:a.status})));
+     if((publicResult.data||[]).length<1000)break;
+     if(page===49){g.setError('Превышен безопасный лимит загрузки оценок.');return}
+    }
     publicScoresCallback.current?.(publicRows);
     const safeRows:Assessment[]=publicRows
     .map(a=>({...a,id:'public-'+a.user_id+'-'+a.stage_no,game_id:game.id,
