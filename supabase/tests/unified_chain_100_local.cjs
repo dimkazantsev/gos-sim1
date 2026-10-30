@@ -89,8 +89,8 @@ async function main(){
   assert(!r.error&&r.data===GAME,'Original production role-join must return game ID: '+r.error?.message);
   return r.data;
  };
- const memberships=await batches(people,10,p=>join(p,'student','STD-LOCAL-100','ГМУ-100'));
- assert.equal(memberships.length,100,'100 student joins completed');
+ const enrollments=await batches(people,10,p=>join(p,'student','STD-LOCAL-100','ГМУ-100'));
+ assert.equal(enrollments.length,100,'100 student joins completed');
  await join(guest,'observer','GST-LOCAL-100',null);
  const [wrongStudentCode,crossRole,teacherToStudent,guestToStudent,anonymousJoin]=await Promise.all([
   people[1].client.rpc('join_game_as_role',{p_game_code:'CQA100',
