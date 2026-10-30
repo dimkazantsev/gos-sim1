@@ -64,15 +64,63 @@ async function main(){
  const teacher=await who('teacher',0),guest=await who('guest',0),outsider=await who('outsider',0);
  const people=await batches(Array.from({length:100},(_,i)=>i),10,i=>who('student',i));
  assert.equal(new Set(people.map(p=>p.id)).size,100);
- const all=[...people,teacher,guest];
  ok(await admin.from('games').insert([
   {id:GAME,title:'Disposable 100×16 chain QA',game_code:'CQA100',owner_id:teacher.id},
   {id:FOREIGN,title:'Foreign disposable game',game_code:'CQA200',owner_id:outsider.id}
  ]),'Games');
+ // The teacher owns the pre-existing test game (its creation is a fixture).
+ // Students and the observer join with the ORIGINAL production join_game_as_role
+ // function, using individual Auth/JWT sessions and hashed local invites.
  ok(await admin.from('game_members').insert([
-  ...all.map(p=>({game_id:GAME,user_id:p.id,kind:p.role,role_title:p.role,full_name:'Local QA '+p.role})),
+  {game_id:GAME,user_id:teacher.id,kind:'teacher',role_title:'Преподаватель',full_name:'Local QA Teacher'},
   {game_id:FOREIGN,user_id:outsider.id,kind:'student',role_title:'Student',full_name:'Foreign only'}
- ]),'Membership');
+ ]),'Teacher and foreign fixture membership');
+ ok(await admin.from('teacher_profiles').insert({user_id:teacher.id}),'Teacher profile fixture');
+ ok(await admin.rpc('qa_unified_seed_invitations',{p_game_id:GAME}),'Disposable invitation seed');
+ const joinedMs=[];
+ const join=async(p,kind,code,group)=>{
+  const start=performance.now();
+  const r=await p.client.rpc('join_game_as_role',{
+   p_game_code:'CQA100',p_invite_code:code,
+   p_full_name:'Local QA '+p.role+' '+p.id.slice(0,8),
+   p_group_name:group,p_expected_kind:kind
+  });
+  joinedMs.push(performance.now()-start);
+  assert(!r.error&&r.data===GAME,'Original production role-join must return game ID: '+r.error?.message);
+  return r.data;
+ };
+ const memberships=await batches(people,10,p=>join(p,'student','STD-LOCAL-100','ГМУ-100'));
+ assert.equal(memberships.length,100,'100 student joins completed');
+ await join(guest,'observer','GST-LOCAL-100',null);
+ const [wrongStudentCode,crossRole,teacherToStudent,guestToStudent,anonymousJoin]=await Promise.all([
+  people[1].client.rpc('join_game_as_role',{p_game_code:'CQA100',
+   p_invite_code:'TCH-LOCAL-100',p_full_name:'Local QA Student',
+   p_group_name:'ГМУ-100',p_expected_kind:'student'}),
+  people[0].client.rpc('join_game_as_role',{p_game_code:'CQA100',
+   p_invite_code:'TCH-LOCAL-100',p_full_name:'Local QA Student',
+   p_group_name:null,p_expected_kind:'teacher'}),
+  teacher.client.rpc('join_game_as_role',{p_game_code:'CQA100',
+   p_invite_code:'STD-LOCAL-100',p_full_name:'Local QA Teacher',
+   p_group_name:'ГМУ-100',p_expected_kind:'student'}),
+  guest.client.rpc('join_game_as_role',{p_game_code:'CQA100',
+   p_invite_code:'STD-LOCAL-100',p_full_name:'Local QA Observer',
+   p_group_name:'ГМУ-100',p_expected_kind:'student'}),
+  make(u.origin,anon).rpc('join_game_as_role',{p_game_code:'CQA100',
+   p_invite_code:'STD-LOCAL-100',p_full_name:'Unauthenticated QA',
+   p_group_name:'ГМУ-100',p_expected_kind:'student'})
+ ]);
+ assert([wrongStudentCode,crossRole,teacherToStudent,guestToStudent,anonymousJoin]
+  .every(x=>!!x.error),'Wrong invitation, role crossover and unauthenticated entry must be rejected');
+ const joined=ok(await admin.from('game_members').select('user_id,kind,group_name')
+  .eq('game_id',GAME),'Verify memberships after rejected crossovers');
+ assert.equal(joined.length,102,'Exactly 100 students, one teacher and one observer');
+ assert.equal(joined.filter(m=>m.kind==='student').length,100);
+ assert.equal(joined.filter(m=>m.kind==='teacher').length,1);
+ assert.equal(joined.filter(m=>m.kind==='observer').length,1);
+ assert(joined.filter(m=>m.kind==='student').every(m=>m.group_name==='ГМУ-100'));
+ const audits=await admin.from('audit_log').select('id',{count:'exact',head:true}).eq('game_id',GAME).eq('action','member_joined');
+ ok(audits,'Audit enrollment count');
+ assert.equal(audits.count,101,'Only successful join RPCs must create audit entries');
  ok(await admin.from('game_stages').insert(stages.map(stage_no=>({game_id:GAME,stage_no,status:'open'}))),'16 stages');
  ok(await admin.from('state_metrics').insert({game_id:GAME,metric_key:'economy',value:20,min_value:0,max_value:100}),'Start economy');
  ok(await admin.from('impact_rules').insert(stages.map(s=>({
@@ -223,6 +271,17 @@ async function main(){
    JSON.stringify(data.filter(x=>x.error).map(x=>x.error.message)));
   rpcBytes+=data.reduce((n,x)=>n+jsonBytes(x.data),0);
   assert.equal(g0.data.length+g1.data.length,1600,'All 100×16 scores visible');
+  const perStudent=new Map();
+  for(const record of [...g0.data,...g1.data]){
+   assert.equal(record.status,'final','Score row must be final');
+   const numbers=perStudent.get(record.user_id)||new Set();
+   assert(!numbers.has(record.stage_no),'Duplicate stage score for '+record.user_id);
+   numbers.add(record.stage_no);
+   perStudent.set(record.user_id,numbers);
+  }
+  assert.equal(perStudent.size,100,'Final stage results must cover 100 distinct participants');
+  assert(people.every(student=>perStudent.get(student.id)?.size===16),
+   'Each registered participant must have exactly 16 final stage results');
   assert.equal(impact.data.rules.length,16);
   assert.equal(impact.data.ledger.length,16);
   assert.equal(st.data.length,16);
@@ -264,6 +323,10 @@ async function main(){
   status:'PASS',
   scope:'ONE disposable local Supabase game; real Auth/JWT, PostgREST, production vote/close and grade/formal/impact read RPCs, stage doc guard and automatic-effect function bodies; simplified fixtures for stage-specific mechanics, document creation, grading and other readiness checks. Not full-game E2E.',
   independentJWTs:100,stages:16,ballots:1600,duplicatesRetried:50,
+  joinedViaOriginalProductionRoleRpc:100,observerJoinedViaOriginalProductionRoleRpc:1,
+  negativeJoinAttemptsDenied:5,enrollmentLatencyMs:stats(joinedMs),
+  teacherGameCreation:'fixture only, not original owner creation RPC',
+  studentIdentityProvisioning:'admin-created confirmed accounts, not browser anonymous sign-in',
   teacherStageTransitions:16,officialDocuments:totals.reduce((n,x)=>n+x.documents,0),
   gradeRows:1600,impactRows:16,finalEconomy:36,
   parallelFinalReads:200,reauthenticated:50,crossGameOrRoleDenials:5,
@@ -273,7 +336,7 @@ async function main(){
   latencyFinalReadMs:stats([...first,...second].map(x=>x.ms)),
   measuredJsonBytes:rpcBytes,httpRpcCalls:requests,maxPerUserConcurrentFinalReads:1,
   errors:0,productionRequests:0,
-  limitations:'100 synthetic Auth clients, not 100 people; custom stage coordinator/grade data fixture, reduced RLS and missing non-document checks; no full browser UX, live egress or actual independent 16-stage legal procedures'
+  limitations:'100 synthetic Auth/JWT clients, not real people. Original production join_game_as_role is exercised, but accounts and game owner are seeded by admin fixtures; role/RLS schema is reduced. Stage coordinator, document creation, grade contents and non-document conditions remain fixtures. No full browser UX, live egress, or 16 actual legal stage workflows'
  }));
 }
 main().catch(e=>{console.error('FAIL unified 100×16: '+(e.stack||e));process.exitCode=1});
