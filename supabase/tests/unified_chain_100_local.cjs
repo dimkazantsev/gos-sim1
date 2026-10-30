@@ -95,6 +95,32 @@ async function main(){
   forbidden[3].error&&forbidden[4].error,'Server must deny outsider, guest, anon and direct ballot read');
  const memberStage=await people[0].client.from('game_stages').select('status').eq('game_id',GAME).eq('stage_no',1).single();
  assert(!memberStage.error&&memberStage.data.status==='open','Forbidden update did not alter stage');
+ // #491: 100 distinct student JWTs must not acquire teacher write rights
+ // under concurrent requests, nor read a second game's stage rows.
+ // The local table has a deliberately simplified RLS policy; this verifies
+ // that policy, not all production permissions.
+ const deniedWriteMs=[],foreignReadMs=[];
+ const rejected=await Promise.all(people.map(async p=>{
+  const started=performance.now();
+  const update=await p.client.from('game_stages').update({status:'completed'})
+   .eq('game_id',GAME).eq('stage_no',1).select('stage_no,status');
+  deniedWriteMs.push(performance.now()-started);
+  const next=performance.now();
+  const foreign=await p.client.from('game_stages').select('stage_no,status')
+   .eq('game_id',FOREIGN);
+  foreignReadMs.push(performance.now()-next);
+  return {update,foreign};
+ }));
+ assert.equal(rejected.length,100);
+ assert(rejected.every(x=>!x.update.error&&Array.isArray(x.update.data)&&x.update.data.length===0),
+  '100 student JWTs must modify zero stage rows without server errors');
+ assert(rejected.every(x=>!x.foreign.error&&Array.isArray(x.foreign.data)&&x.foreign.data.length===0),
+  '100 student JWTs must see zero stages from a foreign game without server errors');
+ const afterDenied=ok(await teacher.client.from('game_stages').select('stage_no,status')
+  .eq('game_id',GAME),'Check stage integrity after 100 denied writes');
+ assert.equal(afterDenied.length,16);
+ assert(afterDenied.every(s=>s.status==='open'),
+  'All 16 stage states must remain intact after simultaneous unauthorized writes');
  const durations=[],duplicates=[],stageReads=[],blocked=[],totals=[];
  for(const stage of stages){
   const initial=performance.now();
@@ -241,6 +267,8 @@ async function main(){
   teacherStageTransitions:16,officialDocuments:totals.reduce((n,x)=>n+x.documents,0),
   gradeRows:1600,impactRows:16,finalEconomy:36,
   parallelFinalReads:200,reauthenticated:50,crossGameOrRoleDenials:5,
+  concurrentStudentStageWriteDenials:100,foreignGameStageReadDenials:100,
+  denialLatencyMs:stats(deniedWriteMs),foreignGameReadLatencyMs:stats(foreignReadMs),
   latencyVotesMs:stats(durations),latencyStageChainsMs:stats(stageReads),
   latencyFinalReadMs:stats([...first,...second].map(x=>x.ms)),
   measuredJsonBytes:rpcBytes,httpRpcCalls:requests,maxPerUserConcurrentFinalReads:1,
