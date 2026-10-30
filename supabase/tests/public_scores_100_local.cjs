@@ -89,9 +89,10 @@ async function main(){
   assert(!privateReads[2].error&&privateReads[2].data.length===0,'Foreign user sees no private assessments');
   // Teacher final mark supersedes automatic score; never sum both.
   const compute=(rows,id)=>rows.filter(x=>x.user_id===id).reduce((sum,x)=>sum+Number(x.status==='final'?(x.final_score??x.auto_score):x.auto_score),0);
-  const s=students[0],before=compute(first[0].data,s.user_id);
+  const s=students[1],before=compute(first[0].data,s.user_id);
   ok(await admin.from('stage_assessments').update({final_score:0,status:'final'}).eq('game_id',GAME).eq('user_id',s.user_id).eq('stage_no',1),'Teacher-style final mark fixture');
-  const expected=before-assessments[0].auto_score;
+  const expected=before-assessments[16].auto_score;
+  assert.equal(assessments[16].auto_score,1,'Fixture must demonstrate a real final-score change');
   for(const p of students.slice(0,50)){
     ok(await p.db.auth.signOut(),'Sign out');
     const logged=await p.db.auth.signInWithPassword({email:p.email,password:PASS});
