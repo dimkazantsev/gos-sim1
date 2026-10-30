@@ -9,7 +9,7 @@ on:
 permissions:
   contents: read
 concurrency:
-  group: gos-unified-100-16-\${{ github.event.pull_request.number }}
+  group: gos-unified-100-16-${{ github.event.pull_request.number }}
   cancel-in-progress: true
 jobs:
   unified-chain:
