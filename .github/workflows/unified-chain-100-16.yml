@@ -1,0 +1,95 @@
+name: 'ГОС.ID · 100 JWT: Единая цепочка 16 этапов'
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/unified-chain-100-16.yml'
+      - 'supabase/tests/unified_chain_100_local.cjs'
+      - 'supabase/tests/unified_chain_100_local_setup.sql'
+      - 'supabase/tests/unified_chain_100_local_bind.sql'
+permissions:
+  contents: read
+concurrency:
+  group: gos-unified-100-16-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+jobs:
+  unified-chain:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    env:
+      GOS_UNIFIED_QA: LOCAL-100-16
+      GOS_BALLOT_AUTH_QA: LOCAL-100
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci --no-audit --no-fund
+      - run: |
+          node --check supabase/tests/unified_chain_100_local.cjs
+          node --check scripts/ballot-auth-100-local.cjs
+      - uses: supabase/setup-cli@v3
+        with:
+          version: latest
+      - name: Start disposable Supabase on loopback
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/gos-unified-100-16
+          cd /tmp/gos-unified-100-16
+          supabase init
+          supabase start -x storage-api,imgproxy,mailpit,postgres-meta,studio,edge-runtime,logflare,vector,supavisor
+      - name: Export ONLY temporary localhost environment
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd /tmp/gos-unified-100-16
+          while IFS='=' read -r key value; do
+            value="$(printf '%s' "$value" | sed 's/^"//;s/"$//')"
+            printf '%s=%s\n' "$key" "$value" >> "$GITHUB_ENV"
+          done < <(
+            supabase status -o env \
+              --override-name api.url=SUPABASE_URL \
+              --override-name auth.anon_key=SUPABASE_ANON_KEY \
+              --override-name auth.service_role_key=SUPABASE_SERVICE_ROLE_KEY
+          )
+      - name: Install unchanged production SQL bodies into ONE disposable fixture
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd /tmp/gos-unified-100-16
+          DB_URL="$(supabase status -o env | sed -n 's/^DB_URL="\([^"]*\)"$/\1/p')"
+          test -n "$DB_URL"
+          cd "$GITHUB_WORKSPACE"
+          node scripts/ballot-auth-100-local.cjs --schema > /tmp/gos-unified-ballot.sql
+          psql "$DB_URL" -v ON_ERROR_STOP=1 -f /tmp/gos-unified-ballot.sql
+          psql "$DB_URL" -v ON_ERROR_STOP=1 -f supabase/tests/unified_chain_100_local_setup.sql
+          node - <<'NODE'
+          const fs=require('node:fs');
+          const specs=[
+           ['supabase/migrations/20261018152000_three_distinct_gd_resolutions_and_publication_rights.sql',
+            /CREATE OR REPLACE FUNCTION private\.stage_required_final_documents[\s\S]*?\$function\$;/i],
+           ['supabase/migrations/20261018050000_all_stage_final_documents_guard.sql',
+            /CREATE OR REPLACE FUNCTION private\.guard_stage_finalization[\s\S]*?\$guard\$;/i]
+          ];
+          const out=specs.map(([p,re])=>{
+           const s=fs.readFileSync(p,'utf8').match(re)?.[0];
+           if(!s)throw Error('Missing original production SQL function in '+p);
+           return s;
+          });
+          fs.writeFileSync('/tmp/gos-unified-stage.sql',out.join('\n')+'\n');
+          NODE
+          psql "$DB_URL" -v ON_ERROR_STOP=1 -f /tmp/gos-unified-stage.sql
+          psql "$DB_URL" -v ON_ERROR_STOP=1 -f supabase/migrations/20260930013000_public_grade_privacy.sql
+          psql "$DB_URL" -v ON_ERROR_STOP=1 -f supabase/migrations/20261029171500_formal_registry_projection_invoker.sql
+          psql "$DB_URL" -v ON_ERROR_STOP=1 -f supabase/migrations/20261029144000_impact_engine_projection_invoker.sql
+          psql "$DB_URL" -v ON_ERROR_STOP=1 -f supabase/migrations/20261030090000_serialize_same_source_impact_rule.sql
+          psql "$DB_URL" -v ON_ERROR_STOP=1 -f supabase/tests/unified_chain_100_local_bind.sql
+          psql "$DB_URL" -v ON_ERROR_STOP=1 -c "NOTIFY pgrst, 'reload schema';"
+          sleep 2
+      - name: ONE game, 100 JWT, 16 sequential stages, votes, docs, effects, grades and reconnect
+        run: node supabase/tests/unified_chain_100_local.cjs
+      - name: Destroy disposable Supabase without backup
+        if: always()
+        run: |
+          cd /tmp/gos-unified-100-16 || exit 0
+          supabase stop --no-backup
