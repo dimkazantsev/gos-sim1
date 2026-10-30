@@ -1,0 +1,62 @@
+name: 'ГОС.ID · QA: 100 браузерных входов (изолированный API)'
+on:
+  pull_request:
+    paths:
+      - 'scripts/qa-browser-entry-100-check.cjs'
+      - '.github/workflows/qa-browser-entry-100.yml'
+      - 'app/page.tsx'
+      - 'lib/supabase.ts'
+permissions:
+  contents: read
+concurrency:
+  group: gos-browser-entry-100-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+jobs:
+  browser-entry:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    env:
+      GOS_BROWSER_ENTRY_QA: MOCK-ONLY
+      NEXT_PUBLIC_SUPABASE_URL: http://127.0.0.1:54321
+      NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: sb_publishable_isolated_browser_qa
+      NEXT_TELEMETRY_DISABLED: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci --no-audit --no-fund
+      - run: node --check scripts/qa-browser-entry-100-check.cjs
+      - name: Verify controlled QA endpoint
+        run: |
+          set -euo pipefail
+          test "$GOS_BROWSER_ENTRY_QA" = MOCK-ONLY
+          test "$NEXT_PUBLIC_SUPABASE_URL" = "http://127.0.0.1:54321"
+          node -e "const x=process.env.NEXT_PUBLIC_SUPABASE_URL; if(new URL(x).hostname!=='127.0.0.1')process.exit(1)"
+      - name: Serve the real Next.js entry with localhost-only configuration
+        run: |
+          set -euo pipefail
+          npm run dev -- --hostname 127.0.0.1 --port 4180 >/tmp/gos-browser-entry-next.log 2>&1 &
+          echo $! > /tmp/gos-browser-entry-next.pid
+          for i in $(seq 1 75); do
+            if curl --silent --fail --max-time 2 http://127.0.0.1:4180/ >/dev/null; then exit 0; fi
+            sleep 2
+          done
+          tail -80 /tmp/gos-browser-entry-next.log || true
+          exit 1
+      - name: Browser QA (100 contexts in 10 waves, no production calls)
+        run: node scripts/qa-browser-entry-100-check.cjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: gos-browser-entry-qa-5-viewports
+          path: .design-review/screenshots/qa-entry-*.png
+          if-no-files-found: ignore
+          retention-days: 3
+      - name: Stop isolated UI server
+        if: always()
+        run: |
+          if [ -f /tmp/gos-browser-entry-next.pid ]; then
+            kill "$(cat /tmp/gos-browser-entry-next.pid)" 2>/dev/null || true
+          fi
