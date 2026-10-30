@@ -14,14 +14,14 @@ create table public.games(
 );
 alter table public.game_members add column full_name text;
 alter table public.game_members add column team text;
-create or replace function private.is_game_member(p_game uuid)
+create or replace function private.is_game_member(g uuid)
 returns boolean language sql stable security definer set search_path='' as $f$
  select auth.uid() is not null and exists(select 1 from public.game_members
- where game_id=p_game and user_id=auth.uid()) $f$;
-create or replace function private.is_game_teacher(p_game uuid)
+ where game_id=g and user_id=auth.uid()) $f$;
+create or replace function private.is_game_teacher(g uuid)
 returns boolean language sql stable security definer set search_path='' as $f$
  select auth.uid() is not null and exists(select 1 from public.game_members
- where game_id=p_game and user_id=auth.uid() and kind='teacher') $f$;
+ where game_id=g and user_id=auth.uid() and kind='teacher') $f$;
 revoke all on function private.is_game_member(uuid),private.is_game_teacher(uuid) from public,anon,authenticated;
 grant usage on schema private to authenticated;
 grant execute on function private.is_game_member(uuid),private.is_game_teacher(uuid) to authenticated;
