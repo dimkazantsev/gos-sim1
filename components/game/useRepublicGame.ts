@@ -1423,8 +1423,16 @@ export function useRepublicGame(gameId:string){
      return {...m,url:m.storage_path&&old?.storage_path===m.storage_path?old.url||null:null};
     });
     const ordered=[...rows].reverse();
-    if(initial||!oldestChatCursor.current){
-     oldestChatCursor.current=rows.length?{created_at:rows[rows.length-1].created_at,id:rows[rows.length-1].id}:null;
+    const oldestFetched=rows[rows.length-1];
+    const recentWindowMoved=!!oldestFetched&&(
+     oldestChatCursor.current?.id!==oldestFetched.id||
+     oldestChatCursor.current?.created_at!==oldestFetched.created_at
+    );
+    // If no older pages were requested, newer messages can shift the latest
+    // ten; advance the cursor so the displaced eleventh row stays reachable.
+    if(initial||!oldestChatCursor.current||
+       (requestedHistoryCount.current===CHAT_HISTORY_PAGE_SIZE&&recentWindowMoved)){
+     oldestChatCursor.current=oldestFetched?{created_at:oldestFetched.created_at,id:oldestFetched.id}:null;
      setHasOlderChatMessages(rows.length===CHAT_HISTORY_PAGE_SIZE);
     }
     const newest=rows[0];
