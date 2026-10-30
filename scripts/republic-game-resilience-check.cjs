@@ -515,8 +515,17 @@ async function main(){
  await check('Same-channel message refresh keeps the latest accepted history',async()=>{
   const h=harness({effects:true});await h.settle();h.render().setChatOpen(true);await h.settle();assert.equal(h.render().channelId,'channel-a');const old=h.hold('chat_messages');h.setRevision(2);h.emit('chat_messages');await tick();h.setRevision(3);h.emit('chat_messages');await h.settle();assert.equal(h.render().messages[0].id,'message-3');old.resolve();await h.settle();assert.equal(h.render().messages[0].id,'message-3');h.dispose();
  });
+ await check('Switching channels while the chat is closed does not download message bodies',async()=>{
+  const h=harness({effects:true});await h.settle();
+  const before=h.readCount('chat_messages');
+  h.render().setChannelId('channel-b');await h.settle();
+  assert.equal(h.readCount('chat_messages'),before,'Closed chat must not trigger a history fetch');
+  h.render().setChatOpen(true);await h.settle();
+  assert(h.readCount('chat_messages')>before,'Opening the selected channel loads its recent page');
+  h.dispose();
+ });
  await check('A completed send in an old channel does not cancel the new channel history',async()=>{
-  const h=harness({effects:true});await h.settle();const newChannel=h.hold('chat_messages');h.setRevision(2);h.render().setChannelId('channel-b');h.render();await tick();await h.render().sendText('earlier message','channel-a');newChannel.resolve();await h.settle();assert.equal(h.render().messages[0].channel_id,'channel-b');assert.equal(h.render().chatLoading,false);h.dispose();
+  const h=harness({effects:true});await h.settle();h.render().setChatOpen(true);await h.settle();const newChannel=h.hold('chat_messages');h.setRevision(2);h.render().setChannelId('channel-b');h.render();await tick();await h.render().sendText('earlier message','channel-a');newChannel.resolve();await h.settle();assert.equal(h.render().messages[0].channel_id,'channel-b');assert.equal(h.render().chatLoading,false);h.dispose();
  });
  await check('An older partial response cannot restore data from another game',async()=>{
   const h=harness({effects:true});await h.settle();const old=h.hold('political_wall');h.setRevision(2);h.emit('political_posts');await tick();h.setRevision(3);h.render('game-b');await h.settle();assert.equal(h.render().game.id,'game-b');old.resolve();await h.settle();assert.equal(h.render().politicalPosts[0].game_id,'game-b');assert.equal(h.render().politicalPosts[0].id,'post-3');h.dispose();
