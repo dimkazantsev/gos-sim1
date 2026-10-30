@@ -63,6 +63,17 @@ jobs:
           node scripts/ballot-auth-100-local.cjs --schema > /tmp/gos-unified-ballot.sql
           psql "$DB_URL" -v ON_ERROR_STOP=1 -f /tmp/gos-unified-ballot.sql
           psql "$DB_URL" -v ON_ERROR_STOP=1 -f supabase/tests/unified_chain_100_local_setup.sql
+          # Install the unchanged production join RPC, not a QA rewrite.
+          node - <<'NODE'
+          const fs=require('node:fs');
+          const source=fs.readFileSync('supabase/migrations/20261025113000_strict_roles_and_owner_codes.sql','utf8');
+          const match=source.match(/CREATE OR REPLACE FUNCTION public\.join_game_as_role\([\s\S]*?\$function\$;/i);
+          if(!match)throw Error('Original production join_game_as_role function missing');
+          fs.writeFileSync('/tmp/gos-unified-role-join.sql',match[0]+
+           '\nREVOKE ALL ON FUNCTION public.join_game_as_role(text,text,text,text,public.member_kind) FROM PUBLIC,anon;'+
+           '\nGRANT EXECUTE ON FUNCTION public.join_game_as_role(text,text,text,text,public.member_kind) TO authenticated;\n');
+          NODE
+          psql "$DB_URL" -v ON_ERROR_STOP=1 -f /tmp/gos-unified-role-join.sql
           node - <<'NODE'
           const fs=require('node:fs');
           const specs=[
