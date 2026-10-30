@@ -112,12 +112,17 @@ async function main(){
      assert.deepEqual(calls,['signup','join'],'A rejected invite must not navigate');
      assert.equal(new URL(page.url()).pathname,'/');
     }else{
-     await page.waitForURL(url=>url.pathname.includes('/game/'),{timeout:30000});
+     // Next.js dev may not finish loading the game module while other
+     // contexts compile it. Entry acceptance checks the route transition,
+     // not the subsequent game bootstrap (which is a separate E2E case).
+     await page.waitForURL(url=>url.pathname.includes('/game/'),{
+      waitUntil:'commit',timeout:15000
+     });
      assert.deepEqual(calls,['signup','join'],'Each browser context must authorize once and join once');
      entries.push({n,width,role:kind});
     }
     timings.push(performance.now()-start);
-   }catch(e){errors.push({n,width,kind,teacher,denyJoin,error:String(e?.stack||e).slice(0,600)});}
+   }catch(e){errors.push({n,width,kind,teacher,denyJoin,error:String(e?.stack||e).slice(0,600),calls,url:page?.url()||''});}
    finally{await ctx.close();}
   }
   // Bounded fan-out avoids conflating a 100-browser memory stress test
