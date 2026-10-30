@@ -202,7 +202,7 @@ function harness({effects=false,compiledCode=code}={}){
   if(name==='./useGameTableSync')return{notifyGameDataRefresh:(gameId,table)=>notices.push({gameId,table}),notifySectionUpdates:()=>{},setGameRealtimeConnection:()=>{}};
   if(name==='./useBudgetPulse')return{useBudgetPulse:()=>({budgetPulse:null,budgetPulseError:'',refreshBudgetPulse:async()=>{}}),withBudgetIncome:rows=>rows};
   if(name==='./gameRoster')return{currentGameMembers:(rows,id)=>rows.filter(row=>row.game_id===id),currentGameProfiles:(rows,_,id)=>rows.filter(row=>row.game_id===id)};
-  if(name==='./chatChannelSelection'||name==='./chatRealtime'||name==='./coalesceInFlight'||name==='./signDocumentAssetBatch'){
+  if(name==='./chatChannelSelection'||name==='./chatRealtime'||name==='./chatHistoryPaging'||name==='./coalesceInFlight'||name==='./signDocumentAssetBatch'){
    const source=fs.readFileSync(path.join(root,'components/game',name.slice(2)+'.ts'),'utf8');
    const compiled=ts.transpileModule(source,{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}}).outputText;
    const child={exports:{}};
@@ -525,7 +525,12 @@ async function main(){
   h.dispose();
  });
  await check('A completed send in an old channel does not cancel the new channel history',async()=>{
-  const h=harness({effects:true});await h.settle();h.render().setChatOpen(true);await h.settle();const newChannel=h.hold('chat_messages');h.setRevision(2);h.render().setChannelId('channel-b');h.render();await tick();await h.render().sendText('earlier message','channel-a');newChannel.resolve();await h.settle();assert.equal(h.render().messages[0].channel_id,'channel-b');assert.equal(h.render().chatLoading,false);h.dispose();
+  const h=harness({effects:true});
+  h.fixture('chat_channels',[
+   {id:'channel-a',game_id:'game-a',name:'Общий чат',kind:'public'},
+   {id:'channel-b',game_id:'game-a',name:'Другой чат',kind:'public'}
+  ]);
+  await h.settle();h.render().setChatOpen(true);await h.settle();const newChannel=h.hold('chat_messages');h.setRevision(2);h.render().setChannelId('channel-b');h.render();await tick();await h.render().sendText('earlier message','channel-a');newChannel.resolve();await h.settle();assert.equal(h.render().messages[0].channel_id,'channel-b');assert.equal(h.render().chatLoading,false);h.dispose();
  });
  await check('An older partial response cannot restore data from another game',async()=>{
   const h=harness({effects:true});await h.settle();const old=h.hold('political_wall');h.setRevision(2);h.emit('political_posts');await tick();h.setRevision(3);h.render('game-b');await h.settle();assert.equal(h.render().game.id,'game-b');old.resolve();await h.settle();assert.equal(h.render().politicalPosts[0].game_id,'game-b');assert.equal(h.render().politicalPosts[0].id,'post-3');h.dispose();
