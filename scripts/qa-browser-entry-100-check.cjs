@@ -80,7 +80,7 @@ async function main(){
     await page.goto(ORIGIN+'/',{waitUntil:'domcontentloaded',timeout:30000});
     // DOM can be visible while Next.js dev is still compiling/hydrating;
     // controlled inputs get a value tracker only after React mounts.
-    await page.waitForFunction(()=>!!document.querySelector('input[name="fullName"]')?._valueTracker,{timeout:30000});
+    await page.waitForFunction(()=>!!document.querySelector('input[name="fullName"]')?._valueTracker,null,{timeout:30000});
     if(teacher){
      await page.getByRole('button',{name:'Преподаватель',exact:true}).click();
     }else if(kind==='guest'){
