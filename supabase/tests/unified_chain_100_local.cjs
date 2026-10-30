@@ -1,0 +1,247 @@
+'use strict';
+// #491: ONE disposable game + 100 real independently authenticated JWTs
+// passing all 16 stage checkpoints. Calls unchanged production RPC functions
+// for votes, grade reads, formal/impact projections and stage-document gate.
+// IMPORTANT: stage-specific legal mechanics, scores creation and actual stage
+// coordinator are represented by a SMALL TEST FIXTURE, not the complete game.
+// This is an integrated smoke/load test, not live 100-human E2E acceptance.
+const assert=require('node:assert/strict'),{performance}=require('node:perf_hooks');
+const {createClient}=require('@supabase/supabase-js');
+const GAME='a7d10000-0000-4000-8000-000000000100';
+const FOREIGN='a7d10000-0000-4000-8000-000000000200';
+const uuid=n=>'a7d10000-0000-4000-9000-'+String(n).padStart(12,'0');
+const PASSWORD='Unified-16-Stage-100-JWT-Isolated!';
+const stages=Array.from({length:16},(_,i)=>i+1);
+const required={
+  2:[['minutes','ksrf','other',{}]],
+  3:[['minutes','ksrf','other',{}]],
+  4:[['gd_chair_resolution','gd','gd_resolution',{document_kind:'stage4_office_result',source_result_key:'gd_chair'}],
+     ['gd_deputies_resolution','gd','gd_resolution',{document_kind:'stage4_office_result',source_result_key:'gd_deputies'}],
+     ['gd_committees_resolution','gd','gd_resolution',{document_kind:'stage4_office_result',source_result_key:'gd_committees'}],
+     ['minutes','gd','other',{}]],
+  5:[['gd_resolution','gd','gd_resolution',{}],['minutes','gd','other',{}]],
+  7:[['sf_resolution','sf','sf_resolution',{}]],
+  8:[['president_decree','president','president_decree',{}],['gd_resolution','gd','gd_resolution',{}]],
+  9:[['president_decree','president','president_decree',{}],['gd_resolution','gd','gd_resolution',{}]],
+  10:[['state_program','government','state_program',{}],['financial_economic','government','other',{template_key:'financial_economic'}]],
+  11:[['minutes','government','other',{}]],
+  14:[['municipal_act','municipality','municipal_act',{}]],
+  15:[['crisis_act','general','president_decree',{}]]
+};
+const make=(url,key)=>createClient(url,key,{auth:{persistSession:false,autoRefreshToken:false,detectSessionInUrl:false}});
+const batches=async(values,size,fn)=>{const out=[];for(let i=0;i<values.length;i+=size)out.push(...await Promise.all(values.slice(i,i+size).map(fn)));return out};
+const pt=(a,p)=>{const x=[...a].sort((a,b)=>a-b);return Math.round(x[Math.ceil(x.length*p)-1])};
+const stats=a=>({p50_ms:pt(a,.5),p95_ms:pt(a,.95),p99_ms:pt(a,.99)});
+function ok(r,label){assert(!r.error,label+': '+(r.error?.message||''));return r.data}
+const jsonBytes=x=>Buffer.byteLength(JSON.stringify(x??[]));
+async function main(){
+ assert.equal(process.env.GITHUB_ACTIONS,'true');
+ assert.equal(process.env.GOS_UNIFIED_QA,'LOCAL-100-16');
+ const u=new URL(process.env.SUPABASE_URL||'');
+ assert(['localhost','127.0.0.1','[::1]'].includes(u.hostname)&&
+ ['http:','https:'].includes(u.protocol)&&!u.username&&!u.password&&!u.hash&&!u.search&&u.pathname==='/');
+ const anon=process.env.SUPABASE_ANON_KEY,service=process.env.SUPABASE_SERVICE_ROLE_KEY;
+ assert(anon&&service,'Local Supabase keys required');
+ const admin=make(u.origin,service);
+ const marker=ok(await admin.from('qa_unified_chain_guard').select('marker').single(),'Disposable marker');
+ assert.equal(marker.marker,'gos-id-disposable-100x16-jwt-chain-20261030');
+ const [authEmpty,gamesEmpty]=await Promise.all([
+  admin.auth.admin.listUsers({page:1,perPage:1}),
+  admin.from('games').select('id').limit(1)
+ ]);
+ assert(!authEmpty.error&&authEmpty.data.users.length===0&&
+   !gamesEmpty.error&&gamesEmpty.data.length===0,'Refuse nonempty database');
+ let requests=0,rpcBytes=0;
+ async function who(role,i){
+  const email='unified-'+role+'-'+i+'@example.invalid';
+  const a=await admin.auth.admin.createUser({email,password:PASSWORD,email_confirm:true});
+  ok(a,'Auth create '+role);
+  const client=make(u.origin,anon),login=await client.auth.signInWithPassword({email,password:PASSWORD});
+  ok(login,'Auth login '+role);
+  assert(login.data.session?.access_token&&login.data.user?.id===a.data.user.id);
+  return {id:a.data.user.id,email,client,role};
+ }
+ const teacher=await who('teacher',0),guest=await who('guest',0),outsider=await who('outsider',0);
+ const people=await batches(Array.from({length:100},(_,i)=>i),10,i=>who('student',i));
+ assert.equal(new Set(people.map(p=>p.id)).size,100);
+ const all=[...people,teacher,guest];
+ ok(await admin.from('games').insert([
+  {id:GAME,title:'Disposable 100×16 chain QA',game_code:'CQA100',owner_id:teacher.id},
+  {id:FOREIGN,title:'Foreign disposable game',game_code:'CQA200',owner_id:outsider.id}
+ ]),'Games');
+ ok(await admin.from('game_members').insert([
+  ...all.map(p=>({game_id:GAME,user_id:p.id,kind:p.role,role_title:p.role,full_name:'Local QA '+p.role})),
+  {game_id:FOREIGN,user_id:outsider.id,kind:'student',role_title:'Student',full_name:'Foreign only'}
+ ]),'Membership');
+ ok(await admin.from('game_stages').insert(stages.map(stage_no=>({game_id:GAME,stage_no,status:'open'}))),'16 stages');
+ ok(await admin.from('state_metrics').insert({game_id:GAME,metric_key:'economy',value:20,min_value:0,max_value:100}),'Start economy');
+ ok(await admin.from('impact_rules').insert(stages.map(s=>({
+  id:uuid(s),game_id:GAME,rule_key:'stage-qa-'+s,label:'Isolated verification stage '+s,
+  event_type:'stage',priority:s,effects:{metrics:{economy:1}},conditions:{stage_no:s}
+ }))),'16 defined effect rules');
+ const memberships=people.flatMap(p=>stages.map(stage_no=>({game_id:GAME,user_id:p.id,stage_no,institution_key:'gd'})));
+ for(let i=0;i<memberships.length;i+=200)
+  ok(await admin.from('institution_session_registrations').insert(memberships.slice(i,i+200)),'Electorate registrations');
+ const weights=Object.fromEntries(people.map(p=>[p.id,1]));
+ const forbidden=await Promise.all([
+  outsider.client.rpc('get_public_stage_scores',{p_game_id:GAME}),
+  guest.client.rpc('qa_apply_effect',{p_game:GAME,p_stage:1}),
+  guest.client.from('game_stages').update({status:'completed'}).eq('game_id',GAME).eq('stage_no',1).select('stage_no'),
+  make(u.origin,anon).rpc('get_formal_registry_projection',{p_game_id:GAME,p_document_ids:null}),
+  people[0].client.from('game_ballots').select('vote_id').limit(1)
+ ]);
+ assert(forbidden[0].error&&forbidden[1].error&&
+  !forbidden[2].error&&forbidden[2].data.length===0&&
+  forbidden[3].error&&forbidden[4].error,'Server must deny outsider, guest, anon and direct ballot read');
+ const memberStage=await people[0].client.from('game_stages').select('status').eq('game_id',GAME).eq('stage_no',1).single();
+ assert(!memberStage.error&&memberStage.data.status==='open','Forbidden update did not alter stage');
+ const durations=[],duplicates=[],stageReads=[],blocked=[],totals=[];
+ for(const stage of stages){
+  const initial=performance.now();
+  const stageDocs=required[stage]||[];
+  if(stageDocs.length){
+   const attempt=await teacher.client.from('game_stages').update({status:'completed'})
+     .eq('game_id',GAME).eq('stage_no',stage).select('status');
+   assert(attempt.error,'Production document gate must reject unprepared stage '+stage);
+   blocked.push(stage);
+  }
+  // Fixture only: publish the official paperwork required by production policy.
+  const entries=(stageDocs.length?stageDocs:[['general','general','other',{}]]).map(([key,subject,kind,extra],j)=>{
+   const meta={...extra,...(key==='minutes'?{template_key:'minutes'}:{}),
+      ...(key==='financial_economic'?{template_key:'financial_economic'}:{})};
+   return {id:uuid(stage*100+j+1000),game_id:GAME,stage_no:stage,
+    registry_no:'QA-'+stage+'-'+j,title:key==='minutes'?'Протокол заседания QA':('QA '+key),
+    doc_type:kind,subject_key:subject,author_id:teacher.id,body_text:'Only isolated synthetic documents',
+    metadata:meta,status_code:stage===10?'draft':'published'};
+  });
+  ok(await admin.from('formal_documents').insert(entries),'Official documents stage '+stage);
+  ok(await admin.from('formal_document_history').insert(entries.map(d=>({
+   document_id:d.id,game_id:GAME,actor_id:teacher.id,action:'created',note:'Local 100x16 stage',
+   created_at:'2026-10-30T00:'+String(stage).padStart(2,'0')+':00Z'
+  }))),'Document history stage '+stage);
+  const vid=uuid(2000+stage);
+  ok(await admin.from('game_votes').insert({
+   id:vid,game_id:GAME,status:'open',procedure_key:'ordinary',
+   voting_mode:'individual',allow_abstain:true,institution_key:'gd',stage_no:stage,
+   quorum_kind:'none',quorum_value:0,majority_kind:'simple',majority_value:0,
+   tie_breaker_chair:false,electorate_snapshot:{attendance_required:true,weights}
+  }),'Live vote stage '+stage);
+  const cast=async(p)=>{const t=performance.now();const reply=await p.client.rpc('cast_vote_allocation',
+   {p_vote_id:vid,p_yes:1,p_no:0,p_abstain:0});requests++;rpcBytes+=jsonBytes(reply.data);
+   return {...reply,ms:performance.now()-t};};
+  // Same JWT submits duplicates before the remaining 99 ballots finish.
+  if(stage===4||stage===16){
+   const re=await Promise.all(Array.from({length:25},()=>cast(people[0])));
+   assert(re.every(x=>!x.error),'Concurrent duplicate retries must be harmless at stage '+stage);
+   duplicates.push(stage);
+  }
+  const ballots=await Promise.all(people.map(p=>cast(p)));
+  assert(ballots.every(x=>!x.error),'100 JWT votes, stage '+stage+': '+
+    JSON.stringify(ballots.filter(x=>x.error).slice(0,2).map(x=>x.error.message)));
+  durations.push(...ballots.map(x=>x.ms));
+  const [vote,stored]=await Promise.all([
+   admin.from('game_votes').select('status,result_yes,result_cast').eq('id',vid).single(),
+   admin.from('game_ballots').select('voter_id').eq('vote_id',vid)
+  ]);
+  ok(vote,'Vote tally '+stage);ok(stored,'Vote storage '+stage);
+  assert.equal(vote.data.status,'closed','All voters auto-close stage '+stage);
+  assert.equal(Number(vote.data.result_yes),100);
+  assert.equal(Number(vote.data.result_cast),100);
+  assert.equal(stored.data.length,100);
+  assert.equal(new Set(stored.data.map(v=>v.voter_id)).size,100);
+  const complete=await teacher.client.from('game_stages').update({status:'completed'})
+   .eq('game_id',GAME).eq('stage_no',stage).select('stage_no,status');
+  ok(complete,'Teacher JWT stage '+stage);
+  assert.equal(complete.data.length,1);
+  assert.equal(complete.data[0].status,'completed');
+  const applied=await teacher.client.rpc('qa_apply_effect',{p_game:GAME,p_stage:stage});
+  ok(applied,'Original automatic impact code '+stage);
+  assert.equal(applied.data,true,'One initial effect '+stage);
+  if(stage===4||stage===16){
+   const repeat=await Promise.all(Array.from({length:25},()=>teacher.client.rpc('qa_apply_effect',
+      {p_game:GAME,p_stage:stage})));
+   assert(repeat.every(x=>!x.error&&x.data===false),'No reapplication at stage '+stage);
+  }
+  const scores=people.map((p,i)=>({
+   game_id:GAME,user_id:p.id,stage_no:stage,
+   auto_score:(i+stage)%4,final_score:(i+stage)%3,status:'final',
+   evidence_summary:{restricted:'QA'},rationale:'Teacher synthetic fixture'
+  }));
+  ok(await admin.from('stage_assessments').insert(scores),'100 synthetic score records stage '+stage);
+  const s=await people[stage%100].client.from('game_stages').select('status')
+    .eq('game_id',GAME).eq('stage_no',stage).single();
+  ok(s,'Stage synced '+stage);
+  assert.equal(s.data.status,'completed');
+  stageReads.push(performance.now()-initial);
+  totals.push({stage,ballots:stored.data.length,documents:entries.length,elapsed_ms:Math.round(performance.now()-initial)});
+ }
+ // One restricted fixture document, to exercise role isolation after 16 stages.
+ ok(await admin.from('formal_documents').insert({
+  id:uuid(9999),game_id:GAME,stage_no:12,registry_no:'QA-PRIVATE',
+  title:'Private QA',doc_type:'justice_response',subject_key:'justice',
+  author_id:people[0].id,body_text:'Private synthetic record',status_code:'draft'
+ }),'Restricted document fixture');
+ const read=async p=>{
+  const start=performance.now();
+  const [g0,g1,docs,impact,st]=await Promise.all([
+   p.client.rpc('get_public_stage_scores',{p_game_id:GAME}).range(0,999),
+   p.client.rpc('get_public_stage_scores',{p_game_id:GAME}).range(1000,1999),
+   p.client.rpc('get_formal_registry_projection',{p_game_id:GAME,p_document_ids:null}),
+   p.client.rpc('get_impact_engine_projection',{p_game_id:GAME}),
+   p.client.from('game_stages').select('stage_no,status').eq('game_id',GAME)
+  ]);
+  requests+=5;
+  const data=[g0,g1,docs,impact,st];
+  assert(data.every(x=>!x.error),'All five real authenticated reads for '+p.id+': '+
+   JSON.stringify(data.filter(x=>x.error).map(x=>x.error.message)));
+  rpcBytes+=data.reduce((n,x)=>n+jsonBytes(x.data),0);
+  assert.equal(g0.data.length+g1.data.length,1600,'All 100×16 scores visible');
+  assert.equal(impact.data.rules.length,16);
+  assert.equal(impact.data.ledger.length,16);
+  assert.equal(st.data.length,16);
+  assert(st.data.every(x=>x.status==='completed'),'All 16 teacher confirmations persist');
+  assert(docs.data.documents.some(x=>x.stage_no===16));
+  assert(docs.data.history.length>=16);
+  assert(!g0.data.some(x=>'evidence_summary' in x||'rationale' in x));
+  assert(docs.data.documents.every(x=>x.game_id===GAME));
+  assert.equal(docs.data.documents.some(x=>x.doc_type==='justice_response'),p.id===people[0].id);
+  return {ms:performance.now()-start,latest:impact.data.ledger.length,docCount:docs.data.documents.length};
+ };
+ const first=await Promise.all(people.map(read));
+ for(const p of people.slice(0,50)){
+  ok(await p.client.auth.signOut(),'Disconnect');
+  const l=await p.client.auth.signInWithPassword({email:p.email,password:PASSWORD});
+  ok(l,'Reconnect JWT');
+ }
+ const second=await Promise.all(people.map(read));
+ const cross=await Promise.all([
+  outsider.client.rpc('get_impact_engine_projection',{p_game_id:GAME}),
+  outsider.client.rpc('get_formal_registry_projection',{p_game_id:GAME,p_document_ids:null}),
+  outsider.client.rpc('get_public_stage_scores',{p_game_id:GAME}),
+  people[0].client.rpc('qa_apply_effect',{p_game:GAME,p_stage:16}),
+  guest.client.from('stage_assessments').select('rationale').limit(1)
+ ]);
+ assert(cross.slice(0,4).every(x=>x.error));
+ assert(!cross[4].error&&cross[4].data.length===0);
+ const metric=ok(await admin.from('state_metrics').select('value').eq('game_id',GAME)
+   .eq('metric_key','economy').single(),'Economy final');
+ assert.equal(Number(metric.value),36,'Exactly 16 effects applied from 20 baseline');
+ const ledger=ok(await admin.from('impact_ledger').select('rule_key').eq('game_id',GAME),'Impact ledger');
+ assert.equal(ledger.length,16);
+ const ballots=ok(await admin.from('game_ballots').select('vote_id,voter_id'),'All ballots');
+ assert.equal(ballots.length,1600,'16 × 100 unique votes, no losses');
+ console.log(JSON.stringify({
+  status:'PASS',
+  scope:'ONE disposable local Supabase game; real Auth/JWT, PostgREST, production vote/close and grade/formal/impact read RPCs, stage doc guard and automatic-effect function bodies; simplified fixtures for stage-specific mechanics, document creation, grading and other readiness checks. Not full-game E2E.',
+  independentJWTs:100,stages:16,ballots:1600,duplicatesRetried:50,
+  teacherStageTransitions:16,officialDocuments:totals.reduce((n,x)=>n+x.documents,0),
+  gradeRows:1600,impactRows:16,finalEconomy:36,
+  parallelFinalReads:200,reauthenticated:50,crossGameOrRoleDenials:5,
+  latencyVotesMs:stats(durations),latencyStageChainsMs:stats(stageReads),
+  latencyFinalReadMs:stats([...first,...second].map(x=>x.ms)),
+  measuredJsonBytes:rpcBytes,httpRpcCalls:requests,
+  errors:0,productionRequests:0,
+  limitations:'100 synthetic Auth clients, not 100 people; custom stage coordinator/grade data fixture, reduced RLS and missing non-document checks; no full browser UX, live egress or actual independent 16-stage legal procedures'
+ }));
+}
+main().catch(e=>{console.error('FAIL unified 100×16: '+(e.stack||e));process.exitCode=1});
