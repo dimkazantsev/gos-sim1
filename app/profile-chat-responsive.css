@@ -56,3 +56,20 @@
  .profilePage .profileSecurityGrid>button,
  .profilePage .profilePasswordFields>button {width:100%;min-width:0}
 }
+
+/* Same neutral controls as the approved chat; the history button is not
+   fixed, so it never covers messages on narrow devices. */
+.gsChatV2 .chatHistoryMore {
+ display:flex;align-items:center;justify-content:center;
+ align-self:center;max-width:100%;min-height:40px;
+ margin:0 auto 6px;padding:8px 15px;
+ border:1px solid #d6e0ec;border-radius:12px;
+ background:#fff;color:#173455;font:inherit;font-size:13px;font-weight:650;
+ line-height:1.35;text-align:center;cursor:pointer;
+}
+.gsChatV2 .chatHistoryMore:hover:not(:disabled){background:#eef3f9}
+.gsChatV2 .chatHistoryMore:focus-visible{outline:2px solid #2b5f96;outline-offset:2px}
+.gsChatV2 .chatHistoryMore:disabled{opacity:.65;cursor:wait}
+@media (max-width:420px) {
+ .gsChatV2 .chatHistoryMore{width:100%;white-space:normal}
+}
