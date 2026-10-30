@@ -1,0 +1,43 @@
+name: 'ГОС.ID · 100 подключений: Документы и завершение 16 этапов'
+on:
+  pull_request:
+    paths:
+      - 'scripts/stage-final-documents-postgres-100-check.cjs'
+      - 'supabase/migrations/20261018050000_all_stage_final_documents_guard.sql'
+      - 'supabase/migrations/20261018152000_three_distinct_gd_resolutions_and_publication_rights.sql'
+      - '.github/workflows/stage-final-documents-postgres-100.yml'
+permissions:
+  contents: read
+concurrency:
+  group: gos-stage-documents-100-qa
+  cancel-in-progress: true
+jobs:
+  stages:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - run: node --check scripts/stage-final-documents-postgres-100-check.cjs
+      - name: Start disposable local Postgres 17
+        run: |
+          set -euo pipefail
+          docker run --rm -d --name gos-stage-doc-100 -p 127.0.0.1:5432:5432 \
+            -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=qa-only-100 \
+            -e POSTGRES_DB=a07_fixture postgres:17 -c max_connections=160
+          for attempt in $(seq 1 60); do
+            if docker exec gos-stage-doc-100 pg_isready -U postgres -d a07_fixture; then exit 0; fi
+            sleep 1
+          done
+          exit 1
+      - name: Exercise unchanged stage/document SQL with 100 connections
+        env:
+          GOS_FINAL_DOCUMENT_QA: LOCAL-100
+          PGHOST: 127.0.0.1
+          PGPORT: '5432'
+          PGUSER: postgres
+          PGPASSWORD: qa-only-100
+          PGDATABASE: a07_fixture
+        run: node scripts/stage-final-documents-postgres-100-check.cjs
+      - name: Destroy disposable Postgres without backup
+        if: always()
+        run: docker rm -f gos-stage-doc-100 || true
