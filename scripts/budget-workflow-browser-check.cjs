@@ -176,6 +176,20 @@ async function main(){
    assert.equal(await requestForm.getByLabel('Запрашиваемая сумма, ₽').inputValue(),'1250000000','The event estimate is translated to rubles for the author');
    const outcome=requestForm.getByLabel('Ожидаемый результат заявки');
    const submitRequest=requestForm.getByRole('button',{name:'Направить заявку в расходы',exact:true});
+   if(width===320){
+    // Regression for a rapid DOM edit that has not reached React's controlled state.
+    // The server payload must never use an older, valid value instead of the visible one.
+    assert((await outcome.inputValue()).length>=10,'The prepared outcome starts valid');
+    await outcome.evaluate(el=>{el.value='';});
+    assert.equal(await outcome.inputValue(),'','The displayed value is empty while React state is still old');
+    await submitRequest.click();
+    await sim.getByRole('alert').waitFor();
+    assert.match(await sim.getByRole('alert').innerText(),/ожидаемый результат/i);
+    assert.equal(f.calls.filter(c=>c.rpc==='create_budget_event_transfer_request').length,0,'A stale controlled value must never submit a hidden outcome');
+    await requestForm.getByRole('button',{name:'Отменить',exact:true}).click();
+    await event.getByRole('button',{name:'Подготовить заявку',exact:true}).click();
+    await sim.getByRole('alert').waitFor({state:'hidden'});
+   }
    await outcome.fill('');
    assert.equal(await outcome.inputValue(),'','The invalid result must reach the controlled textarea at '+width+'px');
    await submitRequest.click();
