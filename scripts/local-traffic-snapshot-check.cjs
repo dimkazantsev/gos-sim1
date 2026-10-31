@@ -2,7 +2,7 @@ const assert=require('node:assert/strict'),fs=require('node:fs'),ts=require('typ
 const files=['components/game/useRepublicGame.ts','components/GameClient.tsx','components/game/useSectionUpdates.ts','lib/localGameSnapshot.ts'];
 for(const file of files){const source=fs.readFileSync(file,'utf8');const ast=ts.createSourceFile(file,source,ts.ScriptTarget.Latest,true,file.endsWith('tsx')?ts.ScriptKind.TSX:ts.ScriptKind.TS);assert.equal(ast.parseDiagnostics.length,0,'Parse '+file)}
 const hook=fs.readFileSync(files[0],'utf8'),shell=fs.readFileSync(files[1],'utf8'),badges=fs.readFileSync(files[2],'utf8'),cache=fs.readFileSync(files[3],'utf8');
-assert(hook.includes('Date.now()-lastCoreSuccessAt.current>60000'),'Reuse core across navigation');
+assert(hook.includes('!allowFreshCore||lastCoreSuccessAt.current===0'),'Reuse core across navigation; only first entry or explicit full refresh reopens all collections');
 assert(shell.includes('60000+Math.floor(Math.random()*12000)'),'Presence 60-72s, online freshness stays below 90s');
 assert(hook.includes('previous.view===viewKey&&now-previous.at<60000'),'Coalesce duplicate presence writes');
 assert(hook.includes("p_label:label||null")&&hook.includes("response.error?.code==='PGRST202'"),'One authenticated RPC for navigation; fallback only for unavailable migration');

@@ -130,7 +130,8 @@ const env={
  me:{user_id:'regression-student'},
  gameId:'simulation',
  schedule(){changed++},
- liveConnected:true,lastPollAt:clock,disposed:false,dirtyCore:false,dirtyOverview:false,dirtyChat:false,dirtyPins:false,
+ liveConnected:true,lastPollAt:clock,disposed:false,reconcileTables:new Set(),dirtyOverview:false,dirtyChat:false,dirtyPins:false,
+ activeViewRef:{current:'dashboard'},passiveSyncAt:{current:new Map()},lastFullPresentationAt:{current:clock},passiveSections:()=>['game_events','game_evaluations','game_crises'],
  backendRecoveryAfter:{current:0},
  officeReadState:{current:{lastSuccessAt:0,lastAttemptAt:0,inflight:null}},
  loadRepublicOffices:()=>Promise.resolve(),
@@ -145,8 +146,15 @@ clock+=179999;tick();
 assert.equal(changed,0,'Connected refresh skipped until 3-minute fallback threshold');
 clock+=1;tick();
 assert.equal(changed,1,'Once per 3 minutes when connected');
+assert(env.reconcileTables.has('session_recovery'),'Connected fallback only verifies role and membership');
+assert(!env.reconcileTables.has('*')&&!env.reconcileTables.has('game_stages'),
+ 'Connected fallback does not load all core collections or stages');
 clock+=30000;tick();
 assert.equal(changed,1,'Not every 30 seconds while connected');
+env.reconcileTables.clear();
 env.liveConnected=false;tick();
 assert.equal(changed,2,'Disconnected client recovers on next normal poll');
+assert(env.reconcileTables.has('session_recovery')&&env.reconcileTables.has('game_stages')
+ &&env.reconcileTables.has('game_votes'),'Disconnected recovery requests only identity, stages and votes');
+assert(!env.reconcileTables.has('*'),'Disconnection must not trigger a full entry bundle');
 console.log('PASS: 402 visible, connected 5-minute badge fallback, game realtime 3-minute fallback, syntax.');
