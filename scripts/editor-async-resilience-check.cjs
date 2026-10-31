@@ -58,6 +58,7 @@ function harness(component){
  function requireFor(name){
   if(name==='react')return react;
   if(name==='react/jsx-runtime')return{jsx,jsxs:jsx,Fragment:'fragment'};
+  if(name==='./documentMetadataCache'){const source=fs.readFileSync(path.join(root,'components/game/documentMetadataCache.ts'),'utf8'),compiled=ts.transpileModule(source,{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}}).outputText,child={exports:{}};vm.runInNewContext('(function(module,exports){'+compiled+'\n})',{Date,Map,Promise})(child,child.exports);return child.exports;}
   if(name==='./scopedSignedAssetCache'){const source=fs.readFileSync(path.join(root,'components/game/scopedSignedAssetCache.ts'),'utf8'),compiled=ts.transpileModule(source,{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}}).outputText,child={exports:{}};vm.runInNewContext('(function(module,exports){'+compiled+'\n})',{Date,Map,Promise})(child,child.exports);return child.exports;}
   if(name==='./prepareCandidatePhoto')return{prepareCandidatePhoto:async file=>file};
   if(name==='@/lib/supabase')return{supabase};
