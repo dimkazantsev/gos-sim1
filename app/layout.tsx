@@ -64,6 +64,8 @@ import './device-sync-status.css';
 import type {Metadata} from 'next';
 import {BRAND_NAME} from '@/components/ui/BrandIdentity';
 import PwaRegistrar from '@/components/PwaRegistrar';
+import GosReleaseNotice from '@/components/GosReleaseNotice';
+import './release-notice.css';
 import '@fontsource-variable/manrope';
 import {GeistMono} from 'geist/font/mono';
 
@@ -89,5 +91,5 @@ export const metadata:Metadata={
 };
 
 export default function RootLayout({children}:{children:React.ReactNode}){
- return <html lang="ru" className={GeistMono.variable}><body>{children}<PwaRegistrar/></body></html>;
+ return <html lang="ru" className={GeistMono.variable}><body>{children}<PwaRegistrar/><GosReleaseNotice/></body></html>;
 }

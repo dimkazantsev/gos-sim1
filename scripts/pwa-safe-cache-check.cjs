@@ -13,13 +13,13 @@ for(const frag of ["start_url:'/'","display:'standalone'","'/pwa/icon-192.png'",
 const layout=fs.readFileSync('app/layout.tsx','utf8');
 assert(layout.includes("manifest:'/manifest.webmanifest'")&&layout.includes('<PwaRegistrar/>'));
 const sw=fs.readFileSync('public/sw.js','utf8');
-for(const frag of ["url.origin!==self.location.origin","request.method!=='GET'","request.headers.has('authorization')","url.search===''","url.pathname.startsWith('/_next/static/')","request.mode==='navigate'","MAX_ASSETS=80","cache.put(request,response.clone())"])
+for(const frag of ["url.origin!==self.location.origin","request.method!=='GET'","request.headers.has('authorization')","url.search===''","url.pathname.startsWith(BASE+'/_next/static/')","request.mode==='navigate'","MAX_ASSETS=80","cache.put(request,response.clone())"])
  assert(sw.includes(frag),'Missing SW safety: '+frag);
 assert(!/cache\.put\(request,.*(?:game|member|votes)/.test(sw));
 const listeners={},network=[],storage=new Map(),cacheWrites=[];
 const cache={async match(req){return storage.get(typeof req==='string'?req:req.url)},async put(req,resp){cacheWrites.push(req.url);storage.set(req.url,resp)},async keys(){return [...storage.keys()].map(url=>({url}))},async delete(req){storage.delete(req.url)} ,async addAll(urls){for(const url of urls)storage.set(url,{ok:true})}};
 const caches={async open(){return cache},async keys(){return ['gos-id-pwa-static-20261027-v1']},async delete(){return true},async match(u){return storage.get(u)}};
-const scope={self:{location:{origin:'https://gos-sim1.vercel.app'},addEventListener:(name,fn)=>{listeners[name]=fn},clients:{claim:async()=>{}}},caches,URL,Response,fetch:async req=>{network.push(req.url);if(req.fail)throw Error('offline');return{ok:true,type:'basic',headers:new Headers(),clone(){return this}}},Headers,console};
+const scope={self:{location:{origin:'https://gos-sim1.vercel.app',pathname:'/sw.js'},addEventListener:(name,fn)=>{listeners[name]=fn},clients:{claim:async()=>{}}},caches,URL,Response,fetch:async req=>{network.push(req.url);if(req.fail)throw Error('offline');return{ok:true,type:'basic',headers:new Headers(),clone(){return this}}},Headers,console};
 vm.runInNewContext(sw,scope);
 const ask=(url,{mode='cors',method='GET',destination='',authorization=false,fail=false}={})=>{
  const request={url,mode,method,destination,fail,headers:new Headers(authorization?{Authorization:'Bearer secret'}:{})};
