@@ -1022,7 +1022,7 @@ export function useRepublicGame(gameId:string){
   await Promise.allSettled(jobs);
   // The overview needs document status/title only. Other opened sections receive
   // complete bodies on demand, once per unchanged document revision set.
-  if(view!=='dashboard'&&view!=='documents'&&activeViewRef.current===view&&!formalFullVersion.current)
+  if(['stages','votes','actions','teacher'].includes(view)&&activeViewRef.current===view&&!formalFullVersion.current)
    await loadFormalDetails();
  }
 
