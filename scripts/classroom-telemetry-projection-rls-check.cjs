@@ -6,12 +6,16 @@ const fs=require('node:fs'),path=require('node:path');
 const {PGlite}=require('@electric-sql/pglite');
 const root=path.join(__dirname,'..');
 const sql=fs.readFileSync(path.join(root,'supabase/migrations/20261029162000_classroom_telemetry_projection_invoker.sql'),'utf8');
+const pagingSql=fs.readFileSync(path.join(root,'supabase/migrations/20261031150000_classroom_journal_20_projection.sql'),'utf8');
 const client=fs.readFileSync(path.join(root,'components/game/useRepublicGame.ts'),'utf8');
 const id=n=>'00000000-0000-4000-8000-'+String(n).padStart(12,'0');
 const game=id(900),other=id(901);
 assert(sql.includes('security invoker')&&!sql.includes('security definer'),'Original RLS must be enforced');
 assert(sql.includes('private.is_game_teacher(p_game_id)'),'Only teacher/admin may read telemetry');
-assert(sql.includes('limit 250'),'Existing activity cap must remain');
+assert(sql.includes('limit 250'),'Historical baseline is preserved before the new migration');
+assert(pagingSql.includes('security invoker')&&pagingSql.includes('private.is_game_teacher(p_game_id)'));
+assert(pagingSql.includes('limit 20')&&!pagingSql.includes('limit 250'));
+assert(pagingSql.includes('order by created_at desc,id desc'),'Newest page uses timestamp and numeric ID');
 assert(sql.includes('revoke all on function public.get_classroom_telemetry_projection(uuid) from public, anon'),'Anonymous execution denied');
 assert(client.includes("supabase.rpc('get_classroom_telemetry_projection',{p_game_id:gameId})"),'UI must call the projection');
 assert(client.includes("['PGRST202','42883']"),'Only an absent RPC permits the legacy fallback');
@@ -40,7 +44,7 @@ async function main(){
   await db.query("insert into public.game_activity(game_id,actor_id,event_type,label,view_key,payload,created_at) values ($1,$2,'action','Foreign','work','{}'::jsonb,now())",[other,id(43)]);
   for(let n=1;n<=42;n++)await db.query("insert into public.game_presence values($1,$2,'work','2026-10-02'::timestamptz + $3*interval '1 minute')",[game,id(n),n]);
   await db.query("insert into public.game_presence values($1,$2,'work',now())",[other,id(43)]);
-  await db.exec(sql);
+  await db.exec(sql);await db.exec(pagingSql);
   async function as(n){
    await db.exec('reset role');
    await db.query("select set_config('request.jwt.claim.sub',$1,false)",[n?id(n):'']);
@@ -49,9 +53,11 @@ async function main(){
   async function read(g=game){return (await db.query('select public.get_classroom_telemetry_projection($1) v',[g])).rows[0].v;}
   await as(41);
   const data=await read();
-  assert.equal(data.activity.length,250,'Newest 250 activity rows only');
+  assert.equal(data.activity.length,20,'Newest 20 activity rows only');
   assert.equal(data.activity[0].label,'Audit entry');
-  assert(data.activity[0].created_at>data.activity[249].created_at,'Activity is newest-first');
+  assert(data.activity[0].created_at>data.activity[19].created_at,'Activity is newest-first');
+  assert.equal(data.activity[0].id,300,'Newest action is retained');
+  assert.equal(data.activity[19].id,281,'Last action of the page is retained');
   assert.equal(data.presence.length,42,'Teacher sees all 40 students, teacher and observer');
   assert(data.activity.every(row=>row.game_id===game),'No other room activity');
   assert(data.presence.every(row=>row.game_id===game),'No other room presence');
@@ -64,7 +70,7 @@ async function main(){
   await as(null);await assert.rejects(read(),error=>error.code==='42501','No JWT denied');
   await db.exec('reset role');await db.exec('set role anon');
   await assert.rejects(read(),error=>error.code==='42501','Anon denied');
-  console.log('PASS: RLS, 40 students+teacher+observer, 250-row cap, no foreign-game data (PGlite). No production load tested.');
+  console.log('PASS: RLS, 40 students+teacher+observer, latest 20 rows, presence retained, no foreign-game data (PGlite). No production load tested.');
  }finally{await db.close()}
 }
 main().catch(error=>{console.error(error);process.exitCode=1});

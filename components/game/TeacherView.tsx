@@ -149,7 +149,7 @@ export default function TeacherView({g,onOpenProcesses,onOpenStages,initialWorks
      <button className="dangerQuick" onClick={confirmCrisis}><span><AlertTriangle size={22} strokeWidth={1.8}/></span><b>Разыграть кризис</b></button>
      <button onClick={confirmGhost}><span><Zap size={22} strokeWidth={1.8}/></span><b>Случайное теневое голосование</b></button>
      {parties.some(p=>p.ghost_active)&&<button onClick={()=>{if(confirm('Завершить ближайшее заседание ГД и восстановить полный состав всех фракций?'))void clearPartyGhostLoss()}}><span><RotateCcw size={22} strokeWidth={1.8}/></span><b>Завершить заседание ГД · снять ограничения</b></button>}
-     <button onClick={exportSession}><span><Download size={22} strokeWidth={1.8}/></span><b>Экспорт журнала</b></button>
+     <button onClick={exportSession}><span><Download size={22} strokeWidth={1.8}/></span><b>Экспорт загруженного журнала</b></button>
     </div>
     <TeacherGhostVotingPanel g={g}/>
 

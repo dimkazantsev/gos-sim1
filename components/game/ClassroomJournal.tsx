@@ -8,6 +8,7 @@ import StyledSelect from '../ui/StyledSelect';
 import {useGameTableSync} from './useGameTableSync';
 import type {ReturnTypeRepublic} from './viewTypes';
 
+const JOURNAL_PAGE_SIZE=20;
 const VIEW_NAMES:Record<string,string>={
  dashboard:'Обзор игры',stages:'Этапы',parties:'Партии',votes:'Голосования',
  budget:'Бюджет',documents:'НПА',actions:'Политический процесс',grades:'Оценки',
@@ -29,7 +30,7 @@ export default function ClassroomJournal({g}:{g:ReturnTypeRepublic}){
  useGameTableSync(!teacher&&me?.user_id?game?.id:undefined,['game_activity'],async()=>{
   if(!game||!me?.user_id||teacher)return;const requestedScope=ownScope;setOwnBusy(true);
   const r=await supabase.from('game_activity').select('*').eq('game_id',game.id)
-   .eq('actor_id',me.user_id).order('created_at',{ascending:false}).limit(250);
+   .eq('actor_id',me.user_id).order('created_at',{ascending:false}).order('id',{ascending:false}).limit(JOURNAL_PAGE_SIZE);
   if(requestedScope!==activeOwnScope.current)return;
   if(r.error)setOwnError(userError(r.error));else{setOwnRows((r.data||[]) as typeof activities);setOwnError('')}
   setOwnBusy(false);
@@ -37,22 +38,53 @@ export default function ClassroomJournal({g}:{g:ReturnTypeRepublic}){
  const [olderBusy,setOlderBusy]=useState(false);
  const [olderExhausted,setOlderExhausted]=useState(false);
  const [olderError,setOlderError]=useState('');
- useEffect(()=>{setOlder([]);setOlderExhausted(false);setOlderError('')},[game?.id,me?.user_id,cutoff]);
+ const [visibleCount,setVisibleCount]=useState(JOURNAL_PAGE_SIZE);
+ const historyRequest=useRef(false);
+ const historyScope=(game?.id||'')+':'+(me?.user_id||'')+':'+teacher+':'+cutoff;
+ const latestHistoryScope=useRef(historyScope);latestHistoryScope.current=historyScope;
+ useEffect(()=>{
+  historyRequest.current=false;setOlder([]);setOlderExhausted(false);setOlderError('');
+  setVisibleCount(JOURNAL_PAGE_SIZE);
+ },[historyScope]);
  const loaded=useMemo(()=>[...new Map<number,(typeof activities)[number]>([...activities,...older,...ownRows].map(a=>[a.id,a] as const)).values()],[activities,older,ownRows]);
- async function loadOlder(){
-  if(!game||olderBusy||olderExhausted)return;
-  const earliest=loaded.reduce<string|null>((min,a)=>!min||a.created_at<min?a.created_at:min,null);
-  if(!earliest){setOlderExhausted(true);return}
-  setOlderBusy(true);setOlderError('');
-  const r=await supabase.from('game_activity').select('*').eq('game_id',game.id)
-   .lt('created_at',earliest).gte('created_at',cutoff||'1970-01-01').order('created_at',{ascending:false}).limit(250);
-  if(r.error)setOlderError(userError(r.error));
-  else{
+ async function loadOlder():Promise<boolean>{
+  if(!game||historyRequest.current||olderExhausted)return false;
+  const ordered=[...loaded].sort((a,b)=>a.created_at.localeCompare(b.created_at)||a.id-b.id);
+  const earliest=ordered[0];
+  if(!earliest){setOlderExhausted(true);return false}
+  const scope=historyScope;
+  historyRequest.current=true;setOlderBusy(true);setOlderError('');
+  try{
+   // A timestamp alone skips records when multiple actions share a second.
+   // Keyset ordering is identical to the latest-page read.
+   let query=supabase.from('game_activity').select('*')
+    .eq('game_id',game.id)
+    .or('created_at.lt.'+earliest.created_at+',and(created_at.eq.'+earliest.created_at+',id.lt.'+earliest.id+')')
+    .gte('created_at',cutoff||'1970-01-01')
+    .order('created_at',{ascending:false}).order('id',{ascending:false})
+    .limit(JOURNAL_PAGE_SIZE);
+   if(!teacher)query=query.eq('actor_id',me!.user_id);
+   const r=await query;
+   if(latestHistoryScope.current!==scope)return false;
+   if(r.error){setOlderError(userError(r.error));return false}
    const page=(r.data||[]) as typeof activities;
-   setOlder(previous=>[...new Map<number,(typeof activities)[number]>([...previous,...page].map(a=>[a.id,a] as const)).values()]);
-   if(page.length<250)setOlderExhausted(true);
+   setOlder(previous=>[...new Map<number,(typeof activities)[number]>(
+    [...previous,...page].map(a=>[a.id,a] as const)).values()]);
+   if(page.length<JOURNAL_PAGE_SIZE)setOlderExhausted(true);
+   return page.length>0;
+  }catch(e){
+   if(latestHistoryScope.current===scope)setOlderError(userError(e));
+   return false;
+  }finally{
+   if(latestHistoryScope.current===scope){
+    historyRequest.current=false;setOlderBusy(false);
+   }
   }
-  setOlderBusy(false);
+ }
+ async function showNextPage(){
+  if(visibleCount<visible.length){setVisibleCount(n=>n+JOURNAL_PAGE_SIZE);return}
+  const added=await loadOlder();
+  if(added)setVisibleCount(n=>n+JOURNAL_PAGE_SIZE);
  }
 
  const [search,setSearch]=useState('');
@@ -61,7 +93,6 @@ export default function ClassroomJournal({g}:{g:ReturnTypeRepublic}){
  const [sort,setSort]=useState<Sort>('recent');
  const [scope,setScope]=useState<Scope>(teacher?'all':'mine');
  const [onlyOnline,setOnlyOnline]=useState(false);
- const [showAll,setShowAll]=useState(false);
  const studentMembers=members.filter(m=>m.kind==='student');
  const lastMap=new Map(studentMembers.map(m=>[m.user_id,presence.find(p=>p.user_id===m.user_id)]));
  const isOnline=(id:string)=>{const p=lastMap.get(id);return !!p&&Date.now()-new Date(p.last_seen_at).getTime()<90000};
@@ -103,7 +134,7 @@ export default function ClassroomJournal({g}:{g:ReturnTypeRepublic}){
    <div><small>АКТИВНОСТЬ И ПРИСУТСТВИЕ</small><h2>{teacher?'Журнал аудитории':'Мой журнал действий'}</h2>
     <p>{teacher?'Участники, текущий раздел и история действий в одном месте.':'Ваши действия и переходы по разделам игры.'}</p></div>
    <div className="journalCounters"><span><UsersRound size={16} aria-hidden="true"/>{teacher?onlineCount+' онлайн':'Личный журнал'}</span>
-    <span><Activity size={16} aria-hidden="true"/>{visible.length} записей</span>
+    <span><Activity size={16} aria-hidden="true"/>{visible.length} загружено</span>
     {teacher&&<button type="button" disabled={clearing} onClick={()=>void clearHistory()} title="Сбросить видимую историю, сохранив данные оценивания"><Trash2 size={16} aria-hidden="true"/>{clearing?'Очистка…':'Очистить историю'}</button>}
     <button type="button" onClick={exportCsv} title="Экспорт показанных строк в CSV"><Download size={16} aria-hidden="true"/> CSV</button>
    </div>
@@ -127,7 +158,7 @@ export default function ClassroomJournal({g}:{g:ReturnTypeRepublic}){
   </div>}
   <div className="journalFeed" role="region" aria-label="Записи журнала" tabIndex={0}>
    {ownBusy&&!teacher&&<p role="status">Загрузка личного журнала…</p>}
-   {visible.length===0?<div className="journalEmpty">{!teacher?'Ваших действий пока нет. Переходы по разделам и совершённые действия будут отображаться здесь.':'По выбранным фильтрам записей нет.'}</div>:visible.slice(0,showAll?visible.length:50).map(a=>{
+   {visible.length===0?<div className="journalEmpty">{!teacher?'Ваших действий пока нет. Переходы по разделам и совершённые действия будут отображаться здесь.':'По выбранным фильтрам записей нет.'}</div>:visible.slice(0,visibleCount).map(a=>{
     const m=members.find(x=>x.user_id===a.actor_id);
     return <article key={a.id} className="gosJournalRecord">
      <time className="gosJournalRecordTime" dateTime={a.created_at}>{new Date(a.created_at).toLocaleString('ru-RU',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'})}</time>
@@ -139,8 +170,15 @@ export default function ClassroomJournal({g}:{g:ReturnTypeRepublic}){
     </article>;
    })}
   </div>
-  {visible.length>50&&<button type="button" className="journalMore" onClick={()=>setShowAll(!showAll)}>{showAll?'Показать первые 50':'Показать ещё ('+visible.length+' из '+visible.length+')'}</button>}
-  {loaded.length>=250&&!olderExhausted&&<button type="button" className="journalMore" onClick={()=>void loadOlder()} disabled={olderBusy}>{olderBusy?'Загрузка…':'Загрузить предыдущие 250 событий'}</button>}
+  {(visibleCount<visible.length||(!olderExhausted&&loaded.length>=JOURNAL_PAGE_SIZE))&&
+   <button type="button" className="journalMore" onClick={()=>void showNextPage()}
+    disabled={olderBusy} aria-busy={olderBusy}>
+    {olderBusy?'Загрузка…':visibleCount<visible.length
+     ?'Показать ещё '+Math.min(JOURNAL_PAGE_SIZE,visible.length-visibleCount)+' записей'
+     :'Загрузить предыдущие 20 событий'}
+   </button>}
+  {visibleCount>JOURNAL_PAGE_SIZE&&
+   <button type="button" className="journalMore" onClick={()=>setVisibleCount(JOURNAL_PAGE_SIZE)}>Свернуть до 20</button>}
   {olderError&&<p className="journalError" role="alert">{olderError}</p>}
   {ownError&&<p className="journalError" role="alert">{ownError}</p>}
   <p className="journalNote">{teacher?'Загружено '+loaded.length+' событий. Фильтры и экспорт действуют на загруженную историю.':'Вам доступны только собственные события. Действия других студентов и преподавателя скрыты.'}</p>
