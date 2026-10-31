@@ -40,7 +40,8 @@ export function pointsForMetric(
  history:MetricHistory[],
  bucket:MetricBucket='changes',
  gameCreatedAt?:string|null,
- snapshotAt=Date.now()
+ snapshotAt=Date.now(),
+ partialHistory=false
 ):MetricPoint[]{
  const rows=history
   .filter(h=>h.metric_key===metric.metric_key&&Number.isFinite(parseTime(h.recorded_at))&&Number.isFinite(Number(h.value)))
@@ -52,13 +53,14 @@ export function pointsForMetric(
  const firstAt=parseTime(first.recorded_at);
  const firstIsBaseline=first.source_type==='baseline';
  const gameStart=parseTime(gameCreatedAt);
- const initialAt=firstIsBaseline?firstAt:
+ const initialAt=firstIsBaseline||partialHistory?firstAt:
   Number.isFinite(gameStart)&&gameStart<=firstAt?gameStart:firstAt;
  const initialValue=firstIsBaseline?Number(first.value):
   first.previous_value!=null?Number(first.previous_value):Number(first.value);
  const points:MetricPoint[]=[{
   at:initialAt,value:initialValue,kind:'baseline',
-  note:firstIsBaseline?(first.note||'Начальное значение показателя'):
+  note:partialHistory?'Начало загруженного периода; предыдущие записи доступны по запросу':
+   firstIsBaseline?(first.note||'Начальное значение показателя'):
    first.previous_value!=null?'Значение до первого зафиксированного изменения (восстановлено)':
    'Первая доступная запись; более ранних данных нет'
  }];
