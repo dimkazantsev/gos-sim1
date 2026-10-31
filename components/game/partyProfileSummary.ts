@@ -33,8 +33,8 @@ export function mergeProfileAssetRows(
   return {
    ...row,
    bio:prior&&prior.updated_at===row.updated_at?prior.bio??null:null,
-   avatar_url:prior?.avatar_path===row.avatar_path?prior.avatar_url||null:null,
-   signature_url:prior?.signature_path===row.signature_path?prior.signature_url||null:null
+   avatar_url:prior&&prior.avatar_path===row.avatar_path?prior.avatar_url||null:null,
+   signature_url:prior&&prior.signature_path===row.signature_path?prior.signature_url||null:null
   };
  });
 }
