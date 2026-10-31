@@ -3,13 +3,9 @@ import type {FormalDocument} from './types';
 // Match bootstrap v3's lightweight document projection without transferring
 // full texts and metadata on background Realtime reconciliation.
 // Column access continues through the existing formal_documents table RLS.
-export const FORMAL_DOCUMENT_SUMMARY_COLUMNS=[
- 'id','game_id','stage_no','registry_no','title','doc_type',
- 'subject_key','subject_label','author_id','source_file_path',
- 'source_file_name','source_mime_type','workflow_key','workflow_steps',
- 'current_step','status_code','status_label','current_owner_key',
- 'created_at','updated_at'
-].join(',');
+// A string-literal type lets typed Supabase PostgREST verify every requested
+// column at compile time, rather than inferring an unsupported dynamic select.
+export const FORMAL_DOCUMENT_SUMMARY_COLUMNS='id,game_id,stage_no,registry_no,title,doc_type,subject_key,subject_label,author_id,source_file_path,source_file_name,source_mime_type,workflow_key,workflow_steps,current_step,status_code,status_label,current_owner_key,created_at,updated_at' as const;
 
 export type FormalDocumentSummary=Omit<FormalDocument,'body_text'|'metadata'|'file_url'>;
 
