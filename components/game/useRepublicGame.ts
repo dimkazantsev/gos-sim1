@@ -1089,7 +1089,7 @@ export function useRepublicGame(gameId:string){
    if(projection.error&&['PGRST202','42883'].includes(String(projection.error.code||''))){
     // Rolling schema rollout only: do not retry denied or overloaded RPCs.
     const [al,pr]=await Promise.all([
-     supabase.from('game_activity').select('*').eq('game_id',gameId).order('created_at',{ascending:false}).limit(250),
+     supabase.from('game_activity').select('*').eq('game_id',gameId).order('created_at',{ascending:false}).order('id',{ascending:false}).limit(20),
      supabase.from('game_presence').select('*').eq('game_id',gameId).order('last_seen_at',{ascending:false})
     ]);
     if(!readCurrent(ticket))return;
