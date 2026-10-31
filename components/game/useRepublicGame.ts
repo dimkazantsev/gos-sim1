@@ -10,6 +10,7 @@ import {readLocalGameSnapshot,writeLocalGameSnapshot,deleteLocalGameSnapshot} fr
 import {resolveStoredAsset} from '@/lib/resolveStoredAsset';
 import {signDocumentAssetBatch} from './signDocumentAssetBatch';
 import {FORMAL_DOCUMENT_SUMMARY_COLUMNS,mergeFormalDocumentSummaries,type FormalDocumentSummary} from './formalDocumentSummary';
+import {PARTY_LIST_COLUMNS,PROFILE_ASSET_COLUMNS,normalizePartyRows,mergeProfileAssetRows,type PartyListRow,type ProfileAssetRow} from './partyProfileSummary';
 import type {Activity,Ballot,Channel,ChatPin,Crisis,Evaluation,EventItem,FormalDocument,FormalHistory,Game,GameDocument,GameProfile,ImpactLedger,ImpactRule,Member,Message,Metric,MetricHistory,Party,PartyAgreement,PartyDocument,PartyInvitation,PartyMandateAllocation,PartySupportHistory,PoliticalPost,PoliticalPostFormalLink,PoliticalPostMedia,Presence,Stage,Vote,View} from './types';
 import {CRISES} from './constants';
 import {CHAT_MAX_FILE_BYTES,preferredRecordingMime,recordingFileName,uploadedChatKind,inferChatMime} from './recordingMedia';
@@ -31,6 +32,8 @@ const PRESENTATION_CACHE_TTL_MS=600000;
 const SESSION_BOOTSTRAP_TIMEOUT_MS=16000;
 // Explicit projection avoids transferring unused ballot timestamps to every classroom client.
 const GAME_BALLOT_COLUMNS='vote_id,voter_id,choice,weight,yes_weight,no_weight,abstain_weight';
+// No role, seniority, score or archived-membership fields may be omitted.
+const MEMBER_ROSTER_COLUMNS='game_id,user_id,full_name,group_name,kind,role_title,team,score,joined_at,party_joined_at,roster_archived_at' as const;
 async function within<T>(promise:PromiseLike<T>,ms=BOOTSTRAP_TIMEOUT_MS,label='Запрос к серверу'):Promise<T>{
  let timer:ReturnType<typeof setTimeout>|undefined;
  try{return await Promise.race([Promise.resolve(promise),new Promise<T>((_,reject)=>{timer=setTimeout(()=>reject(new Error(label+' не завершился за '+Math.round(ms/1000)+' с. '+(label==='Проверка сессии'?'Сервер авторизации отвечает слишком долго. Повторите вход.':'Сервер игровых данных не отвечает.'))),ms)})])}
@@ -135,29 +138,40 @@ export function useRepublicGame(gameId:string){
  function loadMemberRoster(){
   const key=gameId+':'+(authUser.current||'')+':'+readEpoch.current;
   return coalesceInFlight(rosterReads.current,key,async()=>{
-   const response=await limitedCoreRead(supabase.from('game_members').select('*').eq('game_id',gameId).order('full_name'));
+   const response=await limitedCoreRead(supabase.from('game_members').select(MEMBER_ROSTER_COLUMNS).eq('game_id',gameId).order('full_name'));
    return {data:(response.data||null) as Member[]|null,error:response.error};
   });
  }
  const lastPresenceWrite=useRef({scope:'',view:'',at:0});
  const officeReadState=useRef({scope:'',lastSuccessAt:0,lastAttemptAt:0,inflight:null as Promise<void>|null});
  type PartyRead={data:Party[]|null;error:{message:string;code?:string}|null};
- const partyReadState=useRef({scope:'',lastSuccessAt:0,rows:null as Party[]|null,inflight:null as Promise<PartyRead>|null});
- function invalidatePartyRows(){partyReadState.current={scope:'',lastSuccessAt:0,rows:null,inflight:null}}
+ const partyReadState=useRef({scope:'',lastSuccessAt:0,rows:null as Party[]|null,full:false,
+  inflight:null as Promise<PartyRead>|null,inflightFull:false});
+ function invalidatePartyRows(){partyReadState.current={scope:'',lastSuccessAt:0,rows:null,full:false,inflight:null,inflightFull:false}}
  function loadCachedParties(force=false):Promise<PartyRead>{
   const scope=gameId+':'+(authUser.current||'')+':'+readEpoch.current;
   if(partyReadState.current.scope!==scope){invalidatePartyRows();partyReadState.current.scope=scope}
   const cache=partyReadState.current;
-  if(cache.inflight)return cache.inflight;
-  if(!force&&cache.rows!==null&&Date.now()-cache.lastSuccessAt<PRESENTATION_CACHE_TTL_MS)
+  const needFull=activeViewRef.current==='parties'||activeViewRef.current==='teacher';
+  if(cache.inflight){
+   // A fast navigation to the party/teacher dossier must upgrade a pending
+   // summary read rather than treating it as a full registration package.
+   if(needFull&&!cache.inflightFull)return cache.inflight.then(()=>loadCachedParties(false));
+   return cache.inflight;
+  }
+  if(!force&&cache.rows!==null&&(!needFull||cache.full)&&Date.now()-cache.lastSuccessAt<PRESENTATION_CACHE_TTL_MS)
    return Promise.resolve({data:cache.rows,error:null});
-  const request=limitedCoreRead(supabase.from('game_parties').select('*').eq('game_id',gameId).order('support',{ascending:false}).order('created_at').order('id'))
+  const query=needFull
+   ?supabase.from('game_parties').select('*').eq('game_id',gameId).order('support',{ascending:false}).order('created_at').order('id')
+   :supabase.from('game_parties').select(PARTY_LIST_COLUMNS).eq('game_id',gameId).order('support',{ascending:false}).order('created_at').order('id');
+  const request=limitedCoreRead(query)
    .then(result=>{
-    const response:PartyRead={data:(result.data??null) as Party[]|null,error:result.error};
-    if(!response.error&&partyReadState.current===cache){cache.rows=response.data??[];cache.lastSuccessAt=Date.now()}
+    const rows=result.data?normalizePartyRows(result.data as unknown as PartyListRow[],needFull):null;
+    const response:PartyRead={data:rows,error:result.error};
+    if(!response.error&&partyReadState.current===cache){cache.rows=response.data??[];cache.full=needFull;cache.lastSuccessAt=Date.now()}
     return response;
-   }).finally(()=>{if(cache.inflight===request)cache.inflight=null});
-  cache.inflight=request;
+   }).finally(()=>{if(cache.inflight===request){cache.inflight=null;cache.inflightFull=false}});
+  cache.inflight=request;cache.inflightFull=needFull;
   return request;
  }
  const assetSignatures=useRef(new Map<string,{expiresAt:number;promise:Promise<string|null>}>());
@@ -1022,6 +1036,7 @@ export function useRepublicGame(gameId:string){
   if(view==='parties'||view==='profile')jobs.push(loadPartyAssets(view==='parties'));
   // Teacher dossiers must fetch document rows, not just party representation.
   if(view==='teacher')jobs.push(loadPartyDocuments());
+  if(view==='teacher')jobs.push(loadPartyDossierRows());
   if(view==='parties'||view==='teacher')jobs.push(loadPartyRepresentation(false));
   if(view==='documents')jobs.push(loadFormalRegistry());
   if(view==='actions'||view==='dashboard')jobs.push(loadPoliticalWall());
@@ -1154,6 +1169,16 @@ export function useRepublicGame(gameId:string){
   });
  }
 
+ async function loadPartyDossierRows(){
+  // Teacher dossiers require long registration notes and descriptions, which
+  // the initial dashboard deliberately omits. Upgrade only this party read.
+  await readSafely(['parties'],async ticket=>{
+   const result=await loadCachedParties();
+   if(!readCurrent(ticket,'parties'))return;
+   requireSuccessful([result]);
+   acceptPartyRows((result.data||[]) as Party[],ticket);
+  });
+ }
  async function loadPartyDocuments(){
   // Separate from party identity/profile reads so the teacher's 30-second
   // refresh doesn't re-sign every participant avatar.
@@ -1205,15 +1230,23 @@ export function useRepublicGame(gameId:string){
       else acceptPartyDocuments((data||[]) as PartyDocument[],ticket);
      })
     :Promise.resolve();
-   const profileRead=Promise.resolve(supabase.from('game_profiles').select('*').eq('game_id',gameId)).then(({data,error})=>{
+   const includeProfileBio=activeViewRef.current==='profile';
+   const profileQuery=!includeProfileBio
+     ?supabase.from('game_profiles').select(PROFILE_ASSET_COLUMNS).eq('game_id',gameId)
+     :supabase.from('game_profiles').select('*').eq('game_id',gameId);
+    const profileRead=Promise.resolve(profileQuery).then(({data,error})=>{
     if(!readCurrent(ticket,'profiles'))return;
     if(error){setError(error);return}
    if(readCurrent(ticket,'profiles')){
-    const rows=(data||[]) as GameProfile[];
-    setProfiles(previous=>rows.map(row=>{
-     const old=previous.find(p=>p.user_id===row.user_id);
-     return {...row,avatar_url:old?.avatar_path===row.avatar_path?old?.avatar_url||null:null,signature_url:old?.signature_path===row.signature_path?old?.signature_url||null:null};
-    }));
+    const rows=(data||[]) as unknown as GameProfile[];
+    setProfiles(previous=>{
+     const source=!includeProfileBio?mergeProfileAssetRows(previous,rows as ProfileAssetRow[]):rows;
+     return source.map(row=>{
+      const old=previous.find(p=>p.user_id===row.user_id);
+      return {...row,avatar_url:old?.avatar_path===row.avatar_path?old?.avatar_url||null:null,
+       signature_url:old?.signature_path===row.signature_path?old?.signature_url||null:null};
+     });
+    });
     void Promise.all(rows.map(async row=>{
      try{
       const [avatar,signature]=await Promise.all([
