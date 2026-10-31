@@ -2,6 +2,7 @@
 import {userError} from '@/lib/userError';
 import {notifyGameDataRefresh,notifySectionUpdates,setGameRealtimeConnection} from './useGameTableSync';
 import {assetFailureBackoffMs} from './assetFailureBackoff';
+import {boundedChatWrite} from '@/lib/boundedChatWrite';
 import {useBudgetPulse,withBudgetIncome} from './useBudgetPulse';
 import {VOTING_BODIES,bodyQuorum} from './votingBodies';
 import {useEffect,useMemo,useRef,useState} from 'react';
@@ -2685,7 +2686,22 @@ export function useRepublicGame(gameId:string){
   await loadFormalRegistry();return true;
  }
 
- async function sendText(text:string,targetChannel=channelId,mentionedUserIds:string[]=[]){if(!me||!targetChannel||!text.trim())return false;const r=await supabase.rpc('send_chat_text',{p_game:gameId,p_channel:targetChannel,p_text:text.trim(),p_mentioned_users:mentionedUserIds});if(r.error){setError(r.error.message);return false}rememberChatChannel(targetChannel,me.user_id);void Promise.allSettled([loadMessages(targetChannel),loadChatOverview()]);return true}
+ async function sendText(text:string,targetChannel=channelId,mentionedUserIds:string[]=[]){
+  if(!me||!targetChannel||!text.trim())return false;
+  try{
+   const r=await boundedChatWrite(signal=>
+    supabase.rpc('send_chat_text',{p_game:gameId,p_channel:targetChannel,p_text:text.trim(),p_mentioned_users:mentionedUserIds}).abortSignal(signal));
+   if(r.error){setError(userError(r.error));return false}
+   rememberChatChannel(targetChannel,me.user_id);
+   void Promise.allSettled([loadMessages(targetChannel),loadChatOverview()]);
+   return true;
+  }catch(e){
+   setError(userError(e));
+   // A timed-out request might have committed. Do not retry it automatically.
+   void Promise.allSettled([loadMessages(targetChannel),loadChatOverview()]);
+   return false;
+  }
+ }
  async function storeChatAttachment(blob:Blob,fileName:string,mime:string,kind:'file'|ChatMediaKind,targetChannel:string,voiceMeta?:{duration?:number;waveform?:number[]}){
   if(!me||!targetChannel){setChatMediaError('Канал недоступен. Повторно откройте чат.');return false}
   const ticket:ReadTicket={gameId,epoch:readEpoch.current,versions:{}};
