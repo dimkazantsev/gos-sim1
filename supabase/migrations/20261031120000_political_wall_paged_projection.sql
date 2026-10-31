@@ -44,6 +44,7 @@ begin
   'formal_links',coalesce((select jsonb_agg(to_jsonb(l))
     from public.political_post_formal_links l where l.game_id=p_game_id and l.post_id in (select id from page)),'[]'::jsonb),
   'has_more',(select count(*)>10 from pool),
+  'total_posts',(select count(*) from public.political_posts where game_id=p_game_id),
   'metric_history',case when p_cursor_created_at is null then
    coalesce((select jsonb_agg(to_jsonb(h) order by h.recorded_at asc,h.id asc)
     from (select * from public.state_metric_history where game_id=p_game_id order by recorded_at desc,id desc limit 50) h),'[]'::jsonb)
