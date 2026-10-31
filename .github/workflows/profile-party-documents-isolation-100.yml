@@ -4,6 +4,8 @@ on:
     paths:
       - 'components/game/useRepublicGame.ts'
       - 'scripts/profile-party-documents-isolation-100-check.cjs'
+      - 'scripts/profile-signature-on-demand-100-check.cjs'
+      - 'components/game/SignatureUpload.tsx'
       - '.github/workflows/profile-party-documents-isolation-100.yml'
 permissions:
   contents: read
@@ -25,6 +27,8 @@ jobs:
         run: npm run typecheck
       - name: Verify profile, student and teacher document reads at 100 simulated clients
         run: node scripts/profile-party-documents-isolation-100-check.cjs
+      - name: Verify 100 users never request unrelated signatures, preview remains opt-in
+        run: node scripts/profile-signature-on-demand-100-check.cjs
       - name: Check party document access, versions and teacher maintenance
         run: |
           node scripts/party-document-visibility-check.cjs
