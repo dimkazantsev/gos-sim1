@@ -36,7 +36,7 @@ const WORKSPACES=[
 ] as const;
 
 export default function TeacherView({g,onOpenProcesses,onOpenStages,initialWorkspace='overview',onOpenChat,onNavigate,onStartTutorial}:{g:ReturnTypeRepublic;onOpenProcesses:()=>void;onOpenStages:(stageNo:number)=>void;initialWorkspace?:Workspace;onOpenChat?:(channelId:string)=>void;onNavigate?:(destination:'documents'|'votes'|'budget'|'actions')=>void;onStartTutorial?:()=>void}){
- const {game,currentStage,stages,members,parties,partyMandates,partyInvitations,metrics,metricHistory,politicalPosts,formalDocuments,votes,ballots,evaluations,activities,presence,names,nextStage,setTurn,setTurnMinutes,publishEvent,triggerCrisis,ghostVoting,clearPartyGhostLoss,updateMember,updateMetric}=g;
+ const {game,currentStage,stages,members,parties,partyMandates,partyInvitations,metrics,metricHistory,politicalPosts,politicalPostTotal,formalDocuments,votes,ballots,evaluations,activities,presence,names,nextStage,setTurn,setTurnMinutes,publishEvent,triggerCrisis,ghostVoting,clearPartyGhostLoss,updateMember,updateMetric}=g;
 
  const [workspace,setWorkspace]=useSavedGameState<Workspace>(g.game?.id,g.me?.user_id,'teacher-workspace',initialWorkspace,savedChoice(...WORKSPACES.map(w=>w.key)));
  const navigationTarget=useTeacherNavigationTarget();
@@ -124,7 +124,7 @@ export default function TeacherView({g,onOpenProcesses,onOpenStages,initialWorks
     {workspace==='analytics'&&<section className="teacherAnalytics surface">
    <div className="surfaceHead"><div><small>АНАЛИТИКА ИГРЫ</small><h2>Общая статистика и вклад участников</h2></div><span>{members.filter(m=>m.kind==='student').length} участников</span></div>
    <div className="teacherAnalyticsCards">
-    <div><small>ПУБЛИКАЦИИ</small><strong>{politicalPosts.length}</strong><span>политических процессов</span></div>
+    <div><small>ПУБЛИКАЦИИ</small><strong>{politicalPostTotal||politicalPosts.length}</strong><span>политических процессов</span></div>
     <div><small>ПАРТИИ</small><strong>{parties.length}</strong><span>политических организаций в игре</span></div>
     <div><small>НПА</small><strong>{formalDocuments.length}</strong><span>в реестре</span></div>
     <div><small>ГОЛОСОВАНИЯ</small><strong>{votes.length}</strong><span>{votes.filter(v=>v.status==='open').length} открыто</span></div>
