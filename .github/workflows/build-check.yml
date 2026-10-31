@@ -290,6 +290,8 @@ on:
       - 'supabase/migrations/*crisis_baseline*'
       - 'components/game/CivicDiscussion.tsx'
       - 'components/game/useRepublicGame.ts'
+      - 'components/game/documentMetadataCache.ts'
+      - 'scripts/document-metadata-cache-40-check.cjs'
       - 'scripts/realtime-overview-singleflight-40-check.cjs'
       - 'scripts/game-bootstrap-v3-lightweight-check.cjs'
       - 'supabase/migrations/20261031183000_game_bootstrap_v3_lightweight.sql'
@@ -343,6 +345,7 @@ jobs:
         run: npm audit --audit-level=high
       - run: node scripts/private-game-presence-100-clients-check.cjs
       - run: npm run typecheck
+      - run: node scripts/document-metadata-cache-40-check.cjs
       - run: node scripts/realtime-overview-singleflight-40-check.cjs
       - run: node scripts/game-bootstrap-v3-lightweight-check.cjs
       - run: npm run news:check
