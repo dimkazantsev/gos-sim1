@@ -43,7 +43,7 @@ const PRESENCE_RATE_WINDOW_MS=30000;
 const PRESENCE_RATE_CALL_LIMIT=4;
 const presenceCallTimes:number[]=[];
 function reservePresenceCall(now:number):number{
- while(presenceCallTimes.length&&now-presenceCallTimes[0]<=now-PRESENCE_RATE_WINDOW_MS)
+ while(presenceCallTimes.length&&presenceCallTimes[0]<=now-PRESENCE_RATE_WINDOW_MS)
   presenceCallTimes.shift();
  if(presenceCallTimes.length>=PRESENCE_RATE_CALL_LIMIT)
   return Math.max(1,PRESENCE_RATE_WINDOW_MS-(now-presenceCallTimes[0])+1);
