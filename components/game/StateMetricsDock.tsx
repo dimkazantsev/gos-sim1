@@ -59,6 +59,8 @@ export default function StateMetricsDock({g,initialSelectedMetricId='',initialCo
  const [historyMore,setHistoryMore]=useState<Record<string,boolean>>({});
  const [historyLoading,setHistoryLoading]=useState<Record<string,boolean>>({});
  const [historyError,setHistoryError]=useState('');
+ const [linkedPostTitles,setLinkedPostTitles]=useState<Record<string,string>>({});
+ const linkedPostsRequested=useRef(new Set<string>());
  const historyCursor=useRef(new Map<string,{recorded_at:string;id:number}>());
  const historyLoaded=useRef(new Set<string>());
  const historyPending=useRef(new Set<string>());
@@ -106,6 +108,34 @@ export default function StateMetricsDock({g,initialSelectedMetricId='',initialCo
 
  function rowsFor(metricKey:string){return mergedHistory.filter(h=>h.metric_key===metricKey)}
  const hist=chosen?rowsFor(chosen.metric_key).sort((a,b)=>Date.parse(a.recorded_at)-Date.parse(b.recorded_at)):[];
+ // A closed dashboard never needs the full political feed just to display
+ // six small metric cards. When history is opened, resolve only the exact
+ // linked publication titles that can appear in that dialog (RLS scoped).
+ const visibleHistory=[...hist].reverse().slice(0,showFullHistory?hist.length:HISTORY_PREVIEW_COUNT);
+ const historyPostIds=visibleHistory.map(row=>String(row.source_id||''))
+  .filter(id=>/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(id));
+ const historyPostKey=historyPostIds.join('|');
+ useEffect(()=>{
+  const gid=game?.id,scope=historyScope.current;
+  if(!selected||!gid||!historyPostKey)return;
+  const existing=new Set(politicalPosts.map(post=>post.id));
+  const ids=[...new Set(historyPostKey.split('|'))].filter(id=>
+   !existing.has(id)&&!linkedPostsRequested.current.has(id)).slice(0,50);
+  if(!ids.length)return;
+  ids.forEach(id=>linkedPostsRequested.current.add(id));
+  let active=true;
+  void supabase.from('political_posts').select('id,title').eq('game_id',gid)
+   .in('id',ids).then(({data,error})=>{
+    if(!active||historyScope.current!==scope)return;
+    if(error){ids.forEach(id=>linkedPostsRequested.current.delete(id));return}
+    if(data?.length)setLinkedPostTitles(previous=>Object.assign({},previous,
+     Object.fromEntries(data.map(post=>[post.id,post.title]))));
+   },()=>{
+    if(active&&historyScope.current===scope)
+     ids.forEach(id=>linkedPostsRequested.current.delete(id));
+   });
+  return()=>{active=false};
+ },[game?.id,g.me?.user_id,selected,historyPostKey,politicalPosts]);
  const affectsChosen=chosen&&ruleRows?ruleRows.filter(rule=>Number(rule.effects?.metrics?.[chosen.metric_key]||0)!==0):[];
  const activeEffects=affectsChosen?affectsChosen.filter(rule=>rule.enabled&&rule.auto_apply):[];
  const metricEvents=hist.filter(entry=>entry.source_type!=='baseline').length;
@@ -164,6 +194,7 @@ export default function StateMetricsDock({g,initialSelectedMetricId='',initialCo
   historyScope.current=game?.id+':'+g.me?.user_id;
   historyCursor.current.clear();historyLoaded.current.clear();historyPending.current.clear();
   setHistoryPages({});setHistoryMore({});setHistoryLoading({});setHistoryError('');
+  linkedPostsRequested.current.clear();setLinkedPostTitles({});
  },[game?.id,g.me?.user_id]);
  useEffect(()=>{
   if(!selected||!game?.id)return;
@@ -292,7 +323,7 @@ export default function StateMetricsDock({g,initialSelectedMetricId='',initialCo
      <div className="metricHistoryHead"><b>Журнал показателя</b><span>{hist.length} загружено</span></div>
      {[...hist].reverse().slice(0,showFullHistory?hist.length:HISTORY_PREVIEW_COUNT).map(h=>{const p=h.source_id?politicalPosts.find(x=>x.id===h.source_id):undefined;return <article key={h.id}>
       <time>{new Date(h.recorded_at).toLocaleString('ru-RU')}</time>
-      <div><b>{Number(h.previous_value??h.value).toLocaleString('ru-RU')} → {Number(h.value).toLocaleString('ru-RU')} {chosen.unit||''}</b><p>{h.note||p?.title||gameValueLabel(h.source_type,'Изменение показателя')}</p>{h.actor_id&&<small>{names[h.actor_id]||'Участник'}</small>}</div>
+      <div><b>{Number(h.previous_value??h.value).toLocaleString('ru-RU')} → {Number(h.value).toLocaleString('ru-RU')} {chosen.unit||''}</b><p>{h.note||p?.title||linkedPostTitles[String(h.source_id||'')]||gameValueLabel(h.source_type,'Изменение показателя')}</p>{h.actor_id&&<small>{names[h.actor_id]||'Участник'}</small>}</div>
       <strong className={Number(h.delta)>=0?'up':'down'}>{Number(h.delta)>0?'+':''}{Number(h.delta||0).toFixed(1)}</strong>
      </article>})}
      {hist.length>HISTORY_PREVIEW_COUNT&&<button type="button" className="metricHistoryMore" onClick={()=>setShowFullHistory(v=>!v)}>{showFullHistory?'Свернуть журнал':`Показать ещё ${Math.min(hist.length,30)-HISTORY_PREVIEW_COUNT} записей`}</button>}
