@@ -9,6 +9,7 @@ import {supabase} from '@/lib/supabase';
 import {readLocalGameSnapshot,writeLocalGameSnapshot,deleteLocalGameSnapshot} from '@/lib/localGameSnapshot';
 import {resolveStoredAsset} from '@/lib/resolveStoredAsset';
 import {signDocumentAssetBatch} from './signDocumentAssetBatch';
+import {FORMAL_DOCUMENT_SUMMARY_COLUMNS,mergeFormalDocumentSummaries,type FormalDocumentSummary} from './formalDocumentSummary';
 import type {Activity,Ballot,Channel,ChatPin,Crisis,Evaluation,EventItem,FormalDocument,FormalHistory,Game,GameDocument,GameProfile,ImpactLedger,ImpactRule,Member,Message,Metric,MetricHistory,Party,PartyAgreement,PartyDocument,PartyInvitation,PartyMandateAllocation,PartySupportHistory,PoliticalPost,PoliticalPostFormalLink,PoliticalPostMedia,Presence,Stage,Vote,View} from './types';
 import {CRISES} from './constants';
 import {CHAT_MAX_FILE_BYTES,preferredRecordingMime,recordingFileName,uploadedChatKind,inferChatMime} from './recordingMedia';
@@ -870,14 +871,18 @@ export function useRepublicGame(gameId:string){
   if(tables.has('formal_documents')){
    if(view==='documents')jobs.push(loadFormalRegistry());
    else jobs.push(readSafely(['formal'],async ticket=>{
-    const fd=await supabase.from('formal_documents').select('*').eq('game_id',gameId).order('updated_at',{ascending:false});
+    // Realtime reconciliation uses table RLS, but skips every document's
+    // body and metadata unless the user opens a document-dependent section.
+    const fd=await limitedCoreRead(supabase.from('formal_documents')
+     .select(FORMAL_DOCUMENT_SUMMARY_COLUMNS).eq('game_id',gameId)
+     .order('updated_at',{ascending:false}));
     if(!readCurrent(ticket))return;
     requireSuccessful([fd]);
-    formalFullVersion.current=formalVersion((fd.data||[]) as FormalDocument[]);
-    setFormalDocuments(previous=>((fd.data||[]) as FormalDocument[]).map(row=>{
-     const old=previous.find(doc=>doc.id===row.id);
-     return {...row,file_url:old?.source_file_path===row.source_file_path?old.file_url||null:null};
-    }));
+    const summaries=(fd.data||[]) as FormalDocumentSummary[];
+    // A summary-only response must never be mistaken for a fully hydrated cache.
+    if(formalFullVersion.current!==formalVersion(summaries as FormalDocument[]))
+     formalFullVersion.current='';
+    setFormalDocuments(previous=>mergeFormalDocumentSummaries(previous,summaries));
    }));
   }
   if(tables.has('political_posts')&&(view==='actions'||view==='dashboard'))jobs.push(loadPoliticalWall());
