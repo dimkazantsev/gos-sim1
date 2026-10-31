@@ -61,6 +61,9 @@ export default function StateMetricsDock({g,initialSelectedMetricId='',initialCo
  const [historyError,setHistoryError]=useState('');
  const [linkedPostTitles,setLinkedPostTitles]=useState<Record<string,string>>({});
  const linkedPostsRequested=useRef(new Set<string>());
+ const linkedPostCache=useRef(new Map<string,{title:string;body:string}>());
+ const linkedPostRequest=useRef(0);
+ const [linkedPostPreview,setLinkedPostPreview]=useState<{id:string;title:string;body:string;loading:boolean;error:string}|null>(null);
  const historyCursor=useRef(new Map<string,{recorded_at:string;id:number}>());
  const historyLoaded=useRef(new Set<string>());
  const historyPending=useRef(new Set<string>());
@@ -136,6 +139,33 @@ export default function StateMetricsDock({g,initialSelectedMetricId='',initialCo
    });
   return()=>{active=false};
  },[game?.id,g.me?.user_id,selected,historyPostKey,politicalPosts]);
+ // A footnote opens exactly one RLS-authorised record, not the full process
+ // page. Use the same game/account scope as the history-title cache.
+ async function toggleLinkedPostPreview(id:string){
+  const gid=game?.id;
+  if(!gid||!linkedPostTitles[id]&&!politicalPosts.some(post=>post.id===id))return;
+  if(linkedPostPreview?.id===id){linkedPostRequest.current++;setLinkedPostPreview(null);return}
+  const existing=linkedPostCache.current.get(id)||politicalPosts.find(post=>post.id===id);
+  if(existing){setLinkedPostPreview({id,title:existing.title,body:existing.body,loading:false,error:''});return}
+  const scope=historyScope.current,request=++linkedPostRequest.current;
+  setLinkedPostPreview({id,title:linkedPostTitles[id]||'',body:'',loading:true,error:''});
+  try{
+   const result=await supabase.from('political_posts').select('id,title,body')
+    .eq('game_id',gid).eq('id',id).maybeSingle();
+   if(request!==linkedPostRequest.current||historyScope.current!==scope)return;
+   if(result.error||!result.data){
+    setLinkedPostPreview({id,title:linkedPostTitles[id]||'',body:'',loading:false,
+     error:'Публикация недоступна для просмотра.'});
+    return;
+   }
+   const post={title:result.data.title,body:result.data.body};
+   linkedPostCache.current.set(id,post);
+   setLinkedPostPreview({id,...post,loading:false,error:''});
+  }catch{
+   if(request===linkedPostRequest.current&&historyScope.current===scope)
+    setLinkedPostPreview({id,title:linkedPostTitles[id]||'',body:'',loading:false,error:'Не удалось загрузить публикацию.'});
+  }
+ }
  const affectsChosen=chosen&&ruleRows?ruleRows.filter(rule=>Number(rule.effects?.metrics?.[chosen.metric_key]||0)!==0):[];
  const activeEffects=affectsChosen?affectsChosen.filter(rule=>rule.enabled&&rule.auto_apply):[];
  const metricEvents=hist.filter(entry=>entry.source_type!=='baseline').length;
@@ -195,6 +225,7 @@ export default function StateMetricsDock({g,initialSelectedMetricId='',initialCo
   historyCursor.current.clear();historyLoaded.current.clear();historyPending.current.clear();
   setHistoryPages({});setHistoryMore({});setHistoryLoading({});setHistoryError('');
   linkedPostsRequested.current.clear();setLinkedPostTitles({});
+  linkedPostRequest.current++;linkedPostCache.current.clear();setLinkedPostPreview(null);
  },[game?.id,g.me?.user_id]);
  useEffect(()=>{
   if(!selected||!game?.id)return;
@@ -323,7 +354,15 @@ export default function StateMetricsDock({g,initialSelectedMetricId='',initialCo
      <div className="metricHistoryHead"><b>Журнал показателя</b><span>{hist.length} загружено</span></div>
      {[...hist].reverse().slice(0,showFullHistory?hist.length:HISTORY_PREVIEW_COUNT).map(h=>{const p=h.source_id?politicalPosts.find(x=>x.id===h.source_id):undefined;return <article key={h.id}>
       <time>{new Date(h.recorded_at).toLocaleString('ru-RU')}</time>
-      <div><b>{Number(h.previous_value??h.value).toLocaleString('ru-RU')} → {Number(h.value).toLocaleString('ru-RU')} {chosen.unit||''}</b><p>{h.note||p?.title||linkedPostTitles[String(h.source_id||'')]||gameValueLabel(h.source_type,'Изменение показателя')}</p>{h.actor_id&&<small>{names[h.actor_id]||'Участник'}</small>}</div>
+      <div><b>{Number(h.previous_value??h.value).toLocaleString('ru-RU')} → {Number(h.value).toLocaleString('ru-RU')} {chosen.unit||''}</b><p>{h.note||p?.title||linkedPostTitles[String(h.source_id||'')]||gameValueLabel(h.source_type,'Изменение показателя')}</p>{h.actor_id&&<small>{names[h.actor_id]||'Участник'}</small>}
+        {(p||linkedPostTitles[String(h.source_id||'')])&&<button type="button" className="metricHistoryMore"
+         onClick={()=>void toggleLinkedPostPreview(String(h.source_id))}>
+         {linkedPostPreview?.id===h.source_id?'Скрыть публикацию':'Открыть связанную публикацию'}
+        </button>}
+        {linkedPostPreview?.id===h.source_id&&<div className="metricPointDetail" role="status">
+         {linkedPostPreview.loading?'Загрузка публикации…':linkedPostPreview.error||
+          <span><b>{linkedPostPreview.title}</b><small>{linkedPostPreview.body}</small></span>}
+        </div>}</div>
       <strong className={Number(h.delta)>=0?'up':'down'}>{Number(h.delta)>0?'+':''}{Number(h.delta||0).toFixed(1)}</strong>
      </article>})}
      {hist.length>HISTORY_PREVIEW_COUNT&&<button type="button" className="metricHistoryMore" onClick={()=>setShowFullHistory(v=>!v)}>{showFullHistory?'Свернуть журнал':`Показать ещё ${Math.min(hist.length,30)-HISTORY_PREVIEW_COUNT} записей`}</button>}
