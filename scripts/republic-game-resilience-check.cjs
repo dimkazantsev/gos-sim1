@@ -39,10 +39,10 @@ function harness({effects=false,compiledCode=code}={}){
   from(table){
    requests++;const number=(counts.get(table)||0)+1;counts.set(table,number);
    const snapshot={revision,user,gameId,memberKind},fixtureSnapshot=fixtures.has(table)?JSON.parse(JSON.stringify(fixtures.get(table))):null;
-   const query={singleRow:false,eqs:{},ins:{},upsert(){started.set('write:'+table,(started.get('write:'+table)||0)+1);return Promise.resolve({data:null,error:null});},insert(){started.set('write:'+table,(started.get('write:'+table)||0)+1);return Promise.resolve({data:null,error:null});},select(){return this;},order(){return this;},limit(){return this;},eq(key,value){this.eqs[key]=value;return this;},single(){this.singleRow=true;return this;},maybeSingle(){this.singleRow=true;return this;},in(key,values){this.ins[key]=values;return this;},abortSignal(signal){this.signal=signal;signal.addEventListener('abort',()=>{aborted++},{once:true});return this;},
+   const query={singleRow:false,eqs:{},ins:{},upsert(){started.set('write:'+table,(started.get('write:'+table)||0)+1);return Promise.resolve({data:null,error:null});},insert(){started.set('write:'+table,(started.get('write:'+table)||0)+1);return Promise.resolve({data:null,error:null});},select(columns='*'){this.columns=columns;return this;},order(){return this;},limit(){return this;},eq(key,value){this.eqs[key]=value;return this;},single(){this.singleRow=true;return this;},maybeSingle(){this.singleRow=true;return this;},in(key,values){this.ins[key]=values;return this;},abortSignal(signal){this.signal=signal;signal.addEventListener('abort',()=>{aborted++},{once:true});return this;},
     async then(resolve,reject){try{
      started.set(table,(started.get(table)||0)+1);
-     queryLog.push({table,eqs:{...this.eqs},ins:{...this.ins}});
+     queryLog.push({table,columns:this.columns||'*',eqs:{...this.eqs},ins:{...this.ins}});
      const wait=holds.get(table+':'+number)?.promise;
      if(wait&&this.signal&&!ignoreAbort)await Promise.race([wait,new Promise((_,fail)=>this.signal.addEventListener('abort',()=>fail(new Error('simulated abort')),{once:true}))]);
      else await wait;
@@ -63,6 +63,11 @@ function harness({effects=false,compiledCode=code}={}){
      if(table==='chat_channels')data=[{id:'channel-a',game_id:id,name:'Общий чат',kind:'public'}];
      if(table==='chat_messages')data=[{id:'message-'+snapshot.revision,game_id:id,channel_id:this.eqs.channel_id||'channel-a',text:'message-'+snapshot.revision,created_at:'2026-10-08T10:00:00Z'}];
      if(fixtureSnapshot){data=fixtureSnapshot.filter(row=>Object.entries(this.eqs).every(([key,value])=>row[key]===value)&&Object.entries(this.ins).every(([key,values])=>values.includes(row[key])));if(this.singleRow)data=data[0]||null;}
+     // Emulate PostgREST column projection for the changed formal document path.
+     if(table==='formal_documents'&&Array.isArray(data)&&this.columns&&this.columns!=='*'){
+      const fields=this.columns.split(',').map(field=>field.trim());
+      data=data.map(row=>Object.fromEntries(fields.filter(field=>field in row).map(field=>[field,row[field]])));
+     }
      const result=failures.has(table)?{data:null,error:{message:'simulated read outage '+table,code:failureCodes.get(table)}}:{data,error:null};
      responseBytes+=Buffer.byteLength(JSON.stringify(result));resolve(result);
     }catch(error){reject(error);}}
@@ -206,7 +211,7 @@ function harness({effects=false,compiledCode=code}={}){
   if(name==='./useGameTableSync')return{notifyGameDataRefresh:(gameId,table)=>notices.push({gameId,table}),notifySectionUpdates:()=>{},setGameRealtimeConnection:()=>{}};
   if(name==='./useBudgetPulse')return{useBudgetPulse:()=>({budgetPulse:null,budgetPulseError:'',refreshBudgetPulse:async()=>{}}),withBudgetIncome:rows=>rows};
   if(name==='./gameRoster')return{currentGameMembers:(rows,id)=>rows.filter(row=>row.game_id===id),currentGameProfiles:(rows,_,id)=>rows.filter(row=>row.game_id===id)};
-  if(name==='./chatChannelSelection'||name==='./chatRealtime'||name==='./chatHistoryPaging'||name==='./coalesceInFlight'||name==='./signDocumentAssetBatch'){
+  if(name==='./chatChannelSelection'||name==='./chatRealtime'||name==='./chatHistoryPaging'||name==='./coalesceInFlight'||name==='./signDocumentAssetBatch'||name==='./formalDocumentSummary'){
    const source=fs.readFileSync(path.join(root,'components/game',name.slice(2)+'.ts'),'utf8');
    const compiled=ts.transpileModule(source,{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}}).outputText;
    const child={exports:{}};
