@@ -45,6 +45,12 @@ begin
     from public.political_post_formal_links l where l.game_id=p_game_id and l.post_id in (select id from page)),'[]'::jsonb),
   'has_more',(select count(*)>10 from pool),
   'total_posts',(select count(*) from public.political_posts where game_id=p_game_id),
+  'actor_options',case when p_cursor_created_at is null then
+   coalesce((select jsonb_agg(jsonb_build_object('actor_key',a.actor_key,'actor_label',a.actor_label))
+    from (select distinct on (p.actor_key) p.actor_key,p.actor_label
+     from public.political_posts p where p.game_id=p_game_id
+     order by p.actor_key,p.created_at desc) a),'[]'::jsonb)
+   else '[]'::jsonb end,
   'metric_history',case when p_cursor_created_at is null then
    coalesce((select jsonb_agg(to_jsonb(h) order by h.recorded_at asc,h.id asc)
     from (select * from public.state_metric_history where game_id=p_game_id order by recorded_at desc,id desc limit 50) h),'[]'::jsonb)
