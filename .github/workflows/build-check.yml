@@ -380,6 +380,7 @@ jobs:
       - run: node scripts/republic-game-resilience-check.cjs
       - run: node scripts/game-identity-access-check.cjs
       - run: node scripts/classroom-telemetry-projection-rls-check.cjs
+      - run: node scripts/classroom-journal-pagination-check.cjs
       - run: node scripts/formal-registry-projection-rls-check.cjs
       - run: node scripts/chat-pins-projection-rls-check.cjs
       - run: node scripts/private-game-broadcast-rls-check.cjs
