@@ -41,15 +41,16 @@ async function checks(){
  h.emit('formal_documents',{...doc('foreign'),game_id:'game-b'},'UPDATE');assert(!h.render().formalDocuments.some(d=>d.id==='foreign'));
  h.visible('hidden');const hidden=h.stats().responseBytes;h.emit('formal_documents',doc('new','Скрытое обновление'),'UPDATE');await h.advance(5000);assert.equal(h.stats().responseBytes,hidden,'Hidden tab starts no reconciliation');h.visible('visible');await h.advance(3100);h.dispose();
  const q=harness({effects:true});await q.settle();q.ignoreAbort(true);
- // Eleven core tables are now bundled: hold only the independent member GET.
- const heldMember=q.hold('game_members',q.readCount('game_members')+2);
- const beforeBootstrap=q.rpcCount('get_game_bootstrap_v3');
+ // Stage 8.5: one bounded entry RPC replaces the independent member GET.
+ // Hold the RPC and verify its timeout does not block a later authorised read.
+ const heldEntry=q.hold('games',q.readCount('games')+1);
+ const beforeBootstrap=q.rpcCount('get_game_entry_v4');
  const refresh=q.render().refresh();for(let n=0;n<4;n++)await tick();
  q.runTimers();await refresh;
- assert(q.stats().aborted>=1,'Stalled personal member read must abort');
- heldMember.resolve();
+ assert.equal(q.rpcCount('get_game_bootstrap_v3'),0,'Timeout must not fan out into legacy table reads');
+ heldEntry.resolve();
  await q.render().refresh();
- assert(q.rpcCount('get_game_bootstrap_v3')>beforeBootstrap,'Next bootstrap must not remain blocked');
+ assert(q.rpcCount('get_game_entry_v4')>beforeBootstrap,'Next entry read must not remain blocked');
  q.dispose();
  const c=harness({effects:true});await c.settle();c.render().setChatOpen(true);await c.settle();const initial=c.stats().started['rpc:mark_chat_channel_read']||0;
  for(let i=0;i<80;i++){c.emit('chat_messages',{id:'m'+i,channel_id:'channel-a',text:'Сообщение',created_at:new Date().toISOString()},'INSERT');await c.settle();await c.advance(125)}
@@ -76,7 +77,7 @@ async function checks(){
  assert(!pulse.stats().notices.slice(noticeStart).some(row=>row.table==='state_metrics'),'Metric payloads must not invalidate unrelated party-election listeners');
  pulse.render().setActiveView('budget');await pulse.settle();noticeStart=pulse.stats().notices.length;pulse.emit('state_metrics',{id:'metric',value:8},'UPDATE');
  assert(pulse.stats().notices.slice(noticeStart).some(row=>row.table==='state_metrics'),'Visible budget widgets retain their targeted metric invalidation');pulse.dispose();
- console.log('PASS targeted document/history reads, preserved history, late document response, foreign-game rejection, hidden recovery, stalled queue abort/release, coalesced chat receipts, targeted ballot confirmation and auto-closure reconciliation');
+ console.log('PASS targeted document/history reads, preserved history, late document response, foreign-game rejection, hidden recovery, stalled entry timeout/release, coalesced chat receipts, targeted ballot confirmation and auto-closure reconciliation');
  const model=await steady();assert(model.fullGameReads<=280,'Only periodic reconciliation may load game identity');assert(model.reads<20000,'Steady vote updates must not trigger a full game fanout');
  let beforeModel=null;
  if(process.env.PERFORMANCE_BASELINE_REF){const source=execFileSync('git',['show',process.env.PERFORMANCE_BASELINE_REF+':components/game/useRepublicGame.ts'],{encoding:'utf8'});const code=ts.transpileModule(source,{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}}).outputText;beforeModel=await steady(code);assert(model.reads<beforeModel.reads/2);assert(model.jsonResponseBytes<beforeModel.jsonResponseBytes)}
