@@ -88,6 +88,11 @@ export default function StateMetricsDock({g,initialSelectedMetricId='',initialCo
  const secondary=allowed.filter(m=>!PRIMARY.includes(m.metric_key));
  const visibleMetrics=[...primary,...secondary];
  const chosen=allowed.find(m=>m.id===selected);
+ const mergedHistory=useMemo(()=>{
+  const unique=new Map(metricHistory.map(row=>[row.id,row]));
+  Object.values(historyPages).forEach(rows=>rows.forEach(row=>unique.set(row.id,row)));
+  return [...unique.values()].sort((a,b)=>a.recorded_at.localeCompare(b.recorded_at)||a.id-b.id);
+ },[metricHistory,historyPages]);
  useEffect(()=>{
   if(!chosen||!plotRef.current)return;
   const node=plotRef.current;
@@ -166,11 +171,7 @@ export default function StateMetricsDock({g,initialSelectedMetricId='',initialCo
    if(!historyLoaded.current.has(metricKey))void loadHistoryPage(metricKey);
  },[game?.id,selected,activeHistoryKeys]);
  useEffect(()=>{setShowFullHistory(false)},[selected]);
- const mergedHistory=useMemo(()=>{
-  const unique=new Map(metricHistory.map(row=>[row.id,row]));
-  Object.values(historyPages).forEach(rows=>rows.forEach(row=>unique.set(row.id,row)));
-  return [...unique.values()].sort((a,b)=>a.recorded_at.localeCompare(b.recorded_at)||a.id-b.id);
- },[metricHistory,historyPages]);
+
  const snapshotAt=useMemo(()=>Date.now(),[selected]);
  const series=activeMetrics.map(metric=>({
   metric,
