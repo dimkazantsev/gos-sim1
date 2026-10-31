@@ -12,6 +12,8 @@ on:
       - 'supabase/migrations/20261017204000_official_meeting_document_titles.sql'
       - 'components/game/Blitz*.tsx'
       - 'scripts/blitz-pending-privacy-check.cjs'
+      - 'scripts/blitz-network-resilience-check.cjs'
+      - 'components/game/blitzRequest.ts'
       - 'supabase/migrations/20261017183000_blitz_archive_pending_question_privacy.sql'
       - 'components/game/TeacherBlitz.tsx'
       - 'components/game/PoliticalWallView.tsx'
@@ -414,6 +416,7 @@ jobs:
       - run: node scripts/achievement-preview-check.cjs
       - run: node scripts/ksrf-profile-events-regression-check.cjs
       - run: node scripts/blitz-inbox-sync-check.cjs
+      - run: node scripts/blitz-network-resilience-check.cjs
       - run: node scripts/blitz-pending-privacy-check.cjs
       - run: node scripts/deputy-session-ballots-check.cjs
       - run: node scripts/duma-stage4-layout-browser-check.cjs
