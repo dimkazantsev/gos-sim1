@@ -1035,7 +1035,8 @@ export function useRepublicGame(gameId:string){
   const view=activeViewRef.current;
   if(view==='parties'||view==='profile')jobs.push(loadPartyAssets(view==='parties'));
   // Teacher dossiers must fetch document rows, not just party representation.
-  if(view==='teacher')jobs.push(loadPartyDocuments(),loadPartyDossierRows());
+  if(view==='teacher')jobs.push(loadPartyDocuments());
+  if(view==='teacher')jobs.push(loadPartyDossierRows());
   if(view==='parties'||view==='teacher')jobs.push(loadPartyRepresentation(false));
   if(view==='documents')jobs.push(loadFormalRegistry());
   if(view==='actions'||view==='dashboard')jobs.push(loadPoliticalWall());
