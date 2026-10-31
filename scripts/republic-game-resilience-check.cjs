@@ -314,7 +314,7 @@ async function main(){
   assert(source.includes(".eq('user_id',uid).maybeSingle()"),'Old-server refresh still rechecks membership');
   assert(source.includes("coalesceInFlight(initialCoreReads.current,key,loadCoreSections)"));
   assert(source.includes("if(!cache.full&&!cache.inflight)"),'Do not downgrade full party dossiers');
-  assert(source.includes("core?core.then(()=>loadPoliticalWall()):loadPoliticalWall()"),'Overview must use entry party cache');
+  assert(source.includes("if(view==='actions')\n   jobs.push(core?core.then(()=>loadPoliticalWall()):loadPoliticalWall())"),'Full political feed must load only when Political Process is visible');
   assert(source.includes("const request=limitedCoreRead(query)")&&source.includes(".select(PARTY_LIST_COLUMNS)"));
   assert(source.includes("const response=await limitedCoreRead(supabase.from('game_members').select(MEMBER_ROSTER_COLUMNS)"));
  });
@@ -517,16 +517,22 @@ async function main(){
    }
   }finally{clients.forEach(h=>h.dispose());}
  });
- await check('40 political wall clients each receive one projection and no six direct reads',async()=>{
+ await check('40 dashboards defer political wall; entering Process fetches it once per client',async()=>{
   const clients=Array.from({length:40},()=>harness({effects:true}));
   try{
    await Promise.all(clients.map(h=>h.settle()));
+   for(const h of clients)
+    assert.equal(h.rpcCount('get_political_wall_page'),0,
+     'Dashboard must not fetch invisible political feed or its media/history');
+   await Promise.all(clients.map(async h=>{h.render().setActiveView('actions');await h.settle()}));
    for(const h of clients){
-    assert(h.rpcCount('get_political_wall_page')>=1,'Default political wall uses ten-row RPC');
+    assert.equal(h.rpcCount('get_political_wall_page'),1,
+     'Opening Political Process must fetch the current RLS-scoped feed once');
     for(const table of ['political_posts','political_post_media','political_post_formal_links','state_metric_history','party_support_history']){
      assert.equal(h.readCount(table),0,'No direct '+table+' reads');
     }
    }
+   console.log('Measured simulated shared RPCs: dashboard 40 -> 0; Process 40 -> 40');
   }finally{clients.forEach(h=>h.dispose());}
  });
  await check('Missing political projection falls back under RLS; 402 never fans out',async()=>{
