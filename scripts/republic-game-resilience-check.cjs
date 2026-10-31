@@ -320,24 +320,24 @@ async function main(){
  });
  await check('Publishing a news item refreshes only its RLS-scoped feed, not the full game',async()=>{
   const h=harness({effects:true});await h.settle();
-  const before=h.stats();
+  const before=h.stats(),membersBefore=h.readCount('game_members');
   const result=await h.render().publishEvent('Проверка','Текст');
   assert.equal(result,true);
   assert.equal(h.rpcCount('get_game_entry_v4'),before.started['rpc:get_game_entry_v4'],'News write must not reload entry v4');
   assert.equal(h.stats().started.game_events||0,(before.started.game_events||0)+1,'One bounded news read');
   assert.equal(h.writeCount('game_events'),1,'Exactly one news write');
-  assert.equal(h.readCount('game_members'),before.started.game_members,'News write must not reload roster');
+  assert.equal(h.readCount('game_members'),membersBefore,'News write must not reload roster');
   h.dispose();
  });
  await check('Creating a plain game document refreshes only its scoped document feed',async()=>{
   const h=harness({effects:true});await h.settle();
-  const before=h.stats();
+  const before=h.stats(),membersBefore=h.readCount('game_members');
   const result=await h.render().createDocument({title:'Проверка',type:'Документ',body:'Текст'});
   assert.equal(result,true);
   assert.equal(h.rpcCount('get_game_entry_v4'),before.started['rpc:get_game_entry_v4'],'Document write must not reload entry v4');
   assert.equal(h.stats().started.game_documents||0,(before.started.game_documents||0)+1);
   assert.equal(h.writeCount('game_documents'),1,'Exactly one document write');
-  assert.equal(h.readCount('game_members'),before.started.game_members);
+  assert.equal(h.readCount('game_members'),membersBefore);
   h.dispose();
  });
  await check('40 simultaneous entrants use one v4 RPC, no extra roster/party/intro calls',async()=>{
