@@ -27,7 +27,7 @@ import type {PendingMediaUpload,MediaUploadPhase} from './chatMediaTransport';
 export type RecordingPreview={kind:ChatMediaKind;blob:Blob;url:string;mime:string;fileName:string;channelId:string;duration:number;waveform?:number[]};
 type ReadScope='all'|'core'|'game'|'events'|'documents'|'evaluations'|'crises'|'stages'|'votes'|'members'|'metrics'|'telemetry'|'profiles'|'parties'|'partyDocuments'|'partyRepresentation'|'formal'|'political'|'impact'|'overview'|'channels'|'offices'|'messages'|'pins';
 type ReadTicket={gameId:string;epoch:number;versions:Partial<Record<ReadScope,number>>};
-const BOOTSTRAP_TIMEOUT_MS=12000;
+const BOOTSTRAP_TIMEOUT_MS=20000;
 // A reconciliation may contain several individually bounded requests. Do not
 // mistake a 12s aggregate wall-clock limit for one failed database operation.
 const RECONCILE_TIMEOUT_MS=30000;
@@ -137,7 +137,7 @@ export function useRepublicGame(gameId:string){
      return Promise.race([
       Promise.resolve(abortable.abortSignal?abortable.abortSignal(controller.signal):query),
       new Promise<T>((_,fail)=>{timeout=setTimeout(()=>{
-       controller.abort();fail(new Error('Запрос игровых данных не завершился за 12 с. Повторите попытку.'));
+       controller.abort();fail(new Error('Запрос игровых данных не завершился за '+Math.round(BOOTSTRAP_TIMEOUT_MS/1000)+' с. Повторите попытку.'));
       },BOOTSTRAP_TIMEOUT_MS)})
      ]);
     };
@@ -161,6 +161,9 @@ export function useRepublicGame(gameId:string){
   });
  }
  const lastPresenceWrite=useRef({scope:'',view:'',at:0});
+ const pendingPresenceWrite=useRef<{scope:string;view:string;label?:string}|null>(null);
+ const presenceFlushTimer=useRef<ReturnType<typeof setTimeout>|null>(null);
+ const PRESENCE_MIN_WRITE_INTERVAL_MS=12000;
  const officeReadState=useRef({scope:'',lastSuccessAt:0,lastAttemptAt:0,inflight:null as Promise<void>|null});
  type PartyRead={data:Party[]|null;error:{message:string;code?:string}|null};
  const partyReadState=useRef({scope:'',lastSuccessAt:0,rows:null as Party[]|null,full:false,
@@ -310,6 +313,9 @@ export function useRepublicGame(gameId:string){
   invalidatePartyRows();
   if(overviewRealtimeTimer.current!==null){clearTimeout(overviewRealtimeTimer.current);overviewRealtimeTimer.current=null}
   lastRealtimeOverviewAt.current=0;
+  if(presenceFlushTimer.current!==null){clearTimeout(presenceFlushTimer.current);presenceFlushTimer.current=null}
+  pendingPresenceWrite.current=null;
+  lastPresenceWrite.current={scope:'',view:'',at:0};
   setGame(null);setMe(null);setMetrics([]);setEvents([]);setMembers([]);setOfficeRows([]);
   setChannels([]);channelRef.current='';setChannelId('');setMessages([]);
   oldestChatCursor.current=null;requestedHistoryCount.current=CHAT_HISTORY_PAGE_SIZE;
@@ -902,8 +908,22 @@ export function useRepublicGame(gameId:string){
    if(roleChanged){void hydrateActiveView();return}
    lastCoreSuccessAt.current=Date.now();
   }
-  if(tables.has('*')||tables.has('game_members')){await hydrateActiveView();return}
-  const jobs:Promise<unknown>[]=[];
+  if(tables.has('*')){await hydrateActiveView();return}
+   const jobs:Promise<unknown>[]=[];
+   if(tables.has('game_members')){
+    // Revalidate membership and refresh only the roster, not eleven core tables.
+    if(!tables.has('session_recovery')){
+     const previousEpoch=readEpoch.current;
+     await loadRealtimeSections(new Set(['session_recovery']));
+     if(previousEpoch!==readEpoch.current||!acceptedMember.current)return;
+    }
+    jobs.push(readSafely(['members'],async ticket=>{
+     const roster=await loadMemberRoster();
+     if(!readCurrent(ticket))return;
+     requireSuccessful([roster]);
+     setMembers((roster.data||[]) as Member[]);
+    }));
+   }
   const view=activeViewRef.current;
   if(tables.has('game_stages'))jobs.push(readSafely(['game','stages'],async ticket=>{
    const [g,st]=await Promise.all([
@@ -1184,11 +1204,11 @@ export function useRepublicGame(gameId:string){
   const uid=authUser.current;
   if(!uid)return loadCoreSections();
   const key=gameId+':'+uid+':'+readEpoch.current;
-  // An initial navigation or restored tab may trigger a second hydration while
-  // the first bundled RPC is pending. Never create a second 5-read burst.
-  if(lastCoreSuccessAt.current===0||initialCoreReads.current.has(key))
-   return coalesceInFlight(initialCoreReads.current,key,loadCoreSections);
-  return loadCoreSections();
+  // Avoid concurrent initial entry reads. Subsequent explicit core refreshes
+   // must still be authoritative, even when another screen is hydrating.
+   if(lastCoreSuccessAt.current===0||initialCoreReads.current.has(key))
+    return coalesceInFlight(initialCoreReads.current,key,loadCoreSections);
+   return loadCoreSections();
  }
 
  async function hydrateActiveView(allowFreshCore=false,forceOffices=false){
@@ -1960,13 +1980,32 @@ export function useRepublicGame(gameId:string){
   if(typeof document!=='undefined'&&document.visibilityState==='hidden')return;
   const uid=me?.user_id;if(!uid||authUser.current!==uid)return;
   const scope=gameId+':'+uid,now=Date.now();
-  // Presence is a heartbeat. Duplicate focus/rerender events are not new actions.
-  const previous=lastPresenceWrite.current;
-  if(previous.scope===scope&&previous.view===viewKey&&now-previous.at<60000)return;
-  if(presenceInFlight.current===scope)return;
-  presenceInFlight.current=scope;
-  lastPresenceWrite.current={scope,view:viewKey,at:now};
-  try{
+   // Realtime Presence reports connectivity promptly. Persist only the latest
+   // navigated view during rapid transitions; keep SQL authority and activity.
+   const previous=lastPresenceWrite.current;
+   if(previous.scope===scope&&previous.view===viewKey&&now-previous.at<60000){
+    pendingPresenceWrite.current=null;
+    return;
+   }
+   if(presenceInFlight.current===scope||
+      (previous.scope===scope&&now-previous.at<PRESENCE_MIN_WRITE_INTERVAL_MS)){
+    pendingPresenceWrite.current={scope,view:viewKey,label};
+    if(presenceFlushTimer.current===null){
+     const delay=presenceInFlight.current===scope?1000:
+      Math.max(1000,PRESENCE_MIN_WRITE_INTERVAL_MS-(now-previous.at));
+     presenceFlushTimer.current=setTimeout(()=>{
+      presenceFlushTimer.current=null;
+      const pending=pendingPresenceWrite.current;pendingPresenceWrite.current=null;
+      if(pending&&pending.scope===gameId+':'+authUser.current)
+       void touchPresence(pending.view,pending.label);
+     },delay);
+    }
+    return;
+   }
+   pendingPresenceWrite.current=null;
+   presenceInFlight.current=scope;
+   lastPresenceWrite.current={scope,view:viewKey,at:now};
+   try{
    // A single SECURITY INVOKER RPC preserves presence and the navigation
    // journal under their original RLS checks and database triggers.
    const response=await supabase.rpc('record_my_game_presence',{
@@ -1981,10 +2020,20 @@ export function useRepublicGame(gameId:string){
     },{onConflict:'game_id,user_id'});
     if(!legacy.error&&label)await logActivity('navigation',label,viewKey);
    }
-  }finally{if(presenceInFlight.current===scope)presenceInFlight.current=''}
- }
-
- async function logout(){await supabase.auth.signOut();if(me?.user_id)void deleteLocalGameSnapshot(gameId,me.user_id);router.replace('/')}
+   }finally{
+    if(presenceInFlight.current===scope)presenceInFlight.current='';
+    if((pendingPresenceWrite.current as {scope:string;view:string;label?:string}|null)?.scope===scope&&presenceFlushTimer.current===null){
+     presenceFlushTimer.current=setTimeout(()=>{
+      presenceFlushTimer.current=null;
+      const pending=pendingPresenceWrite.current;pendingPresenceWrite.current=null;
+      if(pending&&pending.scope===gameId+':'+authUser.current)
+       void touchPresence(pending.view,pending.label);
+     },1000);
+    }
+   }
+  }
+ 
+  async function logout(){await supabase.auth.signOut();if(me?.user_id)void deleteLocalGameSnapshot(gameId,me.user_id);router.replace('/')}
  async function setTurn(open:boolean){const r=await supabase.from('games').update({turn_open:open,status:open?'running':'paused',turn_ends_at:open?new Date(Date.now()+12*60*1000).toISOString():null}).eq('id',gameId);if(r.error)setError(r.error.message);else await refreshAffected(['stage_game'])}
  async function setTurnMinutes(minutes:number){if(!game)return;const r=await supabase.from('games').update({turn_open:true,status:'running',turn_ends_at:new Date(Date.now()+minutes*60*1000).toISOString()}).eq('id',gameId);if(r.error)setError(r.error.message);else await refreshAffected(['stage_game'])}
 
