@@ -67,7 +67,8 @@ const ordinaryUrl='https://example.supabase.co/rest/v1/game_members';
 
  const client=fs.readFileSync(path.join(root,'lib/supabase.ts'),'utf8');
  const hook=fs.readFileSync(path.join(root,'components/game/useRepublicGame.ts'),'utf8');
- assert.match(client,/fetchWithBoundedSessionRefresh\(input,init\)/);
+ assert.match(client,/fetchWithBoundedSessionRefresh\(input,boundedInit\)/);
+  assert.match(client,/const boundedInit=controller\?\{\.\.\.init,signal:controller.signal\}:init/,'Only read-only fetches receive the additional bounded signal');
  assert.match(hook,/supabase\.auth\.getSession\(\),SESSION_BOOTSTRAP_TIMEOUT_MS/);
  assert.match(hook,/const SESSION_BOOTSTRAP_TIMEOUT_MS=16000/);
  assert.match(client,/auth:\s*\{\s*persistSession:\s*true,\s*autoRefreshToken:\s*true\s*\}/);
