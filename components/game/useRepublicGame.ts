@@ -25,9 +25,12 @@ import {CHAT_HISTORY_PAGE_SIZE,chatHistoryCursorFilter} from './chatHistoryPagin
 import type {GameOfficeAssignment,ChatOverview} from './types';
 import type {PendingMediaUpload,MediaUploadPhase} from './chatMediaTransport';
 export type RecordingPreview={kind:ChatMediaKind;blob:Blob;url:string;mime:string;fileName:string;channelId:string;duration:number;waveform?:number[]};
-type ReadScope='all'|'core'|'game'|'events'|'documents'|'stages'|'votes'|'members'|'metrics'|'telemetry'|'profiles'|'parties'|'partyDocuments'|'partyRepresentation'|'formal'|'political'|'impact'|'overview'|'channels'|'offices'|'messages'|'pins';
+type ReadScope='all'|'core'|'game'|'events'|'documents'|'evaluations'|'stages'|'votes'|'members'|'metrics'|'telemetry'|'profiles'|'parties'|'partyDocuments'|'partyRepresentation'|'formal'|'political'|'impact'|'overview'|'channels'|'offices'|'messages'|'pins';
 type ReadTicket={gameId:string;epoch:number;versions:Partial<Record<ReadScope,number>>};
 const BOOTSTRAP_TIMEOUT_MS=12000;
+// A reconciliation may contain several individually bounded requests. Do not
+// mistake a 12s aggregate wall-clock limit for one failed database operation.
+const RECONCILE_TIMEOUT_MS=30000;
 const PRESENTATION_CACHE_TTL_MS=600000;
 const SESSION_BOOTSTRAP_TIMEOUT_MS=16000;
 // Explicit projection avoids transferring unused ballot timestamps to every classroom client.
@@ -132,7 +135,7 @@ export function useRepublicGame(gameId:string){
      coreReadQueue.current.waiting.shift()?.();
     });
    };
-   if(coreReadQueue.current.active<4)run();
+   if(coreReadQueue.current.active<2)run();
    else coreReadQueue.current.waiting.push(run);
   });
  }
@@ -352,7 +355,7 @@ export function useRepublicGame(gameId:string){
   const version=++realtimeReloadVersion.current;
   realtimeReloadRunning.current=true;
   lastFullReloadAt.current=Date.now();
-  try{await within(loadRealtimeSections(tables),BOOTSTRAP_TIMEOUT_MS,'Обновление игровых данных')}
+  try{await within(loadRealtimeSections(tables),RECONCILE_TIMEOUT_MS,'Обновление игровых данных')}
   catch(error){
    if(version===realtimeReloadVersion.current){backendRecoveryAfter.current=Date.now()+90000;setError(error)}
   }
@@ -391,7 +394,9 @@ export function useRepublicGame(gameId:string){
     lastRecoveryAt=now;
     // Focus, online and visibility events arrive together. Stage widgets
     // already own their focused reconciliation; do not broadcast a full refresh.
-    if(realtimeDirtyTables.current.size||now-lastCoreSuccessAt.current>90000)scheduleRealtimeReload(0);
+    if(realtimeDirtyTables.current.size)scheduleRealtimeReload(0,[]);
+    else if(now-lastCoreSuccessAt.current>180000)
+     scheduleRealtimeReload(0,['session_recovery','game_stages','game_votes']);
    };
   const visible=()=>{if(document.visibilityState==='visible')recover()};
   window.addEventListener('focus',recover);window.addEventListener('online',recover);document.addEventListener('visibilitychange',visible);
@@ -404,25 +409,24 @@ export function useRepublicGame(gameId:string){
   const subscriptionEpoch=readEpoch.current;
   const currentConnection=()=>!disposed&&subscriptionEpoch===readEpoch.current&&activeGameRef.current===gameId&&authUser.current===me.user_id;
   let liveConnected=false,lastPollAt=0;
-  let dirtyCore=false,dirtyPartyDocuments=false,dirtyChat=false,dirtyPins=false,dirtyOverview=false;
+  let dirtyPartyDocuments=false,dirtyChat=false,dirtyPins=false,dirtyOverview=false;
   const dirtyTables=new Set<string>();
   const reconcileTables=new Set<string>();
   let timer:ReturnType<typeof setTimeout>|undefined;
   let partyDocumentBurstTimer:ReturnType<typeof setTimeout>|undefined;
   function flush(){
    if(!currentConnection()||document.visibilityState==='hidden')return;
-   const core=dirtyCore,partyDocs=dirtyPartyDocuments,chat=dirtyChat,pins=dirtyPins,overview=dirtyOverview;
+   const partyDocs=dirtyPartyDocuments,chat=dirtyChat,pins=dirtyPins,overview=dirtyOverview;
    const tables=[...dirtyTables];dirtyTables.clear();
    const reconcile=[...reconcileTables];reconcileTables.clear();
-   dirtyCore=false;dirtyPartyDocuments=false;dirtyChat=false;dirtyPins=false;dirtyOverview=false;
+   dirtyPartyDocuments=false;dirtyChat=false;dirtyPins=false;dirtyOverview=false;
    // Another pushed table may have flushed a queued document delta already.
    // Cancel the burst timer so it cannot trigger an extra redundant read.
    if(partyDocs&&partyDocumentBurstTimer!==undefined){
     clearTimeout(partyDocumentBurstTimer);partyDocumentBurstTimer=undefined;
    }
    // Coalesce dependent reads; read tickets reject stale results after a delta.
-   if(core)scheduleRealtimeReload(1000,['*']);
-   else if(reconcile.length)scheduleRealtimeReload(1000,reconcile);
+   if(reconcile.length)scheduleRealtimeReload(1000,reconcile);
    for(const table of tables)notifyGameDataRefresh(gameId,table);
    // A document version changes no core identity or party membership.
    if(partyDocs&&(activeViewRef.current==='parties'||activeViewRef.current==='teacher'))void loadPartyDocuments();
@@ -446,7 +450,7 @@ export function useRepublicGame(gameId:string){
    syncNetworkPresence();
    if(document.visibilityState==='visible'&&chatOpenRef.current&&channelRef.current)void markChatRead(channelRef.current);
    if(document.visibilityState==='visible'&&
-     (dirtyCore||dirtyTables.size>0||dirtyPartyDocuments||dirtyChat||dirtyPins||dirtyOverview))schedule();
+     (reconcileTables.size>0||dirtyTables.size>0||dirtyPartyDocuments||dirtyChat||dirtyPins||dirtyOverview))schedule();
   };
   document.addEventListener('visibilitychange',resumePending);
   const channel=supabase.channel('gos-id-live:'+gameId,{config:{private:true}});
@@ -663,7 +667,13 @@ export function useRepublicGame(gameId:string){
    // full reloads while the server reports exhausted connections/timeouts.
    if(!liveConnected&&now<backendRecoveryAfter.current)return;
    lastPollAt=now;
-   dirtyCore=true;dirtyOverview=true;
+   // The existing single-game Realtime socket already supplies hot deltas.
+   // Verify the current authority every 3m, but do not request all 11 core
+   // collections from 40 clients. Offline clients additionally reconcile
+   // stages and vote status through two scoped RLS reads.
+   reconcileTables.add('session_recovery');
+   if(!liveConnected){reconcileTables.add('game_stages');reconcileTables.add('game_votes')}
+   dirtyOverview=true;
    if(chatOpenRef.current){dirtyChat=true;dirtyPins=true}
    schedule();
   },30000+pollJitter);
@@ -843,6 +853,23 @@ export function useRepublicGame(gameId:string){
  }
 
  async function loadRealtimeSections(tables:Set<string>){
+  if(tables.has('session_recovery')){
+   const uid=authUser.current,epoch=readEpoch.current;
+   if(!uid)return;
+   // A small authoritative identity read preserves role revocation and game
+   // isolation without downloading the entire game on each recovery tick.
+   const [g,m]=await within(readIdentity(uid),BOOTSTRAP_TIMEOUT_MS,'Проверка доступа к игре');
+   if(!alive.current||epoch!==readEpoch.current||uid!==authUser.current||activeGameRef.current!==gameId)return;
+   if(g.error||m.error)throw g.error||m.error;
+   if(!g.data||!m.data){
+    readEpoch.current++;clearGameData();setError('Нет доступа к игре');return;
+   }
+   const old=acceptedMember.current,newMember=m.data as Member;
+   const roleChanged=!!old&&(['kind','role_title','team','group_name','roster_archived_at'] as const)
+    .some(key=>old[key]!==newMember[key]);
+   await acceptIdentity(g,m,uid);
+   if(roleChanged){void hydrateActiveView();return}
+  }
   if(tables.has('*')||tables.has('game_members')){await hydrateActiveView();return}
   const jobs:Promise<unknown>[]=[];
   const view=activeViewRef.current;
@@ -876,6 +903,12 @@ export function useRepublicGame(gameId:string){
    if(!readCurrent(ticket)){retryStale();return}
    requireSuccessful([ba]);for(const id of ids)changedVoteIds.current.delete(id);
    setBallots(previous=>[...previous.filter(row=>!ids.includes(row.vote_id)),...(ba.data||[]) as Ballot[]]);
+  }));
+  if(tables.has('game_evaluations'))jobs.push(readSafely(['evaluations'],async ticket=>{
+   const result=await limitedCoreRead(supabase.from('game_evaluations').select('*')
+    .eq('game_id',gameId).order('stage_no'));
+   if(!readCurrent(ticket))return;
+   requireSuccessful([result]);setEvaluations((result.data||[]) as Evaluation[]);
   }));
   if(tables.has('game_parties'))jobs.push(readSafely(['parties'],async ticket=>{
    const pa=await loadCachedParties(true);
@@ -1096,7 +1129,9 @@ export function useRepublicGame(gameId:string){
   // Rapid view navigation can reuse recently updated common data.
   // Realtime, recovery and explicit refresh still force the core read.
   const jobs:Promise<unknown>[]=[loadRepublicOffices(forceOffices)];
-  const core=!allowFreshCore||Date.now()-lastCoreSuccessAt.current>60000
+  // Navigation does not invalidate an already verified core. Role/game are
+  // checked by the small session_recovery RPC; opened sections read lazily.
+  const core=!allowFreshCore||lastCoreSuccessAt.current===0
    ?loadCoreForView():null;
   if(core)jobs.unshift(core);
   const view=activeViewRef.current;
@@ -1843,6 +1878,10 @@ export function useRepublicGame(gameId:string){
    return true;
   }catch(e){setChatPins(original);setError(e instanceof Error?e.message:'Не удалось изменить закрепление');return false}
  }
+ async function refreshAffected(tables:readonly string[]){
+  await loadRealtimeSections(new Set(tables));
+  for(const table of tables)notifyGameDataRefresh(gameId,table);
+ }
  async function refresh(){invalidatePartyRows();await loadAll(false);await Promise.all([hydrateActiveView(false,true),refreshBudgetPulse()]);notifyGameDataRefresh(gameId);if(channelRef.current)await loadMessages(channelRef.current)}
  async function refreshDocuments(id:string){await loadFormalRegistry([id]);notifyGameDataRefresh(gameId,'formal_documents')}
  async function refreshEventEffects(){await Promise.all([loadPoliticalWall(),refreshBudgetPulse()]);notifyGameDataRefresh(gameId,'event_decisions')}
@@ -1880,8 +1919,8 @@ export function useRepublicGame(gameId:string){
  }
 
  async function logout(){await supabase.auth.signOut();if(me?.user_id)void deleteLocalGameSnapshot(gameId,me.user_id);router.replace('/')}
- async function setTurn(open:boolean){const r=await supabase.from('games').update({turn_open:open,status:open?'running':'paused',turn_ends_at:open?new Date(Date.now()+12*60*1000).toISOString():null}).eq('id',gameId);if(r.error)setError(r.error.message);else await refresh()}
- async function setTurnMinutes(minutes:number){if(!game)return;const r=await supabase.from('games').update({turn_open:true,status:'running',turn_ends_at:new Date(Date.now()+minutes*60*1000).toISOString()}).eq('id',gameId);if(r.error)setError(r.error.message);else await refresh()}
+ async function setTurn(open:boolean){const r=await supabase.from('games').update({turn_open:open,status:open?'running':'paused',turn_ends_at:open?new Date(Date.now()+12*60*1000).toISOString():null}).eq('id',gameId);if(r.error)setError(r.error.message);else await refreshAffected(['stage_game'])}
+ async function setTurnMinutes(minutes:number){if(!game)return;const r=await supabase.from('games').update({turn_open:true,status:'running',turn_ends_at:new Date(Date.now()+minutes*60*1000).toISOString()}).eq('id',gameId);if(r.error)setError(r.error.message);else await refreshAffected(['stage_game'])}
 
  async function manageStage(stageNo:number,action:'open'|'close'|'extend',minutes=30):Promise<boolean>{
   if(!teacher){setError('Только преподаватель может управлять этапами.');return false}
@@ -1930,7 +1969,7 @@ export function useRepublicGame(gameId:string){
    if(typeof window!=='undefined')window.dispatchEvent(new CustomEvent('gos-stage-policy-updated',{detail:{gameId,stageNo}}));
    return true;
   }
- async function setStageDeadline(stageId:string,value:string){const r=await supabase.from('game_stages').update({deadline:value?new Date(value).toISOString():null}).eq('id',stageId);if(r.error)setError(r.error.message);else await refresh()}
+ async function setStageDeadline(stageId:string,value:string){const r=await supabase.from('game_stages').update({deadline:value?new Date(value).toISOString():null}).eq('id',stageId);if(r.error)setError(r.error.message);else await refreshAffected(['game_stages'])}
 
 
  function availableActors(){
@@ -2310,7 +2349,7 @@ export function useRepublicGame(gameId:string){
   const payload={score,note:note||old?.note||null,evaluator_id:me.user_id,updated_at:new Date().toISOString()};
   const r=old?await supabase.from('game_evaluations').update(payload).eq('id',old.id):await supabase.from('game_evaluations').insert({game_id:gameId,stage_no:currentStage.stage_no,user_id:userId,...payload});
   if(r.error){setError(r.error.message);return}
-  await refresh();
+  await refreshAffected(['game_evaluations']);
  }
 
  // After a single-table write, refresh only the affected RLS-scoped feed.

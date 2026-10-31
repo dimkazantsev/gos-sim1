@@ -340,6 +340,41 @@ async function main(){
   assert.equal(h.readCount('game_members'),membersBefore);
   h.dispose();
  });
+ await check('Connected 40 clients reconcile authority without repeated full entry bundles',async()=>{
+  const clients=Array.from({length:40},(_,i)=>{const h=harness({effects:true});h.setUser('student-'+i);return h});
+  try{
+   await Promise.all(clients.map(h=>h.settle()));
+   const before=clients.map(h=>({entry:h.rpcCount('get_game_entry_v4'),identity:h.rpcCount('get_my_game_identity')}));
+   await Promise.all(clients.map(h=>h.advance(600001)));
+   for(let i=0;i<clients.length;i++){
+    const h=clients[i];
+    assert.equal(h.rpcCount('get_game_entry_v4'),before[i].entry,'Periodic connected reconciliation cannot redownload full game');
+    assert(h.rpcCount('get_my_game_identity')>before[i].identity,'Connected view must still recheck server identity');
+    assert.equal(h.render().teacher,false,'Student must stay student');
+    assert.equal(h.readCount('game_stages'),0,'Healthy Realtime does not repeatedly scan stages');
+   }
+  }finally{clients.forEach(h=>h.dispose());}
+ });
+ await check('Disconnected recovery reads only stages and votes and still checks identity',async()=>{
+  const h=harness({effects:true});
+  try{
+   await h.settle();const before=h.rpcCount('get_game_entry_v4');
+   h.channelStatus('CLOSED');await h.advance(85000);
+   assert.equal(h.rpcCount('get_game_entry_v4'),before,'Disconnected poll does not invoke full entry');
+   assert(h.rpcCount('get_my_game_identity')>=2,'Disconnected poll rechecks membership');
+   assert(h.readCount('game_stages')>0,'Offline poll requests current stages');
+   assert(h.readCount('game_votes')>0,'Offline poll requests current vote status');
+  }finally{h.dispose()}
+ });
+ await check('Periodic identity check revokes obsolete teacher privileges without full bootstrap',async()=>{
+  const h=harness({effects:true});
+  try{
+   await h.settle();const before=h.rpcCount('get_game_entry_v4');
+   h.setMemberKind('student');await h.advance(190000);await h.settle();
+   assert.equal(h.render().teacher,false,'Server demotion must clear teacher UI');
+   assert(h.rpcCount('get_my_game_identity')>=2);
+  }finally{h.dispose()}
+ });
  await check('40 simultaneous entrants use one v4 RPC, no extra roster/party/intro calls',async()=>{
   const clients=Array.from({length:40},()=>harness({effects:true}));
   try{
