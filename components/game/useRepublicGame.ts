@@ -931,6 +931,37 @@ export function useRepublicGame(gameId:string){
   if(!uid)return;
   const ticket=startRead('core','game','stages','votes','members','metrics','profiles','parties','formal','channels');
   const results=await (async()=>{
+   // One RLS-scoped HTTP request for the initial core, current member, roster,
+   // lightweight parties and the unchanged personal intro flag. Only missing RPCs
+   // fall back during mixed-version publication.
+   const entry=await limitedCoreRead(supabase.rpc('get_game_entry_v4',{p_game_id:gameId}));
+   if(!entry.error){
+    const payload=entry.data as Record<string,unknown>|null;
+    const fields=['game','metrics','events','channels','stages','votes','evaluations','crises',
+     'documents','profiles','formal_documents','member','roster','parties','intro'] as const;
+    if(!payload||!fields.every(key=>Object.prototype.hasOwnProperty.call(payload,key))||
+       !Array.isArray(payload.roster)||!Array.isArray(payload.parties))
+     throw new Error('Сервер вернул неполные данные первоначального входа.');
+    const row=(key:typeof fields[number])=>({data:payload[key],error:null});
+    const partyRows=normalizePartyRows(payload.parties as PartyListRow[],false);
+    const scope=gameId+':'+uid+':'+readEpoch.current;
+    if(partyReadState.current.scope!==scope){
+     invalidatePartyRows();
+     partyReadState.current.scope=scope;
+    }
+    const cache=partyReadState.current;
+    // Never downgrade a full party dossier or overwrite a pending full read.
+    if(!cache.full&&!cache.inflight){
+     cache.rows=partyRows;
+     cache.lastSuccessAt=Date.now();
+    }
+    return [row('game'),row('member'),row('metrics'),row('events'),row('roster'),
+     row('channels'),row('stages'),{data:partyRows,error:null},row('votes'),
+     row('evaluations'),row('crises'),row('documents'),row('profiles'),
+     row('formal_documents'),row('intro')];
+   }
+   if(!['PGRST202','42883'].includes(String(entry.error.code||'')))
+    throw entry.error;
    // Entry identity was just verified by the server. Do not request the same
    // personal member row a second time before the first core snapshot.
    // Every subsequent core refresh reads it again to detect role changes.
@@ -1056,7 +1087,9 @@ export function useRepublicGame(gameId:string){
   // Rapid view navigation can reuse recently updated common data.
   // Realtime, recovery and explicit refresh still force the core read.
   const jobs:Promise<unknown>[]=[loadRepublicOffices(forceOffices)];
-  if(!allowFreshCore||Date.now()-lastCoreSuccessAt.current>60000)jobs.unshift(loadCoreForView());
+  const core=!allowFreshCore||Date.now()-lastCoreSuccessAt.current>60000
+   ?loadCoreForView():null;
+  if(core)jobs.unshift(core);
   const view=activeViewRef.current;
   if(view==='parties'||view==='profile')jobs.push(loadPartyAssets(view==='parties'));
   // Teacher dossiers must fetch document rows, not just party representation.
@@ -1064,7 +1097,10 @@ export function useRepublicGame(gameId:string){
   if(view==='teacher')jobs.push(loadPartyDossierRows());
   if(view==='parties'||view==='teacher')jobs.push(loadPartyRepresentation(false));
   if(view==='documents')jobs.push(loadFormalRegistry());
-  if(view==='actions'||view==='dashboard')jobs.push(loadPoliticalWall());
+  // The entry RPC already delivers party summaries. On dashboard, wait for it
+  // before the political wall reads the same parties from its scoped cache.
+  if(view==='actions'||view==='dashboard')
+   jobs.push(core?core.then(()=>loadPoliticalWall()):loadPoliticalWall());
   if(view==='teacher')jobs.push(loadClassroomTelemetry(),loadImpactEngine());
   if(chatOpenRef.current)jobs.push(loadChatOverview());
   await Promise.allSettled(jobs);
