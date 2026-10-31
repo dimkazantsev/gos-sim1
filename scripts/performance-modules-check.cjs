@@ -24,12 +24,15 @@ function realm(file,old=false,{hidden=false,issueError=false,slowIssue=false,slo
  const document={...target('document'),visibilityState:hidden?'hidden':'visible'},window=target('window');
  const set=(fn,delay,interval)=>{const id=++nextId;timers.set(id,{fn,at:now+Math.max(0,delay),interval});return id};
  Object.assign(window,{setInterval:(fn,delay)=>set(fn,delay,delay),clearInterval:id=>timers.delete(id),setTimeout:(fn,delay)=>set(fn,delay,0),clearTimeout:id=>timers.delete(id)});
- const supabase={rpc:async(name,args)=>{
+ const supabase={rpc:(name,args)=>{
+  const work=(async()=>{
   calls.push({name,args,at:now});
   if(name==='blitz_issue_today'){if(slowIssue)await new Promise(resolve=>{resolveIssue=resolve});return{data:0,error:issueError?{code:'57014',message:'synthetic timeout'}:null}}
   if(slowMutation&&['comment_on_civic_content','react_to_civic_content','delete_civic_comment'].includes(name))await new Promise(resolve=>{resolveMutation=resolve});
   if(name==='get_civic_discussion')return{data:{likes:0,dislikes:0,mine:0,views:1,comment_count:0,comments:[]},error:null};
   return{data:null,error:null};
+  })();
+  return Object.assign(work,{abortSignal:()=>work});
  },
   from(table){calls.push({name:table,at:now});const query=new Proxy({then:resolve=>Promise.resolve({data:[],error:null}).then(resolve)},{get(object,key){return key==='then'?object.then:()=>query}});return query},
   storage:{from:()=>({createSignedUrl:async(storedPath)=>{
@@ -39,7 +42,7 @@ function realm(file,old=false,{hidden=false,issueError=false,slowIssue=false,slo
  class ClockDate extends Date{constructor(...args){super(...(args.length?args:[now]))}static now(){return now}}
  const math=Object.create(Math);math.random=()=>0.5;
  const jsx=(type,props)=>{if(props?.ref&&typeof props.ref==='object')props.ref.current={closest(){return this}};return{type,props}};
- const context={exports:{},console,Date:ClockDate,Math:math,document,window,IntersectionObserver:class{constructor(fn){this.fn=fn}observe(){this.fn([{isIntersecting:true}])}disconnect(){}},Event:class{constructor(type){this.type=type}},CustomEvent:class{constructor(type,options){this.type=type;this.detail=options?.detail}},setInterval:window.setInterval,clearInterval:window.clearInterval,setTimeout:window.setTimeout,clearTimeout:window.clearTimeout,fetch:()=>{throw Error('Network is forbidden in this test')}};
+ const context={exports:{},console,Date:ClockDate,Math:math,document,window,IntersectionObserver:class{constructor(fn){this.fn=fn}observe(){this.fn([{isIntersecting:true}])}disconnect(){}},Event:class{constructor(type){this.type=type}},CustomEvent:class{constructor(type,options){this.type=type;this.detail=options?.detail}},setInterval:window.setInterval,clearInterval:window.clearInterval,setTimeout:window.setTimeout,clearTimeout:window.clearTimeout,AbortController,fetch:()=>{throw Error('Network is forbidden in this test')}};
  let sync;
  context.require=name=>{
   if(name==='react')return react;
@@ -47,6 +50,11 @@ function realm(file,old=false,{hidden=false,issueError=false,slowIssue=false,slo
   if(name==='react-dom')return{createPortal:value=>value};
   if(name==='@/lib/supabase')return{supabase};
   if(name==='@/lib/userError')return{userError:e=>e?.message||String(e)};
+  if(name==='./blitzRequest'){
+   const child={exports:{}};
+   vm.runInContext('(function(module,exports){'+compile('components/game/blitzRequest.ts')+'})',context)(child,child.exports);
+   return child.exports;
+  }
   if(name==='./useGameTableSync')return sync;
   if(name==='../ui/useDialog')return{useDialog:()=>({dialogRef:{current:null}})};
   if(name==='./chatHandles')return{chatHandles:()=>[]};
@@ -79,8 +87,8 @@ async function main(){
  if(before){assert(after.blitz.issue<before.blitz.issue);assert.equal(after.blitz.open,before.blitz.open);assert(after.inbox<before.inbox/2);assert(before.media>after.media*20)}
  if(blitzBefore){assert.equal(after.blitz.issue,blitzBefore.issue);assert(after.blitz.open>=blitzBefore.open&&after.blitz.open<=blitzBefore.open+40);assert(after.blitz.peakPollingPerSecond<=blitzBefore.peakPollingPerSecond)}
  const hidden=realm('components/game/Blitz.tsx',false,{hidden:true});hidden.render('BlitzOverlay',{gameId:'test-game',enabled:true});await tick();await hidden.advance(20*60000);assert.equal(hidden.calls.length,0,'Hidden tabs cannot prepare or start timed questions');hidden.visible(true);await tick();assert.equal(count(hidden,'blitz_issue_today'),1);assert.equal(count(hidden,'blitz_open_recent'),1);hidden.close();
- const failed=realm('components/game/Blitz.tsx',false,{issueError:true});failed.render('BlitzOverlay',{gameId:'test-game',enabled:true});await tick();await failed.advance(20*60000);assert.equal(count(failed,'blitz_issue_today'),1,'An issuance failure must not repeat a heavy backfill every 45 seconds');assert(count(failed,'blitz_open_recent')>20,'Already assigned questions remain deliverable despite issuance failure');failed.close();
- const slow=realm('components/game/Blitz.tsx',false,{slowIssue:true});slow.render('BlitzOverlay',{gameId:'test-game',enabled:true});await tick();await slow.advance(135000);assert.equal(count(slow,'blitz_issue_today'),1,'Slow preparation stays single-flight');slow.visible(false);slow.releaseIssue();await tick();assert.equal(count(slow,'blitz_open_recent'),0,'Becoming hidden during preparation cannot start a 20-second question');slow.close();
+ const failed=realm('components/game/Blitz.tsx',false,{issueError:true});failed.render('BlitzOverlay',{gameId:'test-game',enabled:true});await tick();await failed.advance(20*60000);assert(count(failed,'blitz_issue_today')<=5,'Failed preparation retries at most every five minutes, never every 45 seconds');assert(count(failed,'blitz_open_recent')>20,'Already assigned questions remain deliverable despite issuance failure');failed.close();
+ const slow=realm('components/game/Blitz.tsx',false,{slowIssue:true});slow.render('BlitzOverlay',{gameId:'test-game',enabled:true});await tick();await slow.advance(135000);assert.equal(count(slow,'blitz_issue_today'),1,'Slow preparation stays single-flight');slow.visible(false);slow.releaseIssue();await tick();assert(count(slow,'blitz_open_recent')>=1,'A stalled preparation is released without indefinitely blocking delivery');slow.close();
  const boundary=realm('components/game/Blitz.tsx');boundary.render('BlitzOverlay',{gameId:'test-game',enabled:true});await tick();await boundary.advance(9*60*60000+45000);assert.equal(count(boundary,'blitz_issue_today'),2,'Moscow midnight starts the next assignment day');boundary.close();
  const identity=realm('components/game/Blitz.tsx');identity.render('BlitzOverlay',{gameId:'test-game',userId:'student-A',enabled:true});await tick();identity.render('BlitzOverlay',{gameId:'test-game',userId:'student-B',enabled:true});await tick();assert.equal(count(identity,'blitz_issue_today'),2,'A different authenticated student gets independent daily preparation');identity.close();
  const stage=realm('components/game/Blitz.tsx');stage.render('BlitzOverlay',{gameId:'test-game',userId:'student-A',stageKey:'1:locked:',enabled:true});await tick();stage.render('BlitzOverlay',{gameId:'test-game',userId:'student-A',stageKey:'1:open:2026-10-25T12:01:00Z',enabled:true});await tick();assert.equal(count(stage,'blitz_issue_today'),2,'Opening a stage prepares newly eligible assignments in the same session/day');await stage.advance(135000);assert.equal(count(stage,'blitz_issue_today'),2,'Stage preparation does not repeat on delivery polls');stage.close();
