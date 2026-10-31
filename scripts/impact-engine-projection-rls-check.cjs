@@ -1,14 +1,14 @@
-/* Impact rules/ledger read projection: isolated PGlite RLS and 500-row cap.
+/* Impact rules/ledger read projection: isolated PGlite RLS and 10-row cap.
  * No production database requests, no mutation of score or game data. */
 const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path');
 const {PGlite}=require('@electric-sql/pglite');
-const sql=fs.readFileSync(path.join(__dirname,'..','supabase/migrations/20261029144000_impact_engine_projection_invoker.sql'),'utf8');
+const sql=fs.readFileSync(path.join(__dirname,'..','supabase/migrations/20261029144000_impact_engine_projection_invoker.sql'),'utf8')+'\n'+fs.readFileSync(path.join(__dirname,'..','supabase/migrations/20261031165000_impact_ledger_ten_projection.sql'),'utf8');
 const id=n=>'00000000-0000-4000-8000-'+String(n).padStart(12,'0');
 const game=id(900),other=id(901);
 assert(sql.includes('security invoker')&&!sql.includes('security definer'),'Projection must not bypass RLS');
 assert(sql.includes('private.is_game_member(p_game_id)'),'Foreign game access must be forbidden');
 assert(sql.includes('revoke all on function public.get_impact_engine_projection(uuid) from public, anon'),'Anon must not execute');
-assert(sql.includes('limit 500'),'Original ledger limit must be preserved');
+assert(sql.includes('limit 10'),'Latest ledger projection must cap the result at ten');
 async function main(){
  const db=new PGlite();
  try{
@@ -34,8 +34,8 @@ async function main(){
    await as(i);const data=await projection();
    assert.deepEqual(data.rules.map(r=>r.rule_key),['budget','education'],'Rule priority preserved for role '+i);
    assert.equal(data.rules[0].enabled,false,'Preserve disabled rule');
-   assert.equal(data.ledger.length,500,'Ledger retains exactly newest 500 for role '+i);
-   assert(data.ledger[0].created_at>data.ledger[499].created_at,'Newest-first order preserved');
+   assert.equal(data.ledger.length,10,'Ledger returns exactly newest 10 for role '+i);
+   assert(data.ledger[0].created_at>data.ledger[9].created_at,'Newest-first order preserved');
    assert(data.ledger.every(r=>r.game_id===game),'No foreign ledger rows');
    assert.equal(data.ledger[0].effects.score,2,'Original effect values unchanged');
    assert.equal(data.rules[1].effects.score,2,'Rule effect left unchanged');
@@ -43,7 +43,7 @@ async function main(){
   await as(1);await assert.rejects(projection(other),e=>e.code==='42501','Foreign game access denied');
   await as(null);await assert.rejects(projection(),e=>e.code==='42501','Missing JWT denied');
   await db.exec('reset role');await db.exec('set role anon');await assert.rejects(projection(),e=>e.code==='42501','Anon execution denied');
-  console.log('PASS: 40 students + teacher + observer; 500 latest ledger rows, rule priority, original effects, cross-game/anon/JWT denied (PGlite)');
+  console.log('PASS: 40 students + teacher + observer; 10 latest ledger rows, rule priority, original effects, cross-game/anon/JWT denied (PGlite)');
  }finally{await db.close()}
 }
 main().catch(error=>{console.error(error);process.exitCode=1});

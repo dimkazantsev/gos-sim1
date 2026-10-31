@@ -1444,7 +1444,7 @@ export function useRepublicGame(gameId:string){
     // Only older schemas may fall back. Never amplify 402/429/5xx.
     const [ir,il]=await Promise.all([
      supabase.from('impact_rules').select('*').eq('game_id',gameId).order('priority'),
-     supabase.from('impact_ledger').select('*').eq('game_id',gameId).order('created_at',{ascending:false}).limit(500)
+     supabase.from('impact_ledger').select('*').eq('game_id',gameId).order('created_at',{ascending:false}).limit(10)
     ]);
     if(!readCurrent(ticket))return;
     requireSuccessful([ir,il]);

@@ -6,6 +6,10 @@ on:
       - 'supabase/tests/impact_projection_100_local.cjs'
       - 'supabase/tests/impact_projection_100_local_setup.sql'
       - 'supabase/migrations/20261029144000_impact_engine_projection_invoker.sql'
+      - 'supabase/migrations/20261031165000_impact_ledger_ten_projection.sql'
+      - 'scripts/impact-engine-projection-rls-check.cjs'
+      - 'components/game/ImpactRulesPanel.tsx'
+      - 'components/game/useRepublicGame.ts'
 permissions:
   contents: read
 concurrency:
@@ -25,6 +29,7 @@ jobs:
           cache: npm
       - run: npm ci --no-audit --no-fund
       - run: node --check supabase/tests/impact_projection_100_local.cjs
+      - run: node scripts/impact-engine-projection-rls-check.cjs
       - uses: supabase/setup-cli@v3
         with:
           version: latest
@@ -49,7 +54,7 @@ jobs:
               --override-name auth.anon_key=SUPABASE_ANON_KEY \
               --override-name auth.service_role_key=SUPABASE_SERVICE_ROLE_KEY
           )
-      - name: Load local RLS fixture and unchanged server projection
+      - name: Load local RLS fixture and ten-entry server projection
         shell: bash
         run: |
           set -euo pipefail
@@ -59,6 +64,7 @@ jobs:
           psql "$DB_URL" -v ON_ERROR_STOP=1 -f "$GITHUB_WORKSPACE/supabase/tests/blitz_supabase_setup.sql"
           psql "$DB_URL" -v ON_ERROR_STOP=1 -f "$GITHUB_WORKSPACE/supabase/tests/impact_projection_100_local_setup.sql"
           psql "$DB_URL" -v ON_ERROR_STOP=1 -f "$GITHUB_WORKSPACE/supabase/migrations/20261029144000_impact_engine_projection_invoker.sql"
+          psql "$DB_URL" -v ON_ERROR_STOP=1 -f "$GITHUB_WORKSPACE/supabase/migrations/20261031165000_impact_ledger_ten_projection.sql"
           psql "$DB_URL" -v ON_ERROR_STOP=1 -c "NOTIFY pgrst, 'reload schema';"
           sleep 2
       - name: Verify 100 JWT readers, role isolation and reconnection
