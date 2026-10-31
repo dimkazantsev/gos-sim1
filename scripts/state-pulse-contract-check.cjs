@@ -17,7 +17,7 @@ assert(game.includes('if(!next?.id||next.game_id!==gameId)return;'),'Ignore othe
 assert(game.includes("['INSERT','UPDATE'] as const")&&!game.includes("event:'*',schema:'public',table:'state_metrics'"),'Do not expose RLS-unfiltered DELETE events');
 assert(game.includes('if(!entry?.id||entry.game_id!==gameId)return;'),'Ignore other games in history payload');
 assert(game.includes('previous.some(item=>item.id===entry.id)'),'Deduplicate history deliveries');
-assert(game.includes('slice(-3000)'),'Cap browser history');
+assert(game.includes('slice(-50)'),'Keep only latest 50 metric-history rows in browser');
 assert(game.includes('setMetrics(previous=>'),'Update card immediately on new value, with no request');
 assert(!migration.includes('UPDATE public.state_metrics')&&!migration.includes('DELETE FROM'),'Do not rewrite scores or recorded history');
 assert(source.includes("'post_media'")&&source.includes("'vote_passed'")&&source.includes("'crisis_ultra'"),'Document only source-backed rules');
