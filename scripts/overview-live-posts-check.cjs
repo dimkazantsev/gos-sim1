@@ -4,6 +4,18 @@ const assert=require('node:assert/strict');
 const fs=require('node:fs');
 const path=require('node:path');
 const source=fs.readFileSync(path.join(__dirname,'../components/game/DashboardView.tsx'),'utf8');
+const dock=fs.readFileSync(path.join(__dirname,'../components/game/StateMetricsDock.tsx'),'utf8');
+const game=fs.readFileSync(path.join(__dirname,'../components/game/useRepublicGame.ts'),'utf8');
+assert(game.includes("if(view==='actions')\\n   jobs.push(core?core.then(()=>loadPoliticalWall()):loadPoliticalWall())"),
+ 'Dashboard must not trigger full political wall hydration on navigation');
+assert(game.includes("if(tables.has('political_posts')&&view==='actions')"),
+ 'Realtime must not hydrate an invisible political feed on the dashboard');
+assert(dock.includes('if(!selected||!gid||!historyPostKey)return'),
+ 'Closed metric dialog must never fetch post titles');
+assert(dock.includes(".from('political_posts').select('id,title').eq('game_id',gid)"),
+ 'Opened metric history retrieves only RLS-scoped linked titles');
+assert(dock.includes("linkedPostTitles[String(h.source_id||'')]"),
+ 'Metric history keeps linked news titles without full political feed');
 const between=source.slice(source.indexOf('useEffect(()=>{'),source.indexOf('},[gameId]);')+12);
 assert(source.includes("const {game,me,currentStage,stages,teacher,parties,members,votes"),'Archived events must not be consumed by dashboard');
 assert(!source.includes('events.slice(0,4)'),'Overview must not display historical game_events');
