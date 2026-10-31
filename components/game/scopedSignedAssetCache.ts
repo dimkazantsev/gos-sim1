@@ -1,10 +1,11 @@
 /** Isolated per mounted game/view and signed-in user. Never persist capability URLs. */
 export function createScopedSignedAssetCache(
  sign:(path:string)=>Promise<string|null>,
- options:{now?:()=>number;validForMs?:number;maxEntries?:number;maxParallel?:number}={}
+ options:{now?:()=>number;validForMs?:number;failedForMs?:number;maxEntries?:number;maxParallel?:number}={}
 ){
  const now=options.now||Date.now;
  const ttl=options.validForMs??45*60*1000; // Must remain below the 3600s signed-URL validity.
+ const failedTtl=options.failedForMs??5*60*1000; // Do not hammer missing paths.
  const limit=options.maxEntries??160;
  const concurrency=options.maxParallel??4;
  const cache=new Map<string,{expiresAt:number;promise:Promise<string|null>}>();
@@ -28,7 +29,8 @@ export function createScopedSignedAssetCache(
   cache.delete(path);
   while(cache.size>=limit){const oldest=cache.keys().next().value;if(!oldest)break;cache.delete(oldest)}
   const promise=enqueue(path).then(url=>{
-   if(!url&&cache.get(path)?.promise===promise)cache.delete(path);
+   if(!url&&cache.get(path)?.promise===promise)
+    cache.set(path,{expiresAt:now()+failedTtl,promise});
    return url;
   });
   cache.set(path,{expiresAt:now()+ttl,promise});
