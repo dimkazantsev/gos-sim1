@@ -16,6 +16,10 @@ on:
       - 'public/share/gos-id-preview.jpg'
       - 'public/visit/index.html'
       - 'app/layout.tsx'
+      - 'components/GosReleaseNotice.tsx'
+      - 'components/PwaRegistrar.tsx'
+      - 'app/release-notice.css'
+      - 'scripts/release-version-safety-check.cjs'
       - 'components/GameClient.tsx'
       - 'components/game/GameHeader.tsx'
       - 'components/game/TeacherView.tsx'
@@ -43,9 +47,12 @@ jobs:
           node-version: 22
           cache: npm
       - run: node scripts/prepare-github-pages.mjs
+      - name: Stamp immutable published release
+        run: printf '{"release":"%s"}\n' "$GITHUB_SHA" > .pages-build/public/release.json
       - run: npm ci && npm run build
         working-directory: .pages-build
         env:
+          NEXT_PUBLIC_GOS_RELEASE: ${{ github.sha }}
           NEXT_PUBLIC_ASSET_BASE_PATH: /gos-sim1
           NEXT_PUBLIC_GAME_API_ORIGIN: https://gos-sim1.vercel.app
           NEXT_PUBLIC_SUPABASE_URL: https://bderfrcfuhnutuoyudje.supabase.co
