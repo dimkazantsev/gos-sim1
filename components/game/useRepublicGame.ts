@@ -57,6 +57,12 @@ export function useRepublicGame(gameId:string){
  const chatWindowLimit=()=>requestedHistoryCount.current===CHAT_HISTORY_PAGE_SIZE?150:Math.max(150,requestedHistoryCount.current+200);
  useEffect(()=>{messageRowsRef.current=messages},[messages]);
  const [stages,setStages]=useState<Stage[]>([]),[parties,setParties]=useState<Party[]>([]),[votes,setVotes]=useState<Vote[]>([]),[ballots,setBallots]=useState<Ballot[]>([]),[evaluations,setEvaluations]=useState<Evaluation[]>([]),[crises,setCrises]=useState<Crisis[]>([]),[documents,setDocuments]=useState<GameDocument[]>([]),[activities,setActivities]=useState<Activity[]>([]),[presence,setPresence]=useState<Presence[]>([]),[profileRows,setProfiles]=useState<GameProfile[]>([]),[partyDocuments,setPartyDocuments]=useState<PartyDocument[]>([]),[partyInvitations,setPartyInvitations]=useState<PartyInvitation[]>([]),[partyMandates,setPartyMandateRows]=useState<PartyMandateAllocation[]>([]),[partyAgreements,setPartyAgreements]=useState<PartyAgreement[]>([]),[formalDocuments,setFormalDocuments]=useState<FormalDocument[]>([]),[formalHistory,setFormalHistory]=useState<FormalHistory[]>([]),[politicalPosts,setPoliticalPosts]=useState<PoliticalPost[]>([]),[politicalMedia,setPoliticalMedia]=useState<PoliticalPostMedia[]>([]),[postFormalLinks,setPostFormalLinks]=useState<PoliticalPostFormalLink[]>([]),[metricHistory,setMetricHistory]=useState<MetricHistory[]>([]),[partySupportHistory,setPartySupportHistory]=useState<PartySupportHistory[]>([]),[impactRules,setImpactRules]=useState<ImpactRule[]>([]),[impactLedger,setImpactLedger]=useState<ImpactLedger[]>([]);
+ const [politicalHasOlder,setPoliticalHasOlder]=useState(false);
+ const [politicalOlderLoading,setPoliticalOlderLoading]=useState(false);
+ const [politicalSearchLoading,setPoliticalSearchLoading]=useState(false);
+ const [politicalPostTotal,setPoliticalPostTotal]=useState(0);
+ const politicalCursor=useRef<Pick<PoliticalPost,'id'|'created_at'|'pinned'>|null>(null);
+ const politicalOlderLoaded=useRef(false),politicalPagePending=useRef(false),politicalFullMode=useRef(false);
  const votesRef=useRef(votes);votesRef.current=votes;
  const changedFormalIds=useRef(new Set<string>()),changedVoteIds=useRef(new Set<string>());
  const [loading,setLoading]=useState(true),[error,setErrorRaw]=useState(''),[chatOpen,setChatOpen]=useState(false),[activeView,setActiveView]=useState<View>('dashboard');
@@ -270,7 +276,10 @@ export function useRepublicGame(gameId:string){
   setChatPins([]);setPinnedMessages([]);setChatOverview([]);setChatLoading(false);setChatOpen(false);
   setStages([]);setParties([]);setVotes([]);setBallots([]);setEvaluations([]);setCrises([]);setDocuments([]);setActivities([]);setPresence([]);setProfiles([]);
   setPartyDocuments([]);setPartyInvitations([]);setPartyMandateRows([]);setPartyAgreements([]);setFormalDocuments([]);setFormalHistory([]);
-  setPoliticalPosts([]);setPoliticalMedia([]);setPostFormalLinks([]);setMetricHistory([]);setPartySupportHistory([]);setImpactRules([]);setImpactLedger([]);
+  setPoliticalPosts([]);setPoliticalMedia([]);setPostFormalLinks([]);
+  politicalCursor.current=null;politicalOlderLoaded.current=false;politicalPagePending.current=false;politicalFullMode.current=false;
+  setPoliticalHasOlder(false);setPoliticalOlderLoading(false);setPoliticalSearchLoading(false);setPoliticalPostTotal(0);
+  setMetricHistory([]);setPartySupportHistory([]);setImpactRules([]);setImpactLedger([]);
   setProfileGameId('');setIntroAccountSeen(false);
   if(captureRef.current)captureRef.current.discard=true;
   if(recorder.current&&recorder.current.state!=='inactive')recorder.current.stop();
@@ -997,6 +1006,58 @@ export function useRepublicGame(gameId:string){
   await Promise.allSettled(jobs);
  }
 
+ async function loadOlderPoliticalPosts():Promise<boolean>{
+  if(!politicalHasOlder||politicalFullMode.current||politicalPagePending.current||!politicalCursor.current)return false;
+  const cursor=politicalCursor.current,epoch=readEpoch.current;
+  politicalPagePending.current=true;setPoliticalOlderLoading(true);
+  try{
+   const r=await supabase.rpc('get_political_wall_page',{
+    p_game_id:gameId,p_cursor_pinned:!!cursor.pinned,p_cursor_created_at:cursor.created_at,p_cursor_id:cursor.id
+   });
+   if(!alive.current||activeGameRef.current!==gameId||readEpoch.current!==epoch||politicalFullMode.current)return false;
+   if(r.error){setError(r.error);return false}
+   const page=r.data as {posts?:PoliticalPost[];media?:PoliticalPostMedia[];formal_links?:PoliticalPostFormalLink[];has_more?:boolean}|null;
+   if(!page||!Array.isArray(page.posts)||!Array.isArray(page.media)||!Array.isArray(page.formal_links)){setError('Не удалось загрузить историю публикаций.');return false}
+   if(!page.posts.length){setPoliticalHasOlder(false);return false}
+   const last=page.posts.at(-1)!;
+   politicalOlderLoaded.current=true;
+   politicalCursor.current={id:last.id,created_at:last.created_at,pinned:!!last.pinned};
+   setPoliticalHasOlder(!!page.has_more);
+   setPoliticalPosts(previous=>{
+    const all=new Map(previous.map(p=>[p.id,p]));page.posts!.forEach(p=>all.set(p.id,p));
+    return [...all.values()].sort((a,b)=>Number(!!b.pinned)-Number(!!a.pinned)||
+     b.created_at.localeCompare(a.created_at)||b.id.localeCompare(a.id));
+   });
+   setPostFormalLinks(previous=>[...new Map([...previous,...page.formal_links!].map(l=>[l.post_id+':'+l.formal_document_id,l])).values()]);
+   setPoliticalMedia(previous=>{
+    const cached=new Map(previous.map(row=>[row.id,row]));
+    return [...new Map([...previous,...page.media!.map(row=>({...row,url:cached.get(row.id)?.url||null}))].map(row=>[row.id,row])).values()];
+   });
+   const attachments=page.media.filter(row=>row.storage_path);
+   if(attachments.length)void Promise.all(attachments.map(async row=>({
+    id:row.id,path:row.storage_path,url:await signedAssetUrl('game-assets',row.storage_path)
+   }))).then(links=>{
+    if(!alive.current||activeGameRef.current!==gameId||readEpoch.current!==epoch)return;
+    const urls=new Map(links.map(x=>[x.id,x]));
+    setPoliticalMedia(previous=>previous.map(row=>{
+     const link=urls.get(row.id);return link&&link.path===row.storage_path?{...row,url:link.url||row.url||null}:row;
+    }));
+   }).catch(()=>{});
+   return true;
+  }finally{
+   if(activeGameRef.current===gameId&&readEpoch.current===epoch){
+    politicalPagePending.current=false;setPoliticalOlderLoading(false);
+   }
+  }
+ }
+ function setPoliticalWallFullSearch(enabled:boolean){
+  if(politicalFullMode.current===enabled)return;
+  politicalFullMode.current=enabled;politicalOlderLoaded.current=false;politicalCursor.current=null;
+  politicalPagePending.current=false;setPoliticalHasOlder(false);
+  if(enabled)setPoliticalSearchLoading(true);
+  void loadPoliticalWall();
+ }
+
  async function loadRepublicOffices(force=false):Promise<void>{
   // Share only presentation reads inside one authorised browser; auth and
   // role decisions continue through the authoritative game identity RPC.
@@ -1260,10 +1321,19 @@ export function useRepublicGame(gameId:string){
   await readSafely(['political','metrics','parties'],async ticket=>{
    // Six RLS-checked feeds share one consistent PostgreSQL statement;
    // party identity stays in its independent session-scoped cache.
-   const [projection,pa]=await Promise.all([
-    limitedCoreRead(supabase.rpc('get_political_wall_projection',{p_game_id:gameId})),
+
+   const full=politicalFullMode.current;
+   const [paged,pa]=await Promise.all([
+    limitedCoreRead(full
+     ?supabase.rpc('get_political_wall_projection',{p_game_id:gameId})
+     :supabase.rpc('get_political_wall_page',{p_game_id:gameId})),
     loadCachedParties()
    ]);
+   // Old deployments keep using their original projection until this
+   // nonbreaking migration is installed. Never retry on rate limits.
+   const projection=!full&&paged.error&&['PGRST202','42883'].includes(String(paged.error.code||''))
+    ?await limitedCoreRead(supabase.rpc('get_political_wall_projection',{p_game_id:gameId}))
+    :paged;
    if(!readActive(ticket))return;
    let pp:{data:PoliticalPost[]|null;error:unknown};
    let px:{data:PoliticalPostMedia[]|null;error:unknown};
@@ -1289,7 +1359,7 @@ export function useRepublicGame(gameId:string){
     pl={data:null,error:projection.error};mh={data:null,error:projection.error};
     psh={data:null,error:projection.error};mt={data:null,error:projection.error};
    }else{
-    const data=projection.data as {posts?:PoliticalPost[];media?:PoliticalPostMedia[];formal_links?:PoliticalPostFormalLink[];metric_history?:MetricHistory[];support_history?:PartySupportHistory[];metrics?:Metric[]}|null;
+    const data=projection.data as {posts?:PoliticalPost[];media?:PoliticalPostMedia[];formal_links?:PoliticalPostFormalLink[];metric_history?:MetricHistory[];support_history?:PartySupportHistory[];metrics?:Metric[];has_more?:boolean;total_posts?:number}|null;
     if(!data||!Array.isArray(data.posts)||!Array.isArray(data.media)||
        !Array.isArray(data.formal_links)||!Array.isArray(data.metric_history)||
        !Array.isArray(data.support_history)||!Array.isArray(data.metrics)){
@@ -1306,15 +1376,39 @@ export function useRepublicGame(gameId:string){
     const posts=(pp.data||[]) as PoliticalPost[];
     const visiblePostIds=new Set(posts.map(post=>post.id));
     const rows=((px.data||[]) as PoliticalPostMedia[]).filter(item=>visiblePostIds.has(item.post_id));
-    setPoliticalPosts(posts);
+
+    const pageData=projection.data as {has_more?:boolean;total_posts?:number}|null;
+    const isPaged=!full&&typeof pageData?.has_more==='boolean';
+    setPoliticalPostTotal(isPaged?Number(pageData?.total_posts||posts.length):posts.length);
+    if(full||!isPaged){
+     politicalCursor.current=null;politicalOlderLoaded.current=false;setPoliticalHasOlder(false);
+     setPoliticalPosts(posts);
+    }else{
+     if(!politicalOlderLoaded.current){
+      const last=posts.at(-1);
+      politicalCursor.current=last?{id:last.id,created_at:last.created_at,pinned:!!last.pinned}:null;
+      setPoliticalHasOlder(!!pageData?.has_more);
+      setPoliticalPosts(posts);
+     }else{
+      setPoliticalPosts(previous=>{
+       const all=new Map(previous.filter(p=>p.game_id===gameId).map(p=>[p.id,p]));
+       posts.forEach(p=>all.set(p.id,p));
+       return [...all.values()].sort((a,b)=>Number(!!b.pinned)-Number(!!a.pinned)||
+        b.created_at.localeCompare(a.created_at)||b.id.localeCompare(a.id));
+      });
+     }
+    }
     setPoliticalMedia(previous=>{
      const cached=new Map(previous.map(row=>[row.id,row]));
-     return rows.map(row=>{
+     const combined=politicalOlderLoaded.current&&!full?[...previous.filter(row=>!rows.some(r=>r.id===row.id)),...rows]:rows;
+     return combined.map(row=>{
       const old=cached.get(row.id);
       return {...row,url:old?.storage_path===row.storage_path?old.url||null:null};
      });
     });
-    setPostFormalLinks((pl.data||[]) as PoliticalPostFormalLink[]);
+    setPostFormalLinks(previous=>politicalOlderLoaded.current&&!full
+     ?[...new Map([...previous,...(pl.data||[] as PoliticalPostFormalLink[])].map(row=>[row.post_id+':'+row.formal_document_id,row])).values()]
+     :(pl.data||[]) as PoliticalPostFormalLink[]);
     setMetricHistory(([...(mh.data||[])] as MetricHistory[]).sort((a,b)=>a.recorded_at.localeCompare(b.recorded_at)||a.id-b.id));
     setPartySupportHistory(([...(psh.data||[])] as PartySupportHistory[]).sort((a,b)=>a.recorded_at.localeCompare(b.recorded_at)||a.id-b.id));
     void Promise.all(rows.filter(row=>row.storage_path).map(async row=>({
@@ -1330,6 +1424,7 @@ export function useRepublicGame(gameId:string){
     if(posts.some(post=>post.source_key?.startsWith('media-party-registration:')))void loadPartyDocuments();
    }
    if(readCurrent(ticket,'metrics'))setMetrics((mt.data||[]) as Metric[]);
+   if(readCurrent(ticket,'political'))setPoliticalSearchLoading(false);
    if(readCurrent(ticket,'parties'))acceptPartyRows((pa.data||[]) as Party[],ticket);
   });
  }
@@ -2394,6 +2489,6 @@ export function useRepublicGame(gameId:string){
   finally{mediaOperationRef.current=false;setRecordingSaving(false)}
  }
 
- return {gdMandateCapacity,gdEffectivePresence,game:game?.id===gameId?game:null,me:visibleMe,metrics:sharedMetrics,budgetPulse,budgetPulseError,refreshBudgetPulse,activeView,setActiveView,events,members,officeAssignments,channels,channelId,setChannelId,messages,hasOlderChatMessages,olderChatLoading,loadOlderChatMessages,chatPins,pinnedMessages,chatOverview,chatUnreadCount:chatOverview.reduce((sum,row)=>sum+Number(row.unread_count||0),0),chatMentionCount:chatOverview.reduce((sum,row)=>sum+Number(row.mention_count||0),0),setChatChannelPinned,markChatRead,chatLoading,stages,parties,votes,ballots,evaluations,crises,documents,activities,presence,profiles,profilesLoaded:profileGameId===gameId,introAccountSeen,partyDocuments,partyInvitations,partyMandates,partyAgreements,politicalPosts,politicalMedia,postFormalLinks,metricHistory:sharedMetricHistory,partySupportHistory,impactRules,impactLedger,formalDocuments,formalHistory,loading,error,setError,chatOpen,setChatOpen,recording,recordingPreview,recordingSaving,chatMediaError,chatMediaPhase,recordingStartedAt,recordingStream:recordingStream.current,realtimeState,teacher,names,currentStage,myEvaluations,averageVsn,
+ return {gdMandateCapacity,gdEffectivePresence,game:game?.id===gameId?game:null,me:visibleMe,metrics:sharedMetrics,budgetPulse,budgetPulseError,refreshBudgetPulse,activeView,setActiveView,events,members,officeAssignments,channels,channelId,setChannelId,messages,hasOlderChatMessages,olderChatLoading,loadOlderChatMessages,chatPins,pinnedMessages,chatOverview,chatUnreadCount:chatOverview.reduce((sum,row)=>sum+Number(row.unread_count||0),0),chatMentionCount:chatOverview.reduce((sum,row)=>sum+Number(row.mention_count||0),0),setChatChannelPinned,markChatRead,chatLoading,stages,parties,votes,ballots,evaluations,crises,documents,activities,presence,profiles,profilesLoaded:profileGameId===gameId,introAccountSeen,partyDocuments,partyInvitations,partyMandates,partyAgreements,politicalPosts,politicalPostTotal,politicalHasOlder,politicalOlderLoading,politicalSearchLoading,loadOlderPoliticalPosts,setPoliticalWallFullSearch,politicalMedia,postFormalLinks,metricHistory:sharedMetricHistory,partySupportHistory,impactRules,impactLedger,formalDocuments,formalHistory,loading,error,setError,chatOpen,setChatOpen,recording,recordingPreview,recordingSaving,chatMediaError,chatMediaPhase,recordingStartedAt,recordingStream:recordingStream.current,realtimeState,teacher,names,currentStage,myEvaluations,averageVsn,
   refresh,refreshDocuments,refreshEventEffects,logout,touchPresence,logActivity,setTurn,setTurnMinutes,openStage,manageStage,nextStage,resetStageProgress,configureStageDeadline,setStageDeadline,availableActors,createPoliticalPost,updatePoliticalPost,addMediaToPoliticalPost,acceptPoliticalPost,rejectPoliticalPost,approvePostImpact,createVoteFromPost,updateImpactRule,revertImpactEntry,createParty,voteForPartyChair,updateParty,renameParty,setPartyLeader,setPartyMandates,updatePartyStatistics,inviteToParty,respondPartyInvitation,cancelPartyInvitation,removePartyMember,proposePartyAgreement,respondPartyAgreement,submitPartyRegistration,reviewPartyRegistration,applyPartyGhostLoss,drawGhostVoting,clearPartyGhostLoss,applyGhostVotingBatch,deleteParty,updateMember,createVote,canVote,ballotWeight,castVote,castVoteAllocation,setStudentMandates,closeVote,deleteVote,tally,quorum,setEvaluation,publishEvent,triggerCrisis,ghostVoting,createDocument,updateMetric,saveProfile,saveSignature,savePartyIdentity,uploadPartyDocument,reviewPartyDocument,deletePartyDocument,createFormalDocument,deleteFormalDocument,advanceFormalDocument,updateFormalDraft,vetoFormalDocument,resolveBudgetConciliation,startBudgetRejectionBranch,sendText,sendChatFile,setChatPin,refreshChatMediaUrl,toggleRecording,discardRecording,sendRecordingPreview};
 }
