@@ -96,8 +96,17 @@ async function verifyClients(){
   assert(tabs.every(h=>h.channelsInfo()[0].tracked===4),'Do not overlap track calls during reconnect');
   tabs.forEach(h=>h.releasePresenceTrack());
   await Promise.all(tabs.map(h=>h.settle()));
-  assert(tabs.every(h=>h.channelsInfo()[0].tracked===5),'A stale ACK cannot mark the new socket as tracked');
+  assert(tabs.every(h=>h.channelsInfo()[0].tracked===4),
+   'The fifth rapid Presence call (including untrack) must wait instead of closing the room');
+  await Promise.all(tabs.map(h=>h.advance(31000)));
+  assert(tabs.every(h=>h.channelsInfo()[0].tracked===5),
+   'Queued Presence state must be restored after the rolling rate-limit window');
   assert(tabs.every(h=>h.channelsInfo().length===1),'No duplicate connection when recovering from a stale ACK');
+  // Rapid reconnect cycles must not issue unbounded Presence calls.
+  tabs.forEach(h=>{for(let i=0;i<12;i++){h.channelStatus('CHANNEL_ERROR');h.channelStatus('SUBSCRIBED')}});
+  await Promise.all(tabs.map(h=>h.settle()));
+  assert(tabs.every(h=>h.channelsInfo()[0].tracked<=8),
+   'At most four Presence calls per rolling 30 seconds, including the first restoration');
   for(const h of tabs){
    assert.equal(h.rpcCount('record_my_game_presence'),0,'Network presence does not generate SQL heartbeat');
   }
