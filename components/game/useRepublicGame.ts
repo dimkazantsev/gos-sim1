@@ -1474,21 +1474,22 @@ export function useRepublicGame(gameId:string){
        signature_url:old?.signature_path===row.signature_path?old?.signature_url||null:null};
      });
     });
-    void Promise.all(rows.map(async row=>{
-     try{
-      const [avatar,signature]=await Promise.all([
-       row.avatar_path?signedAssetUrl('game-assets',row.avatar_path):Promise.resolve(null),
-       row.signature_path?signedAssetUrl('game-assets',row.signature_path):Promise.resolve(null)
-      ]);
-      return {id:row.user_id,avatarPath:row.avatar_path,signaturePath:row.signature_path,avatar:avatar||null,signature:signature||null};
-     }catch{return {id:row.user_id,avatarPath:row.avatar_path,signaturePath:row.signature_path,avatar:null,signature:null}}
-    })).then(links=>{
+    // A signature is a private permanent profile asset, not an avatar.
+    // The old eager loop signed every participant's signature on every visit,
+    // including objects forbidden by Storage RLS (45 errors in one class hour).
+    // Never sign signatures here, even for teachers. The owner can explicitly
+    // preview their own image; official documents use immutable signing records.
+    // Keep avatars loaded as before so student, teacher and guest layouts stay intact.
+    void Promise.all(rows.filter(row=>row.avatar_path).map(async row=>({
+     id:row.user_id,avatarPath:row.avatar_path,
+     avatar:await signedAssetUrl('game-assets',row.avatar_path!).catch(()=>null)
+    }))).then(links=>{
      if(!readCurrent(ticket,'profiles'))return;
      const urls=new Map(links.map(link=>[link.id,link]));
      setProfiles(previous=>previous.map(row=>{
       const link=urls.get(row.user_id);
-      return link&&link.avatarPath===row.avatar_path&&link.signaturePath===row.signature_path?
-       {...row,avatar_url:link.avatar||row.avatar_url||null,signature_url:link.signature||row.signature_url||null}:row;
+      return link&&link.avatarPath===row.avatar_path?
+       {...row,avatar_url:link.avatar||row.avatar_url||null}:row;
      }));
     }).catch(()=>{});
    }
@@ -2570,6 +2571,19 @@ export function useRepublicGame(gameId:string){
   await loadPartyAssets();return true;
  }
 
+ // One explicit preview may sign the caller's own unchanged private image.
+ // Do not sign other members' signatures from the party/profile roster, and
+ // never change Storage RLS. Official document signatures are a separate path.
+ async function loadOwnSignaturePreview():Promise<string|null>{
+  const uid=authUser.current,member=acceptedMember.current;
+  if(!uid||!member||member.user_id!==uid||member.kind==='observer'||activeGameRef.current!==gameId)return null;
+  const own=profiles.find(row=>row.user_id===uid);
+  if(!own?.signature_path)return null;
+  const epoch=readEpoch.current;
+  const url=await signedAssetUrl('game-assets',own.signature_path);
+  return alive.current&&readEpoch.current===epoch&&authUser.current===uid&&activeGameRef.current===gameId?url:null;
+ }
+
  async function saveSignature(file:File){
   if(!me||me.kind==='observer'){setError('Подпись может сохранить только участник, вошедший в собственную учётную запись.');return false}
   if(file.type!=='image/png'||file.size===0||file.size>2*1024*1024){setError('Загрузите PNG-подпись размером до 2 МБ.');return false}
@@ -2874,5 +2888,5 @@ export function useRepublicGame(gameId:string){
  }
 
  return {gdMandateCapacity,gdEffectivePresence,game:game?.id===gameId?game:null,me:visibleMe,metrics:sharedMetrics,budgetPulse,budgetPulseError,refreshBudgetPulse,activeView,setActiveView,events,members,officeAssignments,channels,channelId,setChannelId,messages,hasOlderChatMessages,olderChatLoading,loadOlderChatMessages,chatPins,pinnedMessages,chatOverview,chatUnreadCount:chatOverview.reduce((sum,row)=>sum+Number(row.unread_count||0),0),chatMentionCount:chatOverview.reduce((sum,row)=>sum+Number(row.mention_count||0),0),setChatChannelPinned,markChatRead,chatLoading,stages,parties,votes,ballots,evaluations,crises,documents,activities,presence,profiles,profilesLoaded:profileGameId===gameId,introAccountSeen,partyDocuments,partyInvitations,partyMandates,partyAgreements,politicalPosts,politicalPostTotal,politicalActorOptions,politicalHasOlder,politicalOlderLoading,politicalSearchLoading,loadOlderPoliticalPosts,setPoliticalWallFullSearch,politicalMedia,postFormalLinks,metricHistory:sharedMetricHistory,partySupportHistory,impactRules,impactLedger,formalDocuments,formalHistory,loading,error,setError,chatOpen,setChatOpen,recording,recordingPreview,recordingSaving,chatMediaError,chatMediaPhase,recordingStartedAt,recordingStream:recordingStream.current,realtimeState,teacher,names,currentStage,myEvaluations,averageVsn,
-  refresh,refreshDocuments,refreshEventEffects,logout,touchPresence,logActivity,setTurn,setTurnMinutes,openStage,manageStage,nextStage,resetStageProgress,configureStageDeadline,setStageDeadline,availableActors,createPoliticalPost,updatePoliticalPost,addMediaToPoliticalPost,acceptPoliticalPost,rejectPoliticalPost,approvePostImpact,createVoteFromPost,updateImpactRule,revertImpactEntry,createParty,voteForPartyChair,updateParty,renameParty,setPartyLeader,setPartyMandates,updatePartyStatistics,inviteToParty,respondPartyInvitation,cancelPartyInvitation,removePartyMember,proposePartyAgreement,respondPartyAgreement,submitPartyRegistration,reviewPartyRegistration,applyPartyGhostLoss,drawGhostVoting,clearPartyGhostLoss,applyGhostVotingBatch,deleteParty,updateMember,createVote,canVote,ballotWeight,castVote,castVoteAllocation,setStudentMandates,closeVote,deleteVote,tally,quorum,setEvaluation,publishEvent,triggerCrisis,ghostVoting,createDocument,updateMetric,saveProfile,saveSignature,savePartyIdentity,uploadPartyDocument,reviewPartyDocument,deletePartyDocument,createFormalDocument,deleteFormalDocument,advanceFormalDocument,updateFormalDraft,vetoFormalDocument,resolveBudgetConciliation,startBudgetRejectionBranch,sendText,sendChatFile,setChatPin,refreshChatMediaUrl,toggleRecording,discardRecording,sendRecordingPreview};
+  refresh,refreshDocuments,refreshEventEffects,logout,touchPresence,logActivity,setTurn,setTurnMinutes,openStage,manageStage,nextStage,resetStageProgress,configureStageDeadline,setStageDeadline,availableActors,createPoliticalPost,updatePoliticalPost,addMediaToPoliticalPost,acceptPoliticalPost,rejectPoliticalPost,approvePostImpact,createVoteFromPost,updateImpactRule,revertImpactEntry,createParty,voteForPartyChair,updateParty,renameParty,setPartyLeader,setPartyMandates,updatePartyStatistics,inviteToParty,respondPartyInvitation,cancelPartyInvitation,removePartyMember,proposePartyAgreement,respondPartyAgreement,submitPartyRegistration,reviewPartyRegistration,applyPartyGhostLoss,drawGhostVoting,clearPartyGhostLoss,applyGhostVotingBatch,deleteParty,updateMember,createVote,canVote,ballotWeight,castVote,castVoteAllocation,setStudentMandates,closeVote,deleteVote,tally,quorum,setEvaluation,publishEvent,triggerCrisis,ghostVoting,createDocument,updateMetric,saveProfile,saveSignature,loadOwnSignaturePreview,savePartyIdentity,uploadPartyDocument,reviewPartyDocument,deletePartyDocument,createFormalDocument,deleteFormalDocument,advanceFormalDocument,updateFormalDraft,vetoFormalDocument,resolveBudgetConciliation,startBudgetRejectionBranch,sendText,sendChatFile,setChatPin,refreshChatMediaUrl,toggleRecording,discardRecording,sendRecordingPreview};
 }
