@@ -42,7 +42,8 @@ export function useRepublicGame(gameId:string){
  const [game,setGame]=useState<Game|null>(null),[me,setMe]=useState<Member|null>(null),[metrics,setMetrics]=useState<Metric[]>([]),[events,setEvents]=useState<EventItem[]>([]),[memberRows,setMembers]=useState<Member[]>([]);
  const [officeRows,setOfficeRows]=useState<GameOfficeAssignment[]>([]);
  const activeGameRef=useRef(gameId),readEpoch=useRef(0),readVersions=useRef<Partial<Record<ReadScope,number>>>({}),alive=useRef(true),authUser=useRef<string|null|undefined>(undefined),acceptedMember=useRef<Member|null>(null);
- if(activeGameRef.current!==gameId){activeGameRef.current=gameId;readEpoch.current++}
+ const formalFullVersion=useRef('');
+ if(activeGameRef.current!==gameId){activeGameRef.current=gameId;readEpoch.current++;formalFullVersion.current=''}
  const members=useMemo(()=>currentGameMembers(memberRows,gameId),[memberRows,gameId]);
  const [channels,setChannels]=useState<Channel[]>([]),[channelId,setChannelId]=useState(''),[messages,setMessages]=useState<Message[]>([]),[chatPins,setChatPins]=useState<ChatPin[]>([]),[pinnedMessages,setPinnedMessages]=useState<Message[]>([]),[chatOverview,setChatOverview]=useState<ChatOverview[]>([]),[chatLoading,setChatLoading]=useState(false);
  const messageRowsRef=useRef<Message[]>([]),recentChatRecoveryRunning=useRef(false);
@@ -258,8 +259,9 @@ export function useRepublicGame(gameId:string){
   if(!readActive(ticket)||authUser.current===null)return;
   try{return await load(ticket)}catch(error){if(readActive(ticket)&&Object.keys(ticket.versions).some(scope=>readCurrent(ticket,scope as ReadScope)))setError(error)}
  }
+ function formalVersion(rows:FormalDocument[]){return rows.length?rows.map(d=>d.id+':'+d.updated_at).sort().join('|'):'empty'}
  function clearGameData(){
-  acceptedMember.current=null;
+  formalFullVersion.current='';acceptedMember.current=null;
   rosterReads.current.clear();
   realtimeDirtyTables.current.clear();
   changedFormalIds.current.clear();changedVoteIds.current.clear();
@@ -513,6 +515,7 @@ export function useRepublicGame(gameId:string){
     if(typeof row.updated_at!=='string'||typeof row.status_code!=='string')return false;
     const next=row as unknown as FormalDocument;
     startRead('formal');
+    formalFullVersion.current='';
     setFormalDocuments(previous=>{
      const old=previous.find(doc=>doc.id===next.id);
      return [...previous.filter(doc=>doc.id!==next.id),{...next,file_url:old?.source_file_path===next.source_file_path?old?.file_url||null:null}]
@@ -867,6 +870,7 @@ export function useRepublicGame(gameId:string){
     const fd=await supabase.from('formal_documents').select('*').eq('game_id',gameId).order('updated_at',{ascending:false});
     if(!readCurrent(ticket))return;
     requireSuccessful([fd]);
+    formalFullVersion.current=formalVersion((fd.data||[]) as FormalDocument[]);
     setFormalDocuments(previous=>((fd.data||[]) as FormalDocument[]).map(row=>{
      const old=previous.find(doc=>doc.id===row.id);
      return {...row,file_url:old?.source_file_path===row.source_file_path?old.file_url||null:null};
@@ -902,7 +906,12 @@ export function useRepublicGame(gameId:string){
   const results=await (async()=>{
    // Personal authoritative RLS read is independent of the roster and bundle.
    const [bundle,m,mb,pa,intro]=await Promise.all([
-    limitedCoreRead(supabase.rpc('get_game_bootstrap_v2',{p_game_id:gameId})),
+    (async()=>{
+     const primary=await limitedCoreRead(supabase.rpc('get_game_bootstrap_v3',{p_game_id:gameId}));
+     // Mixed-version rollout: only a missing RPC may fall back to the legacy full bundle.
+     return primary.error&&['PGRST202','42883'].includes(String(primary.error.code||''))
+      ?limitedCoreRead(supabase.rpc('get_game_bootstrap_v2',{p_game_id:gameId})):primary;
+    })(),
     limitedCoreRead(supabase.from('game_members').select('*').eq('game_id',gameId).eq('user_id',uid).maybeSingle()),
     loadMemberRoster(),
     loadCachedParties(),
@@ -986,7 +995,13 @@ export function useRepublicGame(gameId:string){
    }));
    setProfileGameId(gameId);
   }
-  if(!fd.error&&readCurrent(ticket,'formal'))setFormalDocuments((fd.data||[]) as FormalDocument[]);
+  if(!fd.error&&readCurrent(ticket,'formal')){
+   const summaries=(fd.data||[]) as FormalDocument[];
+   // Keep a complete, still-current document cache after refreshing the lightweight core.
+   if(!formalFullVersion.current||formalFullVersion.current!==formalVersion(summaries)){
+    formalFullVersion.current='';setFormalDocuments(summaries);
+   }
+  }
   if(!intro.error)setIntroAccountSeen(!!intro.data);
  }
 
@@ -1005,6 +1020,10 @@ export function useRepublicGame(gameId:string){
   if(view==='teacher')jobs.push(loadClassroomTelemetry(),loadImpactEngine());
   if(chatOpenRef.current)jobs.push(loadChatOverview());
   await Promise.allSettled(jobs);
+  // The overview needs document status/title only. Other opened sections receive
+  // complete bodies on demand, once per unchanged document revision set.
+  if(['stages','votes','actions','teacher'].includes(view)&&activeViewRef.current===view&&!formalFullVersion.current)
+   await loadFormalDetails();
  }
 
  async function loadOlderPoliticalPosts():Promise<boolean>{
@@ -1258,6 +1277,20 @@ export function useRepublicGame(gameId:string){
   });
  }
 
+ async function loadFormalDetails(){
+  if(formalFullVersion.current)return;
+  await readSafely(['formal'],async ticket=>{
+   const response=await limitedCoreRead(supabase.from('formal_documents').select('*').eq('game_id',gameId).order('updated_at',{ascending:false}));
+   if(!readCurrent(ticket))return;
+   requireSuccessful([response]);
+   const rows=(response.data||[]) as FormalDocument[];
+   formalFullVersion.current=formalVersion(rows);
+   setFormalDocuments(previous=>rows.map(row=>{
+    const old=previous.find(doc=>doc.id===row.id);
+    return {...row,file_url:old?.source_file_path===row.source_file_path?old.file_url||null:null};
+   }));
+  });
+ }
  async function loadFormalRegistry(ids?:string[]){
   await readSafely(['formal'],async ticket=>{
    // One consistent RLS-scoped snapshot, also supporting narrow ID refresh.
@@ -1296,6 +1329,7 @@ export function useRepublicGame(gameId:string){
    requireSuccessful([fd,fh]);
    if(ids)for(const id of ids)changedFormalIds.current.delete(id);
    const rows=(fd.data||[]) as FormalDocument[];
+   if(!ids)formalFullVersion.current=formalVersion(rows);
    // Render the register independently from Storage availability.
    setFormalDocuments(previous=>{
     const cached=new Map(previous.map(row=>[row.id,row]));

@@ -145,7 +145,7 @@ function harness({effects=false,compiledCode=code}={}){
      agreements:rows('party_agreements').sort((a,b)=>String(b.created_at).localeCompare(String(a.created_at)))
     },error:null,status:200};
    }
-   if(name==='get_game_bootstrap_v2'){
+   if(name==='get_game_bootstrap_v2'||name==='get_game_bootstrap_v3'){
     const snapshot={revision,user,gameId,memberKind},id=args.p_game_id;
     const num=(counts.get('games')||0)+1;counts.set('games',num);
     await holds.get('games:'+num)?.promise;
@@ -164,8 +164,10 @@ function harness({effects=false,compiledCode=code}={}){
      evaluations:fixtureRows('game_evaluations',withBallots?[{id:'evaluation-'+snapshot.revision,user_id:snapshot.user}]:[]),
      crises:fixtureRows('game_crises',withBallots?[{id:'crisis-'+snapshot.revision,game_id:id}]:[]),
      documents:fixtureRows('game_documents',withBallots?[{id:'document-'+snapshot.revision,game_id:id,created_by:snapshot.user}]:[]),
-     profiles:fixtureRows('game_profiles',assetPaths?[{game_id:id,user_id:snapshot.user,avatar_path:'teacher-assets/'+snapshot.user+'/avatar-fixture.webp',signature_path:'teacher-assets/'+snapshot.user+'/signature-fixture.png'}]:[]),
+     profiles:fixtureRows('game_profiles',assetPaths?[{game_id:id,user_id:snapshot.user,avatar_path:'teacher-assets/'+snapshot.user+'/avatar-fixture.webp',signature_path:'teacher-assets/'+snapshot.user+'/signature-fixture.png'}]:[])
+      .map(row=>name==='get_game_bootstrap_v3'?{...row,bio:null}:row),
      formal_documents:fixtureRows('formal_documents',[])
+      .map(row=>name==='get_game_bootstrap_v3'?{...row,body_text:null,metadata:{}}:row)
     },error:null,status:200};
    }
    if(name==='get_my_game_identity'){
@@ -289,8 +291,8 @@ async function main(){
   const source=fs.readFileSync(path.join(root,'components/game/useRepublicGame.ts'),'utf8');
   const start=source.indexOf('async function loadCoreSections()'),end=source.indexOf('async function hydrateActiveView(',start);
   assert(start>=0&&end>start);
-  assert.equal((source.slice(start,end).match(/limitedCoreRead\(/g)||[]).length,3);
-  assert(source.includes("supabase.rpc('get_game_bootstrap_v2'"),'Server-side RLS bundle replaces eleven HTTP requests');
+  assert.equal((source.slice(start,end).match(/limitedCoreRead\(/g)||[]).length,4);
+  assert(source.includes("supabase.rpc('get_game_bootstrap_v3'"),'Server-side lightweight RLS bundle replaces eleven HTTP requests');
   assert(source.includes("function readLegacyBootstrap()"),'Absent-schema fallback remains available');
   assert(source.includes(".eq('user_id',uid).maybeSingle()"),'Personal membership stays independent of full roster');
   assert(source.slice(start,end).includes('loadCachedParties()'),'One core table uses a shared cache, with its query still queue-limited');
@@ -303,7 +305,7 @@ async function main(){
   try{
    await Promise.all(clients.map(h=>h.settle()));
    for(const h of clients){
-    assert.equal(h.rpcCount('get_game_bootstrap_v2'),1,'One grouped read per client');
+    assert.equal(h.rpcCount('get_game_bootstrap_v3'),1,'One grouped read per client');
     assert.equal(h.readCount('state_metrics'),0,'Political wall projection now includes metrics without an extra table read');
     assert.equal(h.readCount('formal_documents'),0,'Legacy document feed read is skipped');
     assert.equal(h.render().teacher,true);
@@ -313,9 +315,9 @@ async function main(){
   }finally{clients.forEach(h=>h.dispose());}
  });
  await check('Unavailable new RPC uses RLS-preserving legacy selects, without dropping the identity',async()=>{
-  const h=harness();h.failRpc('get_game_bootstrap_v2','PGRST202');
+  const h=harness();h.failRpc('get_game_bootstrap_v3','PGRST202');
   await h.render().refresh();
-  assert(h.readCount('state_metrics')>0,'Older backend uses the existing RLS table read');
+  assert(h.rpcCount('get_game_bootstrap_v2')>0,'Older backend uses the RLS-protected v2 bundle without 11 extra reads');
   assert.equal(h.render().teacher,true);
   h.dispose();
  });
