@@ -25,7 +25,7 @@ import {CHAT_HISTORY_PAGE_SIZE,chatHistoryCursorFilter} from './chatHistoryPagin
 import type {GameOfficeAssignment,ChatOverview} from './types';
 import type {PendingMediaUpload,MediaUploadPhase} from './chatMediaTransport';
 export type RecordingPreview={kind:ChatMediaKind;blob:Blob;url:string;mime:string;fileName:string;channelId:string;duration:number;waveform?:number[]};
-type ReadScope='all'|'core'|'game'|'events'|'documents'|'evaluations'|'stages'|'votes'|'members'|'metrics'|'telemetry'|'profiles'|'parties'|'partyDocuments'|'partyRepresentation'|'formal'|'political'|'impact'|'overview'|'channels'|'offices'|'messages'|'pins';
+type ReadScope='all'|'core'|'game'|'events'|'documents'|'evaluations'|'crises'|'stages'|'votes'|'members'|'metrics'|'telemetry'|'profiles'|'parties'|'partyDocuments'|'partyRepresentation'|'formal'|'political'|'impact'|'overview'|'channels'|'offices'|'messages'|'pins';
 type ReadTicket={gameId:string;epoch:number;versions:Partial<Record<ReadScope,number>>};
 const BOOTSTRAP_TIMEOUT_MS=12000;
 // A reconciliation may contain several individually bounded requests. Do not
@@ -86,6 +86,18 @@ export function useRepublicGame(gameId:string){
  const videoLimitTimer=useRef<ReturnType<typeof setTimeout>|null>(null);
  const lastTelegramDispatch=useRef(0);
  const lastCoreSuccessAt=useRef(0);
+ // Sections outside the Realtime publication must still reconcile on demand.
+ const passiveSyncAt=useRef(new Map<string,number>());
+ function passiveSections(view:View){
+  const groups:string[]=[];
+  if(['dashboard','events','stages','teacher','actions'].includes(view))groups.push('game_events');
+  if(['dashboard','grades','profile','stages','teacher'].includes(view))groups.push('game_evaluations');
+  if(['dashboard','stages','teacher'].includes(view))groups.push('game_crises');
+  if(['documents','stages','teacher'].includes(view))groups.push('game_documents');
+  if(['profile','teacher'].includes(view))groups.push('game_profiles');
+  if(chatOpenRef.current)groups.push('chat_channels');
+  return groups;
+ }
  // Only simultaneous first-entry reads share a promise; later refreshes recheck RLS.
  const initialCoreReads=useRef(new Map<string,Promise<void>>());
  const reusedEntryMemberScope=useRef('');
@@ -293,7 +305,7 @@ export function useRepublicGame(gameId:string){
   changedFormalIds.current.clear();changedVoteIds.current.clear();
   if(readReceipt.current.timer!==null)clearTimeout(readReceipt.current.timer);
   readReceipt.current={scope:'',timer:null,running:false,queued:false,lastAt:0};
-  assetSignatures.current.clear();lastCoreSuccessAt.current=0;
+  assetSignatures.current.clear();lastCoreSuccessAt.current=0;passiveSyncAt.current.clear();
   officeReadState.current={scope:'',lastSuccessAt:0,lastAttemptAt:0,inflight:null};
   invalidatePartyRows();
   if(overviewRealtimeTimer.current!==null){clearTimeout(overviewRealtimeTimer.current);overviewRealtimeTimer.current=null}
@@ -673,6 +685,14 @@ export function useRepublicGame(gameId:string){
    // stages and vote status through two scoped RLS reads.
    reconcileTables.add('session_recovery');
    if(!liveConnected){reconcileTables.add('game_stages');reconcileTables.add('game_votes')}
+   // Non-published data must not remain stale when full polling is removed.
+   // Recover just the visible screen's collections every 3 minutes.
+   const view=activeViewRef.current,lastPassive=passiveSyncAt.current.get(view)||lastCoreSuccessAt.current;
+   if(now-lastPassive>=180000){
+    const groups=passiveSections(view);
+    for(const table of groups)reconcileTables.add(table);
+    if(groups.length)passiveSyncAt.current.set(view,now);
+   }
    dirtyOverview=true;
    if(chatOpenRef.current){dirtyChat=true;dirtyPins=true}
    schedule();
@@ -777,7 +797,18 @@ export function useRepublicGame(gameId:string){
   },1500);
   return()=>clearTimeout(timer);
  },[gameId,me?.user_id,stages,metrics,events]);
- useEffect(()=>{if(me?.user_id)void hydrateActiveView(true);},[activeView,me?.user_id,gameId]);
+ useEffect(()=>{
+  if(!me?.user_id)return;
+  void hydrateActiveView(true);
+  const now=Date.now(),last=passiveSyncAt.current.get(activeView)||lastCoreSuccessAt.current;
+  if(lastCoreSuccessAt.current>0&&now-last>=180000){
+   const groups=passiveSections(activeView);
+   if(groups.length){
+    passiveSyncAt.current.set(activeView,now);
+    scheduleRealtimeReload(0,groups);
+   }
+  }
+ },[activeView,me?.user_id,gameId]);
  useEffect(()=>{if(chatOpen&&me?.user_id)void loadChatOverview();},[chatOpen,me?.user_id,gameId]);
 
  async function readIdentity(userId:string){
@@ -904,6 +935,40 @@ export function useRepublicGame(gameId:string){
    if(!readCurrent(ticket)){retryStale();return}
    requireSuccessful([ba]);for(const id of ids)changedVoteIds.current.delete(id);
    setBallots(previous=>[...previous.filter(row=>!ids.includes(row.vote_id)),...(ba.data||[]) as Ballot[]]);
+  }));
+  if(tables.has('game_events'))jobs.push(readSafely(['events'],async ticket=>{
+   const r=await limitedCoreRead(supabase.from('game_events').select('*')
+    .eq('game_id',gameId).order('published_at',{ascending:false}).limit(100));
+   if(!readCurrent(ticket))return;
+   requireSuccessful([r]);setEvents((r.data||[]) as EventItem[]);
+  }));
+  if(tables.has('game_documents'))jobs.push(readSafely(['documents'],async ticket=>{
+   const r=await limitedCoreRead(supabase.from('game_documents').select('*')
+    .eq('game_id',gameId).order('created_at',{ascending:false}));
+   if(!readCurrent(ticket))return;
+   requireSuccessful([r]);setDocuments((r.data||[]) as GameDocument[]);
+  }));
+  if(tables.has('game_crises'))jobs.push(readSafely(['crises'],async ticket=>{
+   const r=await limitedCoreRead(supabase.from('game_crises').select('*')
+    .eq('game_id',gameId).order('created_at',{ascending:false}));
+   if(!readCurrent(ticket))return;
+   requireSuccessful([r]);setCrises((r.data||[]) as Crisis[]);
+  }));
+  if(tables.has('game_profiles'))jobs.push(readSafely(['profiles'],async ticket=>{
+   const r=await limitedCoreRead(supabase.from('game_profiles').select('*').eq('game_id',gameId));
+   if(!readCurrent(ticket))return;
+   requireSuccessful([r]);
+   setProfiles(previous=>((r.data||[]) as GameProfile[]).map(row=>{
+    const old=previous.find(p=>p.user_id===row.user_id);
+    return {...row,avatar_url:old?.avatar_path===row.avatar_path?old?.avatar_url:null,
+     signature_url:old?.signature_path===row.signature_path?old?.signature_url:null};
+   }));
+  }));
+  if(tables.has('chat_channels'))jobs.push(readSafely(['channels'],async ticket=>{
+   const r=await limitedCoreRead(supabase.from('chat_channels').select('*')
+    .eq('game_id',gameId).order('name'));
+   if(!readCurrent(ticket))return;
+   requireSuccessful([r]);setChannels((r.data||[]) as Channel[]);
   }));
   if(tables.has('game_evaluations'))jobs.push(readSafely(['evaluations'],async ticket=>{
    const result=await limitedCoreRead(supabase.from('game_evaluations').select('*')
