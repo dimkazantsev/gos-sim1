@@ -2576,8 +2576,9 @@ export function useRepublicGame(gameId:string){
  // never change Storage RLS. Official document signatures are a separate path.
  async function loadOwnSignaturePreview():Promise<string|null>{
   const uid=authUser.current,member=acceptedMember.current;
-  if(!uid||!member||member.user_id!==uid||member.kind==='observer'||activeGameRef.current!==gameId)return null;
-  const own=profiles.find(row=>row.user_id===uid);
+  if(!uid||!member||member.user_id!==uid||member.game_id!==gameId||
+     member.kind==='observer'||activeGameRef.current!==gameId||profileGameId!==gameId)return null;
+  const own=profiles.find(row=>row.user_id===uid&&row.game_id===gameId);
   if(!own?.signature_path)return null;
   const epoch=readEpoch.current;
   const url=await signedAssetUrl('game-assets',own.signature_path);
