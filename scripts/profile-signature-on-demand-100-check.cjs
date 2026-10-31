@@ -34,12 +34,21 @@ async function main(){
   await Promise.all(clients.map(h=>h.render().loadOwnSignaturePreview()));
   assert.equal(clients.reduce((sum,h)=>sum+h.assetStats().signed,0),100,
    'Repeating preview in the same session reuses the cached signed URL');
-  const denied=clients[0];
+  // The shared hook fixture treats non-default student identities as
+  // students regardless of the fixture's teacher-specific setMemberKind flag.
+  // Use its authoritative default identity to exercise a real observer role.
+  const denied=harness({effects:true});
   denied.setMemberKind('observer');
-  await denied.render().refresh();await denied.settle();
-  assert.equal(await denied.render().loadOwnSignaturePreview(),null,
-   'Observer cannot preview a profile signature');
-  assert.equal(denied.assetStats().signed,1,'Denied preview does not access Storage');
+  denied.fixture('game_profiles',[{game_id:'game-a',user_id:'teacher-a',
+   avatar_path:null,signature_path:'game-a/profiles/teacher-a/signature.png'}]);
+  try{
+   await denied.settle();
+   denied.render().setActiveView('profile');await denied.settle();
+   assert.equal(denied.render().me?.kind,'observer','Fixture must actually be observer');
+   assert.equal(await denied.render().loadOwnSignaturePreview(),null,
+    'Observer cannot preview a profile signature');
+   assert.equal(denied.assetStats().signed,0,'Denied preview does not access Storage');
+  }finally{denied.dispose()}
   console.log('PASS: 100 simulated players, 1,200 stored signatures: 0 eager requests; 100 opt-in requests, 0 repeated; observer denied.');
   console.log('Note: mocked Supabase transport, not an actual 100-player production stress test.');
  }finally{clients.forEach(h=>h.dispose())}
