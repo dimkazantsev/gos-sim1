@@ -84,6 +84,8 @@ export function useRepublicGame(gameId:string){
  const overviewRealtimeTimer=useRef<ReturnType<typeof setTimeout>|null>(null);
  const readReceipt=useRef({scope:'',timer:null as ReturnType<typeof setTimeout>|null,running:false,queued:false,lastAt:0});
  const lastRealtimeOverviewAt=useRef(0);
+ // Share only in-flight overview reads across chat, Realtime and reconnect handlers.
+ const chatOverviewReads=useRef(new Map<string,Promise<ChatOverview[]>>());
  function scheduleRealtimeChatOverview(){
   if(overviewRealtimeTimer.current!==null)return;
   // Message bodies arrive via the game Realtime socket; this RPC updates
@@ -262,6 +264,7 @@ export function useRepublicGame(gameId:string){
  function formalVersion(rows:FormalDocument[]){return rows.length?rows.map(d=>d.id+':'+d.updated_at).sort().join('|'):'empty'}
  function clearGameData(){
   formalFullVersion.current='';acceptedMember.current=null;
+  chatOverviewReads.current.clear();
   rosterReads.current.clear();
   realtimeDirtyTables.current.clear();
   changedFormalIds.current.clear();changedVoteIds.current.clear();
@@ -1496,15 +1499,20 @@ export function useRepublicGame(gameId:string){
  }
 
  async function loadChatOverview(){
-  const result=await readSafely(['overview'],async ticket=>{
-  const r=await limitedCoreRead(supabase.rpc('get_my_chat_overview',{p_game_id:gameId}));
-  if(!readCurrent(ticket))return [] as ChatOverview[];
-  requireSuccessful([r]);
-  const rows=(r.data||[]) as ChatOverview[];
-  setChatOverview(rows);
-  return rows;
+  const uid=authUser.current;
+  if(!uid)return [];
+  const scope=gameId+':'+uid+':'+readEpoch.current;
+  return coalesceInFlight(chatOverviewReads.current,scope,async()=>{
+   const result=await readSafely(['overview'],async ticket=>{
+    const r=await limitedCoreRead(supabase.rpc('get_my_chat_overview',{p_game_id:gameId}));
+    if(!readCurrent(ticket))return [] as ChatOverview[];
+    requireSuccessful([r]);
+    const rows=(r.data||[]) as ChatOverview[];
+    setChatOverview(rows);
+    return rows;
+   });
+   return result||[];
   });
-  return result||[];
  }
  async function markChatRead(cid:string){
   const uid=authUser.current;
