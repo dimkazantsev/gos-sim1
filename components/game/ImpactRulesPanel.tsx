@@ -235,9 +235,9 @@ export default function ImpactRulesPanel({g,initialTab='rules',initialExpandedRu
     </div></div>
    <div className="impactLedger">
     {filteredHistory.length===0?<div className="impactEmpty">Записей по выбранному фильтру пока нет.</div>:
-     filteredHistory.slice(0,50).map(entry=><LedgerRow key={entry.id} g={g} entry={entry} rule={impactRules.find(r=>r.rule_key===entry.rule_key)}/>)}
+     filteredHistory.slice(0,10).map(entry=><LedgerRow key={entry.id} g={g} entry={entry} rule={impactRules.find(r=>r.rule_key===entry.rule_key)}/>)}
    </div>
-   {filteredHistory.length>50&&<p className="impactListCount">Показаны последние 50 из {filteredHistory.length} записей.</p>}
+   {filteredHistory.length>10&&<p className="impactListCount">Показаны последние 10 из {filteredHistory.length} записей.</p>}
   </div>
  </section>;
 }
