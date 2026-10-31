@@ -131,6 +131,7 @@ const env={
  gameId:'simulation',
  schedule(){changed++},
  liveConnected:true,lastPollAt:clock,disposed:false,reconcileTables:new Set(),dirtyOverview:false,dirtyChat:false,dirtyPins:false,
+ activeViewRef:{current:'dashboard'},passiveSyncAt:{current:new Map()},lastFullPresentationAt:{current:clock},passiveSections:()=>['game_events','game_evaluations','game_crises'],
  backendRecoveryAfter:{current:0},
  officeReadState:{current:{lastSuccessAt:0,lastAttemptAt:0,inflight:null}},
  loadRepublicOffices:()=>Promise.resolve(),
