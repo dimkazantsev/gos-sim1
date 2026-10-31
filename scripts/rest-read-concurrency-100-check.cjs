@@ -31,8 +31,8 @@ async function exercise(index){
  const c=tab(index),url=origin+'/rest/v1/game_members?game_id=eq.abc';
  const jobs=Array.from({length:18},(_,i)=>c.fetch(url+'&page='+i));
  await settle();
- assert.equal(c.count.readStarted,4,'At most four reads may start in a tab');
- assert.equal(c.count.peakRead,4,'Peak read concurrency bounded');
+ assert.equal(c.count.readStarted,3,'At most three optional reads may start in a tab');
+ assert.equal(c.count.peakRead,3,'Peak read concurrency bounded');
  // Critical transactions must bypass queued GETs.
  const [write,auth]=await Promise.all([c.fetch(origin+'/rest/v1/rpc/cast_vote',{method:'POST'}),c.fetch(origin+'/auth/v1/user')]);
  assert.equal(write.status,201);assert.equal(auth.status,200);
@@ -42,7 +42,7 @@ async function exercise(index){
  const result=await Promise.all(jobs);
  assert.ok(result.every(r=>r.status===200));
  assert.equal(c.count.readStarted,18);
- assert.equal(c.count.peakRead,4);
+ assert.equal(c.count.peakRead,3);
  return c.count;
 }
 (async()=>{
@@ -57,7 +57,7 @@ async function exercise(index){
  const denied=await c.fetch(url+'?overflow=yes');
  assert.equal(denied.status,503,'Bounded waiting queue rejects excess work locally');
  assert.equal(denied.headers.get('x-gos-local-limit'),'1');
- assert.equal(c.count.readStarted,4,'Overload must not cause extra network traffic');
+ assert.equal(c.count.readStarted,3,'Overload must not cause extra network traffic');
  // These procedures really write to PostgreSQL despite their get_* names.
  const changing=['get_budget_pulse','get_fiscal_context','blitz_inbox_counts'];
  for(const name of changing){
@@ -70,7 +70,8 @@ async function exercise(index){
  c.unhold();
  while(c.pending.length){c.pending.splice(0).forEach(f=>f());await settle()}
  const result=await Promise.all(jobs);
- assert.equal(result.filter(r=>r.status===200).length,51);
- assert.equal(c.count.readStarted,51);
- console.log('PASS 100 synthetic clients: <=4 GET/readonly RPC per tab, 1800 responses; Auth/votes bypass; abort and backlog protection; no live load.');
+ assert.equal(result.filter(r=>r.status===200).length,27,'Only 3 running and 24 queued reads are admitted');
+  assert.equal(result.filter(r=>r.status===503).length,24,'24 excess reads are rejected locally');
+ assert.equal(c.count.readStarted,27);
+ console.log('PASS 100 synthetic clients: <=3 GET/readonly RPC per tab, 1800 responses; 24 queued and excess locally rejected; Auth/votes bypass; abort protection; no live load.');
 })().catch(error=>{console.error(error);process.exitCode=1});
