@@ -1204,9 +1204,11 @@ export function useRepublicGame(gameId:string){
   const uid=authUser.current;
   if(!uid)return loadCoreSections();
   const key=gameId+':'+uid+':'+readEpoch.current;
-  // Coalesce simultaneous scoped core refreshes, not only first entry.
-   // A later refresh after this promise settles revalidates access as before.
-   return coalesceInFlight(initialCoreReads.current,key,loadCoreSections);
+  // Avoid concurrent initial entry reads. Subsequent explicit core refreshes
+   // must still be authoritative, even when another screen is hydrating.
+   if(lastCoreSuccessAt.current===0||initialCoreReads.current.has(key))
+    return coalesceInFlight(initialCoreReads.current,key,loadCoreSections);
+   return loadCoreSections();
  }
 
  async function hydrateActiveView(allowFreshCore=false,forceOffices=false){
@@ -2020,7 +2022,7 @@ export function useRepublicGame(gameId:string){
    }
    }finally{
     if(presenceInFlight.current===scope)presenceInFlight.current='';
-    if(pendingPresenceWrite.current?.scope===scope&&presenceFlushTimer.current===null){
+    if((pendingPresenceWrite.current as {scope:string;view:string;label?:string}|null)?.scope===scope&&presenceFlushTimer.current===null){
      presenceFlushTimer.current=setTimeout(()=>{
       presenceFlushTimer.current=null;
       const pending=pendingPresenceWrite.current;pendingPresenceWrite.current=null;
