@@ -543,6 +543,36 @@ async function main(){
   await down.render().refresh();down.render().setActiveView('parties');await down.settle();
   assert.equal(down.readCount('party_invitations'),0,'No fallbacks on overload');down.dispose();
  });
+  await check('40 rapid navigations coalesce SQL presence and preserve the latest screen',async()=>{
+   const clients=Array.from({length:40},(_,i)=>{const h=harness();h.setUser('student-'+i);return h});
+   try{
+    await Promise.all(clients.map(h=>h.render().refresh()));
+    await Promise.all(clients.map(async h=>{
+     const before=h.rpcCount('record_my_game_presence');
+     await h.render().touchPresence('dashboard','Панель');
+     await h.render().touchPresence('stages','Этапы');
+     await h.render().touchPresence('votes','Голосование');
+     assert.equal(h.rpcCount('record_my_game_presence'),before+1,'Fast navigation should not issue repeated SQL writes');
+    }));
+    await Promise.all(clients.map(h=>h.advance(13000)));
+    for(const h of clients){
+     assert.equal(h.rpcCount('record_my_game_presence'),2,'Only first and latest views are persisted');
+     await h.render().touchPresence('votes','Голосование');
+     assert.equal(h.rpcCount('record_my_game_presence'),2,'Same-view heartbeat remains cached for 60 seconds');
+    }
+   }finally{clients.forEach(h=>h.dispose())}
+  });
+  await check('Membership recovery keeps scoped reads and bounded core single-flight',async()=>{
+   const source=fs.readFileSync(path.join(root,'components/game/useRepublicGame.ts'),'utf8');
+   const begin=source.indexOf("if(tables.has('game_members'))"),end=source.indexOf('const view=activeViewRef.current;',begin);
+   assert(begin>=0&&end>begin,'Member reconciliation branch must exist');
+   const path=source.slice(begin,end);
+   assert(path.includes("new Set(['session_recovery'])"),'Identity is rechecked under RLS');
+   assert(path.includes("loadMemberRoster()"),'Only scoped roster rows are reloaded');
+   assert(!path.includes('hydrateActiveView('),'Membership signal must not reload the whole entry bundle');
+   assert(source.includes('const BOOTSTRAP_TIMEOUT_MS=20000'),'The bounded client request no longer times out after 12 seconds');
+   assert(source.includes("coalesceInFlight(initialCoreReads.current,key,loadCoreSections)"));
+  });
   await check('100 simulated players submit one presence plus one navigation event in one network call',async()=>{
   const clients=Array.from({length:100},()=>harness());
   try{
