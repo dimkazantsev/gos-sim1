@@ -1059,7 +1059,7 @@ export function useRepublicGame(gameId:string){
     setFormalDocuments(previous=>mergeFormalDocumentSummaries(previous,summaries));
    }));
   }
-  if(tables.has('political_posts')&&(view==='actions'||view==='dashboard'))jobs.push(loadPoliticalWall());
+  if(tables.has('political_posts')&&view==='actions')jobs.push(loadPoliticalWall());
   if([...tables].some(table=>['party_invitations','party_chair_ballots','game_parties'].includes(table))
     &&(view==='parties'||view==='teacher'))jobs.push(loadPartyRepresentation(false));
   await Promise.allSettled(jobs);
@@ -1263,9 +1263,11 @@ export function useRepublicGame(gameId:string){
   if(view==='teacher')jobs.push(loadPartyDossierRows());
   if(view==='parties'||view==='teacher')jobs.push(loadPartyRepresentation(false));
   if(view==='documents')jobs.push(loadFormalRegistry());
-  // The entry RPC already delivers party summaries. On dashboard, wait for it
-  // before the political wall reads the same parties from its scoped cache.
-  if(view==='actions'||view==='dashboard')
+  // The entry RPC already delivers party summaries. On the overview, a
+  // separate four-post RLS read supplies the visible feed; never hydrate the
+  // 10-post political process, media, histories and support datasets there.
+  // When opening Political Process, wait for the initial party snapshot.
+  if(view==='actions')
    jobs.push(core?core.then(()=>loadPoliticalWall()):loadPoliticalWall());
   if(view==='teacher')jobs.push(loadClassroomTelemetry(),loadImpactEngine());
   if(chatOpenRef.current)jobs.push(loadChatOverview());
