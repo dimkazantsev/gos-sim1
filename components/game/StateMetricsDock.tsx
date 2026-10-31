@@ -67,7 +67,7 @@ export default function StateMetricsDock({g,initialSelectedMetricId='',initialCo
  const historyCursor=useRef(new Map<string,{recorded_at:string;id:number}>());
  const historyLoaded=useRef(new Set<string>());
  const historyPending=useRef(new Set<string>());
- const historyScope=useRef(game?.id+':'+g.me?.user_id);
+ const historyScope=useRef(game?.id+':'+g.me?.user_id+':'+g.me?.kind+':'+(g.me?.role_title||''));
  const [bucket,setBucket]=useState<'changes'|'day'|'week'>('changes');
  const plotRef=useRef<HTMLDivElement>(null);
  const [plotWidth,setPlotWidth]=useState(700);
@@ -221,12 +221,12 @@ export default function StateMetricsDock({g,initialSelectedMetricId='',initialCo
  };
  useEffect(()=>{
   // A new game or account may use a different RLS scope.
-  historyScope.current=game?.id+':'+g.me?.user_id;
+  historyScope.current=game?.id+':'+g.me?.user_id+':'+g.me?.kind+':'+(g.me?.role_title||'');
   historyCursor.current.clear();historyLoaded.current.clear();historyPending.current.clear();
   setHistoryPages({});setHistoryMore({});setHistoryLoading({});setHistoryError('');
   linkedPostsRequested.current.clear();setLinkedPostTitles({});
   linkedPostRequest.current++;linkedPostCache.current.clear();setLinkedPostPreview(null);
- },[game?.id,g.me?.user_id]);
+ },[game?.id,g.me?.user_id,g.me?.kind,g.me?.role_title]);
  useEffect(()=>{
   if(!selected||!game?.id)return;
   for(const metricKey of activeHistoryKeys.split('|').filter(Boolean))
