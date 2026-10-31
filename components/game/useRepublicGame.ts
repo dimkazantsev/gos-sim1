@@ -85,6 +85,7 @@ export function useRepublicGame(gameId:string){
  const lastCoreSuccessAt=useRef(0);
  // Only simultaneous first-entry reads share a promise; later refreshes recheck RLS.
  const initialCoreReads=useRef(new Map<string,Promise<void>>());
+ const reusedEntryMemberScope=useRef('');
  // Avoid amplifying PostgREST pool/statement timeouts with repeated 15-table reads.
  const backendRecoveryAfter=useRef(0);
  const overviewRealtimeTimer=useRef<ReturnType<typeof setTimeout>|null>(null);
@@ -284,6 +285,7 @@ export function useRepublicGame(gameId:string){
   chatOverviewReads.current.clear();
   rosterReads.current.clear();
   initialCoreReads.current.clear();
+  reusedEntryMemberScope.current='';
   realtimeDirtyTables.current.clear();
   changedFormalIds.current.clear();changedVoteIds.current.clear();
   if(readReceipt.current.timer!==null)clearTimeout(readReceipt.current.timer);
@@ -932,9 +934,12 @@ export function useRepublicGame(gameId:string){
    // Entry identity was just verified by the server. Do not request the same
    // personal member row a second time before the first core snapshot.
    // Every subsequent core refresh reads it again to detect role changes.
-   const entryMember=lastCoreSuccessAt.current===0&&
+   const entryScope=gameId+':'+uid+':'+readEpoch.current;
+   const entryMember=lastCoreSuccessAt.current===0&&reusedEntryMemberScope.current!==entryScope&&
     acceptedMember.current?.game_id===gameId&&acceptedMember.current?.user_id===uid
      ?acceptedMember.current:null;
+   // Even if the first request fails, a later retry rechecks the current role.
+   if(entryMember)reusedEntryMemberScope.current=entryScope;
    const [bundle,m,mb,pa,intro]=await Promise.all([
     (async()=>{
      const primary=await limitedCoreRead(supabase.rpc('get_game_bootstrap_v3',{p_game_id:gameId}));
