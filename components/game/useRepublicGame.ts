@@ -1219,7 +1219,8 @@ export function useRepublicGame(gameId:string){
       else acceptPartyDocuments((data||[]) as PartyDocument[],ticket);
      })
     :Promise.resolve();
-   const profileQuery=includeDocuments
+   const includeProfileBio=activeViewRef.current==='profile';
+   const profileQuery=!includeProfileBio
      ?supabase.from('game_profiles').select(PROFILE_ASSET_COLUMNS).eq('game_id',gameId)
      :supabase.from('game_profiles').select('*').eq('game_id',gameId);
     const profileRead=Promise.resolve(profileQuery).then(({data,error})=>{
@@ -1228,7 +1229,7 @@ export function useRepublicGame(gameId:string){
    if(readCurrent(ticket,'profiles')){
     const rows=(data||[]) as unknown as GameProfile[];
     setProfiles(previous=>{
-     const source=includeDocuments?mergeProfileAssetRows(previous,rows as ProfileAssetRow[]):rows;
+     const source=!includeProfileBio?mergeProfileAssetRows(previous,rows as ProfileAssetRow[]):rows;
      return source.map(row=>{
       const old=previous.find(p=>p.user_id===row.user_id);
       return {...row,avatar_url:old?.avatar_path===row.avatar_path?old?.avatar_url||null:null,
