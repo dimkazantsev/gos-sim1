@@ -35,6 +35,21 @@ const BOOTSTRAP_TIMEOUT_MS=20000;
 const RECONCILE_TIMEOUT_MS=30000;
 const PRESENTATION_CACHE_TTL_MS=600000;
 const SESSION_BOOTSTRAP_TIMEOUT_MS=16000;
+// Keep one shared budget per browser tab, including a new game channel after a
+// role/session change. Supabase Free limits each client to five Presence calls
+// in a rolling 30-second window (track and untrack both count).
+// Reserve only four to leave a margin for transport-level state transitions.
+const PRESENCE_RATE_WINDOW_MS=30000;
+const PRESENCE_RATE_CALL_LIMIT=4;
+const presenceCallTimes:number[]=[];
+function reservePresenceCall(now:number):number{
+ while(presenceCallTimes.length&&presenceCallTimes[0]<=now-PRESENCE_RATE_WINDOW_MS)
+  presenceCallTimes.shift();
+ if(presenceCallTimes.length>=PRESENCE_RATE_CALL_LIMIT)
+  return Math.max(1,PRESENCE_RATE_WINDOW_MS-(now-presenceCallTimes[0])+1);
+ presenceCallTimes.push(now);
+ return 0;
+}
 // Explicit projection avoids transferring unused ballot timestamps to every classroom client.
 const GAME_BALLOT_COLUMNS='vote_id,voter_id,choice,weight,yes_weight,no_weight,abstain_weight';
 // No role, seniority, score or archived-membership fields may be omitted.
@@ -627,10 +642,23 @@ export function useRepublicGame(gameId:string){
   // Supabase assigns an ephemeral presence key. Never publish user IDs, roles,
   // names, current pages or other personally identifying game data.
   let networkPresenceTracked=false,networkPresencePending=false,networkPresenceEpoch=0;
+  let networkPresenceTimer:ReturnType<typeof setTimeout>|null=null;
   function syncNetworkPresence(){
    if(!currentConnection()||!liveConnected||networkPresencePending)return;
    const shouldTrack=document.visibilityState==='visible';
    if(shouldTrack===networkPresenceTracked)return;
+   if(networkPresenceTimer!==null)return;
+   // Repeated browser visibility changes or reconnects must never close the
+   // private room with ClientPresenceRateLimitReached. Keep the latest desired
+   // state; one delayed request is enough, without a retry loop.
+   const delay=reservePresenceCall(Date.now());
+   if(delay>0){
+    networkPresenceTimer=setTimeout(()=>{
+     networkPresenceTimer=null;
+     syncNetworkPresence();
+    },delay);
+    return;
+   }
    const requestEpoch=networkPresenceEpoch;
    networkPresencePending=true;
    let succeeded=false;
@@ -745,7 +773,7 @@ export function useRepublicGame(gameId:string){
    chatRecovery=setInterval(recoverVisibleChatAndBallots,6000);
   },initialRecoveryDelay);
   return()=>{
-   disposed=true;clearTimeout(timer);clearTimeout(partyDocumentBurstTimer);clearInterval(poll);clearTimeout(startChatRecovery);
+   disposed=true;clearTimeout(timer);clearTimeout(partyDocumentBurstTimer);if(networkPresenceTimer!==null)clearTimeout(networkPresenceTimer);clearInterval(poll);clearTimeout(startChatRecovery);
    if(chatRecovery!==null)clearInterval(chatRecovery);
    document.removeEventListener('visibilitychange',resumePending);
    setGameRealtimeConnection(gameId,false);
