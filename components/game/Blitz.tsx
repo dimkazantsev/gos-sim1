@@ -5,10 +5,12 @@ import {createPortal} from 'react-dom';
 import {RefreshCw,X} from 'lucide-react';
 import {useDialog} from '../ui/useDialog';
 import {supabase} from '@/lib/supabase';
+import {blitzBoundedRequest} from './blitzRequest';
 type Row={server_now?:string;remaining_at_receipt?:number;receipt_monotonic?:number;id:string;question:string|null;topic:string;options:string[]|null;stage_no:number;available_at?:string;started_at?:string|null;deadline?:string;answered_at?:string|null;chosen_index?:number|null;correct_index?:number|null;is_correct?:boolean|null;explanation?:string|null;legal_act?:string|null;article?:string|null;source_url?:string|null};
 // Серверные часы определяют оставшийся срок; время телефона не используется как доказательство.
 const BLITZ_RECEIVE_GRACE_MS=2000;
 const BLITZ_CHOICE_WINDOW_MS=20_000;
+const BLITZ_UNCONFIRMED='Сервер не подтвердил результат. Ответ мог сохраниться. Проверьте его в истории блиц-вопросов.';
 const blitzClockNow=()=>typeof performance==='undefined'?Date.now():performance.now();
 function withBlitzClock(row:Row,sentAt:number):Row{
  const receivedAt=blitzClockNow();
@@ -31,11 +33,11 @@ const legal=(r:Row)=>r.source_url&&/^https:\/\//.test(r.source_url)?<a href={r.s
 export function BlitzOverlay({gameId,userId,stageKey='',enabled}:{gameId:string;userId?:string;stageKey?:string;enabled:boolean}){
  const refreshBusy=useRef(false),answerBusy=useRef(false),selectedQueued=useRef('');
  const timeoutFinalized=useRef('');
- const since=useRef(new Date().toISOString()),issuedDay=useRef('');
+ const since=useRef(new Date().toISOString()),issuedDay=useRef(''),issueRetryAfter=useRef(0);
  const archiveShowing=useRef(false);
  useEffect(()=>{const opened=()=>{archiveShowing.current=true},closed=()=>{archiveShowing.current=false};window.addEventListener('blitz:archive-open',opened);window.addEventListener('blitz:archive-close',closed);return()=>{window.removeEventListener('blitz:archive-open',opened);window.removeEventListener('blitz:archive-close',closed)}},[]);
  const [card,setCard]=useState<Row|null>(null),[feedback,setFeedback]=useState<Row|null>(null),[time,setTime]=useState(20),[busy,setBusy]=useState(false),[error,setError]=useState('');
- useEffect(()=>{since.current=new Date().toISOString();issuedDay.current='';setCard(null);setFeedback(null)},[gameId,userId]);
+ useEffect(()=>{since.current=new Date().toISOString();issuedDay.current='';issueRetryAfter.current=0;setCard(null);setFeedback(null)},[gameId,userId]);
  useEffect(()=>{
   if(!enabled||card||feedback)return;
   let stopped=false;
@@ -46,16 +48,22 @@ export function BlitzOverlay({gameId,userId,stageKey='',enabled}:{gameId:string;
    try{
     // Assignment preparation is idempotent, but its backfill must not run on every delivery check.
     const day=gameId+':'+(userId||'')+':'+stageKey+':'+new Date().toLocaleDateString('en-CA',{timeZone:'Europe/Moscow'});
-    if(!selectedId&&issuedDay.current!==day){
-     issuedDay.current=day;
-     const issued=await supabase.rpc('blitz_issue_today',{p_game:gameId});
-     if(!stopped&&!issued.error&&issued.data>0)window.dispatchEvent(new Event('blitz:updated'));
+    if(!selectedId&&issuedDay.current!==day&&Date.now()>=issueRetryAfter.current){
+     // Offline scheduler recovers failed backfills. Avoid retry storms.
+     try{
+      const issued=await blitzBoundedRequest(signal=>
+       supabase.rpc('blitz_issue_today',{p_game:gameId}).abortSignal(signal));
+      if(!issued.error){
+       issuedDay.current=day;
+       if(!stopped&&issued.data>0)window.dispatchEvent(new Event('blitz:updated'));
+      }else issueRetryAfter.current=Date.now()+300_000;
+     }catch{issueRetryAfter.current=Date.now()+300_000}
     }
     if(stopped||document.visibilityState!=='visible')return;
     const requestedAt=blitzClockNow();
-    const result=selectedId
-     ?await supabase.rpc('blitz_open_selected',{p_id:selectedId})
-     :await supabase.rpc('blitz_open_recent',{p_game:gameId,p_not_before:since.current});
+    const result=await blitzBoundedRequest(signal=>selectedId
+     ?supabase.rpc('blitz_open_selected',{p_id:selectedId}).abortSignal(signal)
+     :supabase.rpc('blitz_open_recent',{p_game:gameId,p_not_before:since.current}).abortSignal(signal));
     if(stopped)return;
     if(result.error){if(selectedId)setError(userError(result.error));return}
     if(result.data){
@@ -64,6 +72,8 @@ export function BlitzOverlay({gameId,userId,stageKey='',enabled}:{gameId:string;
      setTime(remainingBlitzSeconds(question));
      setError('');
     }else if(selectedId){setError('Вопрос уже закрыт или недоступен. Обновите историю.');window.dispatchEvent(new Event('blitz:updated'))}
+   }catch(e){
+    if(selectedId&&!stopped)setError(userError(e));
    }finally{
     refreshBusy.current=false;
     const queued=selectedQueued.current;selectedQueued.current='';
@@ -83,7 +93,17 @@ export function BlitzOverlay({gameId,userId,stageKey='',enabled}:{gameId:string;
   return()=>{stopped=true;window.clearTimeout(first);window.clearInterval(id);window.removeEventListener('blitz:open',request);document.removeEventListener('visibilitychange',resume)}
  },[gameId,userId,stageKey,enabled,!!card,!!feedback]);
  useEffect(()=>{if(!card?.deadline)return;const f=()=>setTime(remainingBlitzSeconds(card));f();const id=setInterval(f,250);return()=>clearInterval(id)},[card?.deadline]);
- async function answer(choice:number){if(!card||answerBusy.current||busy||feedback||(choice>=0&&time===0))return;answerBusy.current=true;setBusy(true);try{const r=await supabase.rpc('blitz_answer',{p_id:card.id,p_choice:choice});if(r.error)setError(userError(r.error));else{setError('');setFeedback({...card,...r.data});window.dispatchEvent(new Event('blitz:updated'))}}catch(e){setError((userError(e)||'Ответ не отправлен. Повторите попытку.'))}finally{answerBusy.current=false;setBusy(false)}}
+ async function answer(choice:number){
+  if(!card||answerBusy.current||busy||feedback||(choice>=0&&time===0))return;
+  answerBusy.current=true;setBusy(true);setError('');
+  try{
+   const r=await blitzBoundedRequest(signal=>
+    supabase.rpc('blitz_answer',{p_id:card.id,p_choice:choice}).abortSignal(signal));
+   if(r.error||!r.data)setError(choice<0||time===0?BLITZ_UNCONFIRMED:userError(r.error||new Error('Нет подтверждения ответа')));
+   else{setError('');setFeedback({...card,...r.data});window.dispatchEvent(new Event('blitz:updated'))}
+  }catch(e){setError(choice<0||time===0?BLITZ_UNCONFIRMED:userError(e))}
+  finally{answerBusy.current=false;setBusy(false)}
+ }
  // Не закрываем попытку на 20-й секунде: ответ мог быть отправлен и находиться в сети.
  useEffect(()=>{
   if(!card?.deadline||feedback||busy||timeoutFinalized.current===card.id)return;
@@ -105,6 +125,7 @@ export function BlitzOverlay({gameId,userId,stageKey='',enabled}:{gameId:string;
   <div className="blitzAnswers">{(card.options||[]).map((option,i)=><button key={i} type="button" disabled={busy||!!feedback||time===0} onClick={()=>void answer(i)} className={feedback?(i===feedback.correct_index?'correct':i===feedback.chosen_index?'incorrect':''):''}>{option}</button>)}</div>
   {feedback&&<footer><p><b>{feedback.is_correct?'Правильно':'Ответ неверный или время истекло.'}</b> {feedback.explanation}</p>{legal(feedback)}<button type="button" className="primary" onClick={()=>{setCard(null);setFeedback(null);setError('')}}>Продолжить игру</button></footer>}
   {error&&<p role="alert">{error}</p>}
+  {!feedback&&time===0&&!busy&&error&&<button type="button" className="secondary" onClick={()=>{setCard(null);setError('')}}>Закрыть вопрос · Проверить результат в истории</button>}
  </section></div>;
 }
 export function BlitzArchive({gameId,userId,open,onClose}:{gameId:string;userId:string;open:boolean;onClose:()=>void}){
@@ -121,7 +142,7 @@ export function BlitzArchive({gameId,userId,open,onClose}:{gameId:string;userId:
   activeLock.current=true;setActiveError('');
   try{
    const requestedAt=blitzClockNow();
-   const result=await supabase.rpc('blitz_open_selected',{p_id:id});
+   const result=await blitzBoundedRequest(signal=>supabase.rpc('blitz_open_selected',{p_id:id}).abortSignal(signal));
    if(result.error){setActiveError(userError(result.error));void refresh();return;}
    if(!result.data){setActiveError('Вопрос уже закрыт или недоступен.');void refresh();return;}
    const question=withBlitzClock(result.data as Row,requestedAt);
@@ -134,10 +155,10 @@ export function BlitzArchive({gameId,userId,open,onClose}:{gameId:string;userId:
   if(!active||activeFeedback||answerBusy||activeLock.current||(choice>=0&&activeSeconds===0))return;
   activeLock.current=true;setAnswerBusy(true);setActiveError('');
   try{
-   const result=await supabase.rpc('blitz_answer',{p_id:active.id,p_choice:choice});
-   if(result.error)setActiveError('Ответ не сохранён: '+userError(result.error));
+   const result=await blitzBoundedRequest(signal=>supabase.rpc('blitz_answer',{p_id:active.id,p_choice:choice}).abortSignal(signal));
+   if(result.error||!result.data)setActiveError(activeSeconds===0||choice<0?BLITZ_UNCONFIRMED:'Нет подтверждения ответа: '+userError(result.error||new Error('Нет ответа сервера')));
    else{setActiveFeedback({...active,...result.data});window.dispatchEvent(new Event('blitz:updated'));}
-  }catch(e){setActiveError((userError(e)||'Ответ не отправлен.'))}
+  }catch(e){setActiveError(activeSeconds===0||choice<0?BLITZ_UNCONFIRMED:userError(e))}
   finally{activeLock.current=false;setAnswerBusy(false);}
  }
  useEffect(()=>{
@@ -165,19 +186,26 @@ export function BlitzArchive({gameId,userId,open,onClose}:{gameId:string;userId:
  const load=useCallback(async(next=0)=>{
   const token=++request.current;
   setLoading(true);setError('');
-  const r=await supabase.rpc('blitz_archive_filtered',{p_game:gameId,p_student:userId,p_state:filter,p_offset:next,p_limit:30});
-  if(token!==request.current)return;
-  if(r.error)setError('Не удалось загрузить блиц-вопросы. Повторите запрос.');
-  else{
-   const page=Array.isArray(r.data)?r.data as Row[]:[];
-   setRows(old=>next?[...old.filter(x=>!page.some(y=>y.id===x.id)),...page]:page);
-   setOffset(next+page.length);setHasMore(page.length===30);
-  }
-  setLoading(false);
+  try{
+   const r=await blitzBoundedRequest(signal=>
+    supabase.rpc('blitz_archive_filtered',{p_game:gameId,p_student:userId,p_state:filter,p_offset:next,p_limit:30}).abortSignal(signal));
+   if(token!==request.current)return;
+   if(r.error)setError('Не удалось загрузить блиц-вопросы. Повторите запрос.');
+   else{
+    const page=Array.isArray(r.data)?r.data as Row[]:[];
+    setRows(old=>next?[...old.filter(x=>!page.some(y=>y.id===x.id)),...page]:page);
+    setOffset(next+page.length);setHasMore(page.length===30);
+   }
+  }catch(e){
+   if(token===request.current)setError(userError(e));
+  }finally{if(token===request.current)setLoading(false)}
  },[gameId,userId,filter]);
  const refresh=useCallback(async()=>{
-  const r=await supabase.rpc('blitz_inbox_counts',{p_game:gameId});
-  if(!r.error&&r.data)setCounts(r.data as typeof counts);
+  try{
+   const r=await blitzBoundedRequest(signal=>
+    supabase.rpc('blitz_inbox_counts',{p_game:gameId}).abortSignal(signal));
+   if(!r.error&&r.data)setCounts(r.data as typeof counts);
+  }catch{/* Counter failure must not prevent loading the history. */}
   await load(0);
  },[gameId,load]);
  useEffect(()=>{setRows([]);setOffset(0);setHasMore(false);if(open)void refresh();return()=>{request.current++}},[gameId,userId,filter,open,refresh]);
@@ -224,6 +252,7 @@ export function BlitzArchive({gameId,userId,open,onClose}:{gameId:string;userId:
         className={activeFeedback?(i===activeFeedback.correct_index?'correct':i===activeFeedback.chosen_index?'incorrect':''):''}>{option}</button>
       )}</div>
       {activeFeedback&&<p className="blitzInlineFeedback">{activeFeedback.is_correct?'Верно.':'Неверно или время истекло.'} {activeFeedback.explanation}</p>}
+      {activeError&&activeSeconds===0&&!answerBusy&&!activeFeedback&&<button type="button" className="secondary" onClick={()=>{setActive(null);setActiveError('');void refresh()}}>Вернуться к списку · Проверить результат</button>}
      </div>}
     </article>;
    })}</div>

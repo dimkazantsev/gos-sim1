@@ -12,6 +12,8 @@ on:
       - 'supabase/migrations/20261017204000_official_meeting_document_titles.sql'
       - 'components/game/Blitz*.tsx'
       - 'scripts/blitz-pending-privacy-check.cjs'
+      - 'scripts/blitz-network-resilience-check.cjs'
+      - 'components/game/blitzRequest.ts'
       - 'supabase/migrations/20261017183000_blitz_archive_pending_question_privacy.sql'
       - 'components/game/TeacherBlitz.tsx'
       - 'components/game/PoliticalWallView.tsx'
@@ -348,6 +350,7 @@ jobs:
       - name: Dependency audit — high and critical
         run: npm audit --audit-level=high
       - run: node scripts/private-game-presence-100-clients-check.cjs
+      - run: node scripts/blitz-network-resilience-check.cjs
       - run: npm run typecheck
       - run: node scripts/party-profile-payload-40-check.cjs
       - run: node scripts/formal-realtime-summary-40-check.cjs
