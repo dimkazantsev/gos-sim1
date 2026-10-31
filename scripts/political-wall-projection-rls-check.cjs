@@ -2,6 +2,11 @@
 const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path');
 const {PGlite}=require('@electric-sql/pglite');
 const sql=fs.readFileSync(path.join(__dirname,'..','supabase/migrations/20261029150000_political_wall_projection_invoker.sql'),'utf8');
+const paging=fs.readFileSync(path.join(__dirname,'..','supabase/migrations/20261031100000_metric_history_50_paging.sql'),'utf8');
+assert(paging.includes('security invoker')&&paging.includes('private.is_game_member(p_game_id)'));
+assert(paging.includes('limit 50')&&!paging.includes('limit 3000'));
+assert(paging.includes('order by recorded_at desc, id desc limit 50'));
+assert(paging.includes("revoke all on function public.get_political_wall_projection(uuid) from public, anon"));
 const id=n=>'00000000-0000-4000-8000-'+String(n).padStart(12,'0');
 const game=id(900),other=id(901),privatePost=id(100),deletedPost=id(101),party=id(700);
 assert(sql.includes('security invoker'),'Must obey full political posts RLS');
@@ -38,9 +43,9 @@ async function main(){
   await db.query("insert into public.political_post_media values($1,$2,$3,'2026-10-28')",[id(300),game,privatePost]);
   await db.query("insert into public.political_post_formal_links values($1,$2,$3)",[id(400),game,privatePost]);
   await db.query("insert into public.state_metric_history select ('00000000-0000-4000-8000-'||lpad((4000+n)::text,12,'0'))::uuid,$1,'2026-10-01'::timestamptz+n*interval '1 minute' from generate_series(1,3002)n",[game]);
-  await db.query("insert into public.party_support_history values($1,$2,'2026-10-01')",[id(500),game]);
+  await db.query("insert into public.party_support_history select ('00000000-0000-4000-8000-'||lpad((8000+n)::text,12,'0'))::uuid,$1,'2026-10-01'::timestamptz+n*interval '1 minute' from generate_series(1,70)n",[game]);
   await db.query("insert into public.state_metrics values($1,$2,1,10)",[id(600),game]);
-  await db.exec(sql);
+  await db.exec(sql);await db.exec(paging);
   async function as(n){await db.exec('reset role');await db.query("select set_config('request.jwt.claim.sub',$1,false)",[n?id(n):'']);await db.exec('set role authenticated');}
   async function read(g=game){return (await db.query('select public.get_political_wall_projection($1) value',[g])).rows[0].value;}
   for(let n=1;n<=42;n++){
@@ -51,8 +56,12 @@ async function main(){
    assert.equal(p.posts.some(x=>x.id===privatePost),allowed,'Private party registration visible only to own team or teacher');
    assert(!p.posts.some(x=>x.id===deletedPost),'Deleted posts never leak');
    assert(!p.posts.some(x=>x.game_id===other),'Foreign posts never leak');
-   assert.equal(p.metric_history.length,3000,'History cap preserved');
-   assert.equal(p.support_history.length,1);
+   assert.equal(p.metric_history.length,50,'Only 50 newest metric rows in initial snapshot');
+   assert.equal(p.support_history.length,50,'Only 50 newest party-support rows in initial snapshot');
+   assert.equal(p.metric_history[0].id,id(6953),'Older 2952 metric rows must stay in database, not in payload');
+   assert.equal(p.metric_history.at(-1).id,id(7002),'Latest metric row must remain available');
+   assert.equal(p.support_history[0].id,id(8021),'Support history must be newest first, chronologically delivered');
+   assert.equal(p.support_history.at(-1).id,id(8070));
    assert.equal(p.metrics[0].value,10);
    assert.equal(p.media.length,1,'Media scope preserved (client filters by visible post)');
    assert.equal(p.formal_links.length,1);
@@ -61,7 +70,7 @@ async function main(){
   await as(null);await assert.rejects(read(),e=>e.code==='42501','No JWT rejected');
   await db.exec('reset role');await db.exec('set role anon');
   await assert.rejects(read(),e=>e.code==='42501','Anon function permission denied');
-  console.log('PASS: 40 student actors, teacher, observer; 250 posts, 3000 metric history, private party news, deleted and foreign rows isolated; anon denied (PGlite)');
+  console.log('PASS: 40 student actors, teacher, observer; 250 posts, 50 most recent metric and support histories, private party news, deleted and foreign rows isolated; anon denied (PGlite)');
  }finally{await db.close()}
 }
 main().catch(e=>{console.error(e);process.exitCode=1});
