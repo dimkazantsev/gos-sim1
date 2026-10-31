@@ -1,6 +1,7 @@
 'use client';
 import {userError} from '@/lib/userError';
 import {notifyGameDataRefresh,notifySectionUpdates,setGameRealtimeConnection} from './useGameTableSync';
+import {assetFailureBackoffMs} from './assetFailureBackoff';
 import {useBudgetPulse,withBudgetIncome} from './useBudgetPulse';
 import {VOTING_BODIES,bodyQuorum} from './votingBodies';
 import {useEffect,useMemo,useRef,useState} from 'react';
@@ -220,10 +221,16 @@ export function useRepublicGame(gameId:string){
     if(epoch!==readEpoch.current||!alive.current){finish(null);return}
     void supabase.storage.from(storage.bucket).createSignedUrl(storage.path,3600).then(({data,error})=>{
      const url=error?null:data?.signedUrl||null;
-     if(!url&&assetSignatures.current.get(key)?.promise===promise)assetSignatures.current.delete(key);
+     // On NoSuchKey, the same immutable path will not magically appear on
+     // every profile refresh. Cache the negative result inside this session.
+     if(!url&&assetSignatures.current.get(key)?.promise===promise){
+      assetSignatures.current.set(key,{expiresAt:Date.now()+assetFailureBackoffMs(error),promise});
+     }
      finish(url);
-    }).catch(()=>{
-     if(assetSignatures.current.get(key)?.promise===promise)assetSignatures.current.delete(key);
+    }).catch(error=>{
+     if(assetSignatures.current.get(key)?.promise===promise){
+      assetSignatures.current.set(key,{expiresAt:Date.now()+assetFailureBackoffMs(error),promise});
+     }
      finish(null);
     });
    };
