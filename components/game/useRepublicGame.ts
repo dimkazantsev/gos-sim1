@@ -431,14 +431,14 @@ export function useRepublicGame(gameId:string){
     if(activeViewRef.current==='budget')notifyGameDataRefresh(gameId,'state_metrics');
    });
   }
-  // A chart/history entry arrives on the same socket, with no follow-up
-  // PostgREST query. The 3000-row bound matches the initial history read.
+  // A chart/history entry arrives on the same socket. Until a metric dialog
+  // explicitly loads older records, keep only the latest 50 history rows.
   channel.on('postgres_changes',{event:'INSERT',schema:'public',table:'state_metric_history',filter:'game_id=eq.'+gameId},payload=>{
    if(!currentConnection())return;
    const entry=payload.new as unknown as MetricHistory;
    if(!entry?.id||entry.game_id!==gameId)return;
    setMetricHistory(previous=>previous.some(item=>item.id===entry.id)?previous:
-    [...previous,entry].sort((a,b)=>a.recorded_at.localeCompare(b.recorded_at)||a.id-b.id).slice(-3000));
+    [...previous,entry].sort((a,b)=>a.recorded_at.localeCompare(b.recorded_at)||a.id-b.id).slice(-50));
   });
   // Render the authorised INSERT payload immediately rather than waiting
   // for another PostgREST query. RLS still governs Realtime visibility.
@@ -1277,8 +1277,8 @@ export function useRepublicGame(gameId:string){
      supabase.from('political_posts').select('*').eq('game_id',gameId).order('created_at',{ascending:false}).limit(250),
      supabase.from('political_post_media').select('*').eq('game_id',gameId).order('created_at',{ascending:false}),
      supabase.from('political_post_formal_links').select('*').eq('game_id',gameId),
-     supabase.from('state_metric_history').select('*').eq('game_id',gameId).order('recorded_at',{ascending:true}).limit(3000),
-     supabase.from('party_support_history').select('*').eq('game_id',gameId).order('recorded_at',{ascending:true}).limit(3000),
+     supabase.from('state_metric_history').select('*').eq('game_id',gameId).order('recorded_at',{ascending:false}).order('id',{ascending:false}).limit(50),
+     supabase.from('party_support_history').select('*').eq('game_id',gameId).order('recorded_at',{ascending:false}).order('id',{ascending:false}).limit(50),
      supabase.from('state_metrics').select('*').eq('game_id',gameId).order('sort_order')
     ]);
     pp={data:oldPosts.data,error:oldPosts.error};px={data:oldMedia.data,error:oldMedia.error};
@@ -1315,8 +1315,8 @@ export function useRepublicGame(gameId:string){
      });
     });
     setPostFormalLinks((pl.data||[]) as PoliticalPostFormalLink[]);
-    setMetricHistory((mh.data||[]) as MetricHistory[]);
-    setPartySupportHistory((psh.data||[]) as PartySupportHistory[]);
+    setMetricHistory(([...(mh.data||[])] as MetricHistory[]).sort((a,b)=>a.recorded_at.localeCompare(b.recorded_at)||a.id-b.id));
+    setPartySupportHistory(([...(psh.data||[])] as PartySupportHistory[]).sort((a,b)=>a.recorded_at.localeCompare(b.recorded_at)||a.id-b.id));
     void Promise.all(rows.filter(row=>row.storage_path).map(async row=>({
      id:row.id,path:row.storage_path,url:await signedAssetUrl('game-assets',row.storage_path)
     }))).then(links=>{

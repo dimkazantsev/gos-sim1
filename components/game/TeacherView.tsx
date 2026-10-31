@@ -128,7 +128,7 @@ export default function TeacherView({g,onOpenProcesses,onOpenStages,initialWorks
     <div><small>ПАРТИИ</small><strong>{parties.length}</strong><span>политических организаций в игре</span></div>
     <div><small>НПА</small><strong>{formalDocuments.length}</strong><span>в реестре</span></div>
     <div><small>ГОЛОСОВАНИЯ</small><strong>{votes.length}</strong><span>{votes.filter(v=>v.status==='open').length} открыто</span></div>
-    <div><small>ИЗМЕНЕНИЯ ПОКАЗАТЕЛЕЙ</small><strong>{metricHistory.filter(h=>h.source_type!=='baseline').length}</strong><span>зафиксированных изменений</span></div>
+    <div><small>ИЗМЕНЕНИЯ ПОКАЗАТЕЛЕЙ</small><strong>{metricHistory.filter(h=>h.source_type!=='baseline').length}</strong><span>последних загруженных изменений</span></div>
    </div>
    <ParticipantsAnalytics g={g}/>
   </section>}

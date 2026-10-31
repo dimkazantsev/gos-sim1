@@ -46,6 +46,14 @@ const reconstructed=pointsForMetric(metric('lawfulness',70),[
 assert.equal(reconstructed[0].value,65);
 assert.equal(reconstructed[0].at,Date.parse(start));
 console.log('PASS first event previous_value supplies the real reconstructed baseline');
+const partial=pointsForMetric(metric('lawfulness',70),[
+ row('lawfulness','2026-09-03T10:00:00Z',70,65,9)
+],'changes',start,Date.parse('2026-09-04T13:00:00Z'),true);
+assert.equal(partial[0].value,65,'Partial history retains the last confirmed previous_value');
+assert.equal(partial[0].at,Date.parse('2026-09-03T10:00:00Z'),
+ 'Partial history must never invent coverage from the beginning of the game');
+assert.match(partial[0].note,/загруженного периода/);
+console.log('PASS partial history does not fabricate earlier chart coverage');
 const duplicate=pointsForMetric(metric('public_trust',55),[
  row('public_trust',start,50,null,1,'baseline'),
  row('public_trust','2026-09-02T10:00:00Z',53,50,2),
