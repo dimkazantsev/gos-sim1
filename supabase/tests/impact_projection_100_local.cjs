@@ -1,7 +1,7 @@
 'use strict';
 // #491: 100 distinct Supabase Auth/JWT clients execute the *unchanged*
 // production get_impact_engine_projection RPC using disposable local PostgREST.
-// This tests the established 500-entry visibility limit, not complete archival
+// This tests the established 10-entry visibility limit, not complete archival
 // playback or 100 human players. Never connect to production.
 const assert=require('node:assert/strict');
 const {performance}=require('node:perf_hooks');
@@ -93,18 +93,18 @@ async function main(){
  ]);
  assert(rejected.every(r=>r.error),'Nonmember, unauthorized foreign-game and anonymous RPC denied');
  const permitted=await Promise.all([read(teacher),read(guest)]);
- for(const r of permitted)assert(!r.error&&r.data.rules.length===16&&r.data.ledger.length===500);
+ for(const r of permitted)assert(!r.error&&r.data.rules.length===16&&r.data.ledger.length===10);
  const before=await Promise.all(students.map(s=>read(s)));
  assert(before.every(r=>!r.error),'All 100 JWT projections succeed');
  for(const [i,r] of before.entries()){
   const data=r.data;
   assert.equal(data.rules.length,16,'All stages available');
-  assert.equal(data.ledger.length,500,'Existing bounded projection must remain capped at 500');
+  assert.equal(data.ledger.length,10,'Bounded projection must return latest 10');
   assert.deepEqual(data.rules.map(x=>x.priority),Array.from({length:16},(_,j)=>j+1));
   assert(data.rules.some(x=>x.enabled===false),'Preserve approved rule toggles');
   assert(data.ledger.every(x=>x.game_id===GAME&&!('foreign' in x.effects)),'Game isolation');
   assert.equal(data.ledger[0].source_id,'student-99-stage-16','Newest row must be returned first');
-  assert.equal(data.ledger[499].source_id,'student-68-stage-13','Oldest of latest 500');
+  assert.equal(data.ledger[9].source_id,'student-99-stage-7','Oldest of latest 10');
   if(i%20===0)assert.equal(data.rules[0].conditions.stage,1);
  }
  const [directForeign,studentForeign,guestMember]=await Promise.all([
@@ -127,20 +127,20 @@ async function main(){
   ok(l,'Sign in after interrupted connection');
  }
  const after=await Promise.all(students.map(s=>read(s)));
- assert(after.every(r=>!r.error&&r.data.ledger.length===500),'Refresh with 100 JWT succeeds');
+ assert(after.every(r=>!r.error&&r.data.ledger.length===10),'Refresh with 100 JWT succeeds');
  assert(after.every(r=>r.data.ledger[0].source_id==='reconnect-confirmed-stage-16'),
    'All 100 clients observe confirmed post-reconnect entry');
  const metrics=[...before,...after];
  console.log(JSON.stringify({
   status:'PASS',
   scope:'Disposable local Supabase Auth/JWT/PostgREST and unchanged production invoker RPC with simplified local membership/RLS',
-  students:100,stages:16,preexistingLedgerRows:1600,projectionLedgerLimit:500,
+  students:100,stages:16,preexistingLedgerRows:1600,projectionLedgerLimit:10,
   concurrentReadsFirstWave:100,concurrentReadsAfterWrite:100,reauthenticated:50,
   confirmedPostReconnectVisible:100,crossGameDenied:3,rlsForeignRows:0,
   errors:0,latencyMs:quantiles(metrics.map(m=>m.elapsed)),
   returnedJsonBytes:metrics.reduce((n,m)=>n+m.bytes,0),
   productionRequests:0,
-  limitations:'Synthetic JWT clients and local fixture; not 100 human browsers, full lifecycle or live egress. The documented 500 newest ledger limit is preserved.'
+  limitations:'Synthetic JWT clients and local fixture; not 100 human browsers, full lifecycle or live egress. The newest 10 ledger entries are returned while all history is retained.'
  }));
 }
 main().catch(err=>{console.error('FAIL impact projection 100: '+(err.stack||err));process.exitCode=1;});
