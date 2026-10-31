@@ -85,7 +85,7 @@ export function useRepublicGame(gameId:string){
  const realtimeDirtyTables=useRef(new Set<string>()),presenceInFlight=useRef('');
  const videoLimitTimer=useRef<ReturnType<typeof setTimeout>|null>(null);
  const lastTelegramDispatch=useRef(0);
- const lastCoreSuccessAt=useRef(0);
+ const lastCoreSuccessAt=useRef(0),lastFullPresentationAt=useRef(0);
  // Sections outside the Realtime publication must still reconcile on demand.
  const passiveSyncAt=useRef(new Map<string,number>());
  function passiveSections(view:View){
@@ -305,7 +305,7 @@ export function useRepublicGame(gameId:string){
   changedFormalIds.current.clear();changedVoteIds.current.clear();
   if(readReceipt.current.timer!==null)clearTimeout(readReceipt.current.timer);
   readReceipt.current={scope:'',timer:null,running:false,queued:false,lastAt:0};
-  assetSignatures.current.clear();lastCoreSuccessAt.current=0;passiveSyncAt.current.clear();
+  assetSignatures.current.clear();lastCoreSuccessAt.current=0;lastFullPresentationAt.current=0;passiveSyncAt.current.clear();
   officeReadState.current={scope:'',lastSuccessAt:0,lastAttemptAt:0,inflight:null};
   invalidatePartyRows();
   if(overviewRealtimeTimer.current!==null){clearTimeout(overviewRealtimeTimer.current);overviewRealtimeTimer.current=null}
@@ -687,7 +687,7 @@ export function useRepublicGame(gameId:string){
    if(!liveConnected){reconcileTables.add('game_stages');reconcileTables.add('game_votes')}
    // Non-published data must not remain stale when full polling is removed.
    // Recover just the visible screen's collections every 3 minutes.
-   const view=activeViewRef.current,lastPassive=passiveSyncAt.current.get(view)||lastCoreSuccessAt.current;
+   const view=activeViewRef.current,lastPassive=passiveSyncAt.current.get(view)||lastFullPresentationAt.current;
    if(now-lastPassive>=180000){
     const groups=passiveSections(view);
     for(const table of groups)reconcileTables.add(table);
@@ -800,7 +800,7 @@ export function useRepublicGame(gameId:string){
  useEffect(()=>{
   if(!me?.user_id)return;
   void hydrateActiveView(true);
-  const now=Date.now(),last=passiveSyncAt.current.get(activeView)||lastCoreSuccessAt.current;
+  const now=Date.now(),last=passiveSyncAt.current.get(activeView)||lastFullPresentationAt.current;
   if(lastCoreSuccessAt.current>0&&now-last>=180000){
    const groups=passiveSections(activeView);
    if(groups.length){
@@ -1139,7 +1139,7 @@ export function useRepublicGame(gameId:string){
   if(previousMember&&(['kind','role_title','team','group_name','roster_archived_at'] as const).some(key=>previousMember[key]!==member[key])){
    readEpoch.current++;clearGameData();authUser.current=uid;acceptedMember.current=member;setGame(g.data as Game);setMe(member);void hydrateActiveView();return;
   }
-  acceptedMember.current=member;lastCoreSuccessAt.current=Date.now();if(readCurrent(ticket,'game'))setGame(g.data as Game);setMe(member);
+  acceptedMember.current=member;lastCoreSuccessAt.current=Date.now();lastFullPresentationAt.current=lastCoreSuccessAt.current;if(readCurrent(ticket,'game'))setGame(g.data as Game);setMe(member);
   if(!mt.error&&readCurrent(ticket,'metrics'))setMetrics((mt.data||[]) as Metric[]);
   if(mt.error&&readCurrent(ticket,'metrics'))setError(mt.error);
   if(!ev.error)setEvents((ev.data||[]) as EventItem[]);

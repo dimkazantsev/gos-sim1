@@ -340,6 +340,28 @@ async function main(){
   assert.equal(h.readCount('game_members'),membersBefore);
   h.dispose();
  });
+ await check('Non-Realtime dashboard data stays synchronised without full entry',async()=>{
+  const h=harness({effects:true});
+  try{
+   await h.settle();
+   const before=h.rpcCount('get_game_entry_v4');
+   h.fixture('game_events',[{id:'event-new',game_id:'game-a',title:'Новая новость',published_at:'2026-10-26T01:00:00Z'}]);
+   h.fixture('game_evaluations',[{id:'evaluation-new',game_id:'game-a',user_id:'teacher-a',stage_no:1,score:4}]);
+   h.fixture('game_crises',[{id:'crisis-new',game_id:'game-a',created_at:'2026-10-26T01:00:00Z'}]);
+   await h.advance(190000);
+   assert.equal(h.rpcCount('get_game_entry_v4'),before);
+   assert(h.readCount('game_events')>0&&h.readCount('game_evaluations')>0&&h.readCount('game_crises')>0,
+    'Non-published updates must use only their RLS-scoped reads');
+   assert(h.render().events.some(e=>e.id==='event-new'));
+   assert(h.render().evaluations.some(e=>e.id==='evaluation-new'));
+   assert(h.render().crises.some(e=>e.id==='crisis-new'));
+   h.fixture('game_documents',[{id:'document-new',game_id:'game-a',created_at:'2026-10-26T01:00:00Z'}]);
+   h.render().setActiveView('documents');await h.settle();await h.advance(3500);
+   assert(h.readCount('game_documents')>0,'An older newly opened view must reconcile its own documents');
+   assert(h.render().documents.some(d=>d.id==='document-new'));
+   assert.equal(h.rpcCount('get_game_entry_v4'),before,'View reconciliation must not download the full game');
+  }finally{h.dispose();}
+ });
  await check('Connected 40 clients reconcile authority without repeated full entry bundles',async()=>{
   const clients=Array.from({length:40},(_,i)=>{const h=harness({effects:true});h.setUser('student-'+i);return h});
   try{
