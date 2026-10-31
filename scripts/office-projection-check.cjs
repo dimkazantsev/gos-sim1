@@ -3,8 +3,9 @@ const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('n
 const fixture=path.join(__dirname,'republic-game-resilience-check.cjs');
 let source=fs.readFileSync(fixture,'utf8');
 function replace(before,after){assert(source.includes(before),'Expected fixture found');source=source.replace(before,after)}
-replace('select(){return this;}',"select(fields){this.selection=fields;return this;}");
-replace('const result=failures.has(table)?',"if(table==='game_office_assignments'&&Array.isArray(data)&&this.selection&&this.selection!=='*'){const fields=this.selection.split(',');data=data.map(row=>Object.fromEntries(fields.filter(key=>key in row).map(key=>[key,row[key]])))}\n     const result=failures.has(table)?");
+if(source.includes('select(){return this;}'))replace('select(){return this;}',"select(columns='*'){this.columns=columns;return this;}");
+else assert(source.includes("select(columns='*'){this.columns=columns;return this;}"),'Projection-aware mock already available');
+replace('const result=failures.has(table)?',"if(table==='game_office_assignments'&&Array.isArray(data)&&this.columns&&this.columns!=='*'){const fields=this.columns.split(',');data=data.map(row=>Object.fromEntries(fields.filter(key=>key in row).map(key=>[key,row[key]])))}\n     const result=failures.has(table)?");
 const loaded=new Module(fixture,module);loaded.filename=fixture;loaded.paths=module.paths;loaded._compile(source,fixture);
 const {harness}=loaded.exports;
 function client(role){
