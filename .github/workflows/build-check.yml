@@ -74,6 +74,9 @@ on:
       - 'scripts/profile-email-*-check.cjs'
       - 'lib/userError.ts'
       - 'lib/supabase.ts'
+      - 'components/game/assetFailureBackoff.ts'
+      - 'components/game/scopedSignedAssetCache.ts'
+      - 'scripts/classroom-overload-safety-check.cjs'
       - 'lib/boundedSessionRefresh.ts'
       - 'scripts/supabase-session-refresh-check.cjs'
       - 'lib/authTransport.ts'
@@ -351,6 +354,7 @@ jobs:
         run: npm audit --audit-level=high
       - run: node scripts/private-game-presence-100-clients-check.cjs
       - run: node scripts/blitz-network-resilience-check.cjs
+      - run: node scripts/classroom-overload-safety-check.cjs
       - run: npm run typecheck
       - run: node scripts/party-profile-payload-40-check.cjs
       - run: node scripts/formal-realtime-summary-40-check.cjs

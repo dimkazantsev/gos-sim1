@@ -17,7 +17,10 @@ const restPrefix=url.replace(/\/$/,'')+'/rest/v1/';
 // Per-tab HTTP concurrency guard. The supabase-js browser client talks to
 // PostgREST, not directly to Postgres: port 6543 is never a browser endpoint.
 // Limit only low-priority reads. Votes, other writes, and Auth bypass the gate.
-const READ_CONCURRENCY=4, READ_BACKLOG=48, READ_QUEUE_WAIT_MS=12000;
+// Bound concurrent low-priority reads per client during classroom joins.
+// Core identity, Auth and every mutation retain their existing priority.
+const READ_CONCURRENCY=3, READ_BACKLOG=24, READ_QUEUE_WAIT_MS=8000;
+const SAFE_READ_TIMEOUT_MS=14000;
 let activeRestReads=0;
 const waitingRestReads:Array<()=>void>=[];
 function acquireReadSlot(signal?:AbortSignal):Promise<boolean>{
@@ -101,7 +104,7 @@ function safeRestRead(href:string,method:string){
  // INSERT/UPDATE state (get_budget_pulse, get_fiscal_context,
  // blitz_inbox_counts) and must never be queued or suppressed.
  // Writes, votes, and login identity are never blocked by an overload circuit.
- return /^rpc\/(?:get_impact_engine_projection|get_political_wall_projection|get_party_representation_projection|get_event_workspace_projection|get_game_bootstrap_v2|get_section_updates|get_teacher_overview|get_signed_state_program_budget|telegram_status|get_process_actors|get_game_achievements|get_achievement_catalog_counts)$/.test(path);
+ return /^rpc\/(?:get_impact_engine_projection|get_political_wall_projection|get_party_representation_projection|get_event_workspace_projection|get_game_bootstrap_v2|get_section_updates|get_teacher_overview|get_my_chat_overview|get_chat_pins_projection|get_signed_state_program_budget|telegram_status|get_process_actors|get_game_achievements|get_achievement_catalog_counts)$/.test(path);
 }
 function pausedRestResponse(status:402|429){
  const headers:Record<string,string>={'content-type':'application/json','x-gos-local-limit':'1'};
@@ -126,20 +129,35 @@ export const supabase = createClient(url, publishableKey, {
    const admitted=!safeRead||await acquireReadSlot(signal??undefined);
    if(!admitted)return busyReadResponse();
    let response:Response;
+   // Limit only read-only transport. An abort can stop an expensive slow
+   // response without accidentally resubmitting votes, chat or other writes.
+   const controller=safeRead?new AbortController():null;
+   const onAbort=()=>controller?.abort();
+   let requestTimer:ReturnType<typeof setTimeout>|undefined;
    try{
     // Recheck the circuit after queueing: another request may have seen HTTP 402/429.
     if(rest&&restQuotaBlocked)return pausedRestResponse(402);
     if(rest&&Date.now()<restRetryAt)return pausedRestResponse(429);
     if(safeRead&&Date.now()<restOverloadUntil)return overloadedReadResponse();
-    response=await (isAuthVerificationRequest(input,init)?fetchWithAuthTimeout(input,init):fetchWithBoundedSessionRefresh(input,init));
+    if(controller){
+     if(signal?.aborted)controller.abort();
+     else signal?.addEventListener('abort',onAbort,{once:true});
+     requestTimer=setTimeout(()=>controller.abort(),SAFE_READ_TIMEOUT_MS);
+    }
+    const boundedInit=controller?{...init,signal:controller.signal}:init;
+    response=await (isAuthVerificationRequest(input,boundedInit)?fetchWithAuthTimeout(input,boundedInit):fetchWithBoundedSessionRefresh(input,boundedInit));
    }catch(error){throw new Error(userError(error))}
-   finally{if(safeRead)releaseReadSlot()}
+   finally{
+    if(requestTimer!==undefined)clearTimeout(requestTimer);
+    signal?.removeEventListener('abort',onAbort);
+    if(safeRead)releaseReadSlot();
+   }
    if(rest&&response.status===402)restQuotaBlocked=true;
-   if(safeRead&&[502,503,504].includes(response.status)){
+   if(safeRead&&[500,502,503,504,520,524,544].includes(response.status)){
     const now=Date.now();
     if(now-restFailureWindow>20000){restFailureWindow=now;restFailures=0}
     restFailures++;
-    if(restFailures>=3){restOverloadUntil=now+30000;restFailures=0}
+    if(restFailures>=3){restOverloadUntil=now+30000+Math.floor(Math.random()*8000);restFailures=0}
    }else if(safeRead&&response.ok){
     restFailures=Math.max(0,restFailures-1);
    }

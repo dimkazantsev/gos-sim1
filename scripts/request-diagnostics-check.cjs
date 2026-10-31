@@ -2,7 +2,7 @@ const assert=require('node:assert/strict'),fs=require('node:fs'),vm=require('nod
 const source=ts.transpileModule(fs.readFileSync('lib/supabase.ts','utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}}).outputText;
 let now=1000000,calls=0,status=200,fail=false,hold=false,release;
 const transport=async()=>{calls++;now+=37;if(hold)await new Promise(resolve=>{release=resolve});if(fail)throw new Error('private body: пароль');return new Response('{}',{status,headers:{'content-type':'application/json'}})};
-const result={},context={exports:result,Response,Headers,URL,window:{},Date:class extends Date{constructor(...args){super(...(args.length?args:[now]))}static now(){return now}},process:{env:{}},require:name=>{
+const result={},context={exports:result,Response,Headers,URL,AbortController,setTimeout,clearTimeout,window:{},Date:class extends Date{constructor(...args){super(...(args.length?args:[now]))}static now(){return now}},process:{env:{}},require:name=>{
  if(name==='./userError')return {userError:()=> 'Ошибка сети'};
  if(name==='./boundedSessionRefresh')return {fetchWithBoundedSessionRefresh:transport};
  if(name==='./authTransport')return {isAuthVerificationRequest:()=>false,fetchWithAuthTimeout:transport};

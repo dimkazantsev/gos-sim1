@@ -4,7 +4,7 @@ const errorExports={};vm.runInNewContext(compile('lib/userError.ts'),{exports:er
 function client(status,retryAfter){
  let now=1_000_000,calls=0,nextStatus=status;
  const transport=async()=>{calls++;return new Response(JSON.stringify({message:nextStatus===429?'Too many requests':'Service unavailable'}),{status:nextStatus,headers:{'content-type':'application/json',...(retryAfter?{'retry-after':retryAfter}:{})}})};
- const result={},context={exports:result,Response,Headers,URL,Date:class extends Date{static now(){return now}},process:{env:{}},require:name=>{
+ const result={},context={exports:result,Response,Headers,URL,AbortController,setTimeout,clearTimeout,Date:class extends Date{static now(){return now}},process:{env:{}},require:name=>{
   if(name==='./userError')return errorExports;
   if(name==='./boundedSessionRefresh')return {fetchWithBoundedSessionRefresh:transport};
   if(name==='./authTransport')return {isAuthVerificationRequest:()=>false,fetchWithAuthTimeout:transport};

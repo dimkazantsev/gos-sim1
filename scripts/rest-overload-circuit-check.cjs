@@ -5,7 +5,7 @@ function makeClient(){
  let now=1000000,calls=0;
  const transport=async(input)=>{calls++;let href=typeof input==='string'?input:input.url;
   return new Response(JSON.stringify({message:'Gateway Timeout'}),{status:href.includes('/auth/')?200:504,headers:{'content-type':'application/json'}})};
- const exports={},sandbox={exports,Response,Headers,URL,Date:class extends Date{static now(){return now}},process:{env:{}},require:name=>{
+ const exports={},sandbox={exports,Response,Headers,URL,AbortController,setTimeout,clearTimeout,Date:class extends Date{static now(){return now}},process:{env:{}},require:name=>{
   if(name==='./userError')return userError;
   if(name==='./boundedSessionRefresh')return {fetchWithBoundedSessionRefresh:transport};
   if(name==='./authTransport')return {isAuthVerificationRequest:()=>false,fetchWithAuthTimeout:transport};
@@ -28,9 +28,9 @@ const url='https://bderfrcfuhnutuoyudje.supabase.co/rest/v1/';
   assert.equal(c.calls(),4,'Writes must never be suppressed');
   await c.fetch('https://bderfrcfuhnutuoyudje.supabase.co/auth/v1/user');
   assert.equal(c.calls(),5,'Auth remains available during REST backoff');
-  c.advance(30001);
+  c.advance(38001);
   assert.equal((await c.fetch(url+'game_activity')).status,504,'Backoff must be finite');
   assert.equal(c.calls(),6);
  }
- console.log('PASS 40 modeled clients: 1600 repeated GETs stopped, writes/auth allowed, 30s bounded recovery');
+ console.log('PASS 40 modeled clients: 1600 repeated GETs stopped, writes/auth allowed, 30–38s jittered bounded recovery');
 })().catch(e=>{console.error(e);process.exitCode=1});
