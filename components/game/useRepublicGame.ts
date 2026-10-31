@@ -1035,7 +1035,7 @@ export function useRepublicGame(gameId:string){
   const view=activeViewRef.current;
   if(view==='parties'||view==='profile')jobs.push(loadPartyAssets(view==='parties'));
   // Teacher dossiers must fetch document rows, not just party representation.
-  if(view==='teacher')jobs.push(loadPartyDocuments());
+  if(view==='teacher')jobs.push(loadPartyDocuments(),loadPartyDossierRows());
   if(view==='parties'||view==='teacher')jobs.push(loadPartyRepresentation(false));
   if(view==='documents')jobs.push(loadFormalRegistry());
   if(view==='actions'||view==='dashboard')jobs.push(loadPoliticalWall());
@@ -1168,6 +1168,16 @@ export function useRepublicGame(gameId:string){
   });
  }
 
+ async function loadPartyDossierRows(){
+  // Teacher dossiers require long registration notes and descriptions, which
+  // the initial dashboard deliberately omits. Upgrade only this party read.
+  await readSafely(['parties'],async ticket=>{
+   const result=await loadCachedParties();
+   if(!readCurrent(ticket,'parties'))return;
+   requireSuccessful([result]);
+   acceptPartyRows((result.data||[]) as Party[],ticket);
+  });
+ }
  async function loadPartyDocuments(){
   // Separate from party identity/profile reads so the teacher's 30-second
   // refresh doesn't re-sign every participant avatar.
