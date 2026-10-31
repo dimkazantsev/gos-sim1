@@ -28,7 +28,7 @@ async function main(){
   await db.exec("create function private.is_game_member(g uuid) returns boolean language sql stable security definer set search_path='' as $$select exists(select 1 from public.game_members where game_id=g and user_id=auth.uid())$$;");
   await db.exec("create function private.is_game_teacher(g uuid) returns boolean language sql stable security definer set search_path='' as $$select exists(select 1 from public.game_members where game_id=g and user_id=auth.uid() and kind='teacher')$$;");
   await db.exec("create function private.party_registration_published(p uuid) returns boolean language sql stable as $$select false$$;");
-  await db.exec("create table public.political_posts(id uuid,game_id uuid,actor_key text,context jsonb,deleted_at timestamptz,created_at timestamptz,title text,source_key text,pinned boolean not null default false);");
+  await db.exec("create table public.political_posts(id uuid,game_id uuid,actor_key text,context jsonb,deleted_at timestamptz,created_at timestamptz,title text,source_key text,actor_label text,pinned boolean not null default false);");
   await db.exec("create table public.political_post_media(id uuid,game_id uuid,post_id uuid,created_at timestamptz);");
   await db.exec("create table public.political_post_formal_links(id uuid,game_id uuid,post_id uuid);");
   await db.exec("create table public.state_metric_history(id uuid,game_id uuid,recorded_at timestamptz);");
