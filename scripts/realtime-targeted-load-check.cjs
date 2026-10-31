@@ -43,13 +43,13 @@ async function checks(){
  const q=harness({effects:true});await q.settle();q.ignoreAbort(true);
  // Eleven core tables are now bundled: hold only the independent member GET.
  const heldMember=q.hold('game_members',q.readCount('game_members')+2);
- const beforeBootstrap=q.rpcCount('get_game_bootstrap_v2');
+ const beforeBootstrap=q.rpcCount('get_game_bootstrap_v3');
  const refresh=q.render().refresh();for(let n=0;n<4;n++)await tick();
  q.runTimers();await refresh;
  assert(q.stats().aborted>=1,'Stalled personal member read must abort');
  heldMember.resolve();
  await q.render().refresh();
- assert(q.rpcCount('get_game_bootstrap_v2')>beforeBootstrap,'Next bootstrap must not remain blocked');
+ assert(q.rpcCount('get_game_bootstrap_v3')>beforeBootstrap,'Next bootstrap must not remain blocked');
  q.dispose();
  const c=harness({effects:true});await c.settle();c.render().setChatOpen(true);await c.settle();const initial=c.stats().started['rpc:mark_chat_channel_read']||0;
  for(let i=0;i<80;i++){c.emit('chat_messages',{id:'m'+i,channel_id:'channel-a',text:'Сообщение',created_at:new Date().toISOString()},'INSERT');await c.settle();await c.advance(125)}
