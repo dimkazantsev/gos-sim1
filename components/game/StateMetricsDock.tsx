@@ -7,12 +7,13 @@ import {useEffect,useMemo,useRef,useState} from 'react';
 import {Activity,BadgeCheck,Globe2,Handshake,HeartHandshake,MessageSquare,Scale,ShieldCheck,TrendingUp,UsersRound,Wallet} from 'lucide-react';
 import {useDialog} from '../ui/useDialog';
 import type {ReturnTypeRepublic} from './viewTypes';
-import type {Metric,ImpactRule} from './types';
+import type {Metric,MetricHistory,ImpactRule} from './types';
 import {drawMetricChart,METRIC_COLORS,pointsForMetric} from './metricChart';
 
 const PRIMARY=['public_trust','economy','budget','social_stability','lawfulness','international_standing'];
 const MAX_CHART_SERIES=4;
 const HISTORY_PREVIEW_COUNT=6;
+const HISTORY_PAGE_SIZE=50;
 
 function spark(points:number[],w=220,h=64){
  if(points.length<2)return '';
@@ -52,6 +53,16 @@ export default function StateMetricsDock({g,initialSelectedMetricId='',initialCo
  const dialogRef=useDialog(!!selected,()=>setSelected(''));
  const [compare,setCompare]=useState<string[]>(initialCompareIds.slice(0,MAX_CHART_SERIES-1));
  const [showFullHistory,setShowFullHistory]=useState(false);
+ // Older records live only in this detail dialog; the dashboard never loads
+ // the complete history for every student. All reads retain table RLS.
+ const [historyPages,setHistoryPages]=useState<Record<string,MetricHistory[]>>({});
+ const [historyMore,setHistoryMore]=useState<Record<string,boolean>>({});
+ const [historyLoading,setHistoryLoading]=useState<Record<string,boolean>>({});
+ const [historyError,setHistoryError]=useState('');
+ const historyCursor=useRef(new Map<string,{recorded_at:string;id:number}>());
+ const historyLoaded=useRef(new Set<string>());
+ const historyPending=useRef(new Set<string>());
+ const historyScope=useRef(game?.id+':'+g.me?.user_id);
  const [bucket,setBucket]=useState<'changes'|'day'|'week'>('changes');
  const plotRef=useRef<HTMLDivElement>(null);
  const [plotWidth,setPlotWidth]=useState(700);
@@ -88,7 +99,7 @@ export default function StateMetricsDock({g,initialSelectedMetricId='',initialCo
   return()=>{observer?.disconnect();window.removeEventListener('resize',update)};
  },[chosen?.id]);
 
- function rowsFor(metricKey:string){return metricHistory.filter(h=>h.metric_key===metricKey)}
+ function rowsFor(metricKey:string){return mergedHistory.filter(h=>h.metric_key===metricKey)}
  const hist=chosen?rowsFor(chosen.metric_key).sort((a,b)=>Date.parse(a.recorded_at)-Date.parse(b.recorded_at)):[];
  const affectsChosen=chosen&&ruleRows?ruleRows.filter(rule=>Number(rule.effects?.metrics?.[chosen.metric_key]||0)!==0):[];
  const activeEffects=affectsChosen?affectsChosen.filter(rule=>rule.enabled&&rule.auto_apply):[];
@@ -98,11 +109,73 @@ export default function StateMetricsDock({g,initialSelectedMetricId='',initialCo
  const comparisonOptions=visibleMetrics.filter(m=>m.id!==chosen?.id);
  const activeMetrics=chosen?[chosen,...comparisonOptions.filter(m=>compare.includes(m.id))]:[];
  const comparisonLimitReached=activeMetrics.length>=MAX_CHART_SERIES;
+ const activeHistoryKeys=activeMetrics.filter(metric=>metric.metric_key!=='budget').map(metric=>metric.metric_key).join('|');
+ const loadHistoryPage=async(metricKey:string)=>{
+  const gid=game?.id,scope=historyScope.current;
+  if(!gid||historyPending.current.has(metricKey)||
+     historyLoaded.current.has(metricKey)&&!historyMore[metricKey])return;
+  // The metric must be currently visible to this role; table RLS still
+  // independently enforces the read on the server.
+  if(!allowed.some(metric=>metric.metric_key===metricKey))return;
+  historyPending.current.add(metricKey);
+  setHistoryLoading(previous=>({...previous,[metricKey]:true}));
+  setHistoryError('');
+  try{
+   const cursor=historyCursor.current.get(metricKey);
+   let query=supabase.from('state_metric_history').select('*')
+    .eq('game_id',gid).eq('metric_key',metricKey)
+    .order('recorded_at',{ascending:false}).order('id',{ascending:false})
+    .limit(HISTORY_PAGE_SIZE);
+   if(cursor){
+    query=query.or('recorded_at.lt.'+cursor.recorded_at+
+     ',and(recorded_at.eq.'+cursor.recorded_at+',id.lt.'+cursor.id+')');
+   }
+   const result=await query;
+   if(historyScope.current!==scope)return;
+   if(result.error){setHistoryError('Не удалось загрузить предыдущие записи.');return}
+   const rows=(result.data||[]) as MetricHistory[];
+   historyLoaded.current.add(metricKey);
+   setHistoryMore(previous=>({...previous,[metricKey]:rows.length===HISTORY_PAGE_SIZE}));
+   if(rows.length){
+    const last=rows[rows.length-1];
+    historyCursor.current.set(metricKey,{recorded_at:last.recorded_at,id:last.id});
+    setHistoryPages(previous=>{
+     const existing=new Map((previous[metricKey]||[]).map(row=>[row.id,row]));
+     rows.forEach(row=>existing.set(row.id,row));
+     return {...previous,[metricKey]:[...existing.values()]};
+    });
+   }
+  }catch{
+   if(historyScope.current===scope)setHistoryError('Не удалось загрузить предыдущие записи.');
+  }finally{
+   if(historyScope.current===scope){
+    historyPending.current.delete(metricKey);
+    setHistoryLoading(previous=>({...previous,[metricKey]:false}));
+   }
+  }
+ };
+ useEffect(()=>{
+  // A new game or account may use a different RLS scope.
+  historyScope.current=game?.id+':'+g.me?.user_id;
+  historyCursor.current.clear();historyLoaded.current.clear();historyPending.current.clear();
+  setHistoryPages({});setHistoryMore({});setHistoryLoading({});setHistoryError('');
+ },[game?.id,g.me?.user_id]);
+ useEffect(()=>{
+  if(!selected||!game?.id)return;
+  for(const metricKey of activeHistoryKeys.split('|').filter(Boolean))
+   if(!historyLoaded.current.has(metricKey))void loadHistoryPage(metricKey);
+ },[game?.id,selected,activeHistoryKeys]);
+ useEffect(()=>{setShowFullHistory(false)},[selected]);
+ const mergedHistory=useMemo(()=>{
+  const unique=new Map(metricHistory.map(row=>[row.id,row]));
+  Object.values(historyPages).forEach(rows=>rows.forEach(row=>unique.set(row.id,row)));
+  return [...unique.values()].sort((a,b)=>a.recorded_at.localeCompare(b.recorded_at)||a.id-b.id);
+ },[metricHistory,historyPages]);
  const snapshotAt=useMemo(()=>Date.now(),[selected]);
  const series=activeMetrics.map(metric=>({
   metric,
   color:metric.id===chosen?.id?METRIC_COLORS[0]:METRIC_COLORS[(1+comparisonOptions.findIndex(option=>option.id===metric.id))%METRIC_COLORS.length],
-  points:pointsForMetric(metric,metricHistory,bucket,game?.created_at,snapshotAt)
+  points:pointsForMetric(metric,mergedHistory,bucket,game?.created_at,snapshotAt,metric.metric_key!=='budget'&&historyMore[metric.metric_key]!==false)
  }));
  const moneyChart=series.length===1&&chosen?.metric_key==='budget';
  const geometry=drawMetricChart(series,series.length>1,Math.max(240,plotWidth),plotWidth<460?222:250,moneyChart?72:52);
@@ -215,13 +288,20 @@ export default function StateMetricsDock({g,initialSelectedMetricId='',initialCo
      </div>
     </section>
     <div className="metricHistoryList">
-     <div className="metricHistoryHead"><b>Журнал показателя</b><span>{hist.length} записей</span></div>
-     {[...hist].reverse().slice(0,showFullHistory?30:HISTORY_PREVIEW_COUNT).map(h=>{const p=h.source_id?politicalPosts.find(x=>x.id===h.source_id):undefined;return <article key={h.id}>
+     <div className="metricHistoryHead"><b>Журнал показателя</b><span>{hist.length} загружено</span></div>
+     {[...hist].reverse().slice(0,showFullHistory?hist.length:HISTORY_PREVIEW_COUNT).map(h=>{const p=h.source_id?politicalPosts.find(x=>x.id===h.source_id):undefined;return <article key={h.id}>
       <time>{new Date(h.recorded_at).toLocaleString('ru-RU')}</time>
       <div><b>{Number(h.previous_value??h.value).toLocaleString('ru-RU')} → {Number(h.value).toLocaleString('ru-RU')} {chosen.unit||''}</b><p>{h.note||p?.title||gameValueLabel(h.source_type,'Изменение показателя')}</p>{h.actor_id&&<small>{names[h.actor_id]||'Участник'}</small>}</div>
       <strong className={Number(h.delta)>=0?'up':'down'}>{Number(h.delta)>0?'+':''}{Number(h.delta||0).toFixed(1)}</strong>
      </article>})}
      {hist.length>HISTORY_PREVIEW_COUNT&&<button type="button" className="metricHistoryMore" onClick={()=>setShowFullHistory(v=>!v)}>{showFullHistory?'Свернуть журнал':`Показать ещё ${Math.min(hist.length,30)-HISTORY_PREVIEW_COUNT} записей`}</button>}
+     {chosen.metric_key!=='budget'&&historyMore[chosen.metric_key]&&
+      <button type="button" className="metricHistoryMore"
+       disabled={!!historyLoading[chosen.metric_key]} aria-busy={!!historyLoading[chosen.metric_key]}
+       onClick={()=>{setShowFullHistory(true);void loadHistoryPage(chosen.metric_key)}}>
+       {historyLoading[chosen.metric_key]?'Загрузка…':'Загрузить более ранние записи'}
+      </button>}
+     {historyError&&<p role="alert">{historyError}</p>}
     </div>
     </div>
    </section>
