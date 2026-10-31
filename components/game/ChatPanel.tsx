@@ -275,7 +275,7 @@ export default function ChatPanel({g,draft:text,onDraftChange:setText,previewCha
     if(lastChannel.current===fromChannel&&text===sentText)setText('');
     follow.current=true;
     requestAnimationFrame(scrollToLatest);
-   }else setLocalError('Не удалось отправить сообщение. Попробуйте ещё раз.');
+   }else setLocalError('Нет подтверждения отправки. Сообщение могло сохраниться — проверьте историю перед повторной отправкой.');
   }catch{setLocalError('Сообщение не отправлено. Повторите попытку.')}
   finally{pendingSend.current=false;setSending(false);if(!overlay)composer.current?.focus()}
  }
