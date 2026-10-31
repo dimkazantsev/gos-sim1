@@ -535,6 +535,30 @@ async function main(){
    console.log('Measured simulated shared RPCs: dashboard 40 -> 0; Process 40 -> 40');
   }finally{clients.forEach(h=>h.dispose());}
  });
+ await check('40 event decisions refresh only visible metrics, never the hidden political feed',async()=>{
+  const clients=Array.from({length:40},()=>harness({effects:true}));
+  try{
+   await Promise.all(clients.map(async h=>{
+    await h.settle();
+    h.render().setActiveView('events');await h.settle();
+    const before=h.readCount('state_metrics'),wall=h.rpcCount('get_political_wall_page');
+    h.setRevision(2);
+    await h.render().refreshEventEffects();
+    await h.settle();
+    assert.equal(h.rpcCount('get_political_wall_page'),wall,
+     'An event response must not download the invisible process feed');
+    assert.equal(h.readCount('state_metrics'),before+1,'Read only the changed visible metric table');
+    assert.equal(h.render().metrics[0].value,2,'New metric value must reach the participant');
+   }));
+   console.log('PASS: 40 simulated event responses: 0 heavy political RPCs, 40 targeted metric reads');
+   const teacher=clients[0];
+   teacher.render().setActiveView('actions');await teacher.settle();
+   const before=teacher.rpcCount('get_political_wall_page');
+   await teacher.render().refreshEventEffects();await teacher.settle();
+   assert.equal(teacher.rpcCount('get_political_wall_page'),before+1,
+    'Visible political process must continue to refresh its detail feed');
+  }finally{clients.forEach(h=>h.dispose())}
+ });
  await check('Missing political projection falls back under RLS; 402 never fans out',async()=>{
   const old=harness({effects:true});old.failRpc('get_political_wall_page','PGRST202');old.failRpc('get_political_wall_projection','PGRST202');
   await old.settle();old.render().setActiveView('actions');await old.settle();assert(old.readCount('political_posts')>=1);old.dispose();
