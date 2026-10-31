@@ -1,7 +1,7 @@
 'use client';
 import {userError} from '@/lib/userError';
 import {useEffect,useRef,useState} from 'react';
-import {Check,ImageUp,Scissors,ShieldCheck} from 'lucide-react';
+import {Check,Eye,ImageUp,Scissors,ShieldCheck} from 'lucide-react';
 import type {ReturnTypeRepublic} from './viewTypes';
 
 type AccountSignature={signatureUrl:string|null;saveSignature:(file:File)=>Promise<boolean>};
@@ -12,9 +12,14 @@ export default function SignatureUpload({g,onSaved,account}:{g?:ReturnTypeRepubl
  const [busy,setBusy]=useState(false);
  const [notice,setNotice]=useState('');
  const mine=g?.profiles.find(p=>p.user_id===g.me?.user_id);
- const savedSignature=account?account.signatureUrl:mine?.signature_url;
+ const savedPath=account?Boolean(account.signatureUrl):Boolean(mine?.signature_path);
+ const [manualPreview,setManualPreview]=useState<string|null>(null);
+ const [previewBusy,setPreviewBusy]=useState(false);
+ const savedSignature=account?account.signatureUrl:manualPreview;
  const [missingSaved,setMissingSaved]=useState(false);
- useEffect(()=>setMissingSaved(false),[savedSignature]);
+ useEffect(()=>{
+  setManualPreview(null);setMissingSaved(false);
+ },[account?.signatureUrl,mine?.signature_path]);
  useEffect(()=>{if(!file){setUrl('');return}const current=URL.createObjectURL(file);setUrl(current);return()=>URL.revokeObjectURL(current)},[file]);
  async function crop(raw:File){
   if(raw.size>5*1024*1024){setNotice('Загрузите изображение размером до 5 МБ.');return}
@@ -52,6 +57,19 @@ export default function SignatureUpload({g,onSaved,account}:{g?:ReturnTypeRepubl
    setNotice('Фон удалён и подпись обрезана. Проверьте предпросмотр, затем сохраните.');
   }catch(e){setNotice((userError(e)||'Не удалось обработать изображение.'))}finally{setBusy(false)}
  }
+ async function viewSaved(){
+  if(!g||!mine?.signature_path||previewBusy)return;
+  setPreviewBusy(true);setNotice('');
+  const path=mine.signature_path;
+  try{
+   const preview=await g.loadOwnSignaturePreview();
+   if(path===g.profiles.find(row=>row.user_id===g.me?.user_id)?.signature_path){
+    if(preview){setManualPreview(preview);setMissingSaved(false)}
+    else setNotice('Подпись сохранена. Её изображение временно недоступно для просмотра.');
+   }
+  }catch{setNotice('Подпись сохранена. Не удалось открыть изображение.')}
+  finally{setPreviewBusy(false)}
+ }
  async function save(){
   if(!file||busy)return;
   setBusy(true);setNotice('');
@@ -64,12 +82,13 @@ export default function SignatureUpload({g,onSaved,account}:{g?:ReturnTypeRepubl
   <header><div><small>ДОКУМЕНТЫ И РЕЕСТР НПА</small><h2>Игровая подпись</h2></div><Scissors size={21} aria-hidden="true"/></header>
   <p>Расписывайтесь тёмной ручкой на чистом белом листе. Сделайте фото при ровном освещении либо загрузите PNG. Система удалит светлый фон, обрежет пустое поле и предложит проверить результат. Это визуальная подпись для учебной игры, а не юридически значимая электронная подпись.</p>
   <div className="profileSignaturePreview">
-   {url?<img src={url} alt="Подпись после автоматического удаления фона"/>:savedSignature&&!missingSaved?<img src={savedSignature} onError={()=>setMissingSaved(true)} alt="Сохранённая игровая подпись"/>:<span>Подпись ещё не загружена</span>}
+   {url?<img src={url} alt="Подпись после автоматического удаления фона"/>:savedSignature&&!missingSaved?<img src={savedSignature} onError={()=>setMissingSaved(true)} alt="Сохранённая игровая подпись"/>:<span>{savedPath?(missingSaved?'Подпись сохранена. Предпросмотр недоступен.':'Подпись сохранена в системе'):'Подпись ещё не загружена'}</span>}
   </div>
   <input type="file" accept="image/png,image/jpeg,image/webp" ref={input} hidden aria-label="Выбрать фото подписи"
    onChange={e=>{const chosen=e.target.files?.[0];if(chosen)void crop(chosen);e.target.value=''}}/>
   <div className="profileSignatureActions">
    <button type="button" disabled={busy} onClick={()=>input.current?.click()}><ImageUp size={17}/> Загрузить и обрезать</button>
+   {!account&&savedPath&&<button type="button" disabled={busy||previewBusy} onClick={()=>void viewSaved()}><Eye size={17}/> {previewBusy?'Загрузка…':'Посмотреть сохранённую'}</button>}
    <button type="button" className="primary" disabled={busy||!file} onClick={()=>void save()}><Check size={17}/> {busy?'Обработка…':'Сохранить подпись'}</button>
   </div>
   {notice&&<p role="status" className="profileSignatureNotice">{notice}</p>}
