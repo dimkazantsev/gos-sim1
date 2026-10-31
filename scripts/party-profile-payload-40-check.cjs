@@ -52,13 +52,13 @@ async function main(){
   let reducedRequests=0;
   for(const h of clients){
    const q=h.stats().queryLog.filter(x=>x.table==='game_parties');
-   assert(q.some(x=>x.columns===PARTY_LIST_COLUMNS),'Overview uses RLS-scoped lightweight party rows');
-   assert(q.every(x=>x.eqs.game_id==='game-a'),'No cross-game party reads');
-   reducedRequests+=q.filter(x=>x.columns===PARTY_LIST_COLUMNS).length;
+   assert.equal(q.length,0,'Overview uses RLS-scoped lightweight parties inside entry v4, not separate reads');
+   assert.equal(h.rpcCount('get_game_entry_v4'),1,'Only one scoped entry RPC per student');
+   reducedRequests+=q.length;
    assert.equal(h.render().parties[0].registration_note,null);
    assert.equal(h.render().parties[0].mandates,10);
   }
-  assert.equal(reducedRequests,40,'40 virtual students each request one cached party summary');
+  assert.equal(reducedRequests,0,'40 virtual students make no separate party-summary requests');
 
   const student=clients[0];
   student.render().setActiveView('parties');await student.settle();

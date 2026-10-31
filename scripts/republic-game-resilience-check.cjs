@@ -150,8 +150,11 @@ function harness({effects=false,compiledCode=code}={}){
      agreements:rows('party_agreements').sort((a,b)=>String(b.created_at).localeCompare(String(a.created_at)))
     },error:null,status:200};
    }
-   if(name==='get_game_bootstrap_v2'||name==='get_game_bootstrap_v3'){
+   if(name==='get_game_bootstrap_v2'||name==='get_game_bootstrap_v3'||name==='get_game_entry_v4'){
     const snapshot={revision,user,gameId,memberKind},id=args.p_game_id;
+    // A v4 call is rejected server-side if current game membership is lost.
+    if(name==='get_game_entry_v4'&&failures.has('game_members'))
+     return{data:null,error:{message:'simulated revoked membership',code:failureCodes.get('game_members')||'42501'},status:403};
     const num=(counts.get('games')||0)+1;counts.set('games',num);
     await holds.get('games:'+num)?.promise;
     const bundled=['games','state_metrics','game_events','chat_channels','game_stages','game_votes','game_evaluations','game_crises','game_documents','game_profiles','formal_documents'];
@@ -162,7 +165,7 @@ function harness({effects=false,compiledCode=code}={}){
      if(!fixtures.has(table))return defaults;
      return JSON.parse(JSON.stringify(fixtures.get(table))).filter(row=>row.game_id===id);
     };
-    return{data:{
+    const projection={
      game,metrics:fixtureRows('state_metrics',[{id:'metric',game_id:id,value:snapshot.revision}]),events:fixtureRows('game_events',[]),
      channels:fixtureRows('chat_channels',[{id:'channel-a',game_id:id,name:'Общий чат',kind:'public'}]),
      stages:fixtureRows('game_stages',[]),votes:fixtureRows('game_votes',withBallots?[{id:'vote',game_id:id}]:[]),
@@ -170,10 +173,20 @@ function harness({effects=false,compiledCode=code}={}){
      crises:fixtureRows('game_crises',withBallots?[{id:'crisis-'+snapshot.revision,game_id:id}]:[]),
      documents:fixtureRows('game_documents',withBallots?[{id:'document-'+snapshot.revision,game_id:id,created_by:snapshot.user}]:[]),
      profiles:fixtureRows('game_profiles',assetPaths?[{game_id:id,user_id:snapshot.user,avatar_path:'teacher-assets/'+snapshot.user+'/avatar-fixture.webp',signature_path:'teacher-assets/'+snapshot.user+'/signature-fixture.png'}]:[])
-      .map(row=>name==='get_game_bootstrap_v3'?{...row,bio:null}:row),
+      .map(row=>name!=='get_game_bootstrap_v2'?{...row,bio:null}:row),
      formal_documents:fixtureRows('formal_documents',[])
-      .map(row=>name==='get_game_bootstrap_v3'?{...row,body_text:null,metadata:{}}:row)
-    },error:null,status:200};
+      .map(row=>name!=='get_game_bootstrap_v2'?{...row,body_text:null,metadata:{}}:row)
+    };
+    if(name==='get_game_entry_v4'){
+     // The fixture emulates the SECURITY INVOKER projection. The student role
+     // never becomes teacher and only its own current member is authoritative.
+     const member={game_id:id,user_id:snapshot.user,full_name:snapshot.user,kind:snapshot.user==='teacher-a'?snapshot.memberKind:'student'};
+     const roster=fixtureRows('game_members',[member]);
+     const parties=fixtureRows('game_parties',[{id:'party-'+snapshot.revision,game_id:id,name:'party-'+snapshot.revision}])
+      .map(({description,ideology,registration_note,...summary})=>summary);
+     return{data:{...projection,member,roster,parties,intro:true},error:null,status:200};
+    }
+    return{data:projection,error:null,status:200};
    }
    if(name==='get_my_game_identity'){
     const snapshot={revision,user,gameId,memberKind};
@@ -233,7 +246,7 @@ function harness({effects=false,compiledCode=code}={}){
  async function settle(){for(let i=0;i<8;i++){render();await tick();if(!dirty)break;}return render();}
  return{
   render,settle,redirects,
-  rpcCount:name=>started.get('rpc:'+name)||0,writeCount:table=>started.get('write:'+table)||0,failRpc:(name,code)=>rpcFailures.set(name,code),
+  rpcCount:name=>started.get('rpc:'+name)||0,writeCount:table=>started.get('write:'+table)||0,failRpc:(name,code)=>code===null?rpcFailures.delete(name):rpcFailures.set(name,code),
   enableBallots(){withBallots=true;},readCount:table=>counts.get(table)||0,
   setRevision:value=>{revision=value;},setUser:value=>{user=value;},setMemberKind:value=>{memberKind=value;},setAssetPaths:value=>{assetPaths=value;},assetStats:()=>({signed,peakSigns,batchCalls}),failTable(table,code){failures.add(table);failureCodes.set(table,code);},setAuthError:value=>{authError=value;},
   hold(table,number=(counts.get(table)||0)+1){const pending=deferred();holds.set(table+':'+number,pending);return pending;},
@@ -292,81 +305,95 @@ async function main(){
   assert.equal(h.assetStats().signed,first.signed,'Unchanged Storage paths must reuse session-scoped signed URLs');
   h.dispose();
  });
- await check('Initial hydration reuses verified identity; later refresh still checks membership under RLS',async()=>{
+ await check('Entry v4 reuses all RLS-scoped projections with old-server fallback',async()=>{
   const source=fs.readFileSync(path.join(root,'components/game/useRepublicGame.ts'),'utf8');
-  const start=source.indexOf('async function loadCoreSections()'),end=source.indexOf('async function hydrateActiveView(',start);
-  assert(start>=0&&end>start);
-  assert.equal((source.slice(start,end).match(/limitedCoreRead\(/g)||[]).length,4);
-  assert(source.includes("supabase.rpc('get_game_bootstrap_v3'"),'Server-side lightweight RLS bundle replaces eleven HTTP requests');
-  assert(source.includes("function readLegacyBootstrap()"),'Absent-schema fallback remains available');
-  assert(source.includes(".eq('user_id',uid).maybeSingle()"),'Subsequent membership verification remains available');
-  assert(source.includes('entryMember?Promise.resolve({data:entryMember,error:null})'),'First entry must reuse only its server-verified personal membership');
-  assert(source.includes("reusedEntryMemberScope.current!==entryScope"),'A failed first bootstrap cannot reuse an old identity indefinitely');
-  assert(source.includes('acceptedMember.current?.game_id===gameId&&acceptedMember.current?.user_id===uid'),'Never reuse identity across a game or user switch');
-  assert(source.includes("coalesceInFlight(initialCoreReads.current,key,loadCoreSections)"),'Concurrent initial hydrations share one pending RPC');
-  assert(source.slice(start,end).includes('loadCachedParties()'),'One core table uses a shared cache, with its query still queue-limited');
-  assert(source.includes("const request=limitedCoreRead(query)")&&source.includes(".select(PARTY_LIST_COLUMNS)"),'Party reads preserve four-slot limiter and lightweight projection');
-  assert(source.slice(start,end).includes('loadMemberRoster()'),'The separately authorised roster remains shared and concurrency limited');
-  assert(source.includes('coreReadQueue.current.active<4'));
+  const a=source.indexOf('async function loadCoreSections()'),b=source.indexOf('async function hydrateActiveView(',a);
+  assert(a>=0&&b>a);
+  assert(source.slice(a,b).includes("supabase.rpc('get_game_entry_v4'"));
+  assert(source.slice(a,b).includes("supabase.rpc('get_game_bootstrap_v3'"),'Old v3 remains only as fallback');
+  assert(source.includes(".eq('user_id',uid).maybeSingle()"),'Old-server refresh still rechecks membership');
+  assert(source.includes("coalesceInFlight(initialCoreReads.current,key,loadCoreSections)"));
+  assert(source.includes("if(!cache.full&&!cache.inflight)"),'Do not downgrade full party dossiers');
+  assert(source.includes("core?core.then(()=>loadPoliticalWall()):loadPoliticalWall()"),'Overview must use entry party cache');
+  assert(source.includes("const request=limitedCoreRead(query)")&&source.includes(".select(PARTY_LIST_COLUMNS)"));
+  assert(source.includes("const response=await limitedCoreRead(supabase.from('game_members').select(MEMBER_ROSTER_COLUMNS)"));
  });
- await check('40 simultaneous synthetic clients hydrate 11 table groups with 40 rather than 440 REST operations',async()=>{
+ await check('40 simultaneous entrants use one v4 RPC, no extra roster/party/intro calls',async()=>{
   const clients=Array.from({length:40},()=>harness({effects:true}));
   try{
    await Promise.all(clients.map(h=>h.settle()));
    for(const h of clients){
-    assert.equal(h.rpcCount('get_game_bootstrap_v3'),1,'One grouped read per client');
-    assert.equal(h.readCount('game_members'),2,'First entry uses identity RPC plus one roster query, without duplicate personal member read');
-    assert.equal(h.readCount('state_metrics'),0,'Political wall projection now includes metrics without an extra table read');
-    assert.equal(h.readCount('formal_documents'),0,'Legacy document feed read is skipped');
+    assert.equal(h.rpcCount('get_game_entry_v4'),1,'One RLS-scoped entry read');
+    assert.equal(h.rpcCount('get_game_bootstrap_v3'),0,'New backend must not fall back');
+    assert.equal(h.readCount('game_members'),1,'Identity only, roster is now inside v4');
+    assert.equal(h.readCount('game_parties'),0,'Dashboard party summary is served by v4');
+    assert.equal(h.rpcCount('has_seen_my_intro'),0,'Intro is included in v4');
+    assert.equal(h.readCount('formal_documents'),0,'Heavy documents stay lazy');
     assert.equal(h.render().teacher,true);
     assert.equal(h.render().game.id,'game-a');
     assert.equal(h.render().metrics.length,1);
    }
   }finally{clients.forEach(h=>h.dispose());}
  });
- await check('40 clients save 40 personal member reads on entry while later refresh checks current roles',async()=>{
-  const clients=Array.from({length:40},()=>harness({effects:true}));
-  try{
-   await Promise.all(clients.map(h=>h.settle()));
-   assert.equal(clients.reduce((sum,h)=>sum+h.readCount('game_members'),0),80,'Identity and roster: 2 member reads per client, not 3');
-   await Promise.all(clients.map(async h=>{await h.render().refresh();await h.settle();}));
-   for(const h of clients){
-    assert(h.readCount('game_members')>=4,'Explicit refresh revalidates the personal role, plus identity');
-    assert.equal(h.render().teacher,true);
-   }
-  }finally{clients.forEach(h=>h.dispose());}
- });
- await check('Retry after first bundle failure rechecks personal membership',async()=>{
+ await check('A new RPC read always rechecks the server role on explicit refresh',async()=>{
   const h=harness({effects:true});
   try{
-   h.failRpc('get_game_bootstrap_v3','PGRST003');
    await h.settle();
-   const before=h.readCount('game_members');
-   assert.equal(before,2,'First attempt uses only identity and roster');
+   assert.equal(h.render().teacher,true);
+   h.setMemberKind('student');
    await h.render().refresh();await h.settle();
-   assert(h.readCount('game_members')>=before+2,'Retry rechecks identity and personal member under RLS');
+   assert(h.rpcCount('get_game_entry_v4')>=2,'New core refresh must not use an old cached role');
+   assert.equal(h.render().teacher,false,'A demoted teacher must have student permissions');
   }finally{h.dispose();}
  });
- await check('Rapid first navigation shares pending core request without cross-game cache',async()=>{
+ await check('Failed v4 request recovers without reusing cached initial roles',async()=>{
+  const h=harness({effects:true});
+  try{
+   h.failRpc('get_game_entry_v4','PGRST003');
+   await h.settle();
+   assert.equal(h.rpcCount('get_game_bootstrap_v3'),0,'Backend pool errors must not fan out to legacy reads');
+   h.failRpc('get_game_entry_v4',null);
+   await h.render().refresh();await h.settle();
+   assert(h.rpcCount('get_game_entry_v4')>=2);
+   assert.equal(h.render().teacher,true);
+  }finally{h.dispose();}
+ });
+ await check('Rapid navigation coalesces pending v4 entry reads, later refresh is fresh',async()=>{
   const h=harness({effects:true});
   const held=h.hold('games',2);
   try{
    await h.settle();
-   assert.equal(h.rpcCount('get_game_bootstrap_v3'),1);
+   assert.equal(h.rpcCount('get_game_entry_v4'),1);
    h.render().setActiveView('parties');await h.settle();
-   assert.equal(h.rpcCount('get_game_bootstrap_v3'),1,'Opening a section must not start a second pending bootstrap');
+   assert.equal(h.rpcCount('get_game_entry_v4'),1);
    held.resolve();await h.settle();
-   assert.equal(h.render().teacher,true);
    await h.render().refresh();await h.settle();
-   assert.equal(h.rpcCount('get_game_bootstrap_v3'),2,'A completed initial read cannot cache subsequent explicit refreshes');
+   assert.equal(h.rpcCount('get_game_entry_v4'),2);
   }finally{held.resolve();h.dispose();}
  });
- await check('Unavailable new RPC uses RLS-preserving legacy selects, without dropping the identity',async()=>{
-  const h=harness();h.failRpc('get_game_bootstrap_v3','PGRST202');
+ await check('Missing v4 function retains the prior protected v3 bootstrap',async()=>{
+  const h=harness();h.failRpc('get_game_entry_v4','PGRST202');
   await h.render().refresh();
-  assert(h.rpcCount('get_game_bootstrap_v2')>0,'Older backend uses the RLS-protected v2 bundle without 11 extra reads');
+  assert(h.rpcCount('get_game_bootstrap_v3')>0);
   assert.equal(h.render().teacher,true);
   h.dispose();
+ });
+ await check('Missing v4 and v3 functions still use protected v2 bootstrap',async()=>{
+  const h=harness();h.failRpc('get_game_entry_v4','PGRST202');h.failRpc('get_game_bootstrap_v3','PGRST202');
+  await h.render().refresh();
+  assert(h.rpcCount('get_game_bootstrap_v2')>0);
+  assert.equal(h.render().teacher,true);
+  h.dispose();
+ });
+ await check('Student and guest entry do not acquire teacher controls',async()=>{
+  for(const kind of ['student','observer']){
+   const h=harness({effects:true});h.setMemberKind(kind);
+   try{
+    await h.settle();
+    assert.equal(h.render().teacher,false);
+    assert.equal(h.rpcCount('get_game_entry_v4'),1);
+   }finally{h.dispose();}
+  }
  });
  await check('40 synthetic teacher panels read one impact projection and preserve results',async()=>{
   const clients=Array.from({length:40},()=>harness({effects:true}));
@@ -605,8 +632,16 @@ async function main(){
  await check('Membership demotion clears old privileges and private data despite an optional read failure',async()=>{
   const h=harness({effects:true});await h.settle();h.render().setChatOpen(true);await h.settle();assert.equal(h.render().teacher,true);assert.equal(h.render().messages.length,1);h.setMemberKind('observer');h.failTable('state_metrics');await h.render().refresh();assert.equal(h.render().teacher,false);assert.equal(h.render().me.kind,'observer');assert.equal(h.render().messages.length,0);h.runTimers();await h.settle();assert.equal(h.render().teacher,false);assert.equal(h.render().metrics.length,0);assert.match(h.render().error,/simulated read outage/);h.dispose();
  });
- await check('Confirmed lost game membership removes the previous accepted game',async()=>{
-  const h=harness({effects:true});await h.settle();h.failTable('game_members','PGRST116');const refreshing=h.render().refresh();await tick();h.runTimers();await refreshing;assert.equal(h.render().me,null);assert.equal(h.render().game,null);assert.equal(h.render().teacher,false);assert.equal(h.render().messages.length,0);assert.equal(h.render().loading,false);assert.equal(h.render().error,'Нет доступа к игре');h.dispose();
+ await check('Revoked membership removes previously accepted game on v4 refusal',async()=>{
+  for(const code of ['42501','PGRST116']){
+   const h=harness({effects:true});await h.settle();h.failTable('game_members',code);
+   const refreshing=h.render().refresh();await tick();h.runTimers();await refreshing;
+   assert.equal(h.render().me,null);assert.equal(h.render().game,null);
+   assert.equal(h.render().teacher,false);assert.equal(h.render().messages.length,0);
+   assert.equal(h.render().loading,false);assert.equal(h.render().error,'Нет доступа к игре');
+   assert.equal(h.rpcCount('get_game_bootstrap_v3'),0,'Denied membership must not trigger a legacy fallback');
+   h.dispose();
+  }
  });
  if(failures.length)process.exitCode=1;
 }
