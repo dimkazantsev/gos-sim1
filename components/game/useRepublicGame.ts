@@ -869,6 +869,7 @@ export function useRepublicGame(gameId:string){
     .some(key=>old[key]!==newMember[key]);
    await acceptIdentity(g,m,uid);
    if(roleChanged){void hydrateActiveView();return}
+   lastCoreSuccessAt.current=Date.now();
   }
   if(tables.has('*')||tables.has('game_members')){await hydrateActiveView();return}
   const jobs:Promise<unknown>[]=[];
