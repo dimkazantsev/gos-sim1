@@ -1030,6 +1030,7 @@ export function useRepublicGame(gameId:string){
      b.created_at.localeCompare(a.created_at)||b.id.localeCompare(a.id));
    });
    setPostFormalLinks(previous=>[...new Map([...previous,...page.formal_links!].map(l=>[l.post_id+':'+l.formal_document_id,l])).values()]);
+   if(page.posts.some(post=>post.source_key?.startsWith('media-party-registration:')))void loadPartyDocuments();
    setPoliticalMedia(previous=>{
     const cached=new Map(previous.map(row=>[row.id,row]));
     return [...new Map([...previous,...page.media!.map(row=>({...row,url:cached.get(row.id)?.url||null}))].map(row=>[row.id,row])).values()];
