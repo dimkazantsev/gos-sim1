@@ -13,7 +13,7 @@ assert.equal(BLITZ_RPC_TIMEOUT_MS,10000);
 assert(component.includes("BLITZ_RECEIVE_GRACE_MS=2000")&&component.includes("BLITZ_CHOICE_WINDOW_MS=20_000"),'The 20+2-second server contract must remain unchanged');
 assert(component.includes('BLITZ_UNCONFIRMED')&&component.includes('Проверить результат в истории'),'An ambiguous server failure must not be presented as a wrong answer');
 assert(component.includes("blitz_archive_filtered")&&component.includes('finally{if(token===request.current)setLoading(false)}'),'Archive must stop displaying indefinite loading');
-assert.equal((component.match(/blitzBoundedRequest\\(/g)||[]).length,7,'All seven Blitz RPC paths are bounded');
+assert.equal(component.split('blitzBoundedRequest(').length-1,7,'All seven Blitz RPC paths are bounded');
 assert(!component.includes('await supabase.rpc('),'No unbounded Blitz RPC left');
 async function run(){
  let started=0,aborted=false;
