@@ -62,11 +62,39 @@ async function dispatchOutbox(gameId?:string){
  if(gameId)queue=queue.eq('game_id',gameId);
  const {data:jobs,error}=await queue.order('id').limit(40);
  if(error)return NextResponse.json({error:'Не удалось получить очередь'},{status:500});
+ // Fetch shared recipient data once per game. Keep the live per-message
+ // membership and source checks below; this must never grant access.
+ // A failed batch means do not claim or send notifications.
+ const links=new Map<string,{chat_id:number|string;notifications_enabled:boolean}>();
+ const prefs=new Map<string,{
+  daily_brief:boolean;task_reminders:boolean;mentions:boolean;documents:boolean;votes:boolean;events:boolean;quiet_hours:boolean
+ }>();
+ const groups=new Map<string,Set<string>>();
+ for(const job of jobs||[]){
+  if(!groups.has(job.game_id))groups.set(job.game_id,new Set());
+  groups.get(job.game_id)!.add(job.user_id);
+ }
+ for(const [scope,recipients] of groups){
+  const users=[...recipients];
+  const [linked,settings]=await Promise.all([
+   config.db.from('telegram_links')
+    .select('game_id,user_id,chat_id,notifications_enabled')
+    .eq('game_id',scope).in('user_id',users),
+   config.db.from('telegram_notification_preferences')
+    .select('game_id,user_id,daily_brief,task_reminders,mentions,documents,votes,events,quiet_hours')
+    .eq('game_id',scope).in('user_id',users)
+  ]);
+  if(linked.error||settings.error){
+   return NextResponse.json({error:'Не удалось проверить получателей уведомлений'},{status:503});
+  }
+  for(const link of linked.data||[])links.set(scope+':'+link.user_id,link);
+  for(const pref of settings.data||[])prefs.set(scope+':'+pref.user_id,pref);
+ }
  let sent=0;
  for(const job of jobs||[]){
   const {data:claimed}=await config.db.from('telegram_outbox').update({attempts:job.attempts+1,next_attempt_at:new Date(Date.now()+120000).toISOString()}).eq('id',job.id).eq('attempts',job.attempts).is('sent_at',null).select('id').maybeSingle();
   if(!claimed)continue;
-  const {data:link}=await config.db.from('telegram_links').select('chat_id,notifications_enabled').eq('game_id',job.game_id).eq('user_id',job.user_id).maybeSingle();
+  const link=links.get(job.game_id+':'+job.user_id);
   const {data:member}=await config.db.from('game_members').select('user_id').eq('game_id',job.game_id).eq('user_id',job.user_id).is('roster_archived_at',null).maybeSingle();
   if(!link?.notifications_enabled||!member){await config.db.from('telegram_outbox').update({sent_at:new Date().toISOString(),last_error:'Subscription inactive'}).eq('id',job.id);continue}
   // Outbox entries can outlive the underlying record. Never deliver material
@@ -193,10 +221,7 @@ async function dispatchOutbox(gameId?:string){
    if(docError){console.error('Telegram party review lookup failed',docError.code);continue}
    if(!document){await dismiss('Party review no longer current');continue}
   }
-  const {data:preferences,error:prefsError}=await config.db.from('telegram_notification_preferences')
-   .select('daily_brief,task_reminders,mentions,documents,votes,events,quiet_hours')
-   .eq('game_id',job.game_id).eq('user_id',job.user_id).maybeSingle();
-  if(prefsError){console.error('Telegram preferences query failed',prefsError.code);continue}
+  const preferences=prefs.get(job.game_id+':'+job.user_id);
   const categoryKey:Record<string,string>={
    daily_brief:'daily_brief',task:'task_reminders',task_done:'task_reminders',
    mention_chat:'mentions',mention_actions:'mentions',mention_documents:'mentions',
