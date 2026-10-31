@@ -83,6 +83,8 @@ export function useRepublicGame(gameId:string){
  const videoLimitTimer=useRef<ReturnType<typeof setTimeout>|null>(null);
  const lastTelegramDispatch=useRef(0);
  const lastCoreSuccessAt=useRef(0);
+ // Only simultaneous first-entry reads share a promise; later refreshes recheck RLS.
+ const initialCoreReads=useRef(new Map<string,Promise<void>>());
  // Avoid amplifying PostgREST pool/statement timeouts with repeated 15-table reads.
  const backendRecoveryAfter=useRef(0);
  const overviewRealtimeTimer=useRef<ReturnType<typeof setTimeout>|null>(null);
@@ -281,6 +283,7 @@ export function useRepublicGame(gameId:string){
   formalFullVersion.current='';acceptedMember.current=null;
   chatOverviewReads.current.clear();
   rosterReads.current.clear();
+  initialCoreReads.current.clear();
   realtimeDirtyTables.current.clear();
   changedFormalIds.current.clear();changedVoteIds.current.clear();
   if(readReceipt.current.timer!==null)clearTimeout(readReceipt.current.timer);
@@ -926,7 +929,12 @@ export function useRepublicGame(gameId:string){
   if(!uid)return;
   const ticket=startRead('core','game','stages','votes','members','metrics','profiles','parties','formal','channels');
   const results=await (async()=>{
-   // Personal authoritative RLS read is independent of the roster and bundle.
+   // Entry identity was just verified by the server. Do not request the same
+   // personal member row a second time before the first core snapshot.
+   // Every subsequent core refresh reads it again to detect role changes.
+   const entryMember=lastCoreSuccessAt.current===0&&
+    acceptedMember.current?.game_id===gameId&&acceptedMember.current?.user_id===uid
+     ?acceptedMember.current:null;
    const [bundle,m,mb,pa,intro]=await Promise.all([
     (async()=>{
      const primary=await limitedCoreRead(supabase.rpc('get_game_bootstrap_v3',{p_game_id:gameId}));
@@ -934,7 +942,8 @@ export function useRepublicGame(gameId:string){
      return primary.error&&['PGRST202','42883'].includes(String(primary.error.code||''))
       ?limitedCoreRead(supabase.rpc('get_game_bootstrap_v2',{p_game_id:gameId})):primary;
     })(),
-    limitedCoreRead(supabase.from('game_members').select('*').eq('game_id',gameId).eq('user_id',uid).maybeSingle()),
+    entryMember?Promise.resolve({data:entryMember,error:null}):
+     limitedCoreRead(supabase.from('game_members').select('*').eq('game_id',gameId).eq('user_id',uid).maybeSingle()),
     loadMemberRoster(),
     loadCachedParties(),
     limitedCoreRead(supabase.rpc('has_seen_my_intro'))
@@ -1027,11 +1036,22 @@ export function useRepublicGame(gameId:string){
   if(!intro.error)setIntroAccountSeen(!!intro.data);
  }
 
+ function loadCoreForView(){
+  const uid=authUser.current;
+  if(!uid)return loadCoreSections();
+  const key=gameId+':'+uid+':'+readEpoch.current;
+  // An initial navigation or restored tab may trigger a second hydration while
+  // the first bundled RPC is pending. Never create a second 5-read burst.
+  if(lastCoreSuccessAt.current===0||initialCoreReads.current.has(key))
+   return coalesceInFlight(initialCoreReads.current,key,loadCoreSections);
+  return loadCoreSections();
+ }
+
  async function hydrateActiveView(allowFreshCore=false,forceOffices=false){
   // Rapid view navigation can reuse recently updated common data.
   // Realtime, recovery and explicit refresh still force the core read.
   const jobs:Promise<unknown>[]=[loadRepublicOffices(forceOffices)];
-  if(!allowFreshCore||Date.now()-lastCoreSuccessAt.current>60000)jobs.unshift(loadCoreSections());
+  if(!allowFreshCore||Date.now()-lastCoreSuccessAt.current>60000)jobs.unshift(loadCoreForView());
   const view=activeViewRef.current;
   if(view==='parties'||view==='profile')jobs.push(loadPartyAssets(view==='parties'));
   // Teacher dossiers must fetch document rows, not just party representation.
