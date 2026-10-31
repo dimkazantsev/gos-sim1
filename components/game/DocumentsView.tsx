@@ -4,6 +4,7 @@ import {useEffect,useMemo,useRef,useState} from 'react';
 import {supabase} from '@/lib/supabase';
 import {resolveStoredAsset} from '@/lib/resolveStoredAsset';
 import {createScopedSignedAssetCache} from './scopedSignedAssetCache';
+import {createDocumentMetadataCache} from './documentMetadataCache';
 import type {ReturnTypeRepublic} from './viewTypes';
 import type {FormalDocument} from './types';
 import {FORMAL_SUBJECTS,FORMAL_TYPES,inferFormal,formalSignature,ownerLabel,formalDocumentTypeLabel,formalDocumentTitle,formalSubjectDisplayLabel} from './formalInstitutions';
@@ -92,6 +93,10 @@ export default function DocumentsView({g,focusId,createTemplate,createStageNo,on
  const [documentAccess,setDocumentAccess]=useState<DocumentAccess|null>(null),[accessError,setAccessError]=useState(''),[editNote,setEditNote]=useState(''),[editRevision,setEditRevision]=useState(1);
  const activeRoles=useMemo(()=>(g.officeAssignments||[]).filter(o=>o.user_id===me?.user_id&&o.status==='active').map(o=>o.role_title),[g.officeAssignments,me?.user_id]);
  const [subjectPermissions,setSubjectPermissions]=useState<string[]|null>(null),[revisions,setRevisions]=useState<HistoricalRevisionHeader[]>([]);
+ // Revisions are immutable; permission tools are intentionally never cached.
+ // Replace the cache when the game, user, role or readonly context changes.
+ const revisionHeaders=useMemo(()=>createDocumentMetadataCache<HistoricalRevisionHeader[]>(),
+  [g.game?.id,me?.user_id,me?.role_title,readOnly,activeRoles.join('|')]);
  const [billProfile,setBillProfile]=useState<BillProfile|null>(null),[billFiles,setBillFiles]=useState<BillFile[]>([]),[billConclusion,setBillConclusion]=useState<BillConclusion|null>(null),[billReadiness,setBillReadiness]=useState<BillReadiness|null>(null);
  const [billFinancial,setBillFinancial]=useState(false),[billGovernmentOpinion,setBillGovernmentOpinion]=useState(false),[billCommittee,setBillCommittee]=useState(''),[billRepresentative,setBillRepresentative]=useState(''),[billNote,setBillNote]=useState('');
  const [billFileKind,setBillFileKind]=useState('explanatory_note'),[billFile,setBillFile]=useState<File|null>(null),[billReviewNote,setBillReviewNote]=useState<Record<string,string>>({}),[billDossierOpen,setBillDossierOpen]=useState(false);
@@ -156,7 +161,25 @@ export default function DocumentsView({g,focusId,createTemplate,createStageNo,on
   setCommitteeRapporteur('');setCommitteeLegal('');setCommitteeLogic('');setCommitteeActs('');setCommitteeRecommendation('draft');
   setBudgetReview(null);setBudgetDocsOk(false);setBudgetDistributed(false);setBudgetAccounts(false);setBudgetConclusion('');setBudgetDecision('draft');setBudgetReviewNote('');
  },[selected?.id,editorScope]);
- useEffect(()=>{setDocumentAccess(null);setAccessError('');setRevisions([]);if(!selected?.id)return;let active=true;void Promise.all([supabase.rpc('get_formal_document_tools',{p_document_id:selected.id}),supabase.from('formal_document_revisions').select('id,revision,title,created_at').eq('document_id',selected.id).order('revision',{ascending:false})]).then(([a,r])=>{if(!active)return;if(a.error)setAccessError(userError(a.error));else setDocumentAccess(a.data as DocumentAccess);if(!r.error)setRevisions(r.data||[])});return()=>{active=false}},[selected?.id,selected?.updated_at,localRefresh,editorScope]);
+ useEffect(()=>{
+  setDocumentAccess(null);setAccessError('');setRevisions([]);
+  if(!selected?.id)return;
+  let active=true;
+  const id=selected.id,version=id+':'+selected.updated_at+':'+localRefresh;
+  const headers=revisionHeaders(version,async()=>{
+   const result=await supabase.from('formal_document_revisions')
+    .select('id,revision,title,created_at').eq('document_id',id).order('revision',{ascending:false});
+   if(result.error)throw result.error;
+   return (result.data||[]) as HistoricalRevisionHeader[];
+  }).then(data=>({data,error:null}),error=>({data:null,error}));
+  // Keep the access decision fresh on every open, including after a role change.
+  void Promise.all([supabase.rpc('get_formal_document_tools',{p_document_id:id}),headers]).then(([a,r])=>{
+   if(!active)return;
+   if(a.error)setAccessError(userError(a.error));else setDocumentAccess(a.data as DocumentAccess);
+   if(!r.error&&r.data)setRevisions(r.data);
+  });
+  return()=>{active=false};
+ },[selected?.id,selected?.updated_at,localRefresh,editorScope,revisionHeaders]);
  useEffect(()=>{
   if(!selected?.id){setDocumentSignatures([]);return}
   let current=true;
