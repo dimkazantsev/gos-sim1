@@ -45,7 +45,7 @@ function PostText({post,onNavigate,onOpenDocument,onOpenVotes}:{post:PoliticalPo
  return <><RichPostText text={text} onNavigate={onNavigate} onOpenDocument={onOpenDocument} onOpenVotes={onOpenVotes}/>{long&&<button className="postReadMore" type="button" aria-expanded={expanded} onClick={()=>setExpanded(v=>!v)}>{expanded?'Свернуть текст':'Читать полностью'}<ChevronDown size={16}/></button>}</>;
 }
 export default function PoliticalWallView({g,onOpenVotes,onOpenDocument,onNavigate,focusPending=false,readOnly=false}:{g:ReturnTypeRepublic;onOpenVotes:(id?:string)=>void;onOpenDocument:(id:string)=>void;onNavigate:(view:View,target?:{stageNo?:number})=>void;focusPending?:boolean;readOnly?:boolean}){
- const {game,me,teacher,currentStage,politicalPosts,politicalMedia,postFormalLinks,formalDocuments,votes,profiles,names,availableActors}=g;
+ const {game,me,teacher,currentStage,politicalPosts,politicalPostTotal,politicalActorOptions,politicalHasOlder,politicalOlderLoading,politicalSearchLoading,politicalMedia,postFormalLinks,formalDocuments,votes,profiles,names,availableActors}=g;
  const [processType,setProcessType]=useState('statement'),[actorKey,setActorKey]=useState('');
  const [serverActors,setServerActors]=useState<{key:string;label:string}[]|null>(null);
  const [actorSearch,setActorSearch]=useState('');
@@ -80,6 +80,15 @@ export default function PoliticalWallView({g,onOpenVotes,onOpenDocument,onNaviga
  const [files,setFiles]=useState<File[]>([]),[busy,setBusy]=useState(false),[notice,setNotice]=useState('');
  const [search,setSearch]=useState(''),[filterActor,setFilterActor]=useState(''),[filterType,setFilterType]=useState(''),[filterStage,setFilterStage]=useState('');
  const [visiblePostCount,setVisiblePostCount]=useState(POLITICAL_POST_BATCH_SIZE);
+ const hasFeedFilters=!!(search.trim()||filterActor||filterType||filterStage);
+ useEffect(()=>{if(game?.id&&typeof g.setPoliticalWallFullSearch==='function')g.setPoliticalWallFullSearch(hasFeedFilters)},[game?.id,hasFeedFilters]);
+ async function showMorePoliticalPosts(){
+  if(visiblePostCount<filtered.length){setVisiblePostCount(current=>nextPoliticalPostCount(current,filtered.length));return}
+  if(politicalHasOlder&&!politicalOlderLoading){
+   const loaded=await g.loadOlderPoliticalPosts();
+   if(loaded)setVisiblePostCount(current=>current+POLITICAL_POST_BATCH_SIZE);
+  }
+ }
  const [bulkMode,setBulkMode]=useState(false),[selectedPostIds,setSelectedPostIds]=useState<Set<string>>(()=>new Set()),[bulkProgress,setBulkProgress]=useState(0);
  const [locallyRemovedIds,setLocallyRemovedIds]=useState<Set<string>>(()=>new Set());
  // Bulk selection is local to one game. Never carry ids into another game.
@@ -250,7 +259,7 @@ export default function PoliticalWallView({g,onOpenVotes,onOpenDocument,onNaviga
  return <div className="wallPage processPortal">
   <section className="wallHero">
    <div><small>Официальная лента игры</small><h1>Политический процесс</h1><p>События, документы и действия участников. Регистрация, смена этапов и итоги голосований появляются автоматически.</p></div>
-   <div className="wallHeroStats"><div><strong>{politicalPosts.length}</strong><span>Публикаций в ленте</span></div><div><strong>{formalDocuments.length}</strong><span>Документов в реестре</span></div><div><strong>{votes.filter(v=>v.status==='open').length}</strong><span>Открытых голосований</span></div></div>
+   <div className="wallHeroStats"><div><strong>{politicalPostTotal||politicalPosts.length}</strong><span>Публикаций в ленте</span></div><div><strong>{formalDocuments.length}</strong><span>Документов в реестре</span></div><div><strong>{votes.filter(v=>v.status==='open').length}</strong><span>Открытых голосований</span></div></div>
   </section>
   {!teacher&&!readOnly&&<section className="wallStageTask"><div className="wallStageTaskNo">{String(stageNo).padStart(2,'0')}</div><div className="wallStageTaskCopy"><small>Текущий этап</small><h2>{stageAction.title}</h2><p>{stageAction.body}</p></div><button className="primary" onClick={()=>onNavigate(stageAction.target)}>{stageAction.button}</button></section>}
 
@@ -289,7 +298,7 @@ export default function PoliticalWallView({g,onOpenVotes,onOpenDocument,onNaviga
       <button type="button" className="secondary" disabled={busy} onClick={exitBulkMode}>Отмена</button>
      </div>}
    </section>}
-   <section className="wallSearch"><label>Поиск<input type="search" aria-label="Поиск публикаций" value={search} onChange={e=>setSearch(e.target.value)} placeholder="Текст, название или тег"/></label><StyledSelect label="Субъект" value={filterActor} onChange={setFilterActor} options={[{value:'',label:'Все субъекты'},...Array.from(new Map(politicalPosts.map(p=>[p.actor_key,p.actor_key==='teacher'||p.actor_key==='system'?BRAND_NAME:p.actor_label])).entries()).map(([value,label])=>({value,label}))]}/><StyledSelect label="Вид публикации" value={filterType} onChange={setFilterType} options={[{value:'',label:'Все публикации'},...PROCESS_TYPES.map(x=>({value:x[0],label:x[1]}))]}/><StyledSelect label="Этап" value={filterStage} onChange={setFilterStage} options={[{value:'',label:'Все этапы'},...g.stages.map(s=>({value:String(s.stage_no),label:'Этап '+s.stage_no+' · '+s.title}))]}/></section>
+   <section className="wallSearch"><label>Поиск<input type="search" aria-label="Поиск публикаций" value={search} onChange={e=>setSearch(e.target.value)} placeholder="Текст, название или тег"/></label><StyledSelect label="Субъект" value={filterActor} onChange={setFilterActor} options={[{value:'',label:'Все субъекты'},...Array.from(new Map((Array.isArray(politicalActorOptions)&&politicalActorOptions.length?politicalActorOptions:politicalPosts).map(p=>[p.actor_key,p.actor_key==='teacher'||p.actor_key==='system'?BRAND_NAME:p.actor_label])).entries()).map(([value,label])=>({value,label}))]}/><StyledSelect label="Вид публикации" value={filterType} onChange={setFilterType} options={[{value:'',label:'Все публикации'},...PROCESS_TYPES.map(x=>({value:x[0],label:x[1]}))]}/><StyledSelect label="Этап" value={filterStage} onChange={setFilterStage} options={[{value:'',label:'Все этапы'},...g.stages.map(s=>({value:String(s.stage_no),label:'Этап '+s.stage_no+' · '+s.title}))]}/></section>
    <section className="wallFeed">{!filtered.length?<div className="emptyState">Подходящих публикаций нет.</div>:visiblePosts.map(p=>{
     const party=g.parties.find(x=>x.id===p.context?.party_id||x.name===p.actor_label||p.actor_key==='party:'+x.id||p.actor_key==='faction:'+x.id),pf=profiles.find(x=>x.user_id===p.author_id);
     const media=politicalMedia.filter(x=>x.post_id===p.id);
@@ -339,12 +348,13 @@ export default function PoliticalWallView({g,onOpenVotes,onOpenDocument,onNaviga
      {npaFor===p.id&&<div className="quickNpa"><StyledSelect label="Вид НПА" value={npaType} onChange={setNpaType} options={[{value:'fz_bill',label:'Проект ФЗ'},{value:'fkz_bill',label:'Проект ФКЗ'},{value:'federal_budget',label:'Федеральный бюджет'},{value:'president_decree',label:'Указ Президента'},{value:'government_resolution',label:'Постановление Правительства'},{value:'gd_resolution',label:'Постановление ГД'},{value:'sf_resolution',label:'Постановление СФ'},{value:'municipal_act',label:'Муниципальный акт'}]}/><button className="primary" disabled={busy} onClick={()=>void quickNpa(p)}>Создать проект из публикации</button></div>}
     </article>;
    })}</section>
-   {filtered.length>POLITICAL_POST_BATCH_SIZE&&<div className="wallFeedPaging" role="group" aria-label="Загрузка публикаций">
-    <span role="status">Показано {visiblePosts.length} из {filtered.length} публикаций</span>
-    {visiblePosts.length<filtered.length
-     ?<button type="button" className="secondary wallFeedMore" onClick={()=>setVisiblePostCount(current=>nextPoliticalPostCount(current,filtered.length))}>Показать ещё {Math.min(POLITICAL_POST_BATCH_SIZE,filtered.length-visiblePosts.length)}<ChevronDown size={17}/></button>
+   {(filtered.length>POLITICAL_POST_BATCH_SIZE||politicalHasOlder)&&<div className="wallFeedPaging" role="group" aria-label="Загрузка публикаций">
+    <span role="status">Показано {visiblePosts.length} из {hasFeedFilters?filtered.length:politicalPostTotal||filtered.length} публикаций</span>
+    {(visiblePosts.length<filtered.length||politicalHasOlder)
+     ?<button type="button" className="secondary wallFeedMore" disabled={politicalOlderLoading} aria-busy={politicalOlderLoading} onClick={()=>void showMorePoliticalPosts()}>{politicalOlderLoading?'Загрузка…':'Показать ещё '+Math.min(POLITICAL_POST_BATCH_SIZE,Math.max(1,(politicalHasOlder&&!hasFeedFilters?politicalPostTotal:filtered.length)-visiblePosts.length))}<ChevronDown size={17}/></button>
      :<button type="button" className="secondary wallFeedMore" onClick={()=>setVisiblePostCount(POLITICAL_POST_BATCH_SIZE)}>Свернуть до 10<ChevronDown className="wallFeedCollapseIcon" size={17}/></button>}
    </div>}
+   {politicalSearchLoading&&hasFeedFilters&&<p role="status" className="wallFeedInfo">Загружаем публикации для поиска…</p>}
   </>
   {metricPost&&<div className="eventCaseBackdrop processMetricBackdrop" onMouseDown={e=>{if(e.target===e.currentTarget)setMetricPost(null)}}><section ref={metricDialog} className="eventCaseModal processMetricDialog" tabIndex={-1} role="dialog" aria-modal="true" aria-label="Показатели публикации"><header className="eventModalHeader"><div><small>Публикация</small><h3>{metricPost.title}</h3></div><button className="eventModalClose" aria-label="Закрыть редактор показателей" onClick={()=>setMetricPost(null)}><X size={20}/></button></header><div className="eventModalBody"><TeacherMetricStudio key={metricPost.id} g={g} postId={metricPost.id}/></div></section></div>}
  </div>;
