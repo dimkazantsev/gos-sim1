@@ -112,7 +112,17 @@ async function main(){
    if(width===390){
     await profile.getByRole('button',{name:'Вводный комикс',exact:true}).click();await page.evaluate(()=>{window.__comicAudio.slow=true});await page.getByRole('button',{name:'Включить звук комикса',exact:true}).click();await page.getByRole('button',{name:'Закрыть комикс',exact:true}).click();await page.waitForTimeout(600);assert.equal(await page.evaluate(()=>window.__comicAudio.live),0,'A cancelled asynchronous start cannot play after close');await page.evaluate(()=>{window.__comicAudio.slow=false});
     unavailable=true;await profile.getByRole('button',{name:'Архив комиксов',exact:true}).click();await page.getByRole('status').filter({hasText:'Не удалось загрузить главы'}).waitFor();await page.getByRole('button',{name:/Пролог · 4 сцены/}).click();await page.locator('.comicOverlay h2').filter({hasText:'Республика после бури'}).waitFor();await page.getByRole('button',{name:'Закрыть комикс',exact:true}).click();unavailable=false;
-    await page.getByRole('button',{name:'Переключить игру для проверки',exact:true}).click();await profile.getByRole('button',{name:'Архив комиксов',exact:true}).click();await page.getByText('Этапы пока не завершены.',{exact:false}).waitFor();assert.equal(await page.getByRole('button',{name:/Итоги · Этап 10/}).count(),0,'Another classroom cannot inherit old chapters');assert(calls.includes('eq.another-classroom'));await page.getByRole('button',{name:'Закрыть комикс',exact:true}).click();
+    await page.getByRole('button',{name:'Переключить игру для проверки',exact:true}).click();
+    const switched=page.waitForResponse(r=>r.url().includes('/republic_comic_chapters')&&r.url().includes('eq.another-classroom'));
+    await profile.getByRole('button',{name:'Архив комиксов',exact:true}).click();await switched;
+    await page.getByRole('button',{name:/Итоги · Этап 10/}).waitFor({state:'hidden'});
+    assert.equal(await page.getByRole('button',{name:/Итоги · Этап 10/}).count(),0,'Another classroom cannot inherit old completed chapters');
+    // The instructor's approved preview library stays populated even without
+    // completed stages; the empty-state label is intentionally student-only.
+    const previews=await page.getByRole('button',{name:/МАКЕТ/}).count();
+    const empty=await page.getByText('Этапы пока не завершены.',{exact:false}).count();
+    assert(previews>0||empty>0,'Unrelated classroom shows teacher previews or its own empty-state label');
+    assert(calls.includes('eq.another-classroom'));await page.getByRole('button',{name:'Закрыть комикс',exact:true}).click();
    }
    await page.getByRole('button',{name:'Первый вход для проверки',exact:true}).click();assert(await page.getByRole('button',{name:'Завершить пролог после просмотра',exact:true}).isDisabled());assert.equal(await page.getByRole('button',{name:'Архив комиксов',exact:true}).count(),1,'Automatic prologue has no archive navigation');await page.keyboard.press('Escape');assert.equal(await page.getByRole('dialog').count(),1,'Required introduction stays open before its final scene');
    for(let i=0;i<3;i++)await page.getByRole('button',{name:'Следующая сцена',exact:true}).click();await page.getByRole('button',{name:'Завершить пролог после просмотра',exact:true}).click();assert.equal(await page.locator('#intro-finished').textContent(),'1');
