@@ -3,9 +3,10 @@
  * Supabase REST/Auth/Storage, RSC navigation, or any write.
  */
 const CACHE='gos-id-pwa-static-20261027-v1';
-const OFFLINE='/offline.html';
+const BASE=(self.location.pathname||'/sw.js').replace(/\/sw\.js$/,'').replace(/\/$/,'');
+const OFFLINE=BASE+'/offline.html';
 const MAX_ASSETS=80;
-const PRELOAD=[OFFLINE,'/pwa/icon-192.png'];
+const PRELOAD=[OFFLINE,BASE+'/pwa/icon-192.png'];
 self.addEventListener('install',event=>{
  event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(PRELOAD)));
 });
@@ -28,7 +29,7 @@ self.addEventListener('fetch',event=>{
   event.respondWith(fetch(request).catch(async()=>await caches.match(OFFLINE)||Response.error()));
   return;
  }
- const safeStatic=url.search===''&&url.pathname.startsWith('/_next/static/')&&
+ const safeStatic=url.search===''&&url.pathname.startsWith(BASE+'/_next/static/')&&
   ['script','style','font','image'].includes(request.destination);
  if(!safeStatic)return;
  event.respondWith((async()=>{
