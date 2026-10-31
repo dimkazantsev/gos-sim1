@@ -301,7 +301,7 @@ async function main(){
   assert(source.includes("function readLegacyBootstrap()"),'Absent-schema fallback remains available');
   assert(source.includes(".eq('user_id',uid).maybeSingle()"),'Personal membership stays independent of full roster');
   assert(source.slice(start,end).includes('loadCachedParties()'),'One core table uses a shared cache, with its query still queue-limited');
-  assert(source.includes("const request=limitedCoreRead(supabase.from('game_parties')"),'Party reads preserve four-slot limiter');
+  assert(source.includes("const request=limitedCoreRead(query)")&&source.includes(".select(PARTY_LIST_COLUMNS)"),'Party reads preserve four-slot limiter and lightweight projection');
   assert(source.slice(start,end).includes('loadMemberRoster()'),'The separately authorised roster remains shared and concurrency limited');
   assert(source.includes('coreReadQueue.current.active<4'));
  });
