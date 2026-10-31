@@ -81,7 +81,7 @@ export default function PoliticalWallView({g,onOpenVotes,onOpenDocument,onNaviga
  const [search,setSearch]=useState(''),[filterActor,setFilterActor]=useState(''),[filterType,setFilterType]=useState(''),[filterStage,setFilterStage]=useState('');
  const [visiblePostCount,setVisiblePostCount]=useState(POLITICAL_POST_BATCH_SIZE);
  const hasFeedFilters=!!(search.trim()||filterActor||filterType||filterStage);
- useEffect(()=>{if(game?.id)g.setPoliticalWallFullSearch(hasFeedFilters)},[game?.id,hasFeedFilters]);
+ useEffect(()=>{if(game?.id&&typeof g.setPoliticalWallFullSearch==='function')g.setPoliticalWallFullSearch(hasFeedFilters)},[game?.id,hasFeedFilters]);
  async function showMorePoliticalPosts(){
   if(visiblePostCount<filtered.length){setVisiblePostCount(current=>nextPoliticalPostCount(current,filtered.length));return}
   if(politicalHasOlder&&!politicalOlderLoading){
