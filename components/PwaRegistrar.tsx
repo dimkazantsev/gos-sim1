@@ -9,7 +9,8 @@ export default function PwaRegistrar(){
   let timer:number|undefined,disposed=false;
   const register=()=>{timer=window.setTimeout(()=>{
    if(disposed)return;
-   void navigator.serviceWorker.register('/sw.js',{scope:'/',updateViaCache:'none'}).catch(()=>{
+   const base=(process.env.NEXT_PUBLIC_ASSET_BASE_PATH||'').replace(/\/$/,'');
+   void navigator.serviceWorker.register(base+'/sw.js',{scope:base+'/',updateViaCache:'none'}).catch(()=>{
     // PWA must never interfere with an online login or active game.
    });
   },2500)};
