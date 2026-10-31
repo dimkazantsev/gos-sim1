@@ -13,10 +13,10 @@ export default function GosReleaseNotice(){
  const [newVersion,setNewVersion]=useState(false);
  useEffect(()=>{
   if(!/^[0-9a-f]{40}$/i.test(CURRENT_RELEASE)||typeof window==='undefined')return;
-  let cancelled=false,lastCheck=0;
+  let cancelled=false,lastCheck=0,checking=false;
   const check=async()=>{
-   if(document.visibilityState==='hidden'||!navigator.onLine||Date.now()-lastCheck<MIN_RECHECK_MS)return;
-   lastCheck=Date.now();
+   if(cancelled||checking||document.visibilityState==='hidden'||!navigator.onLine||Date.now()-lastCheck<MIN_RECHECK_MS)return;
+   lastCheck=Date.now();checking=true;
    try{
     const response=await fetch(BASE+'/release.json',{cache:'no-store',signal:AbortSignal.timeout(6000)});
     if(!response.ok)return;
@@ -25,17 +25,24 @@ export default function GosReleaseNotice(){
      setNewVersion(data.release!==CURRENT_RELEASE);
     }
    }catch{/* Static host or network unavailable. Never interrupt the active game. */}
+   finally{checking=false;}
   };
   const visibility=()=>{if(document.visibilityState==='visible')void check()};
   const focus=()=>void check();
-  const startup=window.setTimeout(()=>void check(),6000);
+  // Stagger classrooms opening 40 devices at once rather than stampeding the host.
+  const startup=window.setTimeout(()=>void check(),4000+Math.floor(Math.random()*8000));
   const interval=window.setInterval(()=>void check(),INTERVAL_MS);
   document.addEventListener('visibilitychange',visibility);
   window.addEventListener('focus',focus);
+  // A suspended or offline student must be checked as soon as they reconnect.
+  window.addEventListener('online',focus);
+  window.addEventListener('pageshow',focus);
   return()=>{
    cancelled=true;window.clearTimeout(startup);window.clearInterval(interval);
    document.removeEventListener('visibilitychange',visibility);
    window.removeEventListener('focus',focus);
+   window.removeEventListener('online',focus);
+   window.removeEventListener('pageshow',focus);
   };
  },[]);
  if(!newVersion)return null;
