@@ -64,7 +64,7 @@ function harness({effects=false,compiledCode=code}={}){
      if(table==='chat_messages')data=[{id:'message-'+snapshot.revision,game_id:id,channel_id:this.eqs.channel_id||'channel-a',text:'message-'+snapshot.revision,created_at:'2026-10-08T10:00:00Z'}];
      if(fixtureSnapshot){data=fixtureSnapshot.filter(row=>Object.entries(this.eqs).every(([key,value])=>row[key]===value)&&Object.entries(this.ins).every(([key,values])=>values.includes(row[key])));if(this.singleRow)data=data[0]||null;}
      // Emulate PostgREST column projection for the changed formal document path.
-     if(table==='formal_documents'&&Array.isArray(data)&&this.columns&&this.columns!=='*'){
+     if(['formal_documents','game_members','game_parties','game_profiles'].includes(table)&&Array.isArray(data)&&this.columns&&this.columns!=='*'){
       const fields=this.columns.split(',').map(field=>field.trim());
       data=data.map(row=>Object.fromEntries(fields.filter(field=>field in row).map(field=>[field,row[field]])));
      }
@@ -211,7 +211,7 @@ function harness({effects=false,compiledCode=code}={}){
   if(name==='./useGameTableSync')return{notifyGameDataRefresh:(gameId,table)=>notices.push({gameId,table}),notifySectionUpdates:()=>{},setGameRealtimeConnection:()=>{}};
   if(name==='./useBudgetPulse')return{useBudgetPulse:()=>({budgetPulse:null,budgetPulseError:'',refreshBudgetPulse:async()=>{}}),withBudgetIncome:rows=>rows};
   if(name==='./gameRoster')return{currentGameMembers:(rows,id)=>rows.filter(row=>row.game_id===id),currentGameProfiles:(rows,_,id)=>rows.filter(row=>row.game_id===id)};
-  if(name==='./chatChannelSelection'||name==='./chatRealtime'||name==='./chatHistoryPaging'||name==='./coalesceInFlight'||name==='./signDocumentAssetBatch'||name==='./formalDocumentSummary'){
+  if(name==='./chatChannelSelection'||name==='./chatRealtime'||name==='./chatHistoryPaging'||name==='./coalesceInFlight'||name==='./signDocumentAssetBatch'||name==='./formalDocumentSummary'||name==='./partyProfileSummary'){
    const source=fs.readFileSync(path.join(root,'components/game',name.slice(2)+'.ts'),'utf8');
    const compiled=ts.transpileModule(source,{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}}).outputText;
    const child={exports:{}};
