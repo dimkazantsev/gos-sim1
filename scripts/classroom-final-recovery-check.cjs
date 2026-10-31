@@ -50,6 +50,12 @@ async function test(){
  assert(notice.includes("window.confirm(")&&notice.includes("window.location.reload()"));
  assert(!notice.includes("window.location.replace(")&&!notice.includes("window.location.assign("));
  assert(notice.includes("INTERVAL_MS=5*60*1000"),'Only one lightweight check every five minutes');
+ assert(notice.includes("checking=true")&&notice.includes("finally{checking=false;}"),'Concurrent update checks must be deduplicated');
+ for(const event of ['online','pageshow']){
+  assert(notice.includes("window.addEventListener('"+event+"',focus)"),'Recheck release on '+event);
+  assert(notice.includes("window.removeEventListener('"+event+"',focus)"),'Remove '+event+' listener on unmount');
+ }
+ assert(notice.includes('Math.random()*8000'),'40 simultaneous entrants should stagger static release requests');
  assert(read('components/PwaRegistrar.tsx').includes("register(base+'/sw.js'"),'GH Pages uses scoped service worker');
  assert(read('public/sw.js').includes("BASE+'/_next/static/'"));
  console.log('PASS 40 Telegram recipients isolated by game; bounded non-idempotent chat write; safe GitHub Pages release checks and PWA scope');
