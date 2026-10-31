@@ -16,6 +16,18 @@ assert(dock.includes(".from('political_posts').select('id,title').eq('game_id',g
  'Opened metric history retrieves only RLS-scoped linked titles');
 assert(dock.includes("linkedPostTitles[String(h.source_id||'')]"),
  'Metric history keeps linked news titles without full political feed');
+assert(dock.includes("async function toggleLinkedPostPreview(id:string)"),
+ 'Individual publication details must load only on an explicit footnote click');
+assert(dock.includes(".from('political_posts').select('id,title,body')")&&
+ dock.includes(".eq('game_id',gid).eq('id',id).maybeSingle()"),
+ 'Footnote must fetch a single game-scoped RLS-authorized post, not a full feed');
+assert(dock.includes('linkedPostRequest.current++')&&
+ dock.includes('g.me?.kind,g.me?.role_title'),
+ 'Late footnote reads must not cross a role or game change');
+assert(game.includes("if(activeViewRef.current==='actions')return loadPoliticalWall()"),
+ 'Full political RPC is allowed only on the visible process screen');
+assert(game.includes("async function refreshVisiblePoliticalEffects()"),
+ 'Remote event effects use scoped metrics off the process screen');
 const between=source.slice(source.indexOf('useEffect(()=>{'),source.indexOf('},[gameId]);')+12);
 assert(source.includes("const {game,me,currentStage,stages,teacher,parties,members,votes"),'Archived events must not be consumed by dashboard');
 assert(!source.includes('events.slice(0,4)'),'Overview must not display historical game_events');
