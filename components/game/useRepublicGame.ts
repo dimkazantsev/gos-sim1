@@ -2009,7 +2009,24 @@ export function useRepublicGame(gameId:string){
  }
  async function refresh(){invalidatePartyRows();await loadAll(false);await Promise.all([hydrateActiveView(false,true),refreshBudgetPulse()]);notifyGameDataRefresh(gameId);if(channelRef.current)await loadMessages(channelRef.current)}
  async function refreshDocuments(id:string){await loadFormalRegistry([id]);notifyGameDataRefresh(gameId,'formal_documents')}
- async function refreshEventEffects(){await Promise.all([loadPoliticalWall(),refreshBudgetPulse()]);notifyGameDataRefresh(gameId,'event_decisions')}
+ // A case decision can change the public metrics without making the
+ // Political Process feed visible. Read only the metrics when the player is
+ // looking at a different section. On the process screen, retain its full
+ // reconciliation (post outcomes, media and linked documents).
+ async function refreshVisiblePoliticalEffects(){
+  if(activeViewRef.current==='actions')return loadPoliticalWall();
+  await readSafely(['metrics'],async ticket=>{
+   const response=await limitedCoreRead(supabase.from('state_metrics')
+    .select('*').eq('game_id',gameId).order('label'));
+   if(!readCurrent(ticket,'metrics'))return;
+   requireSuccessful([response]);
+   setMetrics((response.data||[]) as Metric[]);
+  });
+ }
+ async function refreshEventEffects(){
+  await Promise.all([refreshVisiblePoliticalEffects(),refreshBudgetPulse()]);
+  notifyGameDataRefresh(gameId,'event_decisions');
+ }
 
  async function logActivity(eventType:string,label:string,viewKey?:string,payload:Record<string,unknown>={}){
   const uid=me?.user_id;if(!uid||authUser.current!==uid)return;
@@ -2210,7 +2227,7 @@ export function useRepublicGame(gameId:string){
  }
  async function updateMetric(id:string,value:number,note?:string){
   if(!teacher)return;const r=await supabase.rpc('set_state_metric',{p_metric_id:id,p_value:value,p_note:note||null});
-  if(r.error)setError(r.error.message);else await Promise.all([loadPoliticalWall(),refreshBudgetPulse()]);
+  if(r.error)setError(r.error.message);else await Promise.all([refreshVisiblePoliticalEffects(),refreshBudgetPulse()]);
  }
  async function updateImpactRule(ruleId:string,enabled:boolean,autoApply:boolean,effects:Record<string,unknown>,description?:string){
   const r=await supabase.rpc('update_impact_rule',{p_rule_id:ruleId,p_enabled:enabled,p_auto_apply:autoApply,p_effects:effects,p_description:description||null});
@@ -2218,7 +2235,7 @@ export function useRepublicGame(gameId:string){
  }
  async function revertImpactEntry(id:number){
   const r=await supabase.rpc('revert_impact_entry',{p_ledger_id:id});
-  if(r.error){setError(r.error.message);return false}await Promise.all([loadImpactEngine(),loadPoliticalWall(),refreshBudgetPulse()]);return true;
+  if(r.error){setError(r.error.message);return false}await Promise.all([loadImpactEngine(),refreshVisiblePoliticalEffects(),refreshBudgetPulse()]);return true;
  }
  async function createParty(name:string,ideology:string){
   if(!me||me.kind==='observer'||!name.trim())return false;
