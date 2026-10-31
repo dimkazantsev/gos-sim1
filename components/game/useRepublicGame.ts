@@ -42,8 +42,8 @@ export function useRepublicGame(gameId:string){
  const [game,setGame]=useState<Game|null>(null),[me,setMe]=useState<Member|null>(null),[metrics,setMetrics]=useState<Metric[]>([]),[events,setEvents]=useState<EventItem[]>([]),[memberRows,setMembers]=useState<Member[]>([]);
  const [officeRows,setOfficeRows]=useState<GameOfficeAssignment[]>([]);
  const activeGameRef=useRef(gameId),readEpoch=useRef(0),readVersions=useRef<Partial<Record<ReadScope,number>>>({}),alive=useRef(true),authUser=useRef<string|null|undefined>(undefined),acceptedMember=useRef<Member|null>(null);
- if(activeGameRef.current!==gameId){activeGameRef.current=gameId;readEpoch.current++}
  const formalFullVersion=useRef('');
+ if(activeGameRef.current!==gameId){activeGameRef.current=gameId;readEpoch.current++;formalFullVersion.current=''}
  const members=useMemo(()=>currentGameMembers(memberRows,gameId),[memberRows,gameId]);
  const [channels,setChannels]=useState<Channel[]>([]),[channelId,setChannelId]=useState(''),[messages,setMessages]=useState<Message[]>([]),[chatPins,setChatPins]=useState<ChatPin[]>([]),[pinnedMessages,setPinnedMessages]=useState<Message[]>([]),[chatOverview,setChatOverview]=useState<ChatOverview[]>([]),[chatLoading,setChatLoading]=useState(false);
  const messageRowsRef=useRef<Message[]>([]),recentChatRecoveryRunning=useRef(false);
