@@ -25,7 +25,7 @@ import {CHAT_HISTORY_PAGE_SIZE,chatHistoryCursorFilter} from './chatHistoryPagin
 import type {GameOfficeAssignment,ChatOverview} from './types';
 import type {PendingMediaUpload,MediaUploadPhase} from './chatMediaTransport';
 export type RecordingPreview={kind:ChatMediaKind;blob:Blob;url:string;mime:string;fileName:string;channelId:string;duration:number;waveform?:number[]};
-type ReadScope='all'|'core'|'game'|'stages'|'votes'|'members'|'metrics'|'telemetry'|'profiles'|'parties'|'partyDocuments'|'partyRepresentation'|'formal'|'political'|'impact'|'overview'|'channels'|'offices'|'messages'|'pins';
+type ReadScope='all'|'core'|'game'|'events'|'documents'|'stages'|'votes'|'members'|'metrics'|'telemetry'|'profiles'|'parties'|'partyDocuments'|'partyRepresentation'|'formal'|'political'|'impact'|'overview'|'channels'|'offices'|'messages'|'pins';
 type ReadTicket={gameId:string;epoch:number;versions:Partial<Record<ReadScope,number>>};
 const BOOTSTRAP_TIMEOUT_MS=12000;
 const PRESENTATION_CACHE_TTL_MS=600000;
@@ -2313,7 +2313,31 @@ export function useRepublicGame(gameId:string){
   await refresh();
  }
 
- async function publishEvent(title:string,body:string,severity='notice',category='Режиссёрская'){if(!me||!title.trim()||!body.trim())return false;const r=await supabase.from('game_events').insert({game_id:gameId,round_no:currentStage?.stage_no||1,category,severity,title:title.trim(),body:body.trim(),created_by:me.user_id});if(r.error){setError(r.error.message);return false}await refresh();return true}
+ // After a single-table write, refresh only the affected RLS-scoped feed.
+ // Use the same read-ticket generation as the Realtime reconciliation path:
+ // a delayed HTTP result must not repopulate a previous user/game.
+ async function refreshChangedFeed(table:'game_events'|'game_documents'){
+  if(table==='game_events'){
+   await readSafely(['events'],async ticket=>{
+    const result=await limitedCoreRead(supabase.from('game_events').select('*')
+     .eq('game_id',gameId).order('published_at',{ascending:false}).limit(100));
+    if(!readCurrent(ticket))return;
+    requireSuccessful([result]);
+    setEvents((result.data||[]) as EventItem[]);
+   });
+  }else{
+   await readSafely(['documents'],async ticket=>{
+    const result=await limitedCoreRead(supabase.from('game_documents').select('*')
+     .eq('game_id',gameId).order('created_at',{ascending:false}));
+    if(!readCurrent(ticket))return;
+    requireSuccessful([result]);
+    setDocuments((result.data||[]) as GameDocument[]);
+   });
+  }
+  notifyGameDataRefresh(gameId,table);
+ }
+
+ async function publishEvent(title:string,body:string,severity='notice',category='Режиссёрская'){if(!me||!title.trim()||!body.trim())return false;const r=await supabase.from('game_events').insert({game_id:gameId,round_no:currentStage?.stage_no||1,category,severity,title:title.trim(),body:body.trim(),created_by:me.user_id});if(r.error){setError(r.error.message);return false}await refreshChangedFeed('game_events');return true}
  async function triggerCrisis(choice?:{type:string;intensity:'low'|'medium'|'high'|'ultra'}){
   if(!teacher||!me)return;
   const c=choice?CRISES.find(scenario=>scenario.type===choice.type):CRISES[Math.floor(Math.random()*CRISES.length)];
@@ -2330,7 +2354,7 @@ export function useRepublicGame(gameId:string){
   return await drawGhostVoting();
  }
 
- async function createDocument(data:{title:string;type:string;body:string}){if(!teacher||!me||!data.title.trim())return false;const r=await supabase.from('game_documents').insert({game_id:gameId,title:data.title.trim(),doc_type:data.type.trim()||'Документ',body:data.body.trim()||null,created_by:me.user_id});if(r.error){setError(r.error.message);return false}await refresh();return true}
+ async function createDocument(data:{title:string;type:string;body:string}){if(!teacher||!me||!data.title.trim())return false;const r=await supabase.from('game_documents').insert({game_id:gameId,title:data.title.trim(),doc_type:data.type.trim()||'Документ',body:data.body.trim()||null,created_by:me.user_id});if(r.error){setError(r.error.message);return false}await refreshChangedFeed('game_documents');return true}
 
 
  async function saveProfile(bio:string,file?:File,gender?:'male'|'female'|'unspecified'){
