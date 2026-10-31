@@ -22,7 +22,8 @@ const simulate=async i=>{
  const ctx={
   PRESENTATION_CACHE_TTL_MS:600000,
   gameId:'game-1',authUser:{current:'student-'+i},readEpoch:{current:2},
-  partyReadState:{current:{scope:'',lastSuccessAt:0,rows:null,inflight:null}},
+  partyReadState:{current:{scope:'',lastSuccessAt:0,rows:null,full:false,inflight:null,inflightFull:false}},
+  activeViewRef:{current:'dashboard'},PARTY_LIST_COLUMNS:'id,game_id',normalizePartyRows:rows=>rows,
   Date:{now:()=>clock},
   limitedCoreRead:async query=>await query,
   supabase:{from(table){assert.equal(table,'game_parties');requests++;

@@ -22,7 +22,13 @@ const output=ts.transpileModule(extracted,{compilerOptions:{
  target:ts.ScriptTarget.ES2022,module:ts.ModuleKind.CommonJS
 }}).outputText;
 
-function client(){
+const helperSource=fs.readFileSync(path.resolve(__dirname,'../components/game/partyProfileSummary.ts'),'utf8');
+const helperCode=ts.transpileModule(helperSource,{compilerOptions:{target:ts.ScriptTarget.ES2022,module:ts.ModuleKind.CommonJS}}).outputText;
+const helperModule={exports:{}};
+vm.runInNewContext('(function(module,exports){'+helperCode+'})',{})(helperModule,helperModule.exports);
+const {PROFILE_ASSET_COLUMNS,mergeProfileAssetRows}=helperModule.exports;
+
+function client(view='profile'){
  const reads=[],signs=[],scopeCalls=[],errors=[];
  let parties=[],profiles=[],documents=[];
  const db={
@@ -45,6 +51,7 @@ function client(){
  }};
  const context={
   Promise,Map,console,module:{exports:{}},supabase,gameId:'game-1',
+  activeViewRef:{current:view},PROFILE_ASSET_COLUMNS,mergeProfileAssetRows,
   loadCachedParties:()=>Promise.resolve({data:[{id:'p1',logo_path:null}],error:null}),
   readSafely:async(scopes,reader)=>{scopeCalls.push(scopes);await reader({})},
   readCurrent:()=>true,requireSuccessful:()=>{},
@@ -74,7 +81,7 @@ const flush=()=>new Promise(resolve=>setImmediate(resolve));
  assert.equal(first.profiles.length,1,'Profile pictures must still load');
  assert.equal(first.parties.length,1,'Party identity must still load');
 
- const party=client();
+ const party=client('parties');
  await party.loadPartyAssets(true);
  await flush();
  assert.deepEqual([...party.reads].sort(),['game_profiles','party_documents'].sort(),
