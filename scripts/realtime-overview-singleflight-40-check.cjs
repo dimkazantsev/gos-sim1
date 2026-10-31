@@ -16,10 +16,10 @@ assert(source.includes("if(liveConnected&&now-lastChatRecoveryAt<60000)return"),
  'Connected chat recovery must remain low frequency');
 assert(source.includes('chatRecovery=setInterval(recoverVisibleChatAndBallots,6000)'),
  'Disconnected recovery must retain six-second cadence');
-const module={exports:{}};
+const sandboxModule={exports:{}};
 const js=ts.transpileModule(helper,{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}}).outputText;
-vm.runInNewContext('(function(module,exports){'+js+'})',{})(module,module.exports);
-const {coalesceInFlight}=module.exports;
+vm.runInNewContext('(function(module,exports){'+js+'})',{})(sandboxModule,sandboxModule.exports);
+const {coalesceInFlight}=sandboxModule.exports;
 const deferred=()=>{let resolve;const promise=new Promise(r=>{resolve=r});return {promise,resolve}};
 (async()=>{
  let actual=0;
