@@ -773,7 +773,7 @@ export function useRepublicGame(gameId:string){
    chatRecovery=setInterval(recoverVisibleChatAndBallots,6000);
   },initialRecoveryDelay);
   return()=>{
-   disposed=true;clearTimeout(timer);clearTimeout(partyDocumentBurstTimer);clearTimeout(networkPresenceTimer);clearInterval(poll);clearTimeout(startChatRecovery);
+   disposed=true;clearTimeout(timer);clearTimeout(partyDocumentBurstTimer);if(networkPresenceTimer!==null)clearTimeout(networkPresenceTimer);clearInterval(poll);clearTimeout(startChatRecovery);
    if(chatRecovery!==null)clearInterval(chatRecovery);
    document.removeEventListener('visibilitychange',resumePending);
    setGameRealtimeConnection(gameId,false);
