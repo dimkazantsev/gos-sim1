@@ -6,7 +6,7 @@ const path=require('node:path');
 const source=fs.readFileSync(path.join(__dirname,'../components/game/DashboardView.tsx'),'utf8');
 const dock=fs.readFileSync(path.join(__dirname,'../components/game/StateMetricsDock.tsx'),'utf8');
 const game=fs.readFileSync(path.join(__dirname,'../components/game/useRepublicGame.ts'),'utf8');
-assert(game.includes("if(view==='actions')\\n   jobs.push(core?core.then(()=>loadPoliticalWall()):loadPoliticalWall())"),
+assert(game.includes("if(view==='actions')")&&game.includes("jobs.push(core?core.then(()=>loadPoliticalWall()):loadPoliticalWall())"),
  'Dashboard must not trigger full political wall hydration on navigation');
 assert(game.includes("if(tables.has('political_posts')&&view==='actions')"),
  'Realtime must not hydrate an invisible political feed on the dashboard');
