@@ -8,7 +8,9 @@ const baseline=(file,ref=compareRef)=>execFileSync('git',['show',ref+':'+file],{
 const transpile=source=>ts.transpileModule(source,{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022,jsx:ts.JsxEmit.ReactJSX}}).outputText;
 const compiled=new Map();
 function compile(file,old=false){const key=String(old)+file;if(!compiled.has(key))compiled.set(key,transpile(old?baseline(file,typeof old==='string'?old:compareRef):current(file)));return compiled.get(key)}
-const tick=async()=>{for(let i=0;i<10;i++)await Promise.resolve()};
+// The abortable RPC wraps additional Promise layers; flush their microtasks
+// before advancing the synthetic clock to the next 45-second polling tick.
+const tick=async()=>{for(let i=0;i<40;i++)await Promise.resolve()};
 function realm(file,old=false,{hidden=false,issueError=false,slowIssue=false,slowMutation=false}={}){
  let now=Date.parse('2026-10-25T12:00:00Z'),cursor=0,nextId=0,resolveIssue,resolveMutation;
  const hooks=[],effects=[],timers=new Map(),calls=[],listeners={window:new Map(),document:new Map()};
