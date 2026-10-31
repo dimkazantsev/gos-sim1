@@ -301,6 +301,7 @@ async function main(){
   assert(source.includes("function readLegacyBootstrap()"),'Absent-schema fallback remains available');
   assert(source.includes(".eq('user_id',uid).maybeSingle()"),'Subsequent membership verification remains available');
   assert(source.includes('entryMember?Promise.resolve({data:entryMember,error:null})'),'First entry must reuse only its server-verified personal membership');
+  assert(source.includes("reusedEntryMemberScope.current!==entryScope"),'A failed first bootstrap cannot reuse an old identity indefinitely');
   assert(source.includes('acceptedMember.current?.game_id===gameId&&acceptedMember.current?.user_id===uid'),'Never reuse identity across a game or user switch');
   assert(source.includes("coalesceInFlight(initialCoreReads.current,key,loadCoreSections)"),'Concurrent initial hydrations share one pending RPC');
   assert(source.slice(start,end).includes('loadCachedParties()'),'One core table uses a shared cache, with its query still queue-limited');
@@ -334,6 +335,17 @@ async function main(){
     assert.equal(h.render().teacher,true);
    }
   }finally{clients.forEach(h=>h.dispose());}
+ });
+ await check('Retry after first bundle failure rechecks personal membership',async()=>{
+  const h=harness({effects:true});
+  try{
+   h.failRpc('get_game_bootstrap_v3','PGRST003');
+   await h.settle();
+   const before=h.readCount('game_members');
+   assert.equal(before,2,'First attempt uses only identity and roster');
+   await h.render().refresh();await h.settle();
+   assert(h.readCount('game_members')>=before+2,'Retry rechecks identity and personal member under RLS');
+  }finally{h.dispose();}
  });
  await check('Rapid first navigation shares pending core request without cross-game cache',async()=>{
   const h=harness({effects:true});
