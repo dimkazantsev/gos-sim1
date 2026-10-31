@@ -566,10 +566,10 @@ async function main(){
    const source=fs.readFileSync(path.join(root,'components/game/useRepublicGame.ts'),'utf8');
    const begin=source.indexOf("if(tables.has('game_members'))"),end=source.indexOf('const view=activeViewRef.current;',begin);
    assert(begin>=0&&end>begin,'Member reconciliation branch must exist');
-   const path=source.slice(begin,end);
-   assert(path.includes("new Set(['session_recovery'])"),'Identity is rechecked under RLS');
-   assert(path.includes("loadMemberRoster()"),'Only scoped roster rows are reloaded');
-   assert(!path.includes('hydrateActiveView('),'Membership signal must not reload the whole entry bundle');
+   const recoverySlice=source.slice(begin,end);
+   assert(recoverySlice.includes("new Set(['session_recovery'])"),'Identity is rechecked under RLS');
+   assert(recoverySlice.includes("loadMemberRoster()"),'Only scoped roster rows are reloaded');
+   assert(!recoverySlice.includes('hydrateActiveView('),'Membership signal must not reload the whole entry bundle');
    assert(source.includes('const BOOTSTRAP_TIMEOUT_MS=20000'),'The bounded client request no longer times out after 12 seconds');
    assert(source.includes("coalesceInFlight(initialCoreReads.current,key,loadCoreSections)"));
   });
