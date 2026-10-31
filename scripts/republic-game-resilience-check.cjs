@@ -324,7 +324,8 @@ async function main(){
   const result=await h.render().publishEvent('Проверка','Текст');
   assert.equal(result,true);
   assert.equal(h.rpcCount('get_game_entry_v4'),before.started['rpc:get_game_entry_v4'],'News write must not reload entry v4');
-  assert.equal(h.readCount('game_events'),(before.started.game_events||0)+1,'One bounded news read');
+  assert.equal(h.stats().started.game_events||0,(before.started.game_events||0)+1,'One bounded news read');
+  assert.equal(h.writeCount('game_events'),1,'Exactly one news write');
   assert.equal(h.readCount('game_members'),before.started.game_members,'News write must not reload roster');
   h.dispose();
  });
@@ -334,7 +335,8 @@ async function main(){
   const result=await h.render().createDocument({title:'Проверка',type:'Документ',body:'Текст'});
   assert.equal(result,true);
   assert.equal(h.rpcCount('get_game_entry_v4'),before.started['rpc:get_game_entry_v4'],'Document write must not reload entry v4');
-  assert.equal(h.readCount('game_documents'),(before.started.game_documents||0)+1);
+  assert.equal(h.stats().started.game_documents||0,(before.started.game_documents||0)+1);
+  assert.equal(h.writeCount('game_documents'),1,'Exactly one document write');
   assert.equal(h.readCount('game_members'),before.started.game_members);
   h.dispose();
  });
