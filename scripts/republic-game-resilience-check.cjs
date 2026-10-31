@@ -152,6 +152,9 @@ function harness({effects=false,compiledCode=code}={}){
    }
    if(name==='get_game_bootstrap_v2'||name==='get_game_bootstrap_v3'||name==='get_game_entry_v4'){
     const snapshot={revision,user,gameId,memberKind},id=args.p_game_id;
+    // A v4 call is rejected server-side if current game membership is lost.
+    if(name==='get_game_entry_v4'&&failures.has('game_members'))
+     return{data:null,error:{message:'simulated revoked membership',code:failureCodes.get('game_members')||'42501'},status:403};
     const num=(counts.get('games')||0)+1;counts.set('games',num);
     await holds.get('games:'+num)?.promise;
     const bundled=['games','state_metrics','game_events','chat_channels','game_stages','game_votes','game_evaluations','game_crises','game_documents','game_profiles','formal_documents'];
@@ -629,8 +632,16 @@ async function main(){
  await check('Membership demotion clears old privileges and private data despite an optional read failure',async()=>{
   const h=harness({effects:true});await h.settle();h.render().setChatOpen(true);await h.settle();assert.equal(h.render().teacher,true);assert.equal(h.render().messages.length,1);h.setMemberKind('observer');h.failTable('state_metrics');await h.render().refresh();assert.equal(h.render().teacher,false);assert.equal(h.render().me.kind,'observer');assert.equal(h.render().messages.length,0);h.runTimers();await h.settle();assert.equal(h.render().teacher,false);assert.equal(h.render().metrics.length,0);assert.match(h.render().error,/simulated read outage/);h.dispose();
  });
- await check('Confirmed lost game membership removes the previous accepted game',async()=>{
-  const h=harness({effects:true});await h.settle();h.failTable('game_members','PGRST116');const refreshing=h.render().refresh();await tick();h.runTimers();await refreshing;assert.equal(h.render().me,null);assert.equal(h.render().game,null);assert.equal(h.render().teacher,false);assert.equal(h.render().messages.length,0);assert.equal(h.render().loading,false);assert.equal(h.render().error,'Нет доступа к игре');h.dispose();
+ await check('Revoked membership removes previously accepted game on v4 refusal',async()=>{
+  for(const code of ['42501','PGRST116']){
+   const h=harness({effects:true});await h.settle();h.failTable('game_members',code);
+   const refreshing=h.render().refresh();await tick();h.runTimers();await refreshing;
+   assert.equal(h.render().me,null);assert.equal(h.render().game,null);
+   assert.equal(h.render().teacher,false);assert.equal(h.render().messages.length,0);
+   assert.equal(h.render().loading,false);assert.equal(h.render().error,'Нет доступа к игре');
+   assert.equal(h.rpcCount('get_game_bootstrap_v3'),0,'Denied membership must not trigger a legacy fallback');
+   h.dispose();
+  }
  });
  if(failures.length)process.exitCode=1;
 }

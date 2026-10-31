@@ -960,7 +960,16 @@ export function useRepublicGame(gameId:string){
      row('evaluations'),row('crises'),row('documents'),row('profiles'),
      row('formal_documents'),row('intro')];
    }
-   if(!['PGRST202','42883'].includes(String(entry.error.code||'')))
+   const entryCode=String(entry.error.code||'');
+   if(['42501','PGRST116'].includes(entryCode)){
+    // The RLS/member gate is authoritative. Never leave a previously
+    // rendered game or teacher panel visible after access is revoked.
+    readEpoch.current++;
+    clearGameData();
+    setError('Нет доступа к игре');
+    return null;
+   }
+   if(!['PGRST202','42883'].includes(entryCode))
     throw entry.error;
    // Entry identity was just verified by the server. Do not request the same
    // personal member row a second time before the first core snapshot.
