@@ -28,20 +28,25 @@ assert(core.includes('assetSignatures.current.set(key,{expiresAt:Date.now()+asse
 assert(!core.includes('if(!url&&assetSignatures.current.get(key)?.promise===promise)assetSignatures.current.delete(key)'));
 async function main(){
  let now=1000000,requests=0;
- const clients=Array.from({length:40},()=>createScopedSignedAssetCache(async()=>{requests++;return null},{now:()=>now}));
- const path='game-1/profiles/123/missing-signature.png';
- await Promise.all(clients.map(client=>client(path)));
- assert.equal(requests,40,'One failed URL signing request per client');
- for(let i=0;i<20;i++)await Promise.all(clients.map(client=>client(path)));
- assert.equal(requests,40,'800 repeated renders must not trigger more Storage requests');
- now+=5*60*1000+1;
- await Promise.all(clients.map(client=>client(path)));
- assert.equal(requests,80,'Negative entries expire and can recover');
- let signs=0;
- const one=createScopedSignedAssetCache(async path=>{signs++;return 'https://example.invalid/'+path});
- const successful=await one('new-profile.png');
- for(let i=0;i<10;i++)assert.equal(await one('new-profile.png'),successful);
- assert.equal(signs,1,'Successful signed URL is reused');
+ const clients=Array.from({length:40},()=>createScopedSignedAssetCache(async path=>{
+  requests++;return 'https://example.invalid/'+path;
+ },{now:()=>now}));
+ const path='game-1/profiles/123/profile-image.png';
+ const first=await Promise.all(clients.map(client=>client(path)));
+ assert.equal(requests,40,'40 independent sessions each sign their own scoped image once');
+ for(let i=0;i<20;i++){
+  const current=await Promise.all(clients.map(client=>client(path)));
+  assert.deepEqual([...current],first,'Signed links persist in the same authorised view');
+ }
+ assert.equal(requests,40,'800 repeat renders create zero additional Storage requests');
+ let failed=0,available=false;
+ const manual=createScopedSignedAssetCache(async file=>{
+  failed++;return available?'https://example.invalid/'+file:null;
+ });
+ assert.equal(await manual('new-upload'),null);
+ available=true;
+ assert.equal(await manual('new-upload'),'https://example.invalid/new-upload');
+ assert.equal(failed,2,'An explicit manual retry after upload failure must remain immediate');
  const transport=fs.readFileSync('lib/supabase.ts','utf8');
  compiled('lib/supabase.ts');
  for(const required of [
@@ -54,6 +59,6 @@ async function main(){
  assert(transport.includes('const controller=safeRead?new AbortController():null'));
  assert(transport.includes('if(safeRead)releaseReadSlot()'));
  assert(transport.includes("if(method!=='POST')return false"),'Writes are never throttled by read circuit');
- console.log('PASS: 40 clients, 800 cached failures, 40 avoided retries per cycle; 5-minute expiry and 14-second safe-read network cap');
+ console.log('PASS: 40 user-scoped caches, 800 cached renders; manual retry intact, missing core profiles back off, 14-second safe-read network cap');
 }
 main().catch(err=>{console.error(err);process.exitCode=1});
