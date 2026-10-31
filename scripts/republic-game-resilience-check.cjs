@@ -292,14 +292,17 @@ async function main(){
   assert.equal(h.assetStats().signed,first.signed,'Unchanged Storage paths must reuse session-scoped signed URLs');
   h.dispose();
  });
- await check('Initial game hydration makes five core reads including one bundled RPC under four-slot limit',async()=>{
+ await check('Initial hydration reuses verified identity; later refresh still checks membership under RLS',async()=>{
   const source=fs.readFileSync(path.join(root,'components/game/useRepublicGame.ts'),'utf8');
   const start=source.indexOf('async function loadCoreSections()'),end=source.indexOf('async function hydrateActiveView(',start);
   assert(start>=0&&end>start);
   assert.equal((source.slice(start,end).match(/limitedCoreRead\(/g)||[]).length,4);
   assert(source.includes("supabase.rpc('get_game_bootstrap_v3'"),'Server-side lightweight RLS bundle replaces eleven HTTP requests');
   assert(source.includes("function readLegacyBootstrap()"),'Absent-schema fallback remains available');
-  assert(source.includes(".eq('user_id',uid).maybeSingle()"),'Personal membership stays independent of full roster');
+  assert(source.includes(".eq('user_id',uid).maybeSingle()"),'Subsequent membership verification remains available');
+  assert(source.includes('entryMember?Promise.resolve({data:entryMember,error:null})'),'First entry must reuse only its server-verified personal membership');
+  assert(source.includes('acceptedMember.current?.game_id===gameId&&acceptedMember.current?.user_id===uid'),'Never reuse identity across a game or user switch');
+  assert(source.includes("coalesceInFlight(initialCoreReads.current,key,loadCoreSections)"),'Concurrent initial hydrations share one pending RPC');
   assert(source.slice(start,end).includes('loadCachedParties()'),'One core table uses a shared cache, with its query still queue-limited');
   assert(source.includes("const request=limitedCoreRead(query)")&&source.includes(".select(PARTY_LIST_COLUMNS)"),'Party reads preserve four-slot limiter and lightweight projection');
   assert(source.slice(start,end).includes('loadMemberRoster()'),'The separately authorised roster remains shared and concurrency limited');
@@ -311,6 +314,7 @@ async function main(){
    await Promise.all(clients.map(h=>h.settle()));
    for(const h of clients){
     assert.equal(h.rpcCount('get_game_bootstrap_v3'),1,'One grouped read per client');
+    assert.equal(h.readCount('game_members'),2,'First entry uses identity RPC plus one roster query, without duplicate personal member read');
     assert.equal(h.readCount('state_metrics'),0,'Political wall projection now includes metrics without an extra table read');
     assert.equal(h.readCount('formal_documents'),0,'Legacy document feed read is skipped');
     assert.equal(h.render().teacher,true);
@@ -318,6 +322,32 @@ async function main(){
     assert.equal(h.render().metrics.length,1);
    }
   }finally{clients.forEach(h=>h.dispose());}
+ });
+ await check('40 clients save 40 personal member reads on entry while later refresh checks current roles',async()=>{
+  const clients=Array.from({length:40},()=>harness({effects:true}));
+  try{
+   await Promise.all(clients.map(h=>h.settle()));
+   assert.equal(clients.reduce((sum,h)=>sum+h.readCount('game_members'),0),80,'Identity and roster: 2 member reads per client, not 3');
+   await Promise.all(clients.map(async h=>{await h.render().refresh();await h.settle();}));
+   for(const h of clients){
+    assert(h.readCount('game_members')>=4,'Explicit refresh revalidates the personal role, plus identity');
+    assert.equal(h.render().teacher,true);
+   }
+  }finally{clients.forEach(h=>h.dispose());}
+ });
+ await check('Rapid first navigation shares pending core request without cross-game cache',async()=>{
+  const h=harness({effects:true});
+  const held=h.hold('games',2);
+  try{
+   await h.settle();
+   assert.equal(h.rpcCount('get_game_bootstrap_v3'),1);
+   h.render().setActiveView('parties');await h.settle();
+   assert.equal(h.rpcCount('get_game_bootstrap_v3'),1,'Opening a section must not start a second pending bootstrap');
+   held.resolve();await h.settle();
+   assert.equal(h.render().teacher,true);
+   await h.render().refresh();await h.settle();
+   assert.equal(h.rpcCount('get_game_bootstrap_v3'),2,'A completed initial read cannot cache subsequent explicit refreshes');
+  }finally{held.resolve();h.dispose();}
  });
  await check('Unavailable new RPC uses RLS-preserving legacy selects, without dropping the identity',async()=>{
   const h=harness();h.failRpc('get_game_bootstrap_v3','PGRST202');
