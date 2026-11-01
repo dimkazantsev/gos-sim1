@@ -87,6 +87,8 @@ on:
       - 'supabase/ops/chat_media_cleanup_schedule.sql'
       - 'supabase/migrations/20261021085946_chat_media_cleanup_skip_empty.sql'
       - 'components/GameClient.tsx'
+      - 'components/game/firstPresenceWriteDelay.ts'
+      - 'scripts/first-presence-pacing-100-check.cjs'
       - 'scripts/forty-sessions-realtime-budget-check.cjs'
       - 'scripts/password-login-resilience-check.cjs'
       - 'scripts/participant-test-login-check.cjs'
@@ -183,6 +185,8 @@ on:
       - 'supabase/ops/chat_media_cleanup_schedule.sql'
       - 'supabase/migrations/20261021085946_chat_media_cleanup_skip_empty.sql'
       - 'components/GameClient.tsx'
+      - 'components/game/firstPresenceWriteDelay.ts'
+      - 'scripts/first-presence-pacing-100-check.cjs'
       - 'scripts/forty-sessions-realtime-budget-check.cjs'
       - 'scripts/password-login-resilience-check.cjs'
       - 'scripts/participant-test-login-check.cjs'
@@ -205,6 +209,7 @@ jobs:
           cache: npm
       - run: npm ci --no-audit --no-fund
       - run: node scripts/auth-402-realtime-quota-check.cjs
+      - run: node scripts/first-presence-pacing-100-check.cjs
       - run: node scripts/forty-sessions-realtime-budget-check.cjs
       - run: node scripts/backend-quota-stop-check.cjs
       - run: node scripts/game-shell-load-check.cjs
