@@ -11,7 +11,7 @@ function tab(index){
   if(href.includes('/auth/v1/')){count.auth++;return new Response('{}',{status:200})}
   if(/rpc\/(?:cast_vote|get_budget_pulse|get_fiscal_context|blitz_inbox_counts)(?:\?|$)/.test(href)){count.writes++;return new Response('{}',{status:201})}
   count.readStarted++;count.readActive++;count.peakRead=Math.max(count.peakRead,count.readActive);
-  if(!hold){count.readActive--;return new Response('{}',{status:200})}
+  if(!hold||href.includes('/chat_messages?')||href.includes('/rpc/get_my_chat_overview')){count.readActive--;return new Response('{}',{status:200})}
   return new Promise(resolve=>{pending.push(()=>{count.readActive--;resolve(new Response('{}',{status:200}))})});
  };
  const module={exports:{}};
@@ -31,8 +31,8 @@ async function exercise(index){
  const c=tab(index),url=origin+'/rest/v1/game_members?game_id=eq.abc';
  const jobs=Array.from({length:18},(_,i)=>c.fetch(url+'&page='+i));
  await settle();
- assert.equal(c.count.readStarted,3,'At most three optional reads may start in a tab');
- assert.equal(c.count.peakRead,3,'Peak read concurrency bounded');
+ assert.equal(c.count.readStarted,2,'At most two background reads may start in a tab');
+ assert.equal(c.count.peakRead,2,'A foreground chat slot remains free');
  // Critical transactions must bypass queued GETs.
  const [write,auth]=await Promise.all([c.fetch(origin+'/rest/v1/rpc/cast_vote',{method:'POST'}),c.fetch(origin+'/auth/v1/user')]);
  assert.equal(write.status,201);assert.equal(auth.status,200);
@@ -42,7 +42,7 @@ async function exercise(index){
  const result=await Promise.all(jobs);
  assert.ok(result.every(r=>r.status===200));
  assert.equal(c.count.readStarted,18);
- assert.equal(c.count.peakRead,3);
+ assert.equal(c.count.peakRead,2);
  return c.count;
 }
 (async()=>{
@@ -57,7 +57,7 @@ async function exercise(index){
  const denied=await c.fetch(url+'?overflow=yes');
  assert.equal(denied.status,503,'Bounded waiting queue rejects excess work locally');
  assert.equal(denied.headers.get('x-gos-local-limit'),'1');
- assert.equal(c.count.readStarted,3,'Overload must not cause extra network traffic');
+ assert.equal(c.count.readStarted,2,'Overload must not cause extra network traffic');
  // These procedures really write to PostgreSQL despite their get_* names.
  const changing=['get_budget_pulse','get_fiscal_context','blitz_inbox_counts'];
  for(const name of changing){
@@ -70,8 +70,28 @@ async function exercise(index){
  c.unhold();
  while(c.pending.length){c.pending.splice(0).forEach(f=>f());await settle()}
  const result=await Promise.all(jobs);
- assert.equal(result.filter(r=>r.status===200).length,27,'Only 3 running and 24 queued reads are admitted');
-  assert.equal(result.filter(r=>r.status===503).length,24,'24 excess reads are rejected locally');
- assert.equal(c.count.readStarted,27);
- console.log('PASS 100 synthetic clients: <=3 GET/readonly RPC per tab, 1800 responses; 24 queued and excess locally rejected; Auth/votes bypass; abort protection; no live load.');
+ assert.equal(result.filter(r=>r.status===200).length,26,'Only 2 background and 24 queued reads are admitted');
+  assert.equal(result.filter(r=>r.status===503).length,25,'25 excess reads are rejected locally');
+ assert.equal(c.count.readStarted,26);
+ // Even a tab with two stalled background requests must open visible chat
+ // without waiting 16 seconds or starting duplicate HTTP requests.
+ const chat=tab(202),background=origin+'/rest/v1/game_activity';
+ const stalled=Array.from({length:12},(_,i)=>chat.fetch(background+'?i='+i));
+ await settle();
+ assert.equal(chat.count.readStarted,2,'Only two background requests occupy slots');
+ const chatUrl=origin+'/rest/v1/chat_messages?channel_id=eq.demo';
+ const options={headers:{Authorization:'Bearer isolated-student-202'}};
+ const [first,duplicate]=await Promise.all([chat.fetch(chatUrl,options),chat.fetch(chatUrl,options)]);
+ assert.equal(first.status,200);assert.equal(duplicate.status,200);
+ assert.equal(chat.count.readStarted,3,'Two identical chat reads share exactly one transport');
+ assert.equal(chat.count.peakRead,3,'Foreground chat gets reserved third slot');
+ const [overviewA,overviewB]=await Promise.all([
+  chat.fetch(origin+'/rest/v1/rpc/get_my_chat_overview',{method:'POST',body:JSON.stringify({p_game_id:'test'}),headers:{Authorization:'Bearer isolated-student-202'}}),
+  chat.fetch(origin+'/rest/v1/rpc/get_my_chat_overview',{method:'POST',body:JSON.stringify({p_game_id:'test'}),headers:{Authorization:'Bearer isolated-student-202'}})]);
+ assert.equal(overviewA.status,200);assert.equal(overviewB.status,200);
+ assert.equal(chat.count.readStarted,4,'One foreground overview request, not two');
+ chat.unhold();
+ while(chat.pending.length){chat.pending.splice(0).forEach(f=>f());await settle()}
+ assert.equal((await Promise.all(stalled)).filter(r=>r.status===200).length,12);
+ console.log('PASS 100 synthetic tabs: 2 background + 1 reserved chat slot, 1800 responses; identical foreground requests single-flight, Auth/votes bypass, abort and bounded backlog; no live load.');
 })().catch(error=>{console.error(error);process.exitCode=1});
