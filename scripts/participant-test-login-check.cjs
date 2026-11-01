@@ -57,7 +57,7 @@ function harness(initialSession,changeIdentity=false,signupError=null,teacherAcc
  const teacher={user:{id:'account-teacher',is_anonymous:false}};
  const teacherSwitch=harness(teacher,false);await teacherSwitch.submit();
  assert.deepEqual(teacherSwitch.calls.filter(x=>x!=='getSession'),
-   ['signOut:local','signInAnonymously','rpc:join_game_as_role','navigate:/game/test-game-uuid'],
+   ['teacher_profiles','signOut:local','signInAnonymously','rpc:join_game_as_role','navigate:/game/test-game-uuid'],
    'Entering participant mode automatically leaves the teacher identity');
  const student=harness({user:{id:'student-confirmed',is_anonymous:false}},false,null,false);
  await student.submit();
