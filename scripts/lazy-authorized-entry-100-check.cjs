@@ -15,8 +15,8 @@ for(const [path,source,kind] of [
 }
 assert(hook.includes("if(me.kind!=='teacher'&&activeView==='dashboard'&&lastCoreSuccessAt.current===0)return;"),
  'Student/observer dashboard must not eagerly fetch the full game entry');
-assert(hook.includes("if(!me?.user_id||me.game_id!==gameId||!coreLoaded)return;"),
- 'Only entered, data-ready clients may subscribe to Realtime and polling');
+assert(hook.includes("if(!me?.user_id||me.game_id!==gameId)return;"),
+ 'One essential Realtime socket must work for a verified lightweight entrant');
 assert(hook.includes("openDetailedDashboard:()=>{if(authUser.current&&acceptedMember.current)void loadCoreForView()}"),
  'The player must be able to explicitly open a full overview');
 assert(client.includes("view!=='dashboard'&&!g.coreLoaded&&!teacher&&sectionLoading()"),
@@ -41,7 +41,7 @@ async function main(){
    assert.equal(screen.coreLoaded,false,'No full game before opening a section');
    assert.equal(h.rpcCount('get_game_entry_v5'),0,'One of 100 students eagerly loaded the full game');
    assert.equal(h.rpcCount('get_my_game_identity'),1,'One authoritative identity read per participant');
-   assert.equal(h.channelsInfo().length,0,'No unnecessary Realtime socket in the lightweight lobby');
+   assert.equal(h.channelsInfo().length,1,'Only the existing single private presence socket is allowed');
   }
   // A selected section must read once, then retain its RLS-scoped data.
   const selected=clients.slice(0,8);
@@ -69,7 +69,7 @@ async function main(){
    assert.equal(teacher.rpcCount('get_game_entry_v5'),1,'Teacher dashboard keeps required administration data');
   }finally{teacher.dispose()}
   console.log(JSON.stringify({result:'PASS',participants:100,authoritativeIdentityReads:100,
-   initialFullGameReads:0,firstSectionOpens:8,firstSectionCoreReads:8,
+   initialFullGameReads:0,realtimeSocketsPerParticipant:1,firstSectionOpens:8,firstSectionCoreReads:8,
    deliberateDashboardOpens:1,untouchedLightweightSessions:91,teacherUnchanged:true,
    observerProtected:true,productionCalls:0,scenario:'real game hook, simulated transport'}));
  }finally{clients.forEach(h=>h.dispose())}
