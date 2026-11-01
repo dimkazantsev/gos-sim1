@@ -150,15 +150,15 @@ function harness({effects=false,compiledCode=code}={}){
      agreements:rows('party_agreements').sort((a,b)=>String(b.created_at).localeCompare(String(a.created_at)))
     },error:null,status:200};
    }
-   if(name==='get_game_bootstrap_v2'||name==='get_game_bootstrap_v3'||name==='get_game_entry_v4'){
+   if(name==='get_game_bootstrap_v2'||name==='get_game_bootstrap_v3'||name==='get_game_entry_v4'||name==='get_game_entry_v5'){
     const snapshot={revision,user,gameId,memberKind},id=args.p_game_id;
     // A v4 call is rejected server-side if current game membership is lost.
-    if(name==='get_game_entry_v4'&&failures.has('game_members'))
+    if((name==='get_game_entry_v4'||name==='get_game_entry_v5')&&failures.has('game_members'))
      return{data:null,error:{message:'simulated revoked membership',code:failureCodes.get('game_members')||'42501'},status:403};
     const num=(counts.get('games')||0)+1;counts.set('games',num);
     await holds.get('games:'+num)?.promise;
     const bundled=['games','state_metrics','game_events','chat_channels','game_stages','game_votes','game_evaluations','game_crises','game_documents','game_profiles','formal_documents'];
-    const broken=bundled.find(table=>failures.has(table));
+    const broken=bundled.filter(table=>name!=='get_game_entry_v5'||!['game_events','game_evaluations','game_documents'].includes(table)).find(table=>failures.has(table));
     if(broken)return{data:null,error:{message:'simulated read outage '+broken,code:failureCodes.get(broken)||'PGRST123'},status:400};
     const game={id,current_round:snapshot.revision,title:'revision-'+snapshot.revision};
     const fixtureRows=(table,defaults)=>{
@@ -177,13 +177,17 @@ function harness({effects=false,compiledCode=code}={}){
      formal_documents:fixtureRows('formal_documents',[])
       .map(row=>name!=='get_game_bootstrap_v2'?{...row,body_text:null,metadata:{}}:row)
     };
-    if(name==='get_game_entry_v4'){
+    if(name==='get_game_entry_v4'||name==='get_game_entry_v5'){
      // The fixture emulates the SECURITY INVOKER projection. The student role
      // never becomes teacher and only its own current member is authoritative.
      const member={game_id:id,user_id:snapshot.user,full_name:snapshot.user,kind:snapshot.user==='teacher-a'?snapshot.memberKind:'student'};
      const roster=fixtureRows('game_members',[member]);
      const parties=fixtureRows('game_parties',[{id:'party-'+snapshot.revision,game_id:id,name:'party-'+snapshot.revision}])
       .map(({description,ideology,registration_note,...summary})=>summary);
+     if(name==='get_game_entry_v5'){
+      const {events,evaluations,documents,...lite}=projection;
+      return{data:{...lite,member,roster,parties,intro:true},error:null,status:200};
+     }
      return{data:{...projection,member,roster,parties,intro:true},error:null,status:200};
     }
     return{data:projection,error:null,status:200};
