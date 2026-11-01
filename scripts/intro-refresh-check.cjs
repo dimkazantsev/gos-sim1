@@ -29,6 +29,14 @@ function harness(g,storage=new Map(),rpc=async()=>({error:null})){
  function requireFor(request){
   if(request==='react')return react;
   if(request==='react/jsx-runtime')return{jsx,jsxs:jsx,Fragment:'fragment'};
+  // In this renderer a lazily imported panel is represented by the same
+  // tagged component as a statically imported panel: network chunk loading
+  // is tested separately by the production build and game-shell contract.
+  if(request==='next/dynamic')return{__esModule:true,default:(loader)=>{
+   const match=String(loader).match(/\\.\\/game\\/([A-Za-z0-9_]+)/);
+   assert(match,'Dynamic panel loader must use a static game module path');
+   return tag(match[1]);
+  }};
   if(request==='./game/useRepublicGame')return{useRepublicGame:()=>g};
   if(request==='./game/useActionErrorPlacement')return{useActionErrorPlacement:()=>({onClickCapture:noop,onSubmitCapture:noop,onChangeCapture:noop,localized:false,notice:null})};
   if(request==='@/lib/supabase')return{supabase};
