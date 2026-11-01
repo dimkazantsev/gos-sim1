@@ -33,7 +33,7 @@ function harness(g,storage=new Map(),rpc=async()=>({error:null})){
   // tagged component as a statically imported panel: network chunk loading
   // is tested separately by the production build and game-shell contract.
   if(request==='next/dynamic')return{__esModule:true,default:(loader)=>{
-   const match=String(loader).match(/\\.\\/game\\/([A-Za-z0-9_]+)/);
+   const match=String(loader).match(new RegExp('game/([A-Za-z0-9_]+)'));
    assert(match,'Dynamic panel loader must use a static game module path');
    return tag(match[1]);
   }};
