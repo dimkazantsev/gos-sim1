@@ -4,6 +4,7 @@ import {IconAction} from './ui/IconAction';
 import {BrandIdentity,BrandName} from './ui/BrandIdentity';
 import ChatToggleButton from './game/ChatToggleButton';
 import {useEffect,useRef,useState} from 'react';
+import dynamic from 'next/dynamic';
 import {BookOpenText,CalendarDays,ChevronDown,ChevronLeft,ChevronRight,Eye,FileText,GraduationCap,GripVertical,Landmark,LayoutDashboard,LogOut,Menu,MessageCircle,Radio,Settings2,Share2,ShieldCheck,UserRound,Wallet,Vote as VoteIcon} from 'lucide-react';
 import {useRepublicGame} from './game/useRepublicGame';
 import {useActionErrorPlacement} from './game/useActionErrorPlacement';
@@ -13,14 +14,14 @@ import type {ReturnTypeRepublic} from './game/viewTypes';
 import {initials} from './game/constants';
 import DashboardView from './game/DashboardView';
 import {useDialog} from './ui/useDialog';
-import PoliticalWallView from './game/PoliticalWallView';
-import CrisisRoom from './game/CrisisRoom';
-import StagesView from './game/StagesView';
-import PartiesView from './game/PartiesView';
-import VotesView from './game/VotesView';
-import DocumentsView from './game/DocumentsView';
-import GradesView from './game/GradesView';
-import TeacherView from './game/TeacherView';
+
+
+
+
+
+
+
+
 import ProfileView from './game/ProfileView';
 import {PROFILE_SETUP_FIELDS,PROFILE_SETUP_LABELS,validProfileSetupStatus,type ProfileSetupStatus} from './game/profileSetup';
 import RepublicComic from './game/RepublicComic';
@@ -28,16 +29,33 @@ import StageComics from './game/StageComics';
 import GuidedTour,{getTourSteps,type TourTarget} from './game/GuidedTour';
 import {useIntroProgress} from './game/introProgress';
 import ChatPanel from './game/ChatPanel';
-import EventWorkspace from './game/EventWorkspace';
+
+
 import {AchievementCelebration} from './game/Achievements';
 import {BlitzOverlay} from './game/Blitz';
-import BudgetView from './game/BudgetView';
+
 import {useSectionUpdates} from './game/useSectionUpdates';
 import {notifyGameDataRefresh,useGameTableSync} from './game/useGameTableSync';
 import {supabase} from '@/lib/supabase';
 import MobileDock from './game/MobileDock';
 import GameHeader,{TeacherNavigationProvider} from './game/GameHeader';
 import {useSavedGameState,savedString} from './game/useSavedGameState';
+
+// Keep the main overview, session/role gate and always-mounted live overlays
+// immediately available. Inactive panels must not inflate initial JavaScript
+// transferred to every student, teacher and observer.
+const sectionLoading=()=> <div className="emptyState" role="status">Открываем раздел…</div>;
+const PoliticalWallView=dynamic(()=>import('./game/PoliticalWallView'),{loading:sectionLoading});
+const CrisisRoom=dynamic(()=>import('./game/CrisisRoom'),{loading:sectionLoading});
+const StagesView=dynamic(()=>import('./game/StagesView'),{loading:sectionLoading});
+const PartiesView=dynamic(()=>import('./game/PartiesView'),{loading:sectionLoading});
+const VotesView=dynamic(()=>import('./game/VotesView'),{loading:sectionLoading});
+const DocumentsView=dynamic(()=>import('./game/DocumentsView'),{loading:sectionLoading});
+const GradesView=dynamic(()=>import('./game/GradesView'),{loading:sectionLoading});
+const TeacherView=dynamic(()=>import('./game/TeacherView'),{loading:sectionLoading});
+
+const EventWorkspace=dynamic(()=>import('./game/EventWorkspace'),{loading:sectionLoading});
+const BudgetView=dynamic(()=>import('./game/BudgetView'),{loading:sectionLoading});
 
 const GENERIC_STUDENT='__generic_student_preview__';
 type ScreenLocation={view:View;stageNo:number;documentId:string;voteId?:string;templateKey?:string};

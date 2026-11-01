@@ -365,6 +365,7 @@ jobs:
       - run: node scripts/classroom-overload-safety-check.cjs
       - run: node scripts/classroom-final-recovery-check.cjs
       - run: npm run typecheck
+      - run: node scripts/game-shell-load-check.cjs
       - run: node scripts/party-profile-payload-40-check.cjs
       - run: node scripts/formal-realtime-summary-40-check.cjs
       - run: node scripts/document-metadata-cache-40-check.cjs
