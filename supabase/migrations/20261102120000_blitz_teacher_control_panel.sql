@@ -17,19 +17,19 @@ alter table public.blitz_daily_plans add constraint blitz_daily_plans_target_cou
 
 create or replace function public.blitz_teacher_get_settings(p_game uuid)
 returns jsonb language plpgsql security definer set search_path=public,pg_temp as $fn$
-declare s record;
+declare n integer; is_enabled boolean; changed_at timestamptz;
 begin
  if auth.uid() is null or not exists (
   select 1 from public.game_members m
   where m.game_id=p_game and m.user_id=auth.uid() and m.kind='teacher'
    and m.roster_archived_at is null
  ) then raise exception 'Forbidden' using errcode='42501'; end if;
- select daily_count,enabled,updated_at into s
+ select daily_count,enabled,updated_at into n,is_enabled,changed_at
  from public.blitz_game_settings where game_id=p_game;
  return jsonb_build_object(
-  'daily_count',coalesce(s.daily_count,2),
-  'enabled',coalesce(s.enabled,true),
-  'updated_at',s.updated_at
+  'daily_count',coalesce(n,2),
+  'enabled',coalesce(is_enabled,true),
+  'updated_at',changed_at
  );
 end $fn$;
 
