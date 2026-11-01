@@ -25,7 +25,7 @@ assert(client.includes('mark_my_game_profile_setup_prompt_seen'),'First display 
 assert(client.indexOf("mark_my_game_profile_setup_prompt_seen")>client.indexOf("setSetupWelcomeActive(true)"),'Persist on first display, not only on completion');
 assert(client.includes('const setupDialogRef=useDialog(showSetupWelcome'),'Modal must trap focus');
 assert(client.includes('setSetupFocusVersion(x=>x+1)'),'Jump to missing field required');
-assert(client.includes("useGameTableSync(!previewMode&&me?game?.id:undefined,['event_assignments','event_collaboration_invites','event_decisions']")&&!client.includes("supabase.channel('event-count:"),'Event counts retain shared reconciliation without a duplicate subscription');
+assert(client.includes("useGameTableSync(!previewMode&&g.coreLoaded&&me?game?.id:undefined,['event_assignments','event_collaboration_invites','event_decisions']")&&!client.includes("supabase.channel('event-count:"),'Event counts remain dormant in lightweight entry and share reconciliation after section activation');
 assert(client.includes("supabase.rpc('complete_my_game_profile'"),'Server completion guard must remain');
 assert(profile.includes('data-profile-setup-field="name"')&&profile.includes('data-profile-setup-field="gender"')&&profile.includes('data-profile-setup-field="bio"'));
 assert(profile.includes('data-profile-setup-field="signature"')&&auth.includes('data-profile-setup-field="email"')&&auth.includes('data-profile-setup-field="password"'));

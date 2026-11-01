@@ -478,7 +478,9 @@ async function main(){
    try{
     await h.settle();
     assert.equal(h.render().teacher,false);
-    assert.equal(h.rpcCount('get_game_entry_v5'),1);
+    assert.equal(h.rpcCount('get_game_entry_v5'),0,'Student and observer enter without an eager full game query');
+    h.render().setActiveView('stages');await h.settle();
+    assert.equal(h.rpcCount('get_game_entry_v5'),1,'A chosen stage opens the full authorised game');
    }finally{h.dispose();}
   }
  });

@@ -58,6 +58,7 @@ async function checks(){
  assert(receipts<=5&&receipts>=3,'Eighty incoming messages coalesce into read receipts, including the trailing receipt: '+receipts);c.dispose();
  const v=harness({effects:true});v.setUser('student-voter');await v.settle();
  const open={...vote('own'),voting_mode:'member',institution_key:'all'};v.fixture('game_votes',[open]);v.fixture('game_ballots',[{vote_id:'own',voter_id:'student-voter',choice:'yes',weight:1}]);
+ v.render().setActiveView('votes');await v.settle();
  const ownBefore=v.stats();assert.equal(await v.render().castVoteAllocation(open,1,0,0),true);
  const ownAfter=v.stats();assert.equal(ownAfter.started.games,ownBefore.started.games,'A regular ballot cannot reload the game');assert.equal(v.render().ballots[0].vote_id,'own');
  assert(ownAfter.queryLog.slice(ownBefore.queryLog.length).every(q=>q.eqs.id==='own'||q.eqs.vote_id==='own'),'Ballot confirmation reads only the affected vote');

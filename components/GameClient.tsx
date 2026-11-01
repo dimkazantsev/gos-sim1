@@ -5,7 +5,7 @@ import {BrandIdentity,BrandName} from './ui/BrandIdentity';
 import ChatToggleButton from './game/ChatToggleButton';
 import {useEffect,useRef,useState} from 'react';
 import dynamic from 'next/dynamic';
-import {BookOpenText,CalendarDays,ChevronDown,ChevronLeft,ChevronRight,Eye,FileText,GraduationCap,GripVertical,Landmark,LayoutDashboard,LogOut,Menu,MessageCircle,Radio,Settings2,Share2,ShieldCheck,UserRound,Wallet,Vote as VoteIcon} from 'lucide-react';
+import {ArrowRight,ArrowUpRight,BookOpenText,CalendarDays,ChevronDown,ChevronLeft,ChevronRight,Eye,FileText,GraduationCap,GripVertical,Landmark,LayoutDashboard,LogOut,Menu,MessageCircle,Radio,Settings2,Share2,ShieldCheck,UserRound,Wallet,Vote as VoteIcon} from 'lucide-react';
 import {useRepublicGame} from './game/useRepublicGame';
 import {firstPresenceWriteDelay} from './game/firstPresenceWriteDelay';
 import {useActionErrorPlacement} from './game/useActionErrorPlacement';
@@ -276,7 +276,7 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
  const counterScope=gameId+':'+g.me?.user_id+':'+g.me?.kind+':'+!!viewAs;
  const counterScopeRef=useRef(counterScope);counterScopeRef.current=counterScope;
  useEffect(()=>{setPendingEvents(0);setPendingBlitz(0)},[counterScope]);
- const sectionUpdates=useSectionUpdates(gameId,g.me?.user_id,view,!!viewAs);
+ const sectionUpdates=useSectionUpdates(g.coreLoaded?gameId:undefined,g.me?.user_id,view,!!viewAs);
  const sectionBadge=(key:string)=>Math.min(999,Math.max(sectionUpdates?.[key]||0,key==='events'?pendingEvents:key==='profile'?pendingBlitz:0));
  const [selectedProfileId,setSelectedProfileId]=useSavedGameState(gameId,g.me?.user_id,'profile-selected','',savedString);
  const [completingProfile,setCompletingProfile]=useState(false);
@@ -536,7 +536,7 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
  // Stable, independently salted jitter prevents a 12–100-device burst.
  const firstEventBadgeDelay=me?.user_id?firstPresenceWriteDelay(me.user_id+':event-badge')+3000:0;
  const firstBlitzBadgeDelay=me?.user_id?firstPresenceWriteDelay(me.user_id+':blitz-badge')+3000:0;
- useGameTableSync(!previewMode&&me?game?.id:undefined,['event_assignments','event_collaboration_invites','event_decisions'],async()=>{
+ useGameTableSync(!previewMode&&g.coreLoaded&&me?game?.id:undefined,['event_assignments','event_collaboration_invites','event_decisions'],async()=>{
   if(!game||!me||previewMode)return;
   const requestedScope=counterScope;
   const [r,i]=await Promise.all([supabase.from('event_assignments').select('case_id').eq('game_id',game.id).eq('recipient_id',me.user_id).eq('status','pending'),supabase.from('event_collaboration_invites').select('case_id').eq('game_id',game.id).eq('recipient_id',me.user_id).eq('status','pending')]);
@@ -544,7 +544,7 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
  },counterScope,undefined,750,30000,firstEventBadgeDelay);
 
 
- useGameTableSync(!previewMode&&me?.kind==='student'?game?.id:undefined,['blitz_assignments'],async()=>{
+ useGameTableSync(!previewMode&&g.coreLoaded&&me?.kind==='student'?game?.id:undefined,['blitz_assignments'],async()=>{
   if(!game||!me||previewMode||me.kind!=='student')return;
   const requestedScope=counterScope;
   const result=await supabase.rpc('blitz_inbox_counts',{p_game:game.id});
@@ -587,7 +587,7 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
  
 
  useEffect(()=>{
-  if(!me||previewMode||me.kind==='observer')return;
+  if(!me||!g.coreLoaded||previewMode||me.kind==='observer')return;
   const labels:Record<View,string>={dashboard:'Обзор игры',stages:'Этапы',parties:'Партия',votes:'Голосование',documents:'НПА / Формальные институты',actions:'Политический процесс',grades:'Оценки',profile:'Мой профиль',teacher:'Управление',events:'Ситуационные решения',budget:'Бюджет'};
   // The database journal is noncritical to joining. Distribute the FIRST
   // SQL write across students so 100 arrivals do not hit PostgreSQL together.
@@ -605,7 +605,7 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
   const id=setInterval(visible,60000+Math.floor(Math.random()*12000));
   document.addEventListener('visibilitychange',visible);
   return()=>{clearTimeout(first);clearInterval(id);document.removeEventListener('visibilitychange',visible)};
- },[gameId,view,me?.user_id,previewMode]);
+ },[gameId,view,me?.user_id,previewMode,g.coreLoaded]);
 
  useEffect(()=>{
   if(!previewMode)return;
@@ -672,7 +672,7 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
   </aside>
 
   <TeacherNavigationProvider><div className={'simWorkspace '+(chatOpen?'chatOpen':'')}>
-   <GameHeader teacherNavigation={view==='teacher'&&teacher&&!previewMode}>
+   <GameHeader teacherNavigation={view==='teacher'&&(g.coreLoaded||teacher)&&teacher&&!previewMode}>
    <header className="simTop">
     <div className="mobileBrand"><BrandIdentity tagline/></div>
     <nav className="topScreenHistory" aria-label="История разделов">
@@ -719,16 +719,34 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
     <main id="game-main" tabIndex={-1} onClickCapture={actionError.onClickCapture} onSubmitCapture={actionError.onSubmitCapture} onChangeCapture={actionError.onChangeCapture} className={`simMain ${chatOpen?'chatOpen':''} ${previewMode?'studentPreviewMain':''}`}>
      {error&&!actionError.localized&&<div className="errorBox closable" role="alert"><span>{error}</span><IconAction onClick={()=>setError('')} label="Закрыть сообщение об ошибке"/></div>}
       {actionError.notice}
-     {view==='dashboard'&&<DashboardView g={vg} onOpenProfile={navigateProfile} onNavigate={v=>navigate(v,v==='stages'?{stageNo:currentStage?.stage_no||game.current_round}:undefined)}/>}
-     {view==='stages'&&<StagesView g={vg} readOnly={previewMode||observer} focusStageNo={focusStage} onOpenVotes={voteId=>navigate('votes',voteId?{voteId}:undefined)} onOpenDocument={id=>navigate('documents',{documentId:id})} onCreateDocument={(templateKey,stageNo)=>navigate('documents',{templateKey,stageNo})} onNavigate={v=>navigate(v)}/>}
-     {view==='parties'&&<PartiesView g={vg}/>}
-     {view==='votes'&&<VotesView g={vg} focusId={currentScreen.voteId} onClearFocus={clearVoteFocus} onOpenDocument={id=>navigate('documents',{documentId:id})} onOpenStages={()=>navigate('stages')}/>}
-     {view==='budget'&&<BudgetView g={vg} readOnly={previewMode||observer} onOpenDocument={id=>navigate('documents',{documentId:id})} onOpenEvents={()=>navigate('events')} onOpenVotes={voteId=>navigate('votes',{voteId})} onOpenStage={stageNo=>navigate('stages',{stageNo})}/>}
-     {view==='documents'&&<DocumentsView g={vg} readOnly={previewMode||observer} focusId={focusFormalId} createTemplate={currentScreen.templateKey} createStageNo={focusStage} onSelectDocument={rememberDocument} onOpenBudget={()=>navigate('budget')} onOpenVotes={voteId=>navigate('votes',{voteId})}/>}
-     {view==='grades'&&<GradesView g={vg} onOpenProfile={navigateProfile}/>}
-     {view==='actions'&&<PoliticalWallView g={vg} readOnly={previewMode||observer} focusPending={true} onOpenVotes={voteId=>navigate('votes',voteId?{voteId}:undefined)} onOpenDocument={id=>navigate('documents',{documentId:id})} onNavigate={navigate}/>}
-     {view==='profile'&&<ProfileView g={vg} targetUserId={selectedProfileId} readOnly={previewMode||observer} onStartTutorial={beginTour} previewAchievementsUserId={teacher&&viewAs===GENERIC_STUDENT?me?.user_id:undefined} onOpenProfile={navigateProfile} onOwnProfile={()=>{setSelectedProfileId('');navigate('profile')}} setupStatus={setupStatus} setupNotice={onboardingNotice} setupFocusVersion={setupFocusVersion} onProfileChanged={()=>void loadProfileSetup()} onFinishSetup={()=>void completeOnboarding()} pendingBlitz={pendingBlitz}/>}
-     {view==='events'&&<EventWorkspace g={vg} readOnly={previewMode||observer}/>}
+     {view==='dashboard'&&(g.coreLoaded||teacher
+      ?<DashboardView g={vg} onOpenProfile={navigateProfile} onNavigate={v=>navigate(v,v==='stages'?{stageNo:currentStage?.stage_no||game.current_round}:undefined)}/>
+      :<div className="overviewPage" aria-label="Быстрый вход в игру">
+       <header className="overviewHeading"><div><span className="overline">{game.title}</span><h1>Вы вошли в игру.</h1></div></header>
+       <section className="missionCard" aria-labelledby="fast-entry-title">
+        <div className="missionTop"><span className="overline">ЭТАП / {String(game.current_round||1).padStart(2,'0')}</span>
+         <span className={'missionState '+(game.turn_open?'open':'paused')}><span/>{game.turn_open?'Ход открыт':'Пауза'}</span></div>
+        <h2 id="fast-entry-title">Выберите, что хотите открыть</h2>
+        <p>Данные разделов загружаются только при переходе в них. Это снижает нагрузку при одновременном входе участников.</p>
+        <div className="missionBottom"><button className="missionButton" onClick={()=>navigate('stages')}>Этапы и задачи <ArrowUpRight aria-hidden="true"/></button>
+         <span className="missionNumber" aria-hidden="true">{String(game.current_round||1).padStart(2,'0')}</span></div>
+       </section>
+       <section className="agendaCard" aria-label="Другие разделы">
+        <div className="sectionTop"><span className="overline">РАЗДЕЛЫ ИГРЫ</span></div>
+        <button className="agendaAction" onClick={()=>g.openDetailedDashboard()}><span><b>Полный обзор игры</b><small>Этапы, голосования и показатели</small></span><ArrowRight aria-hidden="true"/></button>
+        <button className="agendaAction" onClick={()=>navigate('profile')}><span><b>Мой профиль</b><small>Личные данные и документы</small></span><ArrowRight aria-hidden="true"/></button>
+       </section>
+      </div>)}
+     {view!=='dashboard'&&!g.coreLoaded&&!teacher&&sectionLoading()}
+     {view==='stages'&&(g.coreLoaded||teacher)&&<StagesView g={vg} readOnly={previewMode||observer} focusStageNo={focusStage} onOpenVotes={voteId=>navigate('votes',voteId?{voteId}:undefined)} onOpenDocument={id=>navigate('documents',{documentId:id})} onCreateDocument={(templateKey,stageNo)=>navigate('documents',{templateKey,stageNo})} onNavigate={v=>navigate(v)}/>}
+     {view==='parties'&&(g.coreLoaded||teacher)&&<PartiesView g={vg}/>}
+     {view==='votes'&&(g.coreLoaded||teacher)&&<VotesView g={vg} focusId={currentScreen.voteId} onClearFocus={clearVoteFocus} onOpenDocument={id=>navigate('documents',{documentId:id})} onOpenStages={()=>navigate('stages')}/>}
+     {view==='budget'&&(g.coreLoaded||teacher)&&<BudgetView g={vg} readOnly={previewMode||observer} onOpenDocument={id=>navigate('documents',{documentId:id})} onOpenEvents={()=>navigate('events')} onOpenVotes={voteId=>navigate('votes',{voteId})} onOpenStage={stageNo=>navigate('stages',{stageNo})}/>}
+     {view==='documents'&&(g.coreLoaded||teacher)&&<DocumentsView g={vg} readOnly={previewMode||observer} focusId={focusFormalId} createTemplate={currentScreen.templateKey} createStageNo={focusStage} onSelectDocument={rememberDocument} onOpenBudget={()=>navigate('budget')} onOpenVotes={voteId=>navigate('votes',{voteId})}/>}
+     {view==='grades'&&(g.coreLoaded||teacher)&&<GradesView g={vg} onOpenProfile={navigateProfile}/>}
+     {view==='actions'&&(g.coreLoaded||teacher)&&<PoliticalWallView g={vg} readOnly={previewMode||observer} focusPending={true} onOpenVotes={voteId=>navigate('votes',voteId?{voteId}:undefined)} onOpenDocument={id=>navigate('documents',{documentId:id})} onNavigate={navigate}/>}
+     {view==='profile'&&(g.coreLoaded||teacher)&&<ProfileView g={vg} targetUserId={selectedProfileId} readOnly={previewMode||observer} onStartTutorial={beginTour} previewAchievementsUserId={teacher&&viewAs===GENERIC_STUDENT?me?.user_id:undefined} onOpenProfile={navigateProfile} onOwnProfile={()=>{setSelectedProfileId('');navigate('profile')}} setupStatus={setupStatus} setupNotice={onboardingNotice} setupFocusVersion={setupFocusVersion} onProfileChanged={()=>void loadProfileSetup()} onFinishSetup={()=>void completeOnboarding()} pendingBlitz={pendingBlitz}/>}
+     {view==='events'&&(g.coreLoaded||teacher)&&<EventWorkspace g={vg} readOnly={previewMode||observer}/>}
      {view==='teacher'&&teacher&&!previewMode&&<TeacherView g={g} onStartTutorial={beginTour} onNavigate={destination=>navigate(destination)} onOpenProcesses={()=>navigate('actions')} onOpenStages={stageNo=>navigate('stages',{stageNo})}
        onOpenChat={channelId=>{g.setChannelId(channelId);g.setChatOpen(true)}}/>}
     </main>
@@ -777,9 +795,9 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
      {(onboardingNotice||introSyncError)&&<p role="alert" className="profileSetupModalError">{onboardingNotice||introSyncError}</p>}
      <button type="button" className="primary profileSetupStart" disabled={setupPromptBusy} onClick={()=>void goToIncompleteProfile()}>{setupPromptBusy?'Открываем профиль…':'Перейти к заполнению'}</button>
     </section>
-   </div>} <BlitzOverlay gameId={gameId} userId={me.user_id} stageKey={g.currentStage?g.currentStage.stage_no+':'+g.currentStage.status+':'+(g.currentStage.opened_at||''):''} enabled={me?.kind==='student'&&!previewMode&&!introOpen&&!onboardingRequired&&tourMode==='idle'&&!stageComicOpen}/>
-  <AchievementCelebration gameId={gameId} userId={me?.user_id} enabled={me?.kind==='student'&&!previewMode&&!introOpen&&!stageComicOpen}/>
-  <StageComics key={gameId+':'+me?.user_id} gameId={gameId} userId={me?.user_id||''} stages={g.stages} enabled={!g.loading&&!previewMode&&!introOpen&&!onboardingRequired&&tourMode==='idle'} onOpenChange={setStageComicOpen}/>
+   </div>} <BlitzOverlay gameId={gameId} userId={me.user_id} stageKey={g.currentStage?g.currentStage.stage_no+':'+g.currentStage.status+':'+(g.currentStage.opened_at||''):''} enabled={g.coreLoaded&&me?.kind==='student'&&!previewMode&&!introOpen&&!onboardingRequired&&tourMode==='idle'&&!stageComicOpen}/>
+  <AchievementCelebration gameId={gameId} userId={me?.user_id} enabled={g.coreLoaded&&me?.kind==='student'&&!previewMode&&!introOpen&&!stageComicOpen}/>
+  <StageComics key={gameId+':'+me?.user_id} gameId={gameId} userId={me?.user_id||''} stages={g.stages} enabled={g.coreLoaded&&!g.loading&&!previewMode&&!introOpen&&!onboardingRequired&&tourMode==='idle'} onOpenChange={setStageComicOpen}/>
   <RepublicComic gameId={gameId} intro open={introOpen} onClose={()=>void finishIntro()}/>
   <MobileDock items={dockItems} activeView={view} storageKey={'gos-sims-dock:'+shownMe.user_id+(teacher&&!previewMode?':teacher':':student')} editing={mobileDockEditing} setEditing={setMobileDockEditing} onNavigate={k=>{if(k==='profile')setSelectedProfileId('');navigate(k,undefined,false,true)}} onChat={()=>{setMobileMenuOpen(false);toggleTourChat()}} chatOpen={chatOpen} chatUnreadCount={g.chatUnreadCount} chatMentionCount={g.chatMentionCount} allOpen={mobileMenuOpen} onAll={()=>{setChatOpen(false);setMobileMenuOpen(true)}}/></div>;
 }
