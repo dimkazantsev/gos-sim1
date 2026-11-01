@@ -9,7 +9,7 @@ const code=ts.transpileModule(source,{compilerOptions:{module:ts.ModuleKind.Comm
 const noop=()=>{};
 function gameState(user='user-a',game='game-a'){
  const me={user_id:user,game_id:game,kind:'student',full_name:'Тестовый Участник Игры',role_title:'Участник'};
- const g={game:{id:game,title:'Проверка',game_code:'QA',current_round:1},me,teacher:false,loading:false,profilesLoaded:true,error:'',profiles:[],members:[me],names:{[user]:me.full_name},channelId:'',secondsLeft:0,realtimeState:'connected'};
+ const g={game:{id:game,title:'Проверка',game_code:'QA',current_round:1},me,teacher:false,coreLoaded:true,loading:false,profilesLoaded:true,error:'',profiles:[],members:[me],names:{[user]:me.full_name},channelId:'',secondsLeft:0,realtimeState:'connected'};
  for(const key of ['metrics','events','actions','channels','messages','stages','parties','votes','ballots','evaluations','crises','documents','activities','presence','partyDocuments','partyInvitations','partyMandates','partyAgreements','formalDocuments','formalHistory','politicalPosts','politicalMedia','postFormalLinks','politicalDecisions','metricHistory','partySupportHistory','impactRules','impactLedger','myEvaluations','chatPins','pinnedMessages'])g[key]=[];
  for(const key of ['setError','setChatOpen','setChannelId','logout','touchPresence','logActivity'])g[key]=noop;
  g.refresh=async()=>{};
