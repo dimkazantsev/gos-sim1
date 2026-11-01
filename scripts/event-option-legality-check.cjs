@@ -12,6 +12,7 @@ function harness(){
  const props={g,mode:'manage'};
  const react={
   useRef(initial){const i=cursor++;return(slots[i]??={value:{current:initial}}).value;},
+  useMemo(factory,deps){const i=cursor++,old=slots[i];if(!old||deps.some((value,j)=>!Object.is(value,old.deps?.[j])))slots[i]={value:factory(),deps};return slots[i].value;},
   useState(initial){const i=cursor++;if(!slots[i])slots[i]={value:typeof initial==='function'?initial():initial};return[slots[i].value,next=>{const value=typeof next==='function'?next(slots[i].value):next;if(!Object.is(value,slots[i].value)){slots[i].value=value;dirty=true;}}];},
   useEffect(effect,deps){const i=cursor++,old=slots[i];if(!old||deps.some((value,j)=>!Object.is(value,old.deps?.[j]))){slots[i]={deps,cleanup:old?.cleanup};effects.push(()=>{slots[i].cleanup?.();slots[i].cleanup=effect();});}}
  };
@@ -20,9 +21,9 @@ function harness(){
   rpc:async(name,args)=>{
    // Read projection is not a teacher mutation. The established tests assert
    // the number/payload of create calls, not unrelated background reads.
-   if(name==='get_event_workspace_projection')return{data:{
+   if(name==='get_event_workspace_projection'||name==='get_event_workspace_feed_bootstrap')return{data:{
     assignments:[],decisions:[],outcomes:[],invitations:[],authority:[],
-    ready_case_count:args.p_include_ready_count?0:null
+    ready_case_count:args.p_include_ready_count?0:null,compact:{titles:[],positive:0,negative:0}
    },error:null};
    calls.push({name,args});return{data:'fictional-event',error:rpcError};
   },
@@ -31,7 +32,7 @@ function harness(){
  const jsx=(type,props)=>({type,props:props||{}}),tag=name=>Object.assign(()=>{},{displayName:name});
  function requireFor(name){if(name==='react')return react;if(name==='react/jsx-runtime')return{jsx,jsxs:jsx,Fragment:'fragment'};if(name==='@/lib/supabase')return{supabase};if(name==='@/lib/userError')return{userError:error=>String(error?.message||error)};if(name==='../../lib/gameLabels')return{gameValueLabel:value=>String(value||'Не указано')};return new Proxy({__esModule:true,default:tag(path.basename(name))},{get:(object,key)=>key in object?object[key]:tag(String(key))});}
  const module={exports:{}};
- vm.runInNewContext('(function(require,module,exports){'+code+'\n})',{console,Date,Promise,Set,Object,Array,String,Number,Math,setInterval:()=>1,clearInterval:()=>{}})(requireFor,module,module.exports);
+ vm.runInNewContext('(function(require,module,exports){'+code+'\n})',{console,Date,Promise,Set,Object,Array,String,Number,Math,document:{visibilityState:'visible'},setInterval:()=>1,clearInterval:()=>{}})(requireFor,module,module.exports);
  function render(){cursor=0;dirty=false;tree=module.exports.default(props);while(effects.length)effects.shift()();return tree;}
  async function settle(){for(let i=0;i<8;i++){render();await tick();if(!dirty)break;}return render();}
  const all=(type,from=tree)=>nodes(from,node=>node.type===type);
@@ -75,4 +76,5 @@ async function main(){
  });
  if(failures.length)process.exitCode=1;
 }
+require('./event-feed-pagination-check.cjs');
 main().catch(error=>{console.error(error);process.exitCode=1;});

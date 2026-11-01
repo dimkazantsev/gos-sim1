@@ -252,3 +252,12 @@
 /* Read-only context for events controlled by a regional branch of a nationwide party. */
 .eventWorkspace .eventRegionAssignmentNotice{padding:13px 16px;margin:8px 0 14px;border:1px solid #cfdbec;border-radius:12px;background:#f4f8ff;color:#31537d;font-size:13px;line-height:1.6}
 .eventWorkspace .eventRegionAssignmentNotice strong{color:#244b83}
+
+/* Постраничная лента ситуаций: без скрытой отрисовки сотен карточек. */
+.eventWorkspace .eventFeedMore{display:flex;align-items:center;justify-content:center;gap:16px;flex-wrap:wrap;padding:18px 8px 4px;color:#6980a1;font-size:12px}
+.eventWorkspace .eventFeedMore .eventBankShowMore{min-height:44px;padding:10px 18px;border:1px solid #c9d9f4;border-radius:10px;background:#f1f6ff;color:#325ba0;font-size:13px;font-weight:750;cursor:pointer}
+.eventWorkspace .eventFeedMore .eventBankShowMore:hover:not(:disabled){background:#e6efff}
+.eventWorkspace .eventFeedMore .eventBankShowMore:disabled{opacity:.55;cursor:wait}
+.eventWorkspace .eventFeedLoading{text-align:center;margin:14px 0;color:#6980a1;font-size:13px}
+.eventWorkspace .eventFeedLoading button{border:1px solid #c9d9f4;border-radius:8px;background:#fff;color:#325ba0;padding:6px 12px}
+@media(max-width:520px){.eventWorkspace .eventFeedMore{flex-direction:column;align-items:stretch}.eventWorkspace .eventFeedMore .eventBankShowMore{width:100%}}
