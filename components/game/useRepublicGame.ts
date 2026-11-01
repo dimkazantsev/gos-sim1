@@ -1319,13 +1319,18 @@ export function useRepublicGame(gameId:string){
  async function hydrateActiveView(allowFreshCore=false,forceOffices=false){
   // Rapid view navigation can reuse recently updated common data.
   // Realtime, recovery and explicit refresh still force the core read.
-  const jobs:Promise<unknown>[]=[loadRepublicOffices(forceOffices)];
+  const view=activeViewRef.current;
+  // Office assignments are required by role-specific workspaces, not by the
+  // public dashboard or document registry. Never fetch this whole collection
+  // merely because a player selected a read-only overview/document.
+  const needsOffices=!['dashboard','documents'].includes(view);
+  const jobs:Promise<unknown>[]=[];
+  if(needsOffices)jobs.push(loadRepublicOffices(forceOffices));
   // Navigation does not invalidate an already verified core. Role/game are
   // checked by the small session_recovery RPC; opened sections read lazily.
   const core=!allowFreshCore||lastCoreSuccessAt.current===0
    ?loadCoreForView():null;
   if(core)jobs.unshift(core);
-  const view=activeViewRef.current;
   const cold:('events'|'evaluations'|'documents')[]=[];
   if(['events','teacher'].includes(view))cold.push('events');
   if(['grades','profile','stages','teacher'].includes(view))cold.push('evaluations');
