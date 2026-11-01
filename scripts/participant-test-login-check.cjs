@@ -17,7 +17,7 @@ function harness(initialSession,changeIdentity=false,signupError=null,teacherAcc
   useEffect(){cursor++;},useMemo(fn){cursor++;return fn()},
   useRef(initial){const i=cursor++;if(!values[i])values[i]={value:{current:initial}};return values[i].value}
  };
- const api={from(table){assert.equal(table,'teacher_profiles');return{select:()=>({eq:()=>({maybeSingle:async()=>({data:teacherAccount?{user_id:initialSession?.user?.id}:null,error:null})})})}},auth:{
+ const api={from(table){calls.push('teacher_profiles');assert.equal(table,'teacher_profiles');return{select:()=>({eq:()=>({maybeSingle:async()=>({data:teacherAccount?{user_id:initialSession?.user?.id}:null,error:null})})})}},auth:{
   async getSession(){calls.push('getSession');return{data:{session:initialSession},error:null}},
   async signOut({scope}){assert.equal(scope,'local');calls.push('signOut:local');return{error:null}},
   async signInAnonymously(){calls.push('signInAnonymously');return{error:signupError}}
@@ -71,6 +71,12 @@ function harness(initialSession,changeIdentity=false,signupError=null,teacherAcc
  assert(first.calls.includes('signInAnonymously')&&!first.calls.includes('signOut:local'));
  const anonymous=harness({user:{id:'old-anonymous',is_anonymous:true,user_metadata:{full_name:'Предыдущее Имя'}}},false);
  await anonymous.submit();assert(anonymous.calls.includes('signOut:local'),'Another FIO must create a fresh identity');
+ assert.equal(anonymous.calls.filter(c=>c==='teacher_profiles').length,0,'Returning anonymous students must not read protected teacher profiles');
+ const sameName=harness({user:{id:'old-anonymous',is_anonymous:true,user_metadata:{full_name:'Новый Участник Тестовый'}}},false);
+ await sameName.submit();
+ assert.equal(sameName.calls.filter(c=>c==='teacher_profiles').length,0,'One reusable anonymous session eliminates the extra HTTP read');
+ assert.equal(sameName.calls.filter(c=>c==='signInAnonymously').length,0,'Rejoining the same browser does not create another anonymous account');
+ assert.equal(sameName.calls.filter(c=>c==='rpc:join_game_as_role').length,1);
  const blocked=harness(teacher,false,{message:'Anonymous sign-ins are disabled'});
  await blocked.submit();assert(!blocked.calls.some(x=>x.startsWith('rpc:')),'Failed identity creation cannot enter a game');
  console.log('PASS role entry: automatic teacher separation, correct student resume, new anonymous accounts and fail-closed auth');
