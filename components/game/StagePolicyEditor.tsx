@@ -42,8 +42,9 @@ export default function StagePolicyEditor({g,stageNo}:{g:ReturnTypeRepublic;stag
   let active=true;
   const gameId=game.id;
   const stageDeadline=stage.deadline;
+  const userId=me.user_id;
   async function loadRule(){
-   const {data,error}=await getStageDeadlineRule(gameId,stageNo,me.user_id);
+   const {data,error}=await getStageDeadlineRule(gameId,stageNo,userId);
    if(!active)return;
    if(error){setMessage(userError(error));return}
    setDeadline(localDate(data?.deadline_at??stageDeadline));
