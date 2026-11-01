@@ -80,6 +80,7 @@ export default function PoliticalWallView({g,onOpenVotes,onOpenDocument,onNaviga
  const [files,setFiles]=useState<File[]>([]),[busy,setBusy]=useState(false),[notice,setNotice]=useState('');
  const [search,setSearch]=useState(''),[filterActor,setFilterActor]=useState(''),[filterType,setFilterType]=useState(''),[filterStage,setFilterStage]=useState('');
  const [visiblePostCount,setVisiblePostCount]=useState(POLITICAL_POST_BATCH_SIZE);
+ const postFeedRef=useRef<HTMLElement>(null);
  const hasFeedFilters=!!(search.trim()||filterActor||filterType||filterStage);
  useEffect(()=>{if(game?.id&&typeof g.setPoliticalWallFullSearch==='function')g.setPoliticalWallFullSearch(hasFeedFilters)},[game?.id,hasFeedFilters]);
  async function showMorePoliticalPosts(){
@@ -122,6 +123,39 @@ export default function PoliticalWallView({g,onOpenVotes,onOpenDocument,onNaviga
  // widgets are mounted only when requested; the underlying game state is untouched.
  useEffect(()=>setVisiblePostCount(POLITICAL_POST_BATCH_SIZE),[game?.id,search,filterActor,filterType,filterStage]);
  const visiblePosts=useMemo(()=>filtered.slice(0,visiblePoliticalPostCount(filtered.length,visiblePostCount)),[filtered,visiblePostCount]);
+ // Sign private attachments only for posts near the viewport.
+ const visiblePostIds=visiblePosts.map(post=>post.id).join('|');
+ const mediaKeys=politicalMedia.map(row=>row.id+':'+row.post_id+':'+Boolean(row.url)).join('|');
+ useEffect(()=>{
+  const root=postFeedRef.current;
+  if(!root||!game?.id)return;
+  const missing=new Map<string,string[]>();
+  for(const row of politicalMedia){
+   if(!row.storage_path||row.url)continue;
+   const ids=missing.get(row.post_id)||[];
+   ids.push(row.id);missing.set(row.post_id,ids);
+  }
+  const targets=Array.from(root.querySelectorAll<HTMLElement>('[data-political-post-id]'))
+   .filter(node=>missing.has(node.dataset.politicalPostId||''));
+  if(!targets.length)return;
+  const load=(node:HTMLElement)=>{
+   const ids=missing.get(node.dataset.politicalPostId||'')||[];
+   for(const id of ids)void g.loadPoliticalMediaUrl(id);
+  };
+  if(typeof IntersectionObserver==='undefined'){
+   for(const node of targets)load(node);
+   return;
+  }
+  const observer=new IntersectionObserver(entries=>{
+   for(const entry of entries){
+    if(!entry.isIntersecting)continue;
+    load(entry.target as HTMLElement);
+    observer.unobserve(entry.target);
+   }
+  },{rootMargin:'240px 0px',threshold:0.01});
+  for(const node of targets)observer.observe(node);
+  return()=>observer.disconnect();
+ },[game?.id,visiblePostIds,mediaKeys]);
  const bulkAllowed=teacher&&!readOnly;
  const allVisibleSelected=visiblePosts.length>0&&visiblePosts.every(p=>selectedPostIds.has(p.id));
  function toggleSelectedPost(id:string){
@@ -299,7 +333,7 @@ export default function PoliticalWallView({g,onOpenVotes,onOpenDocument,onNaviga
      </div>}
    </section>}
    <section className="wallSearch"><label>Поиск<input type="search" aria-label="Поиск публикаций" value={search} onChange={e=>setSearch(e.target.value)} placeholder="Текст, название или тег"/></label><StyledSelect label="Субъект" value={filterActor} onChange={setFilterActor} options={[{value:'',label:'Все субъекты'},...Array.from(new Map((Array.isArray(politicalActorOptions)&&politicalActorOptions.length?politicalActorOptions:politicalPosts).map(p=>[p.actor_key,p.actor_key==='teacher'||p.actor_key==='system'?BRAND_NAME:p.actor_label])).entries()).map(([value,label])=>({value,label}))]}/><StyledSelect label="Вид публикации" value={filterType} onChange={setFilterType} options={[{value:'',label:'Все публикации'},...PROCESS_TYPES.map(x=>({value:x[0],label:x[1]}))]}/><StyledSelect label="Этап" value={filterStage} onChange={setFilterStage} options={[{value:'',label:'Все этапы'},...g.stages.map(s=>({value:String(s.stage_no),label:'Этап '+s.stage_no+' · '+s.title}))]}/></section>
-   <section className="wallFeed">{!filtered.length?<div className="emptyState">Подходящих публикаций нет.</div>:visiblePosts.map(p=>{
+   <section className="wallFeed" ref={postFeedRef}>{!filtered.length?<div className="emptyState">Подходящих публикаций нет.</div>:visiblePosts.map(p=>{
     const party=g.parties.find(x=>x.id===p.context?.party_id||x.name===p.actor_label||p.actor_key==='party:'+x.id||p.actor_key==='faction:'+x.id),pf=profiles.find(x=>x.user_id===p.author_id);
     const media=politicalMedia.filter(x=>x.post_id===p.id);
     const links=postFormalLinks.filter(x=>x.post_id===p.id).flatMap(x=>formalDocuments.filter(d=>d.id===x.formal_document_id));
@@ -318,7 +352,7 @@ export default function PoliticalWallView({g,onOpenVotes,onOpenDocument,onNaviga
     const label=publisherLabel,kind=stageLifecycleNotice?'Системное сообщение ГОС.ID':p.process_type==='decision'?'Инициатива':PROCESS_TYPES.find(x=>x[0]===p.process_type)?.[1]||'Публикация';
     const own=p.author_id===me.user_id,editable=!readOnly&&(teacher||own&&!auto);
     const canRequestVote=!readOnly&&(teacher||own&&!auto);
-    return <article className={'wallPost '+p.status+(bulkMode&&bulkAllowed?' bulkSelecting':'')+(selectedPostIds.has(p.id)&&bulkMode&&bulkAllowed?' bulkSelected':'')+(!stageLifecycleNotice&&auto&&(p.context?.editorial_verified||editorialFallback)?' editorialStory':'')+(stageLifecycleNotice?' systemNotice':'')} key={p.id} id={'process-'+p.id}>
+    return <article className={'wallPost '+p.status+(bulkMode&&bulkAllowed?' bulkSelecting':'')+(selectedPostIds.has(p.id)&&bulkMode&&bulkAllowed?' bulkSelected':'')+(!stageLifecycleNotice&&auto&&(p.context?.editorial_verified||editorialFallback)?' editorialStory':'')+(stageLifecycleNotice?' systemNotice':'')} key={p.id} id={'process-'+p.id} data-political-post-id={p.id}>
      <header>{bulkMode&&bulkAllowed&&<label className="wallBulkPostSelect" title={'Выбрать публикацию: '+p.title}><input type="checkbox" aria-label={'Выбрать публикацию: '+p.title} checked={selectedPostIds.has(p.id)} disabled={busy} onChange={()=>toggleSelectedPost(p.id)}/></label>}<div className="wallPostAvatar"><PublisherAvatar actorKey={stageLifecycleNotice?'system':p.actor_key} label={label} partyLogo={stageLifecycleNotice?undefined:party?.logo_url} avatar={stageLifecycleNotice?undefined:pf?.avatar_url} gender={stageLifecycleNotice?undefined:pf?.gender} name={stageLifecycleNotice?undefined:names[p.author_id]}/></div><div className="wallPostWho"><b>{label}</b><small>{stageLifecycleNotice?'Официальное уведомление платформы':auto?'Автоматическая публикация':p.actor_key==='participant'?names[p.author_id]||'Участник':'Официальное сообщение'} · <time dateTime={p.created_at}>{new Date(p.created_at).toLocaleString('ru-RU')}</time></small></div><span className={'postStatus '+p.status}>{p.status==='accepted'?'Принято':p.status==='rejected'?'Отклонено':'Опубликовано'}</span></header>
      {editing?.id===p.id&&<PostInlineEditor key={p.id} post={p} g={g} onClose={()=>setEditing(null)} onSaved={()=>{setEditing(null);setNotice('Изменения сохранены.')}}/>}
      <div className="wallPostBody"><div className="processPostMeta"><span>{kind}</span>{p.context?.stage_no&&<span>Этап {String(p.context.stage_no)}</span>}</div><h2>{displayPost.title}</h2>
@@ -326,7 +360,7 @@ export default function PoliticalWallView({g,onOpenVotes,onOpenDocument,onNaviga
       {p.actor_key==='media'&&Array.isArray(p.context?.rating_changes)?<RatingNewsVisual g={g} post={p}/>:!media.some(m=>m.media_kind==='image')&&!p.comic_scene&&<div className="processSourceVisual"><div><PublisherAvatar actorKey={stageLifecycleNotice?'system':party?'party':p.actor_key} label={stageLifecycleNotice?BRAND_NAME:party?.name||label} partyLogo={stageLifecycleNotice?undefined:party?.logo_url} avatar={stageLifecycleNotice?undefined:pf?.avatar_url} gender={stageLifecycleNotice?undefined:pf?.gender}/></div><span><small>{links.length?'Связанные документы':kind}</small><b>{party?.name||label}</b>{!!p.context?.stage_title&&<small>{g.stages.find(stage=>stage.stage_no===Number(p.context?.stage_no))?.title||String(p.context.stage_title)}</small>}</span></div>}
       <PostText post={displayPost} onNavigate={onNavigate} onOpenDocument={onOpenDocument} onOpenVotes={onOpenVotes}/>
      </div>
-     {media.length>0&&<div className="wallMedia">{media.map(m=>m.media_kind==='image'?<a className="processImageLink" key={m.id} href={m.url||'#'} target="_blank" rel="noreferrer"><img src={m.url||''} alt={m.file_name} loading="lazy" decoding="async"/></a>:m.media_kind==='video'?<video key={m.id} src={m.url||''} controls preload="metadata"/>:m.media_kind==='audio'?<div className="processAudio" key={m.id}><b>{m.file_name}</b><audio src={m.url||''} controls preload="metadata"/></div>:<a className="processFileLink" key={m.id} href={m.url||'#'} target="_blank" rel="noreferrer"><BookOpenText size={18}/><span>{m.file_name}</span></a>)}</div>}
+     {media.length>0&&<div className="wallMedia">{media.map(m=>m.media_kind==='image'?<a className="processImageLink" key={m.id} href={m.url||undefined} target="_blank" rel="noreferrer"><img src={m.url||undefined} alt={m.file_name} loading="lazy" decoding="async"/></a>:m.media_kind==='video'?<video key={m.id} src={m.url||undefined} controls preload="none"/>:m.media_kind==='audio'?<div className="processAudio" key={m.id}><b>{m.file_name}</b><audio src={m.url||undefined} controls preload="none"/></div>:<a className="processFileLink" key={m.id} href={m.url||undefined} target="_blank" rel="noreferrer"><BookOpenText size={18}/><span>{m.file_name}</span></a>)}</div>}
      {publicFiles.length>0&&<div className="processPartyFiles"><h3>{registrationNews?'Опубликованные документы партии':'Документы партии'}</h3>{publicFiles.map(d=><a key={d.id} href={d.url!} target="_blank" rel="noopener noreferrer" className={registrationNews&&d.doc_kind==='program'?'processPartyProgram':''}><BookOpenText size={18}/><span><b>{registrationNews&&d.doc_kind==='program'?'Программа политической партии «'+(party?.name||'')+'»':d.doc_kind==='charter'?'Устав партии':d.doc_kind==='symbol'?'Символика партии':d.doc_kind==='congress_minutes'?'Протокол учредительного съезда':d.title}</b><small>{'Версия В'+(d.version_no??1)+' · '+d.file_name}</small></span></a>)}</div>}
      {Number(p.context?.stage_no)>0&&Number(p.context?.stage_no)<=16&&auto&&<div className="wallLinks"><button type="button" onClick={()=>onNavigate('stages',{stageNo:Number(p.context?.stage_no)})}><Link2 size={16}/>Открыть этап {String(p.context?.stage_no)}</button></div>}
      {p.context?.source_table==='game_stages'&&!stageLifecycleNotice&&(p.context?.news_kind==='stage_result'||p.source_key?.includes(':completed:'))&&votes.filter(v=>v.game_id===p.game_id&&v.stage_no===Number(p.context?.stage_no)&&v.status==='closed').slice(0,5).map(v=><button type="button" className="processLinkedVote closed" key={v.id} onClick={()=>onOpenVotes(v.id)}><Vote size={19}/><span>{v.title}</span></button>)}
