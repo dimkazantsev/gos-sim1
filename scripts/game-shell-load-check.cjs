@@ -5,7 +5,7 @@ assert.equal(ast.parseDiagnostics.length,0);
 // The game must not ship all inactive institution/workspace screens on login.
 // Rendering a route on demand is the only supported trigger for its JS chunk.
 const deferred=['PoliticalWallView','CrisisRoom','StagesView','PartiesView',
- 'VotesView','DocumentsView','GradesView','TeacherView','ChatPanel',
+ 'VotesView','DocumentsView','GradesView','TeacherView',
  'EventWorkspace','BudgetView'];
 for(const screen of deferred){
  assert(source.includes("const "+screen+"=dynamic(()=>import('./game/"+screen+"'),{loading:sectionLoading});"),
@@ -13,7 +13,7 @@ for(const screen of deferred){
  assert(!source.includes("import "+screen+" from './game/"+screen+"';"),
   screen+' must not be bundled eagerly by the game shell');
 }
-for(const essential of ['DashboardView','ProfileView','StageComics'])
+for(const essential of ['DashboardView','ProfileView','ChatPanel','StageComics'])
  assert(source.includes("import "+essential+" from './game/"+essential+"';"),
   essential+' must remain immediately available at login/onboarding');
 assert(source.includes("import dynamic from 'next/dynamic';"),
