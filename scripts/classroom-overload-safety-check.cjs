@@ -60,7 +60,7 @@ async function main(){
  assert(transport.includes('identicalReads.set(key,shared)'));
  assert(transport.includes('const foreground=safeRead&&foregroundRestRead(href,method)'));
  assert(transport.includes('if(safeRead)releaseReadSlot(foreground)'));
- assert(transport.includes('if(safeRead)releaseReadSlot()'));
+ assert(transport.includes('if(safeRead)releaseReadSlot(foreground)'));
  assert(transport.includes("if(method!=='POST')return false"),'Writes are never throttled by read circuit');
  console.log('PASS: 40 user-scoped caches, 800 cached renders; manual retry intact, missing core profiles back off, 14-second safe-read network cap');
 }
