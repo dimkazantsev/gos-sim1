@@ -1323,7 +1323,7 @@ export function useRepublicGame(gameId:string){
   // Office assignments are required by role-specific workspaces, not by the
   // public dashboard or document registry. Never fetch this whole collection
   // merely because a player selected a read-only overview/document.
-  const needsOffices=!['dashboard','documents'].includes(view);
+  const needsOffices=forceOffices||!['dashboard','documents'].includes(view);
   const jobs:Promise<unknown>[]=[];
   if(needsOffices)jobs.push(loadRepublicOffices(forceOffices));
   // Navigation does not invalidate an already verified core. Role/game are
