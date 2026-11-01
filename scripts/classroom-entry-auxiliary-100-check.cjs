@@ -9,7 +9,7 @@ assert(gameClient.includes("firstPresenceWriteDelay(me.user_id+':blitz-badge')+3
 assert(gameClient.includes("},counterScope,undefined,750,30000,firstEventBadgeDelay)"));
 assert(gameClient.includes("},counterScope,undefined,750,60000,firstBlitzBadgeDelay)"));
 function testClient(index,initialDelay){
- let clock=0,reads=0,cleanup;
+ let clock=1_000_000,reads=0,cleanup;
  const timers=[],windowListeners=new Map(),docListeners=new Map();
  const on=(map,key,cb)=>map.set(key,cb);
  const off=(map,key,cb)=>{if(map.get(key)===cb)map.delete(key)};
@@ -33,7 +33,7 @@ function testClient(index,initialDelay){
   callback({detail:{gameId:'game-a',table:'event_assignments'}});
  };
  const moveTo=async at=>{
-  clock=at;
+  clock=1_000_000+at;
   for(let pass=0;pass<5;pass++){
    const ready=timers.filter(t=>!t.cancelled&&t.at<=clock);
    if(!ready.length)break;
