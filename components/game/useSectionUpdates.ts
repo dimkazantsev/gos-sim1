@@ -11,6 +11,7 @@ export function useSectionUpdates(gameId:string|undefined,userId:string|undefine
  // Ignore snapshots that started before a confirmed local read acknowledgement.
  const optimisticVersion=useRef(0);
  const lastRelevantMutationAt=useRef(0);
+ const firstDashboardReadScope=useRef('');
  useEffect(()=>{
   setCounts({});
   optimisticVersion.current+=1;
@@ -75,6 +76,15 @@ export function useSectionUpdates(gameId:string|undefined,userId:string|undefine
   const enteredAtMs=Date.now();
   const enteredAt=new Date(enteredAtMs).toISOString();
   let active=true;
+  // For a returning classroom, the first dashboard read marker is optional
+  // background work. Never send 12 identical-timed writes 1.5s after entry.
+  // A later explicit navigation keeps the original responsive 1.5s delay.
+  const scope=gameId+':'+userId;
+  const firstDashboard=view==='dashboard'&&firstDashboardReadScope.current!==scope;
+  if(firstDashboard)firstDashboardReadScope.current=scope;
+  const stamp=[...(userId+':dashboard-read')].reduce((h,c)=>
+   Math.imul(h^c.charCodeAt(0),16777619)>>>0,2166136261);
+  const acknowledgementDelay=firstDashboard?5000+stamp%12000:1500;
   const id=setTimeout(()=>{
    void supabase.rpc('mark_section_read',{p_game_id:gameId,p_section:view,p_seen_at:enteredAt})
     .then(r=>{
@@ -87,7 +97,7 @@ export function useSectionUpdates(gameId:string|undefined,userId:string|undefine
      }
      notifySectionUpdates(gameId);
     });
-  },1500);
+  },acknowledgementDelay);
   return()=>{active=false;clearTimeout(id)};
  },[gameId,userId,view,readOnly]);
  return counts;
