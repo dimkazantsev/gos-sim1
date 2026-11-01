@@ -1,6 +1,8 @@
 'use client';
 import {gameValueLabel,gameViewLabel} from '../../lib/gameLabels';
 import {createPortal} from 'react-dom';
+import {useState} from 'react';
+import dynamic from 'next/dynamic';
 import {Award,Activity,AlertTriangle,ArrowRight,BarChart3,BookOpenText,Compass,Clock3,Download,GraduationCap,Network,Pause,Play,Radio,RotateCcw,UsersRound,Wrench,Zap} from 'lucide-react';
 import ClassroomJournal from './ClassroomJournal';
 import ParticipantsAnalytics from './ParticipantsAnalytics';
@@ -12,7 +14,7 @@ import type {ReturnTypeRepublic} from './viewTypes';
 import ImpactRulesPanel from './ImpactRulesPanel';
 import GradesView from './GradesView';
 import TeacherAwards from './TeacherAwards';
-import TeacherBlitz from './TeacherBlitz';
+const TeacherBlitz=dynamic(()=>import('./TeacherBlitz'),{ssr:false,loading:()=> <section className="surface blitzTeacher" role="status">Загрузка пульта блиц-вопросов…</section>});
 import TeacherOverview from './TeacherOverview';
 import TeacherParticipantRoster from './TeacherParticipantRoster';
 import {useSavedGameState,savedChoice} from './useSavedGameState';
@@ -39,6 +41,10 @@ export default function TeacherView({g,onOpenProcesses,onOpenStages,initialWorks
  const {game,currentStage,stages,members,parties,partyMandates,partyInvitations,metrics,metricHistory,politicalPosts,politicalPostTotal,formalDocuments,votes,ballots,evaluations,activities,presence,names,nextStage,setTurn,setTurnMinutes,publishEvent,triggerCrisis,ghostVoting,clearPartyGhostLoss,updateMember,updateMetric}=g;
 
  const [workspace,setWorkspace]=useSavedGameState<Workspace>(g.game?.id,g.me?.user_id,'teacher-workspace',initialWorkspace,savedChoice(...WORKSPACES.map(w=>w.key)));
+ // A saved Blitz tab must not fetch the control-panel chunk on login.
+ const [blitzRequestedFor,setBlitzRequestedFor]=useState<string|null>(null);
+ const activeWorkspace=workspace==='blitz'&&blitzRequestedFor!==game?.id?'overview':workspace;
+ const selectWorkspace=(key:Workspace)=>{if(key==='blitz')setBlitzRequestedFor(game?.id||null);setWorkspace(key)};
  const navigationTarget=useTeacherNavigationTarget();
  const navigationRef=useHorizontalWheel(navigationTarget===null?undefined:game?.id);
  const pendingFactionCount=parties.filter(p=>p.registration_status==='submitted').length+(g.partyDocuments||[]).filter(d=>d.status==='submitted').length;
@@ -69,15 +75,15 @@ export default function TeacherView({g,onOpenProcesses,onOpenStages,initialWorks
     {WORKSPACES.map(item=>{
      const Icon=item.icon;
      return <button key={item.key} type="button" role="tab" id={'teacher-tab-'+item.key}
-      aria-controls="teacher-workspace-panel" aria-selected={workspace===item.key} tabIndex={workspace===item.key?0:-1}
-      className={workspace===item.key?'active':''} onClick={()=>setWorkspace(item.key)}
+      aria-controls="teacher-workspace-panel" aria-selected={activeWorkspace===item.key} tabIndex={activeWorkspace===item.key?0:-1}
+      className={activeWorkspace===item.key?'active':''} onClick={()=>selectWorkspace(item.key)}
       onKeyDown={event=>{
        if(!['ArrowLeft','ArrowRight','Home','End'].includes(event.key))return;
        event.preventDefault();
        const index=WORKSPACES.findIndex(entry=>entry.key===item.key);
        const nextIndex=event.key==='Home'?0:event.key==='End'?WORKSPACES.length-1:
         (index+(event.key==='ArrowRight'?1:-1)+WORKSPACES.length)%WORKSPACES.length;
-       const next=WORKSPACES[nextIndex];setWorkspace(next.key);
+       const next=WORKSPACES[nextIndex];selectWorkspace(next.key);
        document.getElementById('teacher-tab-'+next.key)?.focus();
       }}>
       <Icon size={18} strokeWidth={1.9} aria-hidden="true"/><span>{item.title}</span>{item.key==='parties'&&pendingFactionCount>0&&<span className="sectionUnreadBadge" aria-label={'Требуют рассмотрения: '+pendingFactionCount}>{pendingFactionCount}</span>}
@@ -114,14 +120,14 @@ export default function TeacherView({g,onOpenProcesses,onOpenStages,initialWorks
     </button>
    </div>
   </section>
-   <div className="teacherWorkspacePanel" id="teacher-workspace-panel" role="tabpanel" aria-labelledby={'teacher-tab-'+workspace} tabIndex={0}>
-    {workspace==='participants'&&<TeacherParticipantRoster g={g}/>}
-    {workspace==='overview'&&<TeacherOverview g={g} onWorkspace={setWorkspace} onNavigate={onNavigate||(()=>onOpenProcesses())}/>}
+   <div className="teacherWorkspacePanel" id="teacher-workspace-panel" role="tabpanel" aria-labelledby={'teacher-tab-'+activeWorkspace} tabIndex={0}>
+    {activeWorkspace==='participants'&&<TeacherParticipantRoster g={g}/>}
+    {activeWorkspace==='overview'&&<TeacherOverview g={g} onWorkspace={selectWorkspace} onNavigate={onNavigate||(()=>onOpenProcesses())}/>}
 
-    {workspace==='stages'&&<TeacherStageManager g={g} onOpenStage={onOpenStages}/>}
-    {workspace==='journal'&&<ClassroomJournal g={g}/>}
+    {activeWorkspace==='stages'&&<TeacherStageManager g={g} onOpenStage={onOpenStages}/>}
+    {activeWorkspace==='journal'&&<ClassroomJournal g={g}/>}
 
-    {workspace==='analytics'&&<section className="teacherAnalytics surface">
+    {activeWorkspace==='analytics'&&<section className="teacherAnalytics surface">
    <div className="surfaceHead"><div><small>АНАЛИТИКА ИГРЫ</small><h2>Общая статистика и вклад участников</h2></div><span>{members.filter(m=>m.kind==='student').length} участников</span></div>
    <div className="teacherAnalyticsCards">
     <div><small>ПУБЛИКАЦИИ</small><strong>{politicalPostTotal||politicalPosts.length}</strong><span>политических процессов</span></div>
@@ -133,14 +139,14 @@ export default function TeacherView({g,onOpenProcesses,onOpenStages,initialWorks
    <ParticipantsAnalytics g={g}/>
   </section>}
 
-    {workspace==='grades'&&<GradesView g={g}/>}
-    {workspace==='awards'&&<TeacherAwards g={g}/>}
-    {workspace==='blitz'&&<TeacherBlitz g={g}/>}
-    {workspace==='impact'&&<ImpactRulesPanel g={g}/>}
+    {activeWorkspace==='grades'&&<GradesView g={g}/>}
+    {activeWorkspace==='awards'&&<TeacherAwards g={g}/>}
+    {activeWorkspace==='blitz'&&<TeacherBlitz g={g}/>}
+    {activeWorkspace==='impact'&&<ImpactRulesPanel g={g}/>}
 
-    {workspace==='parties'&&<TeacherPartyDossiers g={g} onOpenChat={onOpenChat}/>}
+    {activeWorkspace==='parties'&&<TeacherPartyDossiers g={g} onOpenChat={onOpenChat}/>}
 
-    {workspace==='tools'&&<>
+    {activeWorkspace==='tools'&&<>
     <details className="teacherDetails" open>
    <summary><div><b>Быстрые инструменты</b><span>Таймер, кризис и теневое голосование; публикации доступны в политическом процессе</span></div><i>+</i></summary>
    <div className="teacherDetailsBody">

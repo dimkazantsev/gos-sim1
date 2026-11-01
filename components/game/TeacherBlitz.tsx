@@ -1,7 +1,7 @@
 'use client';
 import {userError} from '@/lib/userError';
 import {type ReactNode,useEffect,useMemo,useRef,useState} from 'react';
-import {BarChart3,BookOpenText,ChevronDown,ChevronLeft,ChevronRight,ClipboardCheck,Table2} from 'lucide-react';
+import {BarChart3,BookOpenText,ChevronDown,ChevronLeft,ChevronRight,SlidersHorizontal,Table2} from 'lucide-react';
 import {supabase} from '@/lib/supabase';
 import {GAME_DATA_REFRESH_EVENT} from './useGameTableSync';
 import type {ReturnTypeRepublic} from './viewTypes';
@@ -9,19 +9,10 @@ type Assignment={id:string;question_id:number;user_id:string;chosen_index:number
 type ReviewStatus='pending'|'approved'|'rejected';
 type Question={id:number;question:string;options:string[];correct_index:number;topic:string;explanation:string;legal_act:string;article:string;source_url:string;verified:boolean;legal_review_status:ReviewStatus;legal_reviewed_at:string|null;legal_review_note:string|null};
 type Stats={user_id:string;correct:number;incorrect:number;pending:number};
-const CHECKS=[
- ['daily','3–5 заданий в сутки без повторов','Восстанавливаются ли вопросы, назначенные во время отсутствия участника?'],
- ['timer','Серверный таймер 20 секунд','Фиксируется ли истечение времени независимо от часов устройства?'],
- ['security','Один ответ и разделение прав','Недоступны ли правильные ответы до завершения попытки?'],
- ['scoring','ВСН: 0,30 + 0,30 + 0,30 + 0,10','Сохранена ли неизменность утверждённых итоговых оценок?'],
- ['matrix','Матрица ответов и статистика','Удобен ли поиск и корректно ли загружаются следующие строки?'],
- ['mobile','Карточка поверх игрового интерфейса','Все ли варианты ответа помещаются на мобильном экране?'],
- ['sources','Актуальность источников и лекций','Все ли ссылки на статьи ведут к действующим редакциям НПА?'],
- ['content','Качество и уникальность банка','Есть ли повторяющиеся или слишком очевидные варианты ответа?']
-] as const;
 
 const PAGE_SIZE=30;
-type Section='bank'|'matrix'|'stats'|'checks';
+type Section='bank'|'matrix'|'stats'|'control';
+type BlitzSettings={daily_count:number;enabled:boolean;updated_at:string|null};
 type IconComponent=typeof BookOpenText;
 function BlitzSection({id,title,subtitle,badge,icon:Icon,open,onToggle,children}:{id:Section;title:string;subtitle:string;badge:string;icon:IconComponent;open:boolean;onToggle:()=>void;children:ReactNode}){
  return <section className={'blitzSection'+(open?' isOpen':'')}>
@@ -48,7 +39,7 @@ function BlitzPager({page,total,onChange,label}:{page:number;total:number;onChan
 export default function TeacherBlitz({g}:{g:ReturnTypeRepublic}){
  const gameId=g.game?.id||'';
  const students=useMemo(()=>g.members.filter(m=>m.game_id===gameId&&m.kind==='student'),[g.members,gameId]);
- const [opened,setOpened]=useState<Record<Section,boolean>>({bank:false,matrix:false,stats:false,checks:false});
+ const [opened,setOpened]=useState<Record<Section,boolean>>({bank:false,matrix:false,stats:false,control:false});
  const toggle=(key:Section)=>setOpened(current=>({...current,[key]:!current[key]}));
  const [questions,setQuestions]=useState<Question[]>([]);
  const [catalogStatus,setCatalogStatus]=useState<'idle'|'loading'|'ready'|'error'>('idle'),[retryCatalog,setRetryCatalog]=useState(0);
@@ -57,11 +48,12 @@ export default function TeacherBlitz({g}:{g:ReturnTypeRepublic}){
  const [query,setQuery]=useState(''),[actFilter,setActFilter]=useState('all'),[reviewFilter,setReviewFilter]=useState<'all'|ReviewStatus>('all'),[sort,setSort]=useState<'question'|'topic'>('question');
  const [bankPage,setBankPage]=useState(0),[matrixPage,setMatrixPage]=useState(0),[expandedQuestion,setExpandedQuestion]=useState<number|null>(null);
  const [notes,setNotes]=useState<Record<string,string>>({}),[error,setError]=useState(''),[saved,setSaved]=useState(''),[reviewBusy,setReviewBusy]=useState<number|null>(null);
+ const [settings,setSettings]=useState<BlitzSettings|null>(null),[settingsLoading,setSettingsLoading]=useState(false),[settingsSaving,setSettingsSaving]=useState(false),[settingsError,setSettingsError]=useState(''),[settingsSaved,setSettingsSaved]=useState(''),[settingsRetry,setSettingsRetry]=useState(0);
  const currentGame=useRef(gameId);currentGame.current=gameId;
  const loadedCatalogFor=useRef(''),requestCatalogFor=useRef(''),loadedNotesFor=useRef(''),requestNotesFor=useRef('');
  useEffect(()=>{
   loadedCatalogFor.current='';requestCatalogFor.current='';loadedNotesFor.current='';requestNotesFor.current='';
-  setQuestions([]);setStats([]);setItems([]);setCatalogStatus('idle');setBankPage(0);setMatrixPage(0);setExpandedQuestion(null);setNotes({});setError('');setSaved('');
+  setQuestions([]);setStats([]);setItems([]);setCatalogStatus('idle');setBankPage(0);setMatrixPage(0);setExpandedQuestion(null);setNotes({});setError('');setSaved('');setSettings(null);setSettingsError('');setSettingsSaved('');
  },[gameId]);
  useEffect(()=>{
   if(!gameId||(!opened.bank&&!opened.matrix)||loadedCatalogFor.current===gameId||requestCatalogFor.current===gameId)return;
@@ -75,7 +67,7 @@ export default function TeacherBlitz({g}:{g:ReturnTypeRepublic}){
   });
  },[gameId,opened.bank,opened.matrix,retryCatalog]);
  useEffect(()=>{
-  if(!gameId||(!opened.bank&&!opened.checks)||loadedNotesFor.current===gameId||requestNotesFor.current===gameId)return;
+  if(!gameId||!opened.bank||loadedNotesFor.current===gameId||requestNotesFor.current===gameId)return;
   requestNotesFor.current=gameId;
   void supabase.from('blitz_check_notes').select('check_key,correction').eq('game_id',gameId).then(({data, error:loadError})=>{
    if(currentGame.current!==gameId)return;
@@ -84,7 +76,22 @@ export default function TeacherBlitz({g}:{g:ReturnTypeRepublic}){
    setNotes(Object.fromEntries((data||[]).map(x=>[x.check_key,x.correction])));
    loadedNotesFor.current=gameId;
   });
- },[gameId,opened.bank,opened.checks]);
+ },[gameId,opened.bank]);
+ useEffect(()=>{
+  if(!gameId||!opened.control)return;
+  let live=true;
+  setSettingsLoading(true);setSettingsError('');setSettingsSaved('');
+  void supabase.rpc('blitz_teacher_get_settings',{p_game:gameId}).then(({data,error:loadError})=>{
+   if(!live)return;
+   setSettingsLoading(false);
+   if(loadError){setSettingsError(userError(loadError));return;}
+   if(!data||typeof data.daily_count!=='number'||typeof data.enabled!=='boolean'){
+    setSettingsError('Сервер не вернул настройки блица.');return;
+   }
+   setSettings(data as BlitzSettings);
+  });
+  return ()=>{live=false};
+ },[gameId,opened.control,settingsRetry]);
  useEffect(()=>{
   if(!gameId||!opened.stats||!students.length)return;
   let live=true;setStatsBusy(true);
@@ -142,6 +149,21 @@ export default function TeacherBlitz({g}:{g:ReturnTypeRepublic}){
   if(!g.me||!gameId)return;setSaved('');
   const {error:saveError}=await supabase.from('blitz_check_notes').upsert({game_id:gameId,check_key:key,teacher_id:g.me.user_id,correction:notes[key]||'',updated_at:new Date().toISOString()});
   if(saveError)setError(userError(saveError));else{setError('');setSaved('Корректировка сохранена.')}
+ }
+ async function saveSettings(){
+  if(!gameId||!settings||settingsSaving)return;
+  setSettingsSaving(true);setSettingsError('');setSettingsSaved('');
+  const {data,error:saveError}=await supabase.rpc('blitz_teacher_set_settings',{
+   p_game:gameId,p_daily_count:settings.daily_count,p_enabled:settings.enabled
+  });
+  if(currentGame.current!==gameId)return;
+  setSettingsSaving(false);
+  if(saveError){setSettingsError(userError(saveError));return;}
+  if(!data||typeof data.daily_count!=='number'||typeof data.enabled!=='boolean'){
+   setSettingsError('Не удалось подтвердить сохранение настроек.');return;
+  }
+  setSettings(data as BlitzSettings);
+  setSettingsSaved('Настройки сохранены. Они действуют для новых назначений.');
  }
  const catalogLoading=catalogStatus==='loading'||catalogStatus==='idle';
  const filterBar=<div className="blitzFilters" role="search" aria-label="Фильтры блиц-вопросов">
@@ -204,8 +226,28 @@ export default function TeacherBlitz({g}:{g:ReturnTypeRepublic}){
       {students.map(m=>{const a=statsMap.get(m.user_id);return <tr key={m.user_id}><th scope="row">{m.full_name}</th><td>{a?.correct??0}</td><td>{a?.incorrect??0}</td><td>{a?.pending??0}</td></tr>})}</tbody></table></div>
     </>}
    </BlitzSection>
-   <BlitzSection id="checks" title="Контрольные проверки" subtitle="Вопросы для регрессии и ваши корректировки" badge={CHECKS.length+' проверок'} icon={ClipboardCheck} open={opened.checks} onToggle={()=>toggle('checks')}>
-    <div className="blitzChecks">{CHECKS.map(([key,title,question],i)=><section className="blitzCheck" key={key}><span className="blitzCheckNumber">{String(i+1).padStart(2,'0')}</span><div><h3>{title}</h3><p>{question}</p><label>Ваши корректировки<textarea rows={2} value={notes[key]||''} onChange={e=>setNotes(prev=>({...prev,[key]:e.target.value}))}/></label><button type="button" className="blitzAction" onClick={()=>void saveNote(key)}>Сохранить корректировку</button></div></section>)}</div>
+   <BlitzSection id="control" title="Пульт блиц-вопросов" subtitle="Настройки выдачи для участников этой игры" badge="Настройки" icon={SlidersHorizontal} open={opened.control} onToggle={()=>toggle('control')}>
+    {settingsLoading?<p className="blitzLoading" role="status">Загрузка настроек…</p>:settingsError&&!settings?<div className="blitzEmpty"><p role="alert">{settingsError}</p><button type="button" className="blitzAction" onClick={()=>setSettingsRetry(v=>v+1)}>Повторить загрузку</button></div>:settings&&<>
+     <div className="blitzControlGrid">
+      <label className="blitzControlField"><strong>Вопросов в сутки на участника</strong><span>Без повторного назначения уже использованных вопросов</span>
+       <select value={settings.daily_count} disabled={settingsSaving} onChange={e=>{setSettings({...settings,daily_count:Number(e.target.value)});setSettingsSaved('')}}>
+        {[1,2,3,4,5].map(n=><option key={n} value={n}>{n} {n===1?'вопрос':n<5?'вопроса':'вопросов'}</option>)}
+       </select>
+      </label>
+      <label className="blitzControlSwitch"><input type="checkbox" checked={settings.enabled} disabled={settingsSaving} onChange={e=>{setSettings({...settings,enabled:e.target.checked});setSettingsSaved('')}}/>
+       <span><strong>Назначать новые вопросы</strong><small>При отключении уже выданные задания сохраняются</small></span>
+      </label>
+     </div>
+     <div className="blitzControlFacts" aria-label="Действующие ограничения блица">
+      <span><b>20 секунд</b> · серверный таймер</span>
+      <span><b>Без повторов</b> · в пределах игры</span>
+      <span><b>Только одобренные</b> · из банка вопросов</span>
+     </div>
+     <p className="blitzControlHint">Изменения влияют только на будущие дневные назначения. Уже назначенные вопросы, ответы и утверждённые оценки не пересчитываются.</p>
+     {settingsError&&<p className="blitzNotice" role="alert">{settingsError}</p>}
+     {settingsSaved&&<p className="blitzNotice" role="status">{settingsSaved}</p>}
+     <div className="blitzControlActions"><button type="button" className="blitzAction" disabled={settingsSaving} onClick={()=>void saveSettings()}>{settingsSaving?'Сохранение…':'Сохранить настройки'}</button></div>
+    </>}
    </BlitzSection>
   </div>
  </section>;
