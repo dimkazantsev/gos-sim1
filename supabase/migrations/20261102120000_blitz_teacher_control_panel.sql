@@ -4,6 +4,7 @@ create table if not exists public.blitz_game_settings (
  game_id uuid primary key references public.games(id) on delete cascade,
  daily_count smallint not null default 2 check (daily_count between 1 and 5),
  enabled boolean not null default true,
+ resume_day date,
  updated_by uuid,
  updated_at timestamptz not null default now()
 );
@@ -48,6 +49,9 @@ begin
  values(p_game,p_daily_count,p_enabled,auth.uid(),clock_timestamp())
  on conflict(game_id) do update set
   daily_count=excluded.daily_count,enabled=excluded.enabled,
+  resume_day=case when not public.blitz_game_settings.enabled and excluded.enabled
+   then (clock_timestamp() at time zone 'Europe/Moscow')::date
+   else public.blitz_game_settings.resume_day end,
   updated_by=excluded.updated_by,updated_at=excluded.updated_at;
  return public.blitz_teacher_get_settings(p_game);
 end $fn$;
@@ -57,6 +61,7 @@ revoke all on function public.blitz_teacher_set_settings(uuid,integer,boolean) f
 grant execute on function public.blitz_teacher_get_settings(uuid) to authenticated;
 grant execute on function public.blitz_teacher_set_settings(uuid,integer,boolean) to authenticated;
 
+-- On resuming, never backfill days when the teacher had disabled issuance.
 -- Keep the existing server-side issue algorithm, locking, topic diversity and no-repeat rule.
 -- Replace only the randomized daily quantity with game-scoped teacher settings.
 do $patch$
@@ -69,10 +74,10 @@ begin
  then raise exception 'Unexpected blitz_issue_for_day definition: migration aborted'; end if;
  definition:=replace(definition,
   'declare n integer; ids bigint[]; inserted_count integer;',
-  'declare n integer; ids bigint[]; inserted_count integer; issue_enabled boolean;');
+  'declare n integer; ids bigint[]; inserted_count integer; issue_enabled boolean; resume_day date;');
  definition:=replace(definition,needle,
-  'select coalesce(s.daily_count,2),coalesce(s.enabled,true) into n,issue_enabled
+  'select coalesce(s.daily_count,2),coalesce(s.enabled,true),s.resume_day into n,issue_enabled,resume_day
    from (select 1) seed left join public.blitz_game_settings s on s.game_id=p_game;
-   if not issue_enabled then return 0; end if;');
+   if not issue_enabled or (resume_day is not null and p_day<resume_day) then return 0; end if;');
  execute definition;
 end $patch$;
