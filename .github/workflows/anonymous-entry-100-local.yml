@@ -1,0 +1,79 @@
+name: 'ГОС.ID · 100 действительно одновременных Auth-входов (изолированный сервер)'
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/anonymous-entry-100-local.yml'
+      - 'scripts/anonymous-entry-100-local.cjs'
+      - 'supabase/tests/anonymous_entry_100_disposable.sql'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: gos-real-local-100-auth-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+jobs:
+  real-100-auth:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    env:
+      GOS_ANON_AUTH_QA: DISPOSABLE-ONLY
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci --no-audit --no-fund
+      - name: Verify guarded real Auth test syntax
+        run: |
+          node --check scripts/anonymous-entry-100-local.cjs
+          grep -q 'DISPOSABLE-LOCAL-100-AUTH-BURST' supabase/tests/anonymous_entry_100_disposable.sql
+      - uses: supabase/setup-cli@v3
+        with:
+          version: latest
+      - name: Configure disposable Auth (100 concurrent burst, no production access)
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/gos-auth-entry-100
+          cd /tmp/gos-auth-entry-100
+          supabase init
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+          p=Path('supabase/config.toml')
+          s=p.read_text()
+          s,n=re.subn(r'(?m)^enable_anonymous_sign_ins\s*=\s*false\s*$', 'enable_anonymous_sign_ins = true',s)
+          if n!=1: raise SystemExit('Unexpected anonymous Auth config')
+          s,n=re.subn(r'(?m)^anonymous_users\s*=\s*\d+\s*$', 'anonymous_users = 150',s)
+          if n!=1: raise SystemExit('Unexpected anonymous rate config')
+          p.write_text(s)
+          PY
+          supabase start -x storage-api,imgproxy,mailpit,postgres-meta,studio,edge-runtime,logflare,vector,supavisor
+      - name: Export ONLY local, disposable Auth credentials
+        run: |
+          set -euo pipefail
+          cd /tmp/gos-auth-entry-100
+          while IFS='=' read -r key value; do
+            value="$(printf '%s' "$value" | sed 's/^"//;s/"$//')"
+            printf '%s=%s\n' "$key" "$value" >> "$GITHUB_ENV"
+          done < <(
+            supabase status -o env \
+              --override-name api.url=SUPABASE_URL \
+              --override-name auth.anon_key=SUPABASE_ANON_KEY \
+              --override-name auth.service_role_key=SUPABASE_SERVICE_ROLE_KEY
+          )
+      - name: Create disposable game and RLS fixture
+        run: |
+          set -euo pipefail
+          cd /tmp/gos-auth-entry-100
+          DB_URL="$(supabase status -o env | sed -n 's/^DB_URL="\([^"]*\)"$/\1/p')"
+          test -n "$DB_URL"
+          psql "$DB_URL" -v ON_ERROR_STOP=1 -f "$GITHUB_WORKSPACE/supabase/tests/anonymous_entry_100_disposable.sql"
+          sleep 3
+      - name: 100 simultaneous signups → 100 JWTs → 100 joins → RLS isolation
+        run: node scripts/anonymous-entry-100-local.cjs
+      - name: Destroy disposable stack without backups
+        if: always()
+        run: |
+          cd /tmp/gos-auth-entry-100 || exit 0
+          supabase stop --no-backup
