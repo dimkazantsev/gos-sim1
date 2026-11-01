@@ -175,7 +175,7 @@ export default function TeacherView({g,onOpenProcesses,onOpenStages,initialWorks
    </div>
   </details>
     </>}
-    {activeWorkspace==='event'&&<EventWorkspace g={g} mode="manage"/>}
+    {workspace==='event'&&<EventWorkspace g={g} mode="manage"/>}
    </div>
   </section>
  </div>;
