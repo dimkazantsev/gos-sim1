@@ -105,5 +105,19 @@ async function tick(clients,steps=1){for(let i=0;i<steps;i++){now+=1000;for(cons
  const peak=Math.max(...perSecond.values());
  assert(peak<=25,'Initial stagger must avoid a 100-client 1-second burst: '+peak);
  hundred.forEach(c=>c.dispose());
- console.log(JSON.stringify({status:'PASS',clients:100,burstEvents:6000,burstSeconds:60,burstRpcCalls:burstReads,initialBadgeReads:initialReads,peakReadsPerSecond:peak,baselineClients:40,baselineInvalidations:24000,baselineRpcCalls:reads,source:'actual useSectionUpdates transpiled TS',network:'synthetic',liveDatabaseReads:0,hidden_tab:'paused',on_return:'reconciled',confirmedRead:'optimistic',concurrentNotification:'preserved'},null,2));
+ // Marking the first dashboard visit is not allowed to create a simultaneous
+ // SQL upsert storm when 100 browsers have just authenticated.
+ const dashboardClients=Array.from({length:100},(_,i)=>session(3000+i,'dashboard'));
+ await tick(dashboardClients,3);
+ assert(dashboardClients.every(c=>c.calls.every(x=>x.method!=='mark_section_read')),
+  'The first dashboard write must not happen during the immediate entry burst');
+ await tick(dashboardClients,18);
+ const marks=dashboardClients.flatMap(c=>c.calls.filter(x=>x.method==='mark_section_read'));
+ assert.equal(marks.length,100,'Every visible dashboard eventually acknowledges entry');
+ const markSeconds=new Map();
+ for(const m of marks)markSeconds.set(m.at,(markSeconds.get(m.at)||0)+1);
+ const peakMarks=Math.max(...markSeconds.values());
+ assert(peakMarks<=20,'One-second first-dashboard SQL write peak must be bounded: '+peakMarks);
+ dashboardClients.forEach(c=>c.dispose());
+ console.log(JSON.stringify({status:'PASS',clients:100,burstEvents:6000,burstSeconds:60,burstRpcCalls:burstReads,initialBadgeReads:initialReads,peakReadsPerSecond:peak,initialDashboardMarks:marks.length,peakDashboardMarksPerSecond:peakMarks,baselineClients:40,baselineInvalidations:24000,baselineRpcCalls:reads,source:'actual useSectionUpdates transpiled TS',network:'synthetic',liveDatabaseReads:0,hidden_tab:'paused',on_return:'reconciled',confirmedRead:'optimistic',concurrentNotification:'preserved'},null,2));
 })().catch(error=>{console.error(error);process.exitCode=1});
