@@ -20,8 +20,8 @@ assert(game.includes('setGameRealtimeConnection(gameId,false)'));
 assert(game.includes('if(liveConnected&&now-lastChatRecoveryAt<60000)return'));
 assert(game.includes('chatRecovery=setInterval(recoverVisibleChatAndBallots,6000)'),'Disconnected chat and ballot recovery retains the original six-second cadence');
 assert(game.includes('const initialRecoveryDelay=500+recoveryHash%5500'),'Per-client initial recovery phase must prevent a synchronized classroom burst');
-assert(client.includes("useGameTableSync(!previewMode&&me?game?.id:undefined,['event_assignments'"),'Event badges use shared realtime and reconciliation');
-assert(client.includes("useGameTableSync(!previewMode&&me?.kind==='student'?game?.id:undefined,['blitz_assignments']"),'Blitz badges use the same bounded game scheduler');
+assert(client.includes("useGameTableSync(!previewMode&&g.coreLoaded&&me?game?.id:undefined,['event_assignments'"),'Event badges use shared realtime and reconciliation');
+assert(client.includes("useGameTableSync(!previewMode&&g.coreLoaded&&me?.kind==='student'?game?.id:undefined,['blitz_assignments']"),'Blitz badges use the same bounded game scheduler');
 assert(!client.includes('},[game?.id,me?.user_id,previewMode,view]);'),'Section navigation must not resubscribe event badges');
 assert(!client.includes("supabase.channel('event-count:")&&!client.includes("supabase.channel('blitz-count:"),'No additional per-student badge subscriptions');
 
