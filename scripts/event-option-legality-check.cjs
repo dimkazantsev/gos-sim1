@@ -12,6 +12,7 @@ function harness(){
  const props={g,mode:'manage'};
  const react={
   useRef(initial){const i=cursor++;return(slots[i]??={value:{current:initial}}).value;},
+  useMemo(factory,deps){const i=cursor++,old=slots[i];if(!old||deps.some((value,j)=>!Object.is(value,old.deps?.[j])))slots[i]={value:factory(),deps};return slots[i].value;},
   useState(initial){const i=cursor++;if(!slots[i])slots[i]={value:typeof initial==='function'?initial():initial};return[slots[i].value,next=>{const value=typeof next==='function'?next(slots[i].value):next;if(!Object.is(value,slots[i].value)){slots[i].value=value;dirty=true;}}];},
   useEffect(effect,deps){const i=cursor++,old=slots[i];if(!old||deps.some((value,j)=>!Object.is(value,old.deps?.[j]))){slots[i]={deps,cleanup:old?.cleanup};effects.push(()=>{slots[i].cleanup?.();slots[i].cleanup=effect();});}}
  };
@@ -20,9 +21,9 @@ function harness(){
   rpc:async(name,args)=>{
    // Read projection is not a teacher mutation. The established tests assert
    // the number/payload of create calls, not unrelated background reads.
-   if(name==='get_event_workspace_projection')return{data:{
+   if(name==='get_event_workspace_projection'||name==='get_event_workspace_feed_bootstrap')return{data:{
     assignments:[],decisions:[],outcomes:[],invitations:[],authority:[],
-    ready_case_count:args.p_include_ready_count?0:null
+    ready_case_count:args.p_include_ready_count?0:null,compact:{titles:[],positive:0,negative:0}
    },error:null};
    calls.push({name,args});return{data:'fictional-event',error:rpcError};
   },
