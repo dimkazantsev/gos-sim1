@@ -76,4 +76,5 @@ async function main(){
  });
  if(failures.length)process.exitCode=1;
 }
+require('./event-feed-pagination-check.cjs');
 main().catch(error=>{console.error(error);process.exitCode=1;});
