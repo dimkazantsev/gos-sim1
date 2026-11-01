@@ -22,7 +22,7 @@ function harness(initialSession,changeIdentity=false,signupError=null,teacherAcc
   assert.equal(table,'game_members');
   return{select(fields){assert(fields.includes('games!inner'));return this},
    eq(field,value){assert.equal(field,'user_id');assert.equal(value,initialSession?.user?.id);return this},
-   in(field,roles){assert.equal(field,'kind');assert.deepEqual(roles,['student','observer']);return this},
+   in(field,roles){assert.equal(field,'kind');assert.equal(roles.join(','),'student,observer');return this},
    is(field,value){assert.equal(field,'roster_archived_at');assert.equal(value,null);return this},
    async limit(n){assert(n>=2&&n<=20);return{data:returningMemberships,error:null}}};
  },auth:{
