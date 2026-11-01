@@ -6,6 +6,7 @@ import type {ReturnTypeRepublic} from './viewTypes';
 import {useDialog} from '../ui/useDialog';
 import {AlertTriangle,CalendarClock,ChevronRight,Scale,ShieldAlert,UserRound,UsersRound,X} from 'lucide-react';
 import {notifyGameDataRefresh,useGameTableSync} from './useGameTableSync';
+import {getStageDeadlineRule,type StageDeadlineRule} from './stageDeadlineRuleShared';
 
 type DeadlineIncident={
  id:string;game_id:string;stage_no:number;party_id:string|null;user_id:string|null;
@@ -13,10 +14,8 @@ type DeadlineIncident={
  magnitude:number|null;note:string;status:'active'|'reverted';created_at:string
 };
 
-type DeadlineRule={
- game_id:string;stage_no:number;deadline_at:string|null;inclusive:boolean;
- penalty_points:number;penalty_description:string;consequence_type:'none'|'representation_loss'|'regional_seat_loss'|'ghost_risk'|'presidential_rating_loss';consequence_magnitude:number|null;updated_at:string
-};
+type DeadlineRule=StageDeadlineRule;
+const PAGE_SIZE=10;
 
 const CONSEQUENCES={
  representation_loss:{label:'Потеря представительства',unit:'мест',hint:'Этапы 1–2: правила предусматривают потерю мест в КСРФ/ГД, но не задают фиксированное число.'},
@@ -34,6 +33,8 @@ export default function DeadlineControl({g,stageNo}:{g:ReturnTypeRepublic;stageN
  const stage=stages.find(s=>s.stage_no===stageNo);
  const [rows,setRows]=useState<DeadlineIncident[]>([]);
  const [rule,setRule]=useState<DeadlineRule|null>(null);
+ const [hasMore,setHasMore]=useState(false);
+ const [pageBusy,setPageBusy]=useState(false);
  const [partyId,setPartyId]=useState('');
  const [userId,setUserId]=useState('');
  const [targetType,setTargetType]=useState<'party'|'student'>('party');
@@ -51,7 +52,7 @@ export default function DeadlineControl({g,stageNo}:{g:ReturnTypeRepublic;stageN
  const readState=reads.current,scopeCurrent=()=>alive.current&&activeScope.current===scope;
  useEffect(()=>{alive.current=true;return()=>{alive.current=false}},[]);
  useEffect(()=>{
-  setRows([]);setRule(null);setTargetType('party');setPartyId('');setUserId('');setNote('');setBusy(false);setApplyOpen(false);setDataScope(scope);
+  setRows([]);setRule(null);setHasMore(false);setPageBusy(false);setTargetType('party');setPartyId('');setUserId('');setNote('');setBusy(false);setApplyOpen(false);setDataScope(scope);
   return()=>{readState.cancel?.()};
  },[scope]);
  async function load(background=false){
@@ -63,16 +64,17 @@ export default function DeadlineControl({g,stageNo}:{g:ReturnTypeRepublic;stageN
     state.queued=false;const passive=!state.explicit;state.explicit=false;
     const controller=new AbortController();let timeout:ReturnType<typeof setTimeout>|undefined;
     try{
+     const loadedCount=Math.max(PAGE_SIZE,rows.length);
      const [incidents,rules]=await Promise.race([Promise.all([
-      supabase.from('stage_deadline_incidents').select('*').eq('game_id',game.id).eq('stage_no',stageNo).order('created_at',{ascending:false}).abortSignal(controller.signal),
-      supabase.from('stage_deadline_rules').select('game_id,stage_no,deadline_at,inclusive,penalty_points,penalty_description,consequence_type,consequence_magnitude,updated_at').eq('game_id',game.id).eq('stage_no',stageNo).abortSignal(controller.signal).maybeSingle()
+      supabase.from('stage_deadline_incidents').select('*').eq('game_id',game.id).eq('stage_no',stageNo).eq('status','active').order('created_at',{ascending:false}).order('id',{ascending:false}).range(0,loadedCount).abortSignal(controller.signal),
+      getStageDeadlineRule(game.id,stageNo,me.user_id)
      ]),new Promise<never>((_,reject)=>{
       state.cancel=()=>{clearTimeout(timeout);controller.abort();reject(new Error('Обновление последствий отменено.'))};
       timeout=setTimeout(()=>{controller.abort();reject(new Error('Не удалось обновить последствия: сервер не ответил вовремя.'))},12000);
      })]);
      if(scopeCurrent()&&!controller.signal.aborted&&(!passive||document.visibilityState==='visible')){
-      if(!incidents.error)setRows((incidents.data||[]) as DeadlineIncident[]);
-      if(!rules.error)setRule((rules.data||null) as DeadlineRule|null);
+      if(!incidents.error){const page=(incidents.data||[]) as DeadlineIncident[];setRows(page.slice(0,loadedCount));setHasMore(page.length>loadedCount)}
+      if(!rules.error)setRule(rules.data as DeadlineRule|null);
       if(incidents.error||rules.error)setError(userError(incidents.error||rules.error));
      }
     }catch(error){if(scopeCurrent()&&(!passive||document.visibilityState==='visible'))setError(userError(error))}
@@ -80,6 +82,26 @@ export default function DeadlineControl({g,stageNo}:{g:ReturnTypeRepublic;stageN
    }while(state.queued&&scopeCurrent());
   })().finally(()=>{state.promise=null});
   return state.promise;
+ }
+ async function loadMore(){
+  if(!game||!me||pageBusy||!hasMore||!scopeCurrent()||reads.current.promise)return;
+  setPageBusy(true);
+  try{
+   const offset=rows.length;
+   const result=await supabase.from('stage_deadline_incidents').select('*')
+    .eq('game_id',game.id).eq('stage_no',stageNo).eq('status','active')
+    .order('created_at',{ascending:false}).order('id',{ascending:false})
+    .range(offset,offset+PAGE_SIZE);
+   if(!scopeCurrent())return;
+   if(result.error){setError(userError(result.error));return}
+   const batch=(result.data||[]) as DeadlineIncident[];
+   setRows(previous=>{
+    const seen=new Set(previous.map(row=>row.id));
+    return [...previous,...batch.slice(0,PAGE_SIZE).filter(row=>!seen.has(row.id))];
+   });
+   setHasMore(batch.length>PAGE_SIZE);
+  }catch(error){if(scopeCurrent())setError(userError(error))}
+  finally{if(scopeCurrent())setPageBusy(false)}
  }
  useGameTableSync(me?.user_id?game?.id:undefined,['stage_deadline_incidents','stage_deadline_rules'],()=>load(true),scope,undefined,3000,180000);
  useEffect(()=>{
@@ -94,7 +116,7 @@ export default function DeadlineControl({g,stageNo}:{g:ReturnTypeRepublic;stageN
  },[scope]);
  useEffect(()=>{
   let id:ReturnType<typeof setInterval>|undefined;
-  const sync=()=>{clearInterval(id);if(document.visibilityState==='visible'){setNow(Date.now());id=setInterval(()=>setNow(Date.now()),1000)}};
+  const sync=()=>{clearInterval(id);if(document.visibilityState==='visible'){setNow(Date.now());id=setInterval(()=>setNow(Date.now()),30000)}};
   sync();document.addEventListener('visibilitychange',sync);
   return()=>{clearInterval(id);document.removeEventListener('visibilitychange',sync)};
  },[]);
@@ -167,7 +189,7 @@ export default function DeadlineControl({g,stageNo}:{g:ReturnTypeRepublic;stageN
     </div>
    </header>
 
-   <div className="deadlineCount"><strong>{active.length}</strong><span>активных последствий</span></div>
+   <div className="deadlineCount"><strong>{active.length}{hasMore?'+':''}</strong><span>активных последствий</span></div>
 
    {teacher&&<button type="button" className="deadlineActionCard" disabled={!canApplyRule} onClick={()=>{if(canApplyRule){setTargetType(partyRuleReady?'party':'student');setApplyOpen(true)}}}>
     <span className="deadlineActionIcon" aria-hidden="true"><Scale size={20}/></span>
@@ -223,5 +245,6 @@ export default function DeadlineControl({g,stageNo}:{g:ReturnTypeRepublic;stageN
   </div>}
 
   {active.length>0&&<div className="deadlineLedger">{active.map(x=><article key={x.id}><div><b>{CONSEQUENCES[x.consequence_type].label}</b><small>{x.party_id?partyName(x.party_id):userName(x.user_id)} · {new Date(x.created_at).toLocaleString('ru-RU')}</small><p>{x.note}</p></div><strong>{x.magnitude!=null?String(x.magnitude)+' '+CONSEQUENCES[x.consequence_type].unit:'зафиксировано'}</strong>{teacher&&<button disabled={busy} onClick={()=>void revert(x.id)}>Отменить</button>}</article>)}</div>}
+  {hasMore&&<div className="deadlineLoadMore"><button type="button" className="secondary" disabled={pageBusy} onClick={()=>void loadMore()}>{pageBusy?'Загрузка…':'Показать ещё 10 нарушений'}</button></div>
  </section>;
 }
