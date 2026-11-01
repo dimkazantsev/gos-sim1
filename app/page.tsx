@@ -121,12 +121,19 @@ export default function Home(){
    // original registered account and its assets remain unchanged on the server.
    let switchIdentity=false;
    if(mode!=='teacher'&&session){
-    const check=await supabase.from('teacher_profiles').select('user_id')
-     .eq('user_id',session.user.id).maybeSingle();
-    if(check.error)throw check.error;
-    switchIdentity=!!check.data
-      ||!!session.user.is_anonymous&&(session.user.user_metadata?.full_name!==name
-        ||window.sessionStorage.getItem('gos-id:last-entry-role')!==null&&window.sessionStorage.getItem('gos-id:last-entry-role')!==mode);
+    if(session.user.is_anonymous){
+     // Anonymous accounts cannot be the protected teacher account. Avoid a
+     // needless protected-profile lookup for every returning classroom player.
+     switchIdentity=session.user.user_metadata?.full_name!==name
+       ||window.sessionStorage.getItem('gos-id:last-entry-role')!==null
+        &&window.sessionStorage.getItem('gos-id:last-entry-role')!==mode;
+    }else{
+     // A confirmed teacher must never reuse the permanent account as a student.
+     const check=await supabase.from('teacher_profiles').select('user_id')
+      .eq('user_id',session.user.id).maybeSingle();
+     if(check.error)throw check.error;
+     switchIdentity=!!check.data;
+    }
    }
    if(switchIdentity){
     const result=await supabase.auth.signOut({scope:'local'});
