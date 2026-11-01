@@ -559,6 +559,39 @@ async function main(){
     'Visible political process must continue to refresh its detail feed');
   }finally{clients.forEach(h=>h.dispose())}
  });
+ await check('40 political readers sign no offscreen media; explicit visible asset signs once',async()=>{
+  const clients=Array.from({length:40},()=>harness({effects:true}));
+  try{
+   for(const h of clients){
+    h.fixture('political_posts',[{id:'post-1',game_id:'game-a',title:'Публикация',body:'Текст'}]);
+    h.fixture('political_post_media',[{id:'media-1',game_id:'game-a',post_id:'post-1',
+     storage_path:'game-a/news/post-1/asset.png',media_kind:'image',file_name:'asset.png'}]);
+   }
+   await Promise.all(clients.map(h=>h.settle()));
+   const initial=clients.map(h=>h.assetStats().signed);
+   await Promise.all(clients.map(async h=>{
+    h.render().setActiveView('actions');await h.settle();
+   }));
+   for(let i=0;i<clients.length;i++){
+    const h=clients[i];
+    assert(h.render().politicalMedia.some(row=>row.id==='media-1'));
+    assert.equal(h.assetStats().signed,initial[i],
+     'An offscreen image must NOT request a signed Storage URL');
+   }
+   const first=clients[0],url=await first.render().loadPoliticalMediaUrl('media-1');
+   await first.settle();
+   assert(url?.includes('https://'),'Visible RLS-authorized image is signed on demand');
+   assert.equal(first.assetStats().signed,initial[0]+1);
+   await first.render().loadPoliticalMediaUrl('media-1');await first.settle();
+   assert.equal(first.assetStats().signed,initial[0]+1,'Repeated render reuses signed image');
+   assert.equal(await first.render().loadPoliticalMediaUrl('other-game-media'),null,
+    'A media id absent from this authorized page must not be signed');
+   assert.equal(first.assetStats().signed,initial[0]+1);
+   assert(clients.slice(1).every((h,i)=>h.assetStats().signed===initial[i+1]),
+    'The other 39 readers have no extra Storage signing calls');
+   console.log('PASS: 40 simulated readers, 0 initial post-image signatures, 1 selected image signed once');
+  }finally{clients.forEach(h=>h.dispose())}
+ });
  await check('Missing political projection falls back under RLS; 402 never fans out',async()=>{
   const old=harness({effects:true});old.failRpc('get_political_wall_page','PGRST202');old.failRpc('get_political_wall_projection','PGRST202');
   await old.settle();old.render().setActiveView('actions');await old.settle();assert(old.readCount('political_posts')>=1);old.dispose();
