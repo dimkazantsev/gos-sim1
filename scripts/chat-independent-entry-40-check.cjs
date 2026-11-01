@@ -9,17 +9,18 @@ const {harness}=require('./republic-game-resilience-check.cjs');
  });
  try{
   await Promise.all(clients.map(h=>h.settle()));
+  const initialRosterReads=clients.map(h=>h.readCount('game_members'));
   for(const h of clients){
    assert.equal(h.render().coreLoaded,false);
    assert.equal(h.rpcCount('get_game_entry_v5'),0);
    h.render().setChatOpen(true);
   }
   await Promise.all(clients.map(h=>h.settle()));
-  for(const h of clients){
+  for(const [index,h] of clients.entries()){
    assert.equal(h.rpcCount('get_game_entry_v5'),0,'Opening chat must not scan 12 game projections');
    assert.equal(h.render().coreLoaded,false,'Chat is separate from full game bootstrap');
    assert.equal(h.readCount('chat_channels'),1,'Exactly one RLS chat-directory read per player');
-   assert.equal(h.readCount('game_members'),1,'Exactly one narrow roster read for mentions');
+   assert.equal(h.readCount('game_members'),initialRosterReads[index]+1,'Chat adds one narrow roster read, excluding essential recovery reads');
    assert.equal(h.render().chatDirectoryLoaded,true,'Chat directory is ready');
    assert(h.rpcCount('get_my_chat_overview')>=1,'Chat overview must load');
   }
