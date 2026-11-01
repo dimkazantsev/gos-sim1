@@ -371,6 +371,7 @@ jobs:
       - run: node scripts/document-metadata-cache-40-check.cjs
       - run: node scripts/realtime-overview-singleflight-40-check.cjs
       - run: node scripts/game-bootstrap-v3-lightweight-check.cjs
+      - run: node scripts/game-entry-v5-deferred-rls-check.cjs
       - run: npm run news:check
       - run: npm run ui:ru-check
       - run: node scripts/game-roster-check.cjs
