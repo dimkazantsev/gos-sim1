@@ -37,7 +37,7 @@ function compile(node,env){
 }
 function fixture(){
  const queries=[],events=[],blitz=[];
- const env={game:{id:'classroom'},me:{user_id:'student',kind:'student'},previewMode:false,counterScope:'scope',counterScopeRef:{current:'scope'},Set,
+ const env={game:{id:'classroom'},me:{user_id:'student',kind:'student'},g:{coreLoaded:true},previewMode:false,counterScope:'scope',counterScopeRef:{current:'scope'},Set,
   setPendingEvents:n=>events.push(n),setPendingBlitz:n=>blitz.push(n)};
  env.supabase={from(table){
   const record={table,filters:{}};queries.push(record);
@@ -72,7 +72,7 @@ async function main(){
   const calls=[],listeners=new Map();
   const document={visibilityState:'visible',addEventListener:(name,fn)=>listeners.set(name,fn),removeEventListener:name=>listeners.delete(name)};
   const {fn}=compile(presence.arguments[0],{
-   me:{kind:'student',user_id:'student-'+n},gameId:'classroom',previewMode:false,view:'documents',
+   me:{kind:'student',user_id:'student-'+n},g:{coreLoaded:true},gameId:'classroom',previewMode:false,view:'documents',
    document,Date:{now:()=>now},Math,firstPresenceWriteDelay:()=>2000,
    initialSqlPresence:{current:{scope:'',readyAt:0}},
    touchPresence:(...args)=>{calls.push(args);return Promise.resolve()},
