@@ -87,7 +87,7 @@ function harness(initialSession,changeIdentity=false,signupError=null,teacherAcc
  assert.equal(sameName.calls.filter(c=>c==='teacher_profiles').length,0,'One reusable anonymous session eliminates the extra HTTP read');
  assert.equal(sameName.calls.filter(c=>c==='signInAnonymously').length,0,'Rejoining the same browser does not create another anonymous account');
  assert.equal(sameName.calls.filter(c=>c==='rpc:join_game_as_role').length,1);
- const prior={game_id:'prior-game-uuid',kind:'student',games:{title:'Республика',game_code:'OLD'}};
+ const prior={game_id:'prior-game-uuid',kind:'student',games:[{title:'Республика',game_code:'OLD'}]};
  const returningAnonymous=harness({user:{id:'return-anon',is_anonymous:true,user_metadata:{full_name:'Другое имя'}}},false,null,false,[prior]);
  await returningAnonymous.resume();
  assert.deepEqual(returningAnonymous.calls,['getSession','game_members','navigate:/game/prior-game-uuid'],
@@ -109,7 +109,7 @@ function harness(initialSession,changeIdentity=false,signupError=null,teacherAcc
  assert(!blockedMember.calls.some(x=>x.startsWith('navigate:')),
   'Revoked, archived and other-game identities must not open a game');
  const twoGames=harness({user:{id:'two-games',is_anonymous:true}},false,null,false,
-  [prior,{game_id:'second-game-uuid',kind:'observer',games:{title:'Другая игра',game_code:'SECOND'}}]);
+  [prior,{game_id:'second-game-uuid',kind:'observer',games:[{title:'Другая игра',game_code:'SECOND'}]}]);
  await twoGames.resume();
  const choices=twoGames.choices();
  assert.equal(choices.length,2,'Two accessible games require explicit selection');
