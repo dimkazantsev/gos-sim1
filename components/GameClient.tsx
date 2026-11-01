@@ -532,12 +532,16 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
   setSetupPromptBusy(false);
  }
 
+ // Initial unread badges are secondary to opening the authorised first screen.
+ // Stable, independently salted jitter prevents a 12–100-device burst.
+ const firstEventBadgeDelay=me?.user_id?firstPresenceWriteDelay(me.user_id+':event-badge')+3000:0;
+ const firstBlitzBadgeDelay=me?.user_id?firstPresenceWriteDelay(me.user_id+':blitz-badge')+3000:0;
  useGameTableSync(!previewMode&&me?game?.id:undefined,['event_assignments','event_collaboration_invites','event_decisions'],async()=>{
   if(!game||!me||previewMode)return;
   const requestedScope=counterScope;
   const [r,i]=await Promise.all([supabase.from('event_assignments').select('case_id').eq('game_id',game.id).eq('recipient_id',me.user_id).eq('status','pending'),supabase.from('event_collaboration_invites').select('case_id').eq('game_id',game.id).eq('recipient_id',me.user_id).eq('status','pending')]);
   if(counterScopeRef.current===requestedScope&&!r.error&&!i.error)setPendingEvents(new Set([...(r.data||[]).map(x=>x.case_id),...(i.data||[]).map(x=>x.case_id)]).size);
- },counterScope,undefined,750,30000);
+ },counterScope,undefined,750,30000,firstEventBadgeDelay);
 
 
  useGameTableSync(!previewMode&&me?.kind==='student'?game?.id:undefined,['blitz_assignments'],async()=>{
@@ -545,7 +549,7 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
   const requestedScope=counterScope;
   const result=await supabase.rpc('blitz_inbox_counts',{p_game:game.id});
   if(counterScopeRef.current===requestedScope&&!result.error)setPendingBlitz(Number(result.data?.pending||0));
- },counterScope);
+ },counterScope,undefined,750,60000,firstBlitzBadgeDelay);
  useEffect(()=>{
   if(!game||!me||previewMode||me.kind!=='student')return;
   const changed=()=>notifyGameDataRefresh(game.id,'blitz_assignments');
