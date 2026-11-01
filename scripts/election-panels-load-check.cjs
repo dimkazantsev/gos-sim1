@@ -19,7 +19,7 @@ function realm(kind,old=false,{hidden=false,subscription='immediate',secretTrans
  const hooks=[],effects=[],timers=new Map(),channels=new Set(),held=[],heldMutations=[],errors=[],failures=new Set(),counts=new Map(),starts=[];
  const listeners={window:new Map(),document:new Map()},same=(a,b)=>a&&b&&a.length===b.length&&a.every((v,i)=>Object.is(v,b[i]));
  const react={
-  useState(value){const i=cursor++;if(!hooks[i])hooks[i]={value:typeof value==='function'?value():value};return[hooks[i].value,v=>{if(kind==='deadline'&&i===8)clockUpdates++;hooks[i].value=typeof v==='function'?v(hooks[i].value):v}]},
+  useState(value){const i=cursor++;if(!hooks[i])hooks[i]={value:typeof value==='function'?value():value};return[hooks[i].value,v=>{if(kind==='deadline'&&i===(old?8:10))clockUpdates++;hooks[i].value=typeof v==='function'?v(hooks[i].value):v}]},
   useRef(value){const i=cursor++;if(!hooks[i])hooks[i]={current:value};return hooks[i]},
   useMemo(fn,deps){const i=cursor++;if(!hooks[i]||!same(hooks[i].deps,deps))hooks[i]={deps,value:fn()};return hooks[i].value},
   useEffect(fn,deps){const i=cursor++;if(!hooks[i]||!same(hooks[i].deps,deps)){hooks[i]?.cleanup?.();hooks[i]={deps};effects.push(()=>{hooks[i].cleanup=fn()})}}
@@ -67,7 +67,7 @@ function realm(kind,old=false,{hidden=false,subscription='immediate',secretTrans
  class ClockDate extends Date{constructor(...args){super(...(args.length?args:[now]))}static now(){return now}}
  const context={exports:{},console:{...console,error:(...args)=>errors.push(args)},Date:ClockDate,Math:math,AbortController,window,document,CustomEvent:class{constructor(type,options){this.type=type;this.detail=options?.detail}},setTimeout:window.setTimeout,clearTimeout:window.clearTimeout,setInterval:window.setInterval,clearInterval:window.clearInterval};
  let sync;
- context.require=name=>name==='react'?react:name==='react/jsx-runtime'?{jsx,jsxs:jsx,Fragment:'fragment'}:name==='@/lib/supabase'?{supabase}:name==='@/lib/userError'?{userError:e=>e?.message||String(e)}:name==='./useGameTableSync'?sync:name==='./stageWorkStatus'?{isStageWorkOpen:(game,stage)=>game?.status==='running'&&stage?.status==='open'}:name==='../ui/useDialog'?{useDialog:()=>({current:null})}:name==='lucide-react'?new Proxy({},{get:(_,name)=>name}):{};
+ context.require=name=>name==='react'?react:name==='react/jsx-runtime'?{jsx,jsxs:jsx,Fragment:'fragment'}:name==='@/lib/supabase'?{supabase}:name==='@/lib/userError'?{userError:e=>e?.message||String(e)}:name==='./stageDeadlineRuleShared'?{getStageDeadlineRule:(gameId,stageNo)=>query('stage_deadline_rules').eq('game_id',gameId).eq('stage_no',stageNo),invalidateStageDeadlineRule:()=>{}}:name==='./useGameTableSync'?sync:name==='./stageWorkStatus'?{isStageWorkOpen:(game,stage)=>game?.status==='running'&&stage?.status==='open'}:name==='../ui/useDialog'?{useDialog:()=>({current:null})}:name==='lucide-react'?new Proxy({},{get:(_,name)=>name}):{};
  vm.createContext(context);vm.runInContext('(function(exports,require){'+syncCode+'})(exports,require)',context);sync={...context.exports};sync.setGameRealtimeConnection('game-A',true);sync.setGameRealtimeConnection('game-B',true);context.exports={};
  vm.runInContext('(function(exports,require){'+componentCode(kind,old)+'})(exports,require)',context);
  const api={errors,starts,failures,
