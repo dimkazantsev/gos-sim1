@@ -453,9 +453,10 @@ export function useRepublicGame(gameId:string){
  },[gameId]);
 
  useEffect(()=>{
-  // A successful identity check is enough for the lightweight entry screen.
-  // Do not open Realtime/Polling until the player requests game data.
-  if(!me?.user_id||me.game_id!==gameId||!coreLoaded)return;
+  // Keep the single authoritative Realtime channel and presence even in
+  // lightweight entry, so teachers can see who is connected immediately.
+  // Full SQL bootstrap stays deferred until a section is requested.
+  if(!me?.user_id||me.game_id!==gameId)return;
   let disposed=false,scheduled=false;
   const subscriptionEpoch=readEpoch.current;
   const currentConnection=()=>!disposed&&subscriptionEpoch===readEpoch.current&&activeGameRef.current===gameId&&authUser.current===me.user_id;
@@ -790,7 +791,7 @@ export function useRepublicGame(gameId:string){
    if(liveRef.current===channel)liveRef.current=null;
    void supabase.removeChannel(channel);
   };
- },[gameId,me?.user_id,me?.kind,me?.role_title,me?.team,me?.group_name,me?.roster_archived_at,coreLoaded]);
+ },[gameId,me?.user_id,me?.kind,me?.role_title,me?.team,me?.group_name,me?.roster_archived_at]);
 
  useEffect(()=>()=>{
   const rec=recorder.current;
@@ -960,7 +961,9 @@ export function useRepublicGame(gameId:string){
     .some(key=>old[key]!==newMember[key]);
    await acceptIdentity(g,m,uid);
    if(roleChanged){void hydrateActiveView();return}
-   lastCoreSuccessAt.current=Date.now();
+   // An identity-only recovery is NOT a successful 12-collection bootstrap.
+   // Preserve the lazy-entry gate until a requested view was actually loaded.
+   if(lastCoreSuccessAt.current>0)lastCoreSuccessAt.current=Date.now();
   }
   if(tables.has('*')){await hydrateActiveView();return}
    const jobs:Promise<unknown>[]=[];
