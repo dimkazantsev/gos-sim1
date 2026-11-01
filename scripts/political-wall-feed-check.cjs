@@ -52,3 +52,34 @@ assert(!source.includes("supabase.from('political_posts').delete("),'Direct clie
 assert(source.includes("if(succeeded)await g.refresh()"),'Refresh should happen once after a batch, not for every post');
 assert(source.includes("setSelectedPostIds(new Set(failed))"),'Failed deletions must remain selected for retry');
 console.log('PASS political-process bulk-delete contract');
+
+
+/* Offscreen political posts must not generate Storage signatures, comment
+ * projections, polling or additional WebSocket subscriptions. */
+const hook=fs.readFileSync(path.join(root,'components/game/useRepublicGame.ts'),'utf8');
+const civic=fs.readFileSync(path.join(root,'components/game/CivicDiscussion.tsx'),'utf8');
+assert(source.includes("postFeedRef=useRef<HTMLElement>(null)")&&
+ source.includes("new IntersectionObserver(entries=>")&&
+ source.includes("g.loadPoliticalMediaUrl(id)"),
+ 'Images and files are signed only as their post enters the viewport');
+assert(source.includes("data-political-post-id={p.id}"),
+ 'Only mounted visible posts are tracked for viewport media requests');
+assert(source.includes("src={m.url||undefined}")&&
+ !source.includes("href={m.url||'#'}"),
+ 'Missing signed URLs must not load the page itself or jump to the top');
+assert(hook.includes("async function loadPoliticalMediaUrl(mediaId:string)")&&
+ hook.includes("activeViewRef.current!=='actions'")&&
+ hook.includes("acceptedMember.current?.kind!==member.kind"),
+ 'Media signing must be scoped to the authorized game, view and role');
+assert(!hook.includes("Promise.all(rows.filter(row=>row.storage_path).map(async row=>({"),
+ 'The initial political feed must not automatically sign all attached media');
+assert(!hook.includes("const attachments=page.media.filter(row=>row.storage_path)"),
+ 'Older pages must not automatically sign every attachment');
+assert(civic.includes("visible&&(kind==='document'||open)?g.game?.id:undefined"),
+ 'Post comment and reaction reads start only after opening the conversation');
+assert(civic.includes("supabase.rpc('record_civic_view'"),
+ 'The established unique-view accounting remains intact');
+assert(civic.includes("async function react(value:number)")&&
+ civic.includes("current.mine===value?0:value"),
+ 'First like or dislike must load the actual reaction state before toggling');
+console.log('PASS: process media and discussions are loaded only when needed');
