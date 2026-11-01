@@ -226,7 +226,7 @@ export default function EventWorkspace({g,readOnly=false,mode='feed'}:{g:ReturnT
  const visibleCases=requestedIds.map(id=>loadedMap.get(id)).filter((c):c is CaseRow=>!!c);
  const hasMore=orderedIds.length>visibleLimit;
  useEffect(()=>{
-  if(!game||!me||!titles)return;
+  if(!game||!me||!titles||document.visibilityState!=='visible')return;
   const missing=requestedIds.filter(id=>!loadedMap.has(id)&&!inflightCases.current.has(id)&&!failedCases.current.has(id)).slice(0,EVENT_FEED_PAGE_SIZE);
   if(!missing.length)return;
   for(const id of missing)inflightCases.current.add(id);
