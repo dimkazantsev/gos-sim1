@@ -58,9 +58,11 @@ export default function CivicDiscussion({kind,targetId,g,readOnly=false}:{kind:'
   void record();document.addEventListener('visibilitychange',record);
   return()=>{live=false;document.removeEventListener('visibilitychange',record)};
  },[visible,readOnly,targetId,kind,identity]);
- // Only an opened conversation needs its comment rows, reaction counts and
- // fallback polling. Keep the existing one-time per-post view recording above.
- useGameTableSync(open&&visible?g.game?.id:undefined,['civic_comments','civic_reactions'],load,scope,undefined,750,45000);
+ // Defer post comment/reaction reads until an interaction. Formal-document
+ // discussions keep their previous visible counters. The one-time recorded
+ // view is still triggered on visibility for both kinds.
+ useGameTableSync(visible&&(kind==='document'||open)?g.game?.id:undefined,
+  ['civic_comments','civic_reactions'],load,scope,undefined,750,open?45000:150000);
  async function mutate(name:string,args:Record<string,unknown>,done?:()=>void){
   if(busy||readOnly||mutating.current===identity)return;const startedIdentity=identity;mutating.current=identity;setBusy(true);
   try{
