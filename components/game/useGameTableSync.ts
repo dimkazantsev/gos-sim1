@@ -45,7 +45,7 @@ export function useGameTableSync(gameId:string|undefined,_tables:readonly string
   let disposed=false,running=false,queued=false,timer:ReturnType<typeof setTimeout>|undefined;
   // Keep last fallback per mounted widget; direct mutations and Realtime
   // invalidation still refresh immediately through GAME_DATA_REFRESH_EVENT.
-  let lastFallbackAt=Date.now(),lastStartedAt=0;
+  let lastFallbackAt=Date.now(),lastStartedAt=0,initialPending=false;
   const hasPushCoverage=_tables.length>0&&_tables.every(table=>GAME_PUSH_TABLES.has(table));
   async function flush(){
    timer=undefined;
@@ -57,7 +57,10 @@ export function useGameTableSync(gameId:string|undefined,_tables:readonly string
    finally{running=false;if(queued&&!disposed){queued=false;schedule(250)}}
   }
   function schedule(delay=120){
-   if(disposed||timer!==undefined)return;
+   if(disposed)return;
+   // A real update or focus must supersede a delayed initial badge read.
+   if(initialPending){initialPending=false;clearTimeout(timer);timer=undefined}
+   if(timer!==undefined)return;
    if(document.visibilityState!=='visible'){queued=true;return}
    timer=setTimeout(()=>void flush(),Math.max(delay,minRefreshMs-(Date.now()-lastStartedAt)));
   }
@@ -77,8 +80,10 @@ export function useGameTableSync(gameId:string|undefined,_tables:readonly string
   }
   // Only explicitly opted-in nonessential counters wait during mass login.
   // Direct mutations and Realtime invalidations still schedule an immediate read.
-  if(initialDelayMs>0)schedule(initialDelayMs);
-  else void flush();
+  if(initialDelayMs>0){
+   initialPending=true;
+   timer=setTimeout(()=>{initialPending=false;void flush()},initialDelayMs);
+  }else void flush();
   // Fall back without aligning all classroom tabs and stage widgets on the same tick.
   const poll=setInterval(()=>{
     if(document.visibilityState!=='visible')return;
