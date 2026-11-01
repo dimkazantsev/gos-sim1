@@ -53,11 +53,11 @@ async function main(){
    await db.query('insert into public.game_stages values ($1,1)',[key]);
    await db.query('insert into public.game_votes values ($1,now())',[key]);
    await db.query('insert into public.game_crises values ($1,now())',[key]);
-   await db.query('insert into public.game_profiles values ($1,$2,$3)',[key,key===game?id(1):id(43),repeat('private biography',100)]);
-   await db.query('insert into public.formal_documents values ($1,now(),$2,$3)',[key,repeat('classified full document',200),{sensitive:repeat('X',1500)}]);
+   await db.query('insert into public.game_profiles values ($1,$2,$3)',[key,key===game?id(1):id(43),'private biography'.repeat(100)]);
+   await db.query('insert into public.formal_documents values ($1,now(),$2,$3)',[key,'classified full document'.repeat(200),{sensitive:'X'.repeat(1500)}]);
    await db.query('insert into public.game_parties(id,game_id,name,support,created_at) values ($1,$2,$3,1,now())',[key===game?id(800):id(801),key,'Party']);
-   await db.query('insert into public.game_evaluations values ($1,1,$2)',[key,repeat('grades private',150)]);
-   await db.query('insert into public.game_documents values ($1,now(),$2)',[key,repeat('old document',200)]);
+   await db.query('insert into public.game_evaluations values ($1,1,$2)',[key,'grades private'.repeat(150)]);
+   await db.query('insert into public.game_documents values ($1,now(),$2)',[key,'old document'.repeat(200)]);
   }
   await db.query("insert into public.game_events select $1::uuid,now()+n*interval '1 minute',repeat('Old long news ',150) from generate_series(1,130)n",[game]);
   await db.exec(sql);
