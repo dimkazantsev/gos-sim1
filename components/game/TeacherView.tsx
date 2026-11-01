@@ -42,9 +42,9 @@ export default function TeacherView({g,onOpenProcesses,onOpenStages,initialWorks
 
  const [workspace,setWorkspace]=useSavedGameState<Workspace>(g.game?.id,g.me?.user_id,'teacher-workspace',initialWorkspace,savedChoice(...WORKSPACES.map(w=>w.key)));
  // A saved Blitz tab must not fetch the control-panel chunk on login.
- const [blitzRequested,setBlitzRequested]=useState(false);
- const activeWorkspace=workspace==='blitz'&&!blitzRequested?'overview':workspace;
- const selectWorkspace=(key:Workspace)=>{if(key==='blitz')setBlitzRequested(true);setWorkspace(key)};
+ const [blitzRequestedFor,setBlitzRequestedFor]=useState<string|null>(null);
+ const activeWorkspace=workspace==='blitz'&&blitzRequestedFor!==game?.id?'overview':workspace;
+ const selectWorkspace=(key:Workspace)=>{if(key==='blitz')setBlitzRequestedFor(game?.id||null);setWorkspace(key)};
  const navigationTarget=useTeacherNavigationTarget();
  const navigationRef=useHorizontalWheel(navigationTarget===null?undefined:game?.id);
  const pendingFactionCount=parties.filter(p=>p.registration_status==='submitted').length+(g.partyDocuments||[]).filter(d=>d.status==='submitted').length;
