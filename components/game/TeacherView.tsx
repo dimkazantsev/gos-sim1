@@ -120,7 +120,7 @@ export default function TeacherView({g,onOpenProcesses,onOpenStages,initialWorks
     </button>
    </div>
   </section>
-   <div className="teacherWorkspacePanel" id="teacher-workspace-panel" role="tabpanel" aria-labelledby={'teacher-tab-'+workspace} tabIndex={0}>
+   <div className="teacherWorkspacePanel" id="teacher-workspace-panel" role="tabpanel" aria-labelledby={'teacher-tab-'+activeWorkspace} tabIndex={0}>
     {activeWorkspace==='participants'&&<TeacherParticipantRoster g={g}/>}
     {activeWorkspace==='overview'&&<TeacherOverview g={g} onWorkspace={selectWorkspace} onNavigate={onNavigate||(()=>onOpenProcesses())}/>}
 
