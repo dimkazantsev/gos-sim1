@@ -44,3 +44,25 @@ BEGIN
 END $fn$;
 REVOKE ALL ON FUNCTION public.event_feed_compact_summary(uuid,uuid[]) FROM PUBLIC,anon;
 GRANT EXECUTE ON FUNCTION public.event_feed_compact_summary(uuid,uuid[]) TO authenticated;
+
+-- Одна сетевая операция вместо двух: существующая RLS-проекция + лёгкий индекс.
+-- SECURITY INVOKER сохраняет исходные RLS-права для статистики и назначений.
+CREATE OR REPLACE FUNCTION public.get_event_workspace_feed_bootstrap(
+ p_game_id uuid, p_include_ready_count boolean DEFAULT false)
+RETURNS jsonb LANGUAGE plpgsql STABLE SECURITY INVOKER SET search_path = ''
+AS $fn$
+DECLARE v_snapshot jsonb; v_case_ids uuid[];
+BEGIN
+ v_snapshot := public.get_event_workspace_projection(p_game_id,p_include_ready_count);
+ SELECT coalesce(array_agg(DISTINCT v.case_id),ARRAY[]::uuid[])
+ INTO v_case_ids FROM (
+  SELECT (item->>'case_id')::uuid AS case_id
+  FROM jsonb_array_elements(v_snapshot->'assignments') AS item
+  UNION ALL
+  SELECT (item->>'case_id')::uuid
+  FROM jsonb_array_elements(v_snapshot->'invitations') AS item
+ ) v;
+ RETURN v_snapshot || jsonb_build_object('compact',public.event_feed_compact_summary(p_game_id,v_case_ids));
+END $fn$;
+REVOKE ALL ON FUNCTION public.get_event_workspace_feed_bootstrap(uuid,boolean) FROM PUBLIC,anon;
+GRANT EXECUTE ON FUNCTION public.get_event_workspace_feed_bootstrap(uuid,boolean) TO authenticated;
