@@ -12,7 +12,7 @@ type Stats={user_id:string;correct:number;incorrect:number;pending:number};
 
 const PAGE_SIZE=30;
 type Section='bank'|'matrix'|'stats'|'control';
-type BlitzSettings={daily_count:number;enabled:boolean;updated_at:string|null};
+type BlitzSettings={daily_count:number;enabled:boolean;answer_seconds:number;restore_missed:boolean;updated_at:string|null};
 type IconComponent=typeof BookOpenText;
 function BlitzSection({id,title,subtitle,badge,icon:Icon,open,onToggle,children}:{id:Section;title:string;subtitle:string;badge:string;icon:IconComponent;open:boolean;onToggle:()=>void;children:ReactNode}){
  return <section className={'blitzSection'+(open?' isOpen':'')}>
@@ -85,7 +85,7 @@ export default function TeacherBlitz({g}:{g:ReturnTypeRepublic}){
    if(!live)return;
    setSettingsLoading(false);
    if(loadError){setSettingsError(userError(loadError));return;}
-   if(!data||typeof data.daily_count!=='number'||typeof data.enabled!=='boolean'){
+   if(!data||typeof data.daily_count!=='number'||typeof data.enabled!=='boolean'||typeof data.answer_seconds!=='number'||typeof data.restore_missed!=='boolean'){
     setSettingsError('Сервер не вернул настройки блица.');return;
    }
    setSettings(data as BlitzSettings);
@@ -153,8 +153,8 @@ export default function TeacherBlitz({g}:{g:ReturnTypeRepublic}){
  async function saveSettings(){
   if(!gameId||!settings||settingsSaving)return;
   setSettingsSaving(true);setSettingsError('');setSettingsSaved('');
-  const {data,error:saveError}=await supabase.rpc('blitz_teacher_set_settings',{
-   p_game:gameId,p_daily_count:settings.daily_count,p_enabled:settings.enabled
+  const {data,error:saveError}=await supabase.rpc('blitz_teacher_save_extended_settings',{
+   p_game:gameId,p_daily_count:settings.daily_count,p_enabled:settings.enabled,p_answer_seconds:settings.answer_seconds,p_restore_missed:settings.restore_missed
   });
   if(currentGame.current!==gameId)return;
   setSettingsSaving(false);
@@ -237,16 +237,24 @@ export default function TeacherBlitz({g}:{g:ReturnTypeRepublic}){
       <label className="blitzControlSwitch"><input type="checkbox" checked={settings.enabled} disabled={settingsSaving} onChange={e=>{setSettings({...settings,enabled:e.target.checked});setSettingsSaved('')}}/>
        <span><strong>Назначать новые вопросы</strong><small>При отключении уже выданные задания сохраняются</small></span>
       </label>
+      <label className="blitzControlField"><strong>Время на ответ</strong><span>Серверный таймер для новых заданий</span>
+       <select value={settings.answer_seconds} disabled={settingsSaving} onChange={e=>{setSettings({...settings,answer_seconds:Number(e.target.value)});setSettingsSaved('')}}>
+        {[10,15,20,30,45,60].map(n=><option key={n} value={n}>{n} секунд</option>)}
+       </select>
+      </label>
+      <label className="blitzControlSwitch"><input type="checkbox" checked={settings.restore_missed} disabled={settingsSaving} onChange={e=>{setSettings({...settings,restore_missed:e.target.checked});setSettingsSaved('')}}/>
+       <span><strong>Восстанавливать пропущенные дни</strong><small>Назначать вопросы за дни отсутствия в пределах 30 дней текущего этапа</small></span>
+      </label>
      </div>
      <div className="blitzControlFacts" aria-label="Действующие ограничения блица">
-      <span><b>20 секунд</b> · серверный таймер</span>
+      <span><b>{settings.answer_seconds} секунд</b> · серверный таймер</span>
       <span><b>Без повторов</b> · в пределах игры</span>
       <span><b>Только одобренные</b> · из банка вопросов</span>
      </div>
      <p className="blitzControlHint">Изменения влияют только на будущие дневные назначения. Уже назначенные вопросы, ответы и утверждённые оценки не пересчитываются.</p>
      {settingsError&&<p className="blitzNotice" role="alert">{settingsError}</p>}
      {settingsSaved&&<p className="blitzNotice" role="status">{settingsSaved}</p>}
-     <div className="blitzControlActions"><button type="button" className="blitzAction" disabled={settingsSaving} onClick={()=>void saveSettings()}>{settingsSaving?'Сохранение…':'Сохранить настройки'}</button></div>
+     <div className="blitzControlActions"><button type="button" className="blitzAction" disabled={settingsSaving} onClick={()=>void saveSettings()}>{settingsSaving?'Сохранение…':'Сохранить режим блица'}</button></div>
     </>}
    </BlitzSection>
   </div>
