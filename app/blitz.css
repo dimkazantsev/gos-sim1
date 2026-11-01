@@ -237,3 +237,21 @@
 .telegramLinkManual button{min-height:41px;white-space:normal}
 .telegramLinkSteps .telegramLinkDisclaimer{font-size:12px;color:#657992}
 @media(max-width:540px){.telegramLinkChoices{display:grid;grid-template-columns:minmax(0,1fr)}.telegramLinkManual{display:grid;grid-template-columns:minmax(0,1fr)}}
+
+
+/* Teacher-only Blitz control panel: mounted and fetched only after explicit opening. */
+.blitzControlGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.blitzControlField,.blitzControlSwitch{display:flex;flex-direction:column;gap:8px;min-width:0;padding:15px;border:1px solid var(--line,#d8e1ee);border-radius:11px;background:var(--surface-2,#f7f9fc);color:var(--navy,#0b234a);font-size:13px}
+.blitzControlField>strong,.blitzControlSwitch strong{font-weight:800}
+.blitzControlField>span,.blitzControlSwitch small{font-size:12px;color:var(--muted,#687995);line-height:1.5}
+.blitzTeacher .blitzControlField select{width:100%;max-width:260px;min-height:42px;border:1px solid var(--line,#d8e1ee);border-radius:9px;background:#fff;padding:8px 10px;color:var(--navy,#0b234a);font:inherit}
+.blitzControlSwitch{flex-direction:row;align-items:center;gap:12px;cursor:pointer}
+.blitzControlSwitch input{width:20px;height:20px;flex:none;accent-color:var(--blue,#1769e8)}
+.blitzControlSwitch>span{display:grid;gap:5px;min-width:0}
+.blitzControlFacts{display:flex;gap:8px;flex-wrap:wrap}
+.blitzControlFacts span{border:1px solid var(--line,#d8e1ee);border-radius:8px;background:#fff;color:var(--body,#33486d);padding:8px 10px;font-size:12px}
+.blitzControlHint{margin:0;color:var(--muted,#687995);font-size:12px;line-height:1.55}
+.blitzControlActions{display:flex;justify-content:flex-end}
+.blitzTeacher .blitzControlActions .blitzAction{min-height:42px;padding:9px 16px;background:var(--blue,#1769e8);border-color:var(--blue,#1769e8);color:#fff}
+.blitzTeacher .blitzControlActions .blitzAction:disabled{opacity:.5}
+@media(max-width:680px){.blitzControlGrid{grid-template-columns:minmax(0,1fr)}.blitzControlActions{justify-content:stretch}.blitzTeacher .blitzControlActions .blitzAction{width:100%}}
