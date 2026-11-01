@@ -69,6 +69,7 @@ export function useRepublicGame(gameId:string){
  const formalFullVersion=useRef('');
  if(activeGameRef.current!==gameId){activeGameRef.current=gameId;readEpoch.current++;formalFullVersion.current=''}
  const members=useMemo(()=>currentGameMembers(memberRows,gameId),[memberRows,gameId]);
+ const [chatDirectoryLoaded,setChatDirectoryLoaded]=useState(false);
  const [channels,setChannels]=useState<Channel[]>([]),[channelId,setChannelId]=useState(''),[messages,setMessages]=useState<Message[]>([]),[chatPins,setChatPins]=useState<ChatPin[]>([]),[pinnedMessages,setPinnedMessages]=useState<Message[]>([]),[chatOverview,setChatOverview]=useState<ChatOverview[]>([]),[chatLoading,setChatLoading]=useState(false);
  const messageRowsRef=useRef<Message[]>([]),recentChatRecoveryRunning=useRef(false);
  const [hasOlderChatMessages,setHasOlderChatMessages]=useState(false);
@@ -347,6 +348,7 @@ export function useRepublicGame(gameId:string){
   pendingPresenceWrite.current=null;
   lastPresenceWrite.current={scope:'',view:'',at:0};
   setCoreLoaded(false);
+  setChatDirectoryLoaded(false);
   setGame(null);setMe(null);setMetrics([]);setEvents([]);setMembers([]);setOfficeRows([]);
   setChannels([]);channelRef.current='';setChannelId('');setMessages([]);
   oldestChatCursor.current=null;requestedHistoryCount.current=CHAT_HISTORY_PAGE_SIZE;
@@ -865,11 +867,12 @@ export function useRepublicGame(gameId:string){
    }
   }
  },[activeView,me?.user_id,gameId]);
- useEffect(()=>{if(chatOpen&&me?.user_id&&coreLoaded)void loadChatOverview();},[chatOpen,me?.user_id,gameId,coreLoaded]);
  useEffect(()=>{
-  // Opening chat from lightweight entry is a deliberate request for game
-  // content. No background chat read is allowed before that action.
-  if(chatOpen&&me?.user_id&&!coreLoaded)void loadCoreForView();
+  if(!chatOpen||!me?.user_id)return;
+  // The chat has its own narrow authorised directory. Never bootstrap all
+  // twelve game projections merely because the message drawer is opened.
+  if(coreLoaded){void loadChatOverview();return}
+  void refreshChatDirectory();
  },[chatOpen,me?.user_id,gameId,coreLoaded]);
 
  async function readIdentity(userId:string){
@@ -1233,7 +1236,7 @@ export function useRepublicGame(gameId:string){
   if(previousMember&&(['kind','role_title','team','group_name','roster_archived_at'] as const).some(key=>previousMember[key]!==member[key])){
    readEpoch.current++;clearGameData();authUser.current=uid;acceptedMember.current=member;setGame(g.data as Game);setMe(member);void hydrateActiveView();return;
   }
-  acceptedMember.current=member;lastCoreSuccessAt.current=Date.now();lastFullPresentationAt.current=lastCoreSuccessAt.current;setCoreLoaded(true);if(readCurrent(ticket,'game'))setGame(g.data as Game);setMe(member);
+  acceptedMember.current=member;lastCoreSuccessAt.current=Date.now();lastFullPresentationAt.current=lastCoreSuccessAt.current;setCoreLoaded(true);setChatDirectoryLoaded(true);if(readCurrent(ticket,'game'))setGame(g.data as Game);setMe(member);
   if(!mt.error&&readCurrent(ticket,'metrics'))setMetrics((mt.data||[]) as Metric[]);
   if(mt.error&&readCurrent(ticket,'metrics'))setError(mt.error);
   if(!ev.error&&ev.data!==null)setEvents((ev.data||[]) as EventItem[]);
@@ -1319,13 +1322,18 @@ export function useRepublicGame(gameId:string){
  async function hydrateActiveView(allowFreshCore=false,forceOffices=false){
   // Rapid view navigation can reuse recently updated common data.
   // Realtime, recovery and explicit refresh still force the core read.
-  const jobs:Promise<unknown>[]=[loadRepublicOffices(forceOffices)];
+  const view=activeViewRef.current;
+  // Office assignments are required by role-specific workspaces, not by the
+  // public dashboard or document registry. Never fetch this whole collection
+  // merely because a player selected a read-only overview/document.
+  const needsOffices=forceOffices||!['dashboard','documents'].includes(view);
+  const jobs:Promise<unknown>[]=[];
+  if(needsOffices)jobs.push(loadRepublicOffices(forceOffices));
   // Navigation does not invalidate an already verified core. Role/game are
   // checked by the small session_recovery RPC; opened sections read lazily.
   const core=!allowFreshCore||lastCoreSuccessAt.current===0
    ?loadCoreForView():null;
   if(core)jobs.unshift(core);
-  const view=activeViewRef.current;
   const cold:('events'|'evaluations'|'documents')[]=[];
   if(['events','teacher'].includes(view))cold.push('events');
   if(['grades','profile','stages','teacher'].includes(view))cold.push('evaluations');
@@ -1839,6 +1847,26 @@ export function useRepublicGame(gameId:string){
    setImpactRules(snapshot.rules);
    setImpactLedger(snapshot.ledger);
   });
+ }
+
+ async function refreshChatDirectory(){
+  const uid=authUser.current;
+  if(!uid||acceptedMember.current?.game_id!==gameId)return;
+  await readSafely(['channels','members'],async ticket=>{
+   // Both reads use the signed-in player's RLS. The private roster is
+   // intentionally limited to the existing chat mention/name columns.
+   const [ch,roster]=await Promise.all([
+    limitedCoreRead(supabase.from('chat_channels').select('*').eq('game_id',gameId).order('name')),
+    loadMemberRoster()
+   ]);
+   if(!readCurrent(ticket))return;
+   requireSuccessful([ch,roster]);
+   setChannels((ch.data||[]) as Channel[]);
+   setMembers((roster.data||[]) as Member[]);
+   setChatDirectoryLoaded(true);
+  });
+  // Overview itself is RLS-scoped; it does not include entire game state.
+  if(authUser.current===uid&&chatOpenRef.current)await loadChatOverview();
  }
 
  async function loadChatOverview(){
@@ -2982,6 +3010,6 @@ export function useRepublicGame(gameId:string){
   finally{mediaOperationRef.current=false;setRecordingSaving(false)}
  }
 
- return {coreLoaded,openDetailedDashboard:()=>{if(authUser.current&&acceptedMember.current)void loadCoreForView()},gdMandateCapacity,gdEffectivePresence,game:game?.id===gameId?game:null,me:visibleMe,metrics:sharedMetrics,budgetPulse,budgetPulseError,refreshBudgetPulse,activeView,setActiveView,events,members,officeAssignments,channels,channelId,setChannelId,messages,hasOlderChatMessages,olderChatLoading,loadOlderChatMessages,chatPins,pinnedMessages,chatOverview,chatUnreadCount:chatOverview.reduce((sum,row)=>sum+Number(row.unread_count||0),0),chatMentionCount:chatOverview.reduce((sum,row)=>sum+Number(row.mention_count||0),0),setChatChannelPinned,markChatRead,chatLoading,stages,parties,votes,ballots,evaluations,crises,documents,activities,presence,profiles,profilesLoaded:profileGameId===gameId,introAccountSeen,partyDocuments,partyInvitations,partyMandates,partyAgreements,politicalPosts,politicalPostTotal,politicalActorOptions,politicalHasOlder,politicalOlderLoading,politicalSearchLoading,loadOlderPoliticalPosts,setPoliticalWallFullSearch,politicalMedia,loadPoliticalMediaUrl,postFormalLinks,metricHistory:sharedMetricHistory,partySupportHistory,impactRules,impactLedger,formalDocuments,formalHistory,loading,error,setError,chatOpen,setChatOpen,recording,recordingPreview,recordingSaving,chatMediaError,chatMediaPhase,recordingStartedAt,recordingStream:recordingStream.current,realtimeState,teacher,names,currentStage,myEvaluations,averageVsn,
+ return {coreLoaded,chatDirectoryLoaded,refreshChatDirectory,openDetailedDashboard:()=>{if(authUser.current&&acceptedMember.current)void loadCoreForView()},gdMandateCapacity,gdEffectivePresence,game:game?.id===gameId?game:null,me:visibleMe,metrics:sharedMetrics,budgetPulse,budgetPulseError,refreshBudgetPulse,activeView,setActiveView,events,members,officeAssignments,channels,channelId,setChannelId,messages,hasOlderChatMessages,olderChatLoading,loadOlderChatMessages,chatPins,pinnedMessages,chatOverview,chatUnreadCount:chatOverview.reduce((sum,row)=>sum+Number(row.unread_count||0),0),chatMentionCount:chatOverview.reduce((sum,row)=>sum+Number(row.mention_count||0),0),setChatChannelPinned,markChatRead,chatLoading,stages,parties,votes,ballots,evaluations,crises,documents,activities,presence,profiles,profilesLoaded:profileGameId===gameId,introAccountSeen,partyDocuments,partyInvitations,partyMandates,partyAgreements,politicalPosts,politicalPostTotal,politicalActorOptions,politicalHasOlder,politicalOlderLoading,politicalSearchLoading,loadOlderPoliticalPosts,setPoliticalWallFullSearch,politicalMedia,loadPoliticalMediaUrl,postFormalLinks,metricHistory:sharedMetricHistory,partySupportHistory,impactRules,impactLedger,formalDocuments,formalHistory,loading,error,setError,chatOpen,setChatOpen,recording,recordingPreview,recordingSaving,chatMediaError,chatMediaPhase,recordingStartedAt,recordingStream:recordingStream.current,realtimeState,teacher,names,currentStage,myEvaluations,averageVsn,
   refresh,refreshDocuments,refreshEventEffects,logout,touchPresence,logActivity,setTurn,setTurnMinutes,openStage,manageStage,nextStage,resetStageProgress,configureStageDeadline,setStageDeadline,availableActors,createPoliticalPost,updatePoliticalPost,addMediaToPoliticalPost,acceptPoliticalPost,rejectPoliticalPost,approvePostImpact,createVoteFromPost,updateImpactRule,revertImpactEntry,createParty,voteForPartyChair,updateParty,renameParty,setPartyLeader,setPartyMandates,updatePartyStatistics,inviteToParty,respondPartyInvitation,cancelPartyInvitation,removePartyMember,proposePartyAgreement,respondPartyAgreement,submitPartyRegistration,reviewPartyRegistration,applyPartyGhostLoss,drawGhostVoting,clearPartyGhostLoss,applyGhostVotingBatch,deleteParty,updateMember,createVote,canVote,ballotWeight,castVote,castVoteAllocation,setStudentMandates,closeVote,deleteVote,tally,quorum,setEvaluation,publishEvent,triggerCrisis,ghostVoting,createDocument,updateMetric,saveProfile,saveSignature,loadOwnSignaturePreview,savePartyIdentity,uploadPartyDocument,reviewPartyDocument,deletePartyDocument,createFormalDocument,deleteFormalDocument,advanceFormalDocument,updateFormalDraft,vetoFormalDocument,resolveBudgetConciliation,startBudgetRejectionBranch,sendText,sendChatFile,setChatPin,refreshChatMediaUrl,toggleRecording,discardRecording,sendRecordingPreview};
 }
