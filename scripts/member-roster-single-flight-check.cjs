@@ -10,7 +10,7 @@ const {coalesceInFlight}=moduleContext.exports;
 assert.equal(typeof coalesceInFlight,'function','A production helper must own in-flight de-duplication');
 const gameFile=fs.readFileSync('components/game/useRepublicGame.ts','utf8');
 assert.match(gameFile,/coalesceInFlight\(rosterReads\.current/, 'Real game hook must reuse the pending roster request');
-assert.equal((gameFile.match(/loadMemberRoster\(\)/g)||[]).length,4,'Initial load, teacher view and targeted membership recovery share one loader');
+assert.equal((gameFile.match(/loadMemberRoster\(\)/g)||[]).length,5,'Initial load, teacher view, targeted recovery and chat directory share the same bounded roster loader');
 assert.match(gameFile,/\.eq\('game_id',gameId\)\.order\('full_name'\)/,'Game-specific sorted roster must be preserved');
 assert.match(gameFile,/\.eq\('user_id',uid\)\.maybeSingle\(\)/,'Independent, authoritative personal membership check must remain');
 async function flush(){await Promise.resolve();await Promise.resolve();await Promise.resolve()}
