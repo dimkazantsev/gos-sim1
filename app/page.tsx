@@ -184,9 +184,13 @@ export default function Home(){
     .eq('user_id',userId).in('kind',['student','observer'])
     .is('roster_archived_at',null).limit(20);
    if(membersError)throw membersError;
-   const memberships=(rows??[]) as Array<{game_id:string;kind:'student'|'observer';games:{title:string;game_code:string}|null}>;
-   const available=memberships.filter(row=>row.games&&row.game_id)
-    .map(row=>({id:row.game_id,kind:row.kind,code:row.games!.game_code,title:row.games!.title||row.games!.game_code}));
+   const memberships=(rows??[]) as Array<{game_id:string;kind:'student'|'observer';games:Array<{title:string;game_code:string}>}>;
+   const available=memberships.flatMap(row=>{
+    const game=row.games?.[0];
+    return game?.game_code&&row.game_id
+     ?[{id:row.game_id,kind:row.kind,code:game.game_code,title:game.title||game.game_code}]
+     :[];
+   });
    if(available.length===1){
     saveSuccessfulGameCode(available[0].code);
     router.push('/game/'+available[0].id+incomingSectionSuffix());
