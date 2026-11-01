@@ -50,13 +50,16 @@ async function main(){
  const transport=fs.readFileSync('lib/supabase.ts','utf8');
  compiled('lib/supabase.ts');
  for(const required of [
-  'READ_CONCURRENCY=3','READ_BACKLOG=24','READ_QUEUE_WAIT_MS=8000',
+  'READ_CONCURRENCY=3','BACKGROUND_READ_CONCURRENCY=2','READ_BACKLOG=24','READ_QUEUE_WAIT_MS=16000',
   'SAFE_READ_TIMEOUT_MS=14000',
   'setTimeout(()=>controller.abort(),SAFE_READ_TIMEOUT_MS)',
   "if(safeRead&&[500,502,503,504,520,524,544].includes(response.status))",
   "get_my_chat_overview|get_chat_pins_projection"
  ])assert(transport.includes(required),'Missing request protection '+required);
  assert(transport.includes('const controller=safeRead?new AbortController():null'));
+ assert(transport.includes('identicalReads.set(key,shared)'));
+ assert(transport.includes('const foreground=safeRead&&foregroundRestRead(href,method)'));
+ assert(transport.includes('if(safeRead)releaseReadSlot(foreground)'));
  assert(transport.includes('if(safeRead)releaseReadSlot()'));
  assert(transport.includes("if(method!=='POST')return false"),'Writes are never throttled by read circuit');
  console.log('PASS: 40 user-scoped caches, 800 cached renders; manual retry intact, missing core profiles back off, 14-second safe-read network cap');
