@@ -13,6 +13,7 @@ on:
       - 'scripts/classroom-entry-auxiliary-100-check.cjs'
       - 'scripts/lazy-authorized-entry-100-check.cjs'
       - 'scripts/section-office-demand-40-check.cjs'
+      - 'scripts/chat-independent-entry-40-check.cjs'
       - 'scripts/section-badge-burst-check.cjs'
       - 'scripts/party-ten-minute-cache-check.cjs'
       - 'scripts/party-representation-projection-rls-check.cjs'
@@ -115,6 +116,7 @@ on:
       - 'scripts/classroom-entry-auxiliary-100-check.cjs'
       - 'scripts/lazy-authorized-entry-100-check.cjs'
       - 'scripts/section-office-demand-40-check.cjs'
+      - 'scripts/chat-independent-entry-40-check.cjs'
       - 'scripts/section-badge-burst-check.cjs'
       - 'scripts/party-ten-minute-cache-check.cjs'
       - 'scripts/party-representation-projection-rls-check.cjs'
@@ -228,6 +230,7 @@ jobs:
       - run: node scripts/classroom-entry-auxiliary-100-check.cjs
       - run: node scripts/lazy-authorized-entry-100-check.cjs
       - run: node scripts/section-office-demand-40-check.cjs
+      - run: node scripts/chat-independent-entry-40-check.cjs
       - run: node scripts/section-badge-burst-check.cjs
       - run: node scripts/party-ten-minute-cache-check.cjs
       - run: node scripts/party-representation-projection-rls-check.cjs
