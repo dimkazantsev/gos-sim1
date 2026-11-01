@@ -167,6 +167,16 @@ export default function Home(){
     setError('В этом браузере нет действующей сессии. Войдите с личной почтой и паролем, чтобы вернуть свою игру.');
     return;
    }
+   if(!auth.session!.user.is_anonymous){
+    const {data:teacherProfile,error:teacherError}=await supabase.from('teacher_profiles')
+     .select('user_id').eq('user_id',userId).maybeSingle();
+    if(teacherError)throw teacherError;
+    if(teacherProfile){
+     setTeacherLogin(true);setPersonalLogin(true);
+     setError('Это учётная запись преподавателя. Используйте отдельный кабинет преподавателя.');
+     return;
+    }
+   }
    // Both related tables enforce membership RLS; revoked/archived accounts
    // must not appear. The teacher remains in the separate protected cabinet.
    const {data:rows,error:membersError}=await supabase.from('game_members')
