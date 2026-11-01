@@ -1,0 +1,31 @@
+'use strict';
+// Isolated deterministic 100-student pacing check: no production traffic.
+const assert=require('node:assert/strict');
+const fs=require('node:fs'),ts=require('typescript'),vm=require('node:vm'),crypto=require('node:crypto');
+const delaySource=fs.readFileSync('components/game/firstPresenceWriteDelay.ts','utf8');
+const entry=fs.readFileSync('components/GameClient.tsx','utf8');
+const js=ts.transpileModule(delaySource,{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}}).outputText;
+const exported={exports:{}};
+vm.runInNewContext('(function(module,exports){'+js+'})',{})(exported,exported.exports);
+const delay=exported.exports.firstPresenceWriteDelay;
+assert.equal(typeof delay,'function');
+const bins=Array.from({length:15},()=>0);
+const delays=Array.from({length:100},(_,i)=>{
+ const hash=crypto.createHash('sha256').update('isolated-student-'+i).digest('hex');
+ const userId=hash.slice(0,8)+'-'+hash.slice(8,12)+'-4'+hash.slice(13,16)+'-a'+hash.slice(17,20)+'-'+hash.slice(20,32);
+ const v=delay(userId);
+ assert.equal(v,delay(userId),'One student must keep a stable deadline across view changes');
+ assert(v>=2000&&v<17000,'No optional SQL presence write is immediate');
+ bins[Math.floor((v-2000)/1000)]++;
+ return v;
+});
+assert(bins.filter(v=>v>0).length>=12,'Initial SQL writes must cover most seconds');
+assert(Math.max(...bins)<=18,'No new single-second stampede for the isolated 100-user sample');
+const effect=entry.slice(entry.indexOf(" const labels:Record<View,string>="),entry.indexOf(" useEffect(()=>{\n  if(!previewMode)return;",entry.indexOf(" const labels:Record<View,string>=")));
+assert(effect.includes("firstPresenceWriteDelay(me.user_id)"));
+assert(effect.includes("if(initialSqlPresence.current.scope!==scope)"),'A view change must not restart admission pacing');
+assert(effect.includes("clearTimeout(first)"),'Unloading a view must cancel old writes');
+assert(effect.includes("document.visibilityState==='visible'&&isReady()"),'Background tabs must not send SQL presence writes');
+assert(effect.includes("const id=setInterval(visible,60000+Math.floor(Math.random()*12000))"),'Steady-state presence interval stays unchanged');
+assert(effect.includes("void touchPresence(view,'Открыл раздел"),'First admitted visit must still be recorded');
+console.log(JSON.stringify({status:'PASS',scope:'isolated deterministic scheduling only, not Supabase Auth/DB performance',clients:100,delaysMs:{min:Math.min(...delays),max:Math.max(...delays)},perSecond:bins,peakPerSecond:Math.max(...bins),earliestWriteMs:2000,latestWriteBeforeMs:17000,productionRequests:0}));
