@@ -107,8 +107,8 @@ export function useRepublicGame(gameId:string){
  const passiveSyncAt=useRef(new Map<string,number>());
  function passiveSections(view:View){
   const groups:string[]=[];
-  if(['dashboard','events','stages','teacher','actions'].includes(view))groups.push('game_events');
-  if(['dashboard','grades','profile','stages','teacher'].includes(view))groups.push('game_evaluations');
+  if(['events','stages','teacher','actions'].includes(view))groups.push('game_events');
+  if(['grades','profile','stages','teacher'].includes(view))groups.push('game_evaluations');
   if(['dashboard','stages','teacher'].includes(view))groups.push('game_crises');
   if(['documents','stages','teacher'].includes(view))groups.push('game_documents');
   if(['profile','teacher'].includes(view))groups.push('game_profiles');
@@ -120,6 +120,11 @@ export function useRepublicGame(gameId:string){
  const reusedEntryMemberScope=useRef('');
  // Avoid amplifying PostgREST pool/statement timeouts with repeated 15-table reads.
  const backendRecoveryAfter=useRef(0);
+ // These collections are not part of the v5 entry. Read them only when a
+ // screen needs them, once per authorised game/user/role scope.
+ type ColdEntryKey='events'|'evaluations'|'documents';
+ const coldEntry=useRef({scope:'',loaded:new Set<ColdEntryKey>(),
+  running:new Map<ColdEntryKey,Promise<void>>()});
  const overviewRealtimeTimer=useRef<ReturnType<typeof setTimeout>|null>(null);
  const readReceipt=useRef({scope:'',timer:null as ReturnType<typeof setTimeout>|null,running:false,queued:false,lastAt:0});
  const lastRealtimeOverviewAt=useRef(0);
@@ -332,6 +337,7 @@ export function useRepublicGame(gameId:string){
   if(readReceipt.current.timer!==null)clearTimeout(readReceipt.current.timer);
   readReceipt.current={scope:'',timer:null,running:false,queued:false,lastAt:0};
   assetSignatures.current.clear();lastCoreSuccessAt.current=0;lastFullPresentationAt.current=0;passiveSyncAt.current.clear();
+  coldEntry.current={scope:'',loaded:new Set(),running:new Map()};
   officeReadState.current={scope:'',lastSuccessAt:0,lastAttemptAt:0,inflight:null};
   invalidatePartyRows();
   if(overviewRealtimeTimer.current!==null){clearTimeout(overviewRealtimeTimer.current);overviewRealtimeTimer.current=null}
@@ -1089,11 +1095,19 @@ export function useRepublicGame(gameId:string){
    // One RLS-scoped HTTP request for the initial core, current member, roster,
    // lightweight parties and the unchanged personal intro flag. Only missing RPCs
    // fall back during mixed-version publication.
-   const entry=await limitedCoreRead(supabase.rpc('get_game_entry_v4',{p_game_id:gameId}));
+   // V5 omits three cold collections entirely; v4 is used only during a
+   // mixed-version rollout, never as an overload/timeout retry.
+   const slim=await limitedCoreRead(supabase.rpc('get_game_entry_v5',{p_game_id:gameId}));
+   const useV5=!slim.error;
+   const entry=useV5||!['PGRST202','42883'].includes(String(slim.error.code||''))
+    ?slim:await limitedCoreRead(supabase.rpc('get_game_entry_v4',{p_game_id:gameId}));
    if(!entry.error){
     const payload=entry.data as Record<string,unknown>|null;
-    const fields=['game','metrics','events','channels','stages','votes','evaluations','crises',
-     'documents','profiles','formal_documents','member','roster','parties','intro'] as const;
+    const fields=(useV5
+     ?['game','metrics','channels','stages','votes','crises','profiles','formal_documents',
+       'member','roster','parties','intro']
+     :['game','metrics','events','channels','stages','votes','evaluations','crises',
+       'documents','profiles','formal_documents','member','roster','parties','intro']) as const;
     if(!payload||!fields.every(key=>Object.prototype.hasOwnProperty.call(payload,key))||
        !Array.isArray(payload.roster)||!Array.isArray(payload.parties))
      throw new Error('Сервер вернул неполные данные первоначального входа.');
@@ -1110,9 +1124,13 @@ export function useRepublicGame(gameId:string){
      cache.rows=partyRows;
      cache.lastSuccessAt=Date.now();
     }
-    return [row('game'),row('member'),row('metrics'),row('events'),row('roster'),
+    // null means "not fetched", not "the table is empty"; existing authorised
+    // state from Realtime or a visited section must not be overwritten.
+    const cold=(key:'events'|'evaluations'|'documents')=>
+     useV5?{data:null,error:null}:row(key);
+    return [row('game'),row('member'),row('metrics'),cold('events'),row('roster'),
      row('channels'),row('stages'),{data:partyRows,error:null},row('votes'),
-     row('evaluations'),row('crises'),row('documents'),row('profiles'),
+     cold('evaluations'),row('crises'),cold('documents'),row('profiles'),
      row('formal_documents'),row('intro')];
    }
    const entryCode=String(entry.error.code||'');
@@ -1176,10 +1194,15 @@ export function useRepublicGame(gameId:string){
    void writeLocalGameSnapshot(gameId,uid,{
     stages:(st.data||[]) as Stage[],
     metrics:((mt.data||[]) as Metric[]).filter(value=>value.is_public),
-    events:(ev.data||[]) as EventItem[]
+    events:(ev.data===null?events:(ev.data||[])) as EventItem[]
    });
   }
   if(!readCurrent(ticket,'core'))return;
+  const coldScope=gameId+':'+uid+':'+readEpoch.current;
+  if(coldEntry.current.scope!==coldScope)
+   coldEntry.current={scope:coldScope,loaded:new Set(),running:new Map()};
+  for(const [key,result] of [['events',ev],['evaluations',ge],['documents',dc]] as const)
+   if(!result.error&&result.data!==null)coldEntry.current.loaded.add(key);
   const coreResults=[g,m,mt,ev,mb,ch,st,pa,vo,ge,cr,dc,pf,fd,intro];
   if(coreResults.some(result=>['PGRST003','57014'].includes(String((result.error as {code?:string}|null)?.code||'')))){
    backendRecoveryAfter.current=Date.now()+90000;
@@ -1198,7 +1221,7 @@ export function useRepublicGame(gameId:string){
   acceptedMember.current=member;lastCoreSuccessAt.current=Date.now();lastFullPresentationAt.current=lastCoreSuccessAt.current;if(readCurrent(ticket,'game'))setGame(g.data as Game);setMe(member);
   if(!mt.error&&readCurrent(ticket,'metrics'))setMetrics((mt.data||[]) as Metric[]);
   if(mt.error&&readCurrent(ticket,'metrics'))setError(mt.error);
-  if(!ev.error)setEvents((ev.data||[]) as EventItem[]);
+  if(!ev.error&&ev.data!==null)setEvents((ev.data||[]) as EventItem[]);
   if(!mb.error&&readCurrent(ticket,'members'))setMembers((mb.data||[]) as Member[]);
   if(!ch.error&&readCurrent(ticket,'channels'))setChannels((ch.data||[]) as Channel[]);
   if(!st.error&&readCurrent(ticket,'stages'))setStages((st.data||[]) as Stage[]);
@@ -1216,9 +1239,9 @@ export function useRepublicGame(gameId:string){
     if(!ba.error&&readCurrent(ticket,'votes'))setBallots((ba.data||[]) as Ballot[]);
    }else setBallots([]);
   }
-  if(!ge.error)setEvaluations((ge.data||[]) as Evaluation[]);
+  if(!ge.error&&ge.data!==null)setEvaluations((ge.data||[]) as Evaluation[]);
   if(!cr.error)setCrises((cr.data||[]) as Crisis[]);
-  if(!dc.error)setDocuments((dc.data||[]) as GameDocument[]);
+  if(!dc.error&&dc.data!==null)setDocuments((dc.data||[]) as GameDocument[]);
   if(!pf.error&&readCurrent(ticket,'profiles')){
    setProfiles(previous=>((pf.data||[]) as GameProfile[]).map(row=>{
     const old=previous.find(p=>p.user_id===row.user_id);
@@ -1247,6 +1270,37 @@ export function useRepublicGame(gameId:string){
    return loadCoreSections();
  }
 
+ async function loadColdEntry(key:'events'|'evaluations'|'documents'):Promise<void>{
+  const uid=authUser.current;
+  if(!uid||!acceptedMember.current||acceptedMember.current.game_id!==gameId)return;
+  const scope=gameId+':'+uid+':'+readEpoch.current;
+  const cache=coldEntry.current;
+  if(cache.scope!==scope){
+   coldEntry.current={scope,loaded:new Set(),running:new Map()};
+  }
+  const current=coldEntry.current;
+  if(current.loaded.has(key))return;
+  const existing=current.running.get(key);
+  if(existing)return existing;
+  const task=readSafely([key],async ticket=>{
+   const result=key==='events'
+    ?await limitedCoreRead(supabase.from('game_events').select('*').eq('game_id',gameId)
+      .order('published_at',{ascending:false}).limit(100))
+    :key==='evaluations'
+     ?await limitedCoreRead(supabase.from('game_evaluations').select('*').eq('game_id',gameId).order('stage_no'))
+     :await limitedCoreRead(supabase.from('game_documents').select('*').eq('game_id',gameId)
+       .order('created_at',{ascending:false}));
+   if(!readCurrent(ticket)||current!==coldEntry.current)return;
+   requireSuccessful([result]);
+   if(key==='events')setEvents((result.data||[]) as EventItem[]);
+   else if(key==='evaluations')setEvaluations((result.data||[]) as Evaluation[]);
+   else setDocuments((result.data||[]) as GameDocument[]);
+   current.loaded.add(key);
+  });
+  current.running.set(key,task);
+  try{await task}finally{if(current.running.get(key)===task)current.running.delete(key)}
+ }
+
  async function hydrateActiveView(allowFreshCore=false,forceOffices=false){
   // Rapid view navigation can reuse recently updated common data.
   // Realtime, recovery and explicit refresh still force the core read.
@@ -1257,6 +1311,11 @@ export function useRepublicGame(gameId:string){
    ?loadCoreForView():null;
   if(core)jobs.unshift(core);
   const view=activeViewRef.current;
+  const cold:('events'|'evaluations'|'documents')[]=[];
+  if(['events','teacher'].includes(view))cold.push('events');
+  if(['grades','profile','stages','teacher'].includes(view))cold.push('evaluations');
+  if(['documents','stages','teacher'].includes(view))cold.push('documents');
+  for(const key of cold)jobs.push(core?core.then(()=>loadColdEntry(key)):loadColdEntry(key));
   if(view==='parties'||view==='profile')jobs.push(loadPartyAssets(view==='parties'));
   // Teacher dossiers must fetch document rows, not just party representation.
   if(view==='teacher')jobs.push(loadPartyDocuments());
