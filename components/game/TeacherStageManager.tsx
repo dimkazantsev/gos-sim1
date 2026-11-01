@@ -29,6 +29,10 @@ export default function TeacherStageManager({g,onOpenStage}:{
  const [readinessSnapshot,setReadinessSnapshot]=useState<{scope:string;rows:StageReadiness[]}|null>(null);
  const [readinessFailure,setReadinessFailure]=useState<{scope:string;message:string}|null>(null);
  const [readinessLoading,setReadinessLoading]=useState(false);
+ const [stageReadinessSnapshot,setStageReadinessSnapshot]=useState<{scope:string;stageNo:number;row:StageReadiness}|null>(null);
+ const [stageReadinessError,setStageReadinessError]=useState<{scope:string;stageNo:number;message:string}|null>(null);
+ const [stageReadinessLoading,setStageReadinessLoading]=useState<{scope:string;stageNo:number}|null>(null);
+ const stageReadinessPending=useRef(new Set<number>());
  const scope=JSON.stringify([game?.id,g.me?.user_id,g.me?.kind,teacher]);
  const activeScope=useRef(scope),alive=useRef(true);activeScope.current=scope;
  const reads=useRef({scope,promise:null as Promise<void>|null,queued:false,explicit:false,controller:null as AbortController|null});
@@ -55,7 +59,7 @@ export default function TeacherStageManager({g,onOpenStage}:{
   setStageActionBusy(true);setError('');setNotice('');
   try{
    const ok=await g.manageStage(stageNo,action,action==='extend'?extensionMinutes:30);
-   if(ok){setNotice(action==='open'?'Этап '+stageNo+' открыт.':action==='close'?'Этап '+stageNo+' завершён.':'Срок этапа '+stageNo+' продлён на '+extensionMinutes+' минут. Продление не открывает завершённые голосования и не снимает задолженности по итоговым документам. Проверяйте личные ограничения в кабинете участника.');setReadinessSnapshot(null);}
+   if(ok){setNotice(action==='open'?'Этап '+stageNo+' открыт.':action==='close'?'Этап '+stageNo+' завершён.':'Срок этапа '+stageNo+' продлён на '+extensionMinutes+' минут. Продление не открывает завершённые голосования и не снимает задолженности по итоговым документам. Проверяйте личные ограничения в кабинете участника.');setReadinessSnapshot(null);setStageReadinessSnapshot(null);}
    else setError('Не удалось изменить статус этапа. Проверьте сообщение системы.');
   }finally{setStageActionBusy(false)}
  }
@@ -92,12 +96,31 @@ export default function TeacherStageManager({g,onOpenStage}:{
  useEffect(()=>{
   const invalidate=(event:Event)=>{
    const d=(event as CustomEvent<{gameId?:string;table?:string}>).detail;
-   if(d?.gameId===game?.id&&(!d.table||['stage_readiness_overrides','formal_documents','game_stages','game_votes'].includes(d.table)))setReadinessSnapshot(null);
+   if(d?.gameId===game?.id&&(!d.table||['stage_readiness_overrides','formal_documents','game_stages','game_votes'].includes(d.table))){setReadinessSnapshot(null);setStageReadinessSnapshot(null)}
   };
   window.addEventListener(GAME_DATA_REFRESH_EVENT,invalidate);
   return()=>window.removeEventListener(GAME_DATA_REFRESH_EVENT,invalidate);
  },[game?.id]);
- useEffect(()=>{setReadinessSnapshot(null)},[scope]);
+ useEffect(()=>{setReadinessSnapshot(null);setStageReadinessSnapshot(null);setStageReadinessError(null);setStageReadinessLoading(null);stageReadinessPending.current.clear()},[scope]);
+ async function checkSelectedStage(stageNo:number){
+  if(!game||!teacher||!scopeCurrent()||stageReadinessPending.current.has(stageNo))return;
+  stageReadinessPending.current.add(stageNo);
+  setStageReadinessLoading({scope,stageNo});setStageReadinessError(null);
+  try{
+   // One stage readiness calculation, rather than the full 16-stage scan.
+   const r=await supabase.rpc('get_stage_readiness',{p_game_id:game.id,p_stage_no:stageNo});
+   if(!scopeCurrent())return;
+   if(r.error)throw r.error;
+   const row=r.data as StageReadiness|null;
+   if(!row||row.stage_no!==stageNo||typeof row.ready!=='boolean')throw new Error('Сервер не вернул проверку этапа.');
+   setStageReadinessSnapshot({scope,stageNo,row});
+  }catch(error){
+   if(scopeCurrent()){setStageReadinessSnapshot(null);setStageReadinessError({scope,stageNo,message:userError(error)})}
+  }finally{
+   stageReadinessPending.current.delete(stageNo);
+   if(scopeCurrent())setStageReadinessLoading(null);
+  }
+ }
  const closeDialog=()=>{if(busy)return;setResetTarget(null);setConfirmation('');setError('')};
  const dialogRef=useDialog(resetTarget!==null,closeDialog);
  const readiness=readinessSnapshot&&readinessSnapshot.scope===scope?readinessSnapshot.rows:[];
@@ -111,7 +134,12 @@ export default function TeacherStageManager({g,onOpenStage}:{
  )).sort((a,b)=>stageSort==='reverse'?b.stage_no-a.stage_no:stageSort==='status'?(a.status==='open'?-1:a.status==='locked'?1:0)-(b.status==='open'?-1:b.status==='locked'?1:0)||a.stage_no-b.stage_no:a.stage_no-b.stage_no);
  const selectedStage=stages.find(x=>x.stage_no===(expanded??currentStageNumber()));
  function currentStageNumber(){return stages.find(x=>x.status==='open')?.stage_no||game?.current_round||1}
- const selectedReady=readiness.find(x=>x.stage_no===selectedStage?.stage_no);
+ const selectedStageNo=selectedStage?.stage_no;
+ const matchedSingle=stageReadinessSnapshot?.scope===scope&&stageReadinessSnapshot.stageNo===selectedStageNo?stageReadinessSnapshot.row:null;
+ const selectedReady=matchedSingle||readiness.find(x=>x.stage_no===selectedStageNo);
+ const selectedChecked=Boolean(matchedSingle)||readinessChecked;
+ const selectedLoading=readinessLoading||stageReadinessLoading?.scope===scope&&stageReadinessLoading.stageNo===selectedStageNo;
+ const selectedError=stageReadinessError?.scope===scope&&stageReadinessError.stageNo===selectedStageNo?stageReadinessError.message:readinessError;
  const targetStage=typeof resetTarget==='number'?stages.find(s=>s.stage_no===resetTarget):null;
  const all=resetTarget==='all';
  const canReset=resetTarget!==null&&!busy&&(!all||confirmation.trim()==='СБРОСИТЬ');
@@ -127,7 +155,7 @@ export default function TeacherStageManager({g,onOpenStage}:{
    if(!ok){setError('Не удалось сбросить этапы. Проверьте сообщение об ошибке в верхней части приложения.');return}
    setNotice(all?'Все этапы сброшены. Ход остановлен.':'Этап '+resetTarget+' сброшен.');
    if(all){setFilter('all');setSearch('')}
-   setReadinessSnapshot(null);
+   setReadinessSnapshot(null);setStageReadinessSnapshot(null);
    setResetTarget(null);setConfirmation('');
   }catch(err){
    setError((userError(err)||'Не удалось сбросить этапы.'));
@@ -191,7 +219,7 @@ export default function TeacherStageManager({g,onOpenStage}:{
      </div>
      <button type="button" className="teacherStageInspectorReset" onClick={()=>askReset(selectedStage.stage_no)} title="Сбросить этот этап" aria-label={'Сбросить этап '+selectedStage.stage_no} disabled={busy}><RotateCcw size={17}/></button></header>
      {selectedStage.summary&&<p className="teacherStageInspectorSummary">{selectedStage.summary}</p>}
-     <StageReadinessPanel g={g} stageNo={selectedStage.stage_no} compact compactReadiness={selectedReady} compactChecked={readinessChecked} compactLoading={readinessLoading} compactError={readinessError} onCompactRefresh={()=>void refreshReadiness()}/>
+     <StageReadinessPanel g={g} stageNo={selectedStage.stage_no} compact compactReadiness={selectedReady} compactChecked={selectedChecked} compactLoading={Boolean(selectedLoading)} compactError={selectedError} onCompactRefresh={()=>void checkSelectedStage(selectedStage.stage_no)}/>
      <div className="teacherStageInspectorActions" aria-label="Действия с выбранным этапом">
       <div className={"teacherStageFlowActions"+(selectedStage.status!=="open"?" isOpening":"")}>
        {selectedStage.status!=='open'
