@@ -7,6 +7,7 @@ import {useEffect,useRef,useState} from 'react';
 import dynamic from 'next/dynamic';
 import {BookOpenText,CalendarDays,ChevronDown,ChevronLeft,ChevronRight,Eye,FileText,GraduationCap,GripVertical,Landmark,LayoutDashboard,LogOut,Menu,MessageCircle,Radio,Settings2,Share2,ShieldCheck,UserRound,Wallet,Vote as VoteIcon} from 'lucide-react';
 import {useRepublicGame} from './game/useRepublicGame';
+import {firstPresenceWriteDelay} from './game/firstPresenceWriteDelay';
 import {useActionErrorPlacement} from './game/useActionErrorPlacement';
 import {TurnCountdownPill} from './game/TurnClock';
 import type {Member,View,Vote} from './game/types';
@@ -216,6 +217,7 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
  const [screenHistory,setScreenHistory,navigationHydrated,navigationRestored]=useSavedGameState<{entries:ScreenLocation[];index:number}>(gameId,g.me?.user_id,'navigation',{
   entries:[{view:'dashboard',stageNo:0,documentId:''}],index:0
  },validScreenHistory);
+ const initialSqlPresence=useRef<{scope:string;readyAt:number}>({scope:'',readyAt:0});
  const sharedLinkHandled=useRef(false);
  useEffect(()=>{
   if(!navigationHydrated||!g.me?.user_id||sharedLinkHandled.current)return;
@@ -583,12 +585,23 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
  useEffect(()=>{
   if(!me||previewMode||me.kind==='observer')return;
   const labels:Record<View,string>={dashboard:'Обзор игры',stages:'Этапы',parties:'Партия',votes:'Голосование',documents:'НПА / Формальные институты',actions:'Политический процесс',grades:'Оценки',profile:'Мой профиль',teacher:'Управление',events:'Ситуационные решения',budget:'Бюджет'};
-  const visible=()=>{if(document.visibilityState==='visible')void touchPresence(view)};
-  if(document.visibilityState==='visible')void touchPresence(view,'Открыл раздел «'+labels[view]+'»');
+  // The database journal is noncritical to joining. Distribute the FIRST
+  // SQL write across students so 100 arrivals do not hit PostgreSQL together.
+  // Realtime Presence already announces who is online immediately.
+  // Preserve the same deadline if the student switches views while joining.
+  const scope=gameId+':'+me.user_id;
+  if(initialSqlPresence.current.scope!==scope)
+   initialSqlPresence.current={scope,readyAt:Date.now()+firstPresenceWriteDelay(me.user_id)};
+  const isReady=()=>Date.now()>=initialSqlPresence.current.readyAt;
+  const visible=()=>{if(document.visibilityState==='visible'&&isReady())void touchPresence(view)};
+  const remaining=Math.max(0,initialSqlPresence.current.readyAt-Date.now());
+  const first=setTimeout(()=>{
+   if(document.visibilityState==='visible')void touchPresence(view,'Открыл раздел «'+labels[view]+'»');
+  },remaining);
   const id=setInterval(visible,60000+Math.floor(Math.random()*12000));
   document.addEventListener('visibilitychange',visible);
-  return()=>{clearInterval(id);document.removeEventListener('visibilitychange',visible)};
- },[view,me?.user_id,previewMode]);
+  return()=>{clearTimeout(first);clearInterval(id);document.removeEventListener('visibilitychange',visible)};
+ },[gameId,view,me?.user_id,previewMode]);
 
  useEffect(()=>{
   if(!previewMode)return;
