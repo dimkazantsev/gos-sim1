@@ -88,7 +88,9 @@ async function main(){
   teacher.dispose();
 
   const observer=harness({effects:true});observer.setMemberKind('observer');observer.fixture('game_parties',parties);await observer.settle();
-  assert.equal(observer.render().parties[0].registration_note,null);
+  assert.equal(observer.render().parties.length,0,'Guest does not load the party roster just by signing in');
+  observer.render().setActiveView('stages');await observer.settle();
+  assert.equal(observer.render().parties[0].registration_note,null,'Guest retains the stripped party projection after opening a section');
   observer.dispose();
   console.log(JSON.stringify({status:'PASS',simulatedClients:40,partyFullBytes:fullPartyBytes,partySummaryBytes:litePartyBytes,partyReductionPct:Math.round((1-litePartyBytes/fullPartyBytes)*1000)/10,profileFullBytes:fullProfilesBytes,profileSummaryBytes:liteProfilesBytes,profileReductionPct:Math.round((1-liteProfilesBytes/fullProfilesBytes)*1000)/10,partyReads:reducedRequests,teacherFullDossier:true,profileBiography:true,environment:'synthetic clients with mocked Supabase; not real network'}));
  }finally{clients.forEach(h=>h.dispose())}
