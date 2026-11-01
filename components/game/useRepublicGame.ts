@@ -1103,11 +1103,11 @@ export function useRepublicGame(gameId:string){
     ?slim:await limitedCoreRead(supabase.rpc('get_game_entry_v4',{p_game_id:gameId}));
    if(!entry.error){
     const payload=entry.data as Record<string,unknown>|null;
-    const fields=(useV5
-     ?['game','metrics','channels','stages','votes','crises','profiles','formal_documents',
-       'member','roster','parties','intro']
-     :['game','metrics','events','channels','stages','votes','evaluations','crises',
-       'documents','profiles','formal_documents','member','roster','parties','intro']) as const;
+    const fields=useV5
+     ?(['game','metrics','channels','stages','votes','crises','profiles','formal_documents',
+       'member','roster','parties','intro'] as const)
+     :(['game','metrics','events','channels','stages','votes','evaluations','crises',
+       'documents','profiles','formal_documents','member','roster','parties','intro'] as const);
     if(!payload||!fields.every(key=>Object.prototype.hasOwnProperty.call(payload,key))||
        !Array.isArray(payload.roster)||!Array.isArray(payload.parties))
      throw new Error('Сервер вернул неполные данные первоначального входа.');
