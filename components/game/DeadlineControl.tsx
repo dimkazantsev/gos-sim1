@@ -245,6 +245,6 @@ export default function DeadlineControl({g,stageNo}:{g:ReturnTypeRepublic;stageN
   </div>}
 
   {active.length>0&&<div className="deadlineLedger">{active.map(x=><article key={x.id}><div><b>{CONSEQUENCES[x.consequence_type].label}</b><small>{x.party_id?partyName(x.party_id):userName(x.user_id)} · {new Date(x.created_at).toLocaleString('ru-RU')}</small><p>{x.note}</p></div><strong>{x.magnitude!=null?String(x.magnitude)+' '+CONSEQUENCES[x.consequence_type].unit:'зафиксировано'}</strong>{teacher&&<button disabled={busy} onClick={()=>void revert(x.id)}>Отменить</button>}</article>)}</div>}
-  {hasMore&&<div className="deadlineLoadMore"><button type="button" className="secondary" disabled={pageBusy} onClick={()=>void loadMore()}>{pageBusy?'Загрузка…':'Показать ещё 10 нарушений'}</button></div>
+  {hasMore&&<div className="deadlineLoadMore"><button type="button" className="secondary" disabled={pageBusy} onClick={()=>void loadMore()}>{pageBusy?'Загрузка…':'Показать ещё 10 нарушений'}</button></div>}
  </section>;
 }
