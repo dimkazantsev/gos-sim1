@@ -68,14 +68,28 @@ async function main(){
  const presence=effects.find(n=>n.arguments[0].getText(ast).includes('const labels:Record<View,string>'));
  assert(presence,'The real presence effect is available');
  for(let n=0;n<40;n++){
-  let tick,delay,cleared=false;const calls=[],listeners=new Map();
+  let tick,first,delay,initialDelay,now=1000,cleared=false,firstCleared=false;
+  const calls=[],listeners=new Map();
   const document={visibilityState:'visible',addEventListener:(name,fn)=>listeners.set(name,fn),removeEventListener:name=>listeners.delete(name)};
-  const {fn}=compile(presence.arguments[0],{me:{kind:'student'},previewMode:false,view:'documents',document,Math,touchPresence:(...args)=>{calls.push(args);return Promise.resolve()},setInterval:(fn,ms)=>{tick=fn;delay=ms;return 1},clearInterval:()=>{cleared=true}});
-  const cleanup=fn();assert.equal(calls.length,1);assert(delay>=60000&&delay<72000);
+  const {fn}=compile(presence.arguments[0],{
+   me:{kind:'student',user_id:'student-'+n},gameId:'classroom',previewMode:false,view:'documents',
+   document,Date:{now:()=>now},Math,firstPresenceWriteDelay:()=>2000,
+   initialSqlPresence:{current:{scope:'',readyAt:0}},
+   touchPresence:(...args)=>{calls.push(args);return Promise.resolve()},
+   setTimeout:(fn,ms)=>{first=fn;initialDelay=ms;return 2},
+   clearTimeout:()=>{firstCleared=true},
+   setInterval:(fn,ms)=>{tick=fn;delay=ms;return 1},
+   clearInterval:()=>{cleared=true}
+  });
+  const cleanup=fn();
+  assert.equal(initialDelay,2000,'Optional SQL presence is delayed after entry');
+  assert.equal(calls.length,0,'No immediate database write during a 100-client login burst');
+  assert(delay>=60000&&delay<72000);
+  now+=initialDelay;first();assert.equal(calls.length,1,'First SQL write is preserved once admitted');
   tick();assert.equal(calls.length,2);document.visibilityState='hidden';
   for(let minute=0;minute<20;minute++)tick();assert.equal(calls.length,2,'Hidden sessions send zero twenty-minute presence writes');
   document.visibilityState='visible';listeners.get('visibilitychange')();assert.equal(calls.length,3,'Returning starts a new presence interval');
-  cleanup();assert(cleared);assert.equal(listeners.size,0);
+  cleanup();assert(cleared&&firstCleared);assert.equal(listeners.size,0);
  }
  console.log('PASS: 40 game shells share counter delivery, preserve pending-case deduplication and role scope, suppress stale responses and hidden-tab presence writes');
 }
