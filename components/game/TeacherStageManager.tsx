@@ -32,7 +32,8 @@ export default function TeacherStageManager({g,onOpenStage}:{
  const [stageReadinessSnapshot,setStageReadinessSnapshot]=useState<{scope:string;stageNo:number;row:StageReadiness}|null>(null);
  const [stageReadinessError,setStageReadinessError]=useState<{scope:string;stageNo:number;message:string}|null>(null);
  const [stageReadinessLoading,setStageReadinessLoading]=useState<{scope:string;stageNo:number}|null>(null);
- const stageReadinessPending=useRef(new Set<number>());
+ const stageReadinessPending=useRef(new Set<string>());
+ const selectedControllers=useRef(new Map<string,AbortController>());
  const scope=JSON.stringify([game?.id,g.me?.user_id,g.me?.kind,teacher]);
  const activeScope=useRef(scope),alive=useRef(true);activeScope.current=scope;
  const reads=useRef({scope,promise:null as Promise<void>|null,queued:false,explicit:false,controller:null as AbortController|null});
@@ -101,14 +102,24 @@ export default function TeacherStageManager({g,onOpenStage}:{
   window.addEventListener(GAME_DATA_REFRESH_EVENT,invalidate);
   return()=>window.removeEventListener(GAME_DATA_REFRESH_EVENT,invalidate);
  },[game?.id]);
- useEffect(()=>{setReadinessSnapshot(null);setStageReadinessSnapshot(null);setStageReadinessError(null);setStageReadinessLoading(null);stageReadinessPending.current.clear()},[scope]);
+ useEffect(()=>{
+  setReadinessSnapshot(null);setStageReadinessSnapshot(null);setStageReadinessError(null);setStageReadinessLoading(null);
+  return()=>{for(const controller of selectedControllers.current.values())controller.abort();selectedControllers.current.clear();stageReadinessPending.current.clear()};
+ },[scope]);
  async function checkSelectedStage(stageNo:number){
-  if(!game||!teacher||!scopeCurrent()||stageReadinessPending.current.has(stageNo))return;
-  stageReadinessPending.current.add(stageNo);
+  const key=scope+':'+stageNo;
+  if(!game||!teacher||!scopeCurrent()||stageReadinessPending.current.has(key))return;
+  stageReadinessPending.current.add(key);
+  const controller=new AbortController();
+  selectedControllers.current.set(key,controller);
+  let timeout:ReturnType<typeof setTimeout>|undefined;
   setStageReadinessLoading({scope,stageNo});setStageReadinessError(null);
   try{
-   // One stage readiness calculation, rather than the full 16-stage scan.
-   const r=await supabase.rpc('get_stage_readiness',{p_game_id:game.id,p_stage_no:stageNo});
+   // One stage readiness calculation, bounded to 12 seconds.
+   const r=await Promise.race([
+    supabase.rpc('get_stage_readiness',{p_game_id:game.id,p_stage_no:stageNo}).abortSignal(controller.signal),
+    new Promise<never>((_,reject)=>{timeout=setTimeout(()=>{controller.abort();reject(new Error('Сервер не ответил на проверку этапа вовремя.'))},12000)})
+   ]);
    if(!scopeCurrent())return;
    if(r.error)throw r.error;
    const row=r.data as StageReadiness|null;
@@ -117,7 +128,9 @@ export default function TeacherStageManager({g,onOpenStage}:{
   }catch(error){
    if(scopeCurrent()){setStageReadinessSnapshot(null);setStageReadinessError({scope,stageNo,message:userError(error)})}
   }finally{
-   stageReadinessPending.current.delete(stageNo);
+   clearTimeout(timeout);
+   stageReadinessPending.current.delete(key);
+   if(selectedControllers.current.get(key)===controller)selectedControllers.current.delete(key);
    if(scopeCurrent())setStageReadinessLoading(null);
   }
  }
