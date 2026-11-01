@@ -58,15 +58,15 @@ export default function ChatPanel({g,draft:text,onDraftChange:setText,previewCha
  useEffect(()=>()=>{if(selectHoldTimer.current)clearTimeout(selectHoldTimer.current)},[]);
   const socialChannelsReady=g.channels.some(c=>c.kind==='public'&&c.name==='Публичная политика')&&g.channels.some(c=>c.kind==='public'&&c.name==='Вне игры');
  useEffect(()=>{
-  if(!g.game?.id||socialChannelsReady)return;
+  if(!g.game?.id||!g.chatDirectoryLoaded||socialChannelsReady)return;
   let live=true;
   void supabase.rpc('ensure_social_channels',{p_game_id:g.game.id}).then(r=>{
    if(!live)return;
    if(r.error)g.setError(r.error.message);
-   else void g.refresh();
+   else void g.refreshChatDirectory();
   });
   return()=>{live=false};
- },[g.game?.id,socialChannelsReady]);
+ },[g.game?.id,g.chatDirectoryLoaded,socialChannelsReady]);
  const [sending,setSending]=useState(false);
  const [retentionClock,setRetentionClock]=useState(()=>Date.now());
  useEffect(()=>{const id=window.setInterval(()=>setRetentionClock(Date.now()),15000);return()=>window.clearInterval(id)},[]);
@@ -135,7 +135,7 @@ export default function ChatPanel({g,draft:text,onDraftChange:setText,previewCha
   if(!g.game||sending)return;setSending(true);setLocalError('');
   try{const r=await supabase.rpc('open_direct_conversation',{p_game:g.game.id,p_recipient:userId});
    if(r.error){setLocalError(userError(r.error));return}
-   const target=r.data as string;await g.refresh();setChannelId(target);setSearch('');setSearchOpen(false);setOnlyFiles(false);
+   const target=r.data as string;await g.refreshChatDirectory();setChannelId(target);setSearch('');setSearchOpen(false);setOnlyFiles(false);
    requestAnimationFrame(()=>composer.current?.focus());
   }catch(e){setLocalError(userError(e))}finally{setSending(false)}
  }
