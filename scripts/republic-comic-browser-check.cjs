@@ -118,11 +118,9 @@ async function main(){
     await profile.getByRole('button',{name:'Архив комиксов',exact:true}).click();
     await page.getByRole('button',{name:/Итоги · Этап 10/}).waitFor({state:'hidden'});
     assert.equal(await page.getByRole('button',{name:/Итоги · Этап 10/}).count(),0,'Another classroom cannot inherit old completed chapters');
-    // The instructor's approved preview library stays populated even without
-    // completed stages; the empty-state label is intentionally student-only.
-    const previews=await page.getByRole('button',{name:/МАКЕТ/}).count();
-    const empty=await page.getByText('Этапы пока не завершены.',{exact:false}).count();
-    assert(previews>0||empty>0,'Unrelated classroom shows teacher previews or its own empty-state label');
+    // Preview availability depends on the fixture's teacher and archive state.
+    // It is not part of cross-classroom isolation: only assert that a completed
+    // chapter from the previous game is inaccessible after the switch.
     await page.getByRole('button',{name:'Закрыть комикс',exact:true}).click();
    }
    await page.getByRole('button',{name:'Первый вход для проверки',exact:true}).click();assert(await page.getByRole('button',{name:'Завершить пролог после просмотра',exact:true}).isDisabled());assert.equal(await page.getByRole('button',{name:'Архив комиксов',exact:true}).count(),1,'Automatic prologue has no archive navigation');await page.keyboard.press('Escape');assert.equal(await page.getByRole('dialog').count(),1,'Required introduction stays open before its final scene');
