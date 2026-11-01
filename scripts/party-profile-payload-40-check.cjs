@@ -51,6 +51,13 @@ async function main(){
   await Promise.all(clients.map(h=>h.settle()));
   let reducedRequests=0;
   for(const h of clients){
+   assert.equal(h.rpcCount('get_game_entry_v5'),0,'No full party/roster query before the student selects a section');
+   assert.equal(h.render().coreLoaded,false);
+  }
+  // Explicitly choosing the full dashboard is the only trigger for the
+  // lightweight party-summary projection in the initial screen.
+  await Promise.all(clients.map(async h=>{h.render().openDetailedDashboard();await h.settle()}));
+  for(const h of clients){
    const q=h.stats().queryLog.filter(x=>x.table==='game_parties');
    assert.equal(q.length,0,'Overview uses RLS-scoped lightweight parties inside entry v5, not separate reads');
    assert.equal(h.rpcCount('get_game_entry_v5'),1,'Only one scoped entry RPC per student');
