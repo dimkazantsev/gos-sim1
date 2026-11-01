@@ -43,12 +43,14 @@ const pending=render({compactLoading:true});
 assert.match(pending,/Проверяем готовность/);
 assert.match(pending,/disabled=""/);
 assert.match(render({compactChecked:true}),/Нет данных о готовности этапа/);
-// The teacher manager must pass its single bulk-RPC snapshot into this card.
+// The teacher manager uses focused stage readiness on its card, while the overall button retains bulk readiness.
 const manager=fs.readFileSync(path.join(root,'components/game/TeacherStageManager.tsx'),'utf8');
 assert.match(manager,/supabase\.rpc\('get_game_readiness'/);
 assert.match(manager,/compactReadiness=\{selectedReady\}/);
-assert.match(manager,/compactChecked=\{readinessChecked\}/);
-assert.match(manager,/onCompactRefresh=\{\(\)=>void refreshReadiness\(\)\}/);
+assert.match(manager,/compactChecked=\{selectedChecked\}/);
+assert.match(manager,/onCompactRefresh=\{\(\)=>void checkSelectedStage\(selectedStage\.stage_no\)\}/);
+assert.match(manager,/supabase\.rpc\('get_stage_readiness'/);
+assert.match(manager,/aria-label="Перепроверить готовность всех этапов"/);
 const teacher=fs.readFileSync(path.join(root,'components/game/TeacherView.tsx'),'utf8');
 assert.doesNotMatch(teacher,/teacherCommandStatus|ХОД ОТКРЫТ/);
-console.log('PASS teacher compact readiness: unchecked, ready, blocked, warning, RPC failure, loading, missing data, shared refresh and no duplicate status');
+console.log('PASS teacher compact readiness: unchecked, ready, blocked, warning, RPC failure, loading, missing data, single-stage refresh, explicit bulk refresh and no duplicate status');

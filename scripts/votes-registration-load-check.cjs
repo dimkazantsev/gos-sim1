@@ -4,7 +4,6 @@ const file=path.join(__dirname,'election-panels-load-check.cjs');
 let fixture=fs.readFileSync(file,'utf8');
 function replace(before,after){assert(fixture.includes(before),'Fixture matches: '+before);fixture=fixture.replace(before,after)}
 replace("ghost:'GhostPolicyLab'","ghost:'GhostPolicyLab',votes:'VotesView',registration:'InstitutionRegistrationPanel'");
-replace("kind==='deadline'&&i===8","kind==='deadline'&&i===8");
 replace("institution_session_registrations:[{user_id:'student-A',stage_no:4,institution_key:'gd',present_mandates:15}]","institution_session_registrations:[{user_id:'student-A',stage_no:4,institution_key:'gd',present_mandates:rev?25:15}]");
 replace("game_votes:[{id:'procedure'","institution_meeting_records:[{game_id:game,stage_no:4,institution_key:'gd',agenda_body:'agenda-'+rev,agenda_approved_at:null}],game_votes:[{id:'procedure'");
 replace("const api={errors,starts,failures,","const api={errors,starts,failures,revision(value){revision=value},connection(value){sync.setGameRealtimeConnection('game-A',value)},");

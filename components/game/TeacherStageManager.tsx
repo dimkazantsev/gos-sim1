@@ -4,12 +4,13 @@ import {useEffect,useRef,useState} from 'react';
 import {supabase} from '@/lib/supabase';
 import StageReadinessPanel,{type StageReadiness} from './StageReadinessPanel';
 import {CheckCircle2,ChevronRight,CircleDot,LockKeyhole,RefreshCw,RotateCcw,Search,ShieldAlert,X} from 'lucide-react';
+import dynamic from 'next/dynamic';
 import {useDialog} from '../ui/useDialog';
 import type {ReturnTypeRepublic} from './viewTypes';
-import StagePolicyEditor from './StagePolicyEditor';
-import DeadlineControl from './DeadlineControl';
+const StagePolicyEditor=dynamic(()=>import('./StagePolicyEditor'),{loading:()=>null});
+const DeadlineControl=dynamic(()=>import('./DeadlineControl'),{loading:()=>null});
 import StyledSelect from '../ui/StyledSelect';
-import {useGameTableSync} from './useGameTableSync';
+import {GAME_DATA_REFRESH_EVENT} from './useGameTableSync';
 
 type StageFilter='all'|'open'|'completed'|'locked';
 type ResetTarget=number|'all'|null;
@@ -28,6 +29,11 @@ export default function TeacherStageManager({g,onOpenStage}:{
  const [readinessSnapshot,setReadinessSnapshot]=useState<{scope:string;rows:StageReadiness[]}|null>(null);
  const [readinessFailure,setReadinessFailure]=useState<{scope:string;message:string}|null>(null);
  const [readinessLoading,setReadinessLoading]=useState(false);
+ const [stageReadinessSnapshot,setStageReadinessSnapshot]=useState<{scope:string;stageNo:number;row:StageReadiness}|null>(null);
+ const [stageReadinessError,setStageReadinessError]=useState<{scope:string;stageNo:number;message:string}|null>(null);
+ const [stageReadinessLoading,setStageReadinessLoading]=useState<{scope:string;stageNo:number}|null>(null);
+ const stageReadinessPending=useRef(new Set<string>());
+ const selectedControllers=useRef(new Map<string,AbortController>());
  const scope=JSON.stringify([game?.id,g.me?.user_id,g.me?.kind,teacher]);
  const activeScope=useRef(scope),alive=useRef(true);activeScope.current=scope;
  const reads=useRef({scope,promise:null as Promise<void>|null,queued:false,explicit:false,controller:null as AbortController|null});
@@ -37,6 +43,7 @@ export default function TeacherStageManager({g,onOpenStage}:{
  useEffect(()=>{alive.current=true;return()=>{alive.current=false}},[]);
  useEffect(()=>{setReadinessLoading(false);return()=>{readState.controller?.abort()}},[scope]);
  const [expanded,setExpanded]=useState<number|null>(null);
+ const [detailsStage,setDetailsStage]=useState<number|null>(null);
  const [stageSort,setStageSort]=useState<'number'|'reverse'|'status'>('number');
  const [filter,setFilter]=useState<StageFilter>('all');
  const [search,setSearch]=useState('');
@@ -53,7 +60,7 @@ export default function TeacherStageManager({g,onOpenStage}:{
   setStageActionBusy(true);setError('');setNotice('');
   try{
    const ok=await g.manageStage(stageNo,action,action==='extend'?extensionMinutes:30);
-   if(ok){setNotice(action==='open'?'Этап '+stageNo+' открыт.':action==='close'?'Этап '+stageNo+' завершён.':'Срок этапа '+stageNo+' продлён на '+extensionMinutes+' минут. Продление не открывает завершённые голосования и не снимает задолженности по итоговым документам. Проверяйте личные ограничения в кабинете участника.');void refreshReadiness();}
+   if(ok){setNotice(action==='open'?'Этап '+stageNo+' открыт.':action==='close'?'Этап '+stageNo+' завершён.':'Срок этапа '+stageNo+' продлён на '+extensionMinutes+' минут. Продление не открывает завершённые голосования и не снимает задолженности по итоговым документам. Проверяйте личные ограничения в кабинете участника.');setReadinessSnapshot(null);setStageReadinessSnapshot(null);}
    else setError('Не удалось изменить статус этапа. Проверьте сообщение системы.');
   }finally{setStageActionBusy(false)}
  }
@@ -86,7 +93,47 @@ export default function TeacherStageManager({g,onOpenStage}:{
   })().finally(()=>{state.promise=null});
   return state.promise;
  }
- useGameTableSync(teacher?game?.id:undefined,['stage_readiness_overrides','formal_documents','game_stages','game_votes'],()=>refreshReadiness(true),scope,undefined,5000,180000);
+ // No bulk readiness query on mount, focus, or the periodic recovery interval.
+ useEffect(()=>{
+  const invalidate=(event:Event)=>{
+   const d=(event as CustomEvent<{gameId?:string;table?:string}>).detail;
+   if(d?.gameId===game?.id&&(!d.table||['stage_readiness_overrides','formal_documents','game_stages','game_votes'].includes(d.table))){setReadinessSnapshot(null);setStageReadinessSnapshot(null)}
+  };
+  window.addEventListener(GAME_DATA_REFRESH_EVENT,invalidate);
+  return()=>window.removeEventListener(GAME_DATA_REFRESH_EVENT,invalidate);
+ },[game?.id]);
+ useEffect(()=>{
+  setReadinessSnapshot(null);setStageReadinessSnapshot(null);setStageReadinessError(null);setStageReadinessLoading(null);
+  return()=>{for(const controller of selectedControllers.current.values())controller.abort();selectedControllers.current.clear();stageReadinessPending.current.clear()};
+ },[scope]);
+ async function checkSelectedStage(stageNo:number){
+  const key=scope+':'+stageNo;
+  if(!game||!teacher||!scopeCurrent()||stageReadinessPending.current.has(key))return;
+  stageReadinessPending.current.add(key);
+  const controller=new AbortController();
+  selectedControllers.current.set(key,controller);
+  let timeout:ReturnType<typeof setTimeout>|undefined;
+  setStageReadinessLoading({scope,stageNo});setStageReadinessError(null);
+  try{
+   // One stage readiness calculation, bounded to 12 seconds.
+   const r=await Promise.race([
+    supabase.rpc('get_stage_readiness',{p_game_id:game.id,p_stage_no:stageNo}).abortSignal(controller.signal),
+    new Promise<never>((_,reject)=>{timeout=setTimeout(()=>{controller.abort();reject(new Error('Сервер не ответил на проверку этапа вовремя.'))},12000)})
+   ]);
+   if(!scopeCurrent())return;
+   if(r.error)throw r.error;
+   const row=r.data as StageReadiness|null;
+   if(!row||row.stage_no!==stageNo||typeof row.ready!=='boolean')throw new Error('Сервер не вернул проверку этапа.');
+   setStageReadinessSnapshot({scope,stageNo,row});
+  }catch(error){
+   if(scopeCurrent()){setStageReadinessSnapshot(null);setStageReadinessError({scope,stageNo,message:userError(error)})}
+  }finally{
+   clearTimeout(timeout);
+   stageReadinessPending.current.delete(key);
+   if(selectedControllers.current.get(key)===controller)selectedControllers.current.delete(key);
+   if(scopeCurrent())setStageReadinessLoading(null);
+  }
+ }
  const closeDialog=()=>{if(busy)return;setResetTarget(null);setConfirmation('');setError('')};
  const dialogRef=useDialog(resetTarget!==null,closeDialog);
  const readiness=readinessSnapshot&&readinessSnapshot.scope===scope?readinessSnapshot.rows:[];
@@ -100,7 +147,12 @@ export default function TeacherStageManager({g,onOpenStage}:{
  )).sort((a,b)=>stageSort==='reverse'?b.stage_no-a.stage_no:stageSort==='status'?(a.status==='open'?-1:a.status==='locked'?1:0)-(b.status==='open'?-1:b.status==='locked'?1:0)||a.stage_no-b.stage_no:a.stage_no-b.stage_no);
  const selectedStage=stages.find(x=>x.stage_no===(expanded??currentStageNumber()));
  function currentStageNumber(){return stages.find(x=>x.status==='open')?.stage_no||game?.current_round||1}
- const selectedReady=readiness.find(x=>x.stage_no===selectedStage?.stage_no);
+ const selectedStageNo=selectedStage?.stage_no;
+ const matchedSingle=stageReadinessSnapshot?.scope===scope&&stageReadinessSnapshot.stageNo===selectedStageNo?stageReadinessSnapshot.row:null;
+ const selectedReady=matchedSingle||readiness.find(x=>x.stage_no===selectedStageNo);
+ const selectedChecked=Boolean(matchedSingle)||readinessChecked;
+ const selectedLoading=readinessLoading||stageReadinessLoading?.scope===scope&&stageReadinessLoading.stageNo===selectedStageNo;
+ const selectedError=stageReadinessError?.scope===scope&&stageReadinessError.stageNo===selectedStageNo?stageReadinessError.message:readinessError;
  const targetStage=typeof resetTarget==='number'?stages.find(s=>s.stage_no===resetTarget):null;
  const all=resetTarget==='all';
  const canReset=resetTarget!==null&&!busy&&(!all||confirmation.trim()==='СБРОСИТЬ');
@@ -116,7 +168,7 @@ export default function TeacherStageManager({g,onOpenStage}:{
    if(!ok){setError('Не удалось сбросить этапы. Проверьте сообщение об ошибке в верхней части приложения.');return}
    setNotice(all?'Все этапы сброшены. Ход остановлен.':'Этап '+resetTarget+' сброшен.');
    if(all){setFilter('all');setSearch('')}
-   void refreshReadiness();
+   setReadinessSnapshot(null);setStageReadinessSnapshot(null);
    setResetTarget(null);setConfirmation('');
   }catch(err){
    setError((userError(err)||'Не удалось сбросить этапы.'));
@@ -151,7 +203,7 @@ export default function TeacherStageManager({g,onOpenStage}:{
    <label className="teacherStageSearch"><Search size={16} aria-hidden="true"/><input type="search" placeholder="Найти этап" aria-label="Найти этап" value={search} onChange={e=>setSearch(e.target.value)}/></label>
    <StyledSelect label="Порядок этапов" value={stageSort} onChange={x=>setStageSort(x as typeof stageSort)}
     options={[{value:'number',label:'По номеру ↑'},{value:'reverse',label:'По номеру ↓'},{value:'status',label:'Текущие сначала'}]}/>
-   <button type="button" className="teacherStageCurrentShortcut" onClick={()=>{setExpanded(currentStageNumber());setFilter('all');setSearch('')}}>Текущий этап</button>
+   <button type="button" className="teacherStageCurrentShortcut" onClick={()=>{setExpanded(currentStageNumber());setDetailsStage(null);setFilter('all');setSearch('')}}>Текущий этап</button>
   </div>
   {notice&&<div className="teacherStageNotice" role="status"><CheckCircle2 size={16} aria-hidden="true"/>{notice}
    <button type="button" aria-label="Скрыть уведомление" onClick={()=>setNotice('')}><X size={15}/></button></div>}
@@ -163,14 +215,15 @@ export default function TeacherStageManager({g,onOpenStage}:{
      const StatusIcon=stage.status==='completed'?CheckCircle2:stage.status==='open'?CircleDot:LockKeyhole;
      return <button type="button" key={stage.id} className={'teacherStageListItem '+(selectedStage?.stage_no===stage.stage_no?'selected ':'')+'is-'+stage.status}
        aria-current={selectedStage?.stage_no===stage.stage_no?'step':undefined}
-       onClick={()=>setExpanded(stage.stage_no)}>
+       onClick={()=>{setExpanded(stage.stage_no);setDetailsStage(null)}}>
        <span className="teacherStageNumber">{String(stage.stage_no).padStart(2,'0')}</span>
-       <span className="teacherStageListCopy"><strong>{stage.title}</strong><small><StatusIcon size={13}/>{stage.status==='open'?'Текущий':stage.status==='completed'?'Завершён':'Закрыт'}{ready?.ready?' · Готов':ready?' · Есть препятствия':''}</small></span>
+       <span className="teacherStageListCopy"><strong>{stage.title}</strong><small><StatusIcon size={13}/>{stage.status==='open'?'Текущий':stage.status==='completed'?'Завершён':'Закрыт'}{ready?.ready?' · Готов':ready?' · Есть препятствия':''}{stage.deadline?' · До '+new Date(stage.deadline).toLocaleDateString('ru-RU'):' · Срок не задан'}</small></span>
        <ChevronRight size={17} aria-hidden="true"/>
      </button>;
     })}
     </nav>
-    {selectedStage&&<DeadlineControl g={g} stageNo={selectedStage.stage_no}/>}
+    {selectedStage&&<button type="button" className="teacherStageCurrentShortcut" aria-expanded={detailsStage===selectedStage.stage_no} onClick={()=>setDetailsStage(n=>n===selectedStage.stage_no?null:selectedStage.stage_no)}>{detailsStage===selectedStage.stage_no?'Скрыть сроки и последствия':'Сроки, штрафы и нарушения'}</button>}
+    {selectedStage&&detailsStage===selectedStage.stage_no&&<DeadlineControl g={g} stageNo={selectedStage.stage_no}/>}
    </div>
    <div className="teacherStageInspector">
     {selectedStage?<><header className="teacherStageInspectorHead"><div className="teacherStageInspectorIdentity">
@@ -179,13 +232,13 @@ export default function TeacherStageManager({g,onOpenStage}:{
      </div>
      <button type="button" className="teacherStageInspectorReset" onClick={()=>askReset(selectedStage.stage_no)} title="Сбросить этот этап" aria-label={'Сбросить этап '+selectedStage.stage_no} disabled={busy}><RotateCcw size={17}/></button></header>
      {selectedStage.summary&&<p className="teacherStageInspectorSummary">{selectedStage.summary}</p>}
-     <StageReadinessPanel g={g} stageNo={selectedStage.stage_no} compact compactReadiness={selectedReady} compactChecked={readinessChecked} compactLoading={readinessLoading} compactError={readinessError} onCompactRefresh={()=>void refreshReadiness()}/>
+     <StageReadinessPanel g={g} stageNo={selectedStage.stage_no} compact compactReadiness={selectedReady} compactChecked={selectedChecked} compactLoading={Boolean(selectedLoading)} compactError={selectedError} onCompactRefresh={()=>void checkSelectedStage(selectedStage.stage_no)}/>
      <div className="teacherStageInspectorActions" aria-label="Действия с выбранным этапом">
       <div className={"teacherStageFlowActions"+(selectedStage.status!=="open"?" isOpening":"")}>
        {selectedStage.status!=='open'
         ?<button type="button" className="teacherStageOpenFull" disabled={stageActionBusy} onClick={()=>void changeStage(selectedStage.stage_no,'open')}>Открыть этап</button>
         :<>
-         <button type="button" disabled={stageActionBusy||readinessLoading||!selectedReady?.ready||Boolean(selectedReady?.overridden&&selectedReady.original_blockers?.length)}
+         <button type="button" disabled={stageActionBusy||readinessLoading}
     title={!selectedReady?.ready?'Сначала выполните обязательные процедуры и оформите итоговые документы':'Завершить проверенный этап'}
     onClick={()=>void changeStage(selectedStage.stage_no,'close')}>Завершить этап</button>
          <label className="teacherStageExtendField">Продление, минут
@@ -196,7 +249,7 @@ export default function TeacherStageManager({g,onOpenStage}:{
       </div>
       <button type="button" className="primary teacherStageProcedures" onClick={()=>onOpenStage(selectedStage.stage_no)}>Открыть процедуры этапа <ChevronRight size={16}/></button>
      </div>
-     <StagePolicyEditor key={selectedStage.id} g={g} stageNo={selectedStage.stage_no}/>
+     {detailsStage===selectedStage.stage_no&&<StagePolicyEditor key={selectedStage.id} g={g} stageNo={selectedStage.stage_no}/>}
     </>:<p>Выберите этап из списка.</p>}
    </div>
   </div>

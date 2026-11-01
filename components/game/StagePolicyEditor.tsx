@@ -2,7 +2,7 @@
 import {userError} from '@/lib/userError';
 import {useEffect,useState} from 'react';
 import {CalendarClock,Save} from 'lucide-react';
-import {supabase} from '@/lib/supabase';
+import {getStageDeadlineRule,invalidateStageDeadlineRule} from './stageDeadlineRuleShared';
 import type {ReturnTypeRepublic} from './viewTypes';
 import StyledSelect from '../ui/StyledSelect';
 
@@ -25,7 +25,7 @@ function localDate(iso:string|null|undefined){
  return date.getFullYear()+'-'+p(date.getMonth()+1)+'-'+p(date.getDate())+'T'+p(date.getHours())+':'+p(date.getMinutes());
 }
 export default function StagePolicyEditor({g,stageNo}:{g:ReturnTypeRepublic;stageNo:number}){
- const {game,stages,teacher,configureStageDeadline}=g;
+ const {game,me,stages,teacher,configureStageDeadline}=g;
  const stage=stages.find(s=>s.stage_no===stageNo);
  const [deadline,setDeadline]=useState('');
  const [inclusive,setInclusive]=useState(true);
@@ -38,12 +38,13 @@ export default function StagePolicyEditor({g,stageNo}:{g:ReturnTypeRepublic;stag
  const [saving,setSaving]=useState(false);
  const [message,setMessage]=useState('');
  useEffect(()=>{
-  if(!game||!stage)return;
+  if(!game||!stage||!me)return;
   let active=true;
   const gameId=game.id;
   const stageDeadline=stage.deadline;
+  const userId=me.user_id;
   async function loadRule(){
-   const {data,error}=await supabase.from('stage_deadline_rules').select('*').eq('game_id',gameId).eq('stage_no',stageNo).maybeSingle();
+   const {data,error}=await getStageDeadlineRule(gameId,stageNo,userId);
    if(!active)return;
    if(error){setMessage(userError(error));return}
    setDeadline(localDate(data?.deadline_at??stageDeadline));
@@ -55,12 +56,12 @@ export default function StagePolicyEditor({g,stageNo}:{g:ReturnTypeRepublic;stag
   }
   const sync=(event:Event)=>{
    const detail=(event as CustomEvent<{gameId?:string;stageNo?:number}>).detail;
-   if(detail?.gameId===gameId&&detail?.stageNo===stageNo)void loadRule();
+   if(detail?.gameId===gameId&&detail?.stageNo===stageNo){invalidateStageDeadlineRule(gameId,stageNo);void loadRule()}
   };
   void loadRule();
   window.addEventListener('gos-stage-policy-updated',sync);
   return()=>{active=false;window.removeEventListener('gos-stage-policy-updated',sync)};
- },[game?.id,stageNo,stage?.deadline]);
+ },[game?.id,me?.user_id,stageNo,stage?.deadline]);
  function fillRelative(){
   const n=Number(hours);
   if(!Number.isFinite(n)||n<=0||n>365){setMessage('Укажите от 1 до 365 часов или дней.');return}

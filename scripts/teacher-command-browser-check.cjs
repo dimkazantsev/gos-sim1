@@ -55,6 +55,7 @@ async function check(){
       arrow:rect(entry.querySelector(':scope > svg'))
      })),
      deadline:deadline?rect(deadline):null,actions:actions?rect(actions):null,policy:policy?rect(policy):null,
+     detailsButtonCount:sidebar.querySelectorAll('.teacherStageCurrentShortcut[aria-expanded]').length,
      flow:rect(flow),flowControls:flowControls.map(rect),procedureRect:rect(procedure),
      duplicateTimer:root.querySelectorAll('.teacherCommandClock,.teacherClockSwitch').length,
      stageStatus:root.querySelectorAll('.teacherCommandBar .teacherTurnBadge').length,
@@ -76,7 +77,9 @@ async function check(){
    assert(data.readinessButtonRect.right<=data.width+2,'Readiness refresh must fit the viewport at '+width+'px');
    assert.equal(data.procedures,1,'Procedures action must remain available');
    assert.equal(data.extension,1,'Stage extension input must remain accessible');
-   assert(data.deadline&&data.actions&&data.policy,'Deadline, actions and policy must remain visible');
+   assert(data.actions,'Essential stage actions must remain visible');
+   assert.equal(data.detailsButtonCount,1,'Stage deadline detail must be opt-in');
+   assert(!data.deadline&&!data.policy,'Deadline and penalty panels must not mount before requested');
    const overlap=(a,b)=>Math.min(a.right,b.right)-Math.max(a.left,b.left)>2
     &&Math.min(a.bottom,b.bottom)-Math.max(a.top,b.top)>2;
    for(const control of data.flowControls){
@@ -102,28 +105,24 @@ async function check(){
    const minVisible=width>=1121?5:width>650?6:3;
    assert(data.visibleStageRows>=minVisible,'Expanded list must show additional stages at '+width+'px: '+JSON.stringify({visible:data.visibleStageRows,minVisible}));
    if(width>=1200){
-    const gap=data.deadline.top-data.list.bottom;
-    assert(gap>=10&&gap<=30,'Deadline must follow list with consistent spacing at '+width+'px: '+JSON.stringify({gap,list:data.list,deadline:data.deadline}));
+    assert(data.list.bottom<=data.sidebar.bottom+3,'Collapsed list must remain within sidebar at '+width+'px');
    }
-   assert(data.actions.bottom<=data.policy.top+3,'Stage actions must precede the long policy form at '+width+'px');
+   assert(data.actions.bottom<=data.inspector.bottom+3,'Stage actions must remain within the inspector at '+width+'px');
    if(width>=1200){
-    assert(data.deadline.right<=data.inspector.left+3,'Desktop deadline summary must occupy the left column at '+width+'px');
+    assert(data.sidebar.right<=data.inspector.left+3,'Desktop sidebar must remain left of inspector at '+width+'px');
     assert(Math.abs(data.sidebar.top-data.inspector.top)<=2,
      'Desktop panels must start on the same line at '+width+'px: '+JSON.stringify(data));
     assert(Math.abs(data.sidebar.bottom-data.inspector.bottom)<=2,
      'Stage sidebar and inspector must have aligned bottom edges at '+width+'px: '+JSON.stringify({
       sidebar:data.sidebar,inspector:data.inspector
      }));
-    assert(Math.abs(data.deadline.bottom-data.policy.bottom)<=2,
-     'ACTUAL deadline-and-consequences and late-rule editor bottoms must align at '+width+'px: '+JSON.stringify({
-      deadline:data.deadline,policy:data.policy,sidebar:data.sidebar,inspector:data.inspector
-     }));
+    assert(data.sidebar.bottom>=data.list.bottom-3,'Collapsed sidebar must contain the stage list at '+width+'px');
     assert(Math.abs(data.manager.bottom-data.inspector.bottom)<=2,
      'Visible outer left panel border and right inspector border must end on the same line at '+width+'px: '+JSON.stringify({
       manager:data.manager,inspector:data.inspector
      }));
    }else{
-    assert(data.deadline.top>=data.inspector.bottom-3,'Narrow screens must put deadline summary below stage settings at '+width+'px');
+    assert(data.list.right<=data.width+3,'Narrow stage list must stay within the viewport at '+width+'px');
    }
     assert.equal(await frame.locator('#teacher-tab-blitz').count(),1,'Blitz workspace must be navigable');
    assert(data.scroll<=data.width+3,'Stage management overflows at '+width+'px: '+JSON.stringify(data));
