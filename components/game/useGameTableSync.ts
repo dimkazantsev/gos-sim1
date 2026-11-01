@@ -37,7 +37,7 @@ export function notifyGameDataRefresh(gameId:string,table?:string){
 // subscription per widget multiplies catalog work in Realtime. Keep these
 // views eventually consistent through local invalidation, focus/online
 // recovery and a low-frequency visible-tab poll.
-export function useGameTableSync(gameId:string|undefined,_tables:readonly string[],load:()=>Promise<unknown>,scope='',onlyTable?:string,minRefreshMs=750,fallbackMs=60000){
+export function useGameTableSync(gameId:string|undefined,_tables:readonly string[],load:()=>Promise<unknown>,scope='',onlyTable?:string,minRefreshMs=750,fallbackMs=60000,initialDelayMs=0){
  const latest=useRef(load);latest.current=load;
  const tableKey=_tables.join('|');
  useEffect(()=>{
@@ -75,7 +75,10 @@ export function useGameTableSync(gameId:string|undefined,_tables:readonly string
    if(!onlyTable&&detail.table&&_tables.length&&!_tables.includes(detail.table))return;
    schedule();
   }
-  void flush();
+  // Only explicitly opted-in nonessential counters wait during mass login.
+  // Direct mutations and Realtime invalidations still schedule an immediate read.
+  if(initialDelayMs>0)schedule(initialDelayMs);
+  else void flush();
   // Fall back without aligning all classroom tabs and stage widgets on the same tick.
   const poll=setInterval(()=>{
     if(document.visibilityState!=='visible')return;
@@ -90,5 +93,5 @@ export function useGameTableSync(gameId:string|undefined,_tables:readonly string
   const eventName=onlyTable?KSRF_PROPOSAL_REFRESH_EVENT:GAME_DATA_REFRESH_EVENT;
   window.addEventListener(eventName,local);document.addEventListener('visibilitychange',visible);
   return()=>{disposed=true;clearTimeout(timer);clearInterval(poll);window.removeEventListener('focus',visible);window.removeEventListener('online',online);window.removeEventListener(eventName,local);document.removeEventListener('visibilitychange',visible)};
- },[gameId,scope,onlyTable,tableKey,minRefreshMs,fallbackMs]);
+ },[gameId,scope,onlyTable,tableKey,minRefreshMs,fallbackMs,initialDelayMs]);
 }
