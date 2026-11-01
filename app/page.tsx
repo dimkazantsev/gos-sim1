@@ -56,6 +56,7 @@ export default function Home(){
  const [teacherLogin,setTeacherLogin]=useState(false);
  const [loginEmail,setLoginEmail]=useState(''),[loginPassword,setLoginPassword]=useState(''),[loginGameCode,setLoginGameCode]=useState(''),[recoverySent,setRecoverySent]=useState(false);
  const [savedGameCodes,setSavedGameCodes]=useState<string[]>([]);
+ const [returningGames,setReturningGames]=useState<Array<{id:string;kind:'student'|'observer';code:string;title:string}>>([]);
  const [fromSharedLink,setFromSharedLink]=useState(false);
  useEffect(()=>setFromSharedLink(!!incomingSectionSuffix()),[]);
  useEffect(()=>{
@@ -151,6 +152,58 @@ export default function Home(){
   }catch(e){setError(readableError(e))}finally{unlockEntry()}
  }
 
+ // Re-enter by the already authenticated identity, not by name or a shared
+ // classroom invitation. This works for anonymous sessions in the same browser
+ // as well as permanent student accounts; it never creates a new Auth user.
+ async function resumeExistingParticipant(){
+  if(!lockEntry())return;
+  setReturningGames([]);
+  try{
+   const {data:auth,error:authError}=await supabase.auth.getSession();
+   if(authError)throw authError;
+   const userId=auth.session?.user?.id;
+   if(!userId){
+    setMode('student');setTeacherLogin(false);setPersonalLogin(true);
+    setError('В этом браузере нет действующей сессии. Войдите с личной почтой и паролем, чтобы вернуть свою игру.');
+    return;
+   }
+   if(!auth.session!.user.is_anonymous){
+    const {data:teacherProfile,error:teacherError}=await supabase.from('teacher_profiles')
+     .select('user_id').eq('user_id',userId).maybeSingle();
+    if(teacherError)throw teacherError;
+    if(teacherProfile){
+     setTeacherLogin(true);setPersonalLogin(true);
+     setError('Это учётная запись преподавателя. Используйте отдельный кабинет преподавателя.');
+     return;
+    }
+   }
+   // Both related tables enforce membership RLS; revoked/archived accounts
+   // must not appear. The teacher remains in the separate protected cabinet.
+   const {data:rows,error:membersError}=await supabase.from('game_members')
+    .select('game_id,kind,games!inner(title,game_code)')
+    .eq('user_id',userId).in('kind',['student','observer'])
+    .is('roster_archived_at',null).limit(20);
+   if(membersError)throw membersError;
+   const memberships=(rows??[]) as Array<{game_id:string;kind:'student'|'observer';games:Array<{title:string;game_code:string}>}>;
+   const available=memberships.flatMap(row=>{
+    const game=row.games?.[0];
+    return game?.game_code&&row.game_id
+     ?[{id:row.game_id,kind:row.kind,code:game.game_code,title:game.title||game.game_code}]
+     :[];
+   });
+   if(available.length===1){
+    saveSuccessfulGameCode(available[0].code);
+    router.push('/game/'+available[0].id+incomingSectionSuffix());
+   }else if(available.length>1){
+    setReturningGames(available);
+   }else{
+    setTeacherLogin(false);setPersonalLogin(true);
+    setError('Активных игр для этой учётной записи не найдено. Если Вы уже участвовали, войдите со своей личной почтой и паролем. Преподаватель входит через отдельный кабинет.');
+   }
+  }catch(e){setError(readableError(e))}
+  finally{unlockEntry()}
+ }
+
  async function login(e:FormEvent){
   e.preventDefault();if(!lockEntry())return;
   let phase:'authentication'|'session'|'game'='authentication';
@@ -243,6 +296,15 @@ export default function Home(){
       <div className={'entryFieldRow '+(mode==='teacher'?'single':'')}><label className="entryField">Код игры<input name="gameCode" autoComplete="off" autoCapitalize="none" spellCheck={false} value={gameCode} onChange={e=>setGameCode(e.target.value)} placeholder="Например, 8.414" minLength={2} required/><small>Идентификатор конкретной игры, сообщённый преподавателем.</small></label>{mode==='student'&&<label className="entryField">Группа<input name="group" value={group} onChange={e=>setGroup(e.target.value)} placeholder="Для общего приглашения; при приглашении группы заполнять не нужно"/></label>}</div>
       <div className="entryField"><label htmlFor="invite-code">{mode==='teacher'?'Приглашение преподавателя':mode==='guest'?'Приглашение гостя':'Приглашение участника'}</label><span className="entrySecret"><input id="invite-code" name="inviteCode" autoComplete={createMode?'new-password':'current-password'} type={showCode?'text':'password'} minLength={mode==='guest'?6:4} value={invite} onChange={e=>setInvite(e.target.value)} required aria-describedby="code-hint"/><button type="button" onClick={()=>setShowCode(!showCode)} aria-label={showCode?'Скрыть код':'Показать код'} aria-pressed={showCode}>{showCode?<EyeOff/>:<Eye/>}</button></span><small id="code-hint">{mode==='teacher'?(createMode?'Придумайте код из 4 или более символов.':'Используйте код преподавателя, заданный при создании игры.'):mode==='guest'?'Предоставляет просмотр разрешённых разделов без участия в принятии решений.':mode==='student'?'Приглашение участника разрешает вход; приглашение группы автоматически привяжет группу.':'Отдельное приглашение, полученное от преподавателя.'}</small></div>
       {mode==='teacher'&&createMode&&<div className="entryField"><label htmlFor="student-code">Начальное приглашение участников</label><input id="student-code" name="studentCode" type="password" autoComplete="new-password" minLength={4} value={studentCode} onChange={e=>setStudentCode(e.target.value)} required aria-describedby="student-code-hint"/><small id="student-code-hint">Не должен совпадать с кодом преподавателя.</small></div>}
+      {(mode==='student'||mode==='guest')&&<>
+       <button type="button" className="entryPersonalSwitch entryResumeButton" disabled={busy} onClick={resumeExistingParticipant}><ArrowRight size={17}/> Я уже участвую — продолжить игру</button>
+       {returningGames.length>1&&<div className="entryRememberedGameField" aria-label="Выбор своей игры">
+        <strong>Ваши доступные игры</strong>
+        {returningGames.map(game=><button key={game.id} type="button" className="entryPersonalSwitch" disabled={busy} onClick={()=>{
+         saveSuccessfulGameCode(game.code);router.push('/game/'+game.id+incomingSectionSuffix());
+        }}>{game.title} · {game.code} · {game.kind==='observer'?'Гость':'Участник'}</button>)}
+       </div>}
+      </>}
       {error&&<div className="errorBox" role="alert">{error}</div>}
       <button className="primary entrySubmit" disabled={busy}>{busy?<><LoaderCircle className="spin" aria-hidden="true"/>Подключаемся…</>:<>{mode==='teacher'&&createMode?'Создать игру':'Войти в игру'}<ArrowRight aria-hidden="true"/></>}</button>
      </fieldset>
