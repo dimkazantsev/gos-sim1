@@ -19,43 +19,78 @@ const restPrefix=url.replace(/\/$/,'')+'/rest/v1/';
 // Limit only low-priority reads. Votes, other writes, and Auth bypass the gate.
 // Bound concurrent low-priority reads per client during classroom joins.
 // Core identity, Auth and every mutation retain their existing priority.
-const READ_CONCURRENCY=3, READ_BACKLOG=24, READ_QUEUE_WAIT_MS=8000;
+const READ_CONCURRENCY=3, READ_BACKLOG=24, READ_QUEUE_WAIT_MS=16000;
 const SAFE_READ_TIMEOUT_MS=14000;
-let activeRestReads=0;
-const waitingRestReads:Array<()=>void>=[];
-function acquireReadSlot(signal?:AbortSignal):Promise<boolean>{
+// Keep one of three transport slots available for foreground chat. Background
+// reads are not permitted to occupy it, even when PostgREST stalls.
+const BACKGROUND_READ_CONCURRENCY=2;
+let activeRestReads=0,activeBackgroundReads=0;
+type ReadWaiter={grant:()=>void;foreground:boolean};
+const waitingRestReads:ReadWaiter[]=[];
+function canStartRead(foreground:boolean){
+ return activeRestReads<READ_CONCURRENCY&&
+  (foreground||activeBackgroundReads<BACKGROUND_READ_CONCURRENCY);
+}
+function acquireReadSlot(signal?:AbortSignal,foreground=false):Promise<boolean>{
  if(signal?.aborted)return Promise.resolve(false);
  if(typeof window==='undefined')return Promise.resolve(true);
- if(activeRestReads<READ_CONCURRENCY&&waitingRestReads.length===0){
-  activeRestReads++;return Promise.resolve(true);
+ if(canStartRead(foreground)&&
+   (foreground?!waitingRestReads.some(waiter=>waiter.foreground):waitingRestReads.length===0)){
+  activeRestReads++;if(!foreground)activeBackgroundReads++;
+  return Promise.resolve(true);
  }
  if(waitingRestReads.length>=READ_BACKLOG)return Promise.resolve(false);
  return new Promise<boolean>(resolve=>{
   let finished=false;
   let timer:ReturnType<typeof setTimeout>;
+  const waiter:ReadWaiter={foreground,grant:()=>{
+   if(finished)return;
+   finished=true;cleanup();
+   activeRestReads++;if(!foreground)activeBackgroundReads++;
+   resolve(true);
+  }};
   const cleanup=()=>{clearTimeout(timer);signal?.removeEventListener('abort',cancel)};
   const cancel=()=>{
    if(finished)return;
    finished=true;cleanup();
-   const index=waitingRestReads.indexOf(grant);
+   const index=waitingRestReads.indexOf(waiter);
    if(index>=0)waitingRestReads.splice(index,1);
    resolve(false);
   };
-  const grant=()=>{
-   if(finished)return;
-   finished=true;cleanup();activeRestReads++;resolve(true);
-  };
-  waitingRestReads.push(grant);
+  // A visible conversation should not wait behind offscreen projections.
+  const firstBackground=waitingRestReads.findIndex(item=>!item.foreground);
+  if(foreground&&firstBackground>=0)waitingRestReads.splice(firstBackground,0,waiter);
+  else waitingRestReads.push(waiter);
   signal?.addEventListener('abort',cancel,{once:true});
   timer=setTimeout(cancel,READ_QUEUE_WAIT_MS);
  });
 }
-function releaseReadSlot(){
+function releaseReadSlot(foreground:boolean){
  if(typeof window==='undefined')return;
  activeRestReads=Math.max(0,activeRestReads-1);
- while(activeRestReads<READ_CONCURRENCY&&waitingRestReads.length){
-  waitingRestReads.shift()?.();
+ if(!foreground)activeBackgroundReads=Math.max(0,activeBackgroundReads-1);
+ while(activeRestReads<READ_CONCURRENCY){
+  const index=waitingRestReads.findIndex(item=>canStartRead(item.foreground));
+  if(index<0)break;
+  const [waiter]=waitingRestReads.splice(index,1);
+  waiter.grant();
  }
+}
+function foregroundRestRead(href:string,method:string){
+ const path=href.slice(restPrefix.length).split('?')[0];
+ return method==='GET'&&/^(?:chat_messages|chat_channels)$/.test(path)||
+  method==='POST'&&/^rpc\/(?:get_my_chat_overview|get_chat_pins_projection|get_game_bootstrap_v2)$/.test(path);
+}
+// Deduplicate only identical READS under exactly the same Auth headers.
+// Key is ephemeral (deleted when transport settles), never logged or cached.
+const identicalReads=new Map<string,Promise<Response>>();
+function identicalReadKey(input:RequestInfo|URL,init:RequestInit|undefined):string|null{
+ if(typeof window==='undefined'||typeof input!=='string'||init?.signal)return null;
+ const method=String(init?.method||'GET').toUpperCase();
+ if(!input.startsWith(restPrefix)||!safeRestRead(input,method))return null;
+ if(init?.body!=null&&typeof init.body!=='string')return null;
+ const headers=[...new Headers(init?.headers).entries()].sort(([a],[b])=>a.localeCompare(b));
+ return JSON.stringify([method,input,headers,init?.body||'']);
 }
 function busyReadResponse(){
  return new Response(JSON.stringify({code:'CLIENT_READ_BUSY',
@@ -73,7 +108,18 @@ async function measuredRequest(input:RequestInfo|URL,init:RequestInit|undefined,
  const started=Date.now(),generation=diagnosticsGeneration,clock=typeof performance==='undefined'?()=>Date.now():()=>performance.now(),tick=clock();
  let status=0,source:RequestDiagnostic['source']='network';
  try{
-  const response=await run();status=response.status;
+  const key=identicalReadKey(input,init);
+  let shared=key?identicalReads.get(key):undefined;
+  if(!shared){
+   shared=run();
+   if(key){
+    identicalReads.set(key,shared);
+    void shared.finally(()=>{if(identicalReads.get(key)===shared)identicalReads.delete(key)}).catch(()=>{});
+   }
+  }
+  const original=await shared;
+  const response=key?original.clone():original;
+  status=response.status;
   try{if(response.headers.get('x-gos-local-limit')==='1')source='local_limit'}catch{/* The request result takes precedence over diagnostics. */}
   return response;
  }finally{
@@ -126,7 +172,8 @@ export const supabase = createClient(url, publishableKey, {
    // Hold a slot only for actual transport; reject stale queued reads locally.
    // POST mutations and Auth never wait behind the classroom read queue.
    const signal=init?.signal||(typeof input==='object'&&'signal' in input?input.signal:undefined);
-   const admitted=!safeRead||await acquireReadSlot(signal??undefined);
+   const foreground=safeRead&&foregroundRestRead(href,method);
+   const admitted=!safeRead||await acquireReadSlot(signal??undefined,foreground);
    if(!admitted)return busyReadResponse();
    let response:Response;
    // Limit only read-only transport. An abort can stop an expensive slow
@@ -150,7 +197,7 @@ export const supabase = createClient(url, publishableKey, {
    finally{
     if(requestTimer!==undefined)clearTimeout(requestTimer);
     signal?.removeEventListener('abort',onAbort);
-    if(safeRead)releaseReadSlot();
+    if(safeRead)releaseReadSlot(foreground);
    }
    if(rest&&response.status===402)restQuotaBlocked=true;
    if(safeRead&&[500,502,503,504,520,524,544].includes(response.status)){
