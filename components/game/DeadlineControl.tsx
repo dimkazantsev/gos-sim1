@@ -5,8 +5,8 @@ import {supabase} from '@/lib/supabase';
 import type {ReturnTypeRepublic} from './viewTypes';
 import {useDialog} from '../ui/useDialog';
 import {AlertTriangle,CalendarClock,ChevronRight,Scale,ShieldAlert,UserRound,UsersRound,X} from 'lucide-react';
-import {notifyGameDataRefresh,useGameTableSync} from './useGameTableSync';
-import {getStageDeadlineRule,type StageDeadlineRule} from './stageDeadlineRuleShared';
+import {GAME_DATA_REFRESH_EVENT,notifyGameDataRefresh,useGameTableSync} from './useGameTableSync';
+import {getStageDeadlineRule,invalidateStageDeadlineRule,type StageDeadlineRule} from './stageDeadlineRuleShared';
 
 type DeadlineIncident={
  id:string;game_id:string;stage_no:number;party_id:string|null;user_id:string|null;
@@ -103,6 +103,16 @@ export default function DeadlineControl({g,stageNo}:{g:ReturnTypeRepublic;stageN
   }catch(error){if(scopeCurrent())setError(userError(error))}
   finally{if(scopeCurrent())setPageBusy(false)}
  }
+ // Discard a shared rule snapshot only when that rule changed; keep incident-only reads cheap.
+ useEffect(()=>{
+  if(!game)return;
+  const onRefresh=(event:Event)=>{
+   const d=(event as CustomEvent<{gameId?:string;table?:string}>).detail;
+   if(d?.gameId===game.id&&d.table==='stage_deadline_rules')invalidateStageDeadlineRule(game.id,stageNo);
+  };
+  window.addEventListener(GAME_DATA_REFRESH_EVENT,onRefresh);
+  return()=>window.removeEventListener(GAME_DATA_REFRESH_EVENT,onRefresh);
+ },[game?.id,stageNo]);
  useGameTableSync(me?.user_id?game?.id:undefined,['stage_deadline_incidents','stage_deadline_rules'],()=>load(true),scope,undefined,3000,180000);
  useEffect(()=>{
   if(!game)return;
