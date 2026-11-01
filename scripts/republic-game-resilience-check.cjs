@@ -150,15 +150,15 @@ function harness({effects=false,compiledCode=code}={}){
      agreements:rows('party_agreements').sort((a,b)=>String(b.created_at).localeCompare(String(a.created_at)))
     },error:null,status:200};
    }
-   if(name==='get_game_bootstrap_v2'||name==='get_game_bootstrap_v3'||name==='get_game_entry_v4'){
+   if(name==='get_game_bootstrap_v2'||name==='get_game_bootstrap_v3'||name==='get_game_entry_v4'||name==='get_game_entry_v5'){
     const snapshot={revision,user,gameId,memberKind},id=args.p_game_id;
     // A v4 call is rejected server-side if current game membership is lost.
-    if(name==='get_game_entry_v4'&&failures.has('game_members'))
+    if((name==='get_game_entry_v4'||name==='get_game_entry_v5')&&failures.has('game_members'))
      return{data:null,error:{message:'simulated revoked membership',code:failureCodes.get('game_members')||'42501'},status:403};
     const num=(counts.get('games')||0)+1;counts.set('games',num);
     await holds.get('games:'+num)?.promise;
     const bundled=['games','state_metrics','game_events','chat_channels','game_stages','game_votes','game_evaluations','game_crises','game_documents','game_profiles','formal_documents'];
-    const broken=bundled.find(table=>failures.has(table));
+    const broken=bundled.filter(table=>name!=='get_game_entry_v5'||!['game_events','game_evaluations','game_documents'].includes(table)).find(table=>failures.has(table));
     if(broken)return{data:null,error:{message:'simulated read outage '+broken,code:failureCodes.get(broken)||'PGRST123'},status:400};
     const game={id,current_round:snapshot.revision,title:'revision-'+snapshot.revision};
     const fixtureRows=(table,defaults)=>{
@@ -177,13 +177,17 @@ function harness({effects=false,compiledCode=code}={}){
      formal_documents:fixtureRows('formal_documents',[])
       .map(row=>name!=='get_game_bootstrap_v2'?{...row,body_text:null,metadata:{}}:row)
     };
-    if(name==='get_game_entry_v4'){
+    if(name==='get_game_entry_v4'||name==='get_game_entry_v5'){
      // The fixture emulates the SECURITY INVOKER projection. The student role
      // never becomes teacher and only its own current member is authoritative.
      const member={game_id:id,user_id:snapshot.user,full_name:snapshot.user,kind:snapshot.user==='teacher-a'?snapshot.memberKind:'student'};
      const roster=fixtureRows('game_members',[member]);
      const parties=fixtureRows('game_parties',[{id:'party-'+snapshot.revision,game_id:id,name:'party-'+snapshot.revision}])
       .map(({description,ideology,registration_note,...summary})=>summary);
+     if(name==='get_game_entry_v5'){
+      const {events,evaluations,documents,...lite}=projection;
+      return{data:{...lite,member,roster,parties,intro:true},error:null,status:200};
+     }
      return{data:{...projection,member,roster,parties,intro:true},error:null,status:200};
     }
     return{data:projection,error:null,status:200};
@@ -305,10 +309,11 @@ async function main(){
   assert.equal(h.assetStats().signed,first.signed,'Unchanged Storage paths must reuse session-scoped signed URLs');
   h.dispose();
  });
- await check('Entry v4 reuses all RLS-scoped projections with old-server fallback',async()=>{
+ await check('Entry v5 reuses all RLS-scoped projections with old-server fallback',async()=>{
   const source=fs.readFileSync(path.join(root,'components/game/useRepublicGame.ts'),'utf8');
   const a=source.indexOf('async function loadCoreSections()'),b=source.indexOf('async function hydrateActiveView(',a);
   assert(a>=0&&b>a);
+  assert(source.slice(a,b).includes("supabase.rpc('get_game_entry_v5'"));
   assert(source.slice(a,b).includes("supabase.rpc('get_game_entry_v4'"));
   assert(source.slice(a,b).includes("supabase.rpc('get_game_bootstrap_v3'"),'Old v3 remains only as fallback');
   assert(source.includes(".eq('user_id',uid).maybeSingle()"),'Old-server refresh still rechecks membership');
@@ -323,7 +328,7 @@ async function main(){
   const before=h.stats(),membersBefore=h.readCount('game_members');
   const result=await h.render().publishEvent('Проверка','Текст');
   assert.equal(result,true);
-  assert.equal(h.rpcCount('get_game_entry_v4'),before.started['rpc:get_game_entry_v4'],'News write must not reload entry v4');
+  assert.equal(h.rpcCount('get_game_entry_v5'),before.started['rpc:get_game_entry_v5'],'News write must not reload entry v5');
   assert.equal(h.stats().started.game_events||0,(before.started.game_events||0)+1,'One bounded news read');
   assert.equal(h.writeCount('game_events'),1,'Exactly one news write');
   assert.equal(h.readCount('game_members'),membersBefore,'News write must not reload roster');
@@ -334,7 +339,7 @@ async function main(){
   const before=h.stats(),membersBefore=h.readCount('game_members');
   const result=await h.render().createDocument({title:'Проверка',type:'Документ',body:'Текст'});
   assert.equal(result,true);
-  assert.equal(h.rpcCount('get_game_entry_v4'),before.started['rpc:get_game_entry_v4'],'Document write must not reload entry v4');
+  assert.equal(h.rpcCount('get_game_entry_v5'),before.started['rpc:get_game_entry_v5'],'Document write must not reload entry v5');
   assert.equal(h.stats().started.game_documents||0,(before.started.game_documents||0)+1);
   assert.equal(h.writeCount('game_documents'),1,'Exactly one document write');
   assert.equal(h.readCount('game_members'),membersBefore);
@@ -344,33 +349,36 @@ async function main(){
   const h=harness({effects:true});
   try{
    await h.settle();
-   const before=h.rpcCount('get_game_entry_v4');
+   const before=h.rpcCount('get_game_entry_v5');
    h.fixture('game_events',[{id:'event-new',game_id:'game-a',title:'Новая новость',published_at:'2026-10-26T01:00:00Z'}]);
    h.fixture('game_evaluations',[{id:'evaluation-new',game_id:'game-a',user_id:'teacher-a',stage_no:1,score:4}]);
    h.fixture('game_crises',[{id:'crisis-new',game_id:'game-a',created_at:'2026-10-26T01:00:00Z'}]);
    await h.advance(190000);
-   assert.equal(h.rpcCount('get_game_entry_v4'),before);
-   assert(h.readCount('game_events')>0&&h.readCount('game_evaluations')>0&&h.readCount('game_crises')>0,
-    'Non-published updates must use only their RLS-scoped reads');
-   assert(h.render().events.some(e=>e.id==='event-new'));
-   assert(h.render().evaluations.some(e=>e.id==='evaluation-new'));
+   assert.equal(h.rpcCount('get_game_entry_v5'),before);
+   assert.equal(h.readCount('game_events'),0,'Dashboard must not load hidden history');
+   assert.equal(h.readCount('game_evaluations'),0,'Dashboard must not load hidden grades');
+   assert(h.readCount('game_crises')>0,'Visible global crisis notice remains reconciled');
    assert(h.render().crises.some(e=>e.id==='crisis-new'));
+   h.render().setActiveView('events');await h.settle();
+   assert(h.render().events.some(e=>e.id==='event-new'),'Opening Events restores latest news');
+   h.render().setActiveView('grades');await h.settle();
+   assert(h.render().evaluations.some(e=>e.id==='evaluation-new'),'Opening Grades restores evaluations');
    h.fixture('game_documents',[{id:'document-new',game_id:'game-a',created_at:'2026-10-26T01:00:00Z'}]);
    h.render().setActiveView('documents');await h.settle();await h.advance(3500);
    assert(h.readCount('game_documents')>0,'An older newly opened view must reconcile its own documents');
    assert(h.render().documents.some(d=>d.id==='document-new'));
-   assert.equal(h.rpcCount('get_game_entry_v4'),before,'View reconciliation must not download the full game');
+   assert.equal(h.rpcCount('get_game_entry_v5'),before,'View reconciliation must not download the full game');
   }finally{h.dispose();}
  });
  await check('Connected 40 clients reconcile authority without repeated full entry bundles',async()=>{
   const clients=Array.from({length:40},(_,i)=>{const h=harness({effects:true});h.setUser('student-'+i);return h});
   try{
    await Promise.all(clients.map(h=>h.settle()));
-   const before=clients.map(h=>({entry:h.rpcCount('get_game_entry_v4'),identity:h.rpcCount('get_my_game_identity')}));
+   const before=clients.map(h=>({entry:h.rpcCount('get_game_entry_v5'),identity:h.rpcCount('get_my_game_identity')}));
    await Promise.all(clients.map(h=>h.advance(600001)));
    for(let i=0;i<clients.length;i++){
     const h=clients[i];
-    assert.equal(h.rpcCount('get_game_entry_v4'),before[i].entry,'Periodic connected reconciliation cannot redownload full game');
+    assert.equal(h.rpcCount('get_game_entry_v5'),before[i].entry,'Periodic connected reconciliation cannot redownload full game');
     assert(h.rpcCount('get_my_game_identity')>before[i].identity,'Connected view must still recheck server identity');
     assert.equal(h.render().teacher,false,'Student must stay student');
     assert.equal(h.readCount('game_stages'),0,'Healthy Realtime does not repeatedly scan stages');
@@ -380,9 +388,9 @@ async function main(){
  await check('Disconnected recovery reads only stages and votes and still checks identity',async()=>{
   const h=harness({effects:true});
   try{
-   await h.settle();const before=h.rpcCount('get_game_entry_v4');
+   await h.settle();const before=h.rpcCount('get_game_entry_v5');
    h.channelStatus('CLOSED');await h.advance(85000);
-   assert.equal(h.rpcCount('get_game_entry_v4'),before,'Disconnected poll does not invoke full entry');
+   assert.equal(h.rpcCount('get_game_entry_v5'),before,'Disconnected poll does not invoke full entry');
    assert(h.rpcCount('get_my_game_identity')>=2,'Disconnected poll rechecks membership');
    assert(h.readCount('game_stages')>0,'Offline poll requests current stages');
    assert(h.readCount('game_votes')>0,'Offline poll requests current vote status');
@@ -391,18 +399,18 @@ async function main(){
  await check('Periodic identity check revokes obsolete teacher privileges without full bootstrap',async()=>{
   const h=harness({effects:true});
   try{
-   await h.settle();const before=h.rpcCount('get_game_entry_v4');
+   await h.settle();const before=h.rpcCount('get_game_entry_v5');
    h.setMemberKind('student');await h.advance(190000);await h.settle();
    assert.equal(h.render().teacher,false,'Server demotion must clear teacher UI');
    assert(h.rpcCount('get_my_game_identity')>=2);
   }finally{h.dispose()}
  });
- await check('40 simultaneous entrants use one v4 RPC, no extra roster/party/intro calls',async()=>{
+ await check('40 simultaneous entrants use one v5 RPC, no extra roster/party/intro calls',async()=>{
   const clients=Array.from({length:40},()=>harness({effects:true}));
   try{
    await Promise.all(clients.map(h=>h.settle()));
    for(const h of clients){
-    assert.equal(h.rpcCount('get_game_entry_v4'),1,'One RLS-scoped entry read');
+    assert.equal(h.rpcCount('get_game_entry_v5'),1,'One RLS-scoped entry read');
     assert.equal(h.rpcCount('get_game_bootstrap_v3'),0,'New backend must not fall back');
     assert.equal(h.readCount('game_members'),1,'Identity only, roster is now inside v4');
     assert.equal(h.readCount('game_parties'),0,'Dashboard party summary is served by v4');
@@ -421,44 +429,44 @@ async function main(){
    assert.equal(h.render().teacher,true);
    h.setMemberKind('student');
    await h.render().refresh();await h.settle();
-   assert(h.rpcCount('get_game_entry_v4')>=2,'New core refresh must not use an old cached role');
+   assert(h.rpcCount('get_game_entry_v5')>=2,'New core refresh must not use an old cached role');
    assert.equal(h.render().teacher,false,'A demoted teacher must have student permissions');
   }finally{h.dispose();}
  });
- await check('Failed v4 request recovers without reusing cached initial roles',async()=>{
+ await check('Failed v5 request recovers without reusing cached initial roles',async()=>{
   const h=harness({effects:true});
   try{
-   h.failRpc('get_game_entry_v4','PGRST003');
+   h.failRpc('get_game_entry_v5','PGRST003');
    await h.settle();
    assert.equal(h.rpcCount('get_game_bootstrap_v3'),0,'Backend pool errors must not fan out to legacy reads');
-   h.failRpc('get_game_entry_v4',null);
+   h.failRpc('get_game_entry_v5',null);
    await h.render().refresh();await h.settle();
-   assert(h.rpcCount('get_game_entry_v4')>=2);
+   assert(h.rpcCount('get_game_entry_v5')>=2);
    assert.equal(h.render().teacher,true);
   }finally{h.dispose();}
  });
- await check('Rapid navigation coalesces pending v4 entry reads, later refresh is fresh',async()=>{
+ await check('Rapid navigation coalesces pending v5 entry reads, later refresh is fresh',async()=>{
   const h=harness({effects:true});
   const held=h.hold('games',2);
   try{
    await h.settle();
-   assert.equal(h.rpcCount('get_game_entry_v4'),1);
+   assert.equal(h.rpcCount('get_game_entry_v5'),1);
    h.render().setActiveView('parties');await h.settle();
-   assert.equal(h.rpcCount('get_game_entry_v4'),1);
+   assert.equal(h.rpcCount('get_game_entry_v5'),1);
    held.resolve();await h.settle();
    await h.render().refresh();await h.settle();
-   assert.equal(h.rpcCount('get_game_entry_v4'),2);
+   assert.equal(h.rpcCount('get_game_entry_v5'),2);
   }finally{held.resolve();h.dispose();}
  });
  await check('Missing v4 function retains the prior protected v3 bootstrap',async()=>{
-  const h=harness();h.failRpc('get_game_entry_v4','PGRST202');
+  const h=harness();h.failRpc('get_game_entry_v5','PGRST202');h.failRpc('get_game_entry_v4','PGRST202');
   await h.render().refresh();
   assert(h.rpcCount('get_game_bootstrap_v3')>0);
   assert.equal(h.render().teacher,true);
   h.dispose();
  });
  await check('Missing v4 and v3 functions still use protected v2 bootstrap',async()=>{
-  const h=harness();h.failRpc('get_game_entry_v4','PGRST202');h.failRpc('get_game_bootstrap_v3','PGRST202');
+  const h=harness();h.failRpc('get_game_entry_v5','PGRST202');h.failRpc('get_game_entry_v4','PGRST202');h.failRpc('get_game_bootstrap_v3','PGRST202');
   await h.render().refresh();
   assert(h.rpcCount('get_game_bootstrap_v2')>0);
   assert.equal(h.render().teacher,true);
@@ -470,7 +478,7 @@ async function main(){
    try{
     await h.settle();
     assert.equal(h.render().teacher,false);
-    assert.equal(h.rpcCount('get_game_entry_v4'),1);
+    assert.equal(h.rpcCount('get_game_entry_v5'),1);
    }finally{h.dispose();}
   }
  });
@@ -742,10 +750,18 @@ async function main(){
     assert.equal(current.me,null);assert.equal(current.game,null);
     for(const key of ['ballots','evaluations','crises','documents'])assert.equal(current[key].length,0,key+' must remain cleared');
    }
-   if(transition==='switch user')assert.equal(current.evaluations[0].user_id,'student-b');
-   if(transition==='switch game')assert.equal(current.documents[0].game_id,'game-b');
+   if(transition==='switch user'){
+    h.render().setActiveView('grades');await h.settle();
+    assert.equal(h.render().evaluations[0].user_id,'student-b');
+   }
+   if(transition==='switch game'){
+    h.render().setActiveView('documents');await h.settle();
+    assert.equal(h.render().documents[0].game_id,'game-b');
+   }
    if(transition==='newer refresh'){
-    assert.equal(current.ballots[0].id,'ballot-2');assert.equal(current.evaluations[0].id,'evaluation-2');
+    assert.equal(current.ballots[0].id,'ballot-2');
+    h.render().setActiveView('grades');await h.settle();
+    assert.equal(h.render().evaluations[0].id,'evaluation-2');
    }
    h.dispose();
   });

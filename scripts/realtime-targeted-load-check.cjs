@@ -44,13 +44,13 @@ async function checks(){
  // Stage 8.5: one bounded entry RPC replaces the independent member GET.
  // Hold the RPC and verify its timeout does not block a later authorised read.
  const heldEntry=q.hold('games',q.readCount('games')+1);
- const beforeBootstrap=q.rpcCount('get_game_entry_v4');
+ const beforeBootstrap=q.rpcCount('get_game_entry_v5');
  const refresh=q.render().refresh();for(let n=0;n<4;n++)await tick();
  q.runTimers();await refresh;
  assert.equal(q.rpcCount('get_game_bootstrap_v3'),0,'Timeout must not fan out into legacy table reads');
  heldEntry.resolve();
  await q.render().refresh();
- assert(q.rpcCount('get_game_entry_v4')>beforeBootstrap,'Next entry read must not remain blocked');
+ assert(q.rpcCount('get_game_entry_v5')>beforeBootstrap,'Next v5 entry read must not remain blocked');
  q.dispose();
  const c=harness({effects:true});await c.settle();c.render().setChatOpen(true);await c.settle();const initial=c.stats().started['rpc:mark_chat_channel_read']||0;
  for(let i=0;i<80;i++){c.emit('chat_messages',{id:'m'+i,channel_id:'channel-a',text:'Сообщение',created_at:new Date().toISOString()},'INSERT');await c.settle();await c.advance(125)}

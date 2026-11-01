@@ -37,7 +37,7 @@ async function main(){
   await Promise.all(stale.map(item=>item.pending));
   for(const h of clients){
    assert.equal(h.render().game?.current_round,2,'Late stale response must not overwrite active state');
-   assert.equal(h.rpcCount('get_game_entry_v4'),2,'Two bounded entry RPCs, no runaway retries');
+   assert.equal(h.rpcCount('get_game_entry_v5'),2,'Two bounded v5 entry RPCs, no runaway retries');
    assert.equal(h.readCount('state_metrics'),0,'No redundant legacy fallback when projection works');
    assert.equal(h.writeCount('game_stages'),0,'Recovery must not write or unlock stages');
    assert.equal(h.writeCount('game_ballots'),0,'Recovery must not duplicate ballots');
