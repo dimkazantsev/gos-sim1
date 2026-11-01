@@ -28,6 +28,7 @@ import RepublicComic from './game/RepublicComic';
 import StageComics from './game/StageComics';
 import GuidedTour,{getTourSteps,type TourTarget} from './game/GuidedTour';
 import {useIntroProgress} from './game/introProgress';
+import ChatPanel from './game/ChatPanel';
 
 
 import {AchievementCelebration} from './game/Achievements';
@@ -52,7 +53,7 @@ const VotesView=dynamic(()=>import('./game/VotesView'),{loading:sectionLoading})
 const DocumentsView=dynamic(()=>import('./game/DocumentsView'),{loading:sectionLoading});
 const GradesView=dynamic(()=>import('./game/GradesView'),{loading:sectionLoading});
 const TeacherView=dynamic(()=>import('./game/TeacherView'),{loading:sectionLoading});
-const ChatPanel=dynamic(()=>import('./game/ChatPanel'),{loading:sectionLoading});
+
 const EventWorkspace=dynamic(()=>import('./game/EventWorkspace'),{loading:sectionLoading});
 const BudgetView=dynamic(()=>import('./game/BudgetView'),{loading:sectionLoading});
 
