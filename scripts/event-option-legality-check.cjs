@@ -32,7 +32,7 @@ function harness(){
  const jsx=(type,props)=>({type,props:props||{}}),tag=name=>Object.assign(()=>{},{displayName:name});
  function requireFor(name){if(name==='react')return react;if(name==='react/jsx-runtime')return{jsx,jsxs:jsx,Fragment:'fragment'};if(name==='@/lib/supabase')return{supabase};if(name==='@/lib/userError')return{userError:error=>String(error?.message||error)};if(name==='../../lib/gameLabels')return{gameValueLabel:value=>String(value||'Не указано')};return new Proxy({__esModule:true,default:tag(path.basename(name))},{get:(object,key)=>key in object?object[key]:tag(String(key))});}
  const module={exports:{}};
- vm.runInNewContext('(function(require,module,exports){'+code+'\n})',{console,Date,Promise,Set,Object,Array,String,Number,Math,setInterval:()=>1,clearInterval:()=>{}})(requireFor,module,module.exports);
+ vm.runInNewContext('(function(require,module,exports){'+code+'\n})',{console,Date,Promise,Set,Object,Array,String,Number,Math,document:{visibilityState:'visible'},setInterval:()=>1,clearInterval:()=>{}})(requireFor,module,module.exports);
  function render(){cursor=0;dirty=false;tree=module.exports.default(props);while(effects.length)effects.shift()();return tree;}
  async function settle(){for(let i=0;i<8;i++){render();await tick();if(!dirty)break;}return render();}
  const all=(type,from=tree)=>nodes(from,node=>node.type===type);
