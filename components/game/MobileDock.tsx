@@ -34,7 +34,7 @@ type Gesture={
  pinTimer:ReturnType<typeof setTimeout>|null;
 };
 
-export default function MobileDock({items,activeView,storageKey,editing,setEditing,onNavigate,onAll,onChat,chatOpen=false,chatUnreadCount=0,chatMentionCount=0,allOpen=false}:{
+export default function MobileDock({items,activeView,storageKey,editing,setEditing,onNavigate,onAll,onChat,chatOpen=false,chatUnreadCount=0,chatMentionCount=0,allOpen=false,tourTarget}: {
  items:MobileDockItem[];
  activeView:View;
  storageKey:string;
@@ -47,6 +47,7 @@ export default function MobileDock({items,activeView,storageKey,editing,setEditi
  chatUnreadCount?:number;
  chatMentionCount?:number;
  allOpen?:boolean;
+ tourTarget?:View|'chat';
 }){
  const scrollRef=useRef<HTMLDivElement>(null);
  const gestureRef=useRef<Gesture|null>(null);
@@ -80,7 +81,7 @@ export default function MobileDock({items,activeView,storageKey,editing,setEditi
  useEffect(()=>{setOptimisticView(null)},[activeView,chatOpen,allOpen]);
 
  useEffect(()=>{
-  if(editing||chatOpen||allOpen||pinnedSet.has(activeView))return;
+  if(editing||chatOpen||allOpen||tourTarget||pinnedSet.has(activeView))return;
   const scroller=scrollRef.current;
   const active=scroller?.querySelector<HTMLButtonElement>('[data-dock-item][aria-current="page"]');
   if(!scroller||!active)return;
@@ -89,6 +90,18 @@ export default function MobileDock({items,activeView,storageKey,editing,setEditi
    scroller.scrollTo({left:Math.max(0,left-(scroller.clientWidth-active.offsetWidth)/2),behavior:'smooth'});
   }
  },[activeView,order,pinned,editing]);
+
+ // During the tour follow the *next* control, not the previously active view.
+ // A single immediate scroll per step avoids competing smooth animations.
+ useEffect(()=>{
+  if(!tourTarget||allOpen)return;
+  const scroller=scrollRef.current;
+  const selector=tourTarget==='chat'?'.mobileDockChat':`[data-tour-view="${tourTarget}"]`;
+  const target=scroller?.querySelector<HTMLButtonElement>(selector);
+  if(!scroller||!target)return;
+  const left=target.offsetLeft-scroller.offsetLeft;
+  scroller.scrollTo({left:Math.max(0,left-(scroller.clientWidth-target.offsetWidth)/2),behavior:'auto'});
+ },[tourTarget,order,pinned,allOpen]);
 
  function clearGesture(){
   const g=gestureRef.current;
