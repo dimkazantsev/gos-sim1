@@ -1,7 +1,7 @@
 'use client';
 import {useEffect,useRef,useState} from 'react';
 import {supabase} from '@/lib/supabase';
-import {GAME_DATA_REFRESH_EVENT,SECTION_UPDATES_REFRESH_EVENT,gameRealtimeConnected,notifySectionUpdates} from './useGameTableSync';
+import {GAME_DATA_REFRESH_EVENT,SECTION_UPDATES_REFRESH_EVENT,gameRealtimeConnected} from './useGameTableSync';
 import type {View} from './types';
 
 const READABLE_SECTIONS=new Set<View>(['dashboard','stages','parties','votes','documents','actions','events','teacher']);
