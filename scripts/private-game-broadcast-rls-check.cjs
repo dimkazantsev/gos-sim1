@@ -70,7 +70,11 @@ async function sqlTest(){
 async function hookTest(){
  const clients=Array.from({length:100},(_,i)=>{const h=harness({effects:true});h.setUser('student-'+i);return h});
  try{
-  await Promise.all(clients.map(async h=>{await h.settle();h.render().setActiveView('parties');await h.settle()}));
+  await Promise.all(clients.map(async h=>{
+   await h.settle();h.render().setActiveView('parties');await h.settle();
+   // The new party-document contract hydrates only the explicitly selected dossier.
+   await h.render().loadSelectedPartyDocuments('party-1');await h.settle();
+  }));
   for(const h of clients){
    const rooms=h.channelsInfo();
    assert.equal(rooms.length,1,'One shared game channel per tab');
