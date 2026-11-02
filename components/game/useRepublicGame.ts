@@ -658,9 +658,15 @@ export function useRepublicGame(gameId:string){
   for(const table of ['parliamentary_election_rules','regional_election_rules']){
    channel.on('postgres_changes',{event:'*',schema:'public',table,filter:'game_id=eq.'+gameId},()=>notifyGameDataRefresh(gameId,table));
   }
-  for(const table of ['duma_sessions','duma_agenda_items','institution_session_registrations','bill_amendments','bill_amendment_packs']){
-   channel.on('postgres_changes',{event:'*',schema:'public',table,filter:'game_id=eq.'+gameId},()=>notifyGameDataRefresh(gameId,table));
-  }
+  // Five low-frequency Duma procedure tables share one authorised Broadcast
+  // invalidation instead of five per-client Postgres Changes bindings. Only
+  // table names travel over this private channel; rows still load under RLS.
+  const dumaTables=new Set(['duma_sessions','duma_agenda_items','institution_session_registrations','bill_amendments','bill_amendment_packs']);
+  channel.on('broadcast',{event:'duma_procedure_changed'},payload=>{
+   if(!currentConnection())return;
+   const table=payload.payload?.table;
+   if(typeof table==='string'&&dumaTables.has(table))notifyGameDataRefresh(gameId,table);
+  });
   liveRef.current=channel;
   // The already-private game channel also carries low-frequency Presence.
   // Supabase assigns an ephemeral presence key. Never publish user IDs, roles,
