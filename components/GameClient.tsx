@@ -53,6 +53,7 @@ const PartiesView=dynamic(()=>import('./game/PartiesView'),{loading:sectionLoadi
 const VotesView=dynamic(()=>import('./game/VotesView'),{loading:sectionLoading});
 const DocumentsView=dynamic(()=>import('./game/DocumentsView'),{loading:sectionLoading});
 const GradesView=dynamic(()=>import('./game/GradesView'),{loading:sectionLoading});
+const MandatoryStageAnalysis=dynamic(()=>import('./game/MandatoryStageAnalysis'),{loading:()=>null});
 const TeacherView=dynamic(()=>import('./game/TeacherView'),{loading:sectionLoading});
 
 const EventWorkspace=dynamic(()=>import('./game/EventWorkspace'),{loading:sectionLoading});
@@ -214,6 +215,12 @@ function buildStudentPreview(g:ReturnTypeRepublic,student:Member){
 
 export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:string;initialMobileMenuOpen?:boolean}){
  const g=useRepublicGame(gameId);
+ // The compulsory form and its code remain completely absent until a stage is closed.
+ const completedAnalysisKey=g.stages.filter(s=>s.status==='completed').map(s=>s.stage_no).sort((a,b)=>a-b).join(',');
+ const [clearedAnalysis,setClearedAnalysis]=useState<{scope:string;key:string}|null>(null);
+ const analysisScope=gameId+':'+(g.me?.user_id||'');
+ const pendingAnalysis=!!completedAnalysisKey&&g.coreLoaded&&!g.loading&&g.me?.kind==='student'&&!g.teacher&&
+  !(clearedAnalysis?.scope===analysisScope&&clearedAnalysis.key===completedAnalysisKey);
  const [screenHistory,setScreenHistory,navigationHydrated,navigationRestored]=useSavedGameState<{entries:ScreenLocation[];index:number}>(gameId,g.me?.user_id,'navigation',{
   entries:[{view:'dashboard',stageNo:0,documentId:''}],index:0
  },validScreenHistory);
@@ -797,6 +804,10 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
     </section>
    </div>} <BlitzOverlay gameId={gameId} userId={me.user_id} stageKey={g.currentStage?g.currentStage.stage_no+':'+g.currentStage.status+':'+(g.currentStage.opened_at||''):''} enabled={g.coreLoaded&&me?.kind==='student'&&!previewMode&&!introOpen&&!onboardingRequired&&tourMode==='idle'&&!stageComicOpen}/>
   <AchievementCelebration gameId={gameId} userId={me?.user_id} enabled={g.coreLoaded&&me?.kind==='student'&&!previewMode&&!introOpen&&!stageComicOpen}/>
+  {pendingAnalysis&&!previewMode&&!introOpen&&!onboardingRequired&&tourMode==='idle'&&!stageComicOpen&&
+   <MandatoryStageAnalysis key={analysisScope+':'+completedAnalysisKey} gameId={gameId} userId={g.me!.user_id}
+    completedStages={g.stages.filter(s=>s.status==='completed').map(s=>({stage_no:s.stage_no,title:s.title}))}
+    onComplete={()=>setClearedAnalysis({scope:analysisScope,key:completedAnalysisKey})}/>}
   <StageComics key={gameId+':'+me?.user_id} gameId={gameId} userId={me?.user_id||''} stages={g.stages} enabled={g.coreLoaded&&!g.loading&&!previewMode&&!introOpen&&!onboardingRequired&&tourMode==='idle'} onOpenChange={setStageComicOpen}/>
   <RepublicComic gameId={gameId} intro open={introOpen} onClose={()=>void finishIntro()}/>
   <MobileDock items={dockItems} activeView={view} storageKey={'gos-sims-dock:'+shownMe.user_id+(teacher&&!previewMode?':teacher':':student')} editing={mobileDockEditing} setEditing={setMobileDockEditing} onNavigate={k=>{if(k==='profile')setSelectedProfileId('');navigate(k,undefined,false,true)}} onChat={()=>{setMobileMenuOpen(false);toggleTourChat()}} chatOpen={chatOpen} chatUnreadCount={g.chatUnreadCount} chatMentionCount={g.chatMentionCount} allOpen={mobileMenuOpen} onAll={()=>{setChatOpen(false);setMobileMenuOpen(true)}}/></div>;
