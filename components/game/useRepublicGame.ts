@@ -142,7 +142,7 @@ export function useRepublicGame(gameId:string){
   // Message bodies arrive via the game Realtime socket; this RPC updates
   // only the derived chat overview. Coalesce bursts from 100 clients without
   // delaying delivery of messages or explicit read receipts.
-  const delay=Math.max(0,8000-(Date.now()-lastRealtimeOverviewAt.current));
+  const delay=Math.max(0,12000-(Date.now()-lastRealtimeOverviewAt.current));
   overviewRealtimeTimer.current=setTimeout(()=>{
    overviewRealtimeTimer.current=null;
    if(!alive.current||!authUser.current||document.visibilityState==='hidden')return;
@@ -192,7 +192,7 @@ export function useRepublicGame(gameId:string){
  const lastPresenceWrite=useRef({scope:'',view:'',at:0});
  const pendingPresenceWrite=useRef<{scope:string;view:string;label?:string}|null>(null);
  const presenceFlushTimer=useRef<ReturnType<typeof setTimeout>|null>(null);
- const PRESENCE_MIN_WRITE_INTERVAL_MS=12000;
+ const PRESENCE_MIN_WRITE_INTERVAL_MS=20000;
  const officeReadState=useRef({scope:'',lastSuccessAt:0,lastAttemptAt:0,inflight:null as Promise<void>|null});
  type PartyRead={data:Party[]|null;error:{message:string;code?:string}|null};
  const partyReadState=useRef({scope:'',lastSuccessAt:0,rows:null as Party[]|null,full:false,
