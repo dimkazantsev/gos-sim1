@@ -66,6 +66,9 @@ export default function PartiesView({g}:{g:ReturnTypeRepublic}){
  const inviteClosed=!!selected?.leader_user_id;
  const workflowCount=partyInvitations.filter(i=>i.game_id===g.game?.id&&i.status==='pending'&&i.invited_user_id===me?.user_id).length;
  const canRename=!!selected&&!!me&&(teacher||selected.leader_user_id===me.user_id);
+ useEffect(()=>{
+  if(selected)void g.loadSelectedPartyDocuments(selected.id);
+ },[selected?.id,selected?.registration_status,g.game?.id]);
  const officialRevisionKey=g.formalDocuments.filter(d=>['party_certificate','justice_response'].includes(d.doc_type))
   .map(d=>d.id+':'+d.updated_at).sort().join('|');
  useEffect(()=>{

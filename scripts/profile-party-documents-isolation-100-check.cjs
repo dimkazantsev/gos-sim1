@@ -43,7 +43,7 @@ function client(view='profile'){
  const supabase={from(table){
   assert(Object.hasOwn(db,table),'Unexpected database table '+table);
   const query={
-   select(){return this},eq(){return this},order(){return this},
+   select(){return this},eq(){return this},in(){return this},order(){return this},
    then(ok,fail){
     reads.push(table);
     return Promise.resolve({data:db[table],error:null}).then(ok,fail);
@@ -53,7 +53,10 @@ function client(view='profile'){
  }};
  const context={
   Promise,Map,console,module:{exports:{}},supabase,gameId:'game-1',
-  activeViewRef:{current:view},PROFILE_ASSET_COLUMNS,mergeProfileAssetRows,
+  activeViewRef:{current:view},teacherWorkspaceRef:{current:'parties'},
+  selectedPartyDocuments:{current:null},PARTY_DOCUMENT_COLUMNS:'id,game_id,party_id,version_no',
+  PROFILE_ASSET_COLUMNS,mergeProfileAssetRows,
+  limitedCoreRead:async result=>await result,
   loadCachedParties:()=>Promise.resolve({data:[{id:'p1',logo_path:null}],error:null}),
   readSafely:async(scopes,reader)=>{scopeCalls.push(scopes);await reader({})},
   readCurrent:()=>true,requireSuccessful:()=>{},
@@ -85,6 +88,8 @@ const flush=()=>new Promise(resolve=>setImmediate(resolve));
 
  const party=client('parties');
  await party.loadPartyAssets(true);
+ assert.equal(party.documents.length,0,'No party document before a party is selected');
+ await party.loadSelectedPartyDocuments('p1');
  await flush();
  assert.deepEqual([...party.reads].sort(),['game_profiles','party_documents'].sort(),
   'Party screen keeps full document and profile functionality');
