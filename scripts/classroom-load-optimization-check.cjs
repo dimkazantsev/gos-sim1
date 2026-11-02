@@ -12,7 +12,7 @@ const expectedTables=['duma_sessions','duma_agenda_items','institution_session_r
 for(const table of expectedTables){
  assert(broadcastSql.includes("'"+table+"'"),'Missing trigger for '+table);
  assert(source.includes("'"+table+"'"),'Missing live client invalidation for '+table);
- assert(!source.includes("table,filter:'game_id=eq.'+gameId},()=>notifyGameDataRefresh(gameId,table)"),'Old five subscriptions must be removed');
+ assert(!source.includes("for(const table of ['duma_sessions','duma_agenda_items','institution_session_registrations','bill_amendments','bill_amendment_packs'])"),'Old five subscriptions must be removed');
 }
 assert(source.includes("channel.on('broadcast',{event:'duma_procedure_changed'}"),'One private handler required');
 assert(source.includes("if(typeof table==='string'&&dumaTables.has(table))notifyGameDataRefresh(gameId,table)"),'Only allowlisted table may dispatch');
