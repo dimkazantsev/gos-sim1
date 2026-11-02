@@ -40,6 +40,7 @@ export default function GradesView({g,compact=false,onOpenProfile,onPublicScores
  const loadRequest=useRef(0);
  const [evidence,setEvidence]=useState<Evidence|null>(null);
  const [loadingEvidence,setLoadingEvidence]=useState(false);
+ const [selectedDebrief,setSelectedDebrief]=useState<string|null>(null);
  const [editScore,setEditScore]=useState<number|null>(null);
  const [note,setNote]=useState('');
  const [busy,setBusy]=useState(false);
@@ -198,15 +199,18 @@ export default function GradesView({g,compact=false,onOpenProfile,onPublicScores
   setSelected({userId,stageNo});
   setEditScore(finalScoreChoice(a));
   setNote(a?.teacher_note||'');
-  setEvidence(null);setRuns([]);
+  setEvidence(null);setRuns([]);setSelectedDebrief(null);
   if(!game||(!teacher&&(userId!==me?.user_id||authId!==me.user_id)))return;
   setLoadingEvidence(true);
   const requests:any[]=[supabase.rpc('get_stage_assessment_evidence',{p_game_id:game.id,p_user_id:userId,p_stage_no:stageNo})];
   if(a)requests.push(supabase.from('stage_assessment_runs').select('id,assessment_id,run_type,auto_score,criterion_law,criterion_strategy,criterion_debrief,created_at').eq('assessment_id',a.id).order('created_at',{ascending:false}).limit(50));
-  const rr=await Promise.all(requests);
+  // Read the full student analysis only when the teacher opens this assessment.
+  const debriefRequest=teacher?supabase.from('stage_debriefs').select('body').eq('game_id',game.id).eq('user_id',userId).eq('stage_no',stageNo):null;
+  const [rr,deb]=await Promise.all([Promise.all(requests),debriefRequest]);
   if(request!==evidenceRequest.current||activeScope.current!==requestedScope)return;
   if(!rr[0].error)setEvidence((rr[0].data||{}) as Evidence);
   if(rr[1]&&!rr[1].error)setRuns((rr[1].data||[]) as Run[]);
+  if(teacher&&deb&&!deb.error)setSelectedDebrief((deb.data||[])[0]?.body||'');
   setLoadingEvidence(false);
  }
  const assessment=selected?rows.find(x=>x.user_id===selected.userId&&x.stage_no===selected.stageNo):undefined;
@@ -321,12 +325,12 @@ export default function GradesView({g,compact=false,onOpenProfile,onPublicScores
     <footer className="gradesDebriefFooter"><div aria-live="polite"><strong>{targetAssessment?.status==='final'?'Оценка утверждена':debrief.trim().length+' знаков'}</strong><span>Минимум 40 знаков для отправки</span></div><button type="button" className="primary" disabled={!canWriteDebrief||busy||debrief.trim().length<40} onClick={()=>void submitDebrief()}>{busy?'Сохранение…':'Сдать / обновить разбор'}</button></footer>
    </section>}
 
-  {selected&&selectedScope.current===loadScope&&<AssessmentModal g={g} assessment={assessment} selected={selected} student={selectedStudent} evidence={evidence} runs={runs} loading={loadingEvidence} teacher={teacher} editScore={editScore} setEditScore={setEditScore} note={note} setNote={setNote} busy={busy} close={()=>{evidenceRequest.current++;setSelected(null)}} ensureDraft={ensureDraft} recalc={recalc} finalize={finalize} reopen={reopen}/>}
+  {selected&&selectedScope.current===loadScope&&<AssessmentModal g={g} assessment={assessment} selected={selected} student={selectedStudent} evidence={evidence} runs={runs} loading={loadingEvidence} teacher={teacher} selectedDebrief={selectedDebrief} editScore={editScore} setEditScore={setEditScore} note={note} setNote={setNote} busy={busy} close={()=>{evidenceRequest.current++;setSelected(null)}} ensureDraft={ensureDraft} recalc={recalc} finalize={finalize} reopen={reopen}/>}
  </div>;
 }
 
 function AssessmentModal(p:any){
- const {g,assessment:a,selected,student,evidence,runs,loading,teacher,editScore,setEditScore,note,setNote,busy,close,ensureDraft,recalc,finalize,reopen}=p;
+ const {g,assessment:a,selected,student,evidence,runs,loading,teacher,selectedDebrief,editScore,setEditScore,note,setNote,busy,close,ensureDraft,recalc,finalize,reopen}=p;
  const dialogRef=useDialog(true,close);
  const v=shownScore(a);
  const canSeeEvidence=teacher||(selected.userId===g.me?.user_id&&a?.id?.startsWith('public-')===false);
@@ -350,6 +354,10 @@ function AssessmentModal(p:any){
 
   </>}
   {a&&runs?.length>0&&<details className="gradeRunHistory"><summary>История автоматических пересчётов <span>{runs.length}</span></summary><div>{runs.map((r:Run)=><article key={r.id}><time className="gradeRunTime">{when(r.created_at)}</time><b className="gradeRunScore">{r.auto_score}/3 · {level(r.auto_score)}</b><span className="gradeRunTrigger">{assessmentRunLabel(r.run_type)}</span><em className="gradeRunCriteria">{r.criterion_law?'Право ✓':'Право ○'} · {r.criterion_strategy?'Стратегия ✓':'Стратегия ○'} · {r.criterion_debrief?'Анализ ✓':'Анализ ○'}</em></article>)}</div></details>}
+  {teacher&&<section className="gradeEvidence" aria-label="Анализ этапа студента">
+   <div className="gradeEvidenceHead"><div><small>ЛИЧНЫЙ АНАЛИЗ</small><h3>Анализ этапа студента</h3></div></div>
+   {loading?<p>Загрузка анализа…</p>:selectedDebrief?<p style={{whiteSpace:'pre-wrap',overflowWrap:'anywhere'}}>{selectedDebrief}</p>:<p>Анализ этапа ещё не отправлен.</p>}
+  </section>}
   {canSeeEvidence&&<section className="gradeEvidence"><div className="gradeEvidenceHead"><div><small>ДОКАЗАТЕЛЬСТВА</small><h3>Все зафиксированные действия на этапе</h3></div></div>{loading?<div className="emptyState">Собираю данные…</div>:evidence?<Evidence evidence={evidence}/>:<div className="emptyState">Доказательства ещё не загружены.</div>}</section>}
   {!canSeeEvidence&&<div className="gradePrivacy">Подробные тексты и действия доступны только самому студенту и преподавателю.</div>}
  </article></div>;
