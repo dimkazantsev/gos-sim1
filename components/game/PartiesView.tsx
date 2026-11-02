@@ -4,7 +4,7 @@ import JusticeDocuments from './JusticeDocuments';
 import PartyChairElection from './PartyChairElection';
 import {isStageWorkOpen} from './stageWorkStatus';
 import {useEffect,useMemo,useRef,useState,type ComponentType} from 'react';
-import {latestPartyDocuments,latestPartyDocument,partyDocumentVersionLabel,partyDocumentVerdict} from './partyDocumentVersions';
+import {partyDocumentVersionLabel,partyDocumentVerdict} from './partyDocumentVersions';
 import {IconAction} from '../ui/IconAction';
 import {BookOpen,ChevronDown,CircleAlert,ExternalLink,FileText,PencilLine,Plus,Trash2,Upload,UserPlus,UsersRound} from 'lucide-react';
 import StyledSelect from '../ui/StyledSelect';
@@ -38,9 +38,25 @@ export default function PartiesView({g}:{g:ReturnTypeRepublic}){
    ?(teacher?'Первый этап приостановлен. Преподаватель может продолжать актуализацию документов зарегистрированных партий.':'Первый этап приостановлен. Изменения временно недоступны. Сведения о партиях и результаты можно просматривать.')
    :'Первый этап ещё не открыт. Работа с партиями начнётся после его открытия преподавателем. Пока доступны сведения о партиях и результатах.';
  const canCreate=partyFormationOpen&&(!!teacher||(me?.kind==='student'&&!me.team&&!me.roster_archived_at));
- const ranked=useMemo(()=>[...parties].filter(p=>!query.trim()||[p.name,p.ideology,p.description].join(' ').toLowerCase().includes(query.toLowerCase())).sort((a,b)=>b.support-a.support),[parties,query]);
+ const normalizedQuery=query.trim().toLocaleLowerCase();
+ const ranked=useMemo(()=>[...parties].filter(p=>!normalizedQuery||[p.name,p.ideology,p.description].join(' ').toLocaleLowerCase().includes(normalizedQuery)).sort((a,b)=>b.support-a.support),[parties,normalizedQuery]);
+ // Index once per collection update instead of rescanning profiles and mandates for every roster entry.
+ const profileByUser=useMemo(()=>new Map(profiles.map(p=>[p.user_id,p])),[profiles]);
+ const mandateByUser=useMemo(()=>new Map(partyMandates.map(m=>[m.user_id,m])),[partyMandates]);
  const selected=parties.find(p=>p.id===selectedId)||parties.find(p=>p.name===me?.team)||ranked[0],own=!!selected&&(teacher||selected.name===me?.team),canEditDescription=partyFormationOpen&&!!selected&&(teacher||selected.leader_user_id===me?.user_id),canUploadLogo=partyFormationOpen&&!!selected&&(teacher||me?.kind==='student'&&!me.roster_archived_at&&selected.name===me.team),staff=members.filter(m=>m.kind==='student'&&!m.roster_archived_at&&m.team===selected?.name),leader=members.find(m=>m.user_id===selected?.leader_user_id),docs=partyDocuments.filter(d=>d.party_id===selected?.id),
- latestDocs=latestPartyDocuments(docs),
+ // Group document revisions once; preserve the existing version/date ordering.
+ documentHistory=useMemo(()=>{
+  const byKind=new Map<PartyDocument['doc_kind'],PartyDocument[]>();
+  for(const d of partyDocuments){
+   if(d.party_id!==selected?.id)continue;
+   const rows=byKind.get(d.doc_kind);
+   if(rows)rows.push(d);
+   else byKind.set(d.doc_kind,[d]);
+  }
+  for(const rows of byKind.values())rows.sort((a,b)=>(b.version_no??1)-(a.version_no??1)||b.created_at.localeCompare(a.created_at)||b.id.localeCompare(a.id));
+  return byKind;
+ },[partyDocuments,selected?.id]),
+ latestDocs=Array.from(documentHistory.values(),rows=>rows[0]),
  revisionVersions=latestDocs.filter(d=>d.status==='revision').map(d=>d.id).sort().join(','),
  certificateIssued=!!selected&&g.formalDocuments.some(d=>d.doc_type==='party_certificate'&&d.metadata?.party_id===selected.id),
  publicDocs=selected?.registration_status==='registered'&&certificateIssued?
@@ -115,7 +131,7 @@ export default function PartiesView({g}:{g:ReturnTypeRepublic}){
   <input className="civicPartySearch" aria-label="Поиск партий" placeholder="Название, идеология или программа" value={query} onChange={e=>setQuery(e.target.value)}/>
   <section className="civicPartyTiles" aria-label="Публичные партии">{ranked.map(p=><article className={selected?.id===p.id?'civicPartyTile active':'civicPartyTile'} key={p.id}><button type="button" className="civicPartyTileSelect" onClick={()=>{setSelectedId(p.id);setDescription(p.description||'');setInviteUser('');setInviteFeedback(null)}}><span className="civicPartyLogo" style={{background:p.color}}>{p.logo_url?<img src={p.logo_url} alt=""/>:p.name.slice(0,1)}</span><span className="civicPartyTileCopy"><b>{p.name}</b><small>{p.ideology||'Идеология не указана'}</small><small>{statusLabel[p.registration_status]}</small></span><span className="civicPartyTileStats"><b>{p.support}%</b> поддержка · <b>{p.mandates}</b> мандатов</span></button>{canDeleteParty(p)&&<button type="button" className="civicPartyDelete" aria-label={'Удалить партию «'+p.name+'»'} title={teacher?'Удалить партию':'Удалить свою партию до регистрации'} disabled={deletingPartyId===p.id} onClick={()=>void removeParty(p)}>{deletingPartyId===p.id?<span aria-hidden="true">…</span>:<Trash2 size={17}/>}</button>}</article>)}{!ranked.length&&<p>Партии не найдены.</p>}</section>
   {selected&&<section className="civicPartyPublic"><header><span className="civicPartyLogo" style={{background:selected.color}}>{selected.logo_url?<img src={selected.logo_url} alt={'Эмблема: '+selected.name}/>:selected.name.slice(0,1)}</span><div><h2>{selected.name}</h2><p>{selected.ideology||'Идеология не указана'}</p></div><span>{statusLabel[selected.registration_status]}</span></header><p className="civicPartyDescription">{selected.description||'Публичное описание пока не опубликовано.'}</p><div className="civicPartyFacts"><span><b>{selected.support}%</b> поддержка</span><span><b>{selected.mandates}</b> мандатов</span><span><b>{staff.length}</b> участников</span></div>
-   <div className="civicPartyLeader"><span className="eventVoter"><ProfileAvatar name={leader?.full_name||'Не назначен'} src={profiles.find(p=>p.user_id===leader?.user_id)?.avatar_url}/></span><div><small>Председатель партии</small><b>{leader?.full_name||'Не назначен'}</b></div></div>
+   <div className="civicPartyLeader"><span className="eventVoter"><ProfileAvatar name={leader?.full_name||'Не назначен'} src={profileByUser.get(leader?.user_id||'')?.avatar_url}/></span><div><small>Председатель партии</small><b>{leader?.full_name||'Не назначен'}</b></div></div>
    <PartyChairElection g={g} party={selected}/>
    {canRename&&<details className="civicPartyEditor" data-party-rename>
     <PartyDisclosureSummary icon={PencilLine} title="Изменить название партии" meta="Доступно председателю партии и преподавателю"/>
@@ -143,7 +159,7 @@ export default function PartiesView({g}:{g:ReturnTypeRepublic}){
     {!inviteClosed&&inviteFeedback?.partyId===selected.id&&<p className={'civicPartyInviteFeedback '+(inviteFeedback.kind==='error'?'isError':'isSuccess')} role={inviteFeedback.kind==='error'?'alert':'status'}>{inviteFeedback.message}</p>}
     {pending.map(i=><div className="civicPendingInvite" key={i.id}><span>{g.names[i.invited_user_id]}</span><IconAction variant="remove" label="Отменить приглашение" onClick={()=>void g.cancelPartyInvitation(i.id)}/></div>)}
    </details>}
-   <details className="civicPartyRoster"><PartyDisclosureSummary icon={UsersRound} title="Состав партии" meta={staff.length+' участников'}/><ul>{staff.map(m=><li key={m.user_id}><span className="eventVoter"><ProfileAvatar name={m.full_name} src={profiles.find(p=>p.user_id===m.user_id)?.avatar_url}/></span><div><b>{m.full_name}</b><small>{m.user_id===selected.leader_user_id?'Председатель партии «'+selected.name+'»':m.role_title||'Участник'}</small></div><span>{partyMandates.find(a=>a.user_id===m.user_id)?.base_mandates||0} мандатов</span></li>)}</ul></details>
+   <details className="civicPartyRoster"><PartyDisclosureSummary icon={UsersRound} title="Состав партии" meta={staff.length+' участников'}/><ul>{staff.map(m=><li key={m.user_id}><span className="eventVoter"><ProfileAvatar name={m.full_name} src={profileByUser.get(m.user_id)?.avatar_url}/></span><div><b>{m.full_name}</b><small>{m.user_id===selected.leader_user_id?'Председатель партии «'+selected.name+'»':m.role_title||'Участник'}</small></div><span>{mandateByUser.get(m.user_id)?.base_mandates||0} мандатов</span></li>)}</ul></details>
    {(canEditDescription||canUploadLogo)&&<details className="civicPartyEditor"><PartyDisclosureSummary icon={PencilLine} title="Оформление партии" meta="Эмблема и публичное описание"/>{canEditDescription&&<><label>Описание<textarea rows={4} value={description||selected.description||''} onChange={e=>setDescription(e.target.value)}/></label><button className="secondary" disabled={busy} onClick={()=>void saveDescription()}>Сохранить описание</button></>}{canUploadLogo&&<PartyLogoEditor key={selected.id} partyName={selected.name} disabled={busy} onSave={saveLogo}/>}</details>}
    {(own||(selected.registration_status==='registered'&&certificateIssued))&&
     <div className="gosPartyStageFieldset"><JusticeDocuments g={g} partyId={selected.id}/></div>}
@@ -152,8 +168,8 @@ export default function PartiesView({g}:{g:ReturnTypeRepublic}){
      {partyFormationOpen&&!selected.leader_user_id&&selected.registration_status!=='registered'&&<p className="partyRegistrationEarlyHint">Документы партии можно загружать во время выборов председателя. Подготовка файлов не зависит от итогов голосования. Направить регистрационный пакет на рассмотрение можно после избрания председателя.</p>}
     <div className="civicPartyFiles" aria-label="Регистрационные документы партии">
      {DOCS.map(kind=>{
-      const current=latestPartyDocument(docs,kind.kind);
-      const history=docs.filter(d=>d.doc_kind===kind.kind).sort((a,b)=>(b.version_no??1)-(a.version_no??1)||b.created_at.localeCompare(a.created_at));
+      const history=documentHistory.get(kind.kind)||[];
+      const current=history[0];
       const canUpload=teacher||(selected.registration_status!=='registered'&&me?.kind==='student'&&!me.roster_archived_at&&me.team===selected.name);
       const nextVersion=(current?.version_no??0)+1;
       return <article className={"partyRegistrationDoc"+(current?.status==="revision"?" isRevision":"")} key={kind.kind}>
