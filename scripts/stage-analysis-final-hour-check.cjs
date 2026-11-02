@@ -41,7 +41,7 @@ assert.match(sql,/private\.is_game_teacher\(p_game_id\)/);
   const game='10000000-0000-0000-0000-000000000001',student='10000000-0000-0000-0000-000000000002',teacher='10000000-0000-0000-0000-000000000003';
   await db.query("insert into game_members values($1,$2,'student',null),($1,$3,'teacher',null)",[game,student,teacher]);
   await db.exec("select set_config('app.test_uid','"+student+"',false)");
-  const set=(status,interval)=>db.query("delete from game_stages; insert into game_stages values($1,1,$2,clock_timestamp()+$3::interval)",[game,status,interval]);
+  const set=async(status,interval)=>{await db.exec("delete from game_stages");await db.query("insert into game_stages values($1,1,$2,clock_timestamp()+$3::interval)",[game,status,interval])};
   const submit=()=>db.query("select public.submit_stage_debrief($1,1,$2)",[game,"Причины, интересы и последствия решений: анализ этапа полностью составлен и подтверждён"]);
   await set('open','2 hours');
   await assert.rejects(submit(),/за час/);
