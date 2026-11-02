@@ -38,6 +38,11 @@ assert(client.includes("tourMode==='idle'}"),'Time-sensitive blitz must not obsc
 assert(tour.includes('clippedRect(el)')&&tour.includes("'.mobileDockScroll,.mobileDockPinned,.mobileAllGrid'"),'Targets outside horizontally scrolling mobile navigation must not count as visible');
 assert(tour.includes('dockScroller.scrollBy({left:'),'Guided steps must reveal offscreen dock controls before spotlight placement');
 assert(tour.includes('placeTourCard(rect,viewport,cardSize)'),'Tour must position cards from target and viewport geometry');
+assert(tour.includes("el?.closest<HTMLElement>('.mobileAllGrid')")&&tour.includes('gridScroller.scrollBy({top:'),'Lower mobile menu rows must scroll inside the section grid');
+assert(dock.includes("tourTarget?:View|'chat'")&&dock.includes('if(!tourTarget||allOpen)return')&&dock.includes('scroller.scrollTo({left:')&&client.includes("tourTarget={tourMode==='tour'?"),'During onboarding the dock must scroll to the next tile without fighting the active view');
+const bankPanel=read('components/game/EventAutopilotPanel.tsx');
+assert(!bankPanel.includes('source_note')&&bankPanel.includes("status,source_url,comic_scene"),'The case bank must not download or display editorial fiction disclaimers');
+
 assert(client.includes("key={mobileMenuOpen?'all-sections':'navigation'}"),'Mobile all-sections sheet must refresh the active spotlight');
 assert(client.includes('data-tour-view="chat"')&&client.includes('toggleTourChat()'),'Chat in the mobile menu must advance the tour');
 const ts=require('typescript'),vm=require('node:vm');
