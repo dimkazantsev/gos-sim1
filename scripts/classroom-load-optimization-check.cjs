@@ -23,7 +23,7 @@ assert(source.includes('const PRESENCE_MIN_WRITE_INTERVAL_MS=20000'),'Presence w
 assert(source.includes('const delay=Math.max(0,12000-(Date.now()-lastRealtimeOverviewAt.current))'),'Overview should be throttled');
 assert(rlsFirst.includes("'auth.uid()','(select auth.uid())'"),'First RLS optimization preserves identity');
 assert(rlsSecond.includes("'auth.jwt()','(select auth.jwt())'"),'JWT optimization preserves claims');
-assert(!/drop policy|disable row level security/i.test(rlsFirst+rlsSecond),'Never weaken RLS');
+assert(!/^(?!\s*--).*\b(drop\s+policy|disable\s+row\s+level\s+security)\b/im.test(rlsFirst+rlsSecond),'Never weaken RLS');
 function evalBatch(){
  const js=ts.transpileModule(batchSource,{
   compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}
