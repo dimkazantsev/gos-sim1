@@ -59,7 +59,7 @@ returns table(stage_no integer,submitted integer)
 language plpgsql stable security definer
 set search_path=public,private,pg_temp as $$
 begin
- if (select auth.uid()) is null or not private.is_game_teacher(p_game_id) then
+ if (select auth.uid()) is null or not coalesce(private.is_game_teacher(p_game_id),false) then
   raise exception 'Teacher access required';
  end if;
  return query
