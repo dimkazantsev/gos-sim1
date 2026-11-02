@@ -1389,7 +1389,7 @@ export function useRepublicGame(gameId:string){
    if(['journal','analytics','tools'].includes(workspace))jobs.push(loadClassroomTelemetry());
    if(workspace==='impact')jobs.push(loadImpactEngine());
    if(['parties','tools'].includes(workspace))jobs.push(loadPartyRepresentation(false));
-   if(workspace==='parties')jobs.push(loadPartyAssets(true));
+   if(workspace==='parties')jobs.push(loadPartyDossierRows(),loadPartyAssets(true));
    await Promise.allSettled(jobs);
    if(workspace==='stages'&&!formalFullVersion.current)await loadFormalDetails();
    if(authUser.current&&acceptedMember.current?.kind==='teacher')teacherWorkspaceFresh.current.set(scope,Date.now());
