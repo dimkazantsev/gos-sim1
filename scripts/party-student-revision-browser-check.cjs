@@ -25,7 +25,10 @@ export default function PartyTest(){
  const actionError=useActionErrorPlacement(error,'parties',()=>setError(''));
  const party={...baseParty,registration_status:registered?'registered':'submitted'};
  const game={...fixture.game,current_round:1,turn_open:open,turn_ends_at:null};
- const shared={...fixture,game,setError,parties:[party],partyDocuments:docs,stages:fixture.stages.map(s=>({...s,deadline:null,status:s.stage_no===1?(open?'open':'completed'):'locked'})),formalDocuments:registered?[{id:'certificate',game_id:game.id,doc_type:'party_certificate',registry_no:'МЮ-ТЕСТ',title:'Свидетельство',metadata:{party_id:party.id},created_at:'2026-10-16T10:00:00Z'}]:[],
+ const shared={...fixture,game,setError,parties:[party],partyDocuments:docs,stages:fixture.stages.map(s=>({...s,deadline:null,status:s.stage_no===1?(open?'open':'completed'):'locked'})),formalDocuments:registered?[
+   {id:'certificate',game_id:game.id,doc_type:'party_certificate',registry_no:'МЮ-ТЕСТ',title:'Свидетельство',metadata:{party_id:party.id},created_at:'2026-10-16T10:00:00Z'},
+   {id:'justice-registration',game_id:game.id,doc_type:'justice_response',registry_no:'МЮ-РЕШЕНИЕ',title:'Решение Минюста о регистрации',metadata:{party_id:party.id},body_text:'Регистрация разрешена.',created_at:'2026-10-16T10:00:00Z'}
+  ]:[],
   reviewPartyDocument:async(id:string,status:'accepted'|'revision',note?:string)=>{setDocs(rows=>rows.map(d=>d.id===id?{...d,status,note:note?.trim()||null}:d));return true},
   uploadPartyDocument:async(partyId:string,kind:PartyDocument['doc_kind'],title:string,file:File,onFailure?:(message:string)=>void)=>{
    setUploads(n=>n+1);if(fail){setFail(false);const message='Не удалось загрузить файл. Повторите попытку.';if(onFailure)onFailure(message);else setError(message);return false}
@@ -88,17 +91,17 @@ async function ready(){for(let n=0;n<60;n++){if(server.exitCode!==null)throw Err
    await studentProgram.locator('.partyRegistrationDocHistory>summary').click();
    assert((await studentProgram.locator('.partyRegistrationDocHistory').textContent()).includes(remark));
    assert.equal(await student.locator('.civicPublicDocument').count(),0,'No public files before certificate');
-   await page.locator('#registered').click();await student.locator('.civicPublicDocument').first().waitFor();
-   assert.equal(await student.locator('.civicPublicDocument').count(),4);
-   const publicProgram=student.locator('.civicPublicDocument').first();
-   assert((await publicProgram.getAttribute('class')).includes('civicPartyProgram'));assert((await publicProgram.textContent()).includes('В2'));
+   await page.locator('#registered').click();await student.locator('.justiceDocuments button').first().waitFor();
+   assert.equal(await student.locator('.civicPublicDocument').count(),0,'Registered parties do not hydrate historical public package cards');
+   assert.equal(await student.locator('.civicPartyPackage').count(),0,'Historical dossier is hidden after registration');
+   assert.equal(await student.locator('.justiceDocuments button').count(),2,'Only certificate and Ministry of Justice decision are shown');
    assert.equal(await student.locator('.partyRegistrationDocActions button').count(),0,'Registered party remains locked to students');
-    assert(await teacher.locator('.partyDossierDocDelete').first().isEnabled(),'Teacher may remove outdated documents after registration');
-   const geometry=await student.evaluate(el=>({viewport:document.documentElement.clientWidth,scroll:document.documentElement.scrollWidth,cards:[...el.querySelectorAll('.civicPublicDocument')].map(c=>{const r=c.getBoundingClientRect(),style=getComputedStyle(c);return {left:r.left,right:r.right,display:style.display,decoration:style.textDecorationLine,border:style.borderTopWidth}})}));
+   assert(await teacher.locator('.partyDossierDocDelete').first().isEnabled(),'Teacher may remove outdated documents after registration');
+   const geometry=await student.evaluate(el=>({viewport:document.documentElement.clientWidth,scroll:document.documentElement.scrollWidth,cards:[...el.querySelectorAll('.justiceDocuments button')].map(c=>{const r=c.getBoundingClientRect();return {left:r.left,right:r.right}})}));
    assert(geometry.scroll<=geometry.viewport+2,'Student cabinet overflows at '+width+': '+JSON.stringify(geometry));
-   for(const c of geometry.cards){assert(c.left>=0&&c.right<=width+1);assert.equal(c.display,'grid');assert.equal(c.decoration,'none');assert.equal(c.border,'1px')}
+   for(const c of geometry.cards)assert(c.left>=0&&c.right<=width+1,'Official document row fits the viewport');
    if([390,1600].includes(width))await student.screenshot({path:path.join(shots,'party-student-'+width+'.png')});
-   assert.deepEqual(errors,[]);await page.close();console.log('PASS '+width+'px: teacher note, student revision, closed-stage guard, failed upload retry, V2, re-approval, history and styled public cards');
+   assert.deepEqual(errors,[]);await page.close();console.log('PASS '+width+'px: revisions and teacher archive, registered party shows only two official documents');
   }
  }catch(e){console.error(logs.join(''));throw e}
  finally{await closeTestBrowser(browser);await stopTestServer(server);cleanTestRoute(root,route)}
