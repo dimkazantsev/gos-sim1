@@ -59,12 +59,19 @@ export async function signDocumentAssetBatch(rows:readonly DocumentPath[],option
     }catch{/* The existing single-file path is the bounded fallback. */}
    }
    // A failed batch or per-file denial never gets substituted with another path.
-   const results=await Promise.all(chunk.map(async item=>{
-    if(!options.isCurrent())return [item.key,null] as const;
-    const found=matches.get(item.objectPath);
-    const url=found||await options.signOne(item.original).catch(()=>null);
-    return [item.key,url] as const;
-   }));
+   // A failed batch must not fire 20 individual Storage signing requests at
+   // once. Preserve each path's RLS check and exact URL correspondence.
+   const results:Array<readonly [string,string|null]>=new Array(chunk.length);
+   let cursor=0;
+   async function signWorker(){
+    while(cursor<chunk.length&&options.isCurrent()){
+     const index=cursor++,item=chunk[index];
+     const found=matches.get(item.objectPath);
+     const url=found||await options.signOne(item.original).catch(()=>null);
+     results[index]=[item.key,url];
+    }
+   }
+   await Promise.all(Array.from({length:Math.min(2,chunk.length)},()=>signWorker()));
    if(!options.isCurrent())break;
    for(const [key,url] of results){
     urls.set(key,url);
