@@ -1,5 +1,6 @@
 'use client';
 import {useEffect,useState} from 'react';
+import {GAME_DATA_REFRESH_EVENT} from './useGameTableSync';
 import {supabase} from '@/lib/supabase';
 import {ArrowRight,ArrowUpRight,BookOpen,Check,Clock3,FileText,Landmark,MessageCircle,Vote,Users} from 'lucide-react';
 import type {ReturnTypeRepublic} from './viewTypes';
@@ -8,32 +9,66 @@ import {STAGE_ACTIONS} from './stageActions';
 import StateMetricsDock from './StateMetricsDock';
 import RepublicLeadership from './RepublicLeadership';
 
+type RecentPost=Pick<PoliticalPost,'id'|'title'|'body'|'created_at'|'status'>;
+const recentFeedCache=new Map<string,{rows:RecentPost[];at:number}>();
+const recentFeedPending=new Map<string,Promise<RecentPost[]>>();
+let compactFeedAvailable=true;
+async function getRecentFeed(key:string,gameId:string){
+ const pending=recentFeedPending.get(key);
+ if(pending)return pending;
+ const promise=(async()=>{
+  if(compactFeedAvailable){
+   const result=await supabase.rpc('get_dashboard_recent_posts',{p_game_id:gameId});
+   if(!result.error&&Array.isArray(result.data))return result.data as RecentPost[];
+   if(result.error&&!['PGRST202','42883'].includes(String(result.error.code||'')))throw result.error;
+   compactFeedAvailable=false;
+  }
+  const result=await supabase.from('political_posts').select('id,title,body,created_at,status')
+   .eq('game_id',gameId).is('deleted_at',null).order('created_at',{ascending:false}).limit(4);
+  if(result.error)throw result.error;
+  return (result.data||[]) as RecentPost[];
+ })();
+ recentFeedPending.set(key,promise);
+ try{return await promise}finally{if(recentFeedPending.get(key)===promise)recentFeedPending.delete(key)}
+}
 export default function DashboardView({g,onNavigate,onOpenProfile}:{g:ReturnTypeRepublic;onNavigate:(view:View)=>void;onOpenProfile?:(id:string)=>void}){
  const {game,me,currentStage,stages,teacher,parties,members,votes,ballots,formalDocuments,setChatOpen}=g;
- const [recentPosts,setRecentPosts]=useState<Pick<PoliticalPost,'id'|'title'|'body'|'created_at'|'status'>[]>([]);
+ const [recentPosts,setRecentPosts]=useState<RecentPost[]>([]);
  const [feedLoading,setFeedLoading]=useState(true);
  const [feedError,setFeedError]=useState(false);
  const gameId=game?.id;
+ const feedScope=gameId&&me?.user_id?gameId+':'+me.user_id:'';
  useEffect(()=>{
-  if(!gameId){setRecentPosts([]);setFeedLoading(false);setFeedError(false);return}
-  let cancelled=false;
-  // The overview reads only four live posts; historical game_events are not
-  // linked to the political feed and must never be presented as active posts.
-  setFeedLoading(true);setFeedError(false);setRecentPosts([]);
-  void (async()=>{
-   const {data,error}=await supabase.from('political_posts')
-    .select('id,title,body,created_at,status')
-    .eq('game_id',gameId)
-    .is('deleted_at',null)
-    .order('created_at',{ascending:false})
-    .limit(4);
-   if(cancelled)return;
-   setRecentPosts(error?[]:(data||[]) as Pick<PoliticalPost,'id'|'title'|'body'|'created_at'|'status'>[]);
-   setFeedError(Boolean(error));
-   setFeedLoading(false);
-  })();
-  return ()=>{cancelled=true};
- },[gameId]);
+  if(!gameId||!feedScope){setRecentPosts([]);setFeedLoading(false);setFeedError(false);return}
+  let cancelled=false,sequence=0,pending:ReturnType<typeof setTimeout>|undefined;
+  const cached=recentFeedCache.get(feedScope);
+  if(cached){setRecentPosts(cached.rows);setFeedLoading(false);setFeedError(false)}
+  const load=async(force=false)=>{
+   const saved=recentFeedCache.get(feedScope);
+   if(!force&&saved&&Date.now()-saved.at<60000)return;
+   const ticket=++sequence;
+   if(!saved)setFeedLoading(true);
+   try{
+    const rows=await getRecentFeed(feedScope,gameId);
+    if(cancelled||ticket!==sequence)return;
+    recentFeedCache.delete(feedScope);recentFeedCache.set(feedScope,{rows,at:Date.now()});
+    if(recentFeedCache.size>30)recentFeedCache.delete(recentFeedCache.keys().next().value!);
+    setRecentPosts(rows);setFeedError(false);setFeedLoading(false);
+   }catch{
+    if(!cancelled&&ticket===sequence){setFeedError(!saved);setFeedLoading(false)}
+   }
+  };
+  void load();
+  const onRefresh=(event:Event)=>{
+   const detail=(event as CustomEvent<{gameId?:string;table?:string}>).detail;
+   if(detail?.gameId!==gameId||(detail.table&&detail.table!=='political_posts'))return;
+   recentFeedCache.delete(feedScope);
+   if(document.visibilityState==='hidden'||pending!==undefined)return;
+   pending=setTimeout(()=>{pending=undefined;void load(true)},1200);
+  };
+  window.addEventListener(GAME_DATA_REFRESH_EVENT,onRefresh);
+  return()=>{cancelled=true;clearTimeout(pending);window.removeEventListener(GAME_DATA_REFRESH_EVENT,onRefresh)};
+ },[gameId,feedScope]);
  if(!game||!me)return null;
  const stageNo=currentStage?.stage_no||game.current_round||1;
  const task=STAGE_ACTIONS[stageNo]||STAGE_ACTIONS[1];
