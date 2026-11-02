@@ -83,6 +83,8 @@ async function main(){
 
   const teacher=harness({effects:true});teacher.setMemberKind('teacher');teacher.fixture('game_parties',parties);await teacher.settle();
   teacher.render().setActiveView('teacher');await teacher.settle();
+  assert(!teacher.stats().queryLog.some(x=>x.table==='game_parties'&&x.columns==='*'),'Overview must not fetch party dossiers');
+  await teacher.render().hydrateTeacherWorkspace('parties');await teacher.settle();
   assert(teacher.stats().queryLog.some(x=>x.table==='game_parties'&&x.columns==='*'),'Teacher dossiers get full registration notes');
   assert.equal(teacher.render().parties[0].registration_note,parties[0].registration_note);
   teacher.dispose();
