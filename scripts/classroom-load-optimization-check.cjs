@@ -57,7 +57,7 @@ async function storage(){
 async function broadcast(){
  const db=new PGlite();
  try{
-  await db.exec(`create schema realtime;create table realtime.sent(payload jsonb,event text,topic text,is_private boolean);
+  await db.exec(`create role anon;create role authenticated;create schema private;create schema realtime;create table realtime.sent(payload jsonb,event text,topic text,is_private boolean);
    create function realtime.send(p jsonb,e text,t text,s boolean) returns void language plpgsql as $$
    begin insert into realtime.sent values(p,e,t,s);end;$$;`);
   for(const table of expectedTables)
