@@ -27,11 +27,14 @@ function harness(score){
   if(request==='../ui/IconAction')return{IconAction:({label,onClick})=>React.createElement('button',{'aria-label':label,onClick})};
   if(request==='./ScoreFormula')return{__esModule:true,default:()=>null};if(request==='./BlitzKnowledgeScore')return{__esModule:true,default:()=>null};if(request==='lucide-react')return{ChevronDown:()=>null};
   if(request==='./assessmentPresentation')return presentation;
+  if(request==='./stageAnalysisWindow')return {stageAnalysisPhase:()=> 'unavailable'};
   if(request==='./useGameTableSync')return{useGameTableSync(gameId,tables,load,scope){const latest=react.useRef(load);latest.current=load;react.useEffect(()=>{if(!gameId)return;const ch={handlers:[()=>void latest.current()]};channels.push(ch);void latest.current();return()=>{channels.splice(channels.indexOf(ch),1);};},[gameId,scope]);}};
   if(request==='../../lib/gameLabels')return {gameValueLabel:value=>String(value||'Не указано')};
   throw Error('Unexpected grade fixture import '+request);
  }
- const module={exports:{}};vm.runInNewContext('(function(require,module,exports){'+code+'\nmodule.exports.fixtureModal=AssessmentModal;})',{console,Date,Promise,Map,Set,Object,Number,Math,AbortSignal,AbortController,setTimeout,clearTimeout})(requireFor,module,module.exports);
+ const fakeWindow={setInterval:()=>1,clearInterval:()=>{},setTimeout:()=>1,clearTimeout:()=>{},addEventListener:()=>{},removeEventListener:()=>{}};
+ const fakeDocument={visibilityState:'hidden',addEventListener:()=>{},removeEventListener:()=>{}};
+ const module={exports:{}};vm.runInNewContext('(function(require,module,exports){'+code+'\nmodule.exports.fixtureModal=AssessmentModal;})',{console,Date,Promise,Map,Set,Object,Number,Math,AbortSignal,AbortController,setTimeout,clearTimeout,window:fakeWindow,document:fakeDocument})(requireFor,module,module.exports);
  function render(){cursor=0;tree=module.exports.default({g});while(effects.length)effects.shift()();return tree;}
  async function flush(){for(let i=0;i<24;i++){render();await Promise.resolve();await Promise.resolve();await Promise.resolve();}return tree;}
  function nodes(type,node=tree,out=[]){if(!node||typeof node!=='object')return out;if(node.type===type)out.push(node);const children=typeof node.type==='function'?node.type(node.props):node.props?.children;for(const child of [children].flat(Infinity))if(child!==undefined)nodes(type,child,out);return out;}

@@ -11,6 +11,7 @@ import BlitzKnowledgeScore from './BlitzKnowledgeScore';
 import {ChevronDown} from 'lucide-react';
 import {assessmentRationaleParagraphs,assessmentRationaleSections,assessmentRationaleDetail,assessmentDisplaySentence,assessmentRunLabel} from './assessmentPresentation';
 import {useGameTableSync} from './useGameTableSync';
+import {stageAnalysisPhase} from './stageAnalysisWindow';
 
 type Assessment={
  id:string;game_id:string;stage_no:number;user_id:string;auto_score:number;final_score:number|null;
@@ -35,6 +36,8 @@ export default function GradesView({g,compact=false,onOpenProfile,onPublicScores
  const [storedRows,setRows]=useState<Assessment[]>([]);
  const [runs,setRuns]=useState<Run[]>([]);
  const [storedDebriefs,setDebriefRows]=useState<Debrief[]>([]);
+ const [storedAnalysisCounts,setStoredAnalysisCounts]=useState<{scope:string;rows:{stage_no:number;submitted:number}[]}|null>(null);
+ const [analysisClock,setAnalysisClock]=useState(()=>Date.now());
  const [selected,setSelected]=useState<{userId:string;stageNo:number}|null>(null);
  const evidenceRequest=useRef(0);
  const loadRequest=useRef(0);
@@ -57,6 +60,30 @@ export default function GradesView({g,compact=false,onOpenProfile,onPublicScores
  const publicScoresCallback=useRef(onPublicScores);publicScoresCallback.current=onPublicScores;
  const rows=acceptedRowsScope.current===loadScope?storedRows:[];
  const debriefRows=acceptedDebriefScope.current===loadScope?storedDebriefs:[];
+ const countScope=game?.id+':'+authId;
+ const analysisCounts=storedAnalysisCounts?.scope===countScope
+  ?new Map(storedAnalysisCounts.rows.map(row=>[row.stage_no,row.submitted])):new Map<number,number>();
+ const countRead=useRef(false);
+ async function refreshAnalysisCounts(){
+  if(!teacher||compact||!game||!authId||countRead.current)return;
+  countRead.current=true;
+  const scope=countScope;
+  try{
+   const result=await supabase.rpc('get_stage_debrief_counts',{p_game_id:game.id});
+   if(!result.error&&activeScope.current===loadScope){
+    setStoredAnalysisCounts({scope,rows:(result.data||[]) as {stage_no:number;submitted:number}[]});
+   }
+  }finally{countRead.current=false}
+ }
+ useEffect(()=>{
+  if(!teacher||compact||!game||!authId)return;
+  // One compact aggregation per minute, only while the teacher views Grades.
+  const refresh=()=>{if(document.visibilityState==='visible')void refreshAnalysisCounts()};
+  refresh();
+  const timer=window.setInterval(refresh,60000);
+  document.addEventListener('visibilitychange',refresh);
+  return()=>{window.clearInterval(timer);document.removeEventListener('visibilitychange',refresh)};
+ },[teacher,compact,game?.id,authId,loadScope]);
  const [gradeSearch,setGradeSearch]=useState('');
  const [gradeTeam,setGradeTeam]=useState('');
  const [gradeSort,setGradeSort]=useState<'surname'|'name'|'sum'|'average'|'final'|'graded'>('surname');
@@ -64,6 +91,7 @@ export default function GradesView({g,compact=false,onOpenProfile,onPublicScores
  const [gradeOnlyPending,setGradeOnlyPending]=useState(false);
  const [gradesScrolled,setGradesScrolled]=useState(false);
  const students=members.filter(m=>m.kind==='student');
+ const activeStudentCount=students.filter(m=>!m.roster_archived_at).length;
  const gradeByStudent=useMemo(()=>{
   const map=new Map<string,{sum:number;average:number|null;final:number;graded:number}>();
   for(const student of students){
@@ -184,7 +212,24 @@ export default function GradesView({g,compact=false,onOpenProfile,onPublicScores
  const targetDebriefStage=debriefStage??currentStage?.stage_no??eligibleDebriefStages.at(-1)?.stage_no??null;
  const targetDebrief=targetDebriefStage?stages.find(s=>s.stage_no===targetDebriefStage):undefined;
  const targetAssessment=targetDebriefStage?rows.find(r=>r.user_id===me?.user_id&&r.stage_no===targetDebriefStage):undefined;
- const canWriteDebrief=!!me&&me.kind==='student'&&authId===me.user_id&&!!targetDebrief&&targetAssessment?.status!=='final';
+ const targetDeadline=targetDebrief?.deadline;
+ useEffect(()=>{
+  const sync=()=>{if(document.visibilityState==='visible')setAnalysisClock(Date.now())};
+  sync();
+  if(!targetDeadline||targetDebrief?.status!=='open')return;
+  const end=Date.parse(targetDeadline),now=Date.now();
+  const next=[end-3600000,end].filter(t=>Number.isFinite(t)&&t>now).sort((a,b)=>a-b)[0];
+  const timer=next===undefined?null:window.setTimeout(()=>setAnalysisClock(Date.now()),Math.max(1,next-now+25));
+  window.addEventListener('focus',sync);document.addEventListener('visibilitychange',sync);
+  return()=>{if(timer!==null)window.clearTimeout(timer);window.removeEventListener('focus',sync);document.removeEventListener('visibilitychange',sync)};
+ },[targetDeadline,targetDebrief?.status,targetDebriefStage]);
+ const analysisPhase=targetDebrief?stageAnalysisPhase(targetDebrief,analysisClock):'unavailable';
+ const canWriteDebrief=!!me&&me.kind==='student'&&authId===me.user_id&&analysisPhase==='active';
+ const analysisWindowNote=analysisPhase==='expired'?'Этап уже завершён. Отправка анализа недоступна.'
+  :analysisPhase==='early'?'Сдача анализа откроется за час до окончания этапа.'
+  :analysisPhase==='unavailable'?'Преподаватель ещё не установил срок окончания этапа.'
+  :targetAssessment?.status==='final'?'Оценка уже утверждена; отправка анализа не изменит итоговый балл.'
+  :'Сдайте анализ до окончания этапа.';
  const savedDebrief=targetDebriefStage==null?undefined:debriefRows.find(d=>d.stage_no===targetDebriefStage);
  useEffect(()=>{if(me?.kind!=='student'||targetDebriefStage==null)return;setDebrief(savedDebrief?.body||'')},[targetDebriefStage,savedDebrief?.body,me?.user_id]);
  const myRows=rows.filter(r=>r.user_id===me?.user_id);
@@ -281,6 +326,14 @@ export default function GradesView({g,compact=false,onOpenProfile,onPublicScores
    <div className="gradesHeroLegend"><span className="draft">Черновик</span><span className="final">Итоговая</span><span className="empty">Нет оценки</span></div>
   </section>
 
+  {teacher&&!compact&&<section className="surface gradesAnalysisCounter" aria-label="Количество сданных анализов">
+   <div className="surfaceHead"><div><small>АНАЛИЗЫ СТУДЕНТОВ</small><h2>Сданные анализы этапов</h2></div>
+    <button type="button" className="secondary" onClick={()=>void refreshAnalysisCounts()}>Обновить</button></div>
+   <div className="gradesHeroLegend">{stages.filter(stage=>stage.status==='open'||stage.status==='completed')
+    .sort((a,b)=>a.stage_no-b.stage_no).map(stage=><span key={stage.stage_no}>
+     Этап {stage.stage_no} · <b>{storedAnalysisCounts?.scope===countScope?(analysisCounts.get(stage.stage_no)??0):'—'} из {activeStudentCount}</b>
+    </span>)}</div>
+  </section>}
   <details className="surface gradesRulesCompact vsnGuide"><summary><div className="vsnGuideHeading"><strong>Критерии и формула ВСН</strong><span>Как рассчитывается оценка за этап</span></div><span className="vsnGuideRange">0–3 балла</span><ChevronDown className="vsnGuideChevron" size={20} aria-hidden="true"/></summary><div className="gradesRuleItems vsnCriteria">
    <article><b>1 балл</b><h3>Право и правила</h3><p>Знание норм, полномочий и процедур. Корректное применение их в игровой ситуации.</p></article>
    <article><b>1 балл</b><h3>Стратегия и интересы</h3><p>Осмысленные решения с учётом целей своей стороны, ресурсов, выгод, рисков и последствий.</p></article>
@@ -318,11 +371,11 @@ export default function GradesView({g,compact=false,onOpenProfile,onPublicScores
     <div className="gradesDebriefFields">
      <div className="gradesDebriefContext">
       <StyledSelect label="Этап для итогового разбора" value={String(targetDebriefStage??'')} onChange={v=>setDebriefStage(Number(v))} options={eligibleDebriefStages.map(stage=>({value:String(stage.stage_no),label:stage.stage_no+'. '+stage.title}))}/>
-      <div className="gradesDebriefPrompt"><b>Кому предназначен разбор</b><p>Этот текст вы отправляете системе ИИ для предварительного анализа этапа. Укажите причины и цели действий, интересы сторон, применённые правила, результаты и политические последствия.</p><p>В чате «Вне игры» можно подробнее обсуждать закономерности, аргументы и альтернативные решения. Преподаватель может учесть содержательное обсуждение и повысить итоговую оценку.</p><small>До утверждения итоговой оценки преподавателем разбор можно обновлять.</small></div>
+      <div className="gradesDebriefPrompt"><b>Кому предназначен разбор</b><p>Этот текст вы отправляете системе ИИ для предварительного анализа этапа. Укажите причины и цели действий, интересы сторон, применённые правила, результаты и политические последствия.</p><p>В чате «Вне игры» можно подробнее обсуждать закономерности, аргументы и альтернативные решения. Преподаватель может учесть содержательное обсуждение и повысить итоговую оценку.</p><small>{analysisWindowNote}</small></div>
      </div>
-     <label className="gradesDebriefEditor"><span>Ваш итоговый разбор</span><textarea aria-label="Итоговый разбор этапа" rows={7} value={debrief} disabled={!canWriteDebrief} onChange={e=>setDebrief(e.target.value)} placeholder={targetAssessment?.status==='final'?'Оценка уже утверждена преподавателем':'Изложите содержательный анализ выбранного этапа…'}/></label>
+     <label className="gradesDebriefEditor"><span>Ваш итоговый разбор</span><textarea aria-label="Итоговый разбор этапа" rows={7} value={debrief} disabled={!canWriteDebrief} onChange={e=>setDebrief(e.target.value)} placeholder={!canWriteDebrief?analysisWindowNote:'Изложите содержательный анализ выбранного этапа…'}/></label>
     </div>
-    <footer className="gradesDebriefFooter"><div aria-live="polite"><strong>{targetAssessment?.status==='final'?'Оценка утверждена':debrief.trim().length+' знаков'}</strong><span>Минимум 40 знаков для отправки</span></div><button type="button" className="primary" disabled={!canWriteDebrief||busy||debrief.trim().length<40} onClick={()=>void submitDebrief()}>{busy?'Сохранение…':'Сдать / обновить разбор'}</button></footer>
+    <footer className="gradesDebriefFooter"><div aria-live="polite"><strong>{canWriteDebrief?debrief.trim().length+' знаков':analysisWindowNote}</strong><span>Минимум 40 знаков для отправки</span></div><button type="button" className="primary" disabled={!canWriteDebrief||busy||debrief.trim().length<40} onClick={()=>void submitDebrief()}>{busy?'Сохранение…':'Сдать / обновить разбор'}</button></footer>
    </section>}
 
   {selected&&selectedScope.current===loadScope&&<AssessmentModal g={g} assessment={assessment} selected={selected} student={selectedStudent} evidence={evidence} runs={runs} loading={loadingEvidence} teacher={teacher} selectedDebrief={selectedDebrief} editScore={editScore} setEditScore={setEditScore} note={note} setNote={setNote} busy={busy} close={()=>{evidenceRequest.current++;setSelected(null)}} ensureDraft={ensureDraft} recalc={recalc} finalize={finalize} reopen={reopen}/>}
