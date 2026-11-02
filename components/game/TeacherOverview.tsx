@@ -73,7 +73,7 @@ export default function TeacherOverview({g,onWorkspace,onNavigate}:{g:ReturnType
    keepOverview(cacheKey,value);
    snapshotScope.current=cacheKey;setSnapshot(value.snapshot);setError('');
    if(r.full)dirtyStatic.current=false;
-   if(!value.macroAt||Date.now()-value.macroAt>=300000){
+   if(!value.macroAt||Date.now()-value.macroAt>=120000){
     // Fiscal context is stable across ordinary activity and is shared across tab visits.
     value.macroAt=Date.now();
     void supabase.rpc('get_fiscal_context',{p_game_id:gameId}).then(result=>{
