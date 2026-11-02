@@ -47,11 +47,7 @@ export default function VotesView({g,onOpenDocument,onOpenStages,focusId,onClear
   for(const row of partyMandates){const rows=map.get(row.party_id);if(rows)rows.push(row);else map.set(row.party_id,[row]);}
   return map;
  },[partyMandates]);
- const checkinsByInstitutionAndStage=useMemo(()=>{
-  const map=new Map<string,typeof checkedIn>();
-  for(const row of checkedIn){const key=row.institution_key+':'+row.stage_no;const rows=map.get(key);if(rows)rows.push(row);else map.set(key,[row]);}
-  return map;
- },[checkedIn]);
+
  const scheduledBills=formalDocuments.filter(d=>d.workflow_key==='bill'
   && !['published','rejected'].includes(d.status_code)
   && !openDocumentSteps.has(d.id+':'+d.status_code));
@@ -62,6 +58,11 @@ export default function VotesView({g,onOpenDocument,onOpenStages,focusId,onClear
  const registrationScope=JSON.stringify([g.game?.id,me?.user_id,me?.kind,me?.role_title,me?.roster_archived_at,teacher]);
  const [checkins,setCheckins]=useState<{scope:string;rows:{user_id:string;institution_key:string;stage_no:number;present_mandates:number|null}[]}>({scope:'',rows:[]});
  const checkedIn=checkins.scope===registrationScope?checkins.rows:[];
+ const checkinsByInstitutionAndStage=useMemo(()=>{
+  const map=new Map<string,typeof checkedIn>();
+  for(const row of checkedIn){const key=row.institution_key+':'+row.stage_no;const rows=map.get(key);if(rows)rows.push(row);else map.set(key,[row]);}
+  return map;
+ },[checkedIn]);
  const checkinLoaded=checkins.scope===registrationScope;
  const reads=useRef({scope:registrationScope,live:true,promise:null as Promise<void>|null,queued:false,cancel:null as (()=>void)|null});
  if(reads.current.scope!==registrationScope)reads.current={scope:registrationScope,live:true,promise:null,queued:false,cancel:null};
