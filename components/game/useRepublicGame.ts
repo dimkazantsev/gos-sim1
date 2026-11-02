@@ -115,10 +115,10 @@ export function useRepublicGame(gameId:string){
   const groups:string[]=[];
   const workspace=view==='teacher'?teacherWorkspaceRef.current:'';
   if(['events','stages','actions'].includes(view)||['event','stages','tools'].includes(workspace))groups.push('game_events');
-  if(['grades','profile','stages'].includes(view)||['grades','journal','analytics','awards','stages'].includes(workspace))groups.push('game_evaluations');
+  if(['grades','profile','stages'].includes(view)||workspace==='stages')groups.push('game_evaluations');
   if(['dashboard','stages','teacher'].includes(view))groups.push('game_crises');
   if(['documents','stages'].includes(view)||workspace==='stages')groups.push('game_documents');
-  if(view==='profile'||['participants','parties'].includes(workspace))groups.push('game_profiles');
+  if(view==='profile'||workspace==='parties')groups.push('game_profiles');
   if(chatOpenRef.current)groups.push('chat_channels');
   return groups;
  }
@@ -1383,12 +1383,12 @@ export function useRepublicGame(gameId:string){
    const cold=(key:ColdEntryKey)=>jobs.push(loadColdEntry(key));
    const offices=()=>jobs.push(loadRepublicOffices());
    if(['stages','event','tools'].includes(workspace))cold('events');
-   if(['stages','journal','analytics','grades','awards'].includes(workspace))cold('evaluations');
+   if(workspace==='stages')cold('evaluations');
    if(workspace==='stages')cold('documents');
-   if(['stages','event','tools','participants','parties','impact'].includes(workspace))offices();
+   if(['stages','event','tools','parties','impact'].includes(workspace))offices();
    if(['journal','analytics','tools'].includes(workspace))jobs.push(loadClassroomTelemetry());
-   if(['impact','analytics'].includes(workspace))jobs.push(loadImpactEngine());
-   if(['participants','parties','tools'].includes(workspace))jobs.push(loadPartyRepresentation(false));
+   if(workspace==='impact')jobs.push(loadImpactEngine());
+   if(['parties','tools'].includes(workspace))jobs.push(loadPartyRepresentation(false));
    if(workspace==='parties')jobs.push(loadPartyDossierRows(),loadPartyAssets(true));
    await Promise.allSettled(jobs);
    if(workspace==='stages'&&!formalFullVersion.current)await loadFormalDetails();
