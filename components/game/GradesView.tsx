@@ -91,6 +91,7 @@ export default function GradesView({g,compact=false,onOpenProfile,onPublicScores
  const [gradeOnlyPending,setGradeOnlyPending]=useState(false);
  const [gradesScrolled,setGradesScrolled]=useState(false);
  const students=members.filter(m=>m.kind==='student');
+ const activeStudentCount=students.filter(m=>!m.roster_archived_at).length;
  const gradeByStudent=useMemo(()=>{
   const map=new Map<string,{sum:number;average:number|null;final:number;graded:number}>();
   for(const student of students){
@@ -330,7 +331,7 @@ export default function GradesView({g,compact=false,onOpenProfile,onPublicScores
     <button type="button" className="secondary" onClick={()=>void refreshAnalysisCounts()}>Обновить</button></div>
    <div className="gradesHeroLegend">{stages.filter(stage=>stage.status==='open'||stage.status==='completed')
     .sort((a,b)=>a.stage_no-b.stage_no).map(stage=><span key={stage.stage_no}>
-     Этап {stage.stage_no} · <b>{storedAnalysisCounts?.scope===countScope?(analysisCounts.get(stage.stage_no)??0):'—'} из {students.length}</b>
+     Этап {stage.stage_no} · <b>{storedAnalysisCounts?.scope===countScope?(analysisCounts.get(stage.stage_no)??0):'—'} из {activeStudentCount}</b>
     </span>)}</div>
   </section>}
   <details className="surface gradesRulesCompact vsnGuide"><summary><div className="vsnGuideHeading"><strong>Критерии и формула ВСН</strong><span>Как рассчитывается оценка за этап</span></div><span className="vsnGuideRange">0–3 балла</span><ChevronDown className="vsnGuideChevron" size={20} aria-hidden="true"/></summary><div className="gradesRuleItems vsnCriteria">
