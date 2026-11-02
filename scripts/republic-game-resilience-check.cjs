@@ -491,7 +491,11 @@ async function main(){
     h.fixture('impact_rules',[{id:'rule-a',game_id:'game-a',rule_key:'education',priority:1,enabled:true}]);
     h.fixture('impact_ledger',[{id:1,game_id:'game-a',rule_key:'education',created_at:'2026-10-29T10:00:00Z',effects:{score:2}}]);
    }
-   await Promise.all(clients.map(async h=>{await h.settle();h.render().setActiveView('teacher');await h.settle()}));
+   await Promise.all(clients.map(async h=>{
+    await h.settle();h.render().setActiveView('teacher');await h.settle();
+    assert.equal(h.rpcCount('get_impact_engine_projection'),0,'Overview should not load the impact editor');
+    await h.render().hydrateTeacherWorkspace('impact');await h.settle();
+   }));
    for(const h of clients){
     assert(h.rpcCount('get_impact_engine_projection')>=1,'Teacher panel has one impact RPC');
     assert.equal(h.readCount('impact_rules'),0,'No separate rule HTTP request');
@@ -503,12 +507,12 @@ async function main(){
  });
  await check('Missing impact RPC uses original RLS reads, overload does not fan out',async()=>{
   const legacy=harness({effects:true});legacy.failRpc('get_impact_engine_projection','PGRST202');
-  await legacy.settle();legacy.render().setActiveView('teacher');await legacy.settle();
+  await legacy.settle();legacy.render().setActiveView('teacher');await legacy.settle();await legacy.render().hydrateTeacherWorkspace('impact');await legacy.settle();
   assert(legacy.readCount('impact_rules')>=1);
   assert(legacy.readCount('impact_ledger')>=1);
   legacy.dispose();
   const failed=harness({effects:true});failed.failRpc('get_impact_engine_projection','PGRST003');
-  await failed.settle();failed.render().setActiveView('teacher');await failed.settle();
+  await failed.settle();failed.render().setActiveView('teacher');await failed.settle();await failed.render().hydrateTeacherWorkspace('impact');await failed.settle();
   assert.equal(failed.readCount('impact_rules'),0);
   assert.equal(failed.readCount('impact_ledger'),0);
   failed.dispose();

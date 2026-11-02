@@ -19,7 +19,8 @@ assert(hook.includes("supabase.channel('gos-id-live:'+gameId,{config:{private:tr
 assert(hook.includes("supabase.realtime.setAuth()"),'JWT must be set before joining');
 assert(hook.includes("channel.on('broadcast',{event:'party_documents_changed'}"),'Browser must listen to private Broadcast');
 assert(!hook.includes("channel.on('postgres_changes',{event:'*',schema:'public',table:'party_documents'"),'Remove old direct subscription for same table');
-assert(hook.includes("if(partyDocs&&(activeViewRef.current==='parties'||activeViewRef.current==='teacher'))void loadPartyDocuments()"),'Only active party/teacher screens load changed document rows');
+assert(hook.includes("if(partyDocs&&(activeViewRef.current==='parties'||(activeViewRef.current==='teacher'&&teacherWorkspaceRef.current==='parties')))void loadPartyDocuments()"),'Only active party dossier screen loads changed document rows');
+assert(!hook.includes("if(partyDocs&&(activeViewRef.current==='parties'||activeViewRef.current==='teacher'))void loadPartyDocuments()"),'Teacher Overview must not hydrate party documents after Broadcast');
 
 async function sqlTest(){
  const db=new PGlite();

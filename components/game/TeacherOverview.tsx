@@ -13,47 +13,104 @@ import {GAME_DATA_REFRESH_EVENT} from './useGameTableSync';
 
 type Snapshot={as_of:string;students:number;online:number;active_day:number;actions_day:number;stages_total:number;stages_completed:number;stages_overdue:number;documents_total:number;documents_draft:number;documents_published:number;documents_moving:number;votes_open:number;votes_closed:number;votes_failed_quorum:number;ballots_open:number;parties_total:number;parties_registered:number;parties_waiting:number;party_files:number;mandates:number;mandates_available:number;mandates_allocated:number;cases_active:number;case_invites_waiting:number;cases_resolved:number;posts_public:number;media_waiting:number;grades_final:number;grades_waiting:number;grade_average:number|null;changes_day:number};
 type Destination='documents'|'votes'|'budget'|'actions';
+type OverviewCache={snapshot:Snapshot;fullAt:number;liveAt:number;macro:FiscalContext|null;macroAt:number};
+const overviewCache=new Map<string,OverviewCache>();
+const overviewInFlight=new Map<string,Promise<{data:Partial<Snapshot>;full:boolean}>>();
+function keepOverview(key:string,value:OverviewCache){
+ overviewCache.delete(key);overviewCache.set(key,value);
+ if(overviewCache.size>8)overviewCache.delete(overviewCache.keys().next().value!);
+}
+async function fetchOverview(key:string,gameId:string,full:boolean){
+ const pendingKey=key+':'+(full?'full':'live');
+ const pending=overviewInFlight.get(pendingKey);
+ if(pending)return pending;
+ const task=(async()=>{
+  let data:Partial<Snapshot>;
+  if(full){
+   const r=await supabase.rpc('get_teacher_overview',{p_game_id:gameId});
+   if(r.error)throw r.error;
+   data=r.data as Snapshot;
+  }else{
+   const r=await supabase.rpc('get_teacher_overview_live',{p_game_id:gameId});
+   if(r.error&&['PGRST202','42883'].includes(String(r.error.code||''))){
+    const old=await supabase.rpc('get_teacher_overview',{p_game_id:gameId});
+    if(old.error)throw old.error;
+    return {data:old.data as Snapshot,full:true};
+   }
+   if(r.error)throw r.error;
+   data=r.data as Partial<Snapshot>;
+  }
+  if(!data?.as_of)throw new Error('Обзор управления не вернул данные.');
+  return {data,full};
+ })();
+ overviewInFlight.set(pendingKey,task);
+ try{return await task}finally{if(overviewInFlight.get(pendingKey)===task)overviewInFlight.delete(pendingKey)}
+}
 export default function TeacherOverview({g,onWorkspace,onNavigate}:{g:ReturnTypeRepublic;onWorkspace:(key:'stages'|'parties'|'grades'|'event'|'impact'|'journal')=>void;onNavigate?:(destination:Destination)=>void}){
- const gameId=g.game?.id;
+ const gameId=g.game?.id,cacheKey=gameId&&g.me?.user_id?gameId+':'+g.me.user_id:'';
  const [snapshot,setSnapshot]=useState<Snapshot|null>(null),[error,setError]=useState('');
  const [macro,setMacro]=useState<FiscalContext|null>(null);
- const request=useRef(0),alive=useRef(false),scope=useRef(gameId),snapshotScope=useRef('');
- const fiscalReadAt=useRef(0);scope.current=gameId;
- const refresh=useCallback(async()=>{
-  if(!gameId||!g.teacher)return;
+ const request=useRef(0),alive=useRef(false),scope=useRef(cacheKey),snapshotScope=useRef('');
+ const dirtyStatic=useRef(false);scope.current=cacheKey;
+ const refresh=useCallback(async(mode:'auto'|'changed'|'manual'='auto')=>{
+  if(!gameId||!g.teacher||!cacheKey)return;
+  const saved=overviewCache.get(cacheKey),now=Date.now();
+  const full=mode==='manual'||!saved||now-saved.fullAt>=240000||
+   mode==='changed'&&now-saved.fullAt>=60000;
+  if(mode!=='manual'&&saved&&now-saved.liveAt<45000&&!full)return;
   const ticket=++request.current;
-  try{const r=await supabase.rpc('get_teacher_overview',{p_game_id:gameId});
-   if(!alive.current||ticket!==request.current||scope.current!==gameId)return;
-   if(r.error)throw r.error;if(!r.data?.as_of)throw new Error('Обзор управления не вернул данные.');
-   snapshotScope.current=gameId;setSnapshot(r.data as Snapshot);setError('');
-   if(Date.now()-fiscalReadAt.current>120000){
-    fiscalReadAt.current=Date.now();
-    void supabase.rpc('get_fiscal_context',{p_game_id:gameId}).then(m=>{if(!m.error&&m.data?.policy&&alive.current&&scope.current===gameId)setMacro(m.data as FiscalContext);});
+  try{
+   const r=await fetchOverview(cacheKey,gameId,full);
+   if(!alive.current||ticket!==request.current||scope.current!==cacheKey)return;
+   const existing=overviewCache.get(cacheKey);
+   const value:OverviewCache={
+    snapshot:{...(existing?.snapshot||saved?.snapshot||{}),...r.data} as Snapshot,
+    fullAt:r.full?Date.now():existing?.fullAt||saved?.fullAt||Date.now(),
+    liveAt:Date.now(),
+    macro:existing?.macro||saved?.macro||null,
+    macroAt:existing?.macroAt||saved?.macroAt||0
+   };
+   keepOverview(cacheKey,value);
+   snapshotScope.current=cacheKey;setSnapshot(value.snapshot);setError('');
+   if(r.full)dirtyStatic.current=false;
+   if(!value.macroAt||Date.now()-value.macroAt>=120000){
+    // Fiscal context is stable across ordinary activity and is shared across tab visits.
+    value.macroAt=Date.now();
+    void supabase.rpc('get_fiscal_context',{p_game_id:gameId}).then(result=>{
+     if(result.error||!result.data?.policy||!alive.current||scope.current!==cacheKey)return;
+     const current=overviewCache.get(cacheKey);
+     if(current){keepOverview(cacheKey,{...current,macro:result.data as FiscalContext,macroAt:Date.now()});setMacro(result.data as FiscalContext)}
+    });
    }
-  }catch(e){if(alive.current&&ticket===request.current&&scope.current===gameId)setError(userError(e));}
- },[gameId,g.teacher]);
+  }catch(e){if(alive.current&&ticket===request.current&&scope.current===cacheKey)setError(userError(e));}
+ },[gameId,g.teacher,cacheKey]);
  useEffect(()=>{
-  if(!gameId||!g.teacher)return;
-  alive.current=true;setSnapshot(null);setError('');void refresh();
+  if(!gameId||!g.teacher||!cacheKey)return;
+  alive.current=true;dirtyStatic.current=false;setError('');
+  const cached=overviewCache.get(cacheKey);
+  setSnapshot(cached?.snapshot||null);setMacro(cached?.macro||null);
+  snapshotScope.current=cached?cacheKey:'';
+  void refresh('auto');
   let lastAutomaticAt=Date.now(),pending:ReturnType<typeof setTimeout>|undefined;
   const automatic=()=>{
-   if(document.visibilityState!=='visible'||Date.now()-lastAutomaticAt<12000)return;
-   lastAutomaticAt=Date.now();void refresh();
+   if(document.visibilityState!=='visible'||Date.now()-lastAutomaticAt<45000)return;
+   lastAutomaticAt=Date.now();void refresh(dirtyStatic.current?'changed':'auto');
   };
-  // Reuse the game shell's event stream rather than 16 extra Realtime subscriptions.
   const tables=new Set(['game_stages','formal_documents','game_votes','game_parties','political_posts']);
   const changed=(event:Event)=>{
    const detail=(event as CustomEvent<{gameId?:string;table?:string}>).detail;
-   if(detail?.gameId!==gameId||(detail.table&&!tables.has(detail.table))||pending!==undefined)return;
+   if(detail?.gameId!==gameId||(detail.table&&!tables.has(detail.table)))return;
+   dirtyStatic.current=true;
+   if(pending!==undefined)return;
    pending=setTimeout(()=>{pending=undefined;automatic()},1800);
   };
   const timer=setInterval(automatic,60000+Math.floor(Math.random()*15000));
   document.addEventListener('visibilitychange',automatic);
   window.addEventListener(GAME_DATA_REFRESH_EVENT,changed);
   return()=>{alive.current=false;request.current++;clearInterval(timer);clearTimeout(pending);document.removeEventListener('visibilitychange',automatic);window.removeEventListener(GAME_DATA_REFRESH_EVENT,changed)};
- },[gameId,refresh,g.teacher]);
+ },[gameId,cacheKey,refresh,g.teacher]);
  if(!g.teacher||!gameId)return null;
- const s=snapshotScope.current===gameId?snapshot:null,number=(n:number|undefined)=>n===undefined?'…':quantity(n,''),pulse=g.budgetPulse,c=pulse?.calculation;
+ const s=snapshotScope.current===cacheKey?snapshot:null,number=(n:number|undefined)=>n===undefined?'…':quantity(n,''),pulse=g.budgetPulse,c=pulse?.calculation;
  const waiting=(s?.parties_waiting??0)+(s?.media_waiting??0)+(s?.grades_waiting??0)+(s?.stages_overdue??0);
  const navigate=(destination:Destination)=>()=>onNavigate?.(destination);
  const cards=[
@@ -67,7 +124,7 @@ export default function TeacherOverview({g,onWorkspace,onNavigate}:{g:ReturnType
   {key:'impact',title:'Состояние государства',Icon:Activity,value:s?.changes_day,unit:'изменений показателей за 24 часа',items:[['Просрочено открытых этапов',s?.stages_overdue]],action:()=>onWorkspace('impact'),button:'Открыть модель последствий'}
  ];
  return <section className={styles.overview} aria-label="Мониторинг текущей игры" data-teacher-overview={s?'ready':error?'error':'loading'}>
-  <div className={styles.freshness}><span>{s?'Обновлено '+new Date(s.as_of).toLocaleTimeString('ru-RU'):'Загрузка показателей текущей игры…'} · Автоматическое обновление не чаще раза в минуту</span><button type="button" className="secondary" aria-label="Обновить показатели обзора" onClick={()=>void refresh()}><RefreshCw size={18}/></button></div>
+  <div className={styles.freshness}><span>{s?'Обновлено '+new Date(s.as_of).toLocaleTimeString('ru-RU'):'Загрузка показателей текущей игры…'} · Автоматическое обновление с ограничением частоты</span><button type="button" className="secondary" aria-label="Обновить показатели обзора" onClick={()=>void refresh('manual')}><RefreshCw size={18}/></button></div>
   {error&&<p className={styles.error} role="alert">{error}{s?' Показаны последние полученные данные.':''}</p>}
   <div className="teacherOverviewStats">
    <article><small>В ИГРЕ СЕЙЧАС</small><strong data-overview-kpi="online">{number(s?.online)}</strong><span>из {number(s?.students)} участников · активность за 90 секунд</span></article>

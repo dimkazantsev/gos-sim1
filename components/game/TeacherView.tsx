@@ -1,7 +1,7 @@
 'use client';
 import {gameValueLabel,gameViewLabel} from '../../lib/gameLabels';
 import {createPortal} from 'react-dom';
-import {useState} from 'react';
+import {useEffect,useState} from 'react';
 import dynamic from 'next/dynamic';
 import {Award,Activity,AlertTriangle,ArrowRight,BarChart3,BookOpenText,Compass,Clock3,Download,GraduationCap,Network,Pause,Play,Radio,RotateCcw,UsersRound,Wrench,Zap} from 'lucide-react';
 import ClassroomJournal from './ClassroomJournal';
@@ -45,6 +45,11 @@ export default function TeacherView({g,onOpenProcesses,onOpenStages,initialWorks
  const [blitzRequestedFor,setBlitzRequestedFor]=useState<string|null>(null);
  const activeWorkspace=workspace==='blitz'&&blitzRequestedFor!==game?.id?'overview':workspace;
  const selectWorkspace=(key:Workspace)=>{if(key==='blitz')setBlitzRequestedFor(game?.id||null);setWorkspace(key)};
+ // Do not preload the data of every teacher tab while opening the Overview.
+ useEffect(()=>{
+  if(!g.coreLoaded||!game?.id||!g.me?.user_id)return;
+  void g.hydrateTeacherWorkspace?.(activeWorkspace);
+ },[activeWorkspace,game?.id,g.me?.user_id,g.coreLoaded]);
  const navigationTarget=useTeacherNavigationTarget();
  const navigationRef=useHorizontalWheel(navigationTarget===null?undefined:game?.id);
  const pendingFactionCount=parties.filter(p=>p.registration_status==='submitted').length+(g.partyDocuments||[]).filter(d=>d.status==='submitted').length;

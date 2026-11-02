@@ -15,8 +15,10 @@ const end=source.indexOf('\n async function loadPartyRepresentation(',start);
 assert(start>=0&&end>start,'Party asset loader boundaries must match production code');
 assert(source.includes("if(view==='parties'||view==='profile')jobs.push(loadPartyAssets(view==='parties'))"),
  'Profile must explicitly skip party documents; parties must retain them');
-assert(source.includes("if(view==='teacher')jobs.push(loadPartyDocuments())"),
- 'Teacher dossier must still load full party documents');
+assert(source.includes("if(workspace==='parties')jobs.push(loadPartyDossierRows(),loadPartyAssets(true));"),
+ 'Teacher party dossier must load documents only when opened');
+assert(!source.includes("if(view==='teacher')jobs.push(loadPartyDocuments())"),
+ 'Overview must not fetch party documents');
 const extracted=source.slice(start,end)+'\nmodule.exports={loadPartyAssets,loadPartyDocuments};';
 const output=ts.transpileModule(extracted,{compilerOptions:{
  target:ts.ScriptTarget.ES2022,module:ts.ModuleKind.CommonJS
