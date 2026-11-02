@@ -635,7 +635,8 @@ async function main(){
      await h.render().touchPresence('votes','Голосование');
      assert.equal(h.rpcCount('record_my_game_presence'),before+1,'Fast navigation should not issue repeated SQL writes');
     }));
-    await Promise.all(clients.map(h=>h.advance(13000)));
+    // Presence navigation writes now coalesce over 20 seconds instead of 12.
+    await Promise.all(clients.map(h=>h.advance(21000)));
     for(const h of clients){
      assert.equal(h.rpcCount('record_my_game_presence'),2,'Only first and latest views are persisted');
      await h.render().touchPresence('votes','Голосование');

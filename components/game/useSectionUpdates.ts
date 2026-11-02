@@ -1,7 +1,7 @@
 'use client';
 import {useEffect,useRef,useState} from 'react';
 import {supabase} from '@/lib/supabase';
-import {GAME_DATA_REFRESH_EVENT,SECTION_UPDATES_REFRESH_EVENT,gameRealtimeConnected,notifySectionUpdates} from './useGameTableSync';
+import {GAME_DATA_REFRESH_EVENT,SECTION_UPDATES_REFRESH_EVENT,gameRealtimeConnected} from './useGameTableSync';
 import type {View} from './types';
 
 const READABLE_SECTIONS=new Set<View>(['dashboard','stages','parties','votes','documents','actions','events','teacher']);
@@ -95,7 +95,8 @@ export function useSectionUpdates(gameId:string|undefined,userId:string|undefine
       optimisticVersion.current+=1;
       setCounts(previous=>({...previous,[view]:0}));
      }
-     notifySectionUpdates(gameId);
+     // The current hook already updates its badge locally. Re-broadcasting
+     // this same acknowledgement schedules a redundant get_section_updates RPC.
     });
   },acknowledgementDelay);
   return()=>{active=false;clearTimeout(id)};
