@@ -36,7 +36,10 @@ assert(layout.includes("import './onboarding-tour.css'"),'Initial tutorial choic
 assert(client.includes("tourMode==='idle'}"),'Time-sensitive blitz must not obscure the guided tour');
 
 assert(tour.includes('clippedRect(el)')&&tour.includes("'.mobileDockScroll,.mobileDockPinned,.mobileAllGrid'"),'Targets outside horizontally scrolling mobile navigation must not count as visible');
-assert(tour.includes('dockScroller.scrollBy({left:'),'Guided steps must reveal offscreen dock controls before spotlight placement');
+assert(tour.includes('dockScroller.scrollTo({left:Math.max(0,dockScroller.scrollLeft+offset)'),'Guided steps must reveal offscreen dock controls with an absolute position');
+assert(tour.includes("if(!active||!clippedRect(active))revealMenuRef.current()"),'When scrolling cannot reveal the control, open existing All sections sheet');
+assert(client.includes('menuOpen={mobileMenuOpen} onRevealMenu={()=>setMobileMenuOpen(true)}'),'Tour must be able to reveal menu-only mobile tiles');
+assert(tour.includes("timer=window.setTimeout(()=>{")&&tour.includes('update();'),'Tour must recheck the target after the dock scroll has settled');
 assert(tour.includes('placeTourCard(rect,viewport,cardSize)'),'Tour must position cards from target and viewport geometry');
 assert(client.includes("key={mobileMenuOpen?'all-sections':'navigation'}"),'Mobile all-sections sheet must refresh the active spotlight');
 assert(client.includes('data-tour-view="chat"')&&client.includes('toggleTourChat()'),'Chat in the mobile menu must advance the tour');
