@@ -68,14 +68,14 @@ export default function GuidedTour({step,index,total,onSkip,onFallback,onRevealM
    // active page has its own scroll-restoration logic.
    const r=el.getBoundingClientRect(),bounds=dockScroller.getBoundingClientRect();
    const offset=(r.left+r.right-bounds.left-bounds.right)/2;
-   dockScroller.scrollTo({left:Math.max(0,dockScroller.scrollLeft+offset),behavior:'instant'});
-  }else el?.scrollIntoView({block:'nearest',inline:'nearest',behavior:'instant'});
+   dockScroller.scrollTo({left:Math.max(0,dockScroller.scrollLeft+offset),behavior:'auto'});
+  }else el?.scrollIntoView({block:'nearest',inline:'nearest',behavior:'auto'});
   frame=requestAnimationFrame(update);
   timer=window.setTimeout(()=>{
    update();
    // When a customised dock cannot expose the requested section, open the
    // existing "All sections" grid instead of leaving the tutorial stranded.
-   if(window.matchMedia('(max-width:900px)').matches&&!document.querySelector('.mobileMoreSheet')){
+   if(window.matchMedia('(max-width:900px)').matches&&!menuOpen&&!document.querySelector('.mobileMoreSheet')){
     const active=targetElement(step.target);
     if(!active||!clippedRect(active))revealMenuRef.current();
    }
