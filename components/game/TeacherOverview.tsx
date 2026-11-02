@@ -21,7 +21,8 @@ function keepOverview(key:string,value:OverviewCache){
  if(overviewCache.size>8)overviewCache.delete(overviewCache.keys().next().value!);
 }
 async function fetchOverview(key:string,gameId:string,full:boolean){
- const pending=overviewInFlight.get(key);
+ const pendingKey=key+':'+(full?'full':'live');
+ const pending=overviewInFlight.get(pendingKey);
  if(pending)return pending;
  const task=(async()=>{
   let data:Partial<Snapshot>;
@@ -42,8 +43,8 @@ async function fetchOverview(key:string,gameId:string,full:boolean){
   if(!data?.as_of)throw new Error('Обзор управления не вернул данные.');
   return {data,full};
  })();
- overviewInFlight.set(key,task);
- try{return await task}finally{if(overviewInFlight.get(key)===task)overviewInFlight.delete(key)}
+ overviewInFlight.set(pendingKey,task);
+ try{return await task}finally{if(overviewInFlight.get(pendingKey)===task)overviewInFlight.delete(pendingKey)}
 }
 export default function TeacherOverview({g,onWorkspace,onNavigate}:{g:ReturnTypeRepublic;onWorkspace:(key:'stages'|'parties'|'grades'|'event'|'impact'|'journal')=>void;onNavigate?:(destination:Destination)=>void}){
  const gameId=g.game?.id,cacheKey=gameId&&g.me?.user_id?gameId+':'+g.me.user_id:'';
