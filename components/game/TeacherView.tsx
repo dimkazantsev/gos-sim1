@@ -48,7 +48,7 @@ export default function TeacherView({g,onOpenProcesses,onOpenStages,initialWorks
  // Do not preload the data of every teacher tab while opening the Overview.
  useEffect(()=>{
   if(!g.coreLoaded||!game?.id||!g.me?.user_id)return;
-  void g.hydrateTeacherWorkspace(activeWorkspace);
+  void g.hydrateTeacherWorkspace?.(activeWorkspace);
  },[activeWorkspace,game?.id,g.me?.user_id,g.coreLoaded]);
  const navigationTarget=useTeacherNavigationTarget();
  const navigationRef=useHorizontalWheel(navigationTarget===null?undefined:game?.id);
