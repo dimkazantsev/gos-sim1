@@ -2,6 +2,7 @@ const assert=require('node:assert/strict');
 const fs=require('node:fs');
 const {PGlite}=require('@electric-sql/pglite');
 const sql=fs.readFileSync('supabase/migrations/20261102165000_remove_case_meta_framing.sql','utf8');
+const followup=fs.readFileSync('supabase/migrations/20261102166000_remove_northern_supply_meta_clause.sql','utf8');
 const cases=[...sql.matchAll(/\('([^']+)','([^']+)','([^']+)'\)/g)].map(([,key,oldStart,newStart])=>({key,oldStart,newStart}));
 assert.equal(cases.length,19,'There must be 19 exact regional declension corrections');
 assert.equal(new Set(cases.map(x=>x.key)).size,cases.length,'No repeated case keys');
@@ -38,10 +39,12 @@ assert(regional.includes('вымышленных выпускников'),'Actua
    ['bank-legal-2026-010','В Карелии учтён договор. В учебном реестре указаны участки.'],
    ['budget-region-2026-39-credit-return','Кредит возвращается в конце учебного финансового периода.'],
    ['budget-risk-2026-external','В вымышленном сценарии рублевый курс валюты долга увеличился на 15 %.'],
-   ['bank-curated-light-09','Спектакль с вымышленными отказами в центре услуг — часть обстоятельств.']
+   ['bank-curated-light-09','Спектакль с вымышленными отказами в центре услуг — часть обстоятельств.'],
+   ['budget-region-2026-14-credit','График возврата согласован. В вымышленном сценарии своевременный завоз сохраняет работу нескольких предприятий; ошибка учета затрудняет следующий заем.']
   ];
   for(const [key,body] of exceptions)await db.query('insert into event_cases(case_key,situation) values($1,$2)',[key,body]);
   await db.exec(sql);
+  await db.exec(followup);
   for(const {key,oldStart,newStart} of cases){
    const row=(await db.query('select situation,decision_options,effect_plan from event_cases where case_key=$1',[key])).rows[0];
    assert.equal(row.situation,newStart+original.get(key).slice(oldStart.length),'Only fictional framing may change for '+key);
@@ -55,9 +58,14 @@ assert(regional.includes('вымышленных выпускников'),'Actua
   assert(mapped.get('budget-region-2026-39-credit-return').includes('в конце финансового периода'));
   assert(mapped.get('budget-risk-2026-external').includes('Рублёвый курс валюты долга увеличился на 15 %'));
   assert(mapped.get('bank-curated-light-09').includes('вымышленными отказами'));
+  const northern=(await db.query("select situation from event_cases where case_key='budget-region-2026-14-credit'")).rows[0].situation;
+  assert(northern.includes('Своевременный завоз сохраняет работу нескольких предприятий; ошибка учёта затрудняет следующий заём.'));
+  assert(!northern.includes('вымышленном сценарии'));
+
   const snapshot=(await db.query('select case_key,situation from event_cases order by case_key')).rows;
   await db.exec(sql);
+  await db.exec(followup);
   assert.deepEqual((await db.query('select case_key,situation from event_cases order by case_key')).rows,snapshot,'Migration must be idempotent');
-  console.log('PASS: 23 situation rewrites; all grammatical openings, values, decisions and legitimate fictional details preserved; migration idempotent');
+  console.log('PASS: 24 situation rewrites; all grammatical openings, values, decisions and legitimate fictional details preserved; migration idempotent');
  }finally{await db.close()}
 })().catch(e=>{console.error(e);process.exitCode=1});
