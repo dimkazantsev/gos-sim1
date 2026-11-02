@@ -10,7 +10,7 @@ replace("const api={errors,starts,failures,","const api={errors,starts,failures,
 replace("name==='./useGameTableSync'?sync:","name==='./useGameTableSync'?sync:name==='./useSavedGameState'?{useSavedGameState:(_game,_user,_key,value)=>react.useState(value),savedChoice:()=>()=>true}:name==='./votingBodies'?{VOTING_BODIES:[],bodyQuorum:()=>0}:");
 replace("visibilityState:hidden?'hidden':'visible'","visibilityState:hidden?'hidden':'visible',getElementById:()=>null");
 replace("name!=='get_my_institution_meeting_permissions'","name!=='get_my_institution_meeting_permissions'&&name!=='get_gd_session_attendance'");
-replace("profiles:[],partyInvitations:[],votes:[]","profiles:[],partyInvitations:[],formalDocuments:[],ballots:[],votes:[],names:{}");
+replace("profiles:[],partyInvitations:[],votes:[]","profiles:[],partyInvitations:[],formalDocuments:[],ballots:[],partyMandates:[],members:[],votes:[],names:{}");
 replace("main().catch(error=>{console.error(error);process.exitCode=1});","module.exports={realm,tick,find};");
 const compiled=new Module(file,module);compiled.filename=file;compiled.paths=module.paths;compiled._compile(fixture,file);
 const {realm,tick,find}=compiled.exports;
