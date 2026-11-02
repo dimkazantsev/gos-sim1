@@ -487,7 +487,7 @@ export function useRepublicGame(gameId:string){
    if(reconcile.length)scheduleRealtimeReload(1000,reconcile);
    for(const table of tables)notifyGameDataRefresh(gameId,table);
    // A document version changes no core identity or party membership.
-   if(partyDocs&&(activeViewRef.current==='parties'||activeViewRef.current==='teacher'))void loadPartyDocuments();
+   if(partyDocs&&(activeViewRef.current==='parties'||(activeViewRef.current==='teacher'&&teacherWorkspaceRef.current==='parties')))void loadPartyDocuments();
     if(partyDocs)notifySectionUpdates(gameId);
    if(overview||chat)scheduleRealtimeChatOverview();
    if(chat&&chatOpenRef.current&&channelRef.current)void loadMessages(channelRef.current);
