@@ -68,6 +68,7 @@ on:
       - 'components/game/GuidedTour.module.css'
       - 'app/onboarding-tour.css'
       - 'scripts/guided-tour-check.cjs'
+      - 'scripts/case-meta-language-check.cjs'
       - 'components/game/ProfileSecurityPanel.tsx'
       - 'components/game/profileEmailDelivery.ts'
       - 'scripts/profile-email-rate-limit-check.cjs'
@@ -446,6 +447,7 @@ jobs:
       - run: node scripts/impact-concurrency-contract-check.cjs
       - run: node --experimental-strip-types scripts/session-export-batches-check.mjs
       - run: node scripts/guided-tour-check.cjs
+      - run: node scripts/case-meta-language-check.cjs
       - run: node scripts/document-input-check.cjs
       - run: node scripts/document-signer-title-check.cjs
       - run: node scripts/official-document-paper-check.cjs

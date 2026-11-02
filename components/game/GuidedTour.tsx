@@ -48,10 +48,11 @@ function clippedRect(el:HTMLElement):Rect|null{
  if(right-left<8||bottom-top<8)return null;
  return {left,top,right,bottom,width:right-left,height:bottom-top};
 }
-export default function GuidedTour({step,index,total,onSkip,onFallback}:{step:TourStep;index:number;total:number;onSkip:()=>void;onFallback:(target:TourTarget)=>void}){
+export default function GuidedTour({step,index,total,onSkip,onFallback,onRevealMenu,menuOpen}:{step:TourStep;index:number;total:number;onSkip:()=>void;onFallback:(target:TourTarget)=>void;onRevealMenu:()=>void;menuOpen:boolean}){
  const [rect,setRect]=useState<Rect|null>(null);
  const [viewport,setViewport]=useState(()=>({width:typeof window==='undefined'?1024:window.innerWidth,height:typeof window==='undefined'?768:window.innerHeight}));
  const cardRef=useRef<HTMLDivElement>(null);
+ const revealMenuRef=useRef(onRevealMenu);revealMenuRef.current=onRevealMenu;
  const [cardSize,setCardSize]=useState({width:400,height:240});
  useEffect(()=>{
   let timer:number|undefined,frame:number|undefined;
@@ -61,13 +62,24 @@ export default function GuidedTour({step,index,total,onSkip,onFallback}:{step:To
    setViewport(previous=>previous.width===window.innerWidth&&previous.height===window.innerHeight?previous:{width:window.innerWidth,height:window.innerHeight});
   }
   const el=targetElement(step.target);
-  const dockScroller=el?.closest<HTMLElement>('.mobileDockScroll,.mobileDockPinned');
+  const dockScroller=el?.closest<HTMLElement>('.mobileDockScroll');
   if(el&&dockScroller){
-   const r=el.getBoundingClientRect(),s=dockScroller.getBoundingClientRect();
-   dockScroller.scrollBy({left:(r.left+r.right-s.left-s.right)/2,behavior:'auto'});
+   // Show the target even when the dock is horizontally scrolled and the
+   // active page has its own scroll-restoration logic.
+   const r=el.getBoundingClientRect(),bounds=dockScroller.getBoundingClientRect();
+   const offset=(r.left+r.right-bounds.left-bounds.right)/2;
+   dockScroller.scrollTo({left:Math.max(0,dockScroller.scrollLeft+offset),behavior:'auto'});
   }else el?.scrollIntoView({block:'nearest',inline:'nearest',behavior:'auto'});
   frame=requestAnimationFrame(update);
-  timer=window.setTimeout(update,100);
+  timer=window.setTimeout(()=>{
+   update();
+   // When a customised dock cannot expose the requested section, open the
+   // existing "All sections" grid instead of leaving the tutorial stranded.
+   if(window.matchMedia('(max-width:900px)').matches&&!menuOpen&&!document.querySelector('.mobileMoreSheet')){
+    const active=targetElement(step.target);
+    if(!active||!clippedRect(active))revealMenuRef.current();
+   }
+  },160);
   window.addEventListener('resize',update);
   window.addEventListener('scroll',update,true);
   return()=>{if(frame)cancelAnimationFrame(frame);if(timer)clearTimeout(timer);window.removeEventListener('resize',update);window.removeEventListener('scroll',update,true)};

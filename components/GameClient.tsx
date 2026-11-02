@@ -813,7 +813,7 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
      <span className="tourChoiceNote">Экскурсия не меняет игровые данные, оценки и решения.</span>
     </section>
    </div>}
-  {tourMode==='tour'&&!introOpen&&!previewMode&&<GuidedTour key={mobileMenuOpen?'all-sections':'navigation'} step={getTourSteps(!!teacher)[tourIndex]} index={tourIndex} total={getTourSteps(!!teacher).length} onSkip={skipTour} onFallback={(target:TourTarget)=>target==='chat'?toggleTourChat():navigate(target,undefined,true,true)}/>}
+  {tourMode==='tour'&&!introOpen&&!previewMode&&<GuidedTour key={mobileMenuOpen?'all-sections':'navigation'} step={getTourSteps(!!teacher)[tourIndex]} index={tourIndex} total={getTourSteps(!!teacher).length} onSkip={skipTour} onFallback={(target:TourTarget)=>target==='chat'?toggleTourChat():navigate(target,undefined,true,true)} menuOpen={mobileMenuOpen} onRevealMenu={()=>setMobileMenuOpen(true)}/>}
   {showSetupWelcome&&setupStatus&&<div className="profileSetupBackdrop">
     <section ref={setupDialogRef} tabIndex={-1} role="dialog" aria-modal="true" aria-labelledby="profile-setup-title" aria-describedby="profile-setup-description" className="profileSetupWelcome">
      <div className="profileSetupWelcomeIcon"><UserRound size={26} aria-hidden="true"/></div>
