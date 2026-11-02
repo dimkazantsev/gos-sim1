@@ -11,7 +11,7 @@ has("if(workspace==='impact')jobs.push(loadImpactEngine())");
 lacks("['impact','analytics'].includes(workspace)");
 lacks("['participants','parties','tools'].includes(workspace)");
 lacks("['stages','journal','analytics','grades','awards'].includes(workspace)");
-lacks("loadPartyDossierRows()");
+has("loadPartyDossierRows()");
 has("if(workspace==='parties')jobs.push(loadPartyAssets(true))");
 has("if(['journal','analytics','tools'].includes(workspace))jobs.push(loadClassroomTelemetry())");
 has("if(['parties','tools'].includes(workspace))jobs.push(loadPartyRepresentation(false))");
