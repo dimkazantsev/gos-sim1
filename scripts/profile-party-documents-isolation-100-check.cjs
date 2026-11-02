@@ -19,7 +19,7 @@ assert(source.includes("if(workspace==='parties')jobs.push(loadPartyDossierRows(
  'Teacher party dossier must load documents only when opened');
 assert(!source.includes("if(view==='teacher')jobs.push(loadPartyDocuments())"),
  'Overview must not fetch party documents');
-const extracted=source.slice(start,end)+'\nmodule.exports={loadPartyAssets,loadPartyDocuments};';
+const extracted=source.slice(start,end)+'\nmodule.exports={loadPartyAssets,loadPartyDocuments,loadSelectedPartyDocuments};';
 const output=ts.transpileModule(extracted,{compilerOptions:{
  target:ts.ScriptTarget.ES2022,module:ts.ModuleKind.CommonJS
 }}).outputText;
@@ -30,7 +30,7 @@ const helperModule={exports:{}};
 vm.runInNewContext('(function(module,exports){'+helperCode+'})',{})(helperModule,helperModule.exports);
 const {PROFILE_ASSET_COLUMNS,mergeProfileAssetRows}=helperModule.exports;
 
-function client(view='profile'){
+function client(view='profile',registrationStatus='draft'){
  const reads=[],signs=[],scopeCalls=[],errors=[];
  let parties=[],profiles=[],documents=[];
  const db={
@@ -43,7 +43,7 @@ function client(view='profile'){
  const supabase={from(table){
   assert(Object.hasOwn(db,table),'Unexpected database table '+table);
   const query={
-   select(){return this},eq(){return this},order(){return this},
+   select(){return this},eq(){return this},in(){return this},order(){return this},
    then(ok,fail){
     reads.push(table);
     return Promise.resolve({data:db[table],error:null}).then(ok,fail);
@@ -53,8 +53,11 @@ function client(view='profile'){
  }};
  const context={
   Promise,Map,console,module:{exports:{}},supabase,gameId:'game-1',
-  activeViewRef:{current:view},PROFILE_ASSET_COLUMNS,mergeProfileAssetRows,
-  loadCachedParties:()=>Promise.resolve({data:[{id:'p1',logo_path:null}],error:null}),
+  activeViewRef:{current:view},teacherWorkspaceRef:{current:'parties'},
+  selectedPartyDocuments:{current:null},PARTY_DOCUMENT_COLUMNS:'id,game_id,party_id,version_no',
+  PROFILE_ASSET_COLUMNS,mergeProfileAssetRows,
+  limitedCoreRead:async result=>await result,
+  loadCachedParties:()=>Promise.resolve({data:[{id:'p1',logo_path:null,registration_status:registrationStatus}],error:null}),
   readSafely:async(scopes,reader)=>{scopeCalls.push(scopes);await reader({})},
   readCurrent:()=>true,requireSuccessful:()=>{},
   signedAssetUrl:async(bucket,objectPath)=>{signs.push({bucket,objectPath});return 'signed://'+objectPath},
@@ -85,12 +88,28 @@ const flush=()=>new Promise(resolve=>setImmediate(resolve));
 
  const party=client('parties');
  await party.loadPartyAssets(true);
+ assert.equal(party.documents.length,0,'No party document before a party is selected');
+ await party.loadSelectedPartyDocuments('p1');
  await flush();
  assert.deepEqual([...party.reads].sort(),['game_profiles','party_documents'].sort(),
   'Party screen keeps full document and profile functionality');
  assert.deepEqual(Array.from(party.scopeCalls[0]),['parties','profiles','partyDocuments']);
  assert.equal(party.documents.length,2,'Full party dossier metadata remains readable');
  assert.equal(party.signs.length,2,'Party screen still signs both existing files');
+
+ const registered=client('parties','registered');
+ await registered.loadPartyAssets(true);
+ await registered.loadSelectedPartyDocuments('p1');
+ await flush();
+ assert.equal(registered.reads.filter(table=>table==='party_documents').length,0,
+  'Registered party must not query its historical registration package');
+ assert.equal(registered.signs.length,0,
+  'Registered party must not sign historical registration files');
+ const registeredTeacher=client('teacher','registered');
+ await registeredTeacher.loadPartyDocuments();
+ await flush();
+ assert.equal(registeredTeacher.documents.length,2,
+  'Teacher can still access the registered party archive');
 
  const teacher=client();
  await teacher.loadPartyDocuments();

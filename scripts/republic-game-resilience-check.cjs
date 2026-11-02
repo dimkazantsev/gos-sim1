@@ -291,6 +291,8 @@ async function main(){
   await h.settle();
   h.render().setActiveView('parties');
   await h.settle();
+  await h.render().loadSelectedPartyDocuments('party-1');
+  await h.settle();
   const coreBefore=h.readCount('games'),documentsBefore=h.readCount('party_documents');
   h.emit('party_documents');
   await h.advance(650);
@@ -300,6 +302,8 @@ async function main(){
  await check('Storage signatures are cached and never exceed four parallel requests per client',async()=>{
   const h=harness({effects:true});h.setAssetPaths(true);
   await h.settle();h.render().setActiveView('parties');await h.settle();
+  await h.render().loadSelectedPartyDocuments('party-1');
+  await h.settle();
   for(let i=0;i<15;i++)await tick();
   const first=h.assetStats();
   assert(first.signed>=12,'Asset fixture must exercise document, avatar and emblem signatures');

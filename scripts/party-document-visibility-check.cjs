@@ -10,8 +10,12 @@ assert.match(hook,/if\(workspace==='parties'\)jobs\.push\(loadPartyDossierRows\(
  'Teacher must fetch registered documents upon opening the party dossier');
 assert.doesNotMatch(hook,/if\(view==='teacher'\)jobs\.push\(loadPartyDocuments\(\)\)/,
  'Teacher overview must not fetch full registered documents');
-assert.match(hook,/async function loadPartyDocuments\(\)[\s\S]*?from\('party_documents'\)\.select\('\*'\)\.eq\('game_id',gameId\)[\s\S]*?acceptPartyDocuments\(\(pd\.data\|\|\[\]\)/,
- 'Teacher document loader must read game-scoped rows and update document state');
+assert.match(hook,/async function readScopedPartyDocuments[\s\S]*?from\('party_documents'\)[\s\S]*?eq\('game_id',gameId\)[\s\S]*?in\('party_id',eligible\.map/,
+ 'Document query must stay game-scoped and restrict the selected party');
+assert.match(hook,/function canLoadRegisteredPartyArchive[\s\S]*?activeViewRef\.current==='teacher'[\s\S]*?teacherWorkspaceRef\.current==='parties'/,
+ 'Teacher party dossier retains explicit access to registered files');
+assert.match(hook,/async function loadPartyDocuments\(\)[\s\S]*?readScopedPartyDocuments\([\s\S]*?acceptPartyDocuments\(pd\.data,ticket\)/,
+ 'Document state must be updated from the scoped request');
 assert.match(hook,/async function reviewPartyDocument[\s\S]*?update\(\{status,note:note\?\.trim\(\)\|\|null\}\)[\s\S]*?await loadPartyDocuments\(\)/,
  'Review must persist status and note then refresh teacher documents');
 assert.match(teacher,/const docs=partyDocuments\.filter\(d=>d\.party_id===p\.id\)/,

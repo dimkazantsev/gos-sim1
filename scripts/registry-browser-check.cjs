@@ -24,9 +24,13 @@ const chrome=[process.env.CHROME_BIN,'/usr/bin/google-chrome','/usr/bin/chromium
    if(screen==='votes')await frame.locator('.voteManual').evaluate(el=>el.open=true);
    const geometry=await frame.locator(selector).evaluate(root=>({viewport:document.documentElement.clientWidth,scroll:document.documentElement.scrollWidth,right:root.getBoundingClientRect().right,offenders:[...root.querySelectorAll('input,button,.styledSelectTrigger,.civicPublicDocs a')].filter(el=>el.getClientRects().length).map(el=>({class:el.className,left:el.getBoundingClientRect().left,right:el.getBoundingClientRect().right})).filter(r=>r.left<-2||r.right>document.documentElement.clientWidth+2)}));
    assert(geometry.scroll<=geometry.viewport+2,screen+' overflow at '+width+': '+JSON.stringify(geometry));assert.equal(geometry.offenders.length,0,screen+' controls stay inside at '+width+': '+JSON.stringify(geometry));
-   if(screen==='parties'){assert.equal(await frame.locator('.civicPublicDocs a').count(),2,'Public charter and programme; fee is private');assert.equal(await frame.locator('.ghostBulk,.ghostPanel,.partyAgreements').count(),0,'Public parties omit GV and agreements');}
+   if(screen==='parties'){
+    assert.equal(await frame.locator('.civicPublicDocs a').count(),0,'Registered parties must not show the historic registration files');
+    assert.equal(await frame.locator('.justiceDocuments button').count(),1,'Fixture includes one official certificate; the two-document scenario has its own browser test');
+    assert.equal(await frame.locator('.ghostBulk,.ghostPanel,.partyAgreements').count(),0,'Public parties omit GV and agreements');
+   }
    await page.locator('#preview').screenshot({path:path.join(screens,screen+'-'+width+'.png')});
-   await frame.locator(screen==='parties'?'.civicPublicDocs':'.civicBallot').last().scrollIntoViewIfNeeded();
+   await frame.locator(screen==='parties'?'.justiceDocuments':'.civicBallot').last().scrollIntoViewIfNeeded();
    await page.locator('#preview').screenshot({path:path.join(screens,screen+'-detail-'+width+'.png')});console.log('PASS '+screen+' '+width+'px: public documents and controls remain in the viewport');
   }
   for(const width of [320,390,768,1440]){
