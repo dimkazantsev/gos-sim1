@@ -95,7 +95,8 @@ export function useSectionUpdates(gameId:string|undefined,userId:string|undefine
       optimisticVersion.current+=1;
       setCounts(previous=>({...previous,[view]:0}));
      }
-     notifySectionUpdates(gameId);
+     // The current hook already updates its badge locally. Re-broadcasting
+     // this same acknowledgement schedules a redundant get_section_updates RPC.
     });
   },acknowledgementDelay);
   return()=>{active=false;clearTimeout(id)};
