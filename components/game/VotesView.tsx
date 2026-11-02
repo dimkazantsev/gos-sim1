@@ -27,9 +27,30 @@ export default function VotesView({g,onOpenDocument,onOpenStages,focusId,onClear
  const [query,setQuery]=useState(''),[units,setUnits]=useState<VotingUnit[]>([]);
  const [formalId,setFormalId]=useState('');
  const selectedNpa=formalDocuments.find(d=>d.id===formalId);
+ // Index immutable projections once per update rather than scanning every
+ // ballot, document and participant again for each displayed vote.
+ const openDocumentSteps=useMemo(()=>new Set(votes.filter(v=>v.status==='open'&&v.formal_document_id).map(v=>v.formal_document_id+':'+v.formal_step_code)),[votes]);
+ const documentById=useMemo(()=>new Map(formalDocuments.map(d=>[d.id,d])),[formalDocuments]);
+ const memberById=useMemo(()=>new Map(members.map(m=>[m.user_id,m])),[members]);
+ const ballotByVoteAndVoter=useMemo(()=>{
+  const map=new Map<string,typeof ballots>();
+  for(const b of ballots){const rows=map.get(b.vote_id);if(rows)rows.push(b);else map.set(b.vote_id,[b]);}
+  return map;
+ },[ballots]);
+ const personalBallotByVote=useMemo(()=>{
+  const map=new Map<string,(typeof ballots)[number]>();
+  for(const b of ballots)if(b.voter_id===me?.user_id)map.set(b.vote_id,b);
+  return map;
+ },[ballots,me?.user_id]);
+ const mandatesByParty=useMemo(()=>{
+  const map=new Map<string,typeof partyMandates>();
+  for(const row of partyMandates){const rows=map.get(row.party_id);if(rows)rows.push(row);else map.set(row.party_id,[row]);}
+  return map;
+ },[partyMandates]);
+
  const scheduledBills=formalDocuments.filter(d=>d.workflow_key==='bill'
   && !['published','rejected'].includes(d.status_code)
-  && !votes.some(v=>v.formal_document_id===d.id&&v.formal_step_code===d.status_code&&v.status==='open'));
+  && !openDocumentSteps.has(d.id+':'+d.status_code));
  const pendingNpas=formalDocuments.filter(d=>d.workflow_key!=='bill'&&votePresetForDocument(d)
   &&!votes.some(v=>v.formal_document_id===d.id&&v.formal_step_code===d.status_code&&v.status==='open'));
  const focused=useRef('');
@@ -37,6 +58,11 @@ export default function VotesView({g,onOpenDocument,onOpenStages,focusId,onClear
  const registrationScope=JSON.stringify([g.game?.id,me?.user_id,me?.kind,me?.role_title,me?.roster_archived_at,teacher]);
  const [checkins,setCheckins]=useState<{scope:string;rows:{user_id:string;institution_key:string;stage_no:number;present_mandates:number|null}[]}>({scope:'',rows:[]});
  const checkedIn=checkins.scope===registrationScope?checkins.rows:[];
+ const checkinsByInstitutionAndStage=useMemo(()=>{
+  const map=new Map<string,typeof checkedIn>();
+  for(const row of checkedIn){const key=row.institution_key+':'+row.stage_no;const rows=map.get(key);if(rows)rows.push(row);else map.set(key,[row]);}
+  return map;
+ },[checkedIn]);
  const checkinLoaded=checkins.scope===registrationScope;
  const reads=useRef({scope:registrationScope,live:true,promise:null as Promise<void>|null,queued:false,cancel:null as (()=>void)|null});
  if(reads.current.scope!==registrationScope)reads.current={scope:registrationScope,live:true,promise:null,queued:false,cancel:null};
@@ -91,7 +117,10 @@ export default function VotesView({g,onOpenDocument,onOpenStages,focusId,onClear
  },[focusId,tab,votes,checkedIn,checkinLoaded,focusedNeedsRegistration]);
 
 
- const visible=useMemo(()=>votes.filter(v=>(tab==='all'||v.status===tab)&&(!query.trim()||[v.title,institutionLabel(v.institution_key),v.group_name,v.electorate_snapshot?.institution_label].join(' ').toLowerCase().includes(query.trim().toLowerCase()))),[votes,tab,query]);
+ const visible=useMemo(()=>{
+  const term=query.trim().toLowerCase();
+  return votes.filter(v=>(tab==='all'||v.status===tab)&&(!term||[v.title,institutionLabel(v.institution_key),v.group_name,v.electorate_snapshot?.institution_label].join(' ').toLowerCase().includes(term)));
+ },[votes,tab,query]);
  const openCount=votes.filter(v=>v.status==='open').length;
 
  async function openNpa(id:string){const d=formalDocuments.find(d=>d.id===id),preset=d?votePresetForDocument(d):null;if(!d||!preset)return;setBusy(id);try{await createVote({...preset,formalDocumentId:id,groupName:null})}finally{setBusy('')}}
@@ -112,9 +141,10 @@ export default function VotesView({g,onOpenDocument,onOpenStages,focusId,onClear
   // has not yet cast their vote. Server RPC applies the same safeguard.
   if(voteNeedsRegistration(v)){
    if(!checkinLoaded)return false;
-   const registered=checkedIn.filter(r=>r.institution_key===v.institution_key&&r.stage_no===v.stage_no
-    &&Number(v.electorate_snapshot?.weights?.[r.user_id]||0)>0);
-   if(registered.length===0||registered.some(r=>!ballots.some(b=>b.vote_id===v.id&&b.voter_id===r.user_id)))return false;
+   const registered=(checkinsByInstitutionAndStage.get(v.institution_key+':'+v.stage_no)||[])
+    .filter(r=>Number(v.electorate_snapshot?.weights?.[r.user_id]||0)>0);
+   const submitted=new Set((ballotByVoteAndVoter.get(v.id)||[]).map(b=>b.voter_id));
+   if(registered.length===0||registered.some(r=>!submitted.has(r.user_id)))return false;
   }
   if(units.some(u=>'unit:'+u.id===v.institution_key&&u.head_user_id===me.user_id))return true;
   if(['bill_amendments','budget_second_reading_amendment','budget_government_submission'].includes(v.procedure_key||'')&&v.created_by===me.user_id)return true;
@@ -196,8 +226,8 @@ export default function VotesView({g,onOpenDocument,onOpenStages,focusId,onClear
   <div className="voteTabs"><button className={tab==='open'?'active':''} onClick={()=>{onClearFocus?.();setTab('open')}}>Открытые <span>{openCount}</span></button><button className={tab==='closed'?'active':''} onClick={()=>{onClearFocus?.();setTab('closed')}}>Завершённые</button><button className={tab==='all'?'active':''} onClick={()=>{onClearFocus?.();setTab('all')}}>Все</button></div>
 
   <div className="proceduralVoteList">{visible.length===0?<div className="emptyState">В этой категории голосований пока нет.</div>:visible.map(v=>{
-   const t=tally(v),q=quorum(v,checkedIn),my=ballots.find(b=>b.vote_id===v.id&&b.voter_id===me?.user_id);
-   const doc=v.formal_document_id?formalDocuments.find(d=>d.id===v.formal_document_id):undefined;
+   const t=tally(v),q=quorum(v,checkedIn),my=personalBallotByVote.get(v.id);
+   const doc=v.formal_document_id?documentById.get(v.formal_document_id):undefined;
    const stage=stages.find(s=>s.stage_no===v.stage_no);
    const denominator=Math.max(1,t.yes+t.no+t.abstain);
    const rule=uppercaseFirst(majorityLabel(v.majority_kind,Number(v.majority_value)));
@@ -229,15 +259,15 @@ export default function VotesView({g,onOpenDocument,onOpenStages,focusId,onClear
     {v.status==='open'&&v.electorate_snapshot?.attendance_required&&!v.procedure_key?.startsWith('budget_')&&v.procedure_key!=='bill_amendments'&&doc?.workflow_key!=='budget'&&<p className="voteAutoClosureHint">Голосование автоматически закроется после последнего голоса зарегистрированного участника при наличии кворума. Председательствующий или преподаватель также может закрыть его вручную.</p>}
     <div className="quorumMeter"><div><span>Присутствует: {q.present} из {q.eligible} · Подано: {q.cast}</span><b className={q.met?'ok':'wait'}>{q.met?'КВОРУМ ЕСТЬ':'НУЖНО '+Math.max(0,q.needed-q.present)}</b></div><i><em style={{width:Math.min(100,pct(q.present,q.eligible))+'%'}}/></i></div>
     {v.voting_mode==='mandate'&&<details className="deputyRegistration" open={v.status==='open'}>
-     <summary><div><small>РЕГИСТРАЦИЯ ДЕПУТАТОВ</small><b>Кто представляет голоса фракций на этом заседании</b></div><span>{checkedIn.filter(r=>r.institution_key===v.institution_key&&r.stage_no===v.stage_no).reduce((a,x)=>a+gdEffectivePresence(x.user_id,x.present_mandates),0)} / 450 присутствует · Гоствойтинг −{parties.reduce((a,p)=>a+Math.min(p.mandates,p.ghost_loss_current),0)}</span></summary>
+     <summary><div><small>РЕГИСТРАЦИЯ ДЕПУТАТОВ</small><b>Кто представляет голоса фракций на этом заседании</b></div><span>{(checkinsByInstitutionAndStage.get(v.institution_key+':'+v.stage_no)||[]).reduce((a,x)=>a+gdEffectivePresence(x.user_id,x.present_mandates),0)} / 450 присутствует · Гоствойтинг −{parties.reduce((a,p)=>a+Math.min(p.mandates,p.ghost_loss_current),0)}</span></summary>
      <div className="deputyRegistrationBody">
       {parties.filter(p=>p.mandates>0).map(p=>{
-       const rows=partyMandates.filter(x=>x.party_id===p.id);
+       const rows=mandatesByParty.get(p.id)||[];
        const base=rows.reduce((a,x)=>a+x.base_mandates,0);
        const effective=rows.reduce((a,x)=>a+x.effective_mandates,0);
        return <article key={p.id}>
         <header><span style={{background:p.color}}>{p.name.slice(0,2).toUpperCase()}</span><div><b>{p.name}</b><small>{base} мандатов · {effective} доступно{p.ghost_active?' · гоствойтинг −'+p.ghost_loss_current:''}{p.representation_penalty?' · Потеря мест −'+p.representation_penalty:''}</small></div></header>
-        <div>{rows.map(a=>{const m=members.find(x=>x.user_id===a.user_id);return <div className="deputyStudentRow" key={a.user_id}><b>{m?.full_name||'Участник'}</b><span>{a.base_mandates} манд.</span><em>{[a.ghost_loss?'−'+a.ghost_loss+' гоствойтинг':'',a.representation_loss?'−'+a.representation_loss+' мест':''].filter(Boolean).join(' · ')||'—'}</em><strong>{a.effective_mandates} мандатов {v.procedure_key==='registered_session'?(checkedIn.some(r=>r.user_id===a.user_id&&r.institution_key===v.institution_key&&r.stage_no===v.stage_no)?'· На заседании':'· Не зарегистрирован'):''}</strong></div>})}</div>
+        <div>{rows.map(a=>{const m=memberById.get(a.user_id);return <div className="deputyStudentRow" key={a.user_id}><b>{m?.full_name||'Участник'}</b><span>{a.base_mandates} манд.</span><em>{[a.ghost_loss?'−'+a.ghost_loss+' гоствойтинг':'',a.representation_loss?'−'+a.representation_loss+' мест':''].filter(Boolean).join(' · ')||'—'}</em><strong>{a.effective_mandates} мандатов {v.procedure_key==='registered_session'?((checkinsByInstitutionAndStage.get(v.institution_key+':'+v.stage_no)||[]).some(r=>r.user_id===a.user_id)?'· На заседании':'· Не зарегистрирован'):''}</strong></div>})}</div>
        </article>
       })}
      </div>
