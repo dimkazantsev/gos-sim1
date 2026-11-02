@@ -1,7 +1,7 @@
 const assert=require('node:assert/strict');
 const fs=require('node:fs');
 const hook=fs.readFileSync('components/game/useSectionUpdates.ts','utf8');
-const sql=fs.readFileSync('supabase/migrations/20261102122000_rls_auth_uid_statement_cache.sql','utf8');
+const sql=fs.readFileSync('supabase/migrations/20261102160000_rls_auth_uid_statement_cache.sql','utf8');
 const scope=hook.slice(hook.indexOf('const id=setTimeout(()=>{'),hook.indexOf('return()=>{active=false;clearTimeout(id)}'));
 assert(scope.includes('mark_section_read'),'read acknowledgement must still be persisted');
 assert(scope.includes('setCounts(previous=>({...previous,[view]:0}))'),'local badge must clear');

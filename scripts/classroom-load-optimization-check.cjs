@@ -5,9 +5,9 @@ const ts=require('typescript');
 const {PGlite}=require('@electric-sql/pglite');
 const source=fs.readFileSync('components/game/useRepublicGame.ts','utf8');
 const batchSource=fs.readFileSync('components/game/signDocumentAssetBatch.ts','utf8');
-const rlsFirst=fs.readFileSync('supabase/migrations/20261102122000_rls_auth_uid_statement_cache.sql','utf8');
-const rlsSecond=fs.readFileSync('supabase/migrations/20261102124000_rls_jwt_auth_statement_cache.sql','utf8');
-const broadcastSql=fs.readFileSync('supabase/migrations/20261102123000_duma_procedure_private_invalidation.sql','utf8');
+const rlsFirst=fs.readFileSync('supabase/migrations/20261102160000_rls_auth_uid_statement_cache.sql','utf8');
+const rlsSecond=fs.readFileSync('supabase/migrations/20261102162000_rls_jwt_auth_statement_cache.sql','utf8');
+const broadcastSql=fs.readFileSync('supabase/migrations/20261102161000_duma_procedure_private_invalidation.sql','utf8');
 const expectedTables=['duma_sessions','duma_agenda_items','institution_session_registrations','bill_amendments','bill_amendment_packs'];
 for(const table of expectedTables){
  assert(broadcastSql.includes("'"+table+"'"),'Missing trigger for '+table);
