@@ -70,7 +70,7 @@ export default function PartiesView({g}:{g:ReturnTypeRepublic}){
   .map(d=>d.id+':'+d.updated_at).sort().join('|');
  useEffect(()=>{
   if(selected&&(selected.registration_status==='registered'||
-   (own&&['revision','rejected','submitted'].includes(selected.registration_status))))
+   (own&&['revision','rejected'].includes(selected.registration_status))))
    void g.loadPartyOfficialDocuments(selected.id);
  },[selected?.id,selected?.registration_status,own,officialRevisionKey,g.game?.id]);
  useEffect(()=>{setRenameName(selected?.name||'');setRenameNotice('')},[selected?.id,selected?.name]);
@@ -132,7 +132,7 @@ export default function PartiesView({g}:{g:ReturnTypeRepublic}){
   setDeletingPartyId('');
  }
 
- return <div className="partyPage civicParties"><header className="pageHeader"><div><h1>Партии и фракции</h1><p>Публичные программы, партийные документы, руководство и состав.</p></div><span className={'gosPartyStageBadge '+(partyStageCompleted?'isCompleted':partyFormationOpen?'isActive':'isLocked')}>{partyStageBadge}</span></header>
+ return <div className="partyPage civicParties"><header className="pageHeader"><div><h1>Партии и фракции</h1><p>Регистрация, официальные документы, руководство и состав.</p></div><span className={'gosPartyStageBadge '+(partyStageCompleted?'isCompleted':partyFormationOpen?'isActive':'isLocked')}>{partyStageBadge}</span></header>
   {!partyFormationOpen&&<div className="gosPartyStageWarning" role="status">{partyStageNotice}</div>}
   {inbox.length>0&&<section className="civicPartyInbox"><h2>Приглашения в партии <span className="gosPartyCount">{workflowCount}</span></h2>{inbox.map(i=><article key={i.id}><b>{parties.find(p=>p.id===i.party_id)?.name||'Партия'}</b><button className="primary" disabled={!partyFormationOpen||me?.kind!=='student'||!!me.roster_archived_at} onClick={()=>void g.respondPartyInvitation(i.id,true)}>Принять</button><button className="secondary" disabled={!partyFormationOpen||me?.kind!=='student'} onClick={()=>void g.respondPartyInvitation(i.id,false)}>Отклонить</button></article>)}</section>}
   <input className="civicPartySearch" aria-label="Поиск партий" placeholder="Название, идеология или программа" value={query} onChange={e=>setQuery(e.target.value)}/>
@@ -157,7 +157,7 @@ export default function PartiesView({g}:{g:ReturnTypeRepublic}){
       <span className="civicPublicDocumentCopy"><b>{title}</b>{d.title!==title&&<span>{d.title}</span>}<small>{partyDocumentVersionLabel(d)} · {d.file_name}</small></span>
       <span className="civicPublicDocumentOpen">{d.url?<><span>{program?'Открыть программу':'Открыть'}</span><ExternalLink size={16} aria-hidden="true"/></>:<span>{d.url_loading?'Подготовка ссылки…':'Ссылка недоступна'}</span>}</span>
      </a>;
-    }):<p>Документы появятся после принятия последних версий всего регистрационного пакета, решения о регистрации и выдачи свидетельства.</p>}
+    }):<p>После регистрации будут доступны свидетельство и решение Министерства юстиции.</p>}
    </section>}
    {canInvite&&<details className="civicPartyEditor" data-party-invite-panel><PartyDisclosureSummary icon={UserPlus} title="Пригласить участника" meta={inviteClosed?'Приём закрыт. Председатель избран.':'Ожидают ответа: '+pending.length+' · приглашать можно только студентов'}/>
     {inviteClosed&&<p className="civicPartyInviteFeedback" role="status">Приём приглашений завершён: председатель партии уже избран. Новые приглашения запрещены правилами первого этапа.</p>}
@@ -172,7 +172,7 @@ export default function PartiesView({g}:{g:ReturnTypeRepublic}){
     <div className="gosPartyStageFieldset"><JusticeDocuments g={g} partyId={selected.id}/></div>}
    {own&&selected.registration_status!=='registered'&&<details key={selected.id} ref={registrationPackageRef} className={"civicPartyPackage"+(revisionVersions?" hasRevision":"")}>
     <PartyDisclosureSummary icon={FileText} title="Документы и регистрация партии" meta={"Принято "+reviewedCount+" из "+DOCS.length+" · "+docs.length+" версий"}/>
-     {partyFormationOpen&&!selected.leader_user_id&&selected.registration_status!=='registered'&&<p className="partyRegistrationEarlyHint">Документы партии можно загружать во время выборов председателя. Подготовка файлов не зависит от итогов голосования. Направить регистрационный пакет на рассмотрение можно после избрания председателя.</p>}
+     {partyFormationOpen&&!selected.leader_user_id&&<p className="partyRegistrationEarlyHint">Документы партии можно загружать во время выборов председателя. Подготовка файлов не зависит от итогов голосования. Направить регистрационный пакет на рассмотрение можно после избрания председателя.</p>}
     <div className="civicPartyFiles" aria-label="Регистрационные документы партии">
      {DOCS.map(kind=>{
       const history=documentHistory.get(kind.kind)||[];
@@ -208,7 +208,7 @@ export default function PartiesView({g}:{g:ReturnTypeRepublic}){
        </details>}
       </article>;
      })}
-     {!!selected.leader_user_id&&partyFormationOpen&&selected.registration_status!=='registered'&&
+     {!!selected.leader_user_id&&partyFormationOpen&&
       <div className="partyRegistrationFooter">
        <button type="button" className="primary" disabled={busy||!DOCS.every(req=>latestDocs.some(d=>d.doc_kind===req.kind&&d.status!=="revision"))} onClick={()=>void g.submitPartyRegistration(selected.id)}>Направить пакет на регистрацию</button>
        <details className="partyRegistrationLegal"><summary>Нормативные требования к документам</summary>

@@ -1281,7 +1281,7 @@ export function useRepublicGame(gameId:string){
    const summaries=(fd.data||[]) as FormalDocument[];
    // Keep a complete, still-current document cache after refreshing the lightweight core.
    if(!formalFullVersion.current||formalFullVersion.current!==formalVersion(summaries)){
-    formalFullVersion.current='';setFormalDocuments(summaries);
+    formalFullVersion.current='';setFormalDocuments(previous=>mergeFormalDocumentSummaries(previous,summaries as FormalDocumentSummary[]));
    }
   }
   if(!intro.error)setIntroAccountSeen(!!intro.data);
