@@ -89,7 +89,7 @@ export default function MobileDock({items,activeView,storageKey,editing,setEditi
   if(left<scroller.scrollLeft||right>scroller.scrollLeft+scroller.clientWidth){
    scroller.scrollTo({left:Math.max(0,left-(scroller.clientWidth-active.offsetWidth)/2),behavior:'smooth'});
   }
- },[activeView,order,pinned,editing]);
+ },[activeView,order,pinned,editing,chatOpen,allOpen,tourTarget]);
 
  // During the tour follow the *next* control, not the previously active view.
  // A single immediate scroll per step avoids competing smooth animations.
