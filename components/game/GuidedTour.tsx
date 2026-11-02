@@ -61,13 +61,20 @@ export default function GuidedTour({step,index,total,onSkip,onFallback}:{step:To
    setViewport(previous=>previous.width===window.innerWidth&&previous.height===window.innerHeight?previous:{width:window.innerWidth,height:window.innerHeight});
   }
   const el=targetElement(step.target);
-  const dockScroller=el?.closest<HTMLElement>('.mobileDockScroll,.mobileDockPinned');
+  const dockScroller=el?.closest<HTMLElement>('.mobileDockScroll');
+  const gridScroller=el?.closest<HTMLElement>('.mobileAllGrid');
   if(el&&dockScroller){
+   // Reveal the next dock item even if it begins completely outside the viewport.
    const r=el.getBoundingClientRect(),s=dockScroller.getBoundingClientRect();
    dockScroller.scrollBy({left:(r.left+r.right-s.left-s.right)/2,behavior:'auto'});
+  }else if(el&&gridScroller){
+   // The lower rows of «Все разделы» live in their own vertical scroll area.
+   // Scrolling the page or the non-scrollable sheet leaves these items obstructed.
+   const r=el.getBoundingClientRect(),s=gridScroller.getBoundingClientRect();
+   gridScroller.scrollBy({top:r.top<s.top?r.top-s.top:r.bottom>s.bottom?r.bottom-s.bottom:0,behavior:'auto'});
   }else el?.scrollIntoView({block:'nearest',inline:'nearest',behavior:'auto'});
   frame=requestAnimationFrame(update);
-  timer=window.setTimeout(update,100);
+  timer=window.setTimeout(update,160);
   window.addEventListener('resize',update);
   window.addEventListener('scroll',update,true);
   return()=>{if(frame)cancelAnimationFrame(frame);if(timer)clearTimeout(timer);window.removeEventListener('resize',update);window.removeEventListener('scroll',update,true)};
