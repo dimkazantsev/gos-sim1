@@ -9,5 +9,5 @@ assert(!scope.includes('notifySectionUpdates(gameId)'),'local acknowledgement mu
 assert(hook.includes('lastRelevantMutationAt.current<=enteredAtMs'),'newer updates must not be lost');
 assert(hook.includes('if(r.status===402)blocked=true'),'quota backoff preserved');
 assert(sql.includes("replace(original_qual,'auth.uid()','(select auth.uid())')"),'RLS must use initplan stable uid');
-assert(!/drop policy|disable row level security|security definer/i.test(sql),'no weakened access policy');
+assert(!/^(?!\s*--).*\b(drop\s+policy|disable\s+row\s+level\s+security|security\s+definer)\b/im.test(sql),'no weakened access policy');
 console.log('PASS: local read marker removes only redundant remote counter refresh; RLS uid-only rewrite preserves policy predicates');
