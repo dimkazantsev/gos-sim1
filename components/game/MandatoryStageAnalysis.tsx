@@ -4,7 +4,7 @@ import {supabase} from '@/lib/supabase';
 import {stageAnalysisPhase} from './stageAnalysisWindow';
 import styles from './MandatoryStageAnalysis.module.css';
 
-type Stage={stage_no:number;title:string;status:'open'|'completed';deadline:string|null};
+type Stage={stage_no:number;title:string;status:'open'|'completed'|'locked';deadline:string|null};
 type Saved={stage_no:number};
 export default function MandatoryStageAnalysis({gameId,userId,stages,onComplete}:{
  gameId:string;userId:string;stages:Stage[];onComplete:()=>void
