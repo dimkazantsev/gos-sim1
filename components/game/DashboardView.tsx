@@ -12,9 +12,11 @@ import RepublicLeadership from './RepublicLeadership';
 type RecentPost=Pick<PoliticalPost,'id'|'title'|'body'|'created_at'|'status'>;
 const recentFeedCache=new Map<string,{rows:RecentPost[];at:number}>();
 const recentFeedPending=new Map<string,Promise<RecentPost[]>>();
+const recentFeedVersions=new Map<string,number>();
 let compactFeedAvailable=true;
 async function getRecentFeed(key:string,gameId:string){
- const pending=recentFeedPending.get(key);
+ const pendingKey=key+':'+(recentFeedVersions.get(key)||0);
+ const pending=recentFeedPending.get(pendingKey);
  if(pending)return pending;
  const promise=(async()=>{
   if(compactFeedAvailable){
@@ -28,8 +30,8 @@ async function getRecentFeed(key:string,gameId:string){
   if(result.error)throw result.error;
   return (result.data||[]) as RecentPost[];
  })();
- recentFeedPending.set(key,promise);
- try{return await promise}finally{if(recentFeedPending.get(key)===promise)recentFeedPending.delete(key)}
+ recentFeedPending.set(pendingKey,promise);
+ try{return await promise}finally{if(recentFeedPending.get(pendingKey)===promise)recentFeedPending.delete(pendingKey)}
 }
 export default function DashboardView({g,onNavigate,onOpenProfile}:{g:ReturnTypeRepublic;onNavigate:(view:View)=>void;onOpenProfile?:(id:string)=>void}){
  const {game,me,currentStage,stages,teacher,parties,members,votes,ballots,formalDocuments,setChatOpen}=g;
@@ -63,11 +65,15 @@ export default function DashboardView({g,onNavigate,onOpenProfile}:{g:ReturnType
    const detail=(event as CustomEvent<{gameId?:string;table?:string}>).detail;
    if(detail?.gameId!==gameId||(detail.table&&detail.table!=='political_posts'))return;
    recentFeedCache.delete(feedScope);
+   recentFeedVersions.set(feedScope,(recentFeedVersions.get(feedScope)||0)+1);
+   ++sequence;
    if(document.visibilityState==='hidden'||pending!==undefined)return;
    pending=setTimeout(()=>{pending=undefined;void load(true)},1200);
   };
+  const onVisible=()=>{if(document.visibilityState==='visible'&&!recentFeedCache.has(feedScope))void load(true)};
   window.addEventListener(GAME_DATA_REFRESH_EVENT,onRefresh);
-  return()=>{cancelled=true;clearTimeout(pending);window.removeEventListener(GAME_DATA_REFRESH_EVENT,onRefresh)};
+  document.addEventListener('visibilitychange',onVisible);
+  return()=>{cancelled=true;clearTimeout(pending);window.removeEventListener(GAME_DATA_REFRESH_EVENT,onRefresh);document.removeEventListener('visibilitychange',onVisible)};
  },[gameId,feedScope]);
  if(!game||!me)return null;
  const stageNo=currentStage?.stage_no||game.current_round||1;
