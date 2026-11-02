@@ -6,7 +6,10 @@ const sql=fs.readFileSync('supabase/migrations/20261020095000_presidential_appoi
 const ui=fs.readFileSync('components/game/VotesView.tsx','utf8');
 const ast=ts.createSourceFile('VotesView.tsx',ui,ts.ScriptTarget.ES2022,true,ts.ScriptKind.TSX);
 assert.equal(ast.parseDiagnostics.length,0);
-assert(ui.includes("registered.some(r=>!ballots.some(b=>b.vote_id===v.id&&b.voter_id===r.user_id))"));
+// Indexed ballot lookup preserves the requirement that every registered,
+ // eligible attendee has submitted a ballot before a manual close.
+assert(ui.includes("const submitted=new Set((ballotByVoteAndVoter.get(v.id)||[]).map(b=>b.voter_id))"));
+assert(ui.includes("registered.some(r=>!submitted.has(r.user_id))"));
 assert(ui.includes('if(!checkinLoaded)return false'));
 assert(ui.includes('if(teacher)return true'));
 assert(sql.includes("'v_body,''president_act'',2,'"));
