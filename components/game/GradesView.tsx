@@ -205,12 +205,12 @@ export default function GradesView({g,compact=false,onOpenProfile,onPublicScores
   const requests:any[]=[supabase.rpc('get_stage_assessment_evidence',{p_game_id:game.id,p_user_id:userId,p_stage_no:stageNo})];
   if(a)requests.push(supabase.from('stage_assessment_runs').select('id,assessment_id,run_type,auto_score,criterion_law,criterion_strategy,criterion_debrief,created_at').eq('assessment_id',a.id).order('created_at',{ascending:false}).limit(50));
   // Read the full student analysis only when the teacher opens this assessment.
-  const debriefRequest=teacher?supabase.from('stage_debriefs').select('body').eq('game_id',game.id).eq('user_id',userId).eq('stage_no',stageNo).maybeSingle():null;
+  const debriefRequest=teacher?supabase.from('stage_debriefs').select('body').eq('game_id',game.id).eq('user_id',userId).eq('stage_no',stageNo):null;
   const [rr,deb]=await Promise.all([Promise.all(requests),debriefRequest]);
   if(request!==evidenceRequest.current||activeScope.current!==requestedScope)return;
   if(!rr[0].error)setEvidence((rr[0].data||{}) as Evidence);
   if(rr[1]&&!rr[1].error)setRuns((rr[1].data||[]) as Run[]);
-  if(teacher&&deb&&!deb.error)setSelectedDebrief(deb.data?.body||'');
+  if(teacher&&deb&&!deb.error)setSelectedDebrief((deb.data||[])[0]?.body||'');
   setLoadingEvidence(false);
  }
  const assessment=selected?rows.find(x=>x.user_id===selected.userId&&x.stage_no===selected.stageNo):undefined;
