@@ -25,6 +25,7 @@ function realm(kind='profile',{old=false,hidden=false,user='student-0',teacher=f
   if(name==='get_public_stage_scores')data=assessmentRows(game).map(({user_id,stage_no,auto_score,final_score,status})=>({user_id,stage_no,auto_score,final_score:revision?3:final_score,status}));
   else if(name==='stage_assessments')data=assessmentRows(game);
   else if(name==='stage_debriefs')data=players.map(p=>({id:'debrief:'+p.user_id,game_id:game,user_id:p.user_id,stage_no:2,body:'Личный разбор '+p.user_id}));
+  else if(name==='get_stage_debrief_counts')data=[{stage_no:2,submitted:players.length}];
   else if(name==='stage_assessment_runs')data=Array.from({length:80},(_,i)=>({id:i,assessment_id:filters.assessment_id,created_at:'2026-10-26',auto_score:2,run_type:'automatic'}));
   else if(name==='teacher_game_activity_counts')data=players.map(p=>({user_id:p.user_id,activity_count:1000}));
   else if(name==='get_member_public_stats')data=[{posts:2,votes_cast:3,activity_entries:1000,documents_created:1,events_decided:2}];
@@ -53,6 +54,7 @@ function realm(kind='profile',{old=false,hidden=false,user='student-0',teacher=f
   if(name==='./Achievements')return{AwardShelf:'AwardShelf'};if(name==='./Blitz')return{BlitzArchive:'BlitzArchive'};if(name==='./profileSetup')return{PROFILE_SETUP_LABELS:{}};
   if(name==='../ui/useDialog')return{useDialog:()=>({current:null})};if(name==='../ui/IconAction')return{IconAction:'IconAction'};if(name==='../../lib/gameLabels')return{gameValueLabel:value=>String(value)};
   if(name==='./assessmentPresentation')return modules.presentation;
+  if(name==='./stageAnalysisWindow')return{stageAnalysisPhase:()=> 'unavailable'};
   return{__esModule:true,default:name};
  }
  vm.createContext(context);modules.sync=load('sync',code('useGameTableSync'));modules.presentation=load('presentation',code('assessmentPresentation'));modules.grades=load('grades',code('GradesView',old)+'\nexports.fixtureModal=AssessmentModal;');const rootModule=kind==='grades'?modules.grades:load(kind,code(kind==='analytics'?'ParticipantsAnalytics':'ProfileView',old));
