@@ -138,10 +138,11 @@ export default function TeacherStoryCampaign({gameId}:{gameId:string}){
      {!!preview.variants?.length&&!preview.published&&<div className="teacherDetails" style={{margin:'12px 0'}}>
       <p><b>Редакционные варианты финала</b></p>
       <p><small>Выбор только по документально подтверждённым решениям. Сначала сохранить редакцию, затем утвердить её и опубликовать. Никаких отдельных голосований.</small></p>
-      <div className="directorButtons compact">
-       {preview.variants.map(option=><button type="button" key={option.id} disabled={working}
+      <div className="teacherDetailsBody" style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(220px,1fr))',gap:8}}>
+       {preview.variants.map(option=><button type="button" className="teacherQuick" key={option.id}
+        style={{textAlign:'left'}} disabled={working}
         onClick={()=>{setTitle(option.title);setBody(option.body);}}>
-        <b>{option.id} · {option.title}</b><small>{option.condition}</small></button>)}
+        <b>{option.id} · {option.title}</b><small style={{display:'block'}}>{option.condition}</small></button>)}
       </div>
      </div>}
      <label>Заголовок<input value={title} disabled={working||preview.published}
