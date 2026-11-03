@@ -526,6 +526,26 @@ DROP TRIGGER IF EXISTS trg_duma_session_agenda_signatures ON public.duma_session
 CREATE TRIGGER trg_duma_session_agenda_signatures BEFORE UPDATE OF status
 ON public.duma_sessions FOR EACH ROW EXECUTE FUNCTION private.agenda_session_open_guard();
 
+-- The government session has its own agenda approval field. Prevent its
+-- older one-click approval procedure from bypassing personal signatures.
+CREATE OR REPLACE FUNCTION private.government_agenda_personal_approval_guard() RETURNS trigger
+LANGUAGE plpgsql SECURITY DEFINER SET search_path='' AS $fn$
+BEGIN
+ IF NEW.agenda_approved_at IS NOT NULL
+  AND (OLD.agenda_approved_at IS DISTINCT FROM NEW.agenda_approved_at
+    OR OLD.agenda_document_id IS DISTINCT FROM NEW.agenda_document_id)
+  AND (NEW.agenda_document_id IS NULL
+    OR NOT private.agenda_all_signed(NEW.agenda_document_id)) THEN
+  RAISE EXCEPTION 'Повестка Правительства утверждается только после личной подписи Председателя Правительства'
+   USING ERRCODE='23514';
+ END IF;
+ RETURN NEW;
+END $fn$;
+REVOKE ALL ON FUNCTION private.government_agenda_personal_approval_guard() FROM PUBLIC,anon,authenticated;
+DROP TRIGGER IF EXISTS trg_government_agenda_personal_approval ON public.government_sessions;
+CREATE TRIGGER trg_government_agenda_personal_approval BEFORE UPDATE OF agenda_approved_at,agenda_document_id
+ON public.government_sessions FOR EACH ROW EXECUTE FUNCTION private.government_agenda_personal_approval_guard();
+
 -- One existing KSRF agenda was marked approved based only on profile facsimiles.
 -- Recalculate legacy markers without removing documents, history or saved signature images.
 UPDATE public.institution_meeting_records m SET agenda_approved_at=NULL,
