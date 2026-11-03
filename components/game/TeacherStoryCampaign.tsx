@@ -141,7 +141,7 @@ export default function TeacherStoryCampaign({gameId}:{gameId:string}){
       <div className="directorButtons compact">
        {preview.variants.map(option=><button type="button" key={option.id} disabled={working}
         onClick={()=>{setTitle(option.title);setBody(option.body);}}>
-        <b>{option.id} · {option.title}</b></button>)}
+        <b>{option.id} · {option.title}</b><small>{option.condition}</small></button>)}
       </div>
      </div>}
      <label>Заголовок<input value={title} disabled={working||preview.published}
