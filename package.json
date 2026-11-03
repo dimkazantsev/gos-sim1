@@ -10,7 +10,7 @@
     "build": "next build",
     "start": "next start",
     "typecheck": "tsc --noEmit",
-    "check": "npm run typecheck && npm run design:check && npm run news:check && npm run ui:ru-check && npm run build",
+    "check": "npm run typecheck && node scripts/story-campaign-shell-check.cjs && npm run design:check && npm run news:check && npm run ui:ru-check && npm run build",
     "design:check": "node scripts/design-audit.mjs",
     "design:preview": "node scripts/design-preview.cjs",
     "design:browser": "node scripts/metric-modal-browser-check.cjs",
