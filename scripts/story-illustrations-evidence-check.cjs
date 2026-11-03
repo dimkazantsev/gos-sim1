@@ -15,6 +15,7 @@ assert(wall.includes('!storyPost&&<CivicDiscussion'),'No unnecessary per-story d
 assert(view.includes('<TeacherStoryCampaign key={game.id}'),'Teacher draft cache must reset when switching games');
 assert(!teacher.includes('useEffect')&&!teacher.includes('setInterval(')&&!teacher.includes('.channel('),'Teacher editor must not add polling, timers or subscriptions');
 assert(teacher.includes('preview.variants.map(')&&teacher.includes('preview.evidence.records'),'Endings and evidence must be loaded only on explicit teacher preview');
+assert(teacher.includes('evidenceText(record)')&&teacher.includes("closed:'Завершено'")&&teacher.includes("vote_status:'Голосование'"),'Teacher must show Russian labels instead of raw evidence status codes');
 assert(migration.includes('private.is_game_teacher(p_game_id)'),'Only the teacher can read future endings/evidence');
 assert(migration.includes("coalesce(e.draft->'variants','[]'::jsonb)"),'Future ending content is always obtained from private tables');
 assert(migration.includes('public.government_program_agenda')&&migration.includes("d.doc_type='federal_budget'")&&migration.includes('public.municipal_projects'),'Grounded evidence uses official program, budget and municipal procedures');

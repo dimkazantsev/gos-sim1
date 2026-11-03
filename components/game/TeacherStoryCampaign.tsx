@@ -12,6 +12,9 @@ type Evidence={kind:string;warning:string;records:Record<string,string>[]};
 type Preview={episode_no:number;stage_no:number;title:string;body:string;
  evidence_rule:string;editor_note:string;approved:boolean;published:boolean;
  variants?:Variant[];evidence?:Evidence};
+const EVIDENCE_FIELDS:Record<string,string>={vote_status:'Голосование',vote_result:'Результат',program_status:'Государственная программа',document_status:'Документ',project_status:'Муниципальный проект'};
+const EVIDENCE_VALUES:Record<string,string>={draft:'Черновик',open:'Открыто',closed:'Завершено',pending:'На рассмотрении',ready:'Подготовлено',approved:'Одобрено',accepted:'Принято',rejected:'Отклонено',published:'Опубликовано',signed:'Подписано',active:'Действует',completed:'Выполнено',cancelled:'Отменено',canceled:'Отменено',in_progress:'В работе',submitted:'Направлено',voting:'На голосовании'};
+const evidenceText=(record:Record<string,string>)=>Object.entries(record).map(([key,value])=>`${EVIDENCE_FIELDS[key]||'Сведения'}: ${EVIDENCE_VALUES[String(value)]||String(value||'Нет данных')}`).join(' · ');
 /** Visible to teachers only. No chapter contents or spoiler logic in the public build. */
 export default function TeacherStoryCampaign({gameId}:{gameId:string}){
  const [campaign,setCampaign]=useState<Campaign|null>(null);
@@ -133,7 +136,7 @@ export default function TeacherStoryCampaign({gameId}:{gameId:string}){
       {preview.evidence.records.length===0
        ?<p><small>Подходящих подтверждённых записей пока нет. Не объявляйте положительный итог.</small></p>
        :<div style={{display:'grid',gap:5}}>{preview.evidence.records.map((record,i)=>
-        <p key={i} style={{margin:0}}><small>{Object.values(record).join(' · ')}</small></p>)}</div>}
+        <p key={i} style={{margin:0}}><small>{evidenceText(record)}</small></p>)}</div>}
      </div>}
      {!!preview.variants?.length&&!preview.published&&<div className="teacherDetails" style={{margin:'12px 0'}}>
       <p><b>Редакционные варианты финала</b></p>
