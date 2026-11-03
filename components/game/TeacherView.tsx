@@ -181,7 +181,7 @@ export default function TeacherView({g,onOpenProcesses,onOpenStages,initialWorks
    </div>
   </details>
     </>}
-    {activeWorkspace==='event'&&game&&<TeacherStoryCampaign gameId={game.id}/>}
+    {activeWorkspace==='event'&&game&&<TeacherStoryCampaign key={game.id} gameId={game.id}/>}
      {workspace==='event'&&<EventWorkspace g={g} mode="manage"/>}
    </div>
   </section>
