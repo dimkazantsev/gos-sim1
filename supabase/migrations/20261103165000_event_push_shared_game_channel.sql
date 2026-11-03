@@ -24,6 +24,12 @@ BEGIN
   ('event_assignments','event_collaboration_invites') THEN 'recipient_id' ELSE 'NULL::uuid' END;
  v_new:=format('SELECT game_id,%s AS case_id,%s AS recipient_id FROM new_event_rows',v_case_col,v_recipient_col);
  v_old:=format('SELECT game_id,%s AS case_id,%s AS recipient_id FROM old_event_rows',v_case_col,v_recipient_col);
+ -- Both sides of a collaboration invitation need to see accept/decline.
+ -- No invitation content is broadcast: IDs only, inside the existing game room.
+ IF TG_TABLE_NAME='event_collaboration_invites' THEN
+  v_new:=v_new||' UNION SELECT game_id,case_id,inviter_id FROM new_event_rows';
+  v_old:=v_old||' UNION SELECT game_id,case_id,inviter_id FROM old_event_rows';
+ END IF;
  v_source:=CASE TG_OP
   WHEN 'INSERT' THEN v_new
   WHEN 'DELETE' THEN v_old
