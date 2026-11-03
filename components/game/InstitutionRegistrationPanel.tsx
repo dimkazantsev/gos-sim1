@@ -168,7 +168,7 @@ export default function InstitutionRegistrationPanel({g,readOnly=false,freshAtte
  useEffect(()=>{
   if(!g.game||!g.me||!panelVisible||!agendaSigningDocumentId){setAgendaSigning(null);return}
   let active=true;setAgendaSigning(null);
-  void supabase.rpc('get_institution_document_signers',{p_document_id:agendaSigningDocumentId})
+  void Promise.resolve(supabase.rpc('get_institution_document_signers',{p_document_id:agendaSigningDocumentId}))
    .then(({data,error})=>{
     if(!active)return;
     if(error||!data||!Array.isArray(data.required)){setAgendaSigning(null);return}
