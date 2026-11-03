@@ -705,7 +705,7 @@ export function useRepublicGame(gameId:string){
     if(open)for(const caseId of caseIds)notifyGameDataRefresh(gameId,table,caseId);
     return;
    }
-   if(table==='event_case_outcomes'){
+   if(table==='event_case_outcomes'||table==='event_cases'||table==='event_case_routing'){
     if(mine||isTeacher&&open)notifyGameDataRefresh(gameId,table);
     return;
    }
