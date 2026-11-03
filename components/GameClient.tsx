@@ -569,9 +569,11 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
  useGameTableSync(!previewMode&&g.coreLoaded&&me?game?.id:undefined,['event_assignments','event_collaboration_invites','event_decisions'],async()=>{
   if(!game||!me||previewMode)return;
   const requestedScope=counterScope;
-  const [r,i]=await Promise.all([supabase.from('event_assignments').select('case_id').eq('game_id',game.id).eq('recipient_id',me.user_id).eq('status','pending'),supabase.from('event_collaboration_invites').select('case_id').eq('game_id',game.id).eq('recipient_id',me.user_id).eq('status','pending')]);
-  if(counterScopeRef.current===requestedScope&&!r.error&&!i.error)setPendingEvents(new Set([...(r.data||[]).map(x=>x.case_id),...(i.data||[]).map(x=>x.case_id)]).size);
- },counterScope,undefined,750,30000,firstEventBadgeDelay);
+  // Single indexed RLS-protected read, instead of two separate HTTP requests.
+  const result=await supabase.rpc('get_my_pending_event_count',{p_game_id:game.id});
+  if(counterScopeRef.current===requestedScope&&!result.error&&typeof result.data==='number')
+   setPendingEvents(Math.max(0,Math.trunc(result.data)));
+ },counterScope,undefined,750,60000,firstEventBadgeDelay);
 
 
  useGameTableSync(!previewMode&&g.coreLoaded&&me?.kind==='student'?game?.id:undefined,['blitz_assignments'],async()=>{

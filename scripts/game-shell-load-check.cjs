@@ -44,17 +44,21 @@ function fixture(){
   const q={select(columns){record.columns=columns;return q},eq(key,value){record.filters[key]=value;return q},then(resolve,reject){
    return Promise.resolve({data:table==='event_assignments'?[{case_id:'one'},{case_id:'two'}]:[{case_id:'two'},{case_id:'three'}],error:null}).then(resolve,reject);
   }};return q;
- },rpc:async(name,args)=>{queries.push({rpc:name,args});return {data:{pending:4},error:null}}};
+ },rpc:async(name,args)=>{queries.push({rpc:name,args});return {data:name==='get_my_pending_event_count'?3:{pending:4},error:null}}};
  return {env,queries,events,blitz};
 }
 async function main(){
  const eventCall=sync.find(n=>n.arguments[1].getText(ast).includes('event_assignments'));
  const blitzCall=sync.find(n=>n.arguments[1].getText(ast).includes('blitz_assignments'));
  assert(eventCall&&blitzCall,'Both badge loaders use the existing shared scheduler');
+ assert.equal(eventCall.arguments[6].getText(ast),'60000','Event badge refresh is limited to once per minute');
  for(let n=0;n<40;n++){
   const f=fixture();await compile(eventCall.arguments[2],f.env).fn();await compile(blitzCall.arguments[2],f.env).fn();
-  assert.equal(f.queries.length,3);assert.deepEqual(f.events,[3],'Duplicate pending case IDs are counted once');assert.deepEqual(f.blitz,[4]);
-  for(const query of f.queries.filter(q=>q.table))assert.deepEqual(query.filters,{game_id:'classroom',recipient_id:'student',status:'pending'});
+  assert.equal(f.queries.length,2,'One pending-event counter RPC plus one blitz RPC, not three network reads');
+  assert.equal(f.queries[0].rpc,'get_my_pending_event_count');
+  assert.equal(f.queries[0].args.p_game_id,'classroom');
+  assert.deepEqual(f.events,[3],'Server count already deduplicates matching situation IDs');
+  assert.deepEqual(f.blitz,[4]);
  }
  for(const previewMode of [true,false]){
   const f=fixture();f.env.previewMode=previewMode;f.env.me.kind='observer';
