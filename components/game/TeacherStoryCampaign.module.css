@@ -1,0 +1,26 @@
+/* Isolated layout for the teacher's editorial campaign.
+   Matches existing ГОС.ID button colours without inheriting toolbar nowrap rules. */
+.actions{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin:12px 0}
+.actionButton{display:inline-flex;align-items:center;justify-content:center;min-height:44px;max-width:100%;min-width:180px;padding:10px 16px;border:1px solid #dce5f0;border-radius:10px;background:#fff;color:#476180;font:inherit;font-size:13px;font-weight:700;white-space:normal;text-align:center;cursor:pointer}
+.actionButton:hover:not(:disabled){background:#f3f7fe;border-color:#bbceed}
+.actionButton:focus-visible,.episodeButton:focus-visible{outline:3px solid #7196e8;outline-offset:2px}
+.actionButton:disabled,.episodeButton:disabled{opacity:.6;cursor:not-allowed}
+.summary{display:flex;flex-wrap:wrap;gap:7px 18px;margin:16px 0;color:#476180;font-size:14px;line-height:1.45}
+.summary span{min-width:0;overflow-wrap:anywhere}
+.summary b{color:#1c3352}
+.episodeList{margin-top:18px;min-width:0}
+.episodeHeading{margin:0 0 12px;color:#1c3352;font-size:16px;font-weight:750}
+.episodeGrid,.variantGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,360px),1fr));gap:10px;min-width:0}
+.variantGrid{grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr));padding:10px}
+.episodeButton{display:flex;flex-direction:column;align-items:stretch;justify-content:center;gap:8px;box-sizing:border-box;width:100%;min-width:0;min-height:84px;padding:14px 16px;border:1px solid #dce5f0;border-radius:12px;background:#fff;color:#1c3352;font:inherit;text-align:left;white-space:normal;cursor:pointer}
+.episodeButton:hover:not(:disabled){background:#f3f7fe;border-color:#bbceed}
+.episodeButton[aria-pressed="true"]{background:#edf3ff;border-color:#b8cdf7;box-shadow:inset 0 0 0 1px #b8cdf7}
+.episodeTitle{display:block;min-width:0;max-width:100%;font-size:14px;font-weight:750;line-height:1.4;white-space:normal;overflow-wrap:anywhere}
+.episodeMeta{display:block;min-width:0;max-width:100%;color:#607995;font-size:12px;font-weight:650;line-height:1.4;white-space:normal;overflow-wrap:anywhere}
+@media(max-width:640px){
+ .actions{display:grid;grid-template-columns:minmax(0,1fr);gap:8px}
+ .actionButton{min-width:0;width:100%}
+ .episodeGrid,.variantGrid{grid-template-columns:minmax(0,1fr)}
+ .episodeButton{min-height:78px;padding:12px 14px}
+ .variantGrid{padding:8px 0}
+}
