@@ -12,6 +12,7 @@ import {ChevronDown} from 'lucide-react';
 import {assessmentRationaleParagraphs,assessmentRationaleSections,assessmentRationaleDetail,assessmentDisplaySentence,assessmentRunLabel} from './assessmentPresentation';
 import {useGameTableSync} from './useGameTableSync';
 import {stageAnalysisPhase} from './stageAnalysisWindow';
+import analysisNoticeStyles from './MandatoryStageAnalysis.module.css';
 
 type Assessment={
  id:string;game_id:string;stage_no:number;user_id:string;auto_score:number;final_score:number|null;
@@ -49,6 +50,8 @@ export default function GradesView({g,compact=false,onOpenProfile,onPublicScores
  const [busy,setBusy]=useState(false);
  const [debrief,setDebrief]=useState('');
  const [debriefStage,setDebriefStage]=useState<number|null>(null);
+ const [expiredNoticeStage,setExpiredNoticeStage]=useState<number|null>(null);
+ const expiredNoticeRef=useDialog(expiredNoticeStage!==null,()=>setExpiredNoticeStage(null));
  const authScope=[game?.id,me?.user_id].join(':');
  const [identity,setIdentity]=useState<{scope:string;id:string}|null>(null);
  const authId=identity?.scope===authScope?identity.id:null;
@@ -210,6 +213,7 @@ export default function GradesView({g,compact=false,onOpenProfile,onPublicScores
  const currentStage=stages.find(s=>s.status==='open');
  const eligibleDebriefStages=stages.filter(s=>s.status==='open'||s.status==='completed');
  const targetDebriefStage=debriefStage??currentStage?.stage_no??eligibleDebriefStages.at(-1)?.stage_no??null;
+ useEffect(()=>setExpiredNoticeStage(null),[game?.id,me?.user_id,targetDebriefStage]);
  const targetDebrief=targetDebriefStage?stages.find(s=>s.stage_no===targetDebriefStage):undefined;
  const targetAssessment=targetDebriefStage?rows.find(r=>r.user_id===me?.user_id&&r.stage_no===targetDebriefStage):undefined;
  const targetDeadline=targetDebrief?.deadline;
@@ -316,6 +320,17 @@ export default function GradesView({g,compact=false,onOpenProfile,onPublicScores
    <div className="surfaceHead"><div><small>ЖУРНАЛ ВСН</small><h2>Динамика по 16 этапам</h2></div><strong>{myAverage!==null?myAverage.toFixed(2):'—'}</strong></div>
    <div className="vsnMiniTrend">{STAGES.map(n=>{const a=myRows.find(x=>x.stage_no===n),v=shownScore(a);return <button key={n} className={a?.status||'empty'} onClick={()=>void open(me.user_id,n)} aria-label={'Этап '+n+', оценка '+(v??'нет')}><small>{n}</small><b>{v??'—'}</b></button>})}</div>
    <p className="vsnCompactHint">Нажмите на этап, чтобы увидеть критерии и обоснование оценки.</p>
+   {expiredNoticeStage!==null&&<div className={analysisNoticeStyles.backdrop}>
+    <section ref={expiredNoticeRef} tabIndex={-1} className={analysisNoticeStyles.dialog} role="dialog" aria-modal="true" aria-labelledby="grade-expired-stage-title" aria-describedby="grade-expired-stage-description">
+     <header className={analysisNoticeStyles.heading}>
+      <small>ГОС.ID · АНАЛИЗ ЭТАПА</small>
+      <h2 id="grade-expired-stage-title">Этап {expiredNoticeStage} · {stages.find(s=>s.stage_no===expiredNoticeStage)?.title||'Завершённый этап'}</h2>
+      <p id="grade-expired-stage-description">Этап уже завершён. Отправить или изменить анализ этого этапа нельзя.</p>
+     </header>
+     <div className={analysisNoticeStyles.content}><p>Уже сданные анализы сохраняются.</p></div>
+     <footer className={analysisNoticeStyles.footer}><button type="button" className="secondary" onClick={()=>setExpiredNoticeStage(null)}>Понятно</button></footer>
+    </section>
+   </div>}
    {selected&&selectedScope.current===loadScope&&<AssessmentModal g={g} assessment={assessment} selected={selected} student={selectedStudent} evidence={evidence} runs={runs} loading={loadingEvidence} teacher={false} editScore={editScore} setEditScore={setEditScore} note={note} setNote={setNote} busy={busy} close={()=>{evidenceRequest.current++;setSelected(null)}} ensureDraft={ensureDraft} recalc={recalc} finalize={finalize} reopen={reopen}/>}
   </section>;
  }
@@ -373,7 +388,7 @@ export default function GradesView({g,compact=false,onOpenProfile,onPublicScores
       <StyledSelect label="Этап для итогового разбора" value={String(targetDebriefStage??'')} onChange={v=>setDebriefStage(Number(v))} options={eligibleDebriefStages.map(stage=>({value:String(stage.stage_no),label:stage.stage_no+'. '+stage.title}))}/>
       <div className="gradesDebriefPrompt"><b>Кому предназначен разбор</b><p>Этот текст вы отправляете системе ИИ для предварительного анализа этапа. Укажите причины и цели действий, интересы сторон, применённые правила, результаты и политические последствия.</p><p>В чате «Вне игры» можно подробнее обсуждать закономерности, аргументы и альтернативные решения. Преподаватель может учесть содержательное обсуждение и повысить итоговую оценку.</p><small>{analysisWindowNote}</small></div>
      </div>
-     <label className="gradesDebriefEditor"><span>Ваш итоговый разбор</span><textarea aria-label="Итоговый разбор этапа" rows={7} value={debrief} disabled={!canWriteDebrief} onChange={e=>setDebrief(e.target.value)} placeholder={!canWriteDebrief?analysisWindowNote:'Изложите содержательный анализ выбранного этапа…'}/></label>
+     <label className="gradesDebriefEditor"><span>Ваш итоговый разбор</span><textarea aria-label="Итоговый разбор этапа" rows={7} value={debrief} readOnly={!canWriteDebrief} disabled={!canWriteDebrief&&targetDebrief?.status!=='completed'} onClick={()=>{if(targetDebrief?.status==='completed')setExpiredNoticeStage(targetDebrief.stage_no)}} onKeyDown={event=>{if(targetDebrief?.status==='completed'&&(event.key==='Enter'||event.key.length===1)){event.preventDefault();setExpiredNoticeStage(targetDebrief.stage_no)}}} onChange={e=>setDebrief(e.target.value)} placeholder={!canWriteDebrief?analysisWindowNote:'Изложите содержательный анализ выбранного этапа…'}/></label>
     </div>
     <footer className="gradesDebriefFooter"><div aria-live="polite"><strong>{canWriteDebrief?debrief.trim().length+' знаков':analysisWindowNote}</strong><span>Минимум 40 знаков для отправки</span></div><button type="button" className="primary" disabled={!canWriteDebrief||busy||debrief.trim().length<40} onClick={()=>void submitDebrief()}>{busy?'Сохранение…':'Сдать / обновить разбор'}</button></footer>
    </section>}

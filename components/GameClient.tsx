@@ -53,7 +53,6 @@ const PartiesView=dynamic(()=>import('./game/PartiesView'),{loading:sectionLoadi
 const VotesView=dynamic(()=>import('./game/VotesView'),{loading:sectionLoading});
 const DocumentsView=dynamic(()=>import('./game/DocumentsView'),{loading:sectionLoading});
 const GradesView=dynamic(()=>import('./game/GradesView'),{loading:sectionLoading});
-const MandatoryStageAnalysis=dynamic(()=>import('./game/MandatoryStageAnalysis'),{loading:()=>null});
 const TeacherView=dynamic(()=>import('./game/TeacherView'),{loading:sectionLoading});
 
 const EventWorkspace=dynamic(()=>import('./game/EventWorkspace'),{loading:sectionLoading});
@@ -215,35 +214,6 @@ function buildStudentPreview(g:ReturnTypeRepublic,student:Member){
 
 export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:string;initialMobileMenuOpen?:boolean}){
  const g=useRepublicGame(gameId);
- // Exactly one browser timer for the nearest 1-hour threshold or deadline.
- // No network requests and no modal bundle before a stage reaches that window.
- const [analysisClock,setAnalysisClock]=useState(()=>Date.now());
- const analysisStageSignature=g.stages.map(s=>[s.stage_no,s.status,s.deadline||''].join(':')).join('|');
- useEffect(()=>{
-  if(g.me?.kind!=='student'||!g.coreLoaded)return;
-  const refreshClock=()=>{if(document.visibilityState==='visible')setAnalysisClock(Date.now())};
-  refreshClock();
-  const now=Date.now();
-  const transitions=g.stages.filter(s=>s.status==='open'&&s.deadline)
-   .flatMap(s=>{const end=Date.parse(s.deadline!);return Number.isFinite(end)?[end-3600000,end]:[]})
-   .filter(t=>t>now);
-  const next=transitions.length?Math.min(...transitions):null;
-  const timer=next===null?null:window.setTimeout(()=>setAnalysisClock(Date.now()),Math.min(2147483647,Math.max(1,next-now+25)));
-  window.addEventListener('focus',refreshClock);
-  document.addEventListener('visibilitychange',refreshClock);
-  return()=>{if(timer!==null)window.clearTimeout(timer);window.removeEventListener('focus',refreshClock);document.removeEventListener('visibilitychange',refreshClock)};
- },[analysisStageSignature,g.me?.kind,g.coreLoaded,gameId]);
- const availableAnalysisStages=g.stages.filter(s=>{
-  if(s.status==='completed')return true;
-  if(s.status!=='open'||!s.deadline)return false;
-  const end=Date.parse(s.deadline);
-  return Number.isFinite(end)&&analysisClock>=end-3600000;
- });
- const completedAnalysisKey=availableAnalysisStages.map(s=>s.stage_no+':'+s.status+':'+(s.deadline||'')).sort().join(',');
- const [clearedAnalysis,setClearedAnalysis]=useState<{scope:string;key:string}|null>(null);
- const analysisScope=gameId+':'+(g.me?.user_id||'');
- const pendingAnalysis=!!completedAnalysisKey&&g.coreLoaded&&!g.loading&&g.me?.kind==='student'&&!g.teacher&&
-  !(clearedAnalysis?.scope===analysisScope&&clearedAnalysis.key===completedAnalysisKey);
  const [screenHistory,setScreenHistory,navigationHydrated,navigationRestored]=useSavedGameState<{entries:ScreenLocation[];index:number}>(gameId,g.me?.user_id,'navigation',{
   entries:[{view:'dashboard',stageNo:0,documentId:''}],index:0
  },validScreenHistory);
@@ -841,10 +811,6 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
     </section>
    </div>} <BlitzOverlay gameId={gameId} userId={me.user_id} stageKey={g.currentStage?g.currentStage.stage_no+':'+g.currentStage.status+':'+(g.currentStage.opened_at||''):''} enabled={g.coreLoaded&&me?.kind==='student'&&!previewMode&&!introOpen&&!onboardingRequired&&tourMode==='idle'&&!stageComicOpen}/>
   <AchievementCelebration gameId={gameId} userId={me?.user_id} enabled={g.coreLoaded&&me?.kind==='student'&&!previewMode&&!introOpen&&!stageComicOpen}/>
-  {pendingAnalysis&&!previewMode&&!introOpen&&!onboardingRequired&&tourMode==='idle'&&!stageComicOpen&&
-   <MandatoryStageAnalysis key={analysisScope+':'+completedAnalysisKey} gameId={gameId} userId={g.me!.user_id}
-    stages={availableAnalysisStages.map(s=>({stage_no:s.stage_no,title:s.title,status:s.status,deadline:s.deadline}))}
-    onComplete={()=>setClearedAnalysis({scope:analysisScope,key:completedAnalysisKey})}/>}
   <StageComics key={gameId+':'+me?.user_id} gameId={gameId} userId={me?.user_id||''} stages={g.stages} enabled={g.coreLoaded&&!g.loading&&!previewMode&&!introOpen&&!onboardingRequired&&tourMode==='idle'} onOpenChange={setStageComicOpen}/>
   <RepublicComic gameId={gameId} intro open={introOpen} onClose={()=>void finishIntro()}/>
   <MobileDock items={dockItems} activeView={view} storageKey={'gos-sims-dock:'+shownMe.user_id+(teacher&&!previewMode?':teacher':':student')} editing={mobileDockEditing} setEditing={setMobileDockEditing} tourTarget={tourMode==='tour'?getTourSteps(!!teacher)[tourIndex]?.target:undefined} onNavigate={k=>{if(k==='profile')setSelectedProfileId('');navigate(k,undefined,false,true)}} onChat={()=>{setMobileMenuOpen(false);toggleTourChat()}} chatOpen={chatOpen} chatUnreadCount={g.chatUnreadCount} chatMentionCount={g.chatMentionCount} allOpen={mobileMenuOpen} onAll={()=>{setChatOpen(false);setMobileMenuOpen(true)}}/></div>;
