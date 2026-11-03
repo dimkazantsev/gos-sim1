@@ -12,6 +12,7 @@ import TeacherGhostVotingPanel from './TeacherGhostVotingPanel';
 import EventWorkspace from './EventWorkspace';
 import type {ReturnTypeRepublic} from './viewTypes';
 const ImpactRulesPanel=dynamic(()=>import('./ImpactRulesPanel'),{loading:()=>null});
+const TeacherStoryCampaign=dynamic(()=>import('./TeacherStoryCampaign'),{loading:()=>null});
 import GradesView from './GradesView';
 const TeacherAwards=dynamic(()=>import('./TeacherAwards'),{loading:()=>null});
 const TeacherBlitz=dynamic(()=>import('./TeacherBlitz'),{ssr:false,loading:()=> <section className="surface blitzTeacher" role="status">Загрузка пульта блиц-вопросов…</section>});
@@ -180,7 +181,8 @@ export default function TeacherView({g,onOpenProcesses,onOpenStages,initialWorks
    </div>
   </details>
     </>}
-    {workspace==='event'&&<EventWorkspace g={g} mode="manage"/>}
+    {activeWorkspace==='event'&&game&&<TeacherStoryCampaign gameId={game.id}/>}
+     {workspace==='event'&&<EventWorkspace g={g} mode="manage"/>}
    </div>
   </section>
  </div>;
