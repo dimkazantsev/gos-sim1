@@ -6,7 +6,7 @@ const gameClient=fs.readFileSync('components/GameClient.tsx','utf8');
 const js=ts.transpileModule(hook,{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}}).outputText;
 assert(gameClient.includes("firstPresenceWriteDelay(me.user_id+':event-badge')+3000"));
 assert(gameClient.includes("firstPresenceWriteDelay(me.user_id+':blitz-badge')+3000"));
-assert(gameClient.includes("},counterScope,undefined,750,30000,firstEventBadgeDelay)"));
+assert(gameClient.includes("},counterScope,undefined,750,60000,firstEventBadgeDelay)"));
 assert(gameClient.includes("},counterScope,undefined,750,60000,firstBlitzBadgeDelay)"));
 function testClient(index,initialDelay){
  let clock=1_000_000,reads=0,cleanup;
