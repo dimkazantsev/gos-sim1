@@ -166,7 +166,8 @@ export default function InstitutionRegistrationPanel({g,readOnly=false,freshAtte
  const agendaSigningDocumentId=agendaSigningRow?.agenda_document_id||'';
  const agendaSigningUpdatedAt=agendaSigningRow?.updated_at||'';
  useEffect(()=>{
-  if(!g.game||!g.me||!panelVisible||!agendaSigningDocumentId){setAgendaSigning(null);return}
+  const mayManageAgenda=g.teacher||(permission?.key===permissionKey&&(permission.rights.can_prepare||permission.rights.can_coordinate));
+  if(!g.game||!g.me||!panelVisible||!agendaSigningDocumentId||!mayManageAgenda){setAgendaSigning(null);return}
   let active=true;setAgendaSigning(null);
   void Promise.resolve(supabase.rpc('get_institution_document_signers',{p_document_id:agendaSigningDocumentId}))
    .then(({data,error})=>{
@@ -175,7 +176,7 @@ export default function InstitutionRegistrationPanel({g,readOnly=false,freshAtte
     setAgendaSigning({required:data.required,can_sign:data.can_sign===true,approved:data.approved===true});
    }).catch(()=>{if(active)setAgendaSigning(null)});
   return()=>{active=false};
- },[g.game?.id,g.me?.user_id,agendaSigningDocumentId,agendaSigningUpdatedAt,panelVisible]);
+ },[g.game?.id,g.me?.user_id,g.teacher,permissionKey,permission,agendaSigningDocumentId,agendaSigningUpdatedAt,panelVisible]);
  const currentDelegate=meetingRows.find(m=>m.institution_key===body)?.delegate_user_id;
  useEffect(()=>{
   if(!initialSnapshotReady||!panelVisible||!g.game||!g.me)return;
