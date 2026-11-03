@@ -13,6 +13,7 @@ const supplementSchema=read('supabase/migrations/20261103191629_story_supplement
 const supplementPublish=read('supabase/migrations/20261103191720_story_supplement_teacher_publication.sql');
 const neutralFinal=read('supabase/migrations/20261103192428_story_epilogue_neutral_final.sql');
 const branchSchema=read('supabase/migrations/20261103192838_story_branch_evidence_review.sql');
+const branchReactions=read('supabase/migrations/20261103194001_story_branch_reaction_publish.sql');
 
 const view=read('components/game/TeacherView.tsx');
 const migration=read('supabase/migrations/20261103161012_story_teacher_evidence_preview.sql');
@@ -50,4 +51,6 @@ assert(supplementSchema.includes('enable row level security')&&supplementSchema.
 assert(supplementPublish.includes('private.is_game_teacher')&&supplementPublish.includes('on conflict(game_id,source_key)')&&supplementPublish.includes('effects_applied'),'Supplement publishing is authorized, idempotent and has no metric effects');
 assert(neutralFinal.includes('нейтральный финал Г')&&neutralFinal.includes("code='К-30'"),'Unresolved municipal process uses neutral ending and optional final-only epilogue');
 assert(branchSchema.includes('private.story_supplement_evidence_exists')&&branchSchema.includes('private.is_game_teacher'),'Branch outcomes require teacher access and existing evidence for positive decisions');
+assert(branches.includes('publish_story_branch_reaction_teacher')&&branchReactions.includes('private.story_supplement_evidence_exists')&&branchReactions.includes('on conflict(game_id,source_key)'),'Only verified per-game decisions can publish one-time story reactions');
+assert(branchReactions.includes('effects_applied')&&!branchReactions.includes('CREATE TRIGGER')&&!branchReactions.includes('realtime.send'),'Branch stories cannot alter metrics or create background traffic');
 console.log('PASS: lightweight story visuals (zero network) and teacher-only evidence/variants on existing preview RPC');

@@ -292,7 +292,7 @@ export default function TeacherStoryCampaign({gameId}:{gameId:string}){
      </section>}
    </div>}
    {campaign?.prepared&&<TeacherStorySupplementPanel key={gameId} gameId={gameId} campaignEnabled={campaign.enabled}/>}
-   {campaign?.prepared&&<TeacherStoryBranchesPanel key={'branches-'+gameId} gameId={gameId}/>}
+   {campaign?.prepared&&<TeacherStoryBranchesPanel key={'branches-'+gameId} gameId={gameId} campaignEnabled={campaign.enabled}/>}
   </div>
  </section>;
 }

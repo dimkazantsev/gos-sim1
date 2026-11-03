@@ -7,7 +7,7 @@ import styles from './TeacherStorySupplementPanel.module.css';
 type Branch={branch_no:number;first_episode:number;last_episode:number;title:string;
  when_recorded:string;when_absent:string;evidence_description:string;
  automatic_evidence:boolean|null;reviewed_outcome:string|null;reviewed_at:string|null;
- evidence_kind:string|null;evidence_id:string|null;teacher_note:string|null;};
+ evidence_kind:string|null;evidence_id:string|null;teacher_note:string|null;published:boolean;};
 const TYPES=[
  {value:'',name:'Выберите тип источника'},
  {value:'political_post',name:'Публикация в политической хронике'},
@@ -16,7 +16,7 @@ const TYPES=[
  {value:'government_program',name:'Государственная программа'},
  {value:'municipal_project',name:'Муниципальный проект'},
 ];
-export default function TeacherStoryBranchesPanel({gameId}:{gameId:string}){
+export default function TeacherStoryBranchesPanel({gameId,campaignEnabled}:{gameId:string;campaignEnabled:boolean}){
  const [open,setOpen]=useState(false);const [loaded,setLoaded]=useState(false);
  const [items,setItems]=useState<Branch[]>([]);const [number,setNumber]=useState(1);
  const [outcome,setOutcome]=useState('undetermined');const [kind,setKind]=useState('');
@@ -45,7 +45,7 @@ export default function TeacherStoryBranchesPanel({gameId}:{gameId:string}){
   finally{setPending(false);}
  };
  const save=async()=>{
-  if(!current||pending||!changed)return;
+  if(!current||pending||!changed||current.published)return;
   setPending(true);setError('');setMessage('');
   try{
    const response=await supabase.rpc('save_story_branch_review_teacher',{
@@ -59,13 +59,25 @@ export default function TeacherStoryBranchesPanel({gameId}:{gameId:string}){
   }catch(e){setError(userError(e)||'Не удалось сохранить проверку.');}
   finally{setPending(false);}
  };
+ const publish=async()=>{
+  if(!current||pending||changed||current.published||!campaignEnabled||!current.reviewed_outcome||current.reviewed_outcome==='undetermined')return;
+  if(!window.confirm('Опубликовать реакцию на подтверждённую развилку в общей хронике? Отмена невозможна.'))return;
+  setPending(true);setError('');setMessage('');
+  try{
+   const response=await supabase.rpc('publish_story_branch_reaction_teacher',{p_game_id:gameId,p_branch_no:number});
+   if(response.error)throw response.error;
+   setItems(old=>old.map(x=>x.branch_no===number?{...x,published:true}:x));
+   setMessage('Реакция опубликована в «Политическом процессе». Оценки и государственные показатели не изменены.');
+  }catch(e){setError(userError(e)||'Публикация невозможна.');}
+  finally{setPending(false);}
+ };
  return <section className={styles.root} aria-label="Проверка девяти сюжетных развилок">
   <button className={styles.toggle} type="button" aria-expanded={open} disabled={pending} onClick={()=>void toggle()}>{open?'Свернуть развилки':'Проверка девяти сюжетных развилок'}</button>
   {error&&<p role="alert" className={styles.error}>{error}</p>}
   {open&&<div className={styles.layout}>
    <aside className={styles.list}>
     <label className={styles.picker}>Развилка<select value={number} disabled={pending} onChange={e=>pick(Number(e.target.value))}>{items.map(x=><option key={x.branch_no} value={x.branch_no}>П-{String(x.branch_no).padStart(2,'0')} · {x.title}</option>)}</select></label>
-    <div className={styles.desktopList}>{items.map(x=><button type="button" className={styles.listItem} aria-pressed={number===x.branch_no} key={x.branch_no} disabled={pending} onClick={()=>pick(x.branch_no)}><b>П-{String(x.branch_no).padStart(2,'0')} · {x.title}</b><small>{x.reviewed_outcome?'Проверка записана':'Не проверено'} · ЭП-{x.first_episode}–{x.last_episode}</small></button>)}</div>
+    <div className={styles.desktopList}>{items.map(x=><button type="button" className={styles.listItem} aria-pressed={number===x.branch_no} key={x.branch_no} disabled={pending} onClick={()=>pick(x.branch_no)}><b>П-{String(x.branch_no).padStart(2,'0')} · {x.title}</b><small>{x.published?'Опубликовано':x.reviewed_outcome?'Проверка записана':'Не проверено'} · ЭП-{x.first_episode}–{x.last_episode}</small></button>)}</div>
    </aside>
    {current&&<div className={styles.details}>
     <div className={styles.heading}><h3>П-{String(number).padStart(2,'0')} · {current.title}</h3><small>Эпизоды {current.first_episode}–{current.last_episode}</small></div>
@@ -81,7 +93,7 @@ export default function TeacherStoryBranchesPanel({gameId}:{gameId:string}){
      <label>Идентификатор источника<input type="text" value={sourceId} disabled={pending} onChange={e=>setSourceId(e.target.value)} placeholder="UUID записи ГОС.ID"/></label>
      <label>Что именно подтверждает документ<textarea rows={5} maxLength={1500} disabled={pending} value={note} onChange={e=>setNote(e.target.value)} placeholder="Опишите проверенный факт, не приписывайте органу несуществующее решение."/></label>
     </div>
-    <div className={styles.actions}><button type="button" disabled={pending||!changed} onClick={()=>void save()}>Сохранить проверку</button></div>
+    <div className={styles.actions}><button type="button" disabled={pending||!changed||current.published} onClick={()=>void save()}>Сохранить проверку</button><button type="button" disabled={pending||changed||current.published||!campaignEnabled||!current.reviewed_outcome||current.reviewed_outcome==='undetermined'} onClick={()=>void publish()}>Опубликовать реакцию</button></div>
     <p className={styles.note}>Это закрытая редакционная проверка. Сюжетная реакция появляется у студентов только после отдельной утверждённой публикации. Коэффициенты и баллы не меняются.</p>
     {message&&<p className={styles.success} role="status">{message}</p>}
    </div>}
