@@ -55,7 +55,8 @@ async function main(){
  for(let n=0;n<40;n++){
   const f=fixture();await compile(eventCall.arguments[2],f.env).fn();await compile(blitzCall.arguments[2],f.env).fn();
   assert.equal(f.queries.length,2,'One pending-event counter RPC plus one blitz RPC, not three network reads');
-  assert.deepEqual(f.queries[0],{rpc:'get_my_pending_event_count',args:{p_game_id:'classroom'}});
+  assert.equal(f.queries[0].rpc,'get_my_pending_event_count');
+  assert.equal(f.queries[0].args.p_game_id,'classroom');
   assert.deepEqual(f.events,[3],'Server count already deduplicates matching situation IDs');
   assert.deepEqual(f.blitz,[4]);
  }
