@@ -52,7 +52,7 @@ BEGIN
   ||v_source||') rows_changed WHERE game_id IS NOT NULL GROUP BY game_id'
  LOOP
   v_recipients:=v_item.recipients;
-  IF TG_TABLE_NAME='event_case_outcomes' THEN
+  IF TG_TABLE_NAME IN ('event_case_outcomes','event_cases','event_case_routing') THEN
    SELECT coalesce(array_agg(DISTINCT x.recipient_id),ARRAY[]::uuid[])
      INTO v_recipients
    FROM (
@@ -64,7 +64,8 @@ BEGIN
    ) x;
   END IF;
   PERFORM realtime.send(
-   jsonb_build_object('table',TG_TABLE_NAME,'recipients',v_recipients,'case_ids',v_item.cases),
+   jsonb_build_object('table',TG_TABLE_NAME,'recipients',v_recipients,
+    'case_ids',CASE WHEN TG_TABLE_NAME='event_discussion_messages' THEN v_item.cases ELSE ARRAY[]::uuid[] END),
    'event_feed_changed',
    'gos-id-live:'||v_item.game_id::text,
    true
