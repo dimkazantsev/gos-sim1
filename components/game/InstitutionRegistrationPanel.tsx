@@ -318,7 +318,7 @@ export default function InstitutionRegistrationPanel({g,readOnly=false,freshAtte
  return <><details ref={detailsRef} className="institutionRegistrationPanel civicRegistration civicDisclosure projectDisclosure" aria-label="Регистрация на заседания"><DisclosureSummary icon={ClipboardCheck} title="Регистрация на заседание" description={'Этап '+stage+' · Регистрация в органе власти'}/><div className="civicDisclosureBody"><p>{body==='ksrf'?'До внесения предложений и голосования необходимо зарегистрироваться на заседание КСРФ. Участвовать могут все участники, но один голос от фракции подаёт её избранный представитель.':body==='gd'&&stage===4?'До формирования руководства Государственной Думы повестку готовят председатели зарегистрированных политических партий. После избрания Председателя Думы и формирования Совета Думы полномочия переходят руководству палаты. Для участия в заседании после утверждения повестки необходима регистрация.':'Перед участием в заседании и голосовании необходимо зарегистрироваться в соответствующем органе после утверждения повестки.'}</p>
   <div className="civicRegistrationSelectors"><StyledSelect label="Орган" value={body} onChange={setBody} options={[...availableBodies.map(b=>({value:b.key,label:b.title})),...units.filter(u=>!allowedBodies||allowedBodies.includes('unit:'+u.id)).map(u=>({value:'unit:'+u.id,label:u.title}))]}/></div>
   <section className="civicMeetingDocuments" aria-label="Документы заседания" data-agenda-state={agendaReady?'approved':agendaDraft?'draft':'pending'}>
-   <header><div><b>Повестка заседания</b><small>{agendaReady?'Утверждена · регистрация разрешена':agendaDraft?(gdStage12CanonicalAgenda?'Автоматически сформирована · требуется утверждение':'Проект в реестре · требуется утверждение'):verifiedRights&&!canAttend?'Повестка доступна уполномоченным участникам':'Повестка ещё не составлена'}</small></div><span>{agendaHasDocument?'В реестре НПА':'Не оформлена'}</span></header>
+   <header><div><b>Повестка заседания</b><small>{agendaReady?'Подписана всеми · регистрация разрешена':agendaDraft?(gdStage12CanonicalAgenda?'Автоматически сформирована · требуется утверждение':'Проект в реестре · требуется утверждение'):verifiedRights&&!canAttend?'Повестка доступна уполномоченным участникам':'Повестка ещё не составлена'}</small></div><span>{agendaHasDocument?'В реестре НПА':'Не оформлена'}</span></header>
    {!agendaReady&&<p className="civicMeetingHelp" role="status">{readOnly?'Режим просмотра. Подготовка и регистрация недоступны.':meetingActionsLocked?'Этап закрыт. Изменения и регистрация недоступны.':gdStage12CanonicalAgenda?'Повестка автоматически составляется из пакетов законопроектов в разделе «Работа». До открытия заседания она пополняется автоматически. Председатель утверждает подготовленный документ; после открытия изменения вносит только через обоснованную корректировку заседания.':!verifiedRights?'Проверяем ваши полномочия для этого органа…':meetingCoordinator?'Вы можете составить и утвердить повестку или назначить исполнителя. Документ автоматически создаётся в реестре НПА, отдельно загружать его не нужно.':canPrepare?'Вам поручена подготовка проекта повестки. Сохраните проект, затем председатель утвердит его.':canAttend?'Вы можете зарегистрироваться после утверждения повестки, участвовать в заседании и голосовать в пределах своих полномочий. Подготовку повестки поручает председатель.':'У вас нет назначения в этот орган. Готовить повестку, утверждать её и регистрироваться на это заседание могут только уполномоченные участники.'}</p>}
 
    {preStageKsrf&&stageReadOnly&&!readOnly&&<p className="civicMeetingHelp" role="status">Повестку и регистрацию можно оформить до открытия работы этапа. Для выполнения заданий завершённого этапа преподаватель должен повторно открыть его.</p>}
@@ -328,7 +328,7 @@ export default function InstitutionRegistrationPanel({g,readOnly=false,freshAtte
    {hasSessionRegistrations&&agendaHasDocument&&!agendaReady&&!gdStage12CanonicalAgenda&&<p className="civicMeetingHelp" role="status">Регистрация уже началась. Изменять подготовленный проект нельзя; председатель может только утвердить существующую повестку.</p>}
    {gdStage12CanonicalAgenda&&agendaHasDocument&&<section className="civicAgendaSyncedPreview" aria-label="Автоматически сформированная повестка Государственной Думы"><strong>Содержание повестки · Реестр НПА</strong><pre>{meetingRecord?.agenda_body||'Вопросы повестки загружаются…'}</pre></section>}
    {gdStage12CanonicalAgenda&&meetingCoordinator&&!readOnly&&agendaHasDocument&&<section className="civicAgendaEdit" aria-label="Корректировка повестки Государственной Думы">
-    <button type="button" className="secondary" aria-expanded={agendaEditorOpen} onClick={()=>{setAgendaEditorOpen(v=>!v);if(!agendaEditorOpen){dirtyMeetingDraftRef.current.stage12=false;void loadStage12Editor();}}}>Корректировать повестку</button>
+    <button type="button" className="secondary" aria-expanded={agendaEditorOpen} onClick={()=>{setAgendaEditorOpen(v=>!v);if(!agendaEditorOpen){dirtyMeetingDraftRef.current.stage12=false;void loadStage12Editor();}}}>Предложить редакцию</button>
     {agendaEditorOpen&&<div className="civicAgendaEditBody">
      <p>Измените непосредственно текст повестки заседания Государственной Думы. Состав законопроектов и голосования остаются прежними. Реестровые номера документов необходимо сохранить.</p>
      <label>Полный текст повестки
@@ -346,13 +346,50 @@ export default function InstitutionRegistrationPanel({g,readOnly=false,freshAtte
        ||stage12Text.trim().length<80||stage12Text.length>20000
        ||stage12Text.trim()===stage12InitialText.trim()
        ||(stage12Session.status==='open'&&stage12Reason.trim().length<10)}
-      onClick={()=>void saveStage12Editor()}>{stage12Saving?'Сохранение…':'Сохранить текст повестки'}</button>
+      onClick={()=>void saveStage12Editor(false)}>{stage12Saving?'Сохранение…':'Сохранить'}</button>
+      {agendaSigning?.can_sign&&<button type="button" className="primary"
+       disabled={!stage12Session||stage12Saving||stage12Session.status==='closed'
+        ||stage12Text.trim().length<80||stage12Text.length>20000
+        ||stage12Text.trim()===stage12InitialText.trim()
+        ||(stage12Session.status==='open'&&stage12Reason.trim().length<10)}
+       onClick={()=>void saveStage12Editor(true)}>Сохранить и подписать</button>}
     </div>}
    </section>}
-   {canPrepare&&!readOnly&&!agendaReady&&canWriteAgenda&&<label>Содержание повестки<textarea aria-label="Текст повестки заседания" value={agendaText} rows={4} onChange={event=>{dirtyMeetingDraftRef.current.agenda=true;meetingDraftVersion.current.agenda++;setAgendaText(event.target.value)}} placeholder="Вопросы заседания, порядок рассмотрения, выступающие и регламент"/></label>}
-   {canPrepare&&!readOnly&&!agendaReady&&canWriteAgenda&&<div className="civicAgendaComposer"><small>{agendaTextLength<30?'Для сохранения укажите ещё '+(30-agendaTextLength)+' символов.':'Повестка готова к сохранению в реестре НПА.'}</small><button type="button" className={meetingCoordinator?'primary':'secondary'} disabled={busy||readOnly||agendaTextLength<30} onClick={()=>void saveMeetingDocument('agenda')}>{meetingCoordinator?'Сохранить и утвердить повестку':'Сохранить проект повестки в реестре НПА'}</button></div>}
-   {canApproveAgenda&&!readOnly&&<button type="button" className="primary" disabled={busy||readOnly} onClick={()=>void approveMeeting('agenda')}>Утвердить подготовленный проект повестки</button>}
-   {meetingCoordinator&&!readOnly&&!automatedSessionMinutes&&<div className="civicMeetingDelegate"><StyledSelect label="Поручить оформление повестки" value={delegateUser} onChange={setDelegateUser} options={[{value:'',label:'Без поручения'},...participants.map(p=>({value:p.user_id,label:p.full_name||'Участник'}))]}/><button type="button" disabled={busy} onClick={()=>void assignMeetingDelegate()}>Сохранить поручение</button></div>}
+   {agendaHasDocument&&agendaSigning&&<div className="civicMeetingHelp" role="status">
+      Личные подписи текущей редакции: <b>{signedAgendaCount} из {requiredAgendaCount}</b>.
+      {requiredAgendaCount===0?' Подписанты ещё не определены.':agendaReady?' Утверждена.':' Ожидаются остальные подписи.'}
+      {agendaSigning.required.map(person=><div key={person.user_id}>
+       {g.names[person.user_id]||'Участник'} · {person.office}: {person.signed?'Подписано':'Ожидает подписи'}
+      </div>)}
+     </div>}
+    {canPrepare&&!readOnly&&canWriteAgenda&&<div className="civicAgendaComposer">
+      <button type="button" className="secondary" aria-expanded={agendaProposalOpen}
+       onClick={()=>setAgendaProposalOpen(v=>!v)}>
+       {!agendaHasDocument||meetingRecord?.agenda_prepared_by===g.me?.user_id?'Предложить проект':'Предложить редакцию'}
+      </button>
+     </div>}
+    {canPrepare&&!readOnly&&canWriteAgenda&&agendaProposalOpen&&<>
+      {signedAgendaCount>0&&<p className="civicMeetingHelp" role="status">
+       При сохранении изменённого текста прежние подписи станут недействительными. Новую редакцию должны подписать все уполномоченные лица.
+      </p>}
+      <label>Содержание повестки<textarea aria-label="Текст повестки заседания"
+       value={agendaText} rows={4}
+       onChange={event=>{dirtyMeetingDraftRef.current.agenda=true;meetingDraftVersion.current.agenda++;setAgendaText(event.target.value)}}
+       placeholder="Вопросы заседания, порядок рассмотрения, выступающие и регламент"/></label>
+      <div className="civicAgendaComposer">
+       <small>{agendaTextLength<30?'Для сохранения укажите ещё '+(30-agendaTextLength)+' символов.':'Повестка готова к сохранению в реестре НПА.'}</small>
+       <button type="button" className="secondary" disabled={busy||agendaTextLength<30}
+        onClick={()=>void saveMeetingDocument('agenda',false)}>Сохранить</button>
+       {(agendaSigning?.can_sign||!agendaHasDocument&&meetingCoordinator&&!g.teacher)&&
+        <button type="button" className="primary" disabled={busy||agendaTextLength<30}
+         onClick={()=>void saveMeetingDocument('agenda',true)}>Сохранить и подписать</button>}
+      </div>
+     </>}
+    {canApproveAgenda&&!readOnly&&!agendaProposalOpen&&<button type="button"
+      className="primary" disabled={busy} onClick={()=>void approveMeeting('agenda')}>
+      Сохранить и подписать
+    </button>}
+    {meetingCoordinator&&!readOnly&&!automatedSessionMinutes&&<div className="civicMeetingDelegate"><StyledSelect label="Поручить оформление повестки" value={delegateUser} onChange={setDelegateUser} options={[{value:'',label:'Без поручения'},...participants.map(p=>({value:p.user_id,label:p.full_name||'Участник'}))]}/><button type="button" disabled={busy} onClick={()=>void assignMeetingDelegate()}>Сохранить поручение</button></div>}
 
   </section>
   <div className="civicAttendance"><div><h3>{config?.title||unit?.title}</h3><p>{config?.basis||'Состав зарегистрированного в игре органа. Порог задаётся в голосовании.'}</p></div><div className="civicAttendanceNumbers"><span>Присутствует <b>{present} / {total}</b></span><span>Для кворума <b>{needed}</b></span><span>{present>=needed&&total>0?'Кворум есть':'Ожидаем участников'}</span></div><ul className="civicAttendees">{registered.map(r=>{const faction=body==='ksrf'?g.parties.find(p=>p.leader_user_id===r.user_id):null;const presence=gdPresence?.registered.find(x=>x.user_id===r.user_id);return <li key={r.user_id}>{body==='ksrf'?(faction?.name||'Участник КСРФ')+' · '+(g.names[r.user_id]||'Участник'):g.names[r.user_id]||'Участник'}<b>{body==='gd'?presence?(presence.present+' из '+presence.capacity+' депутатов'+(presence.declared==null?' · автоматически':'')):'Проверяем явку':body==='ksrf'?(faction?'1 голос фракции':'Без голоса фракции'):'1 голос'}</b></li>})}</ul>
