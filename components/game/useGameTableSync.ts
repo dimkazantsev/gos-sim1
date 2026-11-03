@@ -45,7 +45,7 @@ export function notifyGameDataRefresh(gameId:string,table?:string,caseId?:string
 // subscription per widget multiplies catalog work in Realtime. Keep these
 // views eventually consistent through local invalidation, focus/online
 // recovery and a low-frequency visible-tab poll.
-export function useGameTableSync(gameId:string|undefined,_tables:readonly string[],load:()=>Promise<unknown>,scope='',onlyTable?:string,minRefreshMs=750,fallbackMs=60000,initialDelayMs=0,onlyCaseId?:string){
+export function useGameTableSync(gameId:string|undefined,_tables:readonly string[],load:()=>Promise<unknown>,scope='',onlyTable?:string,minRefreshMs=750,fallbackMs=60000,initialDelayMs=0,onlyCaseId?:string,connectedFallbackMs?:number){
  const latest=useRef(load);latest.current=load;
  const tableKey=_tables.join('|');
  useEffect(()=>{
@@ -57,7 +57,7 @@ export function useGameTableSync(gameId:string|undefined,_tables:readonly string
   const hasPushCoverage=_tables.length>0&&_tables.every(table=>GAME_PUSH_TABLES.has(table));
   // Event widgets keep just one rare safety reconciliation while subscribed.
   const eventOnly=_tables.length>0&&_tables.every(table=>table.startsWith('event_'));
-  const connectedReconcileMs=eventOnly?900000:180000;
+  const connectedReconcileMs=connectedFallbackMs??(eventOnly?900000:180000);
   async function flush(){
    timer=undefined;
    if(disposed)return;
@@ -110,5 +110,5 @@ export function useGameTableSync(gameId:string|undefined,_tables:readonly string
   const eventName=onlyTable?KSRF_PROPOSAL_REFRESH_EVENT:GAME_DATA_REFRESH_EVENT;
   window.addEventListener(eventName,local);document.addEventListener('visibilitychange',visible);
   return()=>{disposed=true;clearTimeout(timer);clearInterval(poll);window.removeEventListener('focus',visible);window.removeEventListener('online',online);window.removeEventListener(eventName,local);document.removeEventListener('visibilitychange',visible)};
- },[gameId,scope,onlyTable,onlyCaseId,tableKey,minRefreshMs,fallbackMs,initialDelayMs]);
+ },[gameId,scope,onlyTable,onlyCaseId,tableKey,minRefreshMs,fallbackMs,initialDelayMs,connectedFallbackMs]);
 }
