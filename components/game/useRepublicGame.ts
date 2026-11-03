@@ -471,7 +471,7 @@ export function useRepublicGame(gameId:string){
   let disposed=false,scheduled=false;
   const subscriptionEpoch=readEpoch.current;
   const currentConnection=()=>!disposed&&subscriptionEpoch===readEpoch.current&&activeGameRef.current===gameId&&authUser.current===me.user_id;
-  let liveConnected=false,lastPollAt=0;
+  let liveConnected=false,everSubscribed=false,lastPollAt=0;
   let dirtyPartyDocuments=false,dirtyChat=false,dirtyPins=false,dirtyOverview=false;
   const dirtyTables=new Set<string>();
   const reconcileTables=new Set<string>();
@@ -771,7 +771,17 @@ export function useRepublicGame(gameId:string){
      networkPresenceTracked=false;
     }
     setGameRealtimeConnection(gameId,liveConnected);
-    if(liveConnected){lastPollAt=Date.now();syncNetworkPresence()}
+    if(liveConnected){
+     const restored=everSubscribed&&!wasConnected;
+     everSubscribed=true;lastPollAt=Date.now();syncNetworkPresence();
+     // Reconcile missed assignments/invitations/discussion once after a true
+     // reconnect, but never cancel the jittered cold-entry read on first join.
+     if(restored){
+      notifyGameDataRefresh(gameId,'event_assignments');
+      notifyGameDataRefresh(gameId,'event_collaboration_invites');
+      notifyGameDataRefresh(gameId,'event_discussion_messages');
+     }
+    }
     setRealtimeState(liveConnected?'connected':'disconnected');
    });
   }).catch(()=>{
