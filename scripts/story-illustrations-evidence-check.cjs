@@ -6,6 +6,14 @@ const artwork=read('components/game/StoryNewsIllustration.tsx');
 const wall=read('components/game/PoliticalWallView.tsx');
 const teacher=read('components/game/TeacherStoryCampaign.tsx');
 const storyLayout=read('components/game/TeacherStoryCampaign.module.css');
+const extras=read('components/game/TeacherStorySupplementPanel.tsx');
+const branches=read('components/game/TeacherStoryBranchesPanel.tsx');
+const supplementStyle=read('components/game/TeacherStorySupplementPanel.module.css');
+const supplementSchema=read('supabase/migrations/20261103191629_story_supplement_private_tables.sql');
+const supplementPublish=read('supabase/migrations/20261103191720_story_supplement_teacher_publication.sql');
+const neutralFinal=read('supabase/migrations/20261103192428_story_epilogue_neutral_final.sql');
+const branchSchema=read('supabase/migrations/20261103192838_story_branch_evidence_review.sql');
+
 const view=read('components/game/TeacherView.tsx');
 const migration=read('supabase/migrations/20261103161012_story_teacher_evidence_preview.sql');
 assert(artwork.includes('<svg')&&[0,1,2,3,4,5].every(i=>artwork.includes('variant==='+i))&&artwork.includes('Math.abs(Math.trunc(episodeNo))%6'),'Six generic inline SVG compositions');
@@ -32,4 +40,14 @@ assert(migration.includes("coalesce(e.draft->'variants','[]'::jsonb)"),'Future e
 assert(migration.includes('public.government_program_agenda')&&migration.includes("d.doc_type='federal_budget'")&&migration.includes('public.municipal_projects'),'Grounded evidence uses official program, budget and municipal procedures');
 assert(migration.includes("coalesce(rel.draft_title,e.draft->>'title')"),'Teacher index reflects saved changes');
 assert(!migration.includes('CREATE TRIGGER')&&!migration.includes('realtime.send')&&!migration.includes('CREATE POLICY'),'No background work, new channel or policies');
+
+assert(teacher.includes('TeacherStorySupplementPanel')&&teacher.includes('TeacherStoryBranchesPanel'),'Teacher can open editor for supplemental news and branch checks');
+assert(extras.includes('get_story_supplements_teacher')&&extras.includes('save_story_supplement_teacher')&&extras.includes('publish_story_supplement_teacher'),'Supplement editing and publication use authorized RPCs');
+assert(branches.includes('get_story_branches_teacher')&&branches.includes('save_story_branch_review_teacher'),'Nine branches can be reviewed with evidence');
+assert(!extras.includes('setInterval(')&&!extras.includes('.channel(')&&!branches.includes('setInterval(')&&!branches.includes('.channel('),'No new polling or realtime subscriptions');
+assert(supplementStyle.includes('@media(max-width:780px)')&&supplementStyle.includes('min-width:0'),'Teacher editorial UI is responsive');
+assert(supplementSchema.includes('enable row level security')&&supplementSchema.includes('revoke all'),'Private content is not directly readable by players');
+assert(supplementPublish.includes('private.is_game_teacher')&&supplementPublish.includes('on conflict(game_id,source_key)')&&supplementPublish.includes('effects_applied'),'Supplement publishing is authorized, idempotent and has no metric effects');
+assert(neutralFinal.includes('нейтральный финал Г')&&neutralFinal.includes("code='К-30'"),'Unresolved municipal process uses neutral ending and optional final-only epilogue');
+assert(branchSchema.includes('private.story_supplement_evidence_exists')&&branchSchema.includes('private.is_game_teacher'),'Branch outcomes require teacher access and existing evidence for positive decisions');
 console.log('PASS: lightweight story visuals (zero network) and teacher-only evidence/variants on existing preview RPC');
