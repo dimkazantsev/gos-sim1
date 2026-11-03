@@ -24,7 +24,7 @@ REVOKE ALL ON private.story_episode_releases FROM PUBLIC,anon,authenticated;
 CREATE OR REPLACE FUNCTION public.get_story_campaign_teacher(p_game_id uuid)
 RETURNS jsonb LANGUAGE plpgsql STABLE SECURITY DEFINER SET search_path=''
 AS $fn$
-DECLARE r private.story_campaigns%rowtype; n integer; a integer; pub integer;
+DECLARE r private.story_campaigns%rowtype; n integer; a integer; pub integer; v_items jsonb;
 BEGIN
  IF auth.uid() IS NULL OR NOT private.is_game_teacher(p_game_id) THEN
   RAISE EXCEPTION 'Доступ разрешён только преподавателю игры.' USING ERRCODE='42501';
@@ -35,10 +35,17 @@ BEGIN
  SELECT count(*) FILTER(WHERE approved_at IS NOT NULL),
         count(*) FILTER(WHERE published_at IS NOT NULL)
  INTO a,pub FROM private.story_episode_releases WHERE game_id=p_game_id;
+ SELECT coalesce(jsonb_agg(jsonb_build_object('episode_no',e.episode_no,
+  'stage_no',e.stage_no,'title',e.draft->>'title',
+  'loaded',(length(btrim(e.draft->>'body'))>0),'approved',rel.approved_at IS NOT NULL,
+  'published',rel.published_at IS NOT NULL) ORDER BY e.episode_no),'[]'::jsonb)
+ INTO v_items FROM private.story_episode_drafts e
+ LEFT JOIN private.story_episode_releases rel
+  ON rel.game_id=p_game_id AND rel.episode_no=e.episode_no;
  RETURN jsonb_build_object('prepared',r.game_id IS NOT NULL,'enabled',coalesce(r.enabled,false),
   'current_episode',coalesce(r.current_episode,0),'approved_episodes',a,
   'published_episodes',pub,'loaded_episodes',n,'total_episodes',24,
-  'metrics_enabled',false,'publication_enabled',coalesce(r.enabled,false));
+  'metrics_enabled',false,'publication_enabled',coalesce(r.enabled,false),'episodes',v_items);
 END $fn$;
 
 CREATE OR REPLACE FUNCTION public.get_story_episode_list_teacher(p_game_id uuid)
@@ -183,7 +190,7 @@ BEGIN
  SELECT approved_at,published_post_id,draft_title,draft_body INTO v_approved,v_published,v_draft_title,v_draft_body
   FROM private.story_episode_releases WHERE game_id=p_game_id AND episode_no=p_episode_no;
  IF v_published IS NOT NULL THEN
-  RETURN jsonb_build_object('published',true,'post_id',v_published,'already_published',true);
+  RETURN jsonb_build_object('published',true,'post_id',v_published,'already_published',true,'campaign',public.get_story_campaign_teacher(p_game_id));
  END IF;
  IF v_approved IS NULL THEN RAISE EXCEPTION 'Сначала утвердите текст эпизода.'; END IF;
  IF v_campaign.current_episode+1<>p_episode_no THEN
@@ -236,7 +243,7 @@ BEGIN
   enabled=CASE WHEN p_episode_no=24 THEN false ELSE enabled END
   WHERE game_id=p_game_id;
  RETURN jsonb_build_object('published',true,'post_id',v_post,'already_published',false,
-  'episode_no',p_episode_no,'closed',p_episode_no=24);
+  'episode_no',p_episode_no,'closed',p_episode_no=24,'campaign',public.get_story_campaign_teacher(p_game_id));
 END $fn$;
 
 REVOKE ALL ON FUNCTION public.get_story_campaign_teacher(uuid),
