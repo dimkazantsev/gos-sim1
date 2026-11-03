@@ -60,3 +60,4 @@ export default function TeacherStoryCampaign({gameId}:{gameId:string}){
    <small>Нет фоновых запросов, отдельной подписки, предварительной загрузки эпизодов или автоматического изменения показателей.</small>
   </div>
  </section>;
+}
