@@ -478,8 +478,7 @@ begin
   case when p_kind='agenda' or not v_manager then 'draft' else 'published' end,
   case when p_kind='agenda' then v_subject when v_manager then 'system' else v_subject end,'Этап '||p_stage_no||', орган '||p_institution);
  return v_doc;
-end;$function$
-
+end;$function$;
 
 CREATE OR REPLACE FUNCTION private.attach_published_meeting_facsimiles(p_document uuid)
  RETURNS void
@@ -501,14 +500,15 @@ BEGIN
   AND gm.roster_archived_at IS NULL AND nullif(p.signature_path,'') IS NOT NULL
   AND p.signature_path LIKE d.game_id::text||'/profiles/'||s.user_id::text||'/signature-%.png'
  ON CONFLICT(document_id,signer_id) DO NOTHING;
-END $function$
-
+END $function$;
 
 -- Prevent an automatic session from opening with an unsigned agenda.
 CREATE OR REPLACE FUNCTION private.agenda_session_open_guard() RETURNS trigger
 LANGUAGE plpgsql SECURITY DEFINER SET search_path='' AS $fn$
 BEGIN
- IF NEW.status='open' AND OLD.status IS DISTINCT FROM 'open' THEN
+ IF NEW.status='open' AND OLD.status IS DISTINCT FROM 'open' AND
+   ((TG_TABLE_NAME='duma_sessions' AND NEW.stage_no=12) OR
+    (TG_TABLE_NAME='government_sessions' AND NEW.stage_no=11)) THEN
   IF NEW.agenda_document_id IS NULL OR NOT private.agenda_all_signed(NEW.agenda_document_id) THEN
    RAISE EXCEPTION 'Сначала соберите личные подписи всех уполномоченных лиц под повесткой'
     USING ERRCODE='23514';
