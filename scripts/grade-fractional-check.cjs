@@ -26,6 +26,8 @@ function harness(score){
   if(request==='../ui/useDialog')return{useDialog:()=>({current:null})};
   if(request==='../ui/IconAction')return{IconAction:({label,onClick})=>React.createElement('button',{'aria-label':label,onClick})};
   if(request==='./ScoreFormula')return{__esModule:true,default:()=>null};if(request==='./BlitzKnowledgeScore')return{__esModule:true,default:()=>null};if(request==='lucide-react')return{ChevronDown:()=>null};
+  if(request==='./MandatoryStageAnalysis.module.css')
+   return{__esModule:true,default:{backdrop:'backdrop',dialog:'dialog',heading:'heading',content:'content',footer:'footer'}};
   if(request==='./assessmentPresentation')return presentation;
   if(request==='./stageAnalysisWindow')return {stageAnalysisPhase:()=> 'unavailable'};
   if(request==='./useGameTableSync')return{useGameTableSync(gameId,tables,load,scope){const latest=react.useRef(load);latest.current=load;react.useEffect(()=>{if(!gameId)return;const ch={handlers:[()=>void latest.current()]};channels.push(ch);void latest.current();return()=>{channels.splice(channels.indexOf(ch),1);};},[gameId,scope]);}};
