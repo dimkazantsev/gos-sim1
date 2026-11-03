@@ -18,18 +18,26 @@ export const GAME_PUSH_TABLES:ReadonlySet<string>=new Set([
  'stage_deadline_rules','parliamentary_election_rules','regional_election_rules',
  'state_metrics','party_documents',
  'duma_sessions','duma_agenda_items',
- 'institution_session_registrations','bill_amendments','bill_amendment_packs'
+ 'institution_session_registrations','bill_amendments','bill_amendment_packs',
+ // Private metadata-only Broadcast is emitted by one statement-level trigger.
+ 'event_cases','event_assignments','event_collaboration_invites',
+ 'event_decisions','event_case_outcomes','event_authority_evidence',
+ 'event_case_routing','event_discussion_messages'
 ]);
 export const GAME_DATA_REFRESH_EVENT='gos-sims:refresh';
 export const KSRF_PROPOSAL_REFRESH_EVENT='gos-sims:ksrf-proposals';
 export const SECTION_UPDATES_REFRESH_EVENT='gos-sims:section-updates';
+export const EVENT_PENDING_COUNT_EVENT='gos-sims:event-pending-count';
+export function notifyEventPendingCount(gameId:string,userId:string,count:number){
+ window.dispatchEvent(new CustomEvent(EVENT_PENDING_COUNT_EVENT,{detail:{gameId,userId,count}}));
+}
 export function notifySectionUpdates(gameId:string){window.dispatchEvent(new CustomEvent(SECTION_UPDATES_REFRESH_EVENT,{detail:{gameId}}))}
-export function notifyGameDataRefresh(gameId:string,table?:string){
+export function notifyGameDataRefresh(gameId:string,table?:string,caseId?:string){
  // KSRF proposals only invalidate their own small list. Broadcasting through
  // the generic event caused unrelated stage widgets to query on every proposal.
  const eventName=table==='parliamentary_election_rules'||table==='regional_election_rules'
   ?KSRF_PROPOSAL_REFRESH_EVENT:GAME_DATA_REFRESH_EVENT;
- window.dispatchEvent(new CustomEvent(eventName,{detail:{gameId,table}}));
+ window.dispatchEvent(new CustomEvent(eventName,{detail:{gameId,table,caseId}}));
 }
 
 // Stage workspaces do not open Postgres Changes subscriptions themselves.
@@ -37,7 +45,7 @@ export function notifyGameDataRefresh(gameId:string,table?:string){
 // subscription per widget multiplies catalog work in Realtime. Keep these
 // views eventually consistent through local invalidation, focus/online
 // recovery and a low-frequency visible-tab poll.
-export function useGameTableSync(gameId:string|undefined,_tables:readonly string[],load:()=>Promise<unknown>,scope='',onlyTable?:string,minRefreshMs=750,fallbackMs=60000,initialDelayMs=0){
+export function useGameTableSync(gameId:string|undefined,_tables:readonly string[],load:()=>Promise<unknown>,scope='',onlyTable?:string,minRefreshMs=750,fallbackMs=60000,initialDelayMs=0,onlyCaseId?:string){
  const latest=useRef(load);latest.current=load;
  const tableKey=_tables.join('|');
  useEffect(()=>{
@@ -47,6 +55,9 @@ export function useGameTableSync(gameId:string|undefined,_tables:readonly string
   // invalidation still refresh immediately through GAME_DATA_REFRESH_EVENT.
   let lastFallbackAt=Date.now(),lastStartedAt=0,initialPending=false;
   const hasPushCoverage=_tables.length>0&&_tables.every(table=>GAME_PUSH_TABLES.has(table));
+  // Event widgets keep just one rare safety reconciliation while subscribed.
+  const eventOnly=_tables.length>0&&_tables.every(table=>table.startsWith('event_'));
+  const connectedReconcileMs=eventOnly?900000:180000;
   async function flush(){
    timer=undefined;
    if(disposed)return;
@@ -72,9 +83,10 @@ export function useGameTableSync(gameId:string|undefined,_tables:readonly string
   // Restored connectivity must retry failed reads even after a recent focus event.
   const online=()=>{queued=true;visible()};
   function local(event:Event){
-   const detail=(event as CustomEvent<{gameId:string;table?:string}>).detail;
+   const detail=(event as CustomEvent<{gameId:string;table?:string;caseId?:string}>).detail;
    if(detail?.gameId!==gameId)return;
    if(onlyTable&&detail.table!==onlyTable)return;
+   if(onlyCaseId&&detail.caseId&&detail.caseId!==onlyCaseId)return;
    if(!onlyTable&&detail.table&&_tables.length&&!_tables.includes(detail.table))return;
    schedule();
   }
@@ -86,11 +98,11 @@ export function useGameTableSync(gameId:string|undefined,_tables:readonly string
   }else void flush();
   // Fall back without aligning all classroom tabs and stage widgets on the same tick.
   const poll=setInterval(()=>{
-    if(document.visibilityState!=='visible')return;
+    if(document.visibilityState!=='visible'||typeof navigator!=='undefined'&&!navigator.onLine)return;
     const now=Date.now();
     // A healthy shared Realtime connection makes 25–35s whole-widget polling
     // redundant. Retain 3-minute reconciliation for missed changes.
-    if(hasPushCoverage&&gameRealtimeConnected(gameId)&&now-lastFallbackAt<180000)return;
+    if(hasPushCoverage&&gameRealtimeConnected(gameId)&&now-lastFallbackAt<connectedReconcileMs)return;
     lastFallbackAt=now;
     schedule(0);
   },fallbackMs+Math.floor(Math.random()*Math.min(15000,fallbackMs/4)));
@@ -98,5 +110,5 @@ export function useGameTableSync(gameId:string|undefined,_tables:readonly string
   const eventName=onlyTable?KSRF_PROPOSAL_REFRESH_EVENT:GAME_DATA_REFRESH_EVENT;
   window.addEventListener(eventName,local);document.addEventListener('visibilitychange',visible);
   return()=>{disposed=true;clearTimeout(timer);clearInterval(poll);window.removeEventListener('focus',visible);window.removeEventListener('online',online);window.removeEventListener(eventName,local);document.removeEventListener('visibilitychange',visible)};
- },[gameId,scope,onlyTable,tableKey,minRefreshMs,fallbackMs,initialDelayMs]);
+ },[gameId,scope,onlyTable,onlyCaseId,tableKey,minRefreshMs,fallbackMs,initialDelayMs]);
 }
