@@ -1,11 +1,11 @@
 'use client';
 /**
- * Four generic, locally rendered editorial motifs, reused by all published
+ * Six generic, locally rendered editorial motifs, reused by all published
  * story posts. No files, image requests, timers, dependencies, or unpublished
  * episode names/plot in the public repository.
  */
 export default function StoryNewsIllustration({episodeNo}:{episodeNo:number}){
- const variant=Number.isFinite(episodeNo)?Math.abs(Math.trunc(episodeNo))%4:0;
+ const variant=Number.isFinite(episodeNo)?Math.abs(Math.trunc(episodeNo))%6:0;
  const ink='var(--gs-ink,#172447)';
  const accent='var(--gs-accent,#2453e6)';
  return <div className="storyNewsIllustration" aria-hidden="true"
@@ -44,6 +44,20 @@ export default function StoryNewsIllustration({episodeNo}:{episodeNo:number}){
      stroke={accent} strokeWidth="4" opacity=".37" strokeLinecap="round"/>
     <circle cx="660" cy="35" r="18" fill={accent} opacity=".14"/>
     <circle cx="660" cy="35" r="8" stroke={accent} fill="none" strokeWidth="2" opacity=".6"/>
+   </>}
+   {variant===4&&<>
+    <rect x="135" y="19" width="152" height="81" rx="8" fill="white" fillOpacity=".55" stroke={ink} strokeWidth="2" opacity=".78"/>
+    <path d="M157 42H267 M157 57H248 M157 72H226" stroke={accent} strokeWidth="3" strokeLinecap="round" opacity=".43"/>
+    <path d="M265 82L286 100L319 62" fill="none" stroke={accent} strokeWidth="5" strokeLinecap="round" strokeLinejoin="round" opacity=".72"/>
+    <path d="M380 37H650 M380 57H622 M380 77H671 M380 97H593" stroke={ink} strokeWidth="2.5" strokeLinecap="round" opacity=".32"/>
+   </>}
+   {variant===5&&<>
+    <path d="M158 32H284A12 12 0 0 1 296 44V70A12 12 0 0 1 284 82H228L202 103V82H158A12 12 0 0 1 146 70V44A12 12 0 0 1 158 32Z"
+     fill="white" fillOpacity=".55" stroke={ink} strokeWidth="2" opacity=".75"/>
+    <path d="M169 51H271 M169 63H236" stroke={accent} strokeWidth="3" opacity=".48" strokeLinecap="round"/>
+    <path d="M356 58H426L470 29L519 77L565 44H667" fill="none" stroke={accent} strokeWidth="2.5" strokeLinejoin="round" opacity=".69"/>
+    <path d="M356 93H667" fill="none" stroke={ink} strokeWidth="2" opacity=".24"/>
+    {[426,470,519,565].map((x,i)=><circle key={x} cx={x} cy={[58,29,77,44][i]} r="6" fill={accent} opacity=".58"/>)}
    </>}
   </svg>
  </div>;
