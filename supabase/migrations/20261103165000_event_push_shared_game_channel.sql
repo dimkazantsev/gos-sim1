@@ -35,6 +35,17 @@ BEGIN
   WHEN 'DELETE' THEN v_old
   WHEN 'UPDATE' THEN v_old||' UNION '||v_new
  END;
+ -- A participant's answer updates their own assignment to 'resolved'. The
+ -- submitting client already refreshed locally; do not send 100 room-wide
+ -- Broadcast deliveries per such acknowledgment. The final case outcome has
+ -- its own push. Reopening or changing a recipient still invalidates.
+ IF TG_TABLE_NAME='event_assignments' AND TG_OP='UPDATE' THEN
+  v_source:='SELECT game_id,case_id,recipient_id FROM new_event_rows WHERE status=''pending'''
+    ||' UNION SELECT o.game_id,o.case_id,o.recipient_id FROM old_event_rows o'
+    ||' JOIN new_event_rows n ON n.id=o.id'
+    ||' WHERE o.recipient_id IS DISTINCT FROM n.recipient_id'
+    ||' OR o.game_id IS DISTINCT FROM n.game_id OR o.case_id IS DISTINCT FROM n.case_id';
+ END IF;
  FOR v_item IN EXECUTE
   'SELECT game_id,coalesce(array_remove(array_agg(DISTINCT recipient_id),NULL),ARRAY[]::uuid[]) recipients,'
   ||'coalesce(array_agg(DISTINCT case_id),ARRAY[]::uuid[]) cases FROM ('
