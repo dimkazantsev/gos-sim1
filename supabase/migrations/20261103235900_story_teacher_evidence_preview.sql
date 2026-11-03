@@ -31,7 +31,7 @@ BEGIN
    JOIN public.formal_documents d ON d.id=v.formal_document_id
    WHERE v.game_id=p_game_id AND v.stage_no=13 AND d.game_id=p_game_id
     AND d.doc_type='federal_budget'
-   ORDER BY v.created_at DESC LIMIT 10
+   ORDER BY v.opened_at DESC NULLS LAST LIMIT 10
   ) x;
   v_evidence:=jsonb_build_object('kind','federal_budget','records',v_records,
     'warning','Показаны только голоса по официальному документу бюджета. Закрытие голосования само по себе не равно вступившему в силу закону.');
