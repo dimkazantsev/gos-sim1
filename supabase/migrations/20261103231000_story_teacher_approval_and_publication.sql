@@ -214,6 +214,9 @@ BEGIN
   SELECT 1 FROM public.game_votes
    WHERE game_id=p_game_id AND stage_no=11 AND status='closed'
  ) THEN RAISE EXCEPTION 'Нет завершённого голосования Правительства на этапе 11.'; END IF;
+ IF p_episode_no=21 AND NOT EXISTS(
+  SELECT 1 FROM public.game_votes WHERE game_id=p_game_id AND stage_no=13 AND status='closed'
+ ) THEN RAISE EXCEPTION 'Нет подтверждённого бюджетного голосования на этапе 13.';END IF;
  IF p_episode_no=24 AND NOT EXISTS(
   SELECT 1 FROM public.municipal_projects p
   JOIN public.game_votes v ON v.id=p.vote_id AND v.game_id=p.game_id
@@ -221,6 +224,9 @@ BEGIN
  ) THEN RAISE EXCEPTION 'Нет подтверждённых результатов рассмотрения муниципальных проектов.'; END IF;
  v_title:=coalesce(v_draft_title,v_draft.draft->>'title');
  v_body:=coalesce(v_draft_body,v_draft.draft->>'body');
+ IF v_body ~ '@[[:alpha:]0-9_]' THEN
+  RAISE EXCEPTION 'В сюжетном выпуске нельзя упоминать пользователей через @: это создаёт отдельные уведомления.';
+ END IF;
  IF length(v_title) NOT BETWEEN 12 AND 220 OR length(v_body) NOT BETWEEN 80 AND 9000 THEN
   RAISE EXCEPTION 'Проверьте заголовок и содержимое публикации.';
  END IF;
