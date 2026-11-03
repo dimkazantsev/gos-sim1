@@ -65,18 +65,19 @@ $fn$;
 REVOKE ALL ON FUNCTION private.broadcast_game_event_invalidation() FROM PUBLIC,anon,authenticated;
 
 -- Statement-level, not row-level: bulk assignments to 100 players send one notice.
+-- Individual votes and derived authority rows intentionally do not broadcast:
+-- 100 decisions must not fan out into 10,000 classroom WebSocket messages.
+-- The teacher can inspect intermediate decisions on demand or via 3m recovery;
+-- a completed outcome is delivered immediately to its actual participants.
 DO $t$
 DECLARE name text; op text; suffix text; transitions text;
 BEGIN
  FOR name IN SELECT unnest(ARRAY[
   'event_assignments','event_collaboration_invites','event_cases',
-  'event_decisions','event_case_outcomes','event_discussion_messages',
-  'event_authority_evidence','event_case_routing'
+  'event_case_outcomes','event_discussion_messages','event_case_routing'
  ]) LOOP
   FOR op IN SELECT unnest(CASE name
-   WHEN 'event_decisions' THEN ARRAY['INSERT']::text[]
    WHEN 'event_discussion_messages' THEN ARRAY['INSERT']::text[]
-   WHEN 'event_authority_evidence' THEN ARRAY['INSERT']::text[]
    WHEN 'event_case_outcomes' THEN ARRAY['INSERT','UPDATE']::text[]
    ELSE ARRAY['INSERT','UPDATE','DELETE']::text[] END)
   LOOP
