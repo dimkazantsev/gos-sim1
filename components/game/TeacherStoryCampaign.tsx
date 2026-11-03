@@ -7,8 +7,11 @@ type Episode={episode_no:number;stage_no:number;title:string;loaded:boolean;appr
 type Campaign={prepared:boolean;enabled:boolean;current_episode:number;approved_episodes:number;
  published_episodes:number;loaded_episodes:number;total_episodes:number;metrics_enabled:boolean;
  publication_enabled:boolean;episodes:Episode[]};
+type Variant={id:string;title:string;body:string;condition:string};
+type Evidence={kind:string;warning:string;records:Record<string,string>[]};
 type Preview={episode_no:number;stage_no:number;title:string;body:string;
- evidence_rule:string;editor_note:string;approved:boolean;published:boolean};
+ evidence_rule:string;editor_note:string;approved:boolean;published:boolean;
+ variants?:Variant[];evidence?:Evidence};
 /** Visible to teachers only. No chapter contents or spoiler logic in the public build. */
 export default function TeacherStoryCampaign({gameId}:{gameId:string}){
  const [campaign,setCampaign]=useState<Campaign|null>(null);
@@ -124,6 +127,23 @@ export default function TeacherStoryCampaign({gameId}:{gameId:string}){
       <h3>Редакция для публикации</h3></div></div>
      <p>{preview.evidence_rule}</p>
      <p><small>{preview.editor_note}</small></p>
+     {preview.evidence?.kind&&<div className="processNotice" style={{margin:'12px 0'}}>
+      <b>Подтверждённые сведения по игровым документам</b>
+      <p><small>{preview.evidence.warning}</small></p>
+      {preview.evidence.records.length===0
+       ?<p><small>Подходящих подтверждённых записей пока нет. Не объявляйте положительный итог.</small></p>
+       :<div style={{display:'grid',gap:5}}>{preview.evidence.records.map((record,i)=>
+        <p key={i} style={{margin:0}}><small>{Object.values(record).join(' · ')}</small></p>)}</div>}
+     </div>}
+     {!!preview.variants?.length&&!preview.published&&<div className="teacherDetails" style={{margin:'12px 0'}}>
+      <p><b>Редакционные варианты финала</b></p>
+      <p><small>Выбор только по документально подтверждённым решениям. Сначала сохранить редакцию, затем утвердить её и опубликовать. Никаких отдельных голосований.</small></p>
+      <div className="directorButtons compact">
+       {preview.variants.map(option=><button type="button" key={option.id} disabled={working}
+        onClick={()=>{setTitle(option.title);setBody(option.body);}}>
+        <b>{option.id} · {option.title}</b></button>)}
+      </div>
+     </div>}
      <label>Заголовок<input value={title} disabled={working||preview.published}
       onChange={e=>setTitle(e.target.value)} maxLength={220}/></label>
      <label>Текст выпуска<textarea value={body} disabled={working||preview.published}
