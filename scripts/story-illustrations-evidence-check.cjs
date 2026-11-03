@@ -14,11 +14,15 @@ assert(!/Арсеньева|Нестеров|М-17|Вебер|Финал A|Фи�
 assert(wall.includes('storyPost?<StoryNewsIllustration')&&wall.includes('!storyPost&&<PostChanges'),'Only published story news gets motif, and may never show metric effects');
 assert(wall.includes('!storyPost&&<CivicDiscussion'),'No unnecessary per-story discussions or network subscriptions');
 assert(view.includes('<TeacherStoryCampaign key={game.id}'),'Teacher draft cache must reset when switching games');
-assert(!teacher.includes('useEffect')&&!teacher.includes('setInterval(')&&!teacher.includes('.channel('),'Teacher editor must not add polling, timers or subscriptions');
+assert(teacher.includes('useEffect(')&&teacher.includes('},[gameId]);')&&!teacher.includes('setInterval(')&&!teacher.includes('.channel('),'Only one-shot game-scoped loading is allowed; no timers or subscriptions');
+assert(teacher.includes('get_story_campaign_teacher')&&teacher.includes('get_story_episode_preview_teacher'),'Initial index and one selected preview must be loaded only when teacher opens workspace');
 assert(teacher.includes('preview.variants.map(')&&teacher.includes('preview.evidence.records'),'Endings and evidence must be loaded only on explicit teacher preview');
-assert(teacher.includes('styles.episodeGrid')&&teacher.includes('styles.episodeButton')&&teacher.includes('styles.episodeMeta'),'Episode cards must use isolated layout with separate title and meta');
+assert(teacher.includes('styles.workspace')&&teacher.includes('styles.editorPanel')&&teacher.includes('styles.episodeGrid')&&teacher.includes('styles.episodeMeta'),'Teacher editor must use a two-panel layout with separate selected episode');
+assert(teacher.includes('styles.mobilePicker')&&teacher.includes('preview.body')&&teacher.includes('Условия и связь с игровым процессом'),'On mobile the selected story and its rules must be accessible without scrolling past all 24 episodes');
+assert(teacher.includes('setEditing(true)')&&teacher.includes('cancelEditing')&&teacher.includes('Сохранить редакцию'),'Reading, editing and publishing must remain distinct explicit actions');
 assert(storyLayout.includes('flex-direction:column')&&storyLayout.includes('white-space:normal')&&storyLayout.includes('overflow-wrap:anywhere'),'Cards must wrap content and keep statuses within their bounds');
-assert(storyLayout.includes('minmax(min(100%,360px),1fr)')&&storyLayout.includes('@media(max-width:640px)'),'Grid must be responsive on phones, tablets and desktop');
+assert(storyLayout.includes('grid-template-columns:minmax(235px,295px) minmax(0,1fr)')&&storyLayout.includes('position:sticky')&&storyLayout.includes('max-height:min(80dvh,860px)'),'Desktop must keep selected story visible next to scrollable episode navigation');
+assert(storyLayout.includes('@container (max-width:780px)')&&storyLayout.includes('.episodeGrid{display:none}')&&storyLayout.includes('.mobilePicker{display:grid}'),'Compact layouts must replace 24-card list with a native selector');
 assert(!teacher.includes('repeat(auto-fit,minmax(235px,1fr))')&&!teacher.includes('className="teacherQuick"'),'Do not reintroduce nowrap toolbar buttons into story cards');
 assert(teacher.includes('evidenceText(record)')&&teacher.includes("closed:'Завершено'")&&teacher.includes("vote_status:'Голосование'"),'Teacher must show Russian labels instead of raw evidence status codes');
 assert(migration.includes('private.is_game_teacher(p_game_id)'),'Only the teacher can read future endings/evidence');

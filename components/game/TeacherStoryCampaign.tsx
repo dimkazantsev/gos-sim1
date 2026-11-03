@@ -1,5 +1,5 @@
 'use client';
-import {useRef,useState} from 'react';
+import {useEffect,useRef,useState} from 'react';
 import {supabase} from '@/lib/supabase';
 import {userError} from '@/lib/userError';
 import styles from './TeacherStoryCampaign.module.css';
@@ -23,11 +23,47 @@ export default function TeacherStoryCampaign({gameId}:{gameId:string}){
  const [title,setTitle]=useState('');
  const [body,setBody]=useState('');
  const [working,setWorking]=useState(false);
+ const [loaded,setLoaded]=useState(false);
+ const [editing,setEditing]=useState(false);
  const [error,setError]=useState('');
  const [notice,setNotice]=useState('');
  const busy=useRef(false);
  const cached=useRef(new Map<number,Preview>());
  const change=preview&&(title!==preview.title||body!==preview.body);
+ // Load only when the teacher opens this workspace. One index query and one
+ // first-episode preview; subsequent episodes are loaded on selection and cached.
+ useEffect(()=>{
+  let active=true;
+  const initialise=async()=>{
+   setWorking(true);setLoaded(false);setError('');
+   try{
+    const result=await supabase.rpc('get_story_campaign_teacher',{p_game_id:gameId});
+    if(result.error)throw result.error;
+    if(!active)return;
+    const status=result.data as Campaign;
+    if(!status||!Array.isArray(status.episodes))throw Error('Сведения о сюжетной кампании недоступны.');
+    setCampaign(status);
+    if(status.prepared){
+     const target=status.episodes.find(item=>item.episode_no===Math.min(24,status.current_episode+1)&&item.loaded)
+      ||status.episodes.find(item=>item.loaded);
+     if(target){
+      const response=await supabase.rpc('get_story_episode_preview_teacher',
+       {p_game_id:gameId,p_episode_no:target.episode_no});
+      if(response.error)throw response.error;
+      if(!active)return;
+      const value=response.data as Preview|null;
+      if(value){
+       cached.current.set(target.episode_no,value);
+       setPreview(value);setTitle(value.title);setBody(value.body);
+      }
+     }
+    }
+   }catch(e){if(active)setError(userError(e)||'Не удалось загрузить сюжетную кампанию.');}
+   finally{if(active){setWorking(false);setLoaded(true);}}
+  };
+  void initialise();
+  return()=>{active=false;};
+ },[gameId]);
  const selected=campaign?.episodes.find(item=>item.episode_no===preview?.episode_no);
  const next=(campaign?.current_episode||0)+1;
  const useStatus=(value:unknown)=>{
@@ -47,19 +83,19 @@ export default function TeacherStoryCampaign({gameId}:{gameId:string}){
  const openEpisode=async(item:Episode)=>{
   if(working||change&&!window.confirm('Редакция не сохранена. Перейти к другому эпизоду?'))return;
   const cache=cached.current.get(item.episode_no);
-  if(cache){setPreview(cache);setTitle(cache.title);setBody(cache.body);return;}
+  if(cache){setPreview(cache);setTitle(cache.title);setBody(cache.body);setEditing(false);return;}
   await doCall<Preview>('get_story_episode_preview_teacher',
    {p_game_id:gameId,p_episode_no:item.episode_no},value=>{
     if(!value)throw Error('Текст ещё не загружен в закрытую библиотеку.');
     cached.current.set(item.episode_no,value);
-    setPreview(value);setTitle(value.title);setBody(value.body);
+    setPreview(value);setTitle(value.title);setBody(value.body);setEditing(false);
    });
  };
  const save=async()=>{
   if(!preview)return;
   await doCall<Preview>('save_story_episode_edit_teacher',
    {p_game_id:gameId,p_episode_no:preview.episode_no,p_title:title,p_body:body},value=>{
-    cached.current.set(value.episode_no,value);setPreview(value);setTitle(value.title);setBody(value.body);
+    cached.current.set(value.episode_no,value);setPreview(value);setTitle(value.title);setBody(value.body);setEditing(false);
     setCampaign(previous=>previous?{...previous,episodes:previous.episodes.map(e=>e.episode_no===value.episode_no?{...e,approved:false}:e),
      approved_episodes:Math.max(0,previous.approved_episodes-(selected?.approved?1:0))}:previous);
     setNotice('Редакция сохранена. Для публикации нужно повторное утверждение.');
@@ -92,34 +128,68 @@ export default function TeacherStoryCampaign({gameId}:{gameId:string}){
     useStatus(value);setNotice(enabled?'Ручная публикация разрешена. Ничего не опубликовано автоматически.':'Кампания приостановлена.');
    });
  };
- return <section className="surface" aria-labelledby="story-campaign-title">
+ const chooseVariant=(option:Variant)=>{
+  if(change&&!window.confirm('Несохранённые изменения будут заменены выбранным вариантом. Продолжить?'))return;
+  setTitle(option.title);setBody(option.body);setEditing(true);
+ };
+ const cancelEditing=()=>{
+  if(!preview)return;
+  if(change&&!window.confirm('Отменить несохранённые изменения?'))return;
+  setTitle(preview.title);setBody(preview.body);setEditing(false);
+ };
+ return <section className={['surface',styles.root].join(' ')} aria-labelledby="story-campaign-title">
   <div className="surfaceHead"><div>
    <small>ПРЕПОДАВАТЕЛЬ · СОБЫТИЯ</small>
    <h2 id="story-campaign-title">Сюжетная кампания</h2>
-   <p>Генеральная линия · 24 эпизода · этапы 4–14. Участники видят только опубликованные выпуски.</p>
-  </div><span>{campaign?.enabled?'Публикации разрешены':'Выключена'}</span></div>
+   <p>24 эпизода · этапы 4–14. Преподаватель выбирает, утверждает и публикует каждый выпуск.</p>
+  </div><span>{!loaded?'Загрузка…':campaign?.enabled?'Публикации разрешены':'Публикации выключены'}</span></div>
   <div className="teacherDetailsBody">
-   <p>Выпуски появляются в хронике только после вашего утверждения и публикации.</p>
-   <div className={styles.actions}>
-    <button className={styles.actionButton} type="button" disabled={working} onClick={()=>void doCall<Campaign>('get_story_campaign_teacher',{p_game_id:gameId},useStatus)}>
-     <b>{working?'Выполняется…':'Проверить состояние'}</b>
-    </button>
-    {campaign&&!campaign.prepared&&<button className={styles.actionButton} type="button" disabled={working}
-     onClick={()=>void doCall<Campaign>('prepare_story_campaign_teacher',{p_game_id:gameId},useStatus)}>
-     <b>Подготовить кампанию</b></button>}
-    {campaign?.prepared&&(campaign.enabled
-     ?<button className={styles.actionButton} type="button" disabled={working} onClick={()=>void setActive(false)}><b>Пауза</b></button>
-     :<button className={styles.actionButton} type="button" disabled={working||campaign.current_episode>=24} onClick={()=>void setActive(true)}><b>Разрешить публикации</b></button>)}
-   </div>
-   {campaign&&<div className={styles.summary} role="status">
-     <span>Текущий выпуск: <b>{campaign.current_episode} из 24</b></span>
-     <span>Загружено: <b>{campaign.loaded_episodes}</b></span>
-     <span>Утверждено: <b>{campaign.approved_episodes}</b></span>
-     <span>Опубликовано: <b>{campaign.published_episodes}</b></span>
+   <div className={styles.toolbar}>
+    {campaign&&<div className={styles.summary} role="status">
+     <span>Выпуск <b>{campaign.current_episode} из 24</b></span>
+     <span>Загружено <b>{campaign.loaded_episodes}</b></span>
+     <span>Утверждено <b>{campaign.approved_episodes}</b></span>
+     <span>Опубликовано <b>{campaign.published_episodes}</b></span>
     </div>}
-   {campaign?.prepared&&<>
-    <div className={styles.episodeList}>
-     <h3 className={styles.episodeHeading}>Эпизоды</h3>
+    <div className={styles.actions}>
+     <button className={styles.actionButton} type="button" disabled={working}
+      onClick={()=>void doCall<Campaign>('get_story_campaign_teacher',{p_game_id:gameId},useStatus)}>
+      {working?'Загрузка…':'Обновить состояние'}
+     </button>
+     {campaign&&!campaign.prepared&&<button className={styles.actionButton} type="button" disabled={working}
+      onClick={()=>void doCall<Campaign>('prepare_story_campaign_teacher',{p_game_id:gameId},useStatus)}>
+      Подготовить кампанию</button>}
+     {campaign?.prepared&&(campaign.enabled
+      ?<button className={styles.actionButton} type="button" disabled={working}
+       onClick={()=>void setActive(false)}>Приостановить публикации</button>
+      :<button className={styles.actionButton} type="button" disabled={working||campaign.current_episode>=24}
+       onClick={()=>void setActive(true)}>Разрешить публикации</button>)}
+    </div>
+   </div>
+   {error&&<p className="processNotice" role="alert">{error}</p>}
+   {notice&&<p className="processNotice" role="status">{notice}</p>}
+   {!loaded&&<p role="status">Загружаются эпизоды и первый выпуск…</p>}
+   {loaded&&!campaign&&<p>Не удалось получить сведения о кампании. Нажмите «Обновить состояние».</p>}
+   {campaign&&!campaign.prepared&&<p>Для этой игры кампания ещё не подготовлена. Нажмите «Подготовить кампанию», чтобы открыть закрытые редакции.</p>}
+   {campaign?.prepared&&<div className={styles.workspace}>
+    <aside className={styles.sidebar} aria-label="Эпизоды сюжетной кампании">
+     <div className={styles.sidebarHead}>
+      <h3>Эпизоды</h3><small>{campaign.episodes.length} выпуска · по порядку</small>
+     </div>
+     <label className={styles.mobilePicker}>
+      Выбрать выпуск
+      <select value={preview?.episode_no??''} disabled={working}
+       onChange={event=>{
+        const item=campaign.episodes.find(e=>e.episode_no===Number(event.target.value));
+        if(item)void openEpisode(item);
+       }}>
+       <option value="" disabled>Выберите эпизод</option>
+       {campaign.episodes.map(item=><option key={item.episode_no} value={item.episode_no}
+        disabled={!item.loaded}>
+        {String(item.episode_no).padStart(2,'0')}. {item.title} · Этап {item.stage_no}
+       </option>)}
+      </select>
+     </label>
      <div className={styles.episodeGrid}>
       {campaign.episodes.map(item=><button key={item.episode_no} type="button"
        disabled={working||!item.loaded} aria-pressed={preview?.episode_no===item.episode_no}
@@ -128,48 +198,89 @@ export default function TeacherStoryCampaign({gameId}:{gameId:string}){
        <span className={styles.episodeMeta}>Этап {item.stage_no} · {item.published?'Опубликовано':item.approved?'Утверждено':item.loaded?'Черновик':'Не загружено'}</span>
       </button>)}
      </div>
-    </div>
-    {preview&&<section className="surface" aria-label="Редактор сюжетного выпуска" style={{marginTop:12}}>
-     <div className="surfaceHead"><div><small>ЭПИЗОД {preview.episode_no} · ЭТАП {preview.stage_no}</small>
-      <h3>Редакция для публикации</h3></div></div>
-     <p>{preview.evidence_rule}</p>
-     <p><small>{preview.editor_note}</small></p>
-     {preview.evidence?.kind&&<div className="processNotice" style={{margin:'12px 0'}}>
-      <b>Подтверждённые сведения по игровым документам</b>
-      <p><small>{preview.evidence.warning}</small></p>
+    </aside>
+    {preview?<section className={styles.editorPanel} aria-label="Редактор выбранного эпизода">
+     <header className={styles.editorHead}>
+      <small>ЭПИЗОД {String(preview.episode_no).padStart(2,'0')} · ЭТАП {preview.stage_no}</small>
+      <h3>{preview.title}</h3>
+      <span className={styles.editorStatus}>{preview.published?'Опубликовано':selected?.approved?'Утверждено':'Черновик'}</span>
+     </header>
+     <section className={styles.storySection} aria-label="Содержание эпизода">
+      <h4>Сюжет выпуска</h4>
+      {editing&&!preview.published
+       ?<div className={styles.editFields}>
+        <label>Заголовок<input className={styles.editorInput} value={title}
+         onChange={e=>setTitle(e.target.value)} maxLength={220} disabled={working}/></label>
+        <label>Текст выпуска<textarea className={styles.editorTextarea} value={body}
+         onChange={e=>setBody(e.target.value)} rows={14} maxLength={9000} disabled={working}/></label>
+       </div>
+       :<div className={styles.storyText}>{preview.body}</div>}
+     </section>
+     {!!preview.evidence_rule&&<section className={styles.contextSection}>
+      <h4>Условия и связь с игровым процессом</h4>
+      <p>{preview.evidence_rule}</p>
+     </section>}
+     {preview.evidence?.kind&&<section className={styles.contextSection}>
+      <h4>Подтверждённые игровые решения</h4>
+      <p className={styles.helperText}>{preview.evidence.warning}</p>
       {preview.evidence.records.length===0
-       ?<p><small>Подходящих подтверждённых записей пока нет. Не объявляйте положительный итог.</small></p>
-       :<div style={{display:'grid',gap:5}}>{preview.evidence.records.map((record,i)=>
-        <p key={i} style={{margin:0}}><small>{evidenceText(record)}</small></p>)}</div>}
-     </div>}
-     {!!preview.variants?.length&&!preview.published&&<div className="teacherDetails" style={{margin:'12px 0'}}>
-      <p><b>Редакционные варианты финала</b></p>
-      <p><small>Выбор только по документально подтверждённым решениям. Сначала сохранить редакцию, затем утвердить её и опубликовать. Никаких отдельных голосований.</small></p>
+       ?<p className={styles.helperText}>Подтверждённых записей пока нет. Нельзя объявлять положительный результат.</p>
+       :<div className={styles.evidenceRecords}>{preview.evidence.records.map((record,i)=>
+        <p key={i}>{evidenceText(record)}</p>)}</div>}
+     </section>}
+     {!!preview.variants?.length&&!preview.published&&<section className={styles.contextSection}>
+      <h4>Варианты финала</h4>
+      <p className={styles.helperText}>Выберите вариант по подтверждённым решениям, затем сохраните и утвердите текст. Выбор сам по себе ничего не публикует.</p>
       <div className={styles.variantGrid}>
-       {preview.variants.map(option=><button type="button" className={styles.episodeButton} key={option.id}
-        disabled={working} onClick={()=>{setTitle(option.title);setBody(option.body);}}>
+       {preview.variants.map(option=><button type="button" className={styles.episodeButton}
+        key={option.id} disabled={working} onClick={()=>chooseVariant(option)}>
         <span className={styles.episodeTitle}>{option.id} · {option.title}</span>
-        <span className={styles.episodeMeta}>{option.condition}</span></button>)}
+        <span className={styles.episodeMeta}>{option.condition}</span>
+       </button>)}
       </div>
-     </div>}
-     <label>Заголовок<input value={title} disabled={working||preview.published}
-      onChange={e=>setTitle(e.target.value)} maxLength={220}/></label>
-     <label>Текст выпуска<textarea value={body} disabled={working||preview.published}
-      onChange={e=>setBody(e.target.value)} rows={9} maxLength={9000}/></label>
-     <div className={styles.actions}>
-      <button className={styles.actionButton} type="button" disabled={working||!change||preview.published}
-       onClick={()=>void save()}><b>Сохранить редакцию</b></button>
-      <button className={styles.actionButton} type="button" disabled={working||!!change||preview.published}
-       onClick={()=>void approve(!selected?.approved)}><b>{selected?.approved?'Отозвать утверждение':'Утвердить редакцию'}</b></button>
-      <button className={styles.actionButton} type="button" disabled={working||!!change||!selected?.approved||!campaign.enabled
-       ||preview.published||preview.episode_no!==next}
-       onClick={()=>void publish()}><b>Опубликовать</b></button>
-     </div>
-     {preview.episode_no!==next&&!preview.published&&<p><small>Следующий доступный по порядку эпизод — {next}.</small></p>}
-    </section>}
-   </>}
-   {notice&&<p className="processNotice" role="status">{notice}</p>}
-   {error&&<p className="processNotice" role="alert">{error}</p>}
+     </section>}
+     {!!preview.editor_note&&<details className={styles.notes}>
+      <summary>Заметка редактора</summary><p>{preview.editor_note}</p>
+     </details>}
+     <footer className={styles.editorFooter}>
+      <h4>Управление выпуском</h4>
+      {preview.published
+       ?<p className={styles.helperText}>Эпизод уже опубликован в «Политическом процессе». Изменение опубликованного текста здесь недоступно.</p>
+       :<>
+        <div className={styles.actions}>
+         {editing
+          ?<>
+           <button className={styles.actionButton} type="button" disabled={working}
+            onClick={cancelEditing}>Отменить правки</button>
+           <button className={styles.actionButton} type="button" disabled={working||!change}
+            onClick={()=>void save()}>Сохранить редакцию</button>
+          </>
+          :<button className={styles.actionButton} type="button" disabled={working}
+            onClick={()=>setEditing(true)}>Изменить текст</button>}
+         <button className={styles.actionButton} type="button"
+          disabled={working||editing||!!change}
+          onClick={()=>void approve(!selected?.approved)}>
+          {selected?.approved?'Отозвать утверждение':'Утвердить редакцию'}</button>
+         <button className={styles.actionButton} type="button"
+          disabled={working||editing||!!change||!selected?.approved||!campaign.enabled||preview.episode_no!==next}
+          onClick={()=>void publish()}>Опубликовать</button>
+        </div>
+        <p className={styles.helperText}>
+         {preview.episode_no!==next
+          ?<>Публикация строго по порядку. Следующий выпуск — {next}.</>
+          :!campaign.enabled
+          ?<>Сначала разрешите публикации в верхней панели.</>
+          :!selected?.approved
+          ?<>Для публикации необходимо утвердить редакцию.</>
+          :<>Редакция утверждена. Публикация доступна только по вашему нажатию.</>}
+        </p>
+       </>}
+     </footer>
+    </section>
+    :<section className={styles.editorPanel}><h3>Выберите эпизод</h3>
+      <p>Нажмите на выпуск слева или выберите его в списке сверху. Текст и управление откроются здесь.</p>
+     </section>}
+   </div>}
   </div>
  </section>;
 }
