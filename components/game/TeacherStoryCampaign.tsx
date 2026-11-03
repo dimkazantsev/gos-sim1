@@ -205,8 +205,18 @@ export default function TeacherStoryCampaign({gameId}:{gameId:string}){
       <h3>{preview.title}</h3>
       <span className={styles.editorStatus}>{preview.published?'Опубликовано':selected?.approved?'Утверждено':'Черновик'}</span>
      </header>
+     {!!preview.editor_note&&<section className={styles.guideSection} aria-label="Сценарный план эпизода">
+      <div className={styles.guideHead}>
+       <h4>{preview.editor_note.startsWith('Редакция 4.2')?'Сценарный план · редакция 4.2':'Заметка редактора'}</h4>
+       <small>Только преподавателю</small>
+      </div>
+      {preview.editor_note.startsWith('Редакция 4.2')&&<p className={styles.helperText}>
+       Здесь указаны исходное событие, допустимые действия участников, проверяемые решения и переход к следующему эпизоду. Это сценарная карта, а не опубликованная новость.
+      </p>}
+      <div className={styles.guideBody}>{preview.editor_note}</div>
+     </section>}
      <section className={styles.storySection} aria-label="Содержание эпизода">
-      <h4>Сюжет выпуска</h4>
+      <h4>Текст публикации · черновик</h4>
       {editing&&!preview.published
        ?<div className={styles.editFields}>
         <label>Заголовок<input className={styles.editorInput} value={title}
@@ -239,9 +249,7 @@ export default function TeacherStoryCampaign({gameId}:{gameId:string}){
        </button>)}
       </div>
      </section>}
-     {!!preview.editor_note&&<details className={styles.notes}>
-      <summary>Заметка редактора</summary><p>{preview.editor_note}</p>
-     </details>}
+
      <footer className={styles.editorFooter}>
       <h4>Управление выпуском</h4>
       {preview.published
