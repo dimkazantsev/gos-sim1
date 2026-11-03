@@ -164,7 +164,7 @@ export default function EventWorkspace({g,readOnly=false,mode='feed'}:{g:ReturnT
   })().finally(()=>{state.promise=null});
   return state.promise;
  }
- useGameTableSync(me?.user_id?game?.id:undefined,['event_cases','event_assignments','event_decisions','event_case_outcomes','event_collaboration_invites','event_authority_evidence','event_case_routing'],()=>reload(readyCaseCount===null,true),feedScope,undefined,750,60000);
+ useGameTableSync(me?.user_id?game?.id:undefined,['event_cases','event_assignments','event_decisions','event_case_outcomes','event_collaboration_invites','event_authority_evidence','event_case_routing'],()=>reload(readyCaseCount===null,true),feedScope,undefined,750,60000,0,undefined,teacher?180000:900000);
  const students=members.filter(m=>m.kind==='student');
  const roles=[...new Set(students.map(m=>m.role_title?.trim()).filter((r):r is string=>!!r))].sort((a,b)=>a.localeCompare(b,'ru'));
  const recipients=roleFilter&&audience!=='all'?students.filter(m=>m.role_title===roleFilter):students;
