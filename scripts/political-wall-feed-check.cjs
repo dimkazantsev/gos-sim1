@@ -39,9 +39,9 @@ console.log('PASS process feed component wiring');
 /* Teacher bulk deletion regression: visible-only selection, role gating,
  * and reuse of the audited soft-delete RPC rather than direct table DELETE. */
 assert(source.includes("const bulkAllowed=teacher&&!readOnly"),'Bulk actions must be teacher-only and hidden in read-only mode');
-assert(source.includes("bulkMode&&bulkAllowed&&<label"),'Checkboxes must only appear for teacher when bulk mode is active');
-assert(source.includes("visiblePosts.every(p=>selectedPostIds.has(p.id))"),'Select-all state must derive from visible posts');
-assert(source.includes("for(const post of visiblePosts)"),'Select-all must not select hidden posts');
+assert(source.includes("bulkMode&&bulkAllowed&&!storyPost&&<label"),'Story news is never bulk-selectable, even by the teacher');
+assert(source.includes("selectablePosts.every(p=>selectedPostIds.has(p.id))"),'Select-all derives only from visible editable non-story posts');
+assert(source.includes("for(const post of selectablePosts)"),'Select-all must exclude protected story news');
 assert(source.includes("setSelectedPostIds(previous=>{const next=new Set(previous)"),'Selection must be updated immutably');
 assert(source.includes("setSelectedPostIds(new Set());setBulkProgress(0);setLocallyRemovedIds(new Set())},[game?.id]"),'Selection and local deletion state must reset between games');
 assert(source.includes("if(!bulkAllowed||!game||busy)return"),'Bulk delete must not execute without teacher rights');
@@ -83,3 +83,6 @@ assert(civic.includes("async function react(value:number)")&&
  civic.includes("current.mine===value?0:value"),
  'First like or dislike must load the actual reaction state before toggling');
 console.log('PASS: process media and discussions are loaded only when needed');
+
+assert(source.includes("!readOnly&&!storyPost&&<div className=\"wallPostActions\""),'Story news has no voting, NPA or metric manipulation controls');
+assert(source.includes("!storyPost&&<CivicDiscussion"),'Story news does not mount per-post discussion projection or background queries');
