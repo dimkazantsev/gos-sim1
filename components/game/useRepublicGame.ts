@@ -114,7 +114,7 @@ export function useRepublicGame(gameId:string){
  function passiveSections(view:View){
   const groups:string[]=[];
   const workspace=view==='teacher'?teacherWorkspaceRef.current:'';
-  if(['events','stages','actions'].includes(view)||['event','stages','tools'].includes(workspace))groups.push('game_events');
+  if(['stages','actions'].includes(view)||['stages','tools'].includes(workspace))groups.push('game_events');
   if(['grades','profile','stages'].includes(view)||workspace==='stages')groups.push('game_evaluations');
   if(['dashboard','stages','teacher'].includes(view))groups.push('game_crises');
   if(['documents','stages'].includes(view)||workspace==='stages')groups.push('game_documents');
