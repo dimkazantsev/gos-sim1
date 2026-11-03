@@ -7,6 +7,8 @@ ALTER TABLE private.story_campaigns
 CREATE TABLE IF NOT EXISTS private.story_episode_releases (
  game_id uuid NOT NULL REFERENCES private.story_campaigns(game_id) ON DELETE CASCADE,
  episode_no integer NOT NULL REFERENCES private.story_episode_drafts(episode_no),
+ draft_title text,
+ draft_body text,
  approved_by uuid,
  approved_at timestamptz,
  published_by uuid,
@@ -66,11 +68,15 @@ BEGIN
  IF auth.uid() IS NULL OR NOT private.is_game_teacher(p_game_id) THEN
   RAISE EXCEPTION 'Доступ разрешён только преподавателю игры.' USING ERRCODE='42501';
  END IF;
- SELECT jsonb_build_object('episode_no',episode_no,'stage_no',stage_no,
-   'title',draft->>'title','body',draft->>'body',
-   'editor_note',coalesce(draft->>'editor_note',''),
-   'evidence_rule',coalesce(draft->>'evidence_rule',''))
- INTO item FROM private.story_episode_drafts WHERE episode_no=p_episode_no;
+ SELECT jsonb_build_object('episode_no',e.episode_no,'stage_no',e.stage_no,
+   'title',coalesce(r.draft_title,e.draft->>'title'),
+   'body',coalesce(r.draft_body,e.draft->>'body'),
+   'editor_note',coalesce(e.draft->>'editor_note',''),
+   'evidence_rule',coalesce(e.draft->>'evidence_rule',''),
+   'approved',r.approved_at IS NOT NULL,'published',r.published_at IS NOT NULL)
+ INTO item FROM private.story_episode_drafts e
+ LEFT JOIN private.story_episode_releases r ON r.game_id=p_game_id AND r.episode_no=e.episode_no
+ WHERE e.episode_no=p_episode_no;
  RETURN item;
 END $fn$;
 
@@ -104,6 +110,35 @@ BEGIN
  RETURN public.get_story_campaign_teacher(p_game_id);
 END $fn$;
 
+
+CREATE OR REPLACE FUNCTION public.save_story_episode_edit_teacher(
+ p_game_id uuid,p_episode_no integer,p_title text,p_body text)
+RETURNS jsonb LANGUAGE plpgsql SECURITY DEFINER SET search_path=''
+AS $fn$
+BEGIN
+ IF auth.uid() IS NULL OR NOT private.is_game_teacher(p_game_id) THEN
+  RAISE EXCEPTION 'Доступ разрешён только преподавателю игры.' USING ERRCODE='42501';
+ END IF;
+ IF NOT EXISTS(SELECT 1 FROM private.story_campaigns WHERE game_id=p_game_id) THEN
+  RAISE EXCEPTION 'Кампания не подготовлена.';
+ END IF;
+ IF NOT EXISTS(SELECT 1 FROM private.story_episode_drafts WHERE episode_no=p_episode_no) THEN
+  RAISE EXCEPTION 'Эпизод не найден.';
+ END IF;
+ IF length(btrim(coalesce(p_title,''))) NOT BETWEEN 12 AND 220
+ OR length(btrim(coalesce(p_body,''))) NOT BETWEEN 80 AND 9000 THEN
+  RAISE EXCEPTION 'Проверьте заголовок и содержимое публикации.';
+ END IF;
+ INSERT INTO private.story_episode_releases(game_id,episode_no,draft_title,draft_body)
+ VALUES(p_game_id,p_episode_no,btrim(p_title),btrim(p_body))
+ ON CONFLICT(game_id,episode_no) DO UPDATE SET
+   draft_title=excluded.draft_title,draft_body=excluded.draft_body,
+   approved_by=NULL,approved_at=NULL
+ WHERE private.story_episode_releases.published_at IS NULL;
+ IF NOT FOUND THEN RAISE EXCEPTION 'Опубликованный текст нельзя изменить.';END IF;
+ RETURN public.get_story_episode_preview_teacher(p_game_id,p_episode_no);
+END $fn$;
+
 CREATE OR REPLACE FUNCTION public.approve_story_episode_teacher(p_game_id uuid,p_episode_no integer,p_approved boolean)
 RETURNS jsonb LANGUAGE plpgsql SECURITY DEFINER SET search_path=''
 AS $fn$
@@ -129,11 +164,11 @@ BEGIN
 END $fn$;
 
 CREATE OR REPLACE FUNCTION public.publish_story_episode_teacher(
- p_game_id uuid,p_episode_no integer,p_public_title text DEFAULT NULL,p_public_body text DEFAULT NULL)
+ p_game_id uuid,p_episode_no integer)
 RETURNS jsonb LANGUAGE plpgsql SECURITY DEFINER SET search_path=''
 AS $fn$
 DECLARE v_campaign private.story_campaigns%rowtype; v_draft private.story_episode_drafts%rowtype;
- v_approved timestamptz;v_published uuid;v_stage integer;
+ v_approved timestamptz;v_published uuid;v_draft_title text;v_draft_body text;v_stage integer;
  v_title text;v_body text;v_post uuid;
 BEGIN
  IF auth.uid() IS NULL OR NOT private.is_game_teacher(p_game_id) THEN
@@ -145,7 +180,7 @@ BEGIN
  END IF;
  SELECT * INTO v_draft FROM private.story_episode_drafts WHERE episode_no=p_episode_no;
  IF v_draft.episode_no IS NULL THEN RAISE EXCEPTION 'Эпизод не найден.'; END IF;
- SELECT approved_at,published_post_id INTO v_approved,v_published
+ SELECT approved_at,published_post_id,draft_title,draft_body INTO v_approved,v_published,v_draft_title,v_draft_body
   FROM private.story_episode_releases WHERE game_id=p_game_id AND episode_no=p_episode_no;
  IF v_published IS NOT NULL THEN
   RETURN jsonb_build_object('published',true,'post_id',v_published,'already_published',true);
@@ -177,8 +212,8 @@ BEGIN
   JOIN public.game_votes v ON v.id=p.vote_id AND v.game_id=p.game_id
   WHERE p.game_id=p_game_id AND p.stage_no=14 AND v.status='closed'
  ) THEN RAISE EXCEPTION 'Нет подтверждённых результатов рассмотрения муниципальных проектов.'; END IF;
- v_title:=coalesce(nullif(btrim(p_public_title),''),v_draft.draft->>'title');
- v_body:=coalesce(nullif(btrim(p_public_body),''),v_draft.draft->>'body');
+ v_title:=coalesce(v_draft_title,v_draft.draft->>'title');
+ v_body:=coalesce(v_draft_body,v_draft.draft->>'body');
  IF length(v_title) NOT BETWEEN 12 AND 220 OR length(v_body) NOT BETWEEN 80 AND 9000 THEN
   RAISE EXCEPTION 'Проверьте заголовок и содержимое публикации.';
  END IF;
@@ -208,11 +243,13 @@ REVOKE ALL ON FUNCTION public.get_story_campaign_teacher(uuid),
  public.get_story_episode_list_teacher(uuid),
  public.get_story_episode_preview_teacher(uuid,integer),
  public.set_story_campaign_enabled_teacher(uuid,boolean),
+ public.save_story_episode_edit_teacher(uuid,integer,text,text),
  public.approve_story_episode_teacher(uuid,integer,boolean),
- public.publish_story_episode_teacher(uuid,integer,text,text) FROM PUBLIC,anon,authenticated;
+ public.publish_story_episode_teacher(uuid,integer) FROM PUBLIC,anon,authenticated;
 GRANT EXECUTE ON FUNCTION public.get_story_campaign_teacher(uuid),
  public.get_story_episode_list_teacher(uuid),
  public.get_story_episode_preview_teacher(uuid,integer),
  public.set_story_campaign_enabled_teacher(uuid,boolean),
+ public.save_story_episode_edit_teacher(uuid,integer,text,text),
  public.approve_story_episode_teacher(uuid,integer,boolean),
- public.publish_story_episode_teacher(uuid,integer,text,text) TO authenticated;
+ public.publish_story_episode_teacher(uuid,integer) TO authenticated;
