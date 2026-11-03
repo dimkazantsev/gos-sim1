@@ -667,6 +667,53 @@ export function useRepublicGame(gameId:string){
    const table=payload.payload?.table;
    if(typeof table==='string'&&dumaTables.has(table))notifyGameDataRefresh(gameId,table);
   });
+  // Situation changes use the EXISTING private game socket. The database
+  // emits only table names and recipient/case IDs, never assignments,
+  // invitation bodies, choices or documents. All content remains under RLS.
+  let teacherEventTimer:ReturnType<typeof setTimeout>|undefined;
+  const eventsVisible=()=>activeViewRef.current==='events'
+   ||(activeViewRef.current==='teacher'&&teacherWorkspaceRef.current==='event');
+  const scheduleTeacherEventRefresh=(table:string)=>{
+   if(teacherEventTimer!==undefined)return;
+   // A classroom can submit 100 votes in seconds. Only the teacher's open
+   // panel reconciles those intermediate counts, at most once per 4 seconds.
+   teacherEventTimer=setTimeout(()=>{
+    teacherEventTimer=undefined;
+    if(currentConnection()&&eventsVisible())notifyGameDataRefresh(gameId,table);
+   },4000);
+  };
+  const pushEventTables=new Set([
+   'event_assignments','event_collaboration_invites','event_cases',
+   'event_decisions','event_case_outcomes','event_discussion_messages',
+   'event_authority_evidence','event_case_routing'
+  ]);
+  channel.on('broadcast',{event:'event_feed_changed'},payload=>{
+   if(!currentConnection())return;
+   const data=payload.payload as {table?:unknown;recipients?:unknown;case_ids?:unknown}|undefined;
+   const table=data?.table;
+   if(typeof table!=='string'||!pushEventTables.has(table))return;
+   const targets=Array.isArray(data?.recipients)?data.recipients.filter((id):id is string=>typeof id==='string'):[];
+   const caseIds=Array.isArray(data?.case_ids)?data.case_ids.filter((id):id is string=>typeof id==='string'):[];
+   const mine=targets.includes(me.user_id),isTeacher=me.kind==='teacher',open=eventsVisible();
+   if(table==='event_assignments'||table==='event_collaboration_invites'){
+    // Only the addressed student (or an open teacher panel) needs a read.
+    if(mine||isTeacher&&open)notifyGameDataRefresh(gameId,table);
+    return;
+   }
+   if(table==='event_discussion_messages'){
+    // Each mounted discussion checks its own case ID before loading messages.
+    if(open)for(const caseId of caseIds)notifyGameDataRefresh(gameId,table,caseId);
+    return;
+   }
+   if(table==='event_case_outcomes'){
+    if(mine||isTeacher&&open)notifyGameDataRefresh(gameId,table);
+    return;
+   }
+   // Ordinary decisions and authority evidence can arrive in a large burst.
+   // Students already refresh locally after submitting; only an open
+   // teacher panel needs a batched intermediate progress update.
+   if(isTeacher&&open)scheduleTeacherEventRefresh(table);
+  });
   liveRef.current=channel;
   // The already-private game channel also carries low-frequency Presence.
   // Supabase assigns an ephemeral presence key. Never publish user IDs, roles,
@@ -803,7 +850,7 @@ export function useRepublicGame(gameId:string){
    chatRecovery=setInterval(recoverVisibleChatAndBallots,6000);
   },initialRecoveryDelay);
   return()=>{
-   disposed=true;clearTimeout(timer);clearTimeout(partyDocumentBurstTimer);if(networkPresenceTimer!==null)clearTimeout(networkPresenceTimer);clearInterval(poll);clearTimeout(startChatRecovery);
+   disposed=true;clearTimeout(teacherEventTimer);clearTimeout(timer);clearTimeout(partyDocumentBurstTimer);if(networkPresenceTimer!==null)clearTimeout(networkPresenceTimer);clearInterval(poll);clearTimeout(startChatRecovery);
    if(chatRecovery!==null)clearInterval(chatRecovery);
    document.removeEventListener('visibilitychange',resumePending);
    setGameRealtimeConnection(gameId,false);
