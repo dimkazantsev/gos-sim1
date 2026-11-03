@@ -61,3 +61,11 @@
  .editorFooter .actions{display:grid;grid-template-columns:minmax(0,1fr)}
  .editorFooter .actionButton{width:100%}
 }
+
+/* Teacher-only canon: make the source decisions readable before the short post draft. */
+.guideSection{min-width:0;margin:0 0 20px;padding:17px;border:1px solid #dce5f0;border-radius:12px;background:#fff}
+.guideHead{display:flex;align-items:baseline;justify-content:space-between;gap:8px;flex-wrap:wrap;margin:0 0 10px}
+.guideHead h4{margin:0;color:#1c3352;font-size:16px;font-weight:750}
+.guideHead small{color:#607995;font-size:12px}
+.guideBody{color:#253b59;font-size:14px;line-height:1.7;white-space:pre-wrap;overflow-wrap:anywhere}
+@container (max-width:470px){.guideSection{padding:13px}.guideHead h4{font-size:15px}}
