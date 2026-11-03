@@ -111,7 +111,7 @@ export default function GovernmentProgramSessionLab({g,onOpenVotes,onOpenDocumen
  }
  async function approve(){
   if(!selected||!canApprove||busy)return;setBusy(true);
-  try{const r=await supabase.rpc('approve_government_session_agenda',{p_session_id:selected.id});if(r.error)throw r.error;await load();setNotice('Председатель Правительства утвердил повестку. Документ оформлен в Реестре НПА.');}
+  try{if(!selected.agenda_document_id)throw new Error('Повестка ещё не сформирована');const r=await supabase.rpc('sign_institution_meeting_agenda',{p_document_id:selected.agenda_document_id});if(r.error)throw r.error;await load();setNotice('Председатель Правительства лично подписал повестку. Документ утверждён после всех обязательных подписей.');}
   catch(e){setError(userError(e))}finally{setBusy(false)}
  }
  async function open(){if(!selected||!canApprove||busy)return;setBusy(true);
@@ -174,7 +174,7 @@ export default function GovernmentProgramSessionLab({g,onOpenVotes,onOpenDocumen
     {meetingQuestions.length>0&&<div className="govLegacyQuestions">{meetingQuestions.map((q,i)=><div key={q.id}><span>{i+1}.</span><strong>{q.title}</strong><small>{q.status==='discussed'?'Рассмотрен':'Дополнительный вопрос'}</small></div>)}</div>}
     <div className="govMeetingAgendaActions">
      <div><strong>{selected.status==='closed'?'Заседание завершено':selected.status==='open'?'Заседание открыто':selected.agenda_approved_at?'Повестка утверждена':'Ожидает утверждения'}</strong><small>Председательствующий: {name(selected.chair_user_id)}.</small></div>
-     {canApprove&&selected.status==='draft'&&!selected.agenda_approved_at&&<><button type="button" className="govMeetingRefreshPrograms secondary" aria-label="Обновить список государственных программ" disabled={busy} onClick={()=>void sync()}><RefreshCcw size={17} aria-hidden="true"/><span>Обновить список ГП</span></button><button type="button" className="primary" disabled={busy||agenda.length===0} onClick={()=>void approve()}><ClipboardCheck size={17}/>Утвердить повестку</button></>}
+     {canApprove&&selected.status==='draft'&&!selected.agenda_approved_at&&<><button type="button" className="govMeetingRefreshPrograms secondary" aria-label="Обновить список государственных программ" disabled={busy} onClick={()=>void sync()}><RefreshCcw size={17} aria-hidden="true"/><span>Обновить список ГП</span></button><button type="button" className="primary" disabled={busy||agenda.length===0} onClick={()=>void approve()}><ClipboardCheck size={17}/>Сохранить и подписать</button></>}
      {canApprove&&selected.status==='draft'&&!!selected.agenda_approved_at&&<button type="button" className="primary" disabled={busy} onClick={()=>void open()}><Mic2 size={17}/>Открыть заседание</button>}
      {canApprove&&selected.status==='open'&&<button type="button" disabled={busy||!!current} onClick={()=>void close()}>Закрыть заседание</button>}
      {selected.status==='closed'&&autoMinutes&&onOpenDocument&&<button type="button" className="secondary" onClick={()=>onOpenDocument(autoMinutes.id)}><FileText size={17}/>Опубликованный протокол</button>}
