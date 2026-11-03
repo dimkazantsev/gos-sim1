@@ -19,5 +19,6 @@ assert(sql.includes("p_state='pending' and a.answered_at is null")&&sql.includes
 assert(sql.includes("gos_blitz_issue_offline_today"),'Assignments must persist while offline via pg_cron');
 assert(game.includes("key==='profile'?pendingBlitz")&&game.includes("['event_assignments','event_collaboration_invites','event_decisions']")&&game.includes("['blitz_assignments']"),'Profile and event badges respond through the shared assignment subscriptions');
 assert(css.includes('.blitzArchiveBackdrop')&&css.includes('.blitzInlineQuiz'),'Modal and inline layout styles exist');
-assert(game.includes('setPendingEvents(new Set(')&&events.includes('myPendingCases=new Set('),'Event notifications count unique cases, not duplicate invitations');
+const badgeSql=file('supabase/migrations/20261103135000_pending_event_badge_one_read.sql');
+assert(game.includes("get_my_pending_event_count")&&badgeSql.includes('UNION')&&events.includes('myPendingCases=new Set('),'Event notifications continue to deduplicate pending case IDs server-side');
 console.log('PASS blitz inbox, atomic assignment, offline plan, profile and event badges');
