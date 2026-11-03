@@ -140,3 +140,38 @@ BEGIN
    ELSE NULL END
  );
 END $fn$;
+
+
+-- Preserve all existing assignment authorisation and audience rules;
+-- replace only the per-recipient write loop with a single SQL INSERT.
+CREATE OR REPLACE FUNCTION public.assign_event_case(p_case_id uuid, p_recipients uuid[])
+ RETURNS integer
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+ SET search_path TO 'public', 'private', 'pg_temp'
+AS $function$
+declare c public.event_cases%rowtype;recipient uuid;n integer:=0;recipients uuid[];
+begin
+ select * into c from public.event_cases where id=p_case_id for update;
+ if c.id is null or not private.is_game_teacher(c.game_id) then raise exception 'Требуются права преподавателя';end if;
+ if c.status<>'ready' or exists(select 1 from public.event_case_outcomes where case_id=c.id)
+ then raise exception 'Событие недоступно для назначения';end if;
+ select array_agg(distinct v) into recipients from unnest(p_recipients) v where v is not null;
+ if coalesce(cardinality(recipients),0)=0 then raise exception 'Выберите получателей';end if;
+ if c.audience='single' and cardinality(recipients)<>1 then raise exception 'Выберите одного участника';end if;
+ if c.audience='group' and cardinality(recipients) not between 2 and 3 then raise exception 'Выберите 2–3 участников';end if;
+ if exists(select 1 from unnest(recipients) r where not exists(select 1 from public.game_members
+  where game_id=c.game_id and user_id=r and kind='student')) then raise exception 'Получатель недоступен';end if;
+ if c.audience='all' and cardinality(recipients)<>(select count(*) from public.game_members where game_id=c.game_id and kind='student')
+ then raise exception 'Общее событие назначается всем участникам';end if;
+ -- One set-based INSERT statement for all recipients: one trigger broadcast
+ -- and one database round of assignment checks instead of up to 100 statements.
+ INSERT INTO public.event_assignments(case_id,game_id,recipient_id,created_by)
+ SELECT c.id,c.game_id,r.user_id,auth.uid()
+ FROM unnest(recipients) AS r(user_id)
+ ON CONFLICT(case_id,recipient_id) DO NOTHING;
+ GET DIAGNOSTICS n=ROW_COUNT;
+ return n;
+end;
+$function$
+;
