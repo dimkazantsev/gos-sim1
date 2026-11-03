@@ -48,13 +48,16 @@ const teacher='00000000-0000-0000-0000-000000000001',student='00000000-0000-0000
  assert(ui.includes('civicMeetingDocuments')&&ui.includes('civicMeetingError'),'Meeting document controls and action-local errors must remain visible');
  assert(ui.includes('Открыть повестку в реестре НПА'),'Agenda link must be available after saving');
  assert(!ui.includes("const meetingCoordinator=!!g.teacher||"),'Do not reintroduce client-only privilege checks');
- assert(ui.includes('const canApproveAgenda=meetingCoordinator&&agendaDraft'), 'Approval unavailable without a prepared document');
+ assert(ui.includes('const canApproveAgenda=!!agendaSigning?.can_sign&&agendaDraft'), 'Only a validated signer can sign an existing draft agenda');
  assert(ui.includes('agendaTextLength<30'), 'Explain the minimum 30-character rule before saving');
- assert(ui.includes('Сохранить и утвердить повестку'), 'Coordinator save action matches server auto-approval');
- assert(ui.includes('Сохранить проект повестки в реестре НПА'), 'Delegate cannot publish the draft');
+ assert(ui.includes('Сохранить и подписать'), 'An authorized member must personally confirm consent');
+ assert(ui.includes('Предложить проект')&&ui.includes('Предложить редакцию'), 'Composer preserves preparer and authorized-editor actions');
  assert(ui.includes('Вы можете зарегистрироваться после утверждения повестки'), 'Ordinary participants can see the next step');
- assert(ui.includes('canPrepare&&!readOnly&&!agendaReady'), 'Do not expose editable fields in completed/locked stage views');
+ assert(ui.includes('canPrepare&&!readOnly&&canWriteAgenda'), 'Prepare permissions and registration freeze still protect editing');
  assert(!ui.includes("'Сначала подготовьте документ в реестре НПА'"), 'The form itself creates the agenda document');
+  const migration=fs.readFileSync(path.join(root,'supabase/migrations/20261103123000_agenda_explicit_signing_and_revisions.sql'),'utf8');
+  for(const token of ['public.sign_institution_meeting_agenda','private.agenda_all_signed','revision_changed_at','private.agenda_required_signers','save_and_optionally_sign_agenda'])
+   assert(migration.includes(token),'New production migration includes '+token);
   const docs=await q('select doc_type,registry_no,status_code from formal_documents where id=$1',[agenda]);
  assert.equal(docs[0].doc_type,'meeting_agenda');assert(docs[0].registry_no);assert.equal(docs[0].status_code,'published');
  await db.exec("set request.jwt.claim.sub='"+student+"';");

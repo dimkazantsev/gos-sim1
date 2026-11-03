@@ -14,7 +14,8 @@ type Entry={user_id:string;institution_key:string;stage_no:number;present_mandat
 type GdPresence={user_id:string;capacity:number;declared:number|null;present:number};
 type Assignment={unit_id:string;user_id:string};
 type Office={user_id:string;role_title:string};
-type MeetingRecord={game_id:string;stage_no:number;institution_key:string;agenda_document_id:string|null;agenda_body:string|null;agenda_approved_at:string|null;minutes_document_id:string|null;minutes_body:string|null;minutes_approved_at:string|null;delegate_user_id:string|null};
+type MeetingRecord={game_id:string;stage_no:number;institution_key:string;agenda_document_id:string|null;agenda_body:string|null;agenda_prepared_by:string|null;agenda_approved_at:string|null;minutes_document_id:string|null;minutes_body:string|null;minutes_approved_at:string|null;delegate_user_id:string|null;updated_at:string};
+type AgendaSigning={required:{user_id:string;office:string;signed:boolean}[];can_sign:boolean;approved?:boolean};
 type MeetingPermissions={can_coordinate:boolean;can_prepare:boolean;can_attend:boolean};
 function meetingErrorMessage(message:string):string{
  if(/Этап завершён|ещё не открыт|stage.*closed/i.test(message))return 'Этап завершён или ещё не открыт. Изменение документов разрешено только во время открытого этапа.';
@@ -35,7 +36,9 @@ export default function InstitutionRegistrationPanel({g,readOnly=false,freshAtte
  const [gdPresence,setGdPresence]=useState<{my_capacity:number;registered:GdPresence[]}|null>(null);
  const [presenceDraft,setPresenceDraft]=useState('');
  const [agendaEditorOpen,setAgendaEditorOpen]=useState(false);
- const [stage12Session,setStage12Session]=useState<{id:string;status:string}|null>(null);
+ const [agendaProposalOpen,setAgendaProposalOpen]=useState(false);
+ const [agendaSigning,setAgendaSigning]=useState<AgendaSigning|null>(null);
+ const [stage12Session,setStage12Session]=useState<{id:string;status:string;document_id:string}|null>(null);
  const [stage12Text,setStage12Text]=useState('');
  const [stage12InitialText,setStage12InitialText]=useState('');
  const [stage12Reason,setStage12Reason]=useState('');
@@ -62,12 +65,12 @@ export default function InstitutionRegistrationPanel({g,readOnly=false,freshAtte
   if(!currentScope())return;
   if(doc.error){setMeetingError(meetingErrorMessage(userError(doc.error)));return;}
   if(!doc.data)return;
-  setStage12Session({id:s.data.id,status:s.data.status});
+  setStage12Session({id:s.data.id,status:s.data.status,document_id:s.data.agenda_document_id});
   // Keep keystrokes when the read began before the user started typing.
   if(!dirtyMeetingDraftRef.current.stage12){setStage12InitialText(doc.data.body_text||'');setStage12Text(doc.data.body_text||'');}
   }catch(error){if(currentScope())setMeetingError(meetingErrorMessage(userError(error)))}
  }
- async function saveStage12Editor(){
+ async function saveStage12Editor(signAfterSave=false){
   if(!g.game||!currentScope()||!stage12Session||!verifiedRights?.can_coordinate||readOnly||stage12Saving
    ||stage12Text.trim().length<80||stage12Text.length>20000
    ||stage12Text.trim()===stage12InitialText.trim())return;
@@ -83,9 +86,10 @@ export default function InstitutionRegistrationPanel({g,readOnly=false,freshAtte
   if(!currentScope()){if(!result.error)reconcileStaleWrite('formal_documents');return}
   if(result.error){setMeetingError(meetingErrorMessage(userError(result.error)));}
   else{
+   if(signAfterSave){const signed=await supabase.rpc('sign_institution_meeting_agenda',{p_document_id:stage12Session.document_id});if(signed.error){setMeetingError(meetingErrorMessage(userError(signed.error)));await load();return;}}
    if(meetingDraftVersion.current.stage12===submittedVersion){dirtyMeetingDraftRef.current.stage12=false;setAgendaEditorOpen(false);setStage12Reason('')}
    else setStage12InitialText(stage12Text);
-   setNotice('Текст повестки обновлён в едином документе НПА.');
+   setNotice(signAfterSave?'Редакция сохранена. Ваша личная подпись зафиксирована.':'Текст повестки обновлён. Прежние подписи требуют повторного подтверждения.');
    await load();
   }
   }catch(error){if(currentScope())setMeetingError(meetingErrorMessage(userError(error)))}
@@ -114,13 +118,13 @@ export default function InstitutionRegistrationPanel({g,readOnly=false,freshAtte
  const initialSnapshotReady=readyScope===scope;
  useEffect(()=>{mounted.current=true;return()=>{mounted.current=false;readVersion.current++}},[]);
  useEffect(()=>{const sync=()=>setPanelVisible(document.visibilityState==='visible');document.addEventListener('visibilitychange',sync);sync();return()=>document.removeEventListener('visibilitychange',sync)},[]);
- useEffect(()=>{setPresenceDraft('');setStage12Session(null);setAgendaEditorOpen(false);setStage12Text('');setStage12InitialText('');setStage12Reason('')},[presenceKey]);
+ useEffect(()=>{setPresenceDraft('');setStage12Session(null);setAgendaEditorOpen(false);setAgendaProposalOpen(false);setAgendaSigning(null);setStage12Text('');setStage12InitialText('');setStage12Reason('')},[presenceKey]);
  useEffect(()=>{
   setRows([]);setUnits([]);onUnitsChange?.([]);setAssignments([]);setOffices([]);setMeetingRows([]);setGdPresence(null);setPermission(null);setMeetingError('');setNotice('');
  },[scope]);
  useEffect(()=>{if(!panelVisible)return;const timer=setTimeout(()=>setReadyScope(scope),1500);return()=>clearTimeout(timer)},[scope,panelVisible]);
  async function load(){if(!g.game||!mounted.current||scopeRef.current!==scope)return;const requestedScope=scope,version=++readVersion.current;const [r,u,a,b,o,meeting]=await Promise.all([supabase.from('institution_session_registrations').select('user_id,institution_key,stage_no,present_mandates,presence_updated_at').eq('game_id',g.game.id).eq('stage_no',stage),supabase.from('institution_units').select('id,title,unit_kind,head_user_id,unit_key,mandate_capacity').eq('game_id',g.game.id),supabase.from('institution_assignments').select('unit_id,user_id').eq('game_id',g.game.id),supabase.from('game_voting_body_members').select('unit_id,user_id').eq('game_id',g.game.id),supabase.from('game_office_assignments').select('user_id,role_title').eq('game_id',g.game.id).eq('status','active'),
-  supabase.from('institution_meeting_records').select('game_id,stage_no,institution_key,agenda_document_id,agenda_body,agenda_approved_at,minutes_document_id,minutes_body,minutes_approved_at,delegate_user_id').eq('game_id',g.game.id).eq('stage_no',stage)]);
+  supabase.from('institution_meeting_records').select('game_id,stage_no,institution_key,agenda_document_id,agenda_body,agenda_prepared_by,agenda_approved_at,minutes_document_id,minutes_body,minutes_approved_at,delegate_user_id,updated_at').eq('game_id',g.game.id).eq('stage_no',stage)]);
   if(!mounted.current||scopeRef.current!==requestedScope||version!==readVersion.current)return;
   const failure=[r,u,a,b,o,meeting].find(x=>x.error);if(failure?.error){setMeetingError('Не удалось загрузить сведения о заседании. '+meetingErrorMessage(userError(failure.error)));setReadyScope(requestedScope);return;}
   setMeetingError(value=>value.startsWith('Не удалось загрузить сведения о заседании.')?'':value);
@@ -158,6 +162,21 @@ export default function InstitutionRegistrationPanel({g,readOnly=false,freshAtte
   lastMeetingDraftRef.current=snapshot;
  },[meetingRows,body,g.game?.id,g.me?.user_id,stage]);
  const permissionKey=JSON.stringify([panelScope,body]);
+ const agendaSigningRow=meetingRows.find(m=>m.institution_key===body);
+ const agendaSigningDocumentId=agendaSigningRow?.agenda_document_id||'';
+ const agendaSigningUpdatedAt=agendaSigningRow?.updated_at||'';
+ useEffect(()=>{
+  const mayManageAgenda=g.teacher||(permission?.key===permissionKey&&(permission.rights.can_prepare||permission.rights.can_coordinate));
+  if(!g.game||!g.me||!panelVisible||!agendaSigningDocumentId||!mayManageAgenda){setAgendaSigning(null);return}
+  let active=true;setAgendaSigning(null);
+  void Promise.resolve(supabase.rpc('get_institution_document_signers',{p_document_id:agendaSigningDocumentId}))
+   .then(({data,error})=>{
+    if(!active)return;
+    if(error||!data||!Array.isArray(data.required)){setAgendaSigning(null);return}
+    setAgendaSigning({required:data.required,can_sign:data.can_sign===true,approved:data.approved===true});
+   }).catch(()=>{if(active)setAgendaSigning(null)});
+  return()=>{active=false};
+ },[g.game?.id,g.me?.user_id,g.teacher,permissionKey,permission,agendaSigningDocumentId,agendaSigningUpdatedAt,panelVisible]);
  const currentDelegate=meetingRows.find(m=>m.institution_key===body)?.delegate_user_id;
  useEffect(()=>{
   if(!initialSnapshotReady||!panelVisible||!g.game||!g.me)return;
@@ -217,15 +236,19 @@ export default function InstitutionRegistrationPanel({g,readOnly=false,freshAtte
  // Never offer a second edit once anyone has registered.
  const hasSessionRegistrations=rows.some(r=>r.institution_key===body);
  const canWriteAgenda=!gdStage12CanonicalAgenda&&(!agendaHasDocument||!hasSessionRegistrations);
- const canApproveAgenda=meetingCoordinator&&agendaDraft&&(meetingRecord?.agenda_body?.trim().length||0)>=30;
- async function saveMeetingDocument(kind:'agenda'|'minutes'){
+ const canApproveAgenda=!!agendaSigning?.can_sign&&agendaDraft&&(meetingRecord?.agenda_body?.trim().length||0)>=30&&!meetingActionsLocked;
+ const signedAgendaCount=agendaSigning?.required.filter(s=>s.signed).length||0;
+ const requiredAgendaCount=agendaSigning?.required.length||0;
+ async function saveMeetingDocument(kind:'agenda'|'minutes',signAfterSave=false){
   if(!g.game||!currentScope()||busy||!canPrepare||readOnly||meetingActionsLocked||(kind==='agenda'&&!canWriteAgenda))return;
   const submittedVersion=meetingDraftVersion.current[kind];
   setMeetingError('');setNotice('');setBusy(true);
   try{
-  const r=await supabase.rpc('save_institution_meeting_document',{p_game_id:g.game.id,p_stage_no:stage,p_institution:body,p_kind:kind,p_body:kind==='agenda'?agendaText:minutesText});
+  const r=kind==='agenda'
+   ?await supabase.rpc('save_and_optionally_sign_agenda',{p_game_id:g.game.id,p_stage_no:stage,p_institution:body,p_body:agendaText,p_sign:signAfterSave,p_expected_updated_at:meetingRecord?.updated_at||null})
+   :await supabase.rpc('save_institution_meeting_document',{p_game_id:g.game.id,p_stage_no:stage,p_institution:body,p_kind:kind,p_body:minutesText});
   if(!currentScope()){if(!r.error)reconcileStaleWrite('institution_meeting_records');return}
-  if(r.error)setMeetingError(meetingErrorMessage(userError(r.error)));else{if(meetingDraftVersion.current[kind]===submittedVersion)dirtyMeetingDraftRef.current[kind]=false;await load();if(currentScope())setNotice(kind==='agenda'?(meetingCoordinator?'Повестка сохранена в реестре НПА и утверждена.':'Проект повестки сохранён. Ожидается утверждение председателем.'):'Протокол сохранён в реестре НПА.')}
+  if(r.error)setMeetingError(meetingErrorMessage(userError(r.error)));else{if(meetingDraftVersion.current[kind]===submittedVersion){dirtyMeetingDraftRef.current[kind]=false;if(kind==='agenda')setAgendaProposalOpen(false)}await load();if(currentScope())setNotice(kind==='agenda'?(signAfterSave?'Повестка сохранена. Ваша личная подпись зафиксирована.':'Проект повестки сохранён. Ожидаются личные подписи уполномоченных лиц.'):'Протокол сохранён в реестре НПА.')}
   }catch(error){if(currentScope())setMeetingError(meetingErrorMessage(userError(error)))}
   finally{setBusy(false)}
  }
@@ -234,7 +257,7 @@ export default function InstitutionRegistrationPanel({g,readOnly=false,freshAtte
   try{
   const r=await supabase.rpc(kind==='agenda'?'approve_institution_meeting_agenda':'approve_institution_meeting_minutes',{p_game_id:g.game.id,p_stage_no:stage,p_institution:body});
   if(!currentScope()){if(!r.error)reconcileStaleWrite('institution_meeting_records');return}
-  if(r.error)setMeetingError(meetingErrorMessage(userError(r.error)));else{await load();if(currentScope())setNotice(kind==='agenda'?'Повестка утверждена. Регистрация доступна.':'Протокол утверждён.')}
+  if(r.error)setMeetingError(meetingErrorMessage(userError(r.error)));else{await load();if(currentScope())setNotice(kind==='agenda'?'Ваша личная подпись зарегистрирована. Повестка утверждается после всех обязательных подписей.':'Протокол утверждён.')}
   }catch(error){if(currentScope())setMeetingError(meetingErrorMessage(userError(error)))}
   finally{setBusy(false)}
  }
@@ -296,7 +319,7 @@ export default function InstitutionRegistrationPanel({g,readOnly=false,freshAtte
  return <><details ref={detailsRef} className="institutionRegistrationPanel civicRegistration civicDisclosure projectDisclosure" aria-label="Регистрация на заседания"><DisclosureSummary icon={ClipboardCheck} title="Регистрация на заседание" description={'Этап '+stage+' · Регистрация в органе власти'}/><div className="civicDisclosureBody"><p>{body==='ksrf'?'До внесения предложений и голосования необходимо зарегистрироваться на заседание КСРФ. Участвовать могут все участники, но один голос от фракции подаёт её избранный представитель.':body==='gd'&&stage===4?'До формирования руководства Государственной Думы повестку готовят председатели зарегистрированных политических партий. После избрания Председателя Думы и формирования Совета Думы полномочия переходят руководству палаты. Для участия в заседании после утверждения повестки необходима регистрация.':'Перед участием в заседании и голосовании необходимо зарегистрироваться в соответствующем органе после утверждения повестки.'}</p>
   <div className="civicRegistrationSelectors"><StyledSelect label="Орган" value={body} onChange={setBody} options={[...availableBodies.map(b=>({value:b.key,label:b.title})),...units.filter(u=>!allowedBodies||allowedBodies.includes('unit:'+u.id)).map(u=>({value:'unit:'+u.id,label:u.title}))]}/></div>
   <section className="civicMeetingDocuments" aria-label="Документы заседания" data-agenda-state={agendaReady?'approved':agendaDraft?'draft':'pending'}>
-   <header><div><b>Повестка заседания</b><small>{agendaReady?'Утверждена · регистрация разрешена':agendaDraft?(gdStage12CanonicalAgenda?'Автоматически сформирована · требуется утверждение':'Проект в реестре · требуется утверждение'):verifiedRights&&!canAttend?'Повестка доступна уполномоченным участникам':'Повестка ещё не составлена'}</small></div><span>{agendaHasDocument?'В реестре НПА':'Не оформлена'}</span></header>
+   <header><div><b>Повестка заседания</b><small>{agendaReady?'Подписана всеми · регистрация разрешена':agendaDraft?(gdStage12CanonicalAgenda?'Автоматически сформирована · требуется утверждение':'Проект в реестре · требуется утверждение'):verifiedRights&&!canAttend?'Повестка доступна уполномоченным участникам':'Повестка ещё не составлена'}</small></div><span>{agendaHasDocument?'В реестре НПА':'Не оформлена'}</span></header>
    {!agendaReady&&<p className="civicMeetingHelp" role="status">{readOnly?'Режим просмотра. Подготовка и регистрация недоступны.':meetingActionsLocked?'Этап закрыт. Изменения и регистрация недоступны.':gdStage12CanonicalAgenda?'Повестка автоматически составляется из пакетов законопроектов в разделе «Работа». До открытия заседания она пополняется автоматически. Председатель утверждает подготовленный документ; после открытия изменения вносит только через обоснованную корректировку заседания.':!verifiedRights?'Проверяем ваши полномочия для этого органа…':meetingCoordinator?'Вы можете составить и утвердить повестку или назначить исполнителя. Документ автоматически создаётся в реестре НПА, отдельно загружать его не нужно.':canPrepare?'Вам поручена подготовка проекта повестки. Сохраните проект, затем председатель утвердит его.':canAttend?'Вы можете зарегистрироваться после утверждения повестки, участвовать в заседании и голосовать в пределах своих полномочий. Подготовку повестки поручает председатель.':'У вас нет назначения в этот орган. Готовить повестку, утверждать её и регистрироваться на это заседание могут только уполномоченные участники.'}</p>}
 
    {preStageKsrf&&stageReadOnly&&!readOnly&&<p className="civicMeetingHelp" role="status">Повестку и регистрацию можно оформить до открытия работы этапа. Для выполнения заданий завершённого этапа преподаватель должен повторно открыть его.</p>}
@@ -306,7 +329,7 @@ export default function InstitutionRegistrationPanel({g,readOnly=false,freshAtte
    {hasSessionRegistrations&&agendaHasDocument&&!agendaReady&&!gdStage12CanonicalAgenda&&<p className="civicMeetingHelp" role="status">Регистрация уже началась. Изменять подготовленный проект нельзя; председатель может только утвердить существующую повестку.</p>}
    {gdStage12CanonicalAgenda&&agendaHasDocument&&<section className="civicAgendaSyncedPreview" aria-label="Автоматически сформированная повестка Государственной Думы"><strong>Содержание повестки · Реестр НПА</strong><pre>{meetingRecord?.agenda_body||'Вопросы повестки загружаются…'}</pre></section>}
    {gdStage12CanonicalAgenda&&meetingCoordinator&&!readOnly&&agendaHasDocument&&<section className="civicAgendaEdit" aria-label="Корректировка повестки Государственной Думы">
-    <button type="button" className="secondary" aria-expanded={agendaEditorOpen} onClick={()=>{setAgendaEditorOpen(v=>!v);if(!agendaEditorOpen){dirtyMeetingDraftRef.current.stage12=false;void loadStage12Editor();}}}>Корректировать повестку</button>
+    <button type="button" className="secondary" aria-expanded={agendaEditorOpen} onClick={()=>{setAgendaEditorOpen(v=>!v);if(!agendaEditorOpen){dirtyMeetingDraftRef.current.stage12=false;void loadStage12Editor();}}}>Предложить редакцию</button>
     {agendaEditorOpen&&<div className="civicAgendaEditBody">
      <p>Измените непосредственно текст повестки заседания Государственной Думы. Состав законопроектов и голосования остаются прежними. Реестровые номера документов необходимо сохранить.</p>
      <label>Полный текст повестки
@@ -324,13 +347,50 @@ export default function InstitutionRegistrationPanel({g,readOnly=false,freshAtte
        ||stage12Text.trim().length<80||stage12Text.length>20000
        ||stage12Text.trim()===stage12InitialText.trim()
        ||(stage12Session.status==='open'&&stage12Reason.trim().length<10)}
-      onClick={()=>void saveStage12Editor()}>{stage12Saving?'Сохранение…':'Сохранить текст повестки'}</button>
+      onClick={()=>void saveStage12Editor(false)}>{stage12Saving?'Сохранение…':'Сохранить'}</button>
+      {agendaSigning?.can_sign&&<button type="button" className="primary"
+       disabled={!stage12Session||stage12Saving||stage12Session.status==='closed'
+        ||stage12Text.trim().length<80||stage12Text.length>20000
+        ||stage12Text.trim()===stage12InitialText.trim()
+        ||(stage12Session.status==='open'&&stage12Reason.trim().length<10)}
+       onClick={()=>void saveStage12Editor(true)}>Сохранить и подписать</button>}
     </div>}
    </section>}
-   {canPrepare&&!readOnly&&!agendaReady&&canWriteAgenda&&<label>Содержание повестки<textarea aria-label="Текст повестки заседания" value={agendaText} rows={4} onChange={event=>{dirtyMeetingDraftRef.current.agenda=true;meetingDraftVersion.current.agenda++;setAgendaText(event.target.value)}} placeholder="Вопросы заседания, порядок рассмотрения, выступающие и регламент"/></label>}
-   {canPrepare&&!readOnly&&!agendaReady&&canWriteAgenda&&<div className="civicAgendaComposer"><small>{agendaTextLength<30?'Для сохранения укажите ещё '+(30-agendaTextLength)+' символов.':'Повестка готова к сохранению в реестре НПА.'}</small><button type="button" className={meetingCoordinator?'primary':'secondary'} disabled={busy||readOnly||agendaTextLength<30} onClick={()=>void saveMeetingDocument('agenda')}>{meetingCoordinator?'Сохранить и утвердить повестку':'Сохранить проект повестки в реестре НПА'}</button></div>}
-   {canApproveAgenda&&!readOnly&&<button type="button" className="primary" disabled={busy||readOnly} onClick={()=>void approveMeeting('agenda')}>Утвердить подготовленный проект повестки</button>}
-   {meetingCoordinator&&!readOnly&&!automatedSessionMinutes&&<div className="civicMeetingDelegate"><StyledSelect label="Поручить оформление повестки" value={delegateUser} onChange={setDelegateUser} options={[{value:'',label:'Без поручения'},...participants.map(p=>({value:p.user_id,label:p.full_name||'Участник'}))]}/><button type="button" disabled={busy} onClick={()=>void assignMeetingDelegate()}>Сохранить поручение</button></div>}
+   {agendaHasDocument&&agendaSigning&&<div className="civicMeetingHelp" role="status">
+      Личные подписи текущей редакции: <b>{signedAgendaCount} из {requiredAgendaCount}</b>.
+      {requiredAgendaCount===0?' Подписанты ещё не определены.':agendaReady?' Утверждена.':' Ожидаются остальные подписи.'}
+      {agendaSigning.required.map(person=><div key={person.user_id}>
+       {g.names[person.user_id]||'Участник'} · {person.office}: {person.signed?'Подписано':'Ожидает подписи'}
+      </div>)}
+     </div>}
+    {canPrepare&&!readOnly&&canWriteAgenda&&<div className="civicAgendaComposer">
+      <button type="button" className="secondary" aria-expanded={agendaProposalOpen}
+       onClick={()=>setAgendaProposalOpen(v=>!v)}>
+       {!agendaHasDocument||meetingRecord?.agenda_prepared_by===g.me?.user_id?'Предложить проект':'Предложить редакцию'}
+      </button>
+     </div>}
+    {canPrepare&&!readOnly&&canWriteAgenda&&agendaProposalOpen&&<>
+      {signedAgendaCount>0&&<p className="civicMeetingHelp" role="status">
+       При сохранении изменённого текста прежние подписи станут недействительными. Новую редакцию должны подписать все уполномоченные лица.
+      </p>}
+      <label>Содержание повестки<textarea aria-label="Текст повестки заседания"
+       value={agendaText} rows={4}
+       onChange={event=>{dirtyMeetingDraftRef.current.agenda=true;meetingDraftVersion.current.agenda++;setAgendaText(event.target.value)}}
+       placeholder="Вопросы заседания, порядок рассмотрения, выступающие и регламент"/></label>
+      <div className="civicAgendaComposer">
+       <small>{agendaTextLength<30?'Для сохранения укажите ещё '+(30-agendaTextLength)+' символов.':'Повестка готова к сохранению в реестре НПА.'}</small>
+       <button type="button" className="secondary" disabled={busy||agendaTextLength<30}
+        onClick={()=>void saveMeetingDocument('agenda',false)}>Сохранить</button>
+       {(agendaSigning?.can_sign||!agendaHasDocument&&meetingCoordinator&&!g.teacher)&&
+        <button type="button" className="primary" disabled={busy||agendaTextLength<30}
+         onClick={()=>void saveMeetingDocument('agenda',true)}>Сохранить и подписать</button>}
+      </div>
+     </>}
+    {canApproveAgenda&&!readOnly&&!agendaProposalOpen&&<button type="button"
+      className="primary" disabled={busy} onClick={()=>void approveMeeting('agenda')}>
+      Сохранить и подписать
+    </button>}
+    {meetingCoordinator&&!readOnly&&!automatedSessionMinutes&&<div className="civicMeetingDelegate"><StyledSelect label="Поручить оформление повестки" value={delegateUser} onChange={setDelegateUser} options={[{value:'',label:'Без поручения'},...participants.map(p=>({value:p.user_id,label:p.full_name||'Участник'}))]}/><button type="button" disabled={busy} onClick={()=>void assignMeetingDelegate()}>Сохранить поручение</button></div>}
 
   </section>
   <div className="civicAttendance"><div><h3>{config?.title||unit?.title}</h3><p>{config?.basis||'Состав зарегистрированного в игре органа. Порог задаётся в голосовании.'}</p></div><div className="civicAttendanceNumbers"><span>Присутствует <b>{present} / {total}</b></span><span>Для кворума <b>{needed}</b></span><span>{present>=needed&&total>0?'Кворум есть':'Ожидаем участников'}</span></div><ul className="civicAttendees">{registered.map(r=>{const faction=body==='ksrf'?g.parties.find(p=>p.leader_user_id===r.user_id):null;const presence=gdPresence?.registered.find(x=>x.user_id===r.user_id);return <li key={r.user_id}>{body==='ksrf'?(faction?.name||'Участник КСРФ')+' · '+(g.names[r.user_id]||'Участник'):g.names[r.user_id]||'Участник'}<b>{body==='gd'?presence?(presence.present+' из '+presence.capacity+' депутатов'+(presence.declared==null?' · автоматически':'')):'Проверяем явку':body==='ksrf'?(faction?'1 голос фракции':'Без голоса фракции'):'1 голос'}</b></li>})}</ul>

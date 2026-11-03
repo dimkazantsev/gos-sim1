@@ -7,7 +7,7 @@ const details=read('components/game/stageDetails.ts');
 const css=read('app/2026-october-refinement.css');
 for(const s of [
  'create_government_session_from_programmes','sync_government_session_programmes',
- 'approve_government_session_agenda','start_government_program_report',
+ 'sign_institution_meeting_agenda','start_government_program_report',
  'ask_government_program_speaker','answer_government_program_speaker',
  'close_government_program_questions','open_program_vote_from_agenda',
  'sign_adopted_state_program','onOpenVotes(item.vote_id!)']){
@@ -27,6 +27,10 @@ for(const s of [
  "IF s.status<>'draft'","REVOKE ALL ON FUNCTION public.ask_government_program_speaker"]){
  assert(migration.toLowerCase().includes(s.toLowerCase()),'Missing security or procedure gate '+s);
 }
+const personalSignMigration=read('supabase/migrations/20261103123000_agenda_explicit_signing_and_revisions.sql');
+assert(personalSignMigration.includes('trg_government_agenda_personal_approval'),'Government agenda approval requires personal signatures');
+assert(!code.includes("supabase.rpc('approve_government_session_agenda'"),'No one-click auto-approval remains in government UI');
+assert(code.includes('Сохранить и подписать'),'The Prime Minister has an explicit signature action');
 assert(!/UPDATE\s+public\.game_stages\s+SET\s+(?:status|deadline)/i.test(migration),'No stage opens or deadline changes');
 assert(!/delete\s+from\s+public\.(?:game_votes|game_ballots|state_programs)/i.test(migration),'No history may be removed');
 assert(details.includes('На Этапе 10 государственные программы не принимаются голосованием'),'Rules must distinguish stages');
