@@ -705,7 +705,15 @@ export function useRepublicGame(gameId:string){
     if(open)for(const caseId of caseIds)notifyGameDataRefresh(gameId,table,caseId);
     return;
    }
-   if(table==='event_case_outcomes'||table==='event_cases'||table==='event_case_routing'){
+   if(table==='event_case_outcomes'){
+    // The completed outcome changes a student's pending badge even if the
+    // assignments themselves were resolved without a room-wide update.
+    // Reuse the existing assignment invalidation; no extra fetch is needed.
+    if(mine)notifyGameDataRefresh(gameId,'event_assignments');
+    if(isTeacher&&open)notifyGameDataRefresh(gameId,table);
+    return;
+   }
+   if(table==='event_cases'||table==='event_case_routing'){
     if(mine||isTeacher&&open)notifyGameDataRefresh(gameId,table);
     return;
    }
