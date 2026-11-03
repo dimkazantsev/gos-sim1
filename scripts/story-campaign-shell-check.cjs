@@ -1,0 +1,18 @@
+'use strict';
+const assert=require('node:assert/strict');
+const fs=require('node:fs');
+const read=path=>fs.readFileSync(path,'utf8');
+const panel=read('components/game/TeacherStoryCampaign.tsx');
+const teacher=read('components/game/TeacherView.tsx');
+const migration=read('supabase/migrations/20261103212000_private_story_campaign_shell.sql');
+assert(teacher.includes("activeWorkspace==='event'&&game&&<TeacherStoryCampaign"),'Teacher pane is lazy and hidden outside the Events tab');
+assert(teacher.includes("dynamic(()=>import('./TeacherStoryCampaign')"),'Module is loaded on demand');
+assert(!panel.includes('useEffect')&&!panel.includes('useGameTableSync')&&!panel.includes('setInterval')&&!panel.includes('.channel('),'No student preload, polling or new channels');
+assert(panel.includes("onClick={()=>void query(false)}")&&panel.includes("onClick={()=>void query(true)}"),'Network use requires an explicit teacher action');
+assert(migration.includes("CHECK (NOT enabled)")&&migration.includes("CHECK (NOT approved)"),'Story cannot start or affect metrics before explicit approval');
+assert(migration.includes('private.is_game_teacher(p_game_id)'),'Every RPC verifies teacher membership for this game');
+assert(migration.includes('REVOKE ALL ON private.story_campaigns,private.story_episode_drafts'),'No raw student table access');
+assert(migration.includes('SECURITY DEFINER SET search_path=\'\''),'Privileged RPC uses fixed search path');
+assert(!migration.includes('CREATE TRIGGER')&&!migration.includes('CREATE POLICY')&&!migration.includes('realtime.send'),'No recurring database or broadcast cost');
+assert(!migration.includes('episode_body')&&!migration.includes('М-17')&&!migration.includes('Арсеньева'),'Future plot content is excluded from the public migration');
+console.log('PASS: story shell is teacher-only, fail-closed, opt-in, and idle-request-free');
