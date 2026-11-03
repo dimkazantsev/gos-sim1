@@ -23,7 +23,7 @@ assert(client.includes("view!=='dashboard'&&!g.coreLoaded&&!teacher&&sectionLoad
  'Selected non-dashboard screens must wait for authorised core data, not render false empty values');
 assert(client.includes("g.coreLoaded?gameId:undefined"),
  'Section unread SQL must stay inactive while the lightweight lobby is shown');
-assert(client.includes("g.coreLoaded&&me?game?.id:undefined"),
+assert(client.includes("!previewMode&&g.coreLoaded&&me?.kind==='student'&&view!=='events'?game?.id:undefined"),
  'Event counts must not read before opening game sections');
 assert(client.includes("g.coreLoaded&&me?.kind==='student'"),
  'Blitz counts must not read before opening game sections');

@@ -36,7 +36,7 @@ import {AchievementCelebration} from './game/Achievements';
 import {BlitzOverlay} from './game/Blitz';
 
 import {useSectionUpdates} from './game/useSectionUpdates';
-import {notifyGameDataRefresh,useGameTableSync} from './game/useGameTableSync';
+import {EVENT_PENDING_COUNT_EVENT,notifyGameDataRefresh,useGameTableSync} from './game/useGameTableSync';
 import {supabase} from '@/lib/supabase';
 import MobileDock from './game/MobileDock';
 import GameHeader,{TeacherNavigationProvider} from './game/GameHeader';
@@ -566,7 +566,9 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
  // Stable, independently salted jitter prevents a 12–100-device burst.
  const firstEventBadgeDelay=me?.user_id?firstPresenceWriteDelay(me.user_id+':event-badge')+3000:0;
  const firstBlitzBadgeDelay=me?.user_id?firstPresenceWriteDelay(me.user_id+':blitz-badge')+3000:0;
- useGameTableSync(!previewMode&&g.coreLoaded&&me?game?.id:undefined,['event_assignments','event_collaboration_invites','event_decisions'],async()=>{
+ // The visible Events screen already loads assigned IDs and calculates the
+ // unread badge. Keep only one in-flight per-student read on that screen.
+ useGameTableSync(!previewMode&&g.coreLoaded&&me?.kind==='student'&&view!=='events'?game?.id:undefined,['event_assignments','event_collaboration_invites'],async()=>{
   if(!game||!me||previewMode)return;
   const requestedScope=counterScope;
   // Single indexed RLS-protected read, instead of two separate HTTP requests.
@@ -574,6 +576,16 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
   if(counterScopeRef.current===requestedScope&&!result.error&&typeof result.data==='number')
    setPendingEvents(Math.max(0,Math.trunc(result.data)));
  },counterScope,undefined,750,60000,firstEventBadgeDelay);
+ useEffect(()=>{
+  if(!game||!me||previewMode||me.kind!=='student')return;
+  const fromFeed=(event:Event)=>{
+   const detail=(event as CustomEvent<{gameId:string;userId:string;count:number}>).detail;
+   if(detail?.gameId===game.id&&detail.userId===me.user_id&&Number.isFinite(detail.count))
+    setPendingEvents(Math.max(0,Math.trunc(detail.count)));
+  };
+  window.addEventListener(EVENT_PENDING_COUNT_EVENT,fromFeed);
+  return()=>window.removeEventListener(EVENT_PENDING_COUNT_EVENT,fromFeed);
+ },[game?.id,me?.user_id,me?.kind,previewMode]);
 
 
  useGameTableSync(!previewMode&&g.coreLoaded&&me?.kind==='student'?game?.id:undefined,['blitz_assignments'],async()=>{

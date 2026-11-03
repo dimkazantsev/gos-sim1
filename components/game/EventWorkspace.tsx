@@ -4,7 +4,7 @@ import {userError} from '@/lib/userError';
 import {useEffect,useMemo,useRef,useState} from 'react';
 import {CalendarDays,CheckCircle2,RefreshCw,Send,UsersRound} from 'lucide-react';
 import {supabase} from '@/lib/supabase';
-import {useGameTableSync} from './useGameTableSync';
+import {notifyEventPendingCount,useGameTableSync} from './useGameTableSync';
 import type {ReturnTypeRepublic} from './viewTypes';
 import StyledSelect from '../ui/StyledSelect';
 import DisclosureSummary from '../ui/DisclosureSummary';
@@ -130,6 +130,15 @@ export default function EventWorkspace({g,readOnly=false,mode='feed'}:{g:ReturnT
   setTitles(Object.fromEntries(compact.titles.map(item=>[item.id,item.title])));
   setEffectCounts(typeof compact.positive==='number'&&typeof compact.negative==='number'?{positive:compact.positive,negative:compact.negative}:null);
   setInvitations(invitedRows);setAuthority(snapshot.authority);
+  // This feed is already being read on the visible Events screen. Reuse
+  // its actual assigned/invited case IDs instead of another badge RPC.
+  if(me.kind==='student'&&!readOnly){
+   const pending=new Set([
+    ...assignedRows.filter(a=>a.recipient_id===me.user_id&&a.status==='pending').map(a=>a.case_id),
+    ...invitedRows.filter(i=>i.recipient_id===me.user_id&&i.status==='pending').map(i=>i.case_id)
+   ]);
+   notifyEventPendingCount(game.id,me.user_id,pending.size);
+  }
   setAssignments(assignedRows);setDecisions(snapshot.decisions);setOutcomes(snapshot.outcomes);
   if(includeCount){
    if(snapshot.ready_case_count!==null&&Number.isFinite(snapshot.ready_case_count)){
@@ -155,7 +164,7 @@ export default function EventWorkspace({g,readOnly=false,mode='feed'}:{g:ReturnT
   })().finally(()=>{state.promise=null});
   return state.promise;
  }
- useGameTableSync(me?.user_id?game?.id:undefined,['event_cases','event_assignments','event_decisions','event_case_outcomes','event_collaboration_invites','event_authority_evidence','event_case_routing'],()=>reload(readyCaseCount===null,true),feedScope,undefined,750,180000);
+ useGameTableSync(me?.user_id?game?.id:undefined,['event_cases','event_assignments','event_decisions','event_case_outcomes','event_collaboration_invites','event_authority_evidence','event_case_routing'],()=>reload(readyCaseCount===null,true),feedScope,undefined,750,60000,0,undefined,teacher?180000:900000);
  const students=members.filter(m=>m.kind==='student');
  const roles=[...new Set(students.map(m=>m.role_title?.trim()).filter((r):r is string=>!!r))].sort((a,b)=>a.localeCompare(b,'ru'));
  const recipients=roleFilter&&audience!=='all'?students.filter(m=>m.role_title===roleFilter):students;

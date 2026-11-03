@@ -17,7 +17,8 @@ assert(blitz.includes("!r.answered_at")||blitz.includes('answered?<><p className
 assert(sql.includes('pg_advisory_xact_lock')&&sql.includes('a.answered_at is not null'),'Atomic selected open prevents second answers');
 assert(sql.includes("p_state='pending' and a.answered_at is null")&&sql.includes("p_state='answered' and a.answered_at is not null"),'Filtered views disjoint by answered_at');
 assert(sql.includes("gos_blitz_issue_offline_today"),'Assignments must persist while offline via pg_cron');
-assert(game.includes("key==='profile'?pendingBlitz")&&game.includes("['event_assignments','event_collaboration_invites','event_decisions']")&&game.includes("['blitz_assignments']"),'Profile and event badges respond through the shared assignment subscriptions');
+assert(game.includes("key==='profile'?pendingBlitz")&&game.includes("['event_assignments','event_collaboration_invites']")&&game.includes("['blitz_assignments']"),'Profile and event badges respond through the shared assignment subscriptions');
+assert(file('components/game/useRepublicGame.ts').includes("event:'event_feed_changed'"),'Situation badges are invalidated over the existing private game socket');
 assert(css.includes('.blitzArchiveBackdrop')&&css.includes('.blitzInlineQuiz'),'Modal and inline layout styles exist');
 const badgeSql=file('supabase/migrations/20261103135000_pending_event_badge_one_read.sql');
 assert(game.includes("get_my_pending_event_count")&&badgeSql.includes('UNION')&&events.includes('myPendingCases=new Set('),'Event notifications continue to deduplicate pending case IDs server-side');

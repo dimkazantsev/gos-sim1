@@ -78,7 +78,7 @@ assert(sectionSource.includes("document.addEventListener('visibilitychange',focu
  'Resuming a hidden tab refreshes section counts without waiting for the 3-minute fallback');
 assert(sectionSource.includes('window.removeEventListener(SECTION_UPDATES_REFRESH_EVENT,invalidated)'),
  'Section count hook releases the event listener on unmount');
-assert(gameShell.includes("['event_assignments','event_collaboration_invites','event_decisions']"),
+assert(gameShell.includes("['event_assignments','event_collaboration_invites']"),
  'Event badges retain scoped reconciliation for assignments and invitations');
 assert(source.includes('if(partyDocs)notifySectionUpdates(gameId)'),
  'Party document changes invalidate teacher section counters');

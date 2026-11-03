@@ -36,7 +36,7 @@ export default function EventCollaboration({g,caseId,invitations,assignedIds,clo
   const r=await supabase.from('event_discussion_messages').select('*').eq('case_id',caseId).order('created_at',{ascending:false}).limit(100);
   if(requestedScope===activeDiscussionScope.current&&!r.error)setEntries(((r.data||[]) as Entry[]).reverse());
  }
- useGameTableSync(assigned||g.teacher?g.game?.id:undefined,['event_discussion_messages'],load,discussionScope,undefined,750,30000);
+ useGameTableSync(assigned||g.teacher?g.game?.id:undefined,['event_discussion_messages'],load,discussionScope,undefined,750,60000,0,caseId);
  async function act(name:string,params:Record<string,unknown>){if(busy)return;setBusy(true);const r=await supabase.rpc(name,params);setNotice(r.error?userError(r.error):'');if(!r.error){setText('');if(name==='invite_event_collaborator')setRecipient('');await Promise.all([onChanged(),load()])}setBusy(false)}
  return <section className="eventCollaboration">
  {assigned&&!closed&&!votingStarted&&<p className="eventInviteExplanation">Кнопка «Пригласить» позволяет привлечь участника с необходимыми полномочиями — например, руководителя профильного ведомства. Приглашённый должен принять приглашение; только после этого он участвует в совместном решении. Это особенно важно, если ваша должность не даёт права самостоятельно принять решение.</p>}
