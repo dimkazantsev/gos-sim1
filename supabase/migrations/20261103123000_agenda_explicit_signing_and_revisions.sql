@@ -3,15 +3,15 @@
 
 CREATE OR REPLACE FUNCTION private.agenda_normalized_body(p_body text)
 RETURNS text LANGUAGE sql IMMUTABLE SET search_path='' AS $fn$
- SELECT replace(
-  replace(
-   replace(
-    replace(
-     replace(coalesce(p_body,''),'Статус заседания: Подготовка','Статус заседания: [состояние]'),
-     'Статус заседания: Открыто','Статус заседания: [состояние]'),
+ SELECT regexp_replace(
+   replace(replace(replace(replace(replace(replace(coalesce(p_body,''),
+    'Статус заседания: Подготовка','Статус заседания: [состояние]'),
+    'Статус заседания: Открыто','Статус заседания: [состояние]'),
     'Статус заседания: Завершено','Статус заседания: [состояние]'),
-   'Статус: Проект','Статус: [состояние]'),
-  'Статус: Утверждена','Статус: [состояние]')
+    'Статус: Проект','Статус: [состояние]'),
+    'Статус: Утверждена','Статус: [состояние]'),
+    'Статус: Заседание завершено','Статус: [состояние]'),
+    'Текущая стадия НПА: [^[:cntrl:]]*','Текущая стадия НПА: [состояние]','g')
 $fn$;
 
 CREATE OR REPLACE FUNCTION private.agenda_required_signers(p_document uuid)
@@ -106,6 +106,7 @@ BEGIN
  IF TG_OP='UPDATE' THEN
   v_changed:=private.agenda_normalized_body(NEW.body_text)
                IS DISTINCT FROM private.agenda_normalized_body(OLD.body_text)
+   OR NEW.title IS DISTINCT FROM OLD.title
    OR nullif(NEW.metadata->>'revision_changed_at','') IS DISTINCT FROM nullif(OLD.metadata->>'revision_changed_at','');
   IF v_changed AND nullif(NEW.metadata->>'revision_changed_at','')
                         IS NOT DISTINCT FROM nullif(OLD.metadata->>'revision_changed_at','') THEN
@@ -124,13 +125,14 @@ END $fn$;
 REVOKE ALL ON FUNCTION private.agenda_document_revision_guard() FROM PUBLIC,anon,authenticated;
 DROP TRIGGER IF EXISTS trg_agenda_document_revision_guard ON public.formal_documents;
 CREATE TRIGGER trg_agenda_document_revision_guard BEFORE INSERT OR UPDATE
-ON public.formal_documents FOR EACH ROW EXECUTE FUNCTION private.agenda_document_revision_guard();
+ON public.formal_documents FOR EACH ROW WHEN (NEW.doc_type='meeting_agenda') EXECUTE FUNCTION private.agenda_document_revision_guard();
 
 CREATE OR REPLACE FUNCTION private.agenda_revision_unapprove() RETURNS trigger
 LANGUAGE plpgsql SECURITY DEFINER SET search_path='' AS $fn$
 BEGIN
  IF NEW.doc_type='meeting_agenda'
   AND (private.agenda_normalized_body(NEW.body_text) IS DISTINCT FROM private.agenda_normalized_body(OLD.body_text)
+  OR NEW.title IS DISTINCT FROM OLD.title
   OR NEW.metadata->>'revision_changed_at' IS DISTINCT FROM OLD.metadata->>'revision_changed_at') THEN
   UPDATE public.institution_meeting_records
     SET agenda_approved_at=NULL,agenda_approved_by=NULL,updated_at=now()
@@ -142,8 +144,8 @@ BEGIN
 END $fn$;
 REVOKE ALL ON FUNCTION private.agenda_revision_unapprove() FROM PUBLIC,anon,authenticated;
 DROP TRIGGER IF EXISTS trg_agenda_revision_unapprove ON public.formal_documents;
-CREATE TRIGGER trg_agenda_revision_unapprove AFTER UPDATE OF body_text,metadata
-ON public.formal_documents FOR EACH ROW EXECUTE FUNCTION private.agenda_revision_unapprove();
+CREATE TRIGGER trg_agenda_revision_unapprove AFTER UPDATE OF body_text,metadata,title
+ON public.formal_documents FOR EACH ROW WHEN (NEW.doc_type='meeting_agenda') EXECUTE FUNCTION private.agenda_revision_unapprove();
 
 CREATE OR REPLACE FUNCTION private.meeting_record_approval_guard() RETURNS trigger
 LANGUAGE plpgsql SECURITY DEFINER SET search_path='' AS $fn$
