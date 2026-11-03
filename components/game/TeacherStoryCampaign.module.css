@@ -1,26 +1,63 @@
-/* Isolated layout for the teacher's editorial campaign.
-   Matches existing ГОС.ID button colours without inheriting toolbar nowrap rules. */
-.actions{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin:12px 0}
-.actionButton{display:inline-flex;align-items:center;justify-content:center;min-height:44px;max-width:100%;min-width:180px;padding:10px 16px;border:1px solid #dce5f0;border-radius:10px;background:#fff;color:#476180;font:inherit;font-size:13px;font-weight:700;white-space:normal;text-align:center;cursor:pointer}
+/* ГОС.ID — teacher story editor. All selectors scoped to this component. */
+.root{container-type:inline-size;min-width:0}
+.toolbar{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px}
+.actions{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.actionButton{display:inline-flex;align-items:center;justify-content:center;min-width:0;min-height:44px;padding:10px 14px;border:1px solid #dce5f0;border-radius:10px;background:#fff;color:#476180;font:inherit;font-size:13px;font-weight:700;line-height:1.4;white-space:normal;text-align:center;cursor:pointer}
 .actionButton:hover:not(:disabled){background:#f3f7fe;border-color:#bbceed}
-.actionButton:focus-visible,.episodeButton:focus-visible{outline:3px solid #7196e8;outline-offset:2px}
-.actionButton:disabled,.episodeButton:disabled{opacity:.6;cursor:not-allowed}
-.summary{display:flex;flex-wrap:wrap;gap:7px 18px;margin:16px 0;color:#476180;font-size:14px;line-height:1.45}
-.summary span{min-width:0;overflow-wrap:anywhere}
+.actionButton:disabled,.episodeButton:disabled{opacity:.55;cursor:not-allowed}
+.actionButton:focus-visible,.episodeButton:focus-visible,.mobilePicker select:focus-visible{outline:3px solid #7196e8;outline-offset:2px}
+.summary{display:flex;flex-wrap:wrap;align-items:center;gap:8px 16px;color:#476180;font-size:13px;line-height:1.5}
+.summary span{min-width:0;white-space:normal}
 .summary b{color:#1c3352}
-.episodeList{margin-top:18px;min-width:0}
-.episodeHeading{margin:0 0 12px;color:#1c3352;font-size:16px;font-weight:750}
-.episodeGrid,.variantGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,360px),1fr));gap:10px;min-width:0}
-.variantGrid{grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr));padding:10px}
-.episodeButton{display:flex;flex-direction:column;align-items:stretch;justify-content:center;gap:8px;box-sizing:border-box;width:100%;min-width:0;min-height:84px;padding:14px 16px;border:1px solid #dce5f0;border-radius:12px;background:#fff;color:#1c3352;font:inherit;text-align:left;white-space:normal;cursor:pointer}
+.workspace{display:grid;grid-template-columns:minmax(235px,295px) minmax(0,1fr);align-items:start;gap:16px;min-width:0}
+.sidebar{position:sticky;top:12px;min-width:0;max-height:min(80dvh,860px);overflow-y:auto;overscroll-behavior:contain;border:1px solid #dce5f0;border-radius:13px;background:#fff;padding:12px}
+.sidebarHead{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:5px 10px;margin:0 0 10px}
+.sidebarHead h3{margin:0;color:#1c3352;font-size:16px}
+.sidebarHead small{color:#607995;font-size:12px}
+.mobilePicker{display:none}
+.episodeGrid{display:grid;grid-template-columns:minmax(0,1fr);gap:7px;min-width:0}
+.episodeButton{display:flex;flex-direction:column;align-items:stretch;justify-content:center;gap:4px;box-sizing:border-box;width:100%;min-width:0;min-height:62px;padding:11px 12px;border:1px solid #dce5f0;border-radius:10px;background:#fff;color:#1c3352;font:inherit;text-align:left;white-space:normal;cursor:pointer}
 .episodeButton:hover:not(:disabled){background:#f3f7fe;border-color:#bbceed}
 .episodeButton[aria-pressed="true"]{background:#edf3ff;border-color:#b8cdf7;box-shadow:inset 0 0 0 1px #b8cdf7}
-.episodeTitle{display:block;min-width:0;max-width:100%;font-size:14px;font-weight:750;line-height:1.4;white-space:normal;overflow-wrap:anywhere}
-.episodeMeta{display:block;min-width:0;max-width:100%;color:#607995;font-size:12px;font-weight:650;line-height:1.4;white-space:normal;overflow-wrap:anywhere}
-@media(max-width:640px){
- .actions{display:grid;grid-template-columns:minmax(0,1fr);gap:8px}
- .actionButton{min-width:0;width:100%}
- .episodeGrid,.variantGrid{grid-template-columns:minmax(0,1fr)}
- .episodeButton{min-height:78px;padding:12px 14px}
- .variantGrid{padding:8px 0}
+.episodeTitle{display:block;min-width:0;max-width:100%;font-size:13px;font-weight:750;line-height:1.4;white-space:normal;overflow-wrap:anywhere}
+.episodeMeta{display:block;min-width:0;max-width:100%;color:#607995;font-size:12px;line-height:1.4;white-space:normal;overflow-wrap:anywhere}
+.editorPanel{min-width:0;box-sizing:border-box;border:1px solid #dce5f0;border-radius:13px;background:#fff;padding:20px}
+.editorHead{display:grid;justify-items:start;gap:7px;margin:0 0 18px}
+.editorHead small{color:#607995;font-size:12px;font-weight:700}
+.editorHead h3{margin:0;max-width:100%;font-size:20px;line-height:1.35;color:#1c3352;overflow-wrap:anywhere}
+.editorStatus{display:inline-block;padding:4px 9px;border-radius:8px;background:#edf3ff;color:#476180;font-size:12px;font-weight:700}
+.storySection,.contextSection{min-width:0;margin:0 0 20px}
+.storySection h4,.contextSection h4,.editorFooter h4{margin:0 0 10px;color:#1c3352;font-size:15px;font-weight:750}
+.storyText{font-size:14px;line-height:1.7;color:#253b59;white-space:pre-wrap;overflow-wrap:anywhere}
+.contextSection{border-top:1px solid #e7edf5;padding-top:17px}
+.contextSection p{margin:0 0 10px;color:#476180;line-height:1.55;white-space:pre-wrap;overflow-wrap:anywhere}
+.helperText{color:#607995!important;font-size:13px;line-height:1.55;white-space:normal!important}
+.evidenceRecords{display:grid;gap:6px}
+.evidenceRecords p{margin:0;padding:9px 11px;background:#f3f7fe;border-radius:8px;font-size:13px}
+.variantGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,250px),1fr));gap:8px;min-width:0}
+.variantGrid .episodeButton{min-height:88px}
+.editFields{display:grid;gap:12px}
+.editFields label{display:grid;gap:7px;min-width:0;color:#1c3352;font-size:13px;font-weight:700}
+.editorInput,.editorTextarea{box-sizing:border-box;display:block;width:100%;min-width:0;max-width:100%;border:1px solid #dce5f0;border-radius:10px;padding:12px;color:#1c3352;background:#fff;font:inherit;font-size:14px;font-weight:400}
+.editorTextarea{resize:vertical;line-height:1.6}
+.notes{margin:0 0 16px;padding:10px 0;border-top:1px solid #e7edf5;color:#476180}
+.notes summary{cursor:pointer;font-weight:700;font-size:13px}
+.notes p{font-size:13px;line-height:1.5;white-space:pre-wrap;overflow-wrap:anywhere}
+.editorFooter{margin-top:16px;border-top:1px solid #dce5f0;padding-top:17px}
+.editorFooter .actions{margin:12px 0}
+@container (max-width:780px){
+ .workspace{grid-template-columns:minmax(0,1fr);gap:10px}
+ .sidebar{position:static;max-height:none;overflow:visible;padding:12px}
+ .episodeGrid{display:none}
+ .mobilePicker{display:grid;gap:7px;color:#476180;font-size:13px;font-weight:700}
+ .mobilePicker select{box-sizing:border-box;display:block;width:100%;min-height:44px;min-width:0;padding:8px 10px;border:1px solid #dce5f0;border-radius:10px;background:#fff;color:#1c3352;font:inherit;font-weight:500}
+ .editorPanel{padding:16px}
+ .editorHead h3{font-size:18px}
+}
+@container (max-width:470px){
+ .toolbar{align-items:stretch}
+ .toolbar .actions{width:100%}
+ .toolbar .actionButton{flex:1 1 100%}
+ .editorFooter .actions{display:grid;grid-template-columns:minmax(0,1fr)}
+ .editorFooter .actionButton{width:100%}
 }
