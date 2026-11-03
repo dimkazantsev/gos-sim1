@@ -14,7 +14,8 @@ type Entry={user_id:string;institution_key:string;stage_no:number;present_mandat
 type GdPresence={user_id:string;capacity:number;declared:number|null;present:number};
 type Assignment={unit_id:string;user_id:string};
 type Office={user_id:string;role_title:string};
-type MeetingRecord={game_id:string;stage_no:number;institution_key:string;agenda_document_id:string|null;agenda_body:string|null;agenda_approved_at:string|null;minutes_document_id:string|null;minutes_body:string|null;minutes_approved_at:string|null;delegate_user_id:string|null};
+type MeetingRecord={game_id:string;stage_no:number;institution_key:string;agenda_document_id:string|null;agenda_body:string|null;agenda_prepared_by:string|null;agenda_approved_at:string|null;minutes_document_id:string|null;minutes_body:string|null;minutes_approved_at:string|null;delegate_user_id:string|null;updated_at:string};
+type AgendaSigning={required:{user_id:string;office:string;signed:boolean}[];can_sign:boolean;approved?:boolean};
 type MeetingPermissions={can_coordinate:boolean;can_prepare:boolean;can_attend:boolean};
 function meetingErrorMessage(message:string):string{
  if(/Этап завершён|ещё не открыт|stage.*closed/i.test(message))return 'Этап завершён или ещё не открыт. Изменение документов разрешено только во время открытого этапа.';
@@ -35,7 +36,9 @@ export default function InstitutionRegistrationPanel({g,readOnly=false,freshAtte
  const [gdPresence,setGdPresence]=useState<{my_capacity:number;registered:GdPresence[]}|null>(null);
  const [presenceDraft,setPresenceDraft]=useState('');
  const [agendaEditorOpen,setAgendaEditorOpen]=useState(false);
- const [stage12Session,setStage12Session]=useState<{id:string;status:string}|null>(null);
+ const [agendaProposalOpen,setAgendaProposalOpen]=useState(false);
+ const [agendaSigning,setAgendaSigning]=useState<AgendaSigning|null>(null);
+ const [stage12Session,setStage12Session]=useState<{id:string;status:string;document_id:string}|null>(null);
  const [stage12Text,setStage12Text]=useState('');
  const [stage12InitialText,setStage12InitialText]=useState('');
  const [stage12Reason,setStage12Reason]=useState('');
@@ -62,12 +65,12 @@ export default function InstitutionRegistrationPanel({g,readOnly=false,freshAtte
   if(!currentScope())return;
   if(doc.error){setMeetingError(meetingErrorMessage(userError(doc.error)));return;}
   if(!doc.data)return;
-  setStage12Session({id:s.data.id,status:s.data.status});
+  setStage12Session({id:s.data.id,status:s.data.status,document_id:s.data.agenda_document_id});
   // Keep keystrokes when the read began before the user started typing.
   if(!dirtyMeetingDraftRef.current.stage12){setStage12InitialText(doc.data.body_text||'');setStage12Text(doc.data.body_text||'');}
   }catch(error){if(currentScope())setMeetingError(meetingErrorMessage(userError(error)))}
  }
- async function saveStage12Editor(){
+ async function saveStage12Editor(signAfterSave=false){
   if(!g.game||!currentScope()||!stage12Session||!verifiedRights?.can_coordinate||readOnly||stage12Saving
    ||stage12Text.trim().length<80||stage12Text.length>20000
    ||stage12Text.trim()===stage12InitialText.trim())return;
@@ -83,9 +86,10 @@ export default function InstitutionRegistrationPanel({g,readOnly=false,freshAtte
   if(!currentScope()){if(!result.error)reconcileStaleWrite('formal_documents');return}
   if(result.error){setMeetingError(meetingErrorMessage(userError(result.error)));}
   else{
+   if(signAfterSave){const signed=await supabase.rpc('sign_institution_meeting_agenda',{p_document_id:stage12Session.document_id});if(signed.error){setMeetingError(meetingErrorMessage(userError(signed.error)));await load();return;}}
    if(meetingDraftVersion.current.stage12===submittedVersion){dirtyMeetingDraftRef.current.stage12=false;setAgendaEditorOpen(false);setStage12Reason('')}
    else setStage12InitialText(stage12Text);
-   setNotice('Текст повестки обновлён в едином документе НПА.');
+   setNotice(signAfterSave?'Редакция сохранена. Ваша личная подпись зафиксирована.':'Текст повестки обновлён. Прежние подписи требуют повторного подтверждения.');
    await load();
   }
   }catch(error){if(currentScope())setMeetingError(meetingErrorMessage(userError(error)))}
@@ -114,13 +118,13 @@ export default function InstitutionRegistrationPanel({g,readOnly=false,freshAtte
  const initialSnapshotReady=readyScope===scope;
  useEffect(()=>{mounted.current=true;return()=>{mounted.current=false;readVersion.current++}},[]);
  useEffect(()=>{const sync=()=>setPanelVisible(document.visibilityState==='visible');document.addEventListener('visibilitychange',sync);sync();return()=>document.removeEventListener('visibilitychange',sync)},[]);
- useEffect(()=>{setPresenceDraft('');setStage12Session(null);setAgendaEditorOpen(false);setStage12Text('');setStage12InitialText('');setStage12Reason('')},[presenceKey]);
+ useEffect(()=>{setPresenceDraft('');setStage12Session(null);setAgendaEditorOpen(false);setAgendaProposalOpen(false);setAgendaSigning(null);setStage12Text('');setStage12InitialText('');setStage12Reason('')},[presenceKey]);
  useEffect(()=>{
   setRows([]);setUnits([]);onUnitsChange?.([]);setAssignments([]);setOffices([]);setMeetingRows([]);setGdPresence(null);setPermission(null);setMeetingError('');setNotice('');
  },[scope]);
  useEffect(()=>{if(!panelVisible)return;const timer=setTimeout(()=>setReadyScope(scope),1500);return()=>clearTimeout(timer)},[scope,panelVisible]);
  async function load(){if(!g.game||!mounted.current||scopeRef.current!==scope)return;const requestedScope=scope,version=++readVersion.current;const [r,u,a,b,o,meeting]=await Promise.all([supabase.from('institution_session_registrations').select('user_id,institution_key,stage_no,present_mandates,presence_updated_at').eq('game_id',g.game.id).eq('stage_no',stage),supabase.from('institution_units').select('id,title,unit_kind,head_user_id,unit_key,mandate_capacity').eq('game_id',g.game.id),supabase.from('institution_assignments').select('unit_id,user_id').eq('game_id',g.game.id),supabase.from('game_voting_body_members').select('unit_id,user_id').eq('game_id',g.game.id),supabase.from('game_office_assignments').select('user_id,role_title').eq('game_id',g.game.id).eq('status','active'),
-  supabase.from('institution_meeting_records').select('game_id,stage_no,institution_key,agenda_document_id,agenda_body,agenda_approved_at,minutes_document_id,minutes_body,minutes_approved_at,delegate_user_id').eq('game_id',g.game.id).eq('stage_no',stage)]);
+  supabase.from('institution_meeting_records').select('game_id,stage_no,institution_key,agenda_document_id,agenda_body,agenda_prepared_by,agenda_approved_at,minutes_document_id,minutes_body,minutes_approved_at,delegate_user_id,updated_at').eq('game_id',g.game.id).eq('stage_no',stage)]);
   if(!mounted.current||scopeRef.current!==requestedScope||version!==readVersion.current)return;
   const failure=[r,u,a,b,o,meeting].find(x=>x.error);if(failure?.error){setMeetingError('Не удалось загрузить сведения о заседании. '+meetingErrorMessage(userError(failure.error)));setReadyScope(requestedScope);return;}
   setMeetingError(value=>value.startsWith('Не удалось загрузить сведения о заседании.')?'':value);
@@ -158,6 +162,20 @@ export default function InstitutionRegistrationPanel({g,readOnly=false,freshAtte
   lastMeetingDraftRef.current=snapshot;
  },[meetingRows,body,g.game?.id,g.me?.user_id,stage]);
  const permissionKey=JSON.stringify([panelScope,body]);
+ const agendaSigningRow=meetingRows.find(m=>m.institution_key===body);
+ const agendaSigningDocumentId=agendaSigningRow?.agenda_document_id||'';
+ const agendaSigningUpdatedAt=agendaSigningRow?.updated_at||'';
+ useEffect(()=>{
+  if(!g.game||!g.me||!panelVisible||!agendaSigningDocumentId){setAgendaSigning(null);return}
+  let active=true;setAgendaSigning(null);
+  void supabase.rpc('get_institution_document_signers',{p_document_id:agendaSigningDocumentId})
+   .then(({data,error})=>{
+    if(!active)return;
+    if(error||!data||!Array.isArray(data.required)){setAgendaSigning(null);return}
+    setAgendaSigning({required:data.required,can_sign:data.can_sign===true,approved:data.approved===true});
+   }).catch(()=>{if(active)setAgendaSigning(null)});
+  return()=>{active=false};
+ },[g.game?.id,g.me?.user_id,agendaSigningDocumentId,agendaSigningUpdatedAt,panelVisible]);
  const currentDelegate=meetingRows.find(m=>m.institution_key===body)?.delegate_user_id;
  useEffect(()=>{
   if(!initialSnapshotReady||!panelVisible||!g.game||!g.me)return;
@@ -217,15 +235,19 @@ export default function InstitutionRegistrationPanel({g,readOnly=false,freshAtte
  // Never offer a second edit once anyone has registered.
  const hasSessionRegistrations=rows.some(r=>r.institution_key===body);
  const canWriteAgenda=!gdStage12CanonicalAgenda&&(!agendaHasDocument||!hasSessionRegistrations);
- const canApproveAgenda=meetingCoordinator&&agendaDraft&&(meetingRecord?.agenda_body?.trim().length||0)>=30;
- async function saveMeetingDocument(kind:'agenda'|'minutes'){
+ const canApproveAgenda=!!agendaSigning?.can_sign&&agendaDraft&&(meetingRecord?.agenda_body?.trim().length||0)>=30&&!meetingActionsLocked;
+ const signedAgendaCount=agendaSigning?.required.filter(s=>s.signed).length||0;
+ const requiredAgendaCount=agendaSigning?.required.length||0;
+ async function saveMeetingDocument(kind:'agenda'|'minutes',signAfterSave=false){
   if(!g.game||!currentScope()||busy||!canPrepare||readOnly||meetingActionsLocked||(kind==='agenda'&&!canWriteAgenda))return;
   const submittedVersion=meetingDraftVersion.current[kind];
   setMeetingError('');setNotice('');setBusy(true);
   try{
-  const r=await supabase.rpc('save_institution_meeting_document',{p_game_id:g.game.id,p_stage_no:stage,p_institution:body,p_kind:kind,p_body:kind==='agenda'?agendaText:minutesText});
+  const r=kind==='agenda'
+   ?await supabase.rpc('save_and_optionally_sign_agenda',{p_game_id:g.game.id,p_stage_no:stage,p_institution:body,p_body:agendaText,p_sign:signAfterSave,p_expected_updated_at:meetingRecord?.updated_at||null})
+   :await supabase.rpc('save_institution_meeting_document',{p_game_id:g.game.id,p_stage_no:stage,p_institution:body,p_kind:kind,p_body:minutesText});
   if(!currentScope()){if(!r.error)reconcileStaleWrite('institution_meeting_records');return}
-  if(r.error)setMeetingError(meetingErrorMessage(userError(r.error)));else{if(meetingDraftVersion.current[kind]===submittedVersion)dirtyMeetingDraftRef.current[kind]=false;await load();if(currentScope())setNotice(kind==='agenda'?(meetingCoordinator?'Повестка сохранена в реестре НПА и утверждена.':'Проект повестки сохранён. Ожидается утверждение председателем.'):'Протокол сохранён в реестре НПА.')}
+  if(r.error)setMeetingError(meetingErrorMessage(userError(r.error)));else{if(meetingDraftVersion.current[kind]===submittedVersion){dirtyMeetingDraftRef.current[kind]=false;if(kind==='agenda')setAgendaProposalOpen(false)}await load();if(currentScope())setNotice(kind==='agenda'?(signAfterSave?'Повестка сохранена. Ваша личная подпись зафиксирована.':'Проект повестки сохранён. Ожидаются личные подписи уполномоченных лиц.'):'Протокол сохранён в реестре НПА.')}
   }catch(error){if(currentScope())setMeetingError(meetingErrorMessage(userError(error)))}
   finally{setBusy(false)}
  }
@@ -234,7 +256,7 @@ export default function InstitutionRegistrationPanel({g,readOnly=false,freshAtte
   try{
   const r=await supabase.rpc(kind==='agenda'?'approve_institution_meeting_agenda':'approve_institution_meeting_minutes',{p_game_id:g.game.id,p_stage_no:stage,p_institution:body});
   if(!currentScope()){if(!r.error)reconcileStaleWrite('institution_meeting_records');return}
-  if(r.error)setMeetingError(meetingErrorMessage(userError(r.error)));else{await load();if(currentScope())setNotice(kind==='agenda'?'Повестка утверждена. Регистрация доступна.':'Протокол утверждён.')}
+  if(r.error)setMeetingError(meetingErrorMessage(userError(r.error)));else{await load();if(currentScope())setNotice(kind==='agenda'?'Ваша личная подпись зарегистрирована. Повестка утверждается после всех обязательных подписей.':'Протокол утверждён.')}
   }catch(error){if(currentScope())setMeetingError(meetingErrorMessage(userError(error)))}
   finally{setBusy(false)}
  }
