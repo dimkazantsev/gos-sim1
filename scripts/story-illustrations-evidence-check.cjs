@@ -5,6 +5,7 @@ const read=file=>fs.readFileSync(file,'utf8');
 const artwork=read('components/game/StoryNewsIllustration.tsx');
 const wall=read('components/game/PoliticalWallView.tsx');
 const teacher=read('components/game/TeacherStoryCampaign.tsx');
+const storyLayout=read('components/game/TeacherStoryCampaign.module.css');
 const view=read('components/game/TeacherView.tsx');
 const migration=read('supabase/migrations/20261103161012_story_teacher_evidence_preview.sql');
 assert(artwork.includes('<svg')&&[0,1,2,3,4,5].every(i=>artwork.includes('variant==='+i))&&artwork.includes('Math.abs(Math.trunc(episodeNo))%6'),'Six generic inline SVG compositions');
@@ -15,6 +16,10 @@ assert(wall.includes('!storyPost&&<CivicDiscussion'),'No unnecessary per-story d
 assert(view.includes('<TeacherStoryCampaign key={game.id}'),'Teacher draft cache must reset when switching games');
 assert(!teacher.includes('useEffect')&&!teacher.includes('setInterval(')&&!teacher.includes('.channel('),'Teacher editor must not add polling, timers or subscriptions');
 assert(teacher.includes('preview.variants.map(')&&teacher.includes('preview.evidence.records'),'Endings and evidence must be loaded only on explicit teacher preview');
+assert(teacher.includes('styles.episodeGrid')&&teacher.includes('styles.episodeButton')&&teacher.includes('styles.episodeMeta'),'Episode cards must use isolated layout with separate title and meta');
+assert(storyLayout.includes('flex-direction:column')&&storyLayout.includes('white-space:normal')&&storyLayout.includes('overflow-wrap:anywhere'),'Cards must wrap content and keep statuses within their bounds');
+assert(storyLayout.includes('minmax(min(100%,360px),1fr)')&&storyLayout.includes('@media(max-width:640px)'),'Grid must be responsive on phones, tablets and desktop');
+assert(!teacher.includes('repeat(auto-fit,minmax(235px,1fr))')&&!teacher.includes('className="teacherQuick"'),'Do not reintroduce nowrap toolbar buttons into story cards');
 assert(teacher.includes('evidenceText(record)')&&teacher.includes("closed:'Завершено'")&&teacher.includes("vote_status:'Голосование'"),'Teacher must show Russian labels instead of raw evidence status codes');
 assert(migration.includes('private.is_game_teacher(p_game_id)'),'Only the teacher can read future endings/evidence');
 assert(migration.includes("coalesce(e.draft->'variants','[]'::jsonb)"),'Future ending content is always obtained from private tables');

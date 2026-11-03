@@ -2,6 +2,7 @@
 import {useRef,useState} from 'react';
 import {supabase} from '@/lib/supabase';
 import {userError} from '@/lib/userError';
+import styles from './TeacherStoryCampaign.module.css';
 
 type Episode={episode_no:number;stage_no:number;title:string;loaded:boolean;approved:boolean;published:boolean};
 type Campaign={prepared:boolean;enabled:boolean;current_episode:number;approved_episodes:number;
@@ -98,30 +99,33 @@ export default function TeacherStoryCampaign({gameId}:{gameId:string}){
    <p>Генеральная линия · 24 эпизода · этапы 4–14. Участники видят только опубликованные выпуски.</p>
   </div><span>{campaign?.enabled?'Публикации разрешены':'Выключена'}</span></div>
   <div className="teacherDetailsBody">
-   <p><b>Публикация только вручную.</b> Без новых фоновых запросов, подписок, дополнительных голосований и изменений показателей.</p>
-   <div className="directorButtons compact">
-    <button type="button" disabled={working} onClick={()=>void doCall<Campaign>('get_story_campaign_teacher',{p_game_id:gameId},useStatus)}>
+   <p>Выпуски появляются в хронике только после вашего утверждения и публикации.</p>
+   <div className={styles.actions}>
+    <button className={styles.actionButton} type="button" disabled={working} onClick={()=>void doCall<Campaign>('get_story_campaign_teacher',{p_game_id:gameId},useStatus)}>
      <b>{working?'Выполняется…':'Проверить состояние'}</b>
     </button>
-    {campaign&&!campaign.prepared&&<button type="button" disabled={working}
+    {campaign&&!campaign.prepared&&<button className={styles.actionButton} type="button" disabled={working}
      onClick={()=>void doCall<Campaign>('prepare_story_campaign_teacher',{p_game_id:gameId},useStatus)}>
      <b>Подготовить кампанию</b></button>}
     {campaign?.prepared&&(campaign.enabled
-     ?<button type="button" disabled={working} onClick={()=>void setActive(false)}><b>Пауза</b></button>
-     :<button type="button" disabled={working||campaign.current_episode>=24} onClick={()=>void setActive(true)}><b>Разрешить публикации</b></button>)}
+     ?<button className={styles.actionButton} type="button" disabled={working} onClick={()=>void setActive(false)}><b>Пауза</b></button>
+     :<button className={styles.actionButton} type="button" disabled={working||campaign.current_episode>=24} onClick={()=>void setActive(true)}><b>Разрешить публикации</b></button>)}
    </div>
-   {campaign&&<p role="status">Текущий выпуск: {campaign.current_episode} из 24 ·
-     Загружено: {campaign.loaded_episodes} · Утверждено: {campaign.approved_episodes} ·
-     Опубликовано: {campaign.published_episodes}.
-    </p>}
+   {campaign&&<div className={styles.summary} role="status">
+     <span>Текущий выпуск: <b>{campaign.current_episode} из 24</b></span>
+     <span>Загружено: <b>{campaign.loaded_episodes}</b></span>
+     <span>Утверждено: <b>{campaign.approved_episodes}</b></span>
+     <span>Опубликовано: <b>{campaign.published_episodes}</b></span>
+    </div>}
    {campaign?.prepared&&<>
-    <div className="teacherDetails" style={{marginTop:12}}>
-     <div className="teacherDetailsBody" style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(235px,1fr))',gap:8}}>
+    <div className={styles.episodeList}>
+     <h3 className={styles.episodeHeading}>Эпизоды</h3>
+     <div className={styles.episodeGrid}>
       {campaign.episodes.map(item=><button key={item.episode_no} type="button"
        disabled={working||!item.loaded} aria-pressed={preview?.episode_no===item.episode_no}
-       onClick={()=>void openEpisode(item)} className="teacherQuick" style={{textAlign:'left'}}>
-       <b>{String(item.episode_no).padStart(2,'0')}. {item.title}</b>
-       <small>Этап {item.stage_no} · {item.published?'Опубликовано':item.approved?'Утверждено':item.loaded?'Черновик':'Не загружено'}</small>
+       onClick={()=>void openEpisode(item)} className={styles.episodeButton}>
+       <span className={styles.episodeTitle}>{String(item.episode_no).padStart(2,'0')}. {item.title}</span>
+       <span className={styles.episodeMeta}>Этап {item.stage_no} · {item.published?'Опубликовано':item.approved?'Утверждено':item.loaded?'Черновик':'Не загружено'}</span>
       </button>)}
      </div>
     </div>
@@ -141,23 +145,23 @@ export default function TeacherStoryCampaign({gameId}:{gameId:string}){
      {!!preview.variants?.length&&!preview.published&&<div className="teacherDetails" style={{margin:'12px 0'}}>
       <p><b>Редакционные варианты финала</b></p>
       <p><small>Выбор только по документально подтверждённым решениям. Сначала сохранить редакцию, затем утвердить её и опубликовать. Никаких отдельных голосований.</small></p>
-      <div className="teacherDetailsBody" style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(220px,1fr))',gap:8}}>
-       {preview.variants.map(option=><button type="button" className="teacherQuick" key={option.id}
-        style={{textAlign:'left'}} disabled={working}
-        onClick={()=>{setTitle(option.title);setBody(option.body);}}>
-        <b>{option.id} · {option.title}</b><small style={{display:'block'}}>{option.condition}</small></button>)}
+      <div className={styles.variantGrid}>
+       {preview.variants.map(option=><button type="button" className={styles.episodeButton} key={option.id}
+        disabled={working} onClick={()=>{setTitle(option.title);setBody(option.body);}}>
+        <span className={styles.episodeTitle}>{option.id} · {option.title}</span>
+        <span className={styles.episodeMeta}>{option.condition}</span></button>)}
       </div>
      </div>}
      <label>Заголовок<input value={title} disabled={working||preview.published}
       onChange={e=>setTitle(e.target.value)} maxLength={220}/></label>
      <label>Текст выпуска<textarea value={body} disabled={working||preview.published}
       onChange={e=>setBody(e.target.value)} rows={9} maxLength={9000}/></label>
-     <div className="directorButtons compact">
-      <button type="button" disabled={working||!change||preview.published}
+     <div className={styles.actions}>
+      <button className={styles.actionButton} type="button" disabled={working||!change||preview.published}
        onClick={()=>void save()}><b>Сохранить редакцию</b></button>
-      <button type="button" disabled={working||!!change||preview.published}
+      <button className={styles.actionButton} type="button" disabled={working||!!change||preview.published}
        onClick={()=>void approve(!selected?.approved)}><b>{selected?.approved?'Отозвать утверждение':'Утвердить редакцию'}</b></button>
-      <button type="button" disabled={working||!!change||!selected?.approved||!campaign.enabled
+      <button className={styles.actionButton} type="button" disabled={working||!!change||!selected?.approved||!campaign.enabled
        ||preview.published||preview.episode_no!==next}
        onClick={()=>void publish()}><b>Опубликовать</b></button>
      </div>
