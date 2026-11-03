@@ -29,6 +29,23 @@ function visit(node){
 }
 visit(ast);
 assert(!source.includes("supabase.channel('event-count:")&&!source.includes("supabase.channel('blitz-count:"),'Counters share the game socket instead of two additional channels per participant');
+
+const eventSQL=fs.readFileSync('supabase/migrations/20261103165000_event_push_shared_game_channel.sql','utf8');
+const eventHook=fs.readFileSync('components/game/useGameTableSync.ts','utf8');
+const eventShell=fs.readFileSync('components/game/useRepublicGame.ts','utf8');
+const eventWorkspace=fs.readFileSync('components/game/EventWorkspace.tsx','utf8');
+const eventDiscussion=fs.readFileSync('components/game/EventCollaboration.tsx','utf8');
+assert(eventSQL.includes('FOR EACH STATEMENT'),'Bulk assignments must be coalesced into one broadcast per statement');
+assert(eventSQL.includes('GET DIAGNOSTICS n=ROW_COUNT'),'Audience assignment must use one set-based INSERT and preserve the actual inserted count');
+assert(!eventSQL.includes("WHEN 'event_decisions' THEN ARRAY"),'Individual votes must not be broadcast to every classroom client');
+assert(eventSQL.includes("'gos-id-live:'||v_item.game_id::text"),'Only the existing private game topic carries notifications');
+assert(eventSQL.includes('v_cases')&&eventSQL.includes('case_id=ANY(v_cases)'),'Student feed must load only relevant cases');
+assert(eventHook.includes('connectedReconcileMs=connectedFallbackMs??(eventOnly?900000:180000)'),'Idle events are reconciled sparsely over healthy realtime');
+assert(eventShell.includes("event:'event_feed_changed'")&&eventShell.includes('targets.includes(me.user_id)'),'Only a targeted student should re-read assigned situations');
+assert(eventShell.includes('const restored=everSubscribed&&!wasConnected'),'Reconnect causes one reconciliation but a cold join retains initial jitter');
+assert(eventWorkspace.includes('notifyEventPendingCount(game.id,me.user_id,pending.size)'),'Visible event feed must supply the header counter without a second REST read');
+assert(eventDiscussion.includes('60000,0,caseId'),'Only the expanded discussion case should refetch after its notice');
+
 assert(source.includes("window.addEventListener('blitz:updated',changed)"),'A local blitz answer still invalidates the shared badge immediately');
 assert(source.includes("g.me?.kind+':'+!!viewAs"),'Role changes invalidate the previous counter scope');
 function compile(node,env){
