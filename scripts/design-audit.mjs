@@ -254,12 +254,15 @@ const stageActions=read('components/game/stageActions.ts');
 check('Every one of the 16 stages has a next action',Array.from({length:16},(_,i)=>i+1).every(n=>new RegExp(`\\b${n}:\\{title:`).test(stageActions)));
 const chat=read('components/game/ChatPanel.tsx');
 const chatCss=read('app/design-readability.css');
-check('Chat uses one accessible styled channel switcher in the header',
+check('Chat expands from its message icon without hijacking channel selection',
  chat.includes('<ChatChannelDropdown')&&
- chat.includes('onExpand={()=>setExpanded(true)}')&&
+ chat.includes('className="chatHeadIcon chatExpandTrigger"')&&
+ chat.includes('onClick={()=>setExpanded(value=>!value)}')&&
+ chat.includes('createPortal(chatView,document.body)')&&
+ !chat.includes('onExpand={()=>setExpanded(true)}')&&
  read('components/game/ChatChannelDropdown.tsx').includes('role="menuitemradio"')&&
  read('components/game/ChatChannelDropdown.tsx').includes('aria-expanded={expanded?open:false}')&&
- read('components/game/ChatChannelDropdown.tsx').includes('if(!expanded&&onExpand){setOpen(false);onExpand();return}')&&
+ !read('components/game/ChatChannelDropdown.tsx').includes('onExpand')&&
  !chat.includes('<select aria-label="Канал общения"'));
 check('Chat supports real backend pinning and icon-only send',
  chat.includes('chatPinnedWrap')&&chat.includes('setChatPin(m.id,!pinned)')&&

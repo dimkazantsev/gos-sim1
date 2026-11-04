@@ -1,6 +1,7 @@
 'use client';
 import {useEffect,useLayoutEffect,useMemo,useRef,useState} from 'react';
 import type {ReactNode} from 'react';
+import {createPortal} from 'react-dom';
 import {ArrowDown,AtSign,Download,FileText,Mic,Minimize2,Paperclip,Pin,PinOff,Search,Send,Square,Trash2,UserRound,Video,X} from 'lucide-react';
 import {CHAT_MAX_FILE_BYTES,formatRecordingDuration} from './recordingMedia';
 import {IconAction} from '../ui/IconAction';
@@ -264,7 +265,7 @@ export default function ChatPanel({g,draft:text,onDraftChange:setText,previewCha
    mobile.removeEventListener('change',align);tablet.removeEventListener('change',align);
    node.style.removeProperty('height');node.style.removeProperty('top');node.style.removeProperty('bottom');
   };
- },[]);
+ },[expanded]);
  const scrollToLatest=()=>{if(list.current){list.current.scrollTop=list.current.scrollHeight;follow.current=true;setJumpVisible(false)}};
  async function send(){
   if(pendingSend.current||sending||uploading||chatLoading||!text.trim()||!channelId)return;
@@ -334,14 +335,14 @@ export default function ChatPanel({g,draft:text,onDraftChange:setText,previewCha
   });
  }
  function resetSearch(){setSearch('');setOnlyFiles(false);setSearchOpen(false);follow.current=true;requestAnimationFrame(scrollToLatest)}
- return <aside id="game-chat" ref={panel} tabIndex={-1} className={'simChat gsChatV2'+(expanded?' chatExpanded':'')} role={overlay||expanded?'dialog':'region'} aria-modal={overlay||expanded?true:undefined} aria-label="Командный чат" onKeyDown={e=>{if(e.key==='Escape'){
+ const chatView=<aside id="game-chat" ref={panel} tabIndex={-1} className={'simChat gsChatV2'+(expanded?' chatExpanded':'')} role={overlay||expanded?'dialog':'region'} aria-modal={overlay||expanded?true:undefined} aria-label="Командный чат" onKeyDown={e=>{if(e.key==='Escape'){
   if(attachOpen){e.stopPropagation();setAttachOpen(false);attachmentButton.current?.focus()}
   else if(searchOpen){e.stopPropagation();resetSearch()}
   else{e.stopPropagation();if(expanded)setExpanded(false);else setChatOpen(false)}
  }}}>
   <header className="chatTop">
-   <div className="chatHeadIcon" aria-hidden="true"><MessageIcon/></div>
-   <ChatChannelDropdown channels={channels} value={channelId} onChange={setChannelId} overview={chatOverview} onPin={setChatChannelPinned} initialOpen={previewChannelOpen} expanded={expanded} onExpand={()=>setExpanded(true)}/>
+   <button type="button" className="chatHeadIcon chatExpandTrigger" onClick={()=>setExpanded(value=>!value)} aria-label={expanded?'Свернуть чат':'Развернуть чат'} title={expanded?'Свернуть чат':'Развернуть чат'} aria-pressed={expanded}><MessageIcon/></button>
+   <ChatChannelDropdown channels={channels} value={channelId} onChange={setChannelId} overview={chatOverview} onPin={setChatChannelPinned} initialOpen={previewChannelOpen} expanded={expanded}/>
    {expanded&&<div className="chatExpandedTitle"><b>{channel?.name||'Общение'}</b><small>Общение</small></div>}
    <button type="button" className={'chatIconButton chatSearchToggle '+(searchOpen?'active':'')} onClick={()=>searchOpen?resetSearch():setSearchOpen(true)} aria-label={searchOpen?'Закрыть поиск':'Поиск в чате'} aria-pressed={searchOpen} title="Поиск"><Search aria-hidden="true"/></button>
    {expanded&&<button type="button" className="chatIconButton" onClick={()=>setExpanded(false)} aria-label="Свернуть чат" title="Свернуть чат"><Minimize2 aria-hidden="true"/></button>}
@@ -492,5 +493,6 @@ export default function ChatPanel({g,draft:text,onDraftChange:setText,previewCha
    </div>
   </div>:<div className="chatGuestNote">Гостевой режим: просмотр переписки без отправки сообщений.</div>}
  </aside>;
+ return expanded?createPortal(chatView,document.body):chatView;
 }
 function MessageIcon(){return <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M20 11.5a8 8 0 0 1-8 8 8.2 8.2 0 0 1-3.5-.8L4 20l1.3-4.4A8 8 0 1 1 20 11.5Z"/></svg>}
