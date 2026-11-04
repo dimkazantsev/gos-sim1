@@ -214,11 +214,17 @@
  width:calc(100% - var(--chat-expanded-sidebar-w));
  min-width:0;
 }
-.simChat.gsChatV2.chatExpanded .chatMsg.theirs .chatMessageColumn {
- max-width:min(calc(100% - 70px),790px);
-}
-.simChat.gsChatV2.chatExpanded .chatMsg.mine .chatMessageColumn {
- max-width:min(calc(85% - 24px),790px);
+/* Long messages may use more of the right pane; short bubbles stay content-sized.
+   Do not change compact chat or mobile widths. */
+@media (min-width:761px) {
+ .simChat.gsChatV2.chatExpanded .chatMsg.theirs .chatMessageColumn {
+  width:min(calc(100% - 70px),1060px);
+  max-width:min(calc(100% - 70px),1060px);
+ }
+ .simChat.gsChatV2.chatExpanded .chatMsg.mine .chatMessageColumn {
+  width:min(calc(100% - 70px),1060px);
+  max-width:min(calc(100% - 70px),1060px);
+ }
 }
 /* The composer shares the message column, not the sidebar.
    Subtract its left offset from its width so the send button remains visible. */
