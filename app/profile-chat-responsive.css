@@ -220,12 +220,22 @@
 .simChat.gsChatV2.chatExpanded .chatMsg.mine .chatMessageColumn {
  max-width:min(calc(85% - 24px),790px);
 }
-.simChat.gsChatV2.chatExpanded .chatCompose :is(
- .chatInputRow,.chatComposeActions,.chatProcessTags
-) {
- max-width:940px;
- margin-right:auto;
- margin-left:auto;
+/* The composer shares the message column, not the sidebar.
+   Subtract its left offset from its width so the send button remains visible. */
+@media (min-width:761px) {
+ .simChat.gsChatV2.chatExpanded .chatCompose {
+  box-sizing:border-box;
+  width:calc(100% - var(--chat-expanded-sidebar-w));
+ }
+ .simChat.gsChatV2.chatExpanded .chatCompose :is(
+  .chatInputRow,.chatComposeActions,.chatProcessTags
+ ) {
+  box-sizing:border-box;
+  width:100%;
+  max-width:none;
+  min-width:0;
+  margin:0;
+ }
 }
 @media (max-width:760px) {
  .simChat.gsChatV2.chatExpanded {
