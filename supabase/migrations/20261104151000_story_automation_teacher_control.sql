@@ -9,6 +9,9 @@ ALTER TABLE private.story_branch_reviews
  ADD COLUMN IF NOT EXISTS automatic_review boolean NOT NULL DEFAULT false,
  ADD COLUMN IF NOT EXISTS edited_title text,
  ADD COLUMN IF NOT EXISTS edited_body text;
+ALTER TABLE private.story_branch_rules
+ ADD COLUMN IF NOT EXISTS recorded_title text,
+ ADD COLUMN IF NOT EXISTS neutral_title text;
 
 CREATE OR REPLACE FUNCTION public.get_story_campaign_teacher(p_game_id uuid)
 RETURNS jsonb LANGUAGE plpgsql STABLE SECURITY DEFINER SET search_path=''
@@ -58,7 +61,7 @@ BEGIN
   'automatic_review',coalesce(r.automatic_review,false),
   'evidence_kind',r.evidence_kind,'evidence_id',r.evidence_id,
   'teacher_note',r.teacher_note,'published',r.published_at IS NOT NULL,
-  'response_title',coalesce(r.edited_title,'Горизонты: '||b.title),
+  'response_title',coalesce(r.edited_title,CASE WHEN r.outcome='recorded' THEN coalesce(b.recorded_title,'Горизонты: '||b.title) ELSE coalesce(b.neutral_title,'Горизонты: '||b.title) END),
   'response_body',coalesce(r.edited_body,CASE WHEN r.outcome='recorded' THEN b.recorded_body ELSE b.neutral_body END),
   'ready',coalesce(s.status='completed',false)
  ) ORDER BY b.branch_no),'[]'::jsonb) INTO v_result
