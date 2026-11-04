@@ -12,19 +12,10 @@ type Branch={
  teacher_note:string|null;published:boolean;ready:boolean;
  response_title:string;response_body:string;
 };
-const TYPES=[
- {value:'',name:'Выберите вид подтверждения'},
- {value:'political_post',name:'Публикация в политической хронике'},
- {value:'formal_document',name:'Официальный документ'},
- {value:'game_vote',name:'Завершённое голосование'},
- {value:'government_program',name:'Государственная программа'},
- {value:'municipal_project',name:'Муниципальный проект'},
-];
 export default function TeacherStoryBranchesPanel({gameId}:{gameId:string}){
  const [open,setOpen]=useState(false),[loaded,setLoaded]=useState(false);
  const [items,setItems]=useState<Branch[]>([]),[number,setNumber]=useState(1);
  const [title,setTitle]=useState(''),[body,setBody]=useState(''),[editing,setEditing]=useState(false);
- const [outcome,setOutcome]=useState('undetermined'),[kind,setKind]=useState(''),[sourceId,setSourceId]=useState(''),[note,setNote]=useState('');
  const [pending,setPending]=useState(false),[error,setError]=useState(''),[message,setMessage]=useState('');
  const selected=items.find(item=>item.branch_no===number);
  const dirty=!!selected&&(title!==selected.response_title||body!==selected.response_body);
@@ -32,8 +23,6 @@ export default function TeacherStoryBranchesPanel({gameId}:{gameId:string}){
   if(dirty&&!window.confirm('Несохранённый текст будет потерян. Перейти к другой реакции?'))return;
   const item=source.find(x=>x.branch_no===n);if(!item)return;
   setNumber(n);setTitle(item.response_title);setBody(item.response_body);
-  setOutcome(item.reviewed_outcome||'undetermined');setKind(item.evidence_kind||'');
-  setSourceId(item.evidence_id||'');setNote(item.teacher_note||'');
   setEditing(false);setError('');setMessage('');
  };
  const reload=async()=>{
@@ -68,24 +57,6 @@ export default function TeacherStoryBranchesPanel({gameId}:{gameId:string}){
   }catch(e){setError(userError(e)||'Не удалось сохранить исправление.');}
   finally{setPending(false);}
  };
- const saveEvidence=async()=>{
-  if(!selected||pending||selected.published)return;
-  setPending(true);setError('');setMessage('');
-  try{
-   const res=await supabase.rpc('save_story_branch_review_teacher',{
-    p_game_id:gameId,p_branch_no:number,p_outcome:outcome,
-    p_evidence_kind:kind||null,p_evidence_id:sourceId.trim()||null,p_teacher_note:note.trim()});
-   if(res.error)throw res.error;
-   setMessage('Ручная проверка сохранена. Автоматическая публикация учтёт выбранный результат.');
-   const next=await supabase.rpc('get_story_branches_teacher',{p_game_id:gameId});
-   if(!next.error&&Array.isArray(next.data)){
-    const updated=next.data as Branch[];setItems(updated);
-    const item=updated.find(x=>x.branch_no===number);
-    if(item&&!dirty){setTitle(item.response_title);setBody(item.response_body);}
-   }
-  }catch(e){setError(userError(e)||'Не удалось сохранить ручную проверку.');}
-  finally{setPending(false);}
- };
  const status=(item:Branch)=>item.published?'Опубликовано':item.reviewed_outcome==='recorded'?'Решение подтверждено':
   item.reviewed_outcome==='neutral'?'Подтверждения не найдено':item.ready?'Ожидает обработки':'Ожидает завершения этапа';
  return <section className={styles.root} aria-label="Автоматические сюжетные реакции">
@@ -94,9 +65,10 @@ export default function TeacherStoryBranchesPanel({gameId}:{gameId:string}){
   </button>
   {error&&<p role="alert" className={styles.error}>{error}</p>}
   {open&&<div>
-   <p className={styles.note}>ГОС.ID самостоятельно проверяет официальные результаты после завершения соответствующего этапа и публикует подтверждённую либо нейтральную реакцию. Здесь можно исправить текст; вводить номера документов обычно не нужно.</p>
+   <p className={styles.note}>ГОС.ID самостоятельно проверяет решения после завершения соответствующего этапа и публикует сюжетную реакцию. Вам достаточно просмотреть результат и при необходимости исправить текст. Документы и идентификаторы вводить не требуется.</p>
    <div className={styles.actions}><button type="button" disabled={pending||dirty} onClick={()=>void reload()}>
     {pending?'Проверка…':'Обновить сведения'}</button></div>
+   {!loaded&&<p className={styles.note} role="status">Загружаются результаты сюжетных реакций…</p>}
    <div className={styles.layout}>
     <aside className={styles.list}>
      <label className={styles.picker}>Сюжетная реакция<select value={number} disabled={pending}
@@ -132,23 +104,6 @@ export default function TeacherStoryBranchesPanel({gameId}:{gameId:string}){
        <button type="button" disabled={pending||!dirty} onClick={()=>void saveText()}>Сохранить изменения</button>
       </>}
      </div>
-     <details style={{marginTop:16}}>
-      <summary style={{cursor:'pointer',color:'#476180',fontWeight:700,fontSize:13}}>Исправить результат проверки вручную (необязательно)</summary>
-      <p className={styles.note}>Используйте только если автоматическая проверка не обнаружила существующее официальное решение. После публикации можно исправлять текст, но не подменять основание публикации.</p>
-      <div className={styles.fields}>
-       <label>Результат<select disabled={pending||selected.published} value={outcome} onChange={e=>setOutcome(e.target.value)}>
-        <option value="undetermined">Ещё не установлено</option>
-        <option value="recorded">Подтверждено официальным документом</option>
-        <option value="neutral">Подтверждённого решения нет</option>
-       </select></label>
-       <label>Вид документа<select disabled={pending||selected.published} value={kind} onChange={e=>setKind(e.target.value)}>
-        {TYPES.map(t=><option key={t.value} value={t.value}>{t.name}</option>)}</select></label>
-       <label>Идентификатор документа<input disabled={pending||selected.published} value={sourceId} onChange={e=>setSourceId(e.target.value)}/></label>
-       <label>Что документ подтверждает<textarea rows={3} maxLength={1500} disabled={pending||selected.published} value={note} onChange={e=>setNote(e.target.value)}/></label>
-      </div>
-      <div className={styles.actions}><button type="button" disabled={pending||selected.published}
-       onClick={()=>void saveEvidence()}>Сохранить уточнение</button></div>
-     </details>
      {message&&<p className={styles.success} role="status">{message}</p>}
     </div>}
    </div>
