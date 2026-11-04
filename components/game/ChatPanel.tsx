@@ -54,7 +54,7 @@ function ChatAttachment({message:m,onRefresh}:{message:Message;onRefresh?:(messa
 
 export default function ChatPanel({g,draft:text,onDraftChange:setText,previewChannelOpen=false,previewPinsOpen=false,onOpenMember,readOnly=false}:{g:ReturnTypeRepublic;draft:string;onDraftChange:(next:string)=>void;previewChannelOpen?:boolean;previewPinsOpen?:boolean;onOpenMember?:(userId:string)=>void;readOnly?:boolean}){
  const {channels,channelId,setChannelId,messages,chatPins:allPins,pinnedMessages:allPinnedMessages,setChatPin,refreshChatMediaUrl,chatLoading,hasOlderChatMessages,olderChatLoading,loadOlderChatMessages,names,recording,recordingPreview,recordingSaving,chatMediaError,chatMediaPhase,recordingStartedAt,recordingStream,discardRecording,sendRecordingPreview,setChatOpen,sendText,sendChatFile,toggleRecording,me,teacher,chatOverview,setChatChannelPinned}=g;
- useEffect(()=>{setSelectedMessages([])},[channelId]);
+ useEffect(()=>{setSelectedMessages([]);setProcessTagsOpen(false)},[channelId]);
  useEffect(()=>()=>{if(selectHoldTimer.current)clearTimeout(selectHoldTimer.current)},[]);
   const socialChannelsReady=g.channels.some(c=>c.kind==='public'&&c.name==='Публичная политика')&&g.channels.some(c=>c.kind==='public'&&c.name==='Вне игры');
  useEffect(()=>{
@@ -74,6 +74,7 @@ export default function ChatPanel({g,draft:text,onDraftChange:setText,previewCha
  const [recordElapsed,setRecordElapsed]=useState(0);
  const [overlay,setOverlay]=useState(false);
  const [expanded,setExpanded]=useState(false);
+ const [processTagsOpen,setProcessTagsOpen]=useState(false);
  const [searchOpen,setSearchOpen]=useState(false);
  const [pinsOpen,setPinsOpen]=useState(previewPinsOpen);
  const [pinBusy,setPinBusy]=useState<string|null>(null);
@@ -89,6 +90,7 @@ export default function ChatPanel({g,draft:text,onDraftChange:setText,previewCha
  const list=useRef<HTMLDivElement>(null);
  const restoreHistoryScroll=useRef<{channel:string;height:number;top:number;oldest:string;created:string}|null>(null);
  const composer=useRef<HTMLTextAreaElement>(null);
+ const processTagsRef=useRef<HTMLDetailsElement>(null);
  const liveCamera=useRef<HTMLVideoElement>(null);
  const mediaHoldTimer=useRef<ReturnType<typeof setTimeout>|null>(null);
  const mediaHold=useRef<{kind:'audio'|'video';started:boolean;released:boolean}|null>(null);
@@ -104,6 +106,7 @@ export default function ChatPanel({g,draft:text,onDraftChange:setText,previewCha
  const pendingSend=useRef(false);
  const panel=useDialog(overlay||expanded,()=>{if(expanded)setExpanded(false);else setChatOpen(false)});
  const channel=channels.find(c=>c.id===channelId);
+ const showProcessTags=channel?.kind==='public'&&channel.name!=='Вне игры';
  const chatPins=useMemo(()=>allPins.filter(p=>p.channel_id===channelId),[allPins,channelId]);
  const pinnedMessages=useMemo(()=>allPinnedMessages.filter(m=>m.channel_id===channelId&&visibleChatMedia(m,retentionClock)),[allPinnedMessages,channelId,retentionClock]);
  const channelMessages=useMemo(()=>messages.filter(m=>m.channel_id===channelId&&visibleChatMedia(m,retentionClock)),[messages,channelId,retentionClock]);
@@ -445,7 +448,7 @@ export default function ChatPanel({g,draft:text,onDraftChange:setText,previewCha
   {localError&&<div className="chatLocalError" role="alert"><span>{localError}</span><button type="button" aria-label="Скрыть ошибку" onClick={()=>setLocalError('')}><X size={16}/></button></div>}
   {!readOnly?<div className="chatCompose chatComposeCompact">
    {mentionMatch&&<div className="chatAddressList chatMentionList" aria-label="Упомянуть участника"><small><AtSign size={14} aria-hidden="true"/> Упомянуть в текущем чате</small>{mentionSuggestions.map(x=><button type="button" key={x.member.user_id} onClick={()=>insertMention(x.member.user_id)}><b>{x.member.full_name}</b><span>{x.member.role_title||x.member.team||'Участник'}</span></button>)}{!mentionSuggestions.length&&<span>Участник не найден.</span>}</div>}
-   {channels.find(c=>c.id===channelId)?.kind==='public'&&channels.find(c=>c.id===channelId)?.name!=='Вне игры'&&<details className="chatProcessTags"><summary>Сообщение для политического процесса</summary><small>Добавьте тег, чтобы направить сообщение в публичную ленту.</small><div aria-label="Теги сообщения">{PROCESS_TAGS.map(t=><button type="button" key={t.key} onClick={()=>{if(!text.includes('#'+t.key))setText(text+(text?' ':'')+'#'+t.key);composer.current?.focus()}}>{t.label}</button>)}</div></details>}
+   {showProcessTags&&<details id="chat-process-tags" ref={processTagsRef} className="chatProcessTags" open={processTagsOpen} onToggle={e=>setProcessTagsOpen(e.currentTarget.open)}><summary>Сообщение для политического процесса</summary><small>Добавьте тег, чтобы направить сообщение в публичную ленту.</small><div aria-label="Теги сообщения">{PROCESS_TAGS.map(t=><button type="button" key={t.key} onClick={()=>{if(!text.includes('#'+t.key))setText(text+(text?' ':'')+'#'+t.key);if(window.matchMedia('(max-width:760px)').matches)setProcessTagsOpen(false);composer.current?.focus()}}>{t.label}</button>)}</div></details>}
    <div className="chatInputRow">
     <textarea ref={composer} aria-label="Ваше сообщение" rows={1} value={text} onChange={e=>setText(e.target.value)}
      placeholder={channelId?'Сообщение · @фамилия для упоминания':'Выберите чат'}
@@ -484,6 +487,7 @@ export default function ChatPanel({g,draft:text,onDraftChange:setText,previewCha
      onClick={()=>{if(Date.now()<heldClickUntil.current)return;void toggleRecording('video')}}>
      <Video aria-hidden="true" size={19}/>
     </button>
+    {showProcessTags&&<button type="button" className="chatIconButton chatProcessTagMobileButton" aria-label="Теги политического процесса" title="Сообщение для политического процесса" aria-controls="chat-process-tags" aria-expanded={processTagsOpen} disabled={chatLoading||!channelId} onClick={()=>setProcessTagsOpen(v=>!v)}><span aria-hidden="true">#</span></button>}
     {(uploading||recordingSaving||recording)&&<span className="chatComposerHint" aria-live="polite">
      {uploading?'Загружается вложение…':recordingSaving?(chatMediaPhase==='analyzing'?'Анализируется запись…':chatMediaPhase==='uploading'?'Загружается запись…':'Публикуется сообщение…'):'Идёт запись…'}
     </span>}
