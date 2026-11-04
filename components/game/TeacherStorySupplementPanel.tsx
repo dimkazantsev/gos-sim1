@@ -125,7 +125,7 @@ export default function TeacherStorySupplementPanel({gameId,campaignEnabled}:{ga
       {item.evidence_required&&<div className={styles.proof}>
        <p>Эта новость сообщает о проверяемом действии. Укажите существующую запись данной игры, иначе утверждение будет отклонено.</p>
        <label>Вид записи<select disabled={pending||item.published} value={evidenceKind} onChange={e=>setEvidenceKind(e.target.value)}>{EVIDENCE_TYPES.map(x=><option key={x.value} value={x.value}>{x.label}</option>)}</select></label>
-       <label>Идентификатор записи<input type="text" disabled={pending||item.published} value={evidenceId} onChange={e=>setEvidenceId(e.target.value)} placeholder="UUID подтверждённого действия"/></label>
+       <label>Идентификатор записи<input type="text" disabled={pending||item.published} value={evidenceId} onChange={e=>setEvidenceId(e.target.value)} placeholder="Идентификатор подтверждённого действия"/></label>
       </div>}
      </div>
      <div className={styles.actions}>
