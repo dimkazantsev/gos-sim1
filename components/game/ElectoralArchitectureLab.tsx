@@ -49,6 +49,7 @@ export default function ElectoralArchitectureLab({g,stageNo,onOpenVotes}:{g:Retu
  const [queueNotice,setQueueNotice]=useState('');
  const proposalLoadVersion=useRef(0);
  const proposalSubmitLock=useRef(false);
+ const regionalApprovalInFlight=useRef(false);
  const [reopenReason,setReopenReason]=useState('');
  const ledParty=parties.find(p=>p.leader_user_id===me?.user_id);
  const canPropose=teacher||!!ledParty;
@@ -214,17 +215,26 @@ export default function ElectoralArchitectureLab({g,stageNo,onOpenVotes}:{g:Retu
   setBusy(false);
  }
  async function publishRegionalCalculatorResult(){
-  if(!teacher||!regionalCalculatorReady)return;
-  setBusy(true);
-  const inputs=regionalCalculatorMethod==='proportional'
-   ?{mandates:Object.fromEntries(parties.map((p,i)=>[p.id,regionalMandates[i]||0]))}
-   :regionalCalculatorMethod==='agreement'
-    ?{agreement:Object.fromEntries(parties.map((p,i)=>[p.id,agreementRegional[i]||0]))}
-    :{draw:'random'};
-  const result=Object.fromEntries(regionalPreview.map(x=>[x.party.id,x.regions]));
-  const r=await supabase.rpc('publish_regional_calculator_result',{p_game_id:activeGame.id,p_method:regionalCalculatorMethod,p_inputs:inputs,p_result:result});
-  if(r.error)setError(userError(r.error));else {notifyGameDataRefresh(activeGame.id,'game_parties');await load()}
-  setBusy(false);
+  if(!teacher||!regionalCalculatorReady||busy||regionalApprovalInFlight.current)return;
+  regionalApprovalInFlight.current=true;
+  setBusy(true);setError('');
+  try{
+   const inputs=regionalCalculatorMethod==='proportional'
+    ?{mandates:Object.fromEntries(parties.map((p,i)=>[p.id,regionalMandates[i]||0]))}
+    :regionalCalculatorMethod==='agreement'
+     ?{agreement:Object.fromEntries(parties.map((p,i)=>[p.id,agreementRegional[i]||0]))}
+     :{draw:'random'};
+   const result=Object.fromEntries(regionalPreview.map(x=>[x.party.id,x.regions]));
+   // One server transaction: finalize quotas, protocol and public stage news.
+   const r=await supabase.rpc('finalize_teacher_regional_stage_result',{
+    p_game_id:activeGame.id,p_method:regionalCalculatorMethod,p_inputs:inputs,p_result:result
+   });
+   if(r.error)throw r.error;
+   notifyGameDataRefresh(activeGame.id,'game_parties');
+   await load();
+   setQueueNotice('Итоги этапа 3 утверждены преподавателем. Протокол принят, результат записан, итоговая новость опубликована.');
+  }catch(error){setError(userError(error))}
+  finally{regionalApprovalInFlight.current=false;setBusy(false)}
  }
   async function proposeR(){
   if(busy||proposalSubmitLock.current||!me)return;
@@ -360,7 +370,7 @@ export default function ElectoralArchitectureLab({g,stageNo,onOpenVotes}:{g:Retu
 
   {teacher&&<section className="regionalCalculator">
    <div className="regionalCalculatorHead">
-    <div><small>КАЛЬКУЛЯТОР ПРЕПОДАВАТЕЛЯ</small><h3>Распределение 89 субъектов</h3><p>Расчёт скрыт от студентов до публикации результата.</p></div>
+    <div><small>КАЛЬКУЛЯТОР ПРЕПОДАВАТЕЛЯ</small><h3>Распределение 89 субъектов</h3><p>Расчёт скрыт от студентов до публикации. Утверждение преподавателя сразу закрепит итог, примет протокол и опубликует новость.</p></div>
     <StyledSelect wrap label="Метод распределения" value={regionalCalculatorMethod} onChange={value=>setRegionalCalculatorMethod(value as RRule['method'])} options={[{value:"random",label:"Жеребьёвка"},{value:"proportional",label:"Пропорционально мандатам Государственной Думы"},{value:"agreement",label:"Договорной"}]}/>
    </div>
    {regionalCalculatorMethod==='random'&&<div className="regionalCalculatorLottery"><button type="button" className="primary" onClick={drawRegionalLottery}>Провести жеребьёвку</button><span>Каждый из 89 субъектов случайно назначается одной из партий.</span></div>}
