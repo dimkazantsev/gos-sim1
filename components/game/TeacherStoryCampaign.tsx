@@ -3,6 +3,8 @@ import {useEffect,useRef,useState} from 'react';
 import {supabase} from '@/lib/supabase';
 import {userError} from '@/lib/userError';
 import styles from './TeacherStoryCampaign.module.css';
+import TeacherStorySupplementPanel from './TeacherStorySupplementPanel';
+import TeacherStoryBranchesPanel from './TeacherStoryBranchesPanel';
 
 type Episode={episode_no:number;stage_no:number;title:string;loaded:boolean;approved:boolean;published:boolean};
 type Campaign={prepared:boolean;enabled:boolean;current_episode:number;approved_episodes:number;
@@ -289,6 +291,8 @@ export default function TeacherStoryCampaign({gameId}:{gameId:string}){
       <p>Нажмите на выпуск слева или выберите его в списке сверху. Текст и управление откроются здесь.</p>
      </section>}
    </div>}
+   {campaign?.prepared&&<TeacherStorySupplementPanel key={gameId} gameId={gameId} campaignEnabled={campaign.enabled}/>}
+   {campaign?.prepared&&<TeacherStoryBranchesPanel key={'branches-'+gameId} gameId={gameId} campaignEnabled={campaign.enabled}/>}
   </div>
  </section>;
 }
