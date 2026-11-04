@@ -4,6 +4,9 @@
 const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path'),vm=require('node:vm'),ts=require('typescript'),{execFileSync}=require('node:child_process');
 const root=path.resolve(__dirname,'..'),baseline=process.env.PERFORMANCE_BASELINE_REF;
 const compile=s=>ts.transpileModule(s,{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022,jsx:ts.JsxEmit.ReactJSX}}).outputText;
+// Load the real lightweight grade-format helper into the isolated VM fixture.
+const gradeHelper={};
+new Function('exports',compile(fs.readFileSync(path.join(root,'lib/gradeScore.ts'),'utf8')))(gradeHelper);
 const compiled=new Map();function code(name,old=false){const file='components/game/'+name+'.'+(name==='useGameTableSync'||name==='assessmentPresentation'?'ts':'tsx'),key=old+file;if(!compiled.has(key))compiled.set(key,compile(old?execFileSync('git',['show',baseline+':'+file],{cwd:root,encoding:'utf8'}):fs.readFileSync(path.join(root,file),'utf8')));return compiled.get(key);}
 const tick=async()=>{for(let i=0;i<36;i++)await Promise.resolve()};
 const players=Array.from({length:40},(_,i)=>({game_id:'game-A',user_id:'student-'+i,full_name:'Участник '+String(i).padStart(2,'0'),kind:'student',team:'Партия',role_title:'Депутат'}));
@@ -47,7 +50,7 @@ function realm(kind='profile',{old=false,hidden=false,user='student-0',teacher=f
  const context={console,Date:ClockDate,Math:math,AbortController,AbortSignal:VirtualAbortSignal,window,document,URL,URLSearchParams,...clock,requestAnimationFrame:fn=>schedule(fn,16),cancelAnimationFrame:clock.clearTimeout,CustomEvent:class{constructor(type,opts){this.type=type;this.detail=opts?.detail;}},fetch(){throw Error('Network forbidden');}};
  const modules={};function load(name,sourceCode){const out={};vm.runInContext('(function(exports,require){'+sourceCode+'})(fixtureExports,fixtureRequire)',Object.assign(context,{fixtureExports:out,fixtureRequire:requireFor}));return out;}
  function requireFor(name){
-  if(name==='react')return react;if(name==='react/jsx-runtime')return{jsx,jsxs:jsx,Fragment:'fragment'};if(name==='@/lib/supabase')return{supabase};if(name==='./useGameTableSync')return modules.sync;if(name==='./GradesView')return modules.grades;
+  if(name==='react')return react;if(name==='react/jsx-runtime')return{jsx,jsxs:jsx,Fragment:'fragment'};if(name==='@/lib/gradeScore')return gradeHelper;if(name==='@/lib/supabase')return{supabase};if(name==='./useGameTableSync')return modules.sync;if(name==='./GradesView')return modules.grades;
   if(name==='lucide-react')return new Proxy({},{get:(_,key)=>String(key)});if(name==='@/lib/userError')return{userError:e=>e?.message||String(e)};
   if(name==='./gameRoster')return{currentGameMembers:(members,id)=>members.filter(m=>m.game_id===id),currentGameProfiles:p=>p};
   if(name==='./avatarCrop')return{preparePortraitDetector:async()=>{},decodePortrait:async()=>{}};if(name==='./useGameOfficeCatalog')return{useGameOfficeCatalog:()=>({groups:[],ready:true,error:''})};if(name==='./gameOfficeCatalog')return{gameOfficeRoleList:()=>[]};

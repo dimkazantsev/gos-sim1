@@ -5,6 +5,7 @@ import {supabase} from '@/lib/supabase';
 import type {ReturnTypeRepublic} from './viewTypes';
 import {AwardShelf} from './Achievements';
 import GradesView,{type PublicGradeScore} from './GradesView';
+import {formatGradeScore} from '@/lib/gradeScore';
 import {useGameTableSync} from './useGameTableSync';
 import ClassroomJournal from './ClassroomJournal';
 import SignatureUpload from './SignatureUpload';
@@ -219,7 +220,7 @@ export default function ProfileView({g,targetUserId,onOpenProfile,onOwnProfile,o
    </section>
    <section className="profilePublicBiography surface"><h2>Игровая визитка</h2><p>{targetProfile?.bio||'Игрок пока не добавил описание.'}</p></section>
    {target.kind==='student'&&<section className="surface profilePublicScores"><header><h2>Публичные баллы по этапам</h2><strong aria-label={'Сумма баллов: '+scoreTotalLabel}>{scoreTotalLabel}</strong></header>
-    <div className="profileScoreCells">{Array.from({length:16},(_,i)=>{const row=publicScores.find(s=>s.stage_no===i+1);return <div key={i} className={row?.status||'empty'}><small>{i+1}</small><b>{row?(row.status==='final'?row.final_score??row.auto_score:row.auto_score):'—'}</b></div>})}</div>
+    <div className="profileScoreCells">{Array.from({length:16},(_,i)=>{const row=publicScores.find(s=>s.stage_no===i+1);return <div key={i} className={row?.status||'empty'}><small>{i+1}</small><b>{row?formatGradeScore(row.status==='final'?row.final_score??row.auto_score:row.auto_score):'—'}</b></div>})}</div>
     <p>Показаны только публичные результаты. Тексты, личные обоснования и внутренние материалы оценки не раскрываются.</p>
    </section>}
   </>}

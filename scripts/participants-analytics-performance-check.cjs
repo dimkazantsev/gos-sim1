@@ -35,6 +35,6 @@ function tracked(items,stats,key){
  const stage=nodes(tree,node=>node.props?.label==='Этап')[0];stage.props.onChange('2');
  const second=nodes(r.render(p),node=>node.type==='tr').find(row=>text(row).includes('Участник 000'));
  const stageCells=nodes(second,node=>node.type==='td');
- assert.equal(text(stageCells[0]),'1.5','Selected stage keeps its original score');assert.equal(text(stageCells[2]).replaceAll(' ',''),'1/16');assert.equal(text(stageCells[3]),'0');
+ assert.equal(text(stageCells[0]),'1,5','Selected stage shows at most two decimals, in Russian notation');assert.equal(text(stageCells[2]).replaceAll(' ',''),'1/16');assert.equal(text(stageCells[3]),'0');
  r.close();console.log(JSON.stringify({result:'PASS',students:n,recordsPerCategory:count,firstRenderVisits,environment:'Synthetic component render, no HTTP or DB'}));
 })().catch(error=>{console.error(error);process.exitCode=1});

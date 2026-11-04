@@ -33,6 +33,7 @@ jobs:
           cache: npm
       - run: npm ci --no-audit --no-fund
       - run: node scripts/profile-total-stage-scores-check.cjs
+      - run: node scripts/grade-fractional-score-check.cjs
       - run: node scripts/game-office-catalog-check.cjs
       - run: node scripts/profile-grades-layout-check.cjs
       - run: node scripts/party-grades-stage-consistency-check.cjs
