@@ -12,6 +12,13 @@ presentationModule._compile(ts.transpileModule(fs.readFileSync(presentationPath,
  compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}
 }).outputText,presentationPath);
 const presentation=presentationModule.exports;
+const scorePath=path.join(root,'lib/gradeScore.ts');
+const scoreModule=new Module(scorePath,module);
+scoreModule.filename=scorePath;scoreModule.paths=module.paths;
+scoreModule._compile(ts.transpileModule(fs.readFileSync(scorePath,'utf8'),{
+ compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}
+}).outputText,scorePath);
+const gradeScore=scoreModule.exports;
 function harness(score){
  const slots=[],effects=[],channels=[],calls=[],errors=[];let cursor=0,tree,nextScore=score;
  const teacher={user_id:'qa-teacher',kind:'teacher',full_name:'QA teacher'},student={user_id:'qa-student',kind:'student',full_name:'QA student'};
@@ -21,7 +28,7 @@ function harness(score){
  const supabase={auth:{getUser:async()=>({data:{user:{id:teacher.user_id}}})},from(table){return{filters:[],select(){return this;},eq(key,value){this.filters.push([key,value]);return this;},order(){return this;},limit(){return this;},range(){return this;},abortSignal(){return this;},single(){this.one=true;return this;},then(resolve){let data=table==='stage_assessments'?[{...row}]:table==='stage_assessment_runs'?[{id:1,assessment_id:row.id,auto_score:row.auto_score,run_type:'automatic',criterion_law:true,criterion_strategy:true,criterion_debrief:false,created_at:'2026-10-08T00:00:00Z'}]:[];data=data.filter(value=>this.filters.every(([key,v])=>value[key]===v));return Promise.resolve({data:this.one?data[0]??null:data,error:null}).then(resolve);}};},rpc:async(name,args)=>{calls.push({name,args});if(name==='get_stage_assessment_evidence')return{data:{},error:null};if(name==='recalculate_stage_assessment'||name==='recalculate_student_stage'){row.auto_score=nextScore;row.revision_count++;return{data:row.id,error:null};}if(name==='finalize_stage_assessment'){row.final_score=args.p_score;row.status='final';return{data:row.id,error:null};}return{data:null,error:null};},channel(){const ch={handlers:[],on(event,filter,callback){this.handlers.push(callback);return this;},subscribe(){return this;}};channels.push(ch);return ch;},removeChannel:async()=>{}};
  function StyledSelect({label,value,onChange,options}){return React.createElement('select',{'aria-label':label,value,onChange:e=>onChange(e.target.value)},options.map(option=>React.createElement('option',{key:option.value,value:option.value},option.label)));}
  function requireFor(request){
-  if(request==='react')return react;if(request==='react/jsx-runtime')return require(request);if(request==='@/lib/supabase')return{supabase};
+  if(request==='react')return react;if(request==='react/jsx-runtime')return require(request);if(request==='@/lib/supabase')return{supabase};if(request==='@/lib/gradeScore')return gradeScore;
   if(request==='../ui/StyledSelect')return{__esModule:true,default:StyledSelect};
   if(request==='../ui/useDialog')return{useDialog:()=>({current:null})};
   if(request==='../ui/IconAction')return{IconAction:({label,onClick})=>React.createElement('button',{'aria-label':label,onClick})};
@@ -41,28 +48,73 @@ function harness(score){
  async function flush(){for(let i=0;i<24;i++){render();await Promise.resolve();await Promise.resolve();await Promise.resolve();}return tree;}
  function nodes(type,node=tree,out=[]){if(!node||typeof node!=='object')return out;if(node.type===type)out.push(node);const children=typeof node.type==='function'?node.type(node.props):node.props?.children;for(const child of [children].flat(Infinity))if(child!==undefined)nodes(type,child,out);return out;}
  function modal(){return nodes(module.exports.fixtureModal)[0];}
- return{g,row,calls,errors,flush,nodes,modal,nextScore:value=>{nextScore=value;},html:()=>renderToStaticMarkup(tree),async open(){await flush();nodes('button').find(x=>x.props['aria-label']?.startsWith('QA student, этап 2,')).props.onClick();await flush();},selector:()=>nodes('select').find(x=>x.props['aria-label']==='Итоговый балл'),approval:()=>nodes('button').find(x=>x.props.children==='Утвердить как итоговую'),refresh(){channels.forEach(ch=>ch.handlers[0]?.());},dispose(){slots.forEach(x=>x?.cleanup?.());}};
+ return{g,row,calls,errors,flush,nodes,modal,nextScore:value=>{nextScore=value;},html:()=>renderToStaticMarkup(tree),async open(){await flush();nodes('button').find(x=>x.props['aria-label']?.startsWith('QA student, этап 2,')).props.onClick();await flush();},scoreInput:()=>nodes('input').find(x=>x.props.inputMode==='decimal'),approval:()=>nodes('button').find(x=>x.props.children==='Утвердить как итоговую'),refresh(){channels.forEach(ch=>ch.handlers[0]?.());},dispose(){slots.forEach(x=>x?.cleanup?.());}};
 }
 async function main(){
  const failures=[];async function check(name,fn){try{await fn();console.log('PASS '+name);}catch(error){failures.push(name);console.error('FAIL '+name+': '+error.stack);}}
- await check('Half-point drafts preserve score and require an explicit integer final choice',async()=>{
+ await check('Fractional drafts are shown to two decimals and can be approved directly',async()=>{
   for(const score of [.5,1.5,2.5]){
-   const h=harness(score);await h.open();assert.equal(h.modal().props.editScore,null);assert.equal(h.selector().props.value,'');assert.match(renderToStaticMarkup(h.selector()),/Выберите итоговый балл/);assert.equal(h.approval().props.disabled,true);
-   const hero=h.nodes('div').find(x=>x.props.className?.startsWith('gradeScoreHero'));assert.match(renderToStaticMarkup(hero),/С учётом штрафа/);assert.doesNotMatch(renderToStaticMarkup(hero),/Нет участия/);
-   const history=h.nodes('details').find(x=>x.props.className==='gradeRunHistory');assert.match(renderToStaticMarkup(history),/С учётом штрафа/);
-   await h.modal().props.finalize();assert.equal(h.calls.filter(x=>x.name==='finalize_stage_assessment').length,0);assert.match(h.errors.at(-1),/итоговый целый балл/);
-   h.selector().props.onChange({target:{value:''}});await h.flush();assert.equal(h.modal().props.editScore,null);
-   h.selector().props.onChange({target:{value:'2'}});await h.flush();assert.equal(h.approval().props.disabled,false);await h.modal().props.finalize();await h.flush();assert.equal(h.calls.find(x=>x.name==='finalize_stage_assessment').args.p_score,2);assert.equal(h.row.auto_score,score);h.dispose();
+   const h=harness(score);await h.open();
+   const expected=gradeScore.formatGradeScore(score);
+   assert.equal(h.modal().props.editScore,expected);
+   assert.equal(h.scoreInput().props.value,expected);
+   assert.equal(h.approval().props.disabled,false);
+   assert.equal(h.scoreInput().props['aria-describedby'],'grade-score-hint');
+   const hero=h.nodes('div').find(x=>x.props.className?.startsWith('gradeScoreHero'));
+   assert.match(renderToStaticMarkup(hero),new RegExp(expected.replace(',','[,]')));
+   assert.doesNotMatch(renderToStaticMarkup(hero),/С учётом штрафа/);
+   await h.modal().props.finalize();await h.flush();
+   assert.equal(h.calls.find(x=>x.name==='finalize_stage_assessment').args.p_score,score);
+   assert.equal(h.row.auto_score,score);
+   h.dispose();
   }
  });
- await check('Existing integer scores remain selected including zero',async()=>{
-  for(const score of [0,1,2,3]){const h=harness(score);await h.open();assert.equal(h.modal().props.editScore,score);assert.equal(h.selector().props.value,String(score));assert.equal(h.approval().props.disabled,false);h.dispose();}
+ await check('Integer scores including zero remain valid inputs',async()=>{
+  for(const score of [0,1,2,3]){
+   const h=harness(score);await h.open();
+   assert.equal(h.modal().props.editScore,String(score));
+   assert.equal(h.scoreInput().props.value,String(score));
+   assert.equal(h.approval().props.disabled,false);
+   h.dispose();
+  }
  });
- await check('Explicit recalculation from integer to fraction resets final choice',async()=>{
-  const h=harness(2);await h.open();h.nextScore(2.5);await h.modal().props.recalc();await h.flush();assert.equal(h.modal().props.editScore,null);assert.equal(h.selector().props.value,'');assert.equal(h.approval().props.disabled,true);assert.equal(h.row.auto_score,2.5);h.dispose();
+ await check('Manual comma and dot scores are accepted with exact hundredths',async()=>{
+  for(const [raw,expected] of [['0,5',0.5],['1,4',1.4],['2.75',2.75],['3,00',3]]){
+   const h=harness(0);await h.open();
+   h.scoreInput().props.onChange({target:{value:raw}});await h.flush();
+   assert.equal(h.scoreInput().props.value,raw);
+   assert.equal(h.approval().props.disabled,false);
+   await h.modal().props.finalize();await h.flush();
+   assert.equal(h.calls.find(x=>x.name==='finalize_stage_assessment').args.p_score,expected,raw);
+   h.dispose();
+  }
  });
- await check('Shared refresh fractional draft changes clear stale choices and allow a new integer choice',async()=>{
-  const h=harness(2);await h.open();h.row.auto_score=2.5;h.refresh();await h.flush();assert.equal(h.modal().props.editScore,null);h.selector().props.onChange({target:{value:'2'}});await h.flush();assert.equal(h.modal().props.editScore,2);h.row.auto_score=1.5;h.refresh();await h.flush();assert.equal(h.modal().props.editScore,null);h.dispose();
+ await check('Out of range or overly precise scores cannot be approved',async()=>{
+  for(const raw of ['-0,1','1,234','3,01','4','NaN']){
+   const h=harness(1);await h.open();
+   h.scoreInput().props.onChange({target:{value:raw}});await h.flush();
+   assert.equal(h.approval().props.disabled,true,raw);
+   await h.modal().props.finalize();
+   assert.equal(h.calls.filter(x=>x.name==='finalize_stage_assessment').length,0,raw);
+   assert.match(h.errors.at(-1),/не более двух знаков после запятой/,raw);
+   h.dispose();
+  }
+ });
+ await check('Explicit recalculation refreshes the suggested fractional grade',async()=>{
+  const h=harness(2);await h.open();h.nextScore(2.5);
+  await h.modal().props.recalc();await h.flush();
+  assert.equal(h.modal().props.editScore,'2,5');
+  assert.equal(h.scoreInput().props.value,'2,5');
+  assert.equal(h.approval().props.disabled,false);
+  h.dispose();
+ });
+ await check('Passive shared refresh does not erase the teacher manual entry',async()=>{
+  const h=harness(2);await h.open();
+  h.scoreInput().props.onChange({target:{value:'1,4'}});await h.flush();
+  h.row.auto_score=2.5;h.refresh();await h.flush();
+  assert.equal(h.modal().props.editScore,'1,4');
+  assert.equal(h.approval().props.disabled,false);
+  h.dispose();
  });
  if(failures.length)process.exitCode=1;
 }
