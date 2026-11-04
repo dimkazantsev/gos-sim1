@@ -69,3 +69,20 @@
 .guideHead small{color:#607995;font-size:12px}
 .guideBody{color:#253b59;font-size:14px;line-height:1.7;white-space:pre-wrap;overflow-wrap:anywhere}
 @container (max-width:470px){.guideSection{padding:13px}.guideHead h4{font-size:15px}}
+
+/* Teacher-only illustration preview; identical inlined SVG to the student feed. */
+.visualPreview{min-width:0;margin:0 0 20px;border:1px solid #dce5f0;border-radius:12px;background:#fff;overflow:hidden}
+.visualPreview summary{cursor:pointer;padding:14px 16px;color:#1c3352;font-size:14px;font-weight:750}
+.visualPreview summary:focus-visible{outline:3px solid #7196e8;outline-offset:-3px}
+.visualPreview[open] summary{border-bottom:1px solid #e7edf5;background:#f7f9fe}
+.visualPreviewContent{padding:14px 16px;min-width:0}
+.visualPreviewContent>p{margin:0 0 12px}
+.visualPreviewContent>p:last-child{margin:12px 0 0}
+.visualPreviewArticle{min-width:0;padding:14px;border:1px solid #dce5f0;border-radius:12px;background:#fff}
+.visualPreviewArticle>small{color:#607995;font-size:12px;font-weight:700}
+.visualPreviewArticle h4{margin:0 0 12px;color:#1c3352;font-size:17px;line-height:1.45;overflow-wrap:anywhere}
+@container (max-width:470px){
+ .visualPreview summary{padding:12px}
+ .visualPreviewContent{padding:11px}
+ .visualPreviewArticle{padding:10px}
+}
