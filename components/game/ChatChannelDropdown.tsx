@@ -8,17 +8,18 @@ import {visibleChatChannels} from './chatChannelSelection';
 /** Mirrors the game's "Режим просмотра" dropdown: a styled list rather
  * than browser-native options, including predictable focus on mobile. */
 export default function ChatChannelDropdown({
- channels,value,onChange,overview=[],onPin=async()=>false,initialOpen=false
-}:{channels:Channel[];value:string;onChange:(id:string)=>void;overview?:ChatOverview[];onPin?:(id:string,pin:boolean)=>Promise<boolean>;initialOpen?:boolean}){
+ channels,value,onChange,overview=[],onPin=async()=>false,initialOpen=false,expanded=false
+}:{channels:Channel[];value:string;onChange:(id:string)=>void;overview?:ChatOverview[];onPin?:(id:string,pin:boolean)=>Promise<boolean>;initialOpen?:boolean;expanded?:boolean}){
  const [open,setOpen]=useState(initialOpen);
  const root=useRef<HTMLDivElement>(null);
  const trigger=useRef<HTMLButtonElement>(null);
  const menuId=useId();
- const safeOverview=Array.isArray(overview)?overview:[];
+ const safeOverview=useMemo(()=>Array.isArray(overview)?overview:[],[overview]);
  const meta=useMemo(()=>new Map(safeOverview.map(x=>[x.channel_id,x])),[safeOverview]);
- const visibleChannels=visibleChatChannels(channels,safeOverview);
- const lastSentId=[...safeOverview].filter(x=>x.last_sent_at).sort((a,b)=>Date.parse(b.last_sent_at!)-Date.parse(a.last_sent_at!))[0]?.channel_id||'';
- const orderedChannels=[...visibleChannels].sort((a,b)=>{
+ const visibleChannels=useMemo(()=>visibleChatChannels(channels,safeOverview),[channels,safeOverview]);
+ const orderedChannels=useMemo(()=>{
+  const lastSentId=[...safeOverview].filter(x=>x.last_sent_at).sort((a,b)=>Date.parse(b.last_sent_at!)-Date.parse(a.last_sent_at!))[0]?.channel_id||'';
+  return [...visibleChannels].sort((a,b)=>{
   const am=meta.get(a.id),bm=meta.get(b.id);
   const ap=am?.pinned_at?0:1,bp=bm?.pinned_at?0:1;
   if(ap!==bp)return ap-bp;
@@ -26,8 +27,11 @@ export default function ChatChannelDropdown({
   if(a.id===lastSentId&&b.id!==lastSentId)return -1;
   if(b.id===lastSentId&&a.id!==lastSentId)return 1;
   return Date.parse(bm?.last_message_at||'1970-01-01')-Date.parse(am?.last_message_at||'1970-01-01');
- });
+  });
+ },[visibleChannels,safeOverview,meta]);
  const current=visibleChannels.find(c=>c.id===value);
+ const showOptions=expanded||open;
+ useEffect(()=>{if(expanded)setOpen(false)},[expanded]);
  const options=()=>Array.from(root.current?.querySelectorAll<HTMLButtonElement>('[role="menuitemradio"]')||[]);
  const focusSelected=()=>requestAnimationFrame(()=>{
   const items=options();
@@ -46,7 +50,7 @@ export default function ChatChannelDropdown({
   if(open){setOpen(false);return}
   setOpen(true);focusSelected();
  }
- function choose(id:string){onChange(id);setOpen(false);requestAnimationFrame(()=>trigger.current?.focus())}
+ function choose(id:string){onChange(id);setOpen(false);requestAnimationFrame(()=>{if(!expanded||window.matchMedia('(max-width:760px)').matches)trigger.current?.focus()})}
  async function togglePinned(id:string){const isPinned=!!meta.get(id)?.pinned_at;await onPin(id,!isPinned)}
  function keyDown(event:KeyboardEvent<HTMLDivElement>){
   if(event.key==='Escape'&&open){event.stopPropagation();event.preventDefault();setOpen(false);trigger.current?.focus();return}
@@ -58,14 +62,15 @@ export default function ChatChannelDropdown({
    event.key==='ArrowDown'?(at+1)%items.length:(at-1+items.length)%items.length;
   items[next]?.focus();
  }
- return <div className="chatHeadText chatChannelPicker" ref={root} onKeyDown={keyDown}>
+ return <div className={'chatHeadText chatChannelPicker'+(expanded?' chatChannelSidebar':'')} ref={root} onKeyDown={keyDown}>
   <span className="chatEyebrow">Общение</span>
+  {expanded&&<b className="chatSidebarHeading">Беседы</b>}
   <button type="button" ref={trigger} className="chatChannelTrigger" aria-label={'Выбрать канал: '+(current?.name||'Чаты')}
    aria-haspopup="menu" aria-expanded={open} aria-controls={open?menuId:undefined} disabled={!visibleChannels.length} onClick={toggle}>
    <span className="chatChannelName">{displayName(current?.name)||'Чаты'}</span>
    <ChevronDown className="chatChannelChevron" aria-hidden="true" size={17}/>
   </button>
-  {open&&<div className="chatChannelMenu" id={menuId} role="menu" aria-label="Каналы общения">
+  {showOptions&&<div className={'chatChannelMenu'+(expanded&&!open?' chatMenuExpandedOnly':'')} id={menuId} role="menu" aria-label="Каналы общения">
    {orderedChannels.map(c=>{
     const info=meta.get(c.id);const isPinned=!!info?.pinned_at;const unread=Number(info?.unread_count||0),mentions=Number(info?.mention_count||0);
     return <div className={'chatChannelOptionRow '+(value===c.id?'selected':'')} key={c.id}>
