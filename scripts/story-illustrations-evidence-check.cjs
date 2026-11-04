@@ -21,6 +21,7 @@ assert(artwork.includes('<svg')&&[0,1,2,3,4,5].every(i=>artwork.includes('varian
 assert(!/\bfetch\(|<img|\.channel\(|setInterval\(|http[s]?:\/\//.test(artwork),'Artwork must perform zero network requests and use no external images');
 assert(!/Арсеньева|Нестеров|М-17|Вебер|Финал A|Финал Б/.test(artwork),'Future story details must not enter public artwork');
 assert(wall.includes('storyPost?<StoryNewsIllustration')&&wall.includes('!storyPost&&<PostChanges'),'Only published story news gets motif, and may never show metric effects');
+assert(!wall.includes('StoryReaderGuide')&&!wall.includes('story_guide'),'Editorial story guidance is never rendered in public news');
 assert(wall.includes('!storyPost&&<CivicDiscussion'),'No unnecessary per-story discussions or network subscriptions');
 assert(view.includes('<TeacherStoryCampaign key={game.id}'),'Teacher draft cache must reset when switching games');
 assert(teacher.includes('useEffect(')&&teacher.includes('},[gameId]);')&&!teacher.includes('setInterval(')&&!teacher.includes('.channel('),'Only one-shot game-scoped loading is allowed; no timers or subscriptions');
