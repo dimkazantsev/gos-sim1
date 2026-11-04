@@ -1,0 +1,25 @@
+name: Story automation contract
+on:
+  pull_request:
+    paths:
+      - 'components/game/TeacherStoryBranchesPanel.tsx'
+      - 'components/game/TeacherStoryCampaign.tsx'
+      - 'supabase/migrations/20261104151000_story_automation_teacher_control.sql'
+      - 'supabase/migrations/20261104152000_story_automation_stage_events.sql'
+      - 'scripts/story-automation-contract-check.cjs'
+      - '.github/workflows/story-automation-contract.yml'
+permissions:
+  contents: read
+jobs:
+  story-contract:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci --ignore-scripts --no-audit --no-fund
+      - run: node scripts/story-automation-contract-check.cjs
+      - run: npm run typecheck
