@@ -1,7 +1,7 @@
 'use client';
 import {useEffect,useLayoutEffect,useMemo,useRef,useState} from 'react';
 import type {ReactNode} from 'react';
-import {ArrowDown,AtSign,Download,FileText,Maximize2,Mic,Minimize2,Paperclip,Pin,PinOff,Search,Send,Square,Trash2,UserRound,Video,X} from 'lucide-react';
+import {ArrowDown,AtSign,Download,FileText,Mic,Minimize2,Paperclip,Pin,PinOff,Search,Send,Square,Trash2,UserRound,Video,X} from 'lucide-react';
 import {CHAT_MAX_FILE_BYTES,formatRecordingDuration} from './recordingMedia';
 import {IconAction} from '../ui/IconAction';
 import ChatChannelDropdown from './ChatChannelDropdown';
@@ -341,10 +341,10 @@ export default function ChatPanel({g,draft:text,onDraftChange:setText,previewCha
  }}}>
   <header className="chatTop">
    <div className="chatHeadIcon" aria-hidden="true"><MessageIcon/></div>
-   <ChatChannelDropdown channels={channels} value={channelId} onChange={setChannelId} overview={chatOverview} onPin={setChatChannelPinned} initialOpen={previewChannelOpen} expanded={expanded}/>
+   <ChatChannelDropdown channels={channels} value={channelId} onChange={setChannelId} overview={chatOverview} onPin={setChatChannelPinned} initialOpen={previewChannelOpen} expanded={expanded} onExpand={()=>setExpanded(true)}/>
    {expanded&&<div className="chatExpandedTitle"><b>{channel?.name||'Общение'}</b><small>Общение</small></div>}
    <button type="button" className={'chatIconButton chatSearchToggle '+(searchOpen?'active':'')} onClick={()=>searchOpen?resetSearch():setSearchOpen(true)} aria-label={searchOpen?'Закрыть поиск':'Поиск в чате'} aria-pressed={searchOpen} title="Поиск"><Search aria-hidden="true"/></button>
-   <button type="button" className="chatIconButton chatSizeToggle" onClick={()=>setExpanded(value=>!value)} aria-label={expanded?'Свернуть чат':'Развернуть чат'} aria-pressed={expanded} title={expanded?'Свернуть чат':'Развернуть чат'}>{expanded?<Minimize2 aria-hidden="true"/>:<Maximize2 aria-hidden="true"/>}</button>
+   {expanded&&<button type="button" className="chatIconButton" onClick={()=>setExpanded(false)} aria-label="Свернуть чат" title="Свернуть чат"><Minimize2 aria-hidden="true"/></button>}
    <IconAction onClick={()=>setChatOpen(false)} label="Закрыть чат"/>
   </header>
   {selectedMessages.length>0&&<div className="chatSelectionBar" role="toolbar" aria-label="Выбранные сообщения">

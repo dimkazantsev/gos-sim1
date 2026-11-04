@@ -93,24 +93,6 @@
  border-radius:16px;
  animation:none;
 }
-.simChat.gsChatV2 .chatSizeToggle {
- display:grid;
- place-items:center;
- flex:none;
- min-width:44px;
- min-height:44px;
- padding:9px;
- border:1px solid var(--gs-border);
- border-radius:11px;
- color:var(--gs-ink);
- background:var(--gs-surface-soft);
- cursor:pointer;
-}
-.simChat.gsChatV2 .chatSizeToggle svg {width:19px;height:19px}
-.simChat.gsChatV2 .chatSizeToggle:focus-visible {
- outline:3px solid var(--gs-accent);
- outline-offset:2px;
-}
 .simChat.gsChatV2.chatExpanded .chatTop {
  position:static;
  flex:none;
