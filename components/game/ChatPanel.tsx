@@ -1,7 +1,7 @@
 'use client';
 import {useEffect,useLayoutEffect,useMemo,useRef,useState} from 'react';
 import type {ReactNode} from 'react';
-import {ArrowDown,AtSign,Download,FileText,Mic,Paperclip,Pin,PinOff,Search,Send,Square,Trash2,UserRound,Video,X} from 'lucide-react';
+import {ArrowDown,AtSign,Download,FileText,Maximize2,Mic,Minimize2,Paperclip,Pin,PinOff,Search,Send,Square,Trash2,UserRound,Video,X} from 'lucide-react';
 import {CHAT_MAX_FILE_BYTES,formatRecordingDuration} from './recordingMedia';
 import {IconAction} from '../ui/IconAction';
 import ChatChannelDropdown from './ChatChannelDropdown';
@@ -73,6 +73,7 @@ export default function ChatPanel({g,draft:text,onDraftChange:setText,previewCha
  const [uploading,setUploading]=useState(false);
  const [recordElapsed,setRecordElapsed]=useState(0);
  const [overlay,setOverlay]=useState(false);
+ const [expanded,setExpanded]=useState(false);
  const [searchOpen,setSearchOpen]=useState(false);
  const [pinsOpen,setPinsOpen]=useState(previewPinsOpen);
  const [pinBusy,setPinBusy]=useState<string|null>(null);
@@ -101,7 +102,7 @@ export default function ChatPanel({g,draft:text,onDraftChange:setText,previewCha
  const follow=useRef(true);
  const lastChannel=useRef(channelId);
  const pendingSend=useRef(false);
- const panel=useDialog(overlay,()=>setChatOpen(false));
+ const panel=useDialog(overlay||expanded,()=>{if(expanded)setExpanded(false);else setChatOpen(false)});
  const channel=channels.find(c=>c.id===channelId);
  const chatPins=useMemo(()=>allPins.filter(p=>p.channel_id===channelId),[allPins,channelId]);
  const pinnedMessages=useMemo(()=>allPinnedMessages.filter(m=>m.channel_id===channelId&&visibleChatMedia(m,retentionClock)),[allPinnedMessages,channelId,retentionClock]);
@@ -333,15 +334,17 @@ export default function ChatPanel({g,draft:text,onDraftChange:setText,previewCha
   });
  }
  function resetSearch(){setSearch('');setOnlyFiles(false);setSearchOpen(false);follow.current=true;requestAnimationFrame(scrollToLatest)}
- return <aside id="game-chat" ref={panel} tabIndex={-1} className="simChat gsChatV2" role={overlay?'dialog':'region'} aria-modal={overlay?true:undefined} aria-label="Командный чат" onKeyDown={e=>{if(e.key==='Escape'){
+ return <aside id="game-chat" ref={panel} tabIndex={-1} className={'simChat gsChatV2'+(expanded?' chatExpanded':'')} role={overlay||expanded?'dialog':'region'} aria-modal={overlay||expanded?true:undefined} aria-label="Командный чат" onKeyDown={e=>{if(e.key==='Escape'){
   if(attachOpen){e.stopPropagation();setAttachOpen(false);attachmentButton.current?.focus()}
   else if(searchOpen){e.stopPropagation();resetSearch()}
-  else{e.stopPropagation();setChatOpen(false)}
+  else{e.stopPropagation();if(expanded)setExpanded(false);else setChatOpen(false)}
  }}}>
   <header className="chatTop">
    <div className="chatHeadIcon" aria-hidden="true"><MessageIcon/></div>
-   <ChatChannelDropdown channels={channels} value={channelId} onChange={setChannelId} overview={chatOverview} onPin={setChatChannelPinned} initialOpen={previewChannelOpen}/>
+   <ChatChannelDropdown channels={channels} value={channelId} onChange={setChannelId} overview={chatOverview} onPin={setChatChannelPinned} initialOpen={previewChannelOpen} expanded={expanded}/>
+   {expanded&&<div className="chatExpandedTitle"><b>{channel?.name||'Общение'}</b><small>Общение</small></div>}
    <button type="button" className={'chatIconButton chatSearchToggle '+(searchOpen?'active':'')} onClick={()=>searchOpen?resetSearch():setSearchOpen(true)} aria-label={searchOpen?'Закрыть поиск':'Поиск в чате'} aria-pressed={searchOpen} title="Поиск"><Search aria-hidden="true"/></button>
+   <button type="button" className="chatIconButton chatSizeToggle" onClick={()=>setExpanded(value=>!value)} aria-label={expanded?'Свернуть чат':'Развернуть чат'} aria-pressed={expanded} title={expanded?'Свернуть чат':'Развернуть чат'}>{expanded?<Minimize2 aria-hidden="true"/>:<Maximize2 aria-hidden="true"/>}</button>
    <IconAction onClick={()=>setChatOpen(false)} label="Закрыть чат"/>
   </header>
   {selectedMessages.length>0&&<div className="chatSelectionBar" role="toolbar" aria-label="Выбранные сообщения">
