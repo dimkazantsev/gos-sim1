@@ -1,5 +1,6 @@
 'use client';
 import {useEffect,useRef,useState} from 'react';
+import {ChevronDown} from 'lucide-react';
 import {supabase} from '@/lib/supabase';
 import {userError} from '@/lib/userError';
 import styles from './TeacherStoryCampaign.module.css';
@@ -21,6 +22,7 @@ const EVIDENCE_VALUES:Record<string,string>={draft:'Черновик',open:'От
 const evidenceText=(record:Record<string,string>)=>Object.entries(record).map(([key,value])=>`${EVIDENCE_FIELDS[key]||'Сведения'}: ${EVIDENCE_VALUES[String(value)]||String(value||'Нет данных')}`).join(' · ');
 /** Visible to teachers only. No chapter contents or spoiler logic in the public build. */
 export default function TeacherStoryCampaign({gameId}:{gameId:string}){
+ const [expanded,setExpanded]=useState(false);
  const [campaign,setCampaign]=useState<Campaign|null>(null);
  const [preview,setPreview]=useState<Preview|null>(null);
  const [title,setTitle]=useState('');
@@ -33,9 +35,10 @@ export default function TeacherStoryCampaign({gameId}:{gameId:string}){
  const busy=useRef(false);
  const cached=useRef(new Map<number,Preview>());
  const change=preview&&(title!==preview.title||body!==preview.body);
- // Load only when the teacher opens this workspace. One index query and one
- // first-episode preview; subsequent episodes are loaded on selection and cached.
+ // No story RPCs in the collapsed state; the first opening loads two targeted reads.
+ // The response and editor state stay cached across later open/close interactions.
  useEffect(()=>{
+  if(!expanded||loaded)return;
   let active=true;
   const initialise=async()=>{
    setWorking(true);setLoaded(false);setError('');
@@ -66,7 +69,7 @@ export default function TeacherStoryCampaign({gameId}:{gameId:string}){
   };
   void initialise();
   return()=>{active=false;};
- },[gameId]);
+ },[gameId,expanded,loaded]);
  const selected=campaign?.episodes.find(item=>item.episode_no===preview?.episode_no);
  const next=(campaign?.current_episode||0)+1;
  const useStatus=(value:unknown)=>{
@@ -142,12 +145,21 @@ export default function TeacherStoryCampaign({gameId}:{gameId:string}){
   setTitle(preview.title);setBody(preview.body);setEditing(false);
  };
  return <section className={['surface',styles.root].join(' ')} aria-labelledby="story-campaign-title">
-  <div className="surfaceHead"><div>
-   <small>ПРЕПОДАВАТЕЛЬ · СОБЫТИЯ</small>
-   <h2 id="story-campaign-title">Сюжетная кампания</h2>
-   <p>24 эпизода · этапы 4–14. Новости и реакции автоматически публикуются по подтверждённым событиям. Преподаватель может исправлять тексты.</p>
-  </div><span>{!loaded?'Загрузка…':campaign?.auto_mode?'Автопубликация включена':'Автопубликация приостановлена'}</span></div>
-  <div className="teacherDetailsBody">
+  <div className={['surfaceHead',styles.header].join(' ')}>
+   <div className={styles.headerText}>
+    <small>ПРЕПОДАВАТЕЛЬ · СОБЫТИЯ</small>
+    <h2 id="story-campaign-title">Сюжетная кампания</h2>
+    <p>24 эпизода · этапы 4–14. Новости и реакции автоматически публикуются по подтверждённым событиям. Преподаватель может исправлять тексты.</p>
+   </div>
+   <div className={styles.headerControls}>
+    <span className={styles.automationStatus}>{!loaded?'Настройки и выпуски':campaign?.auto_mode?'Автопубликация включена':'Автопубликация приостановлена'}</span>
+    <button type="button" className={styles.collapseButton} aria-expanded={expanded}
+     aria-controls="story-campaign-content" disabled={working} onClick={()=>setExpanded(v=>!v)}>
+     {expanded?'Свернуть':'Развернуть'} <ChevronDown size={18} aria-hidden="true"/>
+    </button>
+   </div>
+  </div>
+  {(expanded||loaded)&&<div id="story-campaign-content" className={['teacherDetailsBody',styles.campaignBody].join(' ')} hidden={!expanded}>
    <div className={styles.toolbar}>
     {campaign&&<div className={styles.summary} role="status">
      <span>Выпуск <b>{campaign.current_episode} из 24</b></span>
@@ -299,6 +311,6 @@ export default function TeacherStoryCampaign({gameId}:{gameId:string}){
    </div>}
    {campaign?.prepared&&<TeacherStorySupplementPanel key={gameId} gameId={gameId} campaignEnabled={campaign.enabled}/>}
    {campaign?.prepared&&<TeacherStoryBranchesPanel key={'branches-'+gameId} gameId={gameId}/>}
-  </div>
+  </div>}
  </section>;
 }
