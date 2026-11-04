@@ -256,8 +256,10 @@ const chat=read('components/game/ChatPanel.tsx');
 const chatCss=read('app/design-readability.css');
 check('Chat uses one accessible styled channel switcher in the header',
  chat.includes('<ChatChannelDropdown')&&
+ chat.includes('onExpand={()=>setExpanded(true)}')&&
  read('components/game/ChatChannelDropdown.tsx').includes('role="menuitemradio"')&&
- read('components/game/ChatChannelDropdown.tsx').includes('aria-expanded={open}')&&
+ read('components/game/ChatChannelDropdown.tsx').includes('aria-expanded={expanded?open:false}')&&
+ read('components/game/ChatChannelDropdown.tsx').includes('if(!expanded&&onExpand){setOpen(false);onExpand();return}')&&
  !chat.includes('<select aria-label="Канал общения"'));
 check('Chat supports real backend pinning and icon-only send',
  chat.includes('chatPinnedWrap')&&chat.includes('setChatPin(m.id,!pinned)')&&
