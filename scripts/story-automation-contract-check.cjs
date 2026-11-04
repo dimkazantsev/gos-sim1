@@ -34,7 +34,7 @@ const {PGlite}=require('@electric-sql/pglite');
    create table public.game_votes(id uuid,game_id uuid,status text,result_code text,formal_document_id uuid,stage_no integer);
    create table public.state_programs(id uuid,game_id uuid,title text,expected_results text);
    create table public.government_program_agenda(id uuid,game_id uuid,program_id uuid,vote_id uuid,completed_at timestamptz,created_at timestamptz);
-   create table public.formal_documents(id uuid,game_id uuid,stage_no integer,status_code text,doc_type text,title text,body_text text,updated_at timestamptz);
+   create table public.formal_documents(id uuid,game_id uuid,stage_no integer,status_code text,doc_type text,title text,body_text text,updated_at timestamptz,metadata jsonb);
    create table public.municipal_projects(id uuid,game_id uuid,stage_no integer,vote_id uuid,updated_at timestamptz,problem_title text);
    create table private.story_supplement_releases(game_id uuid,code text,approved_at timestamptz,published_at timestamptz,draft_body text,published_post_id uuid,published_by uuid);
    create table public.political_posts(
