@@ -22,7 +22,7 @@ BEGIN
   JOIN public.game_votes v ON v.formal_document_id=d.id AND v.game_id=d.game_id
   WHERE d.game_id=p_game AND d.stage_no=12 AND d.status_code='published'
     AND v.status='closed' AND v.result_code='passed'
-    AND (d.title ~* '(горизонт|выставк)' OR d.body_text ~* '(горизонт|выставк)')
+    AND (d.title ~* 'горизонт' OR d.body_text ~* 'горизонт')
   ORDER BY d.updated_at DESC LIMIT 1;
  ELSIF p_branch=8 THEN
   SELECT d.id,'formal_document','Опубликованный бюджетный документ с подтверждённым голосованием'
@@ -31,7 +31,8 @@ BEGIN
   JOIN public.game_votes v ON v.formal_document_id=d.id AND v.game_id=d.game_id
   WHERE d.game_id=p_game AND d.stage_no=13 AND d.doc_type='federal_budget'
     AND d.status_code='published' AND v.status='closed' AND v.result_code='passed'
-    AND d.body_text ~* '(горизонт|выставк)'
+    AND d.body_text ~* 'горизонт'
+    AND coalesce(d.metadata->>'horizons_funding_approved','false')='true'
   ORDER BY d.updated_at DESC LIMIT 1;
  ELSIF p_branch=9 THEN
   SELECT p.id,'municipal_project','Принятый по результатам голосования муниципальный проект: '||left(p.problem_title,180)
