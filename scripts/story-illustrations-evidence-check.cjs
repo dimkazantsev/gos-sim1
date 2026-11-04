@@ -17,6 +17,7 @@ const branchReactions=read('supabase/migrations/20261103194001_story_branch_reac
 
 const view=read('components/game/TeacherView.tsx');
 const migration=read('supabase/migrations/20261103161012_story_teacher_evidence_preview.sql');
+const previewIllustration=read('supabase/migrations/20261104064434_story_teacher_student_guide_preview.sql');
 assert(artwork.includes('<svg')&&[0,1,2,3,4,5].every(i=>artwork.includes('variant==='+i))&&artwork.includes('Math.abs(Math.trunc(episodeNo))%6'),'Six generic inline SVG compositions');
 assert(!/\bfetch\(|<img|\.channel\(|setInterval\(|http[s]?:\/\//.test(artwork),'Artwork must perform zero network requests and use no external images');
 assert(!/Арсеньева|Нестеров|М-17|Вебер|Финал A|Финал Б/.test(artwork),'Future story details must not enter public artwork');
@@ -53,4 +54,10 @@ assert(neutralFinal.includes('нейтральный финал Г')&&neutralFin
 assert(branchSchema.includes('private.story_supplement_evidence_exists')&&branchSchema.includes('private.is_game_teacher'),'Branch outcomes require teacher access and existing evidence for positive decisions');
 assert(branches.includes('publish_story_branch_reaction_teacher')&&branchReactions.includes('private.story_supplement_evidence_exists')&&branchReactions.includes('on conflict(game_id,source_key)'),'Only verified per-game decisions can publish one-time story reactions');
 assert(branchReactions.includes('effects_applied')&&!branchReactions.includes('CREATE TRIGGER')&&!branchReactions.includes('realtime.send'),'Branch stories cannot alter metrics or create background traffic');
+assert(artwork.includes('episodeNo>=1&&episodeNo<=3')&&artwork.includes('ПИСЬМО Д-01')&&artwork.includes('СЕМЬ ТОЧЕК ЗРЕНИЯ')&&artwork.includes('Рабочая презентация'),'First three chapters require explanatory, distinct story artwork');
+assert(artwork.includes('<figcaption')&&artwork.includes('не изображение подлинного документа'),'Visuals must clearly distinguish diagrams from archival originals');
+assert(teacher.includes('<StoryNewsIllustration episodeNo={preview.episode_no}/>')&&teacher.indexOf('Иллюстрация выпуска')<teacher.indexOf('Текст публикации · черновик'),'Teacher sees the exact student artwork before approving a chapter');
+assert(teacher.includes('Инструкция участнику после публикации')&&teacher.includes('preview.student_guide'),'Teacher sees student-facing instructions from the existing preview call');
+assert(wall.includes('post.context?.story_campaign!==true&&post.body.length>800'),'Published stories remain fully readable; unrelated feed posts may collapse');
+assert(previewIllustration.includes("'student_guide',coalesce(e.draft->'student_guide','{}'::jsonb)")&&previewIllustration.includes('private.is_game_teacher'),'Student guidance preview is teacher-only and requires no additional RPC');
 console.log('PASS: lightweight story visuals (zero network) and teacher-only evidence/variants on existing preview RPC');
