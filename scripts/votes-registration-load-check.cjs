@@ -116,7 +116,11 @@ async function staleMeetingActions(){
   let finish,active=true;const events=[];
   const ctx={ensureCurrentSigner:async()=>true,currentScope:()=>active,reconcileStaleWrite:table=>events.push(table),g:{game:{id:'game'}},supabase:{rpc:()=>new Promise(resolve=>{finish=resolve})},busy:false,meetingRecord:null,canPrepare:true,canWriteAgenda:true,meetingCoordinator:true,verifiedRights:{can_coordinate:true},readOnly:false,meetingActionsLocked:false,stage12Saving:false,stage12Session:{id:'session',status:'draft'},stage12Text:'x'.repeat(100),stage12InitialText:'old',stage12Reason:'',stage:4,body:'gd',agendaText:'draft',minutesText:'',delegateUser:'',newTitle:'body',seats:'1',users:[],head:'',editing:null,dirtyMeetingDraftRef:{current:{agenda:true}},meetingDraftVersion:{current:{agenda:0,stage12:0}},meetingErrorMessage:String,userError:e=>e.message,load:async()=>events.push('load')};
   ctx.setMeetingError=()=>{};ctx.setNotice=()=>{};ctx.setBusy=()=>{};ctx.setStage12Saving=()=>{};ctx.setAgendaProposalOpen=()=>{};
-  const task=make(ctx)[name](name==='saveStage12Editor'?false:'agenda');active=false;finish({error:fail?{message:'failed'}:null,data:'unit'});await task;
+  const task=make(ctx)[name](name==='saveStage12Editor'?false:'agenda');
+  // Signing now verifies Auth asynchronously before calling the mutation RPC.
+  // Start the RPC before simulating a stale scope and resolving its response.
+  await tick();assert.equal(typeof finish,'function',name+' has started its request');
+  active=false;finish({error:fail?{message:'failed'}:null,data:'unit'});await task;
   assert.deepEqual(events,fail?[]:[table],name+' reconciles only successful stale writes without an old success notice');
  }
  for(const name of names)for(const fail of [false,true])for(const change of ['game','body']){
