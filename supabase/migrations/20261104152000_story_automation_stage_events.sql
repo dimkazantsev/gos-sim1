@@ -47,7 +47,7 @@ BEGIN
 END $f$;
 
 -- One episode, from the protected text library; precise ordered stage gate + official prerequisites.
-CREATE OR REPLACE FUNCTION private.story_automation_episode(p_game uuid,p_episode integer,p_stage integer,p_author uuid)
+CREATE OR REPLACE FUNCTION private.story_automation_episode(p_game uuid,p_episode integer,p_stage integer,p_author uuid,p_stage_completed boolean)
 RETURNS boolean LANGUAGE plpgsql SECURITY DEFINER SET search_path=''
 AS $f$
 DECLARE c private.story_campaigns%rowtype;e private.story_episode_drafts%rowtype;
@@ -61,20 +61,24 @@ BEGIN
   OR e.episode_no IS NULL OR e.stage_no<>p_stage OR c.current_episode+1<>p_episode THEN RETURN false; END IF;
  SELECT * INTO r FROM private.story_episode_releases WHERE game_id=p_game AND episode_no=p_episode;
  IF r.published_at IS NOT NULL THEN RETURN false; END IF;
+ -- Do not pre-empt government decisions on the day an institutional stage opens.
+ IF p_episode IN (10,15) AND NOT p_stage_completed THEN RETURN false; END IF;
+ v_title:=coalesce(r.draft_title,e.draft->>'title');
+ v_body:=coalesce(r.draft_body,e.draft->>'body');
  IF p_episode=10 AND NOT EXISTS(
   SELECT 1 FROM public.game_office_assignments
-   WHERE game_id=p_game AND status='active' AND role_title ILIKE '%Президент%') THEN RETURN false; END IF;
- IF p_episode=15 AND NOT EXISTS(
-  SELECT 1 FROM public.government_program_agenda a
-   JOIN public.game_votes v ON v.id=a.vote_id AND v.game_id=a.game_id
-   WHERE a.game_id=p_game AND v.status='closed') THEN RETURN false; END IF;
+  WHERE game_id=p_game AND status='active' AND role_title ILIKE '%Президент%') THEN
+  v_title:=e.draft->>'auto_neutral_title';
+  v_body:=e.draft->>'auto_neutral_body';
+ END IF;
  IF p_episode=21 AND NOT EXISTS(
   SELECT 1 FROM public.game_votes v JOIN public.formal_documents d
   ON d.id=v.formal_document_id AND d.game_id=v.game_id
   WHERE v.game_id=p_game AND v.stage_no=13 AND v.status='closed'
-   AND d.doc_type='federal_budget') THEN RETURN false; END IF;
- v_title:=coalesce(r.draft_title,e.draft->>'title');
- v_body:=coalesce(r.draft_body,e.draft->>'body');
+  AND d.doc_type='federal_budget') THEN
+  v_title:=e.draft->>'auto_neutral_title';
+  v_body:=e.draft->>'auto_neutral_body';
+ END IF;
  IF p_episode=24 THEN
   SELECT EXISTS(SELECT 1 FROM public.municipal_projects p
     JOIN public.game_votes v ON v.id=p.vote_id AND v.game_id=p.game_id
@@ -213,7 +217,7 @@ BEGIN
  IF p_status='open' THEN
   -- At most one introductory news item on opening; the rest on completion.
   IF c.current_episode+1=v_first THEN
-   PERFORM private.story_automation_episode(p_game,v_first,p_stage,v_author);
+   PERFORM private.story_automation_episode(p_game,v_first,p_stage,v_author,false);
   END IF;
   RETURN;
  END IF;
@@ -226,7 +230,7 @@ BEGIN
     format('Пропущен более ранний выпуск перед № %s. Проверьте хронологию.',e.episode_no)
     WHERE game_id=p_game;RETURN;
   END IF;
-  v_ok:=private.story_automation_episode(p_game,e.episode_no,p_stage,v_author);
+  v_ok:=private.story_automation_episode(p_game,e.episode_no,p_stage,v_author,true);
   IF NOT v_ok THEN
    UPDATE private.story_campaigns SET automation_error=
     format('Выпуск № %s ожидает подтверждённого решения или допустимой редакции.',e.episode_no)
@@ -299,7 +303,7 @@ BEGIN
 END $f$;
 
 REVOKE ALL ON FUNCTION private.story_automation_source(uuid,smallint),
- private.story_automation_episode(uuid,integer,integer,uuid),
+ private.story_automation_episode(uuid,integer,integer,uuid,boolean),
  private.story_automation_branch(uuid,smallint,uuid),
  private.story_automation_on_stage(uuid,integer,text),
  private.story_automation_stage_trigger() FROM PUBLIC,anon,authenticated;
