@@ -8,8 +8,8 @@ import {visibleChatChannels} from './chatChannelSelection';
 /** Mirrors the game's "Режим просмотра" dropdown: a styled list rather
  * than browser-native options, including predictable focus on mobile. */
 export default function ChatChannelDropdown({
- channels,value,onChange,overview=[],onPin=async()=>false,initialOpen=false,expanded=false,onExpand
-}:{channels:Channel[];value:string;onChange:(id:string)=>void;overview?:ChatOverview[];onPin?:(id:string,pin:boolean)=>Promise<boolean>;initialOpen?:boolean;expanded?:boolean;onExpand?:()=>void}){
+ channels,value,onChange,overview=[],onPin=async()=>false,initialOpen=false,expanded=false
+}:{channels:Channel[];value:string;onChange:(id:string)=>void;overview?:ChatOverview[];onPin?:(id:string,pin:boolean)=>Promise<boolean>;initialOpen?:boolean;expanded?:boolean}){
  const [open,setOpen]=useState(initialOpen);
  const root=useRef<HTMLDivElement>(null);
  const trigger=useRef<HTMLButtonElement>(null);
@@ -47,9 +47,7 @@ export default function ChatChannelDropdown({
  },[open]);
  function toggle(){
   if(!visibleChannels.length)return;
-  // The existing chevron in the compact header is the requested expand control.
-  // No new subscription or channel reload is necessary: the same picker becomes the sidebar.
-  if(!expanded&&onExpand){setOpen(false);onExpand();return}
+  // Choosing a conversation must not resize the chat.
   if(open){setOpen(false);return}
   setOpen(true);focusSelected();
  }
@@ -68,7 +66,7 @@ export default function ChatChannelDropdown({
  return <div className={'chatHeadText chatChannelPicker'+(expanded?' chatChannelSidebar':'')} ref={root} onKeyDown={keyDown}>
   <span className="chatEyebrow">Общение</span>
   {expanded&&<b className="chatSidebarHeading">Беседы</b>}
-  <button type="button" ref={trigger} className="chatChannelTrigger" aria-label={!expanded&&onExpand?'Развернуть чат и показать беседы':'Выбрать канал: '+(current?.name||'Чаты')}
+  <button type="button" ref={trigger} className="chatChannelTrigger" aria-label={'Выбрать канал: '+(current?.name||'Чаты')}
    aria-haspopup={expanded?'menu':undefined} aria-expanded={expanded?open:false} aria-controls={expanded&&open?menuId:undefined} disabled={!visibleChannels.length} onClick={toggle}>
    <span className="chatChannelName">{displayName(current?.name)||'Чаты'}</span>
    <ChevronDown className="chatChannelChevron" aria-hidden="true" size={17}/>
