@@ -49,7 +49,7 @@ export default function ChatChannelDropdown({
   if(!visibleChannels.length)return;
   // The existing chevron in the compact header is the requested expand control.
   // No new subscription or channel reload is necessary: the same picker becomes the sidebar.
-  if(!expanded&&onExpand){setOpen(false);onExpand();return}
+  if(!expanded&&onExpand&&window.matchMedia('(min-width:761px)').matches){setOpen(false);onExpand();return}
   if(open){setOpen(false);return}
   setOpen(true);focusSelected();
  }
@@ -68,7 +68,7 @@ export default function ChatChannelDropdown({
  return <div className={'chatHeadText chatChannelPicker'+(expanded?' chatChannelSidebar':'')} ref={root} onKeyDown={keyDown}>
   <span className="chatEyebrow">Общение</span>
   {expanded&&<b className="chatSidebarHeading">Беседы</b>}
-  <button type="button" ref={trigger} className="chatChannelTrigger" aria-label={!expanded&&onExpand?'Развернуть чат и показать беседы':'Выбрать канал: '+(current?.name||'Чаты')}
+  <button type="button" ref={trigger} className="chatChannelTrigger" aria-label={!expanded&&onExpand?'Показать беседы':'Выбрать канал: '+(current?.name||'Чаты')}
    aria-haspopup={expanded?'menu':undefined} aria-expanded={expanded?open:false} aria-controls={expanded&&open?menuId:undefined} disabled={!visibleChannels.length} onClick={toggle}>
    <span className="chatChannelName">{displayName(current?.name)||'Чаты'}</span>
    <ChevronDown className="chatChannelChevron" aria-hidden="true" size={17}/>
