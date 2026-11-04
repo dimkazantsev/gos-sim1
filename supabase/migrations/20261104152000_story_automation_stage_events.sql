@@ -170,7 +170,7 @@ BEGIN
    reviewed_by=excluded.reviewed_by,reviewed_at=excluded.reviewed_at,
    automatic_review=true WHERE private.story_branch_reviews.published_at IS NULL;
  SELECT * INTO v_review FROM private.story_branch_reviews WHERE game_id=p_game AND branch_no=p_branch;
- v_title:=coalesce(v_review.edited_title,'Горизонты: '||v_rule.title);
+ v_title:=coalesce(v_review.edited_title,CASE WHEN v_review.outcome='recorded' THEN coalesce(v_rule.recorded_title,'Горизонты: '||v_rule.title) ELSE coalesce(v_rule.neutral_title,'Горизонты: '||v_rule.title) END);
  v_body:=coalesce(v_review.edited_body,
   CASE WHEN v_review.outcome='recorded' THEN v_rule.recorded_body ELSE v_rule.neutral_body END);
  IF length(btrim(coalesce(v_title,''))) NOT BETWEEN 12 AND 220
