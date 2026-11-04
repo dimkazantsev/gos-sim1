@@ -18,7 +18,7 @@ const {PGlite}=require('@electric-sql/pglite');
  assert(two.includes("ON CONFLICT(game_id,source_key)"),'Idempotency is guaranteed by source key');
  const db=new PGlite();
  try{
-  await db.exec(String.raw\`
+  await db.exec(String.raw`
    create schema private; create schema auth;
    create role anon; create role authenticated;
    create function auth.uid() returns uuid language sql stable as $$ select '11111111-1111-4111-8111-111111111111'::uuid $$;
@@ -55,7 +55,7 @@ const {PGlite}=require('@electric-sql/pglite');
     evidence_kind text,evidence_id uuid,teacher_note text not null default '',
     reviewed_by uuid not null,reviewed_at timestamptz not null default now(),
     published_at timestamptz,published_post_id uuid,primary key(game_id,branch_no));
-  \`);
+  `);
   await db.exec(one);
   await db.exec(two);
   const game='aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa',owner='11111111-1111-4111-8111-111111111111';
