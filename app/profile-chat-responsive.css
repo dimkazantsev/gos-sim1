@@ -309,7 +309,7 @@
 
 /* Phone-only chat: no expansion button, no reserved bottom dock or permanent tag banner. */
 .simChat.gsChatV2 .chatPhoneHeadIcon,
-.simChat.gsChatV2 .chatProcessTagMobileButton {display:none}
+.simChat.gsChatV2 .chatComposeActions .chatProcessTagMobileButton {display:none}
 @media (max-width:760px) {
  .simChat.gsChatV2 {
   position:fixed;
