@@ -172,7 +172,7 @@ export default function TeacherStoryCampaign({gameId}:{gameId:string}){
    </div>
    {error&&<p className="processNotice" role="alert">{error}</p>}
    {notice&&<p className="processNotice" role="status">{notice}</p>}
-   {campaign?.automation_error&&<p className="processNotice" role="alert">Автоматическая публикация: {campaign.automation_error}</p>
+   {campaign?.automation_error&&<p className="processNotice" role="alert">Автоматическая публикация: {campaign.automation_error}</p>}
    {!loaded&&<p role="status">Загружаются эпизоды и первый выпуск…</p>}
    {loaded&&!campaign&&<p>Не удалось получить сведения о кампании. Нажмите «Обновить состояние».</p>}
    {campaign&&!campaign.prepared&&<p>Для этой игры кампания ещё не подготовлена. Нажмите «Подготовить кампанию», чтобы открыть закрытые редакции.</p>}
