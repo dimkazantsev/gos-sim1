@@ -1,5 +1,20 @@
 /* ГОС.ID — teacher story editor. All selectors scoped to this component. */
 .root{container-type:inline-size;min-width:0}
+
+/* Disclosure reuses ГОС.ID's existing teacher form palette and surface layout. */
+.header{display:flex;flex-wrap:wrap;align-items:flex-start;gap:12px 20px;min-width:0;max-width:100%}
+.headerText{flex:1 1 360px;min-width:0;max-width:100%}
+.headerText p{max-width:100%;white-space:normal;overflow-wrap:anywhere}
+.headerControls{display:flex;align-items:center;justify-content:flex-end;flex:0 1 auto;flex-wrap:wrap;gap:10px;min-width:0;max-width:100%}
+.automationStatus{min-width:0;max-width:100%;white-space:normal;overflow-wrap:anywhere}
+.collapseButton{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;min-width:0;padding:10px 14px;border:1px solid #dce5f0;border-radius:10px;background:#fff;color:#284b7b;font:inherit;font-size:13px;font-weight:700;cursor:pointer}
+.collapseButton:hover:not(:disabled){background:#f3f7fe;border-color:#bbceed}
+.collapseButton:focus-visible{outline:3px solid #7196e8;outline-offset:2px}
+.collapseButton:disabled{opacity:.55;cursor:not-allowed}
+.collapseButton[aria-expanded="true"] svg{transform:rotate(180deg)}
+.campaignBody[hidden]{display:none!important}
+@container (max-width:470px){.header{gap:10px}.headerText{flex-basis:100%}.headerControls{width:100%;justify-content:space-between}.collapseButton{flex:0 0 auto}}
+
 .toolbar{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px}
 .actions{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
 .actionButton{display:inline-flex;align-items:center;justify-content:center;min-width:0;min-height:44px;padding:10px 14px;border:1px solid #dce5f0;border-radius:10px;background:#fff;color:#476180;font:inherit;font-size:13px;font-weight:700;line-height:1.4;white-space:normal;text-align:center;cursor:pointer}

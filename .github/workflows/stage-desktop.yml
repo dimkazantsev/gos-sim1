@@ -8,6 +8,9 @@ on:
       - 'components/ui/StageModuleHeader.module.css'
       - 'scripts/stage-module-header-alignment-check.cjs'
       - 'components/game/TeacherView.tsx'
+      - 'components/game/TeacherStoryCampaign.tsx'
+      - 'components/game/TeacherStoryCampaign.module.css'
+      - 'scripts/teacher-story-collapse-check.cjs'
       - 'components/game/GameHeader.tsx'
       - 'components/game/TeacherStageManager.tsx'
       - 'components/game/StagePolicyEditor.tsx'
@@ -83,6 +86,10 @@ jobs:
         run: npm run typecheck
       - name: Stage summary KPI alignment on mobile, tablet and desktop
         run: node scripts/stage-module-header-alignment-check.cjs
+        env:
+          CHROME_BIN: /usr/bin/google-chrome
+      - name: Story campaign disclosure, RPC budget and responsive layout
+        run: node scripts/teacher-story-collapse-check.cjs
         env:
           CHROME_BIN: /usr/bin/google-chrome
       - name: Build real component preview
