@@ -8,6 +8,64 @@ export default function StoryNewsIllustration({episodeNo}:{episodeNo:number}){
  const variant=Number.isFinite(episodeNo)?Math.abs(Math.trunc(episodeNo))%6:0;
  const ink='var(--gs-ink,#172447)';
  const accent='var(--gs-accent,#2453e6)';
+ // First three scenes have explicit editorial artwork rather than generic motifs.
+ // The visuals are diagrams, NOT reconstructions of unpublished source documents.
+ if(episodeNo>=1&&episodeNo<=3){
+  const caption=episodeNo===1
+   ?'Сюжетная схема: предварительное письмо Д-01 и идея выставки. Это не изображение подлинного документа.'
+   :episodeNo===2
+   ?'Сюжетная схема: семь разных интересов вокруг одного предложения. Персонажи не заменяют государственные органы.'
+   :'Сюжетная схема: предварительное письмо Д-01 и рабочая презентация Д-02 имеют разный статус.';
+  return <figure className="storyNewsIllustration" style={{
+   margin:'12px 0 16px',padding:0,overflow:'hidden',
+   borderRadius:14,border:'1px solid var(--gs-border,#dce3f0)',
+   background:'var(--gs-accent-soft,#edf1ff)'}}>
+   <svg viewBox="0 0 760 236" width="100%" style={{display:'block',height:'auto',width:'100%'}}
+    role="presentation" aria-hidden="true" focusable="false">
+    <rect width="760" height="236" fill="var(--gs-accent-soft,#edf1ff)"/>
+    <path d="M0 205H760 M0 165H760 M0 125H760 M0 85H760" stroke={accent} strokeOpacity=".06"/>
+    {episodeNo===1&&<>
+     <rect x="65" y="28" width="247" height="182" rx="15" fill="white" fillOpacity=".87" stroke={ink} strokeOpacity=".39" strokeWidth="1.6"/>
+     <text x="89" y="65" fontSize="18" fontWeight="700" fill={ink}>ПИСЬМО Д-01</text>
+     <path d="M88 84H271 M88 103H257 M88 122H276 M88 141H225" stroke={accent} strokeWidth="4" strokeLinecap="round" opacity=".32"/>
+     <circle cx="268" cy="179" r="13" fill={accent} fillOpacity=".13" stroke={accent} strokeWidth="2"/>
+     <path d="M327 119H411" fill="none" stroke={accent} strokeWidth="3" strokeDasharray="6 8"/>
+     <path d="M396 108L414 119L396 130" fill="none" stroke={accent} strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"/>
+     <rect x="432" y="28" width="264" height="182" rx="15" fill="white" fillOpacity=".68" stroke={accent} strokeOpacity=".35" strokeWidth="1.6"/>
+     <text x="454" y="64" fontSize="18" fontWeight="700" fill={ink}>ИДЕЯ ВЫСТАВКИ</text>
+     <path d="M471 153V102L566 78L661 102V153 M476 153H655" fill="none" stroke={ink} strokeWidth="2.6" strokeLinejoin="round" opacity=".58"/>
+     <path d="M495 153V105 M531 153V94 M566 153V85 M601 153V94 M638 153V105" fill="none" stroke={accent} strokeWidth="5" opacity=".19"/>
+     <text x="451" y="185" fontSize="15" fontWeight="700" fill={accent}>РЕШЕНИЕ НЕ ПРИНЯТО</text>
+    </>}
+    {episodeNo===2&&<>
+     <text x="70" y="57" fontSize="22" fontWeight="700" fill={ink}>СЕМЬ ТОЧЕК ЗРЕНИЯ</text>
+     <text x="70" y="85" fontSize="15" fill={accent}>Один проект — разные интересы</text>
+     {[102,194,286,378,470,562,654].map((x,i)=><g key={x}>
+      <circle cx={x} cy={146} r="29" fill="white" fillOpacity=".83" stroke={accent} strokeOpacity=".34" strokeWidth="2"/>
+      <circle cx={x} cy={140} r="9" fill={accent} fillOpacity=".28"/>
+      <path d={'M'+(x-15)+' 164Q'+x+' 148 '+(x+15)+' 164'} fill="none" stroke={ink} strokeOpacity=".47" strokeWidth="3" strokeLinecap="round"/>
+      <text x={x} y="203" fontSize="14" textAnchor="middle" fontWeight="600" fill={ink}>{i+1}</text>
+     </g>)}
+    </>}
+    {episodeNo===3&&<>
+     <rect x="63" y="27" width="265" height="177" rx="15" fill="white" fillOpacity=".84" stroke={ink} strokeOpacity=".4" strokeWidth="2"/>
+     <text x="89" y="66" fontSize="22" fontWeight="700" fill={ink}>Д-01</text>
+     <text x="89" y="92" fontSize="16" fill={accent}>Предварительное письмо</text>
+     <path d="M89 120H299 M89 138H274 M89 156H287" stroke={accent} strokeWidth="3.6" opacity=".31" strokeLinecap="round"/>
+     <path d="M377 96L394 116L411 96 M377 138L394 116L411 138" fill="none" stroke={accent} strokeWidth="3" strokeLinecap="round"/>
+     <rect x="460" y="27" width="249" height="177" rx="15" fill="white" fillOpacity=".74" stroke={accent} strokeOpacity=".5" strokeWidth="2"/>
+     <text x="485" y="66" fontSize="22" fontWeight="700" fill={ink}>Д-02</text>
+     <text x="485" y="92" fontSize="16" fill={accent}>Рабочая презентация</text>
+     <path d="M486 120H682 M486 138H664 M486 156H673" stroke={accent} strokeWidth="3.6" opacity=".31" strokeLinecap="round"/>
+    </>}
+   </svg>
+   <figcaption style={{padding:'10px 14px',fontSize:12,lineHeight:1.5,
+    color:'var(--gs-text-muted,#607995)',background:'var(--gs-surface,#fff)'}}>
+    {caption}
+   </figcaption>
+  </figure>;
+ }
+
  return <div className="storyNewsIllustration" aria-hidden="true"
   style={{overflow:'hidden',borderRadius:14,border:'1px solid var(--gs-border,#dce3f0)',
    background:'var(--gs-accent-soft,#edf1ff)',margin:'12px 0 16px'}}>

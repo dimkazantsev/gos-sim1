@@ -42,7 +42,8 @@ const RESOURCE_VIEWS:{value:View;label:string}[]=[
 ];
 function PostText({post,onNavigate,onOpenDocument,onOpenVotes}:{post:PoliticalPost;onNavigate:(view:View,target?:{stageNo?:number})=>void;onOpenDocument:(id:string)=>void;onOpenVotes:(id?:string)=>void}){
  const [expanded,setExpanded]=useState(false);
- const long=post.body.length>800;
+ // Story chapters are complete articles, not abbreviated activity-feed previews.
+ const long=post.context?.story_campaign!==true&&post.body.length>800;
  const text=long&&!expanded?post.body.slice(0,700).replace(/\s+\S*$/,'')+'…':post.body;
  return <><RichPostText text={text} onNavigate={onNavigate} onOpenDocument={onOpenDocument} onOpenVotes={onOpenVotes}/>{long&&<button className="postReadMore" type="button" aria-expanded={expanded} onClick={()=>setExpanded(v=>!v)}>{expanded?'Свернуть текст':'Читать полностью'}<ChevronDown size={16}/></button>}</>;
 }

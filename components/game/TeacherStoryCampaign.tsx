@@ -3,6 +3,7 @@ import {useEffect,useRef,useState} from 'react';
 import {supabase} from '@/lib/supabase';
 import {userError} from '@/lib/userError';
 import styles from './TeacherStoryCampaign.module.css';
+import StoryNewsIllustration from './StoryNewsIllustration';
 import TeacherStorySupplementPanel from './TeacherStorySupplementPanel';
 import TeacherStoryBranchesPanel from './TeacherStoryBranchesPanel';
 
@@ -12,7 +13,8 @@ type Campaign={prepared:boolean;enabled:boolean;current_episode:number;approved_
  publication_enabled:boolean;episodes:Episode[]};
 type Variant={id:string;title:string;body:string;condition:string};
 type Evidence={kind:string;warning:string;records:Record<string,string>[]};
-type Preview={episode_no:number;stage_no:number;title:string;body:string;
+type StudentGuide={audience:string;action:string;evidence:string;mode:string;stage_number:number};
+type Preview={episode_no:number;stage_no:number;title:string;body:string;student_guide?:StudentGuide;
  evidence_rule:string;editor_note:string;approved:boolean;published:boolean;
  variants?:Variant[];evidence?:Evidence};
 const EVIDENCE_FIELDS:Record<string,string>={vote_status:'Голосование',vote_result:'Результат',program_status:'Государственная программа',document_status:'Документ',project_status:'Муниципальный проект'};
@@ -207,16 +209,11 @@ export default function TeacherStoryCampaign({gameId}:{gameId:string}){
       <h3>{preview.title}</h3>
       <span className={styles.editorStatus}>{preview.published?'Опубликовано':selected?.approved?'Утверждено':'Черновик'}</span>
      </header>
-     {!!preview.editor_note&&<section className={styles.guideSection} aria-label="Сценарный план эпизода">
-      <div className={styles.guideHead}>
-       <h4>{preview.editor_note.startsWith('Редакция 4.2')?'Сценарный план · редакция 4.2':'Заметка редактора'}</h4>
-       <small>Только преподавателю</small>
-      </div>
-      {preview.editor_note.startsWith('Редакция 4.2')&&<p className={styles.helperText}>
-       Здесь указаны исходное событие, допустимые действия участников, проверяемые решения и переход к следующему эпизоду. Это сценарная карта, а не опубликованная новость.
-      </p>}
-      <div className={styles.guideBody}>{preview.editor_note}</div>
-     </section>}
+     <section className={styles.storySection} aria-label="Предварительный просмотр иллюстрации">
+      <h4>Иллюстрация выпуска</h4>
+      <StoryNewsIllustration episodeNo={preview.episode_no}/>
+      <p className={styles.helperText}>Участники увидят эту иллюстрацию над текстом новости в «Политическом процессе» только после публикации. Это схема сюжета, а не фотография или подлинник документа.</p>
+     </section>
      <section className={styles.storySection} aria-label="Содержание эпизода">
       <h4>Текст публикации · черновик</h4>
       {editing&&!preview.published
@@ -228,6 +225,22 @@ export default function TeacherStoryCampaign({gameId}:{gameId:string}){
        </div>
        :<div className={styles.storyText}>{preview.body}</div>}
      </section>
+     {preview.student_guide&&<section className={styles.contextSection} aria-label="Что увидит студент">
+      <h4>Инструкция участнику после публикации</h4>
+      <p><b>Кому:</b> {preview.student_guide.audience}</p>
+      <p><b>Что делать:</b> {preview.student_guide.action}</p>
+      <p><b>Что проверить:</b> {preview.student_guide.evidence}</p>
+     </section>}
+     {!!preview.editor_note&&<section className={styles.guideSection} aria-label="Сценарный план эпизода">
+      <div className={styles.guideHead}>
+       <h4>{preview.editor_note.startsWith('Редакция 4.2')?'Сценарный план · редакция 4.2':'Заметка редактора'}</h4>
+       <small>Только преподавателю</small>
+      </div>
+      {preview.editor_note.startsWith('Редакция 4.2')&&<p className={styles.helperText}>
+       Здесь указаны исходное событие, допустимые действия участников, проверяемые решения и переход к следующему эпизоду. Это сценарная карта, а не опубликованная новость.
+      </p>}
+      <div className={styles.guideBody}>{preview.editor_note}</div>
+     </section>}
      {!!preview.evidence_rule&&<section className={styles.contextSection}>
       <h4>Условия и связь с игровым процессом</h4>
       <p>{preview.evidence_rule}</p>
