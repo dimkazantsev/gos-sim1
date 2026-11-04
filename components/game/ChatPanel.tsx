@@ -341,7 +341,7 @@ export default function ChatPanel({g,draft:text,onDraftChange:setText,previewCha
  }}}>
   <header className="chatTop">
    <div className="chatHeadIcon" aria-hidden="true"><MessageIcon/></div>
-   <ChatChannelDropdown channels={channels} value={channelId} onChange={setChannelId} overview={chatOverview} onPin={setChatChannelPinned} initialOpen={previewChannelOpen} expanded={expanded}/>
+   <ChatChannelDropdown channels={channels} value={channelId} onChange={setChannelId} overview={chatOverview} onPin={setChatChannelPinned} initialOpen={previewChannelOpen} expanded={expanded} onExpand={()=>setExpanded(true)}/>
    {expanded&&<div className="chatExpandedTitle"><b>{channel?.name||'Общение'}</b><small>Общение</small></div>}
    <button type="button" className={'chatIconButton chatSearchToggle '+(searchOpen?'active':'')} onClick={()=>searchOpen?resetSearch():setSearchOpen(true)} aria-label={searchOpen?'Закрыть поиск':'Поиск в чате'} aria-pressed={searchOpen} title="Поиск"><Search aria-hidden="true"/></button>
    <button type="button" className="chatIconButton chatSizeToggle" onClick={()=>setExpanded(value=>!value)} aria-label={expanded?'Свернуть чат':'Развернуть чат'} aria-pressed={expanded} title={expanded?'Свернуть чат':'Развернуть чат'}>{expanded?<Minimize2 aria-hidden="true"/>:<Maximize2 aria-hidden="true"/>}</button>
