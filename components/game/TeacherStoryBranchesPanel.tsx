@@ -90,7 +90,7 @@ export default function TeacherStoryBranchesPanel({gameId,campaignEnabled}:{game
       <option value="undetermined">Не установлено</option><option value="recorded">Решение документально подтверждено</option><option value="neutral">Нет подтверждённого решения / нейтральная реакция</option>
      </select></label>
      <label>Источник<select value={kind} disabled={pending} onChange={e=>setKind(e.target.value)}>{TYPES.map(x=><option key={x.value} value={x.value}>{x.name}</option>)}</select></label>
-     <label>Идентификатор источника<input type="text" value={sourceId} disabled={pending} onChange={e=>setSourceId(e.target.value)} placeholder="UUID записи ГОС.ID"/></label>
+     <label>Идентификатор источника<input type="text" value={sourceId} disabled={pending} onChange={e=>setSourceId(e.target.value)} placeholder="Идентификатор записи ГОС.ID"/></label>
      <label>Что именно подтверждает документ<textarea rows={5} maxLength={1500} disabled={pending} value={note} onChange={e=>setNote(e.target.value)} placeholder="Опишите проверенный факт, не приписывайте органу несуществующее решение."/></label>
     </div>
     <div className={styles.actions}><button type="button" disabled={pending||!changed||current.published} onClick={()=>void save()}>Сохранить проверку</button><button type="button" disabled={pending||changed||current.published||!campaignEnabled||!current.reviewed_outcome||current.reviewed_outcome==='undetermined'} onClick={()=>void publish()}>Опубликовать реакцию</button></div>
