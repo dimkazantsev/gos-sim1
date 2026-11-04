@@ -493,6 +493,6 @@ export default function ChatPanel({g,draft:text,onDraftChange:setText,previewCha
    </div>
   </div>:<div className="chatGuestNote">Гостевой режим: просмотр переписки без отправки сообщений.</div>}
  </aside>;
- return expanded?createPortal(chatView,document.body):chatView;
+ return overlay||expanded?createPortal(chatView,document.body):chatView;
 }
 function MessageIcon(){return <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M20 11.5a8 8 0 0 1-8 8 8.2 8.2 0 0 1-3.5-.8L4 20l1.3-4.4A8 8 0 1 1 20 11.5Z"/></svg>}
