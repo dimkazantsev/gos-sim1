@@ -25,6 +25,13 @@
 .stagePolicyFooter button:first-child{background:#fff;color:#69809e;border-color:#dde5ef}
 .stagePolicyFooter button:last-child,.teacherGhostPanel footer button:last-child,.eventComposerPanel footer button{background:#315feb;color:#fff;border-color:#315feb}
 .stagePolicyMessage,.ghostNotice,.eventNotice{margin:0;padding:11px;border:1px solid #dce7f2;border-radius:9px;color:#41658e;background:#f5f9ff;font-size:12px;line-height:1.45}
+/* Constrain the selected stage consequence to the real card width. */
+.stagePolicyEditor{box-sizing:border-box;min-width:0;max-width:100%}
+.stagePolicyEditor .styledSelect{box-sizing:border-box;min-width:0;max-width:100%;width:100%}
+.stagePolicyEditor .styledSelectTrigger{box-sizing:border-box;display:flex;align-items:center;gap:9px;min-width:0;max-width:100%;width:100%;overflow:hidden}
+.stagePolicyEditor .styledSelectValue{min-width:0;flex:1 1 auto;overflow-wrap:anywhere}
+.stagePolicyEditor .styledSelectTrigger>svg{flex:0 0 auto}
+
 .teacherPartyDossiers,.teacherGhostPanel,.eventWorkspace{display:grid;gap:18px;padding:21px;border:1px solid #dde6f1;border-radius:17px;background:#fff;min-width:0}
 .teacherPartyDossierHead,.teacherGhostPanel>header,.eventWorkspace>header{display:flex;align-items:start;justify-content:space-between;gap:18px}
 .teacherPartyDossierHead>div,.teacherGhostPanel>header>div,.eventWorkspace>header>div{min-width:0}

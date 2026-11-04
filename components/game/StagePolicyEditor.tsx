@@ -93,7 +93,7 @@ export default function StagePolicyEditor({g,stageNo}:{g:ReturnTypeRepublic;stag
    <label>Дедлайн<input type="datetime-local" value={deadline} onChange={e=>setDeadline(e.target.value)}/></label>
    <StyledSelect label="Правило срока" value={inclusive?'inclusive':'exclusive'} onChange={v=>setInclusive(v==='inclusive')} options={[{value:'inclusive',label:'До, включительно'},{value:'exclusive',label:'Строго до указанного времени'}]}/>
    <label>Штраф студенту, баллов<input type="number" step="0.5" min="0" max="3" value={penalty} onChange={e=>setPenalty(e.target.value)}/></label>
-   <StyledSelect label="Последствие для партии" value={consequenceType} onChange={v=>{setConsequenceType(v as typeof CONSEQUENCE_OPTIONS[number]['value']);if(v==='none')setConsequenceMagnitude('')}} options={CONSEQUENCE_OPTIONS.map(x=>({value:x.value,label:x.label}))}/>
+   <StyledSelect wrap label="Последствие для партии" value={consequenceType} onChange={v=>{setConsequenceType(v as typeof CONSEQUENCE_OPTIONS[number]['value']);if(v==='none')setConsequenceMagnitude('')}} options={CONSEQUENCE_OPTIONS.map(x=>({value:x.value,label:x.label}))}/>
    {consequenceType!=='none'&&<label>Величина последствия<div className="stagePolicyMagnitudeField"><input type="number" min="0.1" step="0.1" value={consequenceMagnitude} onChange={e=>setConsequenceMagnitude(e.target.value)} placeholder="0"/><span>{consequenceType==='representation_loss'||consequenceType==='regional_seat_loss'?'Мест':'Значение'}</span></div></label>}
    <label className="stagePolicyDescription">Основание правила<input type="text" maxLength={240} value={description} onChange={e=>setDescription(e.target.value)}/></label>
   </div>

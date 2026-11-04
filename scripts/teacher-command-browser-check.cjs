@@ -170,6 +170,37 @@ async function check(){
    }
    console.log('PASS '+width+'px: 16 stable list rows, contextual reset, twelve workspaces, no overflow');
   }
+  // The long selected consequence must fit the stage inspector, including
+  // when a desktop sidebar leaves the policy card narrow.
+  const policySource=fs.readFileSync(path.join(root,'components/game/StagePolicyEditor.tsx'),'utf8');
+  assert(policySource.includes('<StyledSelect wrap label="Последствие для партии"'),
+   'The long selected consequence must wrap instead of expanding its field');
+  await page.locator('#screen').selectOption('teacher-stages');
+  for(const width of [1440,900,620,430,390,320]){
+   await page.locator('#preview').evaluate((el,n)=>{el.style.width=n+'px'},width);
+   const policyGeometry=await frame.locator('.teacherStageInspector').evaluate(inspector=>{
+    const card=document.createElement('section');
+    card.className='stagePolicyEditor';
+    card.style.margin='0';
+    card.innerHTML='<div class="stagePolicyFields"><div class="styledSelect"><span class="styledSelectLabel">Последствие для партии</span><button type="button" class="styledSelectTrigger" style="height:auto;padding:11px 14px"><span class="styledSelectValue" style="white-space:normal;overflow:visible;text-overflow:clip;overflow-wrap:anywhere">Повышение риска отсутствия депутатов при голосовании</span><svg width="17" height="17" aria-hidden="true"></svg></button></div></div>';
+    inspector.append(card);
+    const measure=el=>{const r=el.getBoundingClientRect();return {left:r.left,right:r.right,height:r.height}};
+    const field=card.querySelector('.styledSelect');
+    const trigger=card.querySelector('.styledSelectTrigger');
+    const value=card.querySelector('.styledSelectValue');
+    const result={card:measure(card),field:measure(field),trigger:measure(trigger),value:measure(value),
+     cardScroll:card.scrollWidth,cardClient:card.clientWidth,valueScroll:value.scrollWidth,valueClient:value.clientWidth};
+    card.remove();return result;
+   });
+   assert(policyGeometry.field.right<=policyGeometry.card.right+1&&
+     policyGeometry.trigger.right<=policyGeometry.card.right+1,
+     'Consequence selector escapes its card at '+width+'px: '+JSON.stringify(policyGeometry));
+   assert(policyGeometry.cardScroll<=policyGeometry.cardClient+1&&
+     policyGeometry.valueScroll<=policyGeometry.valueClient+1,
+     'Consequence label overflows at '+width+'px: '+JSON.stringify(policyGeometry));
+   assert(policyGeometry.trigger.height>=policyGeometry.value.height,
+     'Wrapped consequence value is clipped vertically at '+width+'px');
+  }
   for(const [screen,selector] of [
    ['teacher-journal','.classroomJournal'],
    ['teacher-analytics','.participantsAnalytics'],
