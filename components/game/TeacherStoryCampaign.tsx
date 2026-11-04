@@ -159,7 +159,8 @@ export default function TeacherStoryCampaign({gameId}:{gameId:string}){
     </button>
    </div>
   </div>
-  {(expanded||loaded)&&<div id="story-campaign-content" className={['teacherDetailsBody',styles.campaignBody].join(' ')} hidden={!expanded}>
+  <div id="story-campaign-content" className={['teacherDetailsBody',styles.campaignBody].join(' ')} hidden={!expanded}>
+   {(expanded||loaded)&&<>
    <div className={styles.toolbar}>
     {campaign&&<div className={styles.summary} role="status">
      <span>Выпуск <b>{campaign.current_episode} из 24</b></span>
@@ -311,6 +312,7 @@ export default function TeacherStoryCampaign({gameId}:{gameId:string}){
    </div>}
    {campaign?.prepared&&<TeacherStorySupplementPanel key={gameId} gameId={gameId} campaignEnabled={campaign.enabled}/>}
    {campaign?.prepared&&<TeacherStoryBranchesPanel key={'branches-'+gameId} gameId={gameId}/>}
-  </div>}
+   </>}
+  </div>
  </section>;
 }
