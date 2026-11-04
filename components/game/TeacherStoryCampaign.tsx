@@ -235,8 +235,8 @@ export default function TeacherStoryCampaign({gameId}:{gameId:string}){
        <p className={styles.helperText}>Иллюстрация точно соответствует оформлению выпуска в разделе «Политический процесс». Она встроена в приложение: дополнительных запросов и загрузки изображения нет.</p>
        <article className={styles.visualPreviewArticle}>
         <small>ГОС.ID · Сюжетная хроника · Этап {preview.stage_no}</small>
-        <StoryNewsIllustration episodeNo={preview.episode_no}/>
         <h4>{title}</h4>
+        <StoryNewsIllustration episodeNo={preview.episode_no}/>
         <div className={styles.storyText}>{body}</div>
        </article>
        <p className={styles.helperText}>Предпросмотр не публикует новость. Изменения текста видны здесь сразу, но попадают в игру только после сохранения, утверждения и отдельной публикации.</p>
