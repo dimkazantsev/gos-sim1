@@ -259,7 +259,7 @@ check('Chat uses one accessible styled channel switcher in the header',
  chat.includes('onExpand={()=>setExpanded(true)}')&&
  read('components/game/ChatChannelDropdown.tsx').includes('role="menuitemradio"')&&
  read('components/game/ChatChannelDropdown.tsx').includes('aria-expanded={expanded?open:false}')&&
- read('components/game/ChatChannelDropdown.tsx').includes('if(!expanded&&onExpand){setOpen(false);onExpand();return}')&&
+ read('components/game/ChatChannelDropdown.tsx').includes("if(!expanded&&onExpand&&window.matchMedia('(min-width:761px)').matches){setOpen(false);onExpand();return}")&&
  !chat.includes('<select aria-label="Канал общения"'));
 check('Chat supports real backend pinning and icon-only send',
  chat.includes('chatPinnedWrap')&&chat.includes('setChatPin(m.id,!pinned)')&&
