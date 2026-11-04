@@ -472,6 +472,7 @@ jobs:
       - run: node scripts/action-error-placement-check.cjs
       - run: node scripts/vote-office-grants-check.cjs
       - run: node scripts/chat-channel-selection-check.cjs
+      - run: node scripts/chat-expanded-layout-browser-check.cjs
       - run: node scripts/chat-realtime-check.cjs
       - run: node scripts/chat-history-pagination-check.cjs
       - run: node scripts/chat-media-transport-check.cjs
