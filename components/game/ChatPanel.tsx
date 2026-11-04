@@ -265,7 +265,7 @@ export default function ChatPanel({g,draft:text,onDraftChange:setText,previewCha
    mobile.removeEventListener('change',align);tablet.removeEventListener('change',align);
    node.style.removeProperty('height');node.style.removeProperty('top');node.style.removeProperty('bottom');
   };
- },[expanded]);
+ },[expanded,overlay]);
  const scrollToLatest=()=>{if(list.current){list.current.scrollTop=list.current.scrollHeight;follow.current=true;setJumpVisible(false)}};
  async function send(){
   if(pendingSend.current||sending||uploading||chatLoading||!text.trim()||!channelId)return;
