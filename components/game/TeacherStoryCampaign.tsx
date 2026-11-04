@@ -5,6 +5,7 @@ import {userError} from '@/lib/userError';
 import styles from './TeacherStoryCampaign.module.css';
 import TeacherStorySupplementPanel from './TeacherStorySupplementPanel';
 import TeacherStoryBranchesPanel from './TeacherStoryBranchesPanel';
+import StoryNewsIllustration from './StoryNewsIllustration';
 
 type Episode={episode_no:number;stage_no:number;title:string;loaded:boolean;approved:boolean;published:boolean};
 type Campaign={prepared:boolean;enabled:boolean;current_episode:number;approved_episodes:number;
@@ -228,6 +229,19 @@ export default function TeacherStoryCampaign({gameId}:{gameId:string}){
        </div>
        :<div className={styles.storyText}>{preview.body}</div>}
      </section>
+     <details className={styles.visualPreview} aria-label="Предпросмотр оформления сюжетной новости">
+      <summary>Как новость увидят студенты · иллюстрация и текст</summary>
+      <div className={styles.visualPreviewContent}>
+       <p className={styles.helperText}>Иллюстрация точно соответствует оформлению выпуска в разделе «Политический процесс». Она встроена в приложение: дополнительных запросов и загрузки изображения нет.</p>
+       <article className={styles.visualPreviewArticle}>
+        <small>ГОС.ID · Сюжетная хроника · Этап {preview.stage_no}</small>
+        <StoryNewsIllustration episodeNo={preview.episode_no}/>
+        <h4>{title}</h4>
+        <div className={styles.storyText}>{body}</div>
+       </article>
+       <p className={styles.helperText}>Предпросмотр не публикует новость. Изменения текста видны здесь сразу, но попадают в игру только после сохранения, утверждения и отдельной публикации.</p>
+      </div>
+     </details>
      {!!preview.evidence_rule&&<section className={styles.contextSection}>
       <h4>Условия и связь с игровым процессом</h4>
       <p>{preview.evidence_rule}</p>
