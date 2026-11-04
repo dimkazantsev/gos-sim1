@@ -9,6 +9,7 @@ import StyledSelect from '../ui/StyledSelect';
 import ScoreFormula from './ScoreFormula';
 import BlitzKnowledgeScore from './BlitzKnowledgeScore';
 import {ChevronDown} from 'lucide-react';
+import {formatGradeScore,parseTeacherGradeInput} from '@/lib/gradeScore';
 import {assessmentRationaleParagraphs,assessmentRationaleSections,assessmentRationaleDetail,assessmentDisplaySentence,assessmentRunLabel} from './assessmentPresentation';
 import {useGameTableSync} from './useGameTableSync';
 import {stageAnalysisPhase} from './stageAnalysisWindow';
@@ -27,9 +28,8 @@ export type PublicGradeScore=Pick<Assessment,'user_id'|'stage_no'|'auto_score'|'
 
 const STAGES=Array.from({length:16},(_,i)=>i+1);
 const shownScore=(a?:Assessment)=>a?(a.status==='final'?(a.final_score??a.auto_score):a.auto_score):null;
-const level=(n:number)=>n===3?'Высокий':n===2?'Средний':n===1?'Низкий':n>0?'С учётом штрафа':'Нет участия';
-const isFinalScore=(n:number|null):n is number=>n!==null&&Number.isInteger(n)&&n>=0&&n<=3;
-const finalScoreChoice=(a?:Assessment)=>{const score=shownScore(a);return isFinalScore(score)?score:null;};
+const level=(n:number)=>n>=3?'Высокий':n>=2?'Средний':n>0?'Низкий':'Нет участия';
+const finalScoreChoice=(a?:Assessment)=>{const score=shownScore(a);return score!==null&&Number.isFinite(score)&&score>=0&&score<=3?formatGradeScore(score):'';};
 const when=(v?:string|null)=>v?new Date(v).toLocaleString('ru-RU',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}):'—';
 
 export default function GradesView({g,compact=false,onOpenProfile,onPublicScores}:{g:ReturnTypeRepublic;compact?:boolean;onOpenProfile?:(id:string)=>void;onPublicScores?:(rows:PublicGradeScore[])=>void}){
@@ -45,7 +45,7 @@ export default function GradesView({g,compact=false,onOpenProfile,onPublicScores
  const [evidence,setEvidence]=useState<Evidence|null>(null);
  const [loadingEvidence,setLoadingEvidence]=useState(false);
  const [selectedDebrief,setSelectedDebrief]=useState<string|null>(null);
- const [editScore,setEditScore]=useState<number|null>(null);
+ const [editScore,setEditScore]=useState('');
  const [note,setNote]=useState('');
  const [busy,setBusy]=useState(false);
  const [debrief,setDebrief]=useState('');
@@ -265,7 +265,7 @@ export default function GradesView({g,compact=false,onOpenProfile,onPublicScores
  const assessment=selected?rows.find(x=>x.user_id===selected.userId&&x.stage_no===selected.stageNo):undefined;
  const selectedStudent=selected?members.find(m=>m.user_id===selected.userId):undefined;
  useEffect(()=>{
-  if(teacher&&assessment?.status==='draft'&&!Number.isInteger(assessment.auto_score))setEditScore(null);
+  if(teacher&&assessment?.status==='draft'&&!Number.isFinite(assessment.auto_score))setEditScore('');
  },[assessment?.id,assessment?.auto_score,assessment?.status,teacher]);
 
  async function syncTeacherDraft(assessmentId:string){
@@ -293,9 +293,10 @@ export default function GradesView({g,compact=false,onOpenProfile,onPublicScores
  }
  async function finalize(){
   if(!assessment||!teacher)return;
-  if(!isFinalScore(editScore)){g.setError('Выберите итоговый целый балл от 0 до 3.');return;}
+  const score=parseTeacherGradeInput(editScore);
+  if(score===null){g.setError('Введите итоговый балл от 0 до 3, не более двух знаков после запятой.');return;}
   setBusy(true);
-  const r=await supabase.rpc('finalize_stage_assessment',{p_assessment_id:assessment.id,p_score:editScore,p_teacher_note:note||null});
+  const r=await supabase.rpc('finalize_stage_assessment',{p_assessment_id:assessment.id,p_score:score,p_teacher_note:note||null});
   if(r.error)g.setError(r.error.message);else await load();
   setBusy(false);
  }
@@ -317,8 +318,8 @@ export default function GradesView({g,compact=false,onOpenProfile,onPublicScores
  if(!game||!me)return null;
  if(compact){
   return <section className="surface vsnCompact">
-   <div className="surfaceHead"><div><small>ЖУРНАЛ ВСН</small><h2>Динамика по 16 этапам</h2></div><strong>{myAverage!==null?myAverage.toFixed(2):'—'}</strong></div>
-   <div className="vsnMiniTrend">{STAGES.map(n=>{const a=myRows.find(x=>x.stage_no===n),v=shownScore(a);return <button key={n} className={a?.status||'empty'} onClick={()=>void open(me.user_id,n)} aria-label={'Этап '+n+', оценка '+(v??'нет')}><small>{n}</small><b>{v??'—'}</b></button>})}</div>
+   <div className="surfaceHead"><div><small>ЖУРНАЛ ВСН</small><h2>Динамика по 16 этапам</h2></div><strong>{myAverage!==null?formatGradeScore(myAverage):'—'}</strong></div>
+   <div className="vsnMiniTrend">{STAGES.map(n=>{const a=myRows.find(x=>x.stage_no===n),v=shownScore(a);return <button key={n} className={a?.status||'empty'} onClick={()=>void open(me.user_id,n)} aria-label={'Этап '+n+', оценка '+(v===null?'нет':formatGradeScore(v))}><small>{n}</small><b>{formatGradeScore(v)}</b></button>})}</div>
    <p className="vsnCompactHint">Нажмите на этап, чтобы увидеть критерии и обоснование оценки.</p>
    {expiredNoticeStage!==null&&<div className={analysisNoticeStyles.backdrop}>
     <section ref={expiredNoticeRef} tabIndex={-1} className={analysisNoticeStyles.dialog} role="dialog" aria-modal="true" aria-labelledby="grade-expired-stage-title" aria-describedby="grade-expired-stage-description">
@@ -371,9 +372,9 @@ export default function GradesView({g,compact=false,onOpenProfile,onPublicScores
     <div className="gradesMatrixHead" role="row"><b>Студент</b><span className="gradeTotalHead">Σ</span><span className="gradeTotalHead">Ср.</span>{STAGES.map(n=><span key={n} title={stages.find(s=>s.stage_no===n)?.title||''}>{n}</span>)}</div>
     {sortedStudents.length===0?<div className="emptyState">Нет студентов по выбранным фильтрам.</div>:sortedStudents.map(s=><div className="gradesMatrixRow" role="row" key={s.user_id}>
      <div className="gradesStudentCell">{onOpenProfile?<button type="button" className="gradesProfileLink" onClick={()=>onOpenProfile(s.user_id)} aria-label={s.full_name} title={s.full_name}><span className="gradesNameFull">{s.full_name}</span><span className="gradesNameShort" aria-hidden="true">{s.full_name.trim().split(/\s+/)[0]||s.full_name}</span></button>:<b className="gradesStudentName" title={s.full_name}><span className="gradesNameFull">{s.full_name}</span><span className="gradesNameShort" aria-hidden="true">{s.full_name.trim().split(/\s+/)[0]||s.full_name}</span></b>}<small>{s.team||'Без партии'} · {s.role_title||'Роль не назначена'}</small></div>
-     <span className="gradeTotal">{gradeByStudent.get(s.user_id)?.graded?gradeByStudent.get(s.user_id)?.sum:'—'}</span>
-     <span className="gradeTotal">{gradeByStudent.get(s.user_id)?.average?.toFixed(2)??'—'}</span>
-     {STAGES.map(n=>{const a=rows.find(x=>x.user_id===s.user_id&&x.stage_no===n),v=shownScore(a);return <button key={n} className={a?.status||'empty'} onClick={()=>void open(s.user_id,n)} aria-label={s.full_name+', этап '+n+', '+(v??'нет оценки')}><b>{v??'—'}</b><small>{a?.status==='final'?'итог':a?'авто':''}</small></button>})}
+     <span className="gradeTotal">{gradeByStudent.get(s.user_id)?.graded?formatGradeScore(gradeByStudent.get(s.user_id)?.sum):'—'}</span>
+     <span className="gradeTotal">{formatGradeScore(gradeByStudent.get(s.user_id)?.average)}</span>
+     {STAGES.map(n=>{const a=rows.find(x=>x.user_id===s.user_id&&x.stage_no===n),v=shownScore(a);return <button key={n} className={a?.status||'empty'} onClick={()=>void open(s.user_id,n)} aria-label={s.full_name+', этап '+n+', '+(v===null?'нет оценки':formatGradeScore(v))}><b>{formatGradeScore(v)}</b><small>{a?.status==='final'?'итог':a?'авто':''}</small></button>})}
     </div>)}
    </div>
   </section>
@@ -405,11 +406,11 @@ function AssessmentModal(p:any){
  return <div className="gradeModalBack" onMouseDown={e=>{if(e.target===e.currentTarget)close()}}><article ref={dialogRef} tabIndex={-1} className="gradeModal gradeModalRefined" role="dialog" aria-modal="true" aria-labelledby="assessment-title">
   <header className="gradeModalHeading"><div><small>Этап {selected.stageNo} · Результат участника</small><h2 id="assessment-title">{student?.full_name||g.me?.full_name}</h2><p>{g.stages.find((s:any)=>s.stage_no===selected.stageNo)?.title}</p></div><IconAction onClick={close} label="Закрыть оценку"/></header>
   {!a?<div className="emptyState gradeEmpty">Черновик ещё не создан.{teacher&&<><br/><button className="primary" disabled={busy} onClick={()=>void ensureDraft()}>Рассчитать сейчас</button></>}</div>:<>
-   <div className={'gradeScoreHero '+a.status}><strong>{v}</strong><div><span className="gradeScoreCaption">Оценка за этап · из 3 баллов</span><b>{level(v??0)}</b><span>{a.status==='final'?'Итоговая оценка преподавателя':'Автоматический черновик'}</span></div></div>
+   <div className={'gradeScoreHero '+a.status}><strong>{formatGradeScore(v)}</strong><div><span className="gradeScoreCaption">Оценка за этап · из 3 баллов</span><b>{level(v??0)}</b><span>{a.status==='final'?'Итоговая оценка преподавателя':'Автоматический черновик'}</span></div></div>
 <BlitzKnowledgeScore gameId={g.game?.id||''} userId={selected.userId} stageNo={selected.stageNo}/>
 {canSeeEvidence&&<>
    <div className="gradeCriteria"><span className={a.criterion_law?'ok':'miss'}><b>{a.criterion_law?'✓':'○'}</b> Право и правила</span><span className={a.criterion_strategy?'ok':'miss'}><b>{a.criterion_strategy?'✓':'○'}</b> Стратегия и интересы</span><span className={a.criterion_debrief?'ok':'miss'}><b>{a.criterion_debrief?'✓':'○'}</b> Анализ этапа</span></div>
-   {teacher&&<section className="gradeApproval"><StyledSelect label="Итоговый балл" value={editScore===null?'':String(editScore)} onChange={v=>setEditScore(v===''?null:Number(v))} options={[{value:'',label:'Выберите итоговый балл'},...[0,1,2,3].map(n=>({value:String(n),label:n+' · '+level(n)}))]}/><label>Комментарий<textarea rows={3} value={note} onChange={e=>setNote(e.target.value)} placeholder="Почему вы подтверждаете или меняете автооценку"/></label><div>{a.status==='final'?<button onClick={()=>void reopen()} disabled={busy}>Переоткрыть оценку</button>:<><button onClick={()=>void recalc()} disabled={busy}>Пересчитать сейчас</button><button className="primary" onClick={()=>void finalize()} disabled={busy||!isFinalScore(editScore)}>Утвердить как итоговую</button></>}</div></section>}
+   {teacher&&<section className="gradeApproval"><label className="gradeScoreInput">Итоговый балл<input type="text" inputMode="decimal" autoComplete="off" maxLength={4} value={editScore} onChange={e=>setEditScore(e.target.value)} aria-describedby="grade-score-hint" aria-invalid={editScore!==''&&parseTeacherGradeInput(editScore)===null} placeholder="Например, 1,40"/><small id="grade-score-hint">От 0 до 3, до двух знаков после запятой. Допустимы 0,5 и 1,4.</small></label><label>Комментарий<textarea rows={3} value={note} onChange={e=>setNote(e.target.value)} placeholder="Почему вы подтверждаете или меняете автооценку"/></label><div>{a.status==='final'?<button onClick={()=>void reopen()} disabled={busy}>Переоткрыть оценку</button>:<><button onClick={()=>void recalc()} disabled={busy}>Пересчитать сейчас</button><button className="primary" onClick={()=>void finalize()} disabled={busy||parseTeacherGradeInput(editScore)===null}>Утвердить как итоговую</button></>}</div></section>}
    <section className="gradeRationale gradeRationaleExplained">
     <header className="gradeRationaleHeading"><small>ПОЯСНЕНИЕ ОЦЕНКИ</small><h3>За что начисляются баллы</h3>
      <p className="gradeRationaleIntro">За этап учитываются три направления: соблюдение законов, участие в принятии решений и анализ результатов. Правовые знания могут давать дробные баллы. Окончательную оценку утверждает преподаватель.</p>
@@ -421,7 +422,7 @@ function AssessmentModal(p:any){
 </>}
 
   </>}
-  {a&&runs?.length>0&&<details className="gradeRunHistory"><summary>История автоматических пересчётов <span>{runs.length}</span></summary><div>{runs.map((r:Run)=><article key={r.id}><time className="gradeRunTime">{when(r.created_at)}</time><b className="gradeRunScore">{r.auto_score}/3 · {level(r.auto_score)}</b><span className="gradeRunTrigger">{assessmentRunLabel(r.run_type)}</span><em className="gradeRunCriteria">{r.criterion_law?'Право ✓':'Право ○'} · {r.criterion_strategy?'Стратегия ✓':'Стратегия ○'} · {r.criterion_debrief?'Анализ ✓':'Анализ ○'}</em></article>)}</div></details>}
+  {a&&runs?.length>0&&<details className="gradeRunHistory"><summary>История автоматических пересчётов <span>{runs.length}</span></summary><div>{runs.map((r:Run)=><article key={r.id}><time className="gradeRunTime">{when(r.created_at)}</time><b className="gradeRunScore">{formatGradeScore(r.auto_score)}/3 · {level(r.auto_score)}</b><span className="gradeRunTrigger">{assessmentRunLabel(r.run_type)}</span><em className="gradeRunCriteria">{r.criterion_law?'Право ✓':'Право ○'} · {r.criterion_strategy?'Стратегия ✓':'Стратегия ○'} · {r.criterion_debrief?'Анализ ✓':'Анализ ○'}</em></article>)}</div></details>}
   {teacher&&<section className="gradeEvidence" aria-label="Анализ этапа студента">
    <div className="gradeEvidenceHead"><div><small>ЛИЧНЫЙ АНАЛИЗ</small><h3>Анализ этапа студента</h3></div></div>
    {loading?<p>Загрузка анализа…</p>:selectedDebrief?<p style={{whiteSpace:'pre-wrap',overflowWrap:'anywhere'}}>{selectedDebrief}</p>:<p>Анализ этапа ещё не отправлен.</p>}

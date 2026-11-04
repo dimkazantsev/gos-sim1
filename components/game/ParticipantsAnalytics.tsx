@@ -6,6 +6,7 @@ import {supabase} from '@/lib/supabase';
 import StyledSelect from '../ui/StyledSelect';
 import type {ReturnTypeRepublic} from './viewTypes';
 import {useGameTableSync} from './useGameTableSync';
+import {formatGradeScore} from '@/lib/gradeScore';
 type Assessment={user_id:string;stage_no:number;auto_score:number;final_score:number|null;status:'draft'|'final'};
 type Sort='surname'|'name'|'score'|'average'|'approved'|'activity'|'posts'|'votes';
 const score=(a:Assessment)=>a.status==='final'?(a.final_score??a.auto_score):a.auto_score;
@@ -75,7 +76,7 @@ export default function ParticipantsAnalytics({g}:{g:ReturnTypeRepublic}){
  const totalAssessed=filtered.reduce((x,r)=>x+r.assessed,0);
  function csv(){
   const values=[['Фамилия и имя','Партия или группа','Балл всего','Средний балл','Оценено этапов','Утверждено','Посты','НПА','Голоса','Активность'],...filtered.map(r=>[
-   r.m.full_name,r.m.team||r.m.group_name||'',r.sum.toString(),r.average===null?'':r.average.toFixed(2),
+   r.m.full_name,r.m.team||r.m.group_name||'',formatGradeScore(r.sum),r.average===null?'':formatGradeScore(r.average),
    String(r.assessed),String(r.approved),String(r.posts),String(r.documents),String(r.votes),String(r.activity)])];
   const contents=values.map(row=>row.map(v=>'"'+String(v).replaceAll('"','""')+'"').join(';')).join('\r\n');
   const blob=new Blob(['\ufeff'+contents],{type:'text/csv;charset=utf-8'});const url=URL.createObjectURL(blob);
@@ -106,7 +107,7 @@ export default function ParticipantsAnalytics({g}:{g:ReturnTypeRepublic}){
   <div className="participantsTableScroll" role="region" aria-label="Таблица аналитики участников" tabIndex={0}>
    <table className="participantsTable"><thead><tr><th>Участник</th><th>Сумма</th><th>Среднее</th><th>Этапы</th><th>Итоговых</th><th>Посты</th><th>НПА</th><th>Голоса</th><th>Активность</th></tr></thead>
     <tbody>{filtered.map(r=><tr key={r.m.user_id}><th scope="row"><strong>{r.m.full_name}</strong><small>{r.m.team||r.m.group_name||'Без группы'} · {r.m.role_title||'Роль не назначена'}</small></th>
-     <td><b>{r.assessed?r.sum:'—'}</b></td><td>{r.average===null?'—':r.average.toFixed(2)}</td><td>{r.assessed}/16</td><td>{r.approved}</td><td>{r.posts}</td><td>{r.documents}</td><td>{r.votes}</td><td>{r.activity}</td></tr>)}</tbody>
+     <td><b>{r.assessed?formatGradeScore(r.sum):'—'}</b></td><td>{formatGradeScore(r.average)}</td><td>{r.assessed}/16</td><td>{r.approved}</td><td>{r.posts}</td><td>{r.documents}</td><td>{r.votes}</td><td>{r.activity}</td></tr>)}</tbody>
    </table>
    {!filtered.length&&<div className="journalEmpty">Нет участников по выбранным условиям.</div>}
   </div>

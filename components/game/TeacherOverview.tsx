@@ -4,6 +4,7 @@ import {Activity,ArrowRight,BookOpenText,FileText,GraduationCap,Landmark,Newspap
 import {supabase} from '@/lib/supabase';
 import {userError} from '@/lib/userError';
 import {moneyMillions,quantity} from '@/lib/formatQuantity';
+import {formatGradeScore} from '@/lib/gradeScore';
 import {budgetModeLabel} from './useBudgetPulse';
 import {budgetDisplay} from './federalBudgetMath';
 import type {FiscalContext} from './fiscalMath';
@@ -119,7 +120,7 @@ export default function TeacherOverview({g,onWorkspace,onNavigate}:{g:ReturnType
   {key:'mandates',title:'Мандаты Государственной Думы',Icon:Landmark,value:s?.mandates_allocated,unit:'мандатов распределено студентам',items:[['У фракций',s?.mandates],['Доступно с учётом отсутствующих депутатов и штрафов',s?.mandates_available],['Нормативный состав ГД',450]],action:()=>onWorkspace('parties'),button:'Открыть фракции'},
   {key:'votes',title:'Голосования',Icon:Vote,value:s?.ballots_open,unit:'бюллетеней в открытых процедурах',items:[['Процедур завершено',s?.votes_closed],['Без кворума',s?.votes_failed_quorum],['Сейчас открыто',s?.votes_open]],action:navigate('votes'),button:'Открыть голосование'},
   {key:'events',title:'Правовые ситуации',Icon:Zap,value:s?.cases_active,unit:'кейсов ожидают решения',items:[['Решено ситуаций',s?.cases_resolved],['Приглашения без ответа',s?.case_invites_waiting]],action:()=>onWorkspace('event'),button:'Открыть ситуации'},
-  {key:'grades',title:'Оценки за этапы',Icon:GraduationCap,value:s?.grades_final,unit:'оценок подтверждено',items:[['Ожидают проверки',s?.grades_waiting],['Средний подтвержденный балл',s?s.grade_average===null?'Нет оценок':quantity(s.grade_average,'из 3'):'…']],action:()=>onWorkspace('grades'),button:'Открыть журнал оценок'},
+  {key:'grades',title:'Оценки за этапы',Icon:GraduationCap,value:s?.grades_final,unit:'оценок подтверждено',items:[['Ожидают проверки',s?.grades_waiting],['Средний подтвержденный балл',s?s.grade_average===null?'Нет оценок':formatGradeScore(s.grade_average)+' из 3':'…']],action:()=>onWorkspace('grades'),button:'Открыть журнал оценок'},
   {key:'media',title:'Политический процесс',Icon:Newspaper,value:s?.posts_public,unit:'публичных публикаций',items:[['Предложено новостей в СМИ',s?.media_waiting]],action:navigate('actions'),button:'Проверить новости'},
   {key:'impact',title:'Состояние государства',Icon:Activity,value:s?.changes_day,unit:'изменений показателей за 24 часа',items:[['Просрочено открытых этапов',s?.stages_overdue]],action:()=>onWorkspace('impact'),button:'Открыть модель последствий'}
  ];
