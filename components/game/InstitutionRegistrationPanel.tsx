@@ -78,6 +78,7 @@ export default function InstitutionRegistrationPanel({g,readOnly=false,freshAtte
   const submittedVersion=meetingDraftVersion.current.stage12;
   setStage12Saving(true);setMeetingError('');
   try{
+  if(signAfterSave&&!await ensureCurrentSigner())return;
   const result=await supabase.rpc('edit_stage12_duma_agenda_text',{
    p_session_id:stage12Session.id,p_body:stage12Text,
    p_expected_body:stage12InitialText,
@@ -108,6 +109,15 @@ export default function InstitutionRegistrationPanel({g,readOnly=false,freshAtte
  const actionKey=JSON.stringify([g.game?.id,stage,g.me?.user_id,body]);
  const actionGameId=g.game?.id,currentGameStageRef=useRef({gameId:actionGameId,stage});currentGameStageRef.current={gameId:actionGameId,stage};
  function currentScope(){return mounted.current&&scopeRef.current===scope&&actionRef.current===actionScope}
+ // One Auth identity verification per explicit signature, never during typing.
+ async function ensureCurrentSigner(){
+  const {data,error}=await supabase.auth.getUser();
+  if(error||!data.user||data.user.id!==g.me?.user_id){
+   if(currentScope())setMeetingError('Учётная запись входа не совпадает с текущим участником игры. Войдите под своими данными перед подписанием.');
+   return false;
+  }
+  return currentScope();
+ }
  function reconcileStaleWrite(table:string){if(mounted.current&&actionGameId&&currentGameStageRef.current.gameId===actionGameId&&currentGameStageRef.current.stage===stage)notifyGameDataRefresh(actionGameId,table)}
  const busy=busyScope?.has(actionKey)??false,stage12Saving=stage12SavingScope?.has(actionKey)??false;
  function setBusy(value:boolean){if(value&&!currentScope())return;setBusyScope(previous=>{const next=new Set(previous);if(value)next.add(actionKey);else next.delete(actionKey);return next.size?next:null})}
@@ -181,7 +191,9 @@ export default function InstitutionRegistrationPanel({g,readOnly=false,freshAtte
  useEffect(()=>{
   if(!initialSnapshotReady||!panelVisible||!g.game||!g.me)return;
   let active=true;
-  setPermission(null);
+  // Retain verified rights while rechecking the same scope. Clearing them on each
+  // refresh unmounted the draft editor, resetting its caret and inner scroll.
+  setPermission(previous=>previous?.key===permissionKey?previous:null);
   setMeetingError(value=>value.startsWith('Не удалось загрузить сведения о заседании.')?value:'');
   void Promise.resolve(supabase.rpc('get_my_institution_meeting_permissions',{p_game_id:g.game.id,p_stage_no:stage,p_institution:body}))
    .then(({data,error})=>{
@@ -244,6 +256,7 @@ export default function InstitutionRegistrationPanel({g,readOnly=false,freshAtte
   const submittedVersion=meetingDraftVersion.current[kind];
   setMeetingError('');setNotice('');setBusy(true);
   try{
+  if(signAfterSave&&!await ensureCurrentSigner())return;
   const r=kind==='agenda'
    ?await supabase.rpc('save_and_optionally_sign_agenda',{p_game_id:g.game.id,p_stage_no:stage,p_institution:body,p_body:agendaText,p_sign:signAfterSave,p_expected_updated_at:meetingRecord?.updated_at||null})
    :await supabase.rpc('save_institution_meeting_document',{p_game_id:g.game.id,p_stage_no:stage,p_institution:body,p_kind:kind,p_body:minutesText});
@@ -255,6 +268,7 @@ export default function InstitutionRegistrationPanel({g,readOnly=false,freshAtte
  async function approveMeeting(kind:'agenda'|'minutes'){
   if(!g.game||!currentScope()||busy||!meetingCoordinator||readOnly||meetingActionsLocked)return;setMeetingError('');setNotice('');setBusy(true);
   try{
+  if(kind==='agenda'&&!await ensureCurrentSigner())return;
   const r=await supabase.rpc(kind==='agenda'?'approve_institution_meeting_agenda':'approve_institution_meeting_minutes',{p_game_id:g.game.id,p_stage_no:stage,p_institution:body});
   if(!currentScope()){if(!r.error)reconcileStaleWrite('institution_meeting_records');return}
   if(r.error)setMeetingError(meetingErrorMessage(userError(r.error)));else{await load();if(currentScope())setNotice(kind==='agenda'?'Ваша личная подпись зарегистрирована. Повестка утверждается после всех обязательных подписей.':'Протокол утверждён.')}

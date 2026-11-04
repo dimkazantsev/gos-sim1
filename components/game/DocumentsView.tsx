@@ -611,7 +611,13 @@ export default function DocumentsView({g,focusId,createTemplate,createStageNo,on
        <span>{selected.doc_type==='meeting_agenda'?(institutionSigners.required.every(s=>s.signed)?'Все уполномоченные лица лично подписали текущую редакцию.':'Повестка ожидает личных подписей всех уполномоченных лиц. Изображение из профиля не является подписью документа.'):selected.doc_type==='minutes'?'Игровые подписи размещаются автоматически. Это не личная электронная подпись.':institutionSigners.required.every(s=>s.signed)?'Все уполномоченные лица подписали документ.':'Для оформления необходимо личное подтверждение каждого уполномоченного подписанта.'}</span>
        {institutionSigners.can_sign&&!readOnly&&<button type="button" className="primary" disabled={busy} onClick={async()=>{
         setBusy(true);
-        try{const {error}=await supabase.rpc(selected.doc_type==='meeting_agenda'?'sign_institution_meeting_agenda':'sign_institution_document',{p_document_id:selected.id});
+        try{
+         // Check the authenticated account only when signing; the server still enforces auth.uid().
+         if(selected.doc_type==='meeting_agenda'){
+          const {data:identity,error:identityError}=await supabase.auth.getUser();
+          if(identityError||!identity.user||identity.user.id!==me?.user_id){g.setError('Учётная запись входа не совпадает с текущим участником игры. Войдите под своими данными перед подписанием.');return;}
+         }
+         const {error}=await supabase.rpc(selected.doc_type==='meeting_agenda'?'sign_institution_meeting_agenda':'sign_institution_document',{p_document_id:selected.id});
          if(error)g.setError(userError(error));
          else{await g.refreshDocuments(selected.id);setLocalRefresh(n=>n+1);}
         }catch(error){g.setError(userError(error))}finally{setBusy(false)}
