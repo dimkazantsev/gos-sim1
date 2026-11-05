@@ -2040,6 +2040,13 @@ export function useRepublicGame(gameId:string){
  async function loadChatOverview(){
   const uid=authUser.current;
   if(!uid)return [];
+  // An explicit overview read supersedes a queued Realtime reconciliation.
+  // Keeping that timer would issue a second identical RPC after this read.
+  if(overviewRealtimeTimer.current!==null){
+   clearTimeout(overviewRealtimeTimer.current);
+   overviewRealtimeTimer.current=null;
+  }
+  lastRealtimeOverviewAt.current=Date.now();
   const scope=gameId+':'+uid+':'+readEpoch.current;
   return coalesceInFlight(chatOverviewReads.current,scope,async()=>{
    const result=await readSafely(['overview'],async ticket=>{
