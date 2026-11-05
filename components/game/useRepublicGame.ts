@@ -1215,14 +1215,17 @@ export function useRepublicGame(gameId:string){
    // Read only changed rows, using the viewer's existing RLS. No private
    // party details travel through Broadcast, and deletes remove only that ID.
    const needFull=view==='parties'||view==='teacher';
-   const pa=await limitedCoreRead(supabase.from('game_parties')
-    .select(needFull?'*':PARTY_LIST_COLUMNS).eq('game_id',gameId).in('id',ids));
+   const pa=needFull
+    ?await limitedCoreRead(supabase.from('game_parties')
+     .select('*').eq('game_id',gameId).in('id',ids))
+    :await limitedCoreRead(supabase.from('game_parties')
+     .select(PARTY_LIST_COLUMNS).eq('game_id',gameId).in('id',ids));
    if(!readCurrent(ticket))return;
    requireSuccessful([pa]);
    // Prevent a second pulse arriving mid-query from being overwritten.
    if(version!==partyDeltaVersion.current){scheduleRealtimeReload(0,['game_parties']);return}
    for(const id of ids)changedPartyIds.current.delete(id);
-   const rows=normalizePartyRows((pa.data||[]) as PartyListRow[],needFull);
+   const rows=normalizePartyRows((pa.data||[]) as unknown as PartyListRow[],needFull);
    const affected=new Set(ids);
    setParties(previous=>{
     const next=[...previous.filter(row=>!affected.has(row.id)),...rows.map(row=>{
@@ -1230,7 +1233,8 @@ export function useRepublicGame(gameId:string){
      return {...row,logo_url:old?.logo_path===row.logo_path?old?.logo_url||null:null};
     })];
     return next.sort((a,b)=>(Number(b.support)||0)-(Number(a.support)||0)
-     ||String(a.created_at).localeCompare(String(b.created_at))||a.id.localeCompare(b.id));
+     ||String((a as Party & {created_at?:string}).created_at||'').localeCompare(
+      String((b as Party & {created_at?:string}).created_at||''))||a.id.localeCompare(b.id));
    });
    // Keep signed image links user-scoped. Only changed logos may be signed.
    const images=rows.filter(row=>row.logo_path);
