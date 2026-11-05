@@ -6,10 +6,14 @@ const ts=require('typescript');
 const source=fs.readFileSync('components/game/useRepublicGame.ts','utf8');
 const ast=ts.createSourceFile('useRepublicGame.ts',source,ts.ScriptTarget.Latest,true,ts.ScriptKind.TSX);
 assert.equal(ast.parseDiagnostics.length,0,'Game hook must parse');
-assert(source.includes("if(openVotes.length){for(const vote of openVotes)changedVoteIds.current.add(vote.id);scheduleRealtimeReload(0,['vote_ballots'])}"),
- 'Six-second recovery for every voter must remain intact');
+assert(source.includes("channel.on('broadcast',{event:'ballots_changed'}"),
+ 'Current voting state must update through the existing private Realtime channel');
+assert(source.includes("if(openVotes.length)reconcileTables.add('vote_ballots')"),
+ 'Keep sparse three-minute safety reconciliation for missed push messages');
 assert(source.includes("chatRecovery=setInterval(recoverVisibleChatAndBallots,6000)"),
- 'Keep existing six-second ballot cadence');
+ 'Preserve six-second chat recovery without any repeated ballot reads');
+const chatTick=source.slice(source.indexOf('const recoverVisibleChatAndBallots'),source.indexOf('const recoverVisibleChatAndBallots')+360);
+assert(!chatTick.includes('vote_ballots'),'A chat tick must never load ballots');
 assert(source.includes("officeReadState.current={scope:'',lastSuccessAt:0,lastAttemptAt:0,inflight:null};"),
  'Game/user resets must clear the office cache');
 const start=source.indexOf(' async function loadRepublicOffices(');
@@ -46,5 +50,5 @@ async function simulateBrowser(index){
 (async()=>{
  const results=await Promise.all(Array.from({length:100},(_,i)=>simulateBrowser(i)));
  assert.equal(results.reduce((sum,n)=>sum+n,0),400);
- console.log('PASS: 100 synthetic clients, 10-minute office TTL, concurrent and cross-user isolation, six-second voting unchanged');
+ console.log('PASS: 100 synthetic clients, 10-minute office TTL, concurrent and cross-user isolation, ballot reads are event-driven with sparse recovery');
 })().catch(error=>{console.error(error);process.exitCode=1});
