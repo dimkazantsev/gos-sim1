@@ -35,14 +35,27 @@ export function BlitzOverlay({gameId,userId,stageKey='',enabled}:{gameId:string;
  const timeoutFinalized=useRef('');
  const since=useRef(new Date().toISOString()),issuedDay=useRef(''),issueRetryAfter=useRef(0);
  const archiveShowing=useRef(false);
+ // Suppress automatic retries during a backend outage without delaying healthy
+ // 45-second delivery or retrying an exhausted quota (HTTP 402).
+ const deliveryFailures=useRef(0),deliveryRetryAfter=useRef(0),deliveryQuotaBlocked=useRef(false);
  useEffect(()=>{const opened=()=>{archiveShowing.current=true},closed=()=>{archiveShowing.current=false};window.addEventListener('blitz:archive-open',opened);window.addEventListener('blitz:archive-close',closed);return()=>{window.removeEventListener('blitz:archive-open',opened);window.removeEventListener('blitz:archive-close',closed)}},[]);
  const [card,setCard]=useState<Row|null>(null),[feedback,setFeedback]=useState<Row|null>(null),[time,setTime]=useState(20),[busy,setBusy]=useState(false),[error,setError]=useState('');
  useEffect(()=>{since.current=new Date().toISOString();issuedDay.current='';issueRetryAfter.current=0;setCard(null);setFeedback(null)},[gameId,userId]);
+ // A new stage is a new delivery scope. HTTP 402 remains blocked across stages.
+ useEffect(()=>{deliveryFailures.current=0;deliveryRetryAfter.current=0},[gameId,userId,stageKey]);
  useEffect(()=>{
   if(!enabled||card||feedback)return;
   let stopped=false;
+  function deferDelivery(status:number,code?:string){
+   if(status===402){deliveryQuotaBlocked.current=true;return}
+   if(status===0||status===429||status>=500||code==='PGRST003'||code==='57014'){
+    deliveryFailures.current=Math.min(3,deliveryFailures.current+1);
+    deliveryRetryAfter.current=Date.now()+Math.min(180_000,45_000*2**(deliveryFailures.current-1));
+   }
+  }
   async function refresh(selectedId=''){
    if(document.visibilityState!=='visible'||archiveShowing.current&&!selectedId)return;
+   if(deliveryQuotaBlocked.current||(!selectedId&&Date.now()<deliveryRetryAfter.current))return;
    if(refreshBusy.current){if(selectedId)selectedQueued.current=selectedId;return}
    refreshBusy.current=true;
    try{
@@ -65,7 +78,8 @@ export function BlitzOverlay({gameId,userId,stageKey='',enabled}:{gameId:string;
      ?supabase.rpc('blitz_open_selected',{p_id:selectedId}).abortSignal(signal)
      :supabase.rpc('blitz_open_recent',{p_game:gameId,p_not_before:since.current}).abortSignal(signal));
     if(stopped)return;
-    if(result.error){if(selectedId)setError(userError(result.error));return}
+    if(result.error){if(selectedId)setError(userError(result.error));else deferDelivery(result.status,result.error.code);return}
+    if(!selectedId){deliveryFailures.current=0;deliveryRetryAfter.current=0}
     if(result.data){
      const question=withBlitzClock(result.data as Row,requestedAt);
      setCard(question);
@@ -74,6 +88,7 @@ export function BlitzOverlay({gameId,userId,stageKey='',enabled}:{gameId:string;
     }else if(selectedId){setError('Вопрос уже закрыт или недоступен. Обновите историю.');window.dispatchEvent(new Event('blitz:updated'))}
    }catch(e){
     if(selectedId&&!stopped)setError(userError(e));
+    else if(!selectedId)deferDelivery(0);
    }finally{
     refreshBusy.current=false;
     const queued=selectedQueued.current;selectedQueued.current='';
