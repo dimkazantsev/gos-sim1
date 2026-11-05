@@ -16,7 +16,7 @@ assert(source.includes("channel.on('broadcast',{event:'game_parties_changed'}")&
  source.includes("invalidatePartyRows();\n   dirtyTables.add('game_parties');"),
  'Authorised game-party Broadcast must invalidate cached rows without full-row push');
 assert(source.includes('async function refresh(){invalidatePartyRows()'),'Manual refresh invalidates presentation cache');
-assert(source.includes("if(openVotes.length){for(const vote of openVotes)changedVoteIds.current.add(vote.id);scheduleRealtimeReload(0,['vote_ballots'])}"),'Votes retain six-second reconciliation');
+assert(source.includes("channel.on('broadcast',{event:'ballots_changed'}")&&source.includes("if(openVotes.length)reconcileTables.add('vote_ballots')"),'Votes use private push with sparse missed-event fallback');
 const simulate=async i=>{
  let clock=1000000,requests=0;
  const ctx={
