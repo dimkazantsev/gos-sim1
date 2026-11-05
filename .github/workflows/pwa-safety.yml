@@ -10,6 +10,7 @@ on:
       - 'public/pwa/**'
       - 'next.config.ts'
       - 'scripts/pwa-safe-cache-check.cjs'
+      - 'scripts/public-asset-version-cache-100-check.cjs'
       - '.github/workflows/pwa-safety.yml'
   push:
     branches: [main]
@@ -22,6 +23,7 @@ on:
       - 'public/pwa/**'
       - 'next.config.ts'
       - 'scripts/pwa-safe-cache-check.cjs'
+      - 'scripts/public-asset-version-cache-100-check.cjs'
       - '.github/workflows/pwa-safety.yml'
 jobs:
   checks:
@@ -35,4 +37,5 @@ jobs:
           cache: npm
       - run: npm ci --no-audit --no-fund
       - run: node scripts/pwa-safe-cache-check.cjs
+      - run: node scripts/public-asset-version-cache-100-check.cjs
       - run: npm run typecheck
