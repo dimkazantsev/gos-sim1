@@ -11,7 +11,7 @@ function compile(file,old=false){const key=String(old)+file;if(!compiled.has(key
 // The abortable RPC wraps additional Promise layers; flush their microtasks
 // before advancing the synthetic clock to the next 45-second polling tick.
 const tick=async()=>{for(let i=0;i<40;i++)await Promise.resolve()};
-function realm(file,old=false,{hidden=false,issueError=false,slowIssue=false,slowMutation=false}={}){
+function realm(file,old=false,{hidden=false,issueError=false,slowIssue=false,slowMutation=false,deliveryStatus=0}={}){
  let now=Date.parse('2026-10-25T12:00:00Z'),cursor=0,nextId=0,resolveIssue,resolveMutation;
  const hooks=[],effects=[],timers=new Map(),calls=[],listeners={window:new Map(),document:new Map()};
  const equal=(a,b)=>!!a&&!!b&&a.length===b.length&&a.every((x,i)=>Object.is(x,b[i]));
@@ -30,6 +30,7 @@ function realm(file,old=false,{hidden=false,issueError=false,slowIssue=false,slo
   const work=(async()=>{
   calls.push({name,args,at:now});
   if(name==='blitz_issue_today'){if(slowIssue)await new Promise(resolve=>{resolveIssue=resolve});return{data:0,error:issueError?{code:'57014',message:'synthetic timeout'}:null}}
+  if(name==='blitz_open_recent'&&deliveryStatus)return{data:null,status:deliveryStatus,error:{code:deliveryStatus===402?'QUOTA':'PGRST003',message:'synthetic server outage'}};
   if(slowMutation&&['comment_on_civic_content','react_to_civic_content','delete_civic_comment'].includes(name))await new Promise(resolve=>{resolveMutation=resolve});
   if(name==='get_civic_discussion')return{data:{likes:0,dislikes:0,mine:0,views:1,comment_count:0,comments:[]},error:null};
   return{data:null,error:null};
@@ -85,6 +86,24 @@ async function main(){
  const blitzBefore=blitzCompareRef?{reference:blitzCompareRef,...await blitz(blitzCompareRef)}:null;
  const after={blitz:await blitz(),inbox:await inbox(),media:await media()};
  assert.equal(after.blitz.issue,40,'Daily preparation once per mounted student session/day');
+ // Model 100 distinct client-side sessions during a sustained backend outage.
+ // Healthy delivery cadence must remain unchanged; only failed polls back off.
+ const degraded=Array.from({length:100},()=>realm('components/game/Blitz.tsx',false,{deliveryStatus:503}));
+ for(let i=0;i<degraded.length;i++)degraded[i].render('BlitzOverlay',{gameId:'test-game',userId:'degraded-student-'+i,enabled:true});
+ await tick();
+ for(const session of degraded)await session.advance(20*60000);
+ const degradedOpenRequests=degraded.reduce((n,session)=>n+count(session,'blitz_open_recent'),0);
+ assert(degradedOpenRequests<=1100,'100 degraded clients must not keep a 45-second request storm');
+ assert(degradedOpenRequests>=100,'Every client gets its original first delivery attempt');
+ for(const session of degraded)session.close();
+ const quota=realm('components/game/Blitz.tsx',false,{deliveryStatus:402});
+ quota.render('BlitzOverlay',{gameId:'test-game',userId:'quota-student',enabled:true});
+ await tick();await quota.advance(20*60000);
+ assert.equal(count(quota,'blitz_open_recent'),1,'HTTP 402 permanently suppresses repeated delivery attempts in this mounted client');
+ quota.close();
+ const chatSource=current('components/game/useRepublicGame.ts');
+ assert(chatSource.includes('An explicit overview read supersedes a queued Realtime reconciliation.'),
+  'Explicit chat overview must invalidate stale scheduled overview reads');
  assert(after.blitz.open>=1080&&after.blitz.open<=1120,'Delivery retains its 45-second maximum gap with at most one extra check per client');assert(after.blitz.peakPollingPerSecond<=8,'Polling starts are distributed across the classroom');assert(after.inbox<=840,'Inbox retains a 60–75s fallback when its table is not in the live Realtime publication, without document-identity reloads');assert.equal(after.media,40,'Unchanged attachments reuse still-valid signed links');
  if(before){assert(after.blitz.issue<before.blitz.issue);assert.equal(after.blitz.open,before.blitz.open);assert(after.inbox<before.inbox/2);assert(before.media>after.media*20)}
  if(blitzBefore){assert.equal(after.blitz.issue,blitzBefore.issue);assert(after.blitz.open>=blitzBefore.open&&after.blitz.open<=blitzBefore.open+40);assert(after.blitz.peakPollingPerSecond<=blitzBefore.peakPollingPerSecond)}
@@ -116,6 +135,6 @@ async function main(){
  for(const file of ['BudgetAmendments','DocumentTools','DocumentsView','NewsProposals','PoliticalWallView','EventCollaboration','ClassroomJournal','BlitzKnowledgeScore','CivicDiscussion']){
   const source=current('components/game/'+file+'.tsx');const sf=ts.createSourceFile(file+'.tsx',source,ts.ScriptTarget.Latest,true,ts.ScriptKind.TSX);assert.equal(sf.parseDiagnostics.length,0,file+' syntax');assert(source.includes('useGameTableSync('),file+' uses shared invalidation');assert(!/setInterval\(/.test(source),file+' must not add an independent interval');
  }
- console.log(JSON.stringify({environment:'40 independent component-effect realms, 20 virtual minutes, synthetic replies; no production/Auth/HTTP load',before,blitzBefore,after,checks:['hidden timed questions','midnight rollover','stage opening prepares newly eligible assignments','slow request single-flight','failed backfill bounded','delivery cadence preserved','unchanged attachment signing','signed URL automatic expiry renewal','hidden signed links wait for visibility','unchanged document identities','civic submission single-flight','old civic save preserves new user/target draft','read-only civic mutations blocked']},null,2));
+ console.log(JSON.stringify({environment:'40 independent component-effect realms plus 100 degraded clients, 20 virtual minutes, synthetic replies; no production/Auth/HTTP load',before,blitzBefore,after,degradedOpenRequests,checks:['hidden timed questions','midnight rollover','stage opening prepares newly eligible assignments','slow request single-flight','failed backfill bounded','delivery cadence preserved','unchanged attachment signing','signed URL automatic expiry renewal','hidden signed links wait for visibility','unchanged document identities','civic submission single-flight','old civic save preserves new user/target draft','read-only civic mutations blocked']},null,2));
 }
 main().catch(error=>{console.error(error);process.exitCode=1});
