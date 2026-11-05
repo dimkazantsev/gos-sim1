@@ -76,7 +76,7 @@ export function useGameTableSync(gameId:string|undefined,_tables:readonly string
    if(document.visibilityState!=='visible'){queued=true;return}
    timer=setTimeout(()=>void flush(),Math.max(delay,minRefreshMs-(Date.now()-lastStartedAt)));
   }
-  let lastVisibleRecoveryAt=0;
+  let lastVisibleRecoveryAt=0,skipFocusUntil=0;
   function visible(){
    if(document.visibilityState!=='visible'){
     if(!hiddenAt)hiddenAt=Date.now();
@@ -88,9 +88,19 @@ export function useGameTableSync(gameId:string|undefined,_tables:readonly string
    startPolling();
    const now=Date.now(),hiddenFor=hiddenAt?now-hiddenAt:0;
    hiddenAt=0;
-   // Focus/online/visibility may arrive together. Reconcile a visible widget
-   // once for a missed event or a meaningful absence, not once per event.
-   if(queued||(hiddenFor>=30000&&now-lastVisibleRecoveryAt>20000)){
+   // A short tab switch without changes must not cause a second read from
+   // the follow-up focus event fired by browsers after visibilitychange.
+   if(hiddenFor>0&&hiddenFor<30000)skipFocusUntil=now+1000;
+   // A deferred FIRST snapshot must run as soon as it becomes visible,
+   // including a manual Realtime subscription during the hidden interval.
+   if(queued&&lastStartedAt===0){
+    lastVisibleRecoveryAt=now;lastFallbackAt=now;
+    void flush();return;
+   }
+   // A normal focused tab still recovers a stale readiness panel (>20s).
+   // Focus, online and visibility share this one in-flight widget scheduler.
+   if(queued||(now-lastVisibleRecoveryAt>20000&&
+       (hiddenFor>=30000||(hiddenFor===0&&now>=skipFocusUntil)))){
     lastVisibleRecoveryAt=now;lastFallbackAt=now;schedule();
    }
   }
