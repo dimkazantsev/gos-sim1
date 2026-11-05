@@ -4,6 +4,7 @@ on:
     paths:
       - 'components/game/useRepublicGame.ts'
       - 'scripts/chat-visibility-100-clients-check.cjs'
+      - 'scripts/chat-realtime-check.cjs'
       - 'scripts/chat-pins-100-clients-check.cjs'
       - '.github/workflows/chat-channel-100.yml'
   push:
@@ -13,6 +14,7 @@ on:
     paths:
       - 'components/game/useRepublicGame.ts'
       - 'scripts/chat-visibility-100-clients-check.cjs'
+      - 'scripts/chat-realtime-check.cjs'
       - 'scripts/chat-pins-100-clients-check.cjs'
       - '.github/workflows/chat-channel-100.yml'
 permissions:
@@ -31,5 +33,6 @@ jobs:
           node-version: '22'
           cache: npm
       - run: npm ci --no-audit --no-fund
+      - run: node scripts/chat-realtime-check.cjs
       - run: node scripts/chat-visibility-100-clients-check.cjs
       - run: node scripts/chat-pins-100-clients-check.cjs
