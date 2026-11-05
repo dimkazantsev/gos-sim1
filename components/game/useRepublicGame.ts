@@ -93,6 +93,8 @@ export function useRepublicGame(gameId:string){
  const politicalOlderLoaded=useRef(false),politicalPagePending=useRef(false),politicalFullMode=useRef(false);
  const votesRef=useRef(votes);votesRef.current=votes;
  const changedFormalIds=useRef(new Set<string>()),changedVoteIds=useRef(new Set<string>());
+ // Only changed-party IDs cross the private game socket; SQL remains RLS-scoped.
+ const changedPartyIds=useRef(new Set<string>()),partyDeltaNeedsFull=useRef(false),partyDeltaVersion=useRef(0);
  const [loading,setLoading]=useState(true),[error,setErrorRaw]=useState(''),[chatOpen,setChatOpen]=useState(false),[activeView,setActiveView]=useState<View>('dashboard');
  const [profileGameId,setProfileGameId]=useState('');
  const [coreLoaded,setCoreLoaded]=useState(false);
@@ -345,6 +347,7 @@ export function useRepublicGame(gameId:string){
   reusedEntryMemberScope.current='';
   realtimeDirtyTables.current.clear();
   changedFormalIds.current.clear();changedVoteIds.current.clear();
+  changedPartyIds.current.clear();partyDeltaNeedsFull.current=false;partyDeltaVersion.current=0;
   if(readReceipt.current.timer!==null)clearTimeout(readReceipt.current.timer);
   readReceipt.current={scope:'',timer:null,running:false,queued:false,lastAt:0};
   assetSignatures.current.clear();lastCoreSuccessAt.current=0;lastFullPresentationAt.current=0;passiveSyncAt.current.clear();
@@ -561,10 +564,28 @@ export function useRepublicGame(gameId:string){
     const id=(payload.old as {id?:string}|null)?.id;
     if(id)setMessages(previous=>previous.filter(m=>m.id!==id));
    }else if(payload.eventType==='UPDATE'){
-    // An edit in another channel must not reload the visible channel.
-    // Still reconcile a moved row that was previously visible here.
     const next=payload.new as Partial<Message>;
-    if(!next.channel_id||next.channel_id===channelRef.current||messageRowsRef.current.some(row=>row.id===next.id))dirtyChat=true;
+    const previous=messageRowsRef.current.find(row=>row.id===next?.id);
+    // Realtime UPDATE is already RLS-authorised. Patch the displayed record
+    // rather than refetching its entire channel. Incomplete events use the
+    // existing bounded SQL reconciliation instead.
+    if(typeof next?.id==='string'&&next.game_id===gameId&&
+       typeof next.channel_id==='string'&&typeof next.created_at==='string'&&
+       typeof next.kind==='string'){
+     if(previous){
+      if(next.channel_id!==channelRef.current)
+       setMessages(rows=>rows.filter(row=>row.id!==next.id));
+      else{
+       setMessages(rows=>rows.map(row=>row.id===next.id
+        ?{...row,...next,url:row.storage_path===next.storage_path?row.url||null:null}:row));
+       if(next.storage_path&&next.storage_path!==previous.storage_path)
+        void signedAssetUrl('game-media',next.storage_path).then(url=>{
+         if(currentConnection()&&channelRef.current===next.channel_id&&url)
+          setMessages(rows=>rows.map(row=>row.id===next.id&&row.storage_path===next.storage_path?{...row,url}:row));
+        }).catch(()=>{/* On-demand URL refresh remains available. */});
+      }
+     }else if(next.channel_id===channelRef.current)dirtyChat=true;
+    }else if(!next?.channel_id||next.channel_id===channelRef.current||previous)dirtyChat=true;
    }
    dirtyOverview=true;schedule();
   });
@@ -643,6 +664,12 @@ export function useRepublicGame(gameId:string){
   // Keep the same immediate refresh semantics and existing RLS read path.
   channel.on('broadcast',{event:'game_parties_changed'},payload=>{
    if(!currentConnection()||payload.payload?.table!=='game_parties')return;
+   const id=payload.payload?.party_id,operation=payload.payload?.operation;
+   partyDeltaVersion.current++;
+   if(typeof id==='string'&&/^[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}$/i.test(id)
+      &&['INSERT','UPDATE','DELETE'].includes(String(operation)))
+    changedPartyIds.current.add(id);
+   else partyDeltaNeedsFull.current=true; // Previous app version / malformed pulse.
    officialPartyDocumentReads.current.clear();
    invalidatePartyRows();
    dirtyTables.add('game_parties');
@@ -1174,9 +1201,54 @@ export function useRepublicGame(gameId:string){
    requireSuccessful([result]);setEvaluations((result.data||[]) as Evaluation[]);
   }));
   if(tables.has('game_parties'))jobs.push(readSafely(['parties'],async ticket=>{
-   const pa=await loadCachedParties(true);
+   const ids=[...changedPartyIds.current],version=partyDeltaVersion.current;
+   const full=partyDeltaNeedsFull.current||!ids.length||ids.length>16||lastCoreSuccessAt.current===0;
+   if(full){
+    const pa=await loadCachedParties(true);
+    if(!readCurrent(ticket))return;
+    requireSuccessful([pa]);
+    if(version===partyDeltaVersion.current){changedPartyIds.current.clear();partyDeltaNeedsFull.current=false}
+    else scheduleRealtimeReload(0,['game_parties']);
+    acceptPartyRows((pa.data||[]) as Party[],ticket);
+    return;
+   }
+   // Read only changed rows, using the viewer's existing RLS. No private
+   // party details travel through Broadcast, and deletes remove only that ID.
+   const needFull=view==='parties'||view==='teacher';
+   const pa=needFull
+    ?await limitedCoreRead(supabase.from('game_parties')
+     .select('*').eq('game_id',gameId).in('id',ids))
+    :await limitedCoreRead(supabase.from('game_parties')
+     .select(PARTY_LIST_COLUMNS).eq('game_id',gameId).in('id',ids));
    if(!readCurrent(ticket))return;
-   requireSuccessful([pa]);acceptPartyRows((pa.data||[]) as Party[],ticket);
+   requireSuccessful([pa]);
+   // Prevent a second pulse arriving mid-query from being overwritten.
+   if(version!==partyDeltaVersion.current){scheduleRealtimeReload(0,['game_parties']);return}
+   for(const id of ids)changedPartyIds.current.delete(id);
+   const rows=normalizePartyRows((pa.data||[]) as unknown as PartyListRow[],needFull);
+   const affected=new Set(ids);
+   setParties(previous=>{
+    const next=[...previous.filter(row=>!affected.has(row.id)),...rows.map(row=>{
+     const old=previous.find(p=>p.id===row.id);
+     return {...row,logo_url:old?.logo_path===row.logo_path?old?.logo_url||null:null};
+    })];
+    return next.sort((a,b)=>(Number(b.support)||0)-(Number(a.support)||0)
+     ||String((a as Party & {created_at?:string}).created_at||'').localeCompare(
+      String((b as Party & {created_at?:string}).created_at||''))||a.id.localeCompare(b.id));
+   });
+   // Keep signed image links user-scoped. Only changed logos may be signed.
+   const images=rows.filter(row=>row.logo_path);
+   if(images.length)void Promise.all(images.map(async row=>({
+    id:row.id,path:row.logo_path,
+    url:await signedAssetUrl('game-assets',row.logo_path!).catch(()=>null)
+   }))).then(links=>{
+    if(!readCurrent(ticket))return;
+    const urls=new Map(links.map(link=>[link.id,link]));
+    setParties(previous=>previous.map(row=>{
+     const entry=urls.get(row.id);
+     return entry&&entry.path===row.logo_path&&entry.url?{...row,logo_url:entry.url}:row;
+    }));
+   }).catch(()=>{/* Party metadata is available without its image. */});
   }));
   if(tables.has('game_office_assignments'))jobs.push(loadRepublicOffices(true));
   if(tables.has('formal_document_changes')){
