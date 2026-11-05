@@ -662,6 +662,23 @@ export function useRepublicGame(gameId:string){
     if(currentConnection())schedule();
    },600);
   });
+  // Metadata only: one server pulse per vote per four seconds, delivered
+  // through the existing private game channel. No voter, choice or weight.
+  // The five-second read includes writes suppressed by the pulse window.
+  let ballotBurstTimer:ReturnType<typeof setTimeout>|undefined;
+  channel.on('broadcast',{event:'ballots_changed'},payload=>{
+   if(!currentConnection()||!['votes','stages','teacher'].includes(activeViewRef.current))return;
+   const voteId=payload.payload?.vote_id;
+   if(typeof voteId!=='string'||!votesRef.current.some(v=>v.id===voteId))return;
+   changedVoteIds.current.add(voteId);
+   if(document.visibilityState!=='visible'){reconcileTables.add('vote_ballots');return}
+   if(ballotBurstTimer!==undefined)return;
+   ballotBurstTimer=setTimeout(()=>{
+    ballotBurstTimer=undefined;
+    if(currentConnection()&&['votes','stages','teacher'].includes(activeViewRef.current))
+     scheduleRealtimeReload(0,['vote_ballots']);
+   },5000);
+  });
   // KSRF proposals use this existing authorised game socket, not five widget channels.
   // Only interested stage views refresh their proposal lists.
   for(const table of ['parliamentary_election_rules','regional_election_rules']){
@@ -797,6 +814,12 @@ export function useRepublicGame(gameId:string){
       notifyGameDataRefresh(gameId,'event_assignments');
       notifyGameDataRefresh(gameId,'event_collaboration_invites');
       notifyGameDataRefresh(gameId,'event_discussion_messages');
+      // Reconcile missed pulses once after the existing socket reconnects.
+      if(['votes','stages','teacher'].includes(activeViewRef.current)){
+       const openVotes=votesRef.current.filter(v=>v.status==='open');
+       for(const vote of openVotes)changedVoteIds.current.add(vote.id);
+       if(openVotes.length)scheduleRealtimeReload(0,['vote_ballots']);
+      }
      }
     }
     setRealtimeState(liveConnected?'connected':'disconnected');
@@ -831,6 +854,13 @@ export function useRepublicGame(gameId:string){
    // stages and vote status through two scoped RLS reads.
    reconcileTables.add('session_recovery');
    if(!liveConnected){reconcileTables.add('game_stages');reconcileTables.add('game_votes')}
+   // The existing three-minute safety check reconciles missed ballot pulses.
+   // Disconnected clients already reload all game votes and their ballots.
+   if(liveConnected&&['votes','stages','teacher'].includes(activeViewRef.current)){
+    const openVotes=votesRef.current.filter(vote=>vote.status==='open');
+    for(const vote of openVotes)changedVoteIds.current.add(vote.id);
+    if(openVotes.length)reconcileTables.add('vote_ballots');
+   }
    // Non-published data must not remain stale when full polling is removed.
    // Recover just the visible screen's collections every 3 minutes.
    const view=activeViewRef.current,lastPassive=passiveSyncAt.current.get(view)||lastFullPresentationAt.current;
@@ -848,12 +878,8 @@ export function useRepublicGame(gameId:string){
   let lastChatRecoveryAt=Date.now();
   const recoverVisibleChatAndBallots=()=>{
    if(document.visibilityState!=='visible'||!currentConnection())return;
-   // Ordinary ballots are outside Realtime publication; reconcile only open
-   // procedures on their visible screens, using the existing six-second timer.
-   if(Date.now()>=backendRecoveryAfter.current&&['votes','stages','teacher'].includes(activeViewRef.current)){
-    const openVotes=votesRef.current.filter(vote=>vote.status==='open');
-    if(openVotes.length){for(const vote of openVotes)changedVoteIds.current.add(vote.id);scheduleRealtimeReload(0,['vote_ballots'])}
-   }
+   // Ballots follow server pulses and the shared three-minute fallback.
+   // This six-second timer now recovers only actively opened chats.
    if(!chatOpenRef.current)return;
    const now=Date.now();
    // Incoming messages update from the existing authorised Realtime payload.
@@ -877,7 +903,7 @@ export function useRepublicGame(gameId:string){
    chatRecovery=setInterval(recoverVisibleChatAndBallots,6000);
   },initialRecoveryDelay);
   return()=>{
-   disposed=true;clearTimeout(teacherEventTimer);clearTimeout(timer);clearTimeout(partyDocumentBurstTimer);if(networkPresenceTimer!==null)clearTimeout(networkPresenceTimer);clearInterval(poll);clearTimeout(startChatRecovery);
+   disposed=true;clearTimeout(teacherEventTimer);clearTimeout(ballotBurstTimer);clearTimeout(timer);clearTimeout(partyDocumentBurstTimer);if(networkPresenceTimer!==null)clearTimeout(networkPresenceTimer);clearInterval(poll);clearTimeout(startChatRecovery);
    if(chatRecovery!==null)clearInterval(chatRecovery);
    document.removeEventListener('visibilitychange',resumePending);
    setGameRealtimeConnection(gameId,false);
