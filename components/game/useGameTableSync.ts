@@ -123,7 +123,7 @@ export function useGameTableSync(gameId:string|undefined,_tables:readonly string
     const now=Date.now();
     // A healthy shared Realtime connection makes frequent whole-widget
     // polling redundant. Keep only its existing bounded safety fallback.
-    if(hasPushCoverage&&gameRealtimeConnected(gameId)&&now-lastFallbackAt<connectedReconcileMs)return;
+    if(hasPushCoverage&&gameRealtimeConnected(gameId!)&&now-lastFallbackAt<connectedReconcileMs)return;
     lastFallbackAt=now;
     schedule(0);
    },pollDelay);

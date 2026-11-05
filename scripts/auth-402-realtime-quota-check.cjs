@@ -23,7 +23,7 @@ assert(!migration.includes('create or replace function private.request_telegram_
  'Immediate INSERT-trigger function must remain unchanged');
 
 assert(source.includes("if(liveConnected&&now-lastPollAt<180000)return"),'Connected polling is reduced to once per 3 minutes');
-assert(source.includes('},30000+pollJitter)'), 'Disconnected recovery remains on 30–40s timer');
+assert(source.includes('setInterval(recoveryTick,30000+pollJitter)'), 'Disconnected recovery retains the 30–40s visible-only timer');
 
 const focusStart=source.indexOf('  const recover=()=>{');
 const focusEnd=source.indexOf('  const visible=()=>{',focusStart);
@@ -120,7 +120,7 @@ const from=source.indexOf('  const pollJitter=');
 const to=source.indexOf('  // Realtime handles unread counters while chat is closed.',from);
 assert(from>=0&&to>from,'Live fallback polling section found');
 const snippet=source.slice(from,to);
-assert(snippet.includes('const poll=setInterval'),'Expected 30–40s polling callback');
+assert(snippet.includes('const recoveryTick=()=>{'),'Expected 30–40s polling callback');
 let clock=1_000_000,tick=null,changed=0;
 const env={
  Date:{now:()=>clock},
@@ -138,8 +138,10 @@ const env={
  PRESENTATION_CACHE_TTL_MS:600000,
  console
 };
-vm.runInNewContext(snippet,env);
-assert.equal(typeof tick,'function','Existing fallback timer remains registered');
+const compiledSnippet=ts.transpileModule(snippet,{compilerOptions:{target:ts.ScriptTarget.ES2022}}).outputText;
+vm.runInNewContext(compiledSnippet+'\nthis.__pollTick=recoveryTick;',env);
+tick=env.__pollTick;
+assert.equal(typeof tick,'function','Visible-only fallback callback remains available');
 tick();
 assert.equal(changed,0,'No immediate refresh on healthy socket');
 clock+=179999;tick();
