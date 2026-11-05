@@ -60,7 +60,7 @@ async function clientChecks(){
   for(let i=0;i<clients.length;i++){
    const h=clients[i],log=h.stats().queryLog.filter(q=>q.table==='game_parties');
    assert.equal(h.readCount('game_parties')-before[i],1,'Eight pulses -> one party read');
-   assert.deepEqual(log.at(-1).ins.id,[changed],'Only changed party ID queried');
+   assert.equal(JSON.stringify(log.at(-1).ins.id),JSON.stringify([changed]),'Only changed party ID queried');
    assert.equal(log.at(-1).columns.includes('description'),false,'No editable party dossier on dashboard');
    assert.equal(h.render().parties.find(x=>x.id===changed)?.support,22);
    assert.equal(h.render().parties.find(x=>x.id===untouched)?.support,30);
