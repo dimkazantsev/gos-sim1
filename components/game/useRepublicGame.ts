@@ -474,12 +474,13 @@ export function useRepublicGame(gameId:string){
   let disposed=false,scheduled=false;
   const subscriptionEpoch=readEpoch.current;
   const currentConnection=()=>!disposed&&subscriptionEpoch===readEpoch.current&&activeGameRef.current===gameId&&authUser.current===me.user_id;
-  let liveConnected=false,everSubscribed=false,lastPollAt=0;
+  let liveConnected=false,everSubscribed=false,lastPollAt=0,lastChatRecoveryAt=Date.now();
   let dirtyPartyDocuments=false,dirtyChat=false,dirtyPins=false,dirtyOverview=false;
   const dirtyTables=new Set<string>();
   const reconcileTables=new Set<string>();
   let timer:ReturnType<typeof setTimeout>|undefined;
   let partyDocumentBurstTimer:ReturnType<typeof setTimeout>|undefined;
+  let hiddenAt=document.visibilityState==='hidden'?Date.now():0;
   function flush(){
    if(!currentConnection()||document.visibilityState==='hidden')return;
    const partyDocs=dirtyPartyDocuments,chat=dirtyChat,pins=dirtyPins,overview=dirtyOverview;
@@ -498,7 +499,7 @@ export function useRepublicGame(gameId:string){
    if(partyDocs&&(activeViewRef.current==='parties'||(activeViewRef.current==='teacher'&&teacherWorkspaceRef.current==='parties')))void loadPartyDocuments();
     if(partyDocs)notifySectionUpdates(gameId);
    if(overview||chat)scheduleRealtimeChatOverview();
-   if(chat&&chatOpenRef.current&&channelRef.current)void loadMessages(channelRef.current);
+   if(chat&&chatOpenRef.current&&channelRef.current){lastChatRecoveryAt=Date.now();void loadMessages(channelRef.current)}
    if(pins&&channelRef.current)void loadChatPins(channelRef.current);
    
   }
@@ -511,12 +512,41 @@ export function useRepublicGame(gameId:string){
   // Events received while hidden remain dirty and reconcile on return;
   // clearing the flags while hidden would silently lose these updates.
   const resumePending=()=>{
-   // Visibility only changes ephemeral Realtime Presence; the existing
-   // authoritative SQL presence and navigation journal are unchanged.
+   // Keep Auth and the single private Realtime connection alive. Stop only
+   // automatic UI polling and deferred reads while the tab is invisible.
+   if(document.visibilityState!=='visible'){
+    hiddenAt=Date.now();
+    stopPeriodicPolling();
+    if(realtimeReloadTimer.current!==null){
+     clearTimeout(realtimeReloadTimer.current);realtimeReloadTimer.current=null;
+    }
+    syncNetworkPresence(); // Untrack ephemeral presence once, not Auth.
+    return;
+   }
+   const now=Date.now(),hiddenFor=hiddenAt?now-hiddenAt:0;
+   hiddenAt=0;
+   startPeriodicPolling();
    syncNetworkPresence();
-   if(document.visibilityState==='visible'&&chatOpenRef.current&&channelRef.current)void markChatRead(channelRef.current);
-   if(document.visibilityState==='visible'&&
-     (reconcileTables.size>0||dirtyTables.size>0||dirtyPartyDocuments||dirtyChat||dirtyPins||dirtyOverview))schedule();
+   // One page-level reconciliation after a meaningful absence. Focus, online
+   // and visibility can all fire together; the existing queue coalesces them.
+   // No full game bootstrap and no extra socket.
+   if(hiddenFor>=30000||(!liveConnected&&hiddenFor>0)){
+    lastPollAt=now; // Prevent a redundant 30-40s fallback read.
+    reconcileTables.add('session_recovery');
+    if(!liveConnected){reconcileTables.add('game_stages');reconcileTables.add('game_votes')}
+    const view=activeViewRef.current;
+    const groups=passiveSections(view);
+    for(const table of groups)reconcileTables.add(table);
+    if(['votes','stages','teacher'].includes(view)){
+     const open=votesRef.current.filter(vote=>vote.status==='open');
+     for(const vote of open)changedVoteIds.current.add(vote.id);
+     if(open.length)reconcileTables.add('vote_ballots');
+    }
+    dirtyOverview=true;
+    if(chatOpenRef.current){dirtyChat=true;dirtyPins=true}
+   }
+   if(chatOpenRef.current&&channelRef.current)void markChatRead(channelRef.current);
+   if(reconcileTables.size>0||dirtyTables.size>0||dirtyPartyDocuments||dirtyChat||dirtyPins||dirtyOverview)schedule();
   };
   document.addEventListener('visibilitychange',resumePending);
   const channel=supabase.channel('gos-id-live:'+gameId,{config:{private:true}});
@@ -859,7 +889,8 @@ export function useRepublicGame(gameId:string){
   // Visible-tab recovery works even when a WebSocket cannot connect.
   // Deterministic jitter prevents 40 simultaneous clients from polling in lockstep.
   const pollJitter=[...me.user_id].reduce((hash,char)=>(Math.imul(hash,31)+char.charCodeAt(0))>>>0,0)%10000;
-  const poll=setInterval(()=>{
+  let poll:ReturnType<typeof setInterval>|null=null;
+  const recoveryTick=()=>{
    if(document.visibilityState!=='visible')return;
    // Realtime already dispatches targeted refreshes. A backup full read is
    // necessary only occasionally while connected; polling every 30s even
@@ -899,10 +930,9 @@ export function useRepublicGame(gameId:string){
    dirtyOverview=true;
    if(chatOpenRef.current){dirtyChat=true;dirtyPins=true}
    schedule();
-  },30000+pollJitter);
+  };
   // Realtime handles unread counters while chat is closed. Full chat recovery
   // runs only for an actively open conversation.
-  let lastChatRecoveryAt=Date.now();
   const recoverVisibleChatAndBallots=()=>{
    if(document.visibilityState!=='visible'||!currentConnection())return;
    // Ballots follow server pulses and the shared three-minute fallback.
@@ -924,14 +954,26 @@ export function useRepublicGame(gameId:string){
    Math.imul(hash^char.charCodeAt(0),16777619)>>>0,2166136261);
   const initialRecoveryDelay=500+recoveryHash%5500;
   let chatRecovery:ReturnType<typeof setInterval>|null=null;
-  const startChatRecovery=setTimeout(()=>{
-   if(disposed)return;
-   recoverVisibleChatAndBallots();
-   chatRecovery=setInterval(recoverVisibleChatAndBallots,6000);
-  },initialRecoveryDelay);
+  let startChatRecovery:ReturnType<typeof setTimeout>|null=null;
+  function stopPeriodicPolling(){
+   if(poll!==null){clearInterval(poll);poll=null}
+   if(chatRecovery!==null){clearInterval(chatRecovery);chatRecovery=null}
+   if(startChatRecovery!==null){clearTimeout(startChatRecovery);startChatRecovery=null}
+  }
+  function startPeriodicPolling(){
+   if(disposed||document.visibilityState!=='visible')return;
+   if(poll===null)poll=setInterval(recoveryTick,30000+pollJitter);
+   if(chatRecovery===null&&startChatRecovery===null)
+    startChatRecovery=setTimeout(()=>{
+     startChatRecovery=null;
+     if(disposed||document.visibilityState!=='visible')return;
+     recoverVisibleChatAndBallots();
+     chatRecovery=setInterval(recoverVisibleChatAndBallots,6000);
+    },initialRecoveryDelay);
+  }
+  startPeriodicPolling();
   return()=>{
-   disposed=true;clearTimeout(teacherEventTimer);clearTimeout(ballotBurstTimer);clearTimeout(timer);clearTimeout(partyDocumentBurstTimer);if(networkPresenceTimer!==null)clearTimeout(networkPresenceTimer);clearInterval(poll);clearTimeout(startChatRecovery);
-   if(chatRecovery!==null)clearInterval(chatRecovery);
+   disposed=true;clearTimeout(teacherEventTimer);clearTimeout(ballotBurstTimer);clearTimeout(timer);clearTimeout(partyDocumentBurstTimer);if(networkPresenceTimer!==null)clearTimeout(networkPresenceTimer);stopPeriodicPolling();
    document.removeEventListener('visibilitychange',resumePending);
    setGameRealtimeConnection(gameId,false);
    if(liveRef.current===channel)liveRef.current=null;

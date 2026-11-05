@@ -51,6 +51,7 @@ export function useGameTableSync(gameId:string|undefined,_tables:readonly string
  useEffect(()=>{
   if(!gameId)return;
   let disposed=false,running=false,queued=false,timer:ReturnType<typeof setTimeout>|undefined;
+  let hiddenAt=document.visibilityState==='hidden'?Date.now():0;
   // Keep last fallback per mounted widget; direct mutations and Realtime
   // invalidation still refresh immediately through GAME_DATA_REFRESH_EVENT.
   let lastFallbackAt=Date.now(),lastStartedAt=0,initialPending=false;
@@ -77,8 +78,21 @@ export function useGameTableSync(gameId:string|undefined,_tables:readonly string
   }
   let lastVisibleRecoveryAt=0;
   function visible(){
-   const now=Date.now();
-   if(document.visibilityState==='visible'&&(queued||now-lastVisibleRecoveryAt>20000)){lastVisibleRecoveryAt=now;schedule()}
+   if(document.visibilityState!=='visible'){
+    if(!hiddenAt)hiddenAt=Date.now();
+    pausePolling();
+    // Preserve the unfinished read; never execute it offscreen.
+    if(timer!==undefined){clearTimeout(timer);timer=undefined;initialPending=false;queued=true}
+    return;
+   }
+   startPolling();
+   const now=Date.now(),hiddenFor=hiddenAt?now-hiddenAt:0;
+   hiddenAt=0;
+   // Focus/online/visibility may arrive together. Reconcile a visible widget
+   // once for a missed event or a meaningful absence, not once per event.
+   if(queued||(hiddenFor>=30000&&now-lastVisibleRecoveryAt>20000)){
+    lastVisibleRecoveryAt=now;lastFallbackAt=now;schedule();
+   }
   }
   // Restored connectivity must retry failed reads even after a recent focus event.
   const online=()=>{queued=true;visible()};
@@ -93,22 +107,31 @@ export function useGameTableSync(gameId:string|undefined,_tables:readonly string
   // Only explicitly opted-in nonessential counters wait during mass login.
   // Direct mutations and Realtime invalidations still schedule an immediate read.
   if(initialDelayMs>0){
-   initialPending=true;
-   timer=setTimeout(()=>{initialPending=false;void flush()},initialDelayMs);
+   if(document.visibilityState==='visible'){
+    initialPending=true;
+    timer=setTimeout(()=>{initialPending=false;void flush()},initialDelayMs);
+   }else queued=true;
   }else void flush();
   // Fall back without aligning all classroom tabs and stage widgets on the same tick.
-  const poll=setInterval(()=>{
+  const pollDelay=fallbackMs+Math.floor(Math.random()*Math.min(15000,fallbackMs/4));
+  let poll:ReturnType<typeof setInterval>|null=null;
+  function pausePolling(){if(poll!==null){clearInterval(poll);poll=null}}
+  function startPolling(){
+   if(disposed||poll!==null||document.visibilityState!=='visible')return;
+   poll=setInterval(()=>{
     if(document.visibilityState!=='visible'||typeof navigator!=='undefined'&&!navigator.onLine)return;
     const now=Date.now();
-    // A healthy shared Realtime connection makes 25–35s whole-widget polling
-    // redundant. Retain 3-minute reconciliation for missed changes.
+    // A healthy shared Realtime connection makes frequent whole-widget
+    // polling redundant. Keep only its existing bounded safety fallback.
     if(hasPushCoverage&&gameRealtimeConnected(gameId)&&now-lastFallbackAt<connectedReconcileMs)return;
     lastFallbackAt=now;
     schedule(0);
-  },fallbackMs+Math.floor(Math.random()*Math.min(15000,fallbackMs/4)));
+   },pollDelay);
+  }
+  startPolling();
   window.addEventListener('focus',visible);window.addEventListener('online',online);
   const eventName=onlyTable?KSRF_PROPOSAL_REFRESH_EVENT:GAME_DATA_REFRESH_EVENT;
   window.addEventListener(eventName,local);document.addEventListener('visibilitychange',visible);
-  return()=>{disposed=true;clearTimeout(timer);clearInterval(poll);window.removeEventListener('focus',visible);window.removeEventListener('online',online);window.removeEventListener(eventName,local);document.removeEventListener('visibilitychange',visible)};
+  return()=>{disposed=true;clearTimeout(timer);pausePolling();window.removeEventListener('focus',visible);window.removeEventListener('online',online);window.removeEventListener(eventName,local);document.removeEventListener('visibilitychange',visible)};
  },[gameId,scope,onlyTable,onlyCaseId,tableKey,minRefreshMs,fallbackMs,initialDelayMs,connectedFallbackMs]);
 }
