@@ -32,9 +32,9 @@ assert(source.includes("table:'chat_messages'")&&source.includes("payload.eventT
 assert(source.includes('setMessages(previous=>mergeChatMessages(previous,[row],chatWindowLimit()))'),'Render incoming chat messages immediately and retain explicitly paged history');
 assert(source.includes('void loadRecentChatMessages(channelRef.current)'),'Recover only current channel');
 assert(source.includes('chatRecovery=setInterval(recoverVisibleChatAndBallots,6000)'),'Chat recovery must retain its exact six-second interval');
-assert(source.includes('const startChatRecovery=setTimeout('),'The recovery timer must stagger the first tick without delaying future ticks');
+assert(source.includes('startChatRecovery=setTimeout(')&&source.includes('function stopPeriodicPolling()'),'Chat still staggers first recovery, but stops the interval while hidden');
 assert(source.includes("else if(payload.eventType==='UPDATE')")&&source.includes('next.channel_id===channelRef.current'),'Handle UPDATE only for the selected channel or previously visible moved messages');
-assert(source.includes('if(chat&&chatOpenRef.current&&channelRef.current)void loadMessages(channelRef.current)'),'Do not load hidden chat history on every edit');
+assert(source.includes('if(chat&&chatOpenRef.current&&channelRef.current){lastChatRecoveryAt=Date.now();void loadMessages(channelRef.current)}'),'Chat edits use one current-channel read and reset the fallback cadence');
 assert(source.includes('else if(chatOpen&&channelRef.current)')&&source.includes('void loadMessages(channelRef.current)'), 'Opening chat must recover edits that arrived while closed');
 assert(source.includes('messageRowsRef.current.some(old=>old.id===m.id)'),'Avoid duplicate media signing');
 assert(source.includes('void Promise.allSettled([loadMessages(targetChannel),loadChatOverview()])'),'Text sends must not wait for history readback');

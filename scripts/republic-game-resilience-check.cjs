@@ -273,7 +273,8 @@ function harness({effects=false,compiledCode=code}={}){
   runTimers(){for(const [id,timer] of [...timers]){if(timer.interval)continue;timers.delete(id);timer.fn();}},
   async advance(ms){await settle();const end=virtualNow+ms;let turns=0;while(true){const next=[...timers].filter(([,t])=>t.at<=end).sort((a,b)=>a[1].at-b[1].at)[0];if(!next)break;assert(++turns<10000,'Timers must remain bounded');virtualNow=next[1].at;if(next[1].interval)next[1].at+=next[1].interval;else timers.delete(next[0]);next[1].fn();await settle();}virtualNow=end;await settle();},
   visible(state){doc.visibilityState=state;for(const fn of docListeners.get('visibilitychange')||[])fn();},
-  stats:()=>({requests,responseBytes,aborted,started:Object.fromEntries(started),notices:[...notices],queryLog:[...queryLog],timers:timers.size}),ignoreAbort(value){ignoreAbort=value;},fixture(table,rows){fixtures.set(table,rows)},
+  signal(name){listeners.get(name)?.()},
+  stats:()=>({requests,responseBytes,aborted,started:Object.fromEntries(started),notices:[...notices],queryLog:[...queryLog],timers:timers.size,activeIntervals:[...timers.values()].filter(t=>!!t.interval).length}),ignoreAbort(value){ignoreAbort=value;},fixture(table,rows){fixtures.set(table,rows)},
   resolveMedia(){permission.resolve({getTracks:()=>[{stop(){stoppedTracks++;}}]});},mediaState:()=>({recorders,stoppedTracks}),
   resolveMediaSend(){mediaSend.resolve();},
   dispose(){if(disposed)return;disposed=true;for(const slot of slots)slot?.cleanup?.();}

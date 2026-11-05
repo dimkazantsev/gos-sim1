@@ -156,7 +156,15 @@ export default function DumaLeadershipElection({g,onOpenVotes}:{g:ReturnTypeRepu
     else pending.full=true;
    }
   };
-  const recover=()=>{pending.full=true};
+  const recover=()=>{
+   pending.full=true;
+   // A subscription can join while the tab is hidden: the first election
+   // snapshot must not be lost when the browser restores the page.
+   // Only the initial RLS read is triggered here; ongoing updates stay on
+   // useGameTableSync and its single-flight scheduler.
+   if(document.visibilityState==='visible'&&initial.subscribed&&!initial.started)
+    void load(true);
+  };
   window.addEventListener(GAME_DATA_REFRESH_EVENT,local);window.addEventListener('focus',recover);window.addEventListener('online',recover);document.addEventListener('visibilitychange',recover);
   return()=>{window.removeEventListener(GAME_DATA_REFRESH_EVENT,local);window.removeEventListener('focus',recover);window.removeEventListener('online',recover);document.removeEventListener('visibilitychange',recover)};
  },[scope]);

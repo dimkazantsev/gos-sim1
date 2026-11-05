@@ -28,27 +28,45 @@ export function useBudgetPulse(gameId:string,enabled:boolean){
  useEffect(()=>{
   alive.current=true;setPulse(null);setError('');
   if(!enabled)return()=>{alive.current=false;request.current++;};
-  void refresh();
-  // The game shell already owns the WebSocket: never create a second channel.
-  // Explicit saves call refreshBudgetPulse directly; other clients reconcile
-  // without racing to re-run this expensive budget calculation.
+  // The game shell owns the sole socket. Keep budget authority behind its
+  // existing RPC; never cache or calculate unpublished rights offscreen.
   const relevant=new Set(['formal_documents','state_metrics','game_fiscal_policy','game_fiscal_regions','game_fiscal_rates','budget_simulator_plans','budget_simulator_state','budget_transfer_requests']);
   let pending:ReturnType<typeof setTimeout>|undefined,lastAutomaticAt=Date.now();
-  function automatic(){
-   if(document.visibilityState!=='visible'||Date.now()-lastAutomaticAt<8000)return;
-   lastAutomaticAt=Date.now();void refresh();
+  let dirtyWhileHidden=document.visibilityState!=='visible';
+  let timer:ReturnType<typeof setInterval>|null=null;
+  const intervalMs=60000+Math.floor(Math.random()*15000);
+  if(!dirtyWhileHidden)void refresh();
+  function automatic(force=false){
+   if(document.visibilityState!=='visible'){dirtyWhileHidden=true;return}
+   if(!force&&Date.now()-lastAutomaticAt<8000)return;
+   lastAutomaticAt=Date.now();dirtyWhileHidden=false;void refresh();
   }
   function changed(event:Event){
    const detail=(event as CustomEvent<{gameId?:string;table?:string}>).detail;
    if(detail?.gameId!==gameId||detail.table&&!relevant.has(detail.table))return;
+   if(document.visibilityState!=='visible'){dirtyWhileHidden=true;return}
    if(pending!==undefined)return;
    pending=setTimeout(()=>{pending=undefined;automatic()},1200);
   }
-  const timer=setInterval(automatic,60000+Math.floor(Math.random()*15000));
-  const resume=()=>{if(document.visibilityState==='visible')automatic()};
+  function stopPolling(){
+   if(timer!==null){clearInterval(timer);timer=null}
+   if(pending!==undefined){clearTimeout(pending);pending=undefined;dirtyWhileHidden=true}
+  }
+  function startPolling(){
+   if(timer===null&&document.visibilityState==='visible')
+    timer=setInterval(()=>automatic(),intervalMs);
+  }
+  const resume=()=>{
+   if(document.visibilityState!=='visible'){stopPolling();return}
+   startPolling();
+   // One budget read after a hidden change or a stale minute; short tab
+   // switches do not re-run the expensive projection.
+   if(dirtyWhileHidden||Date.now()-lastAutomaticAt>=60000)automatic(dirtyWhileHidden);
+  };
+  startPolling();
   document.addEventListener('visibilitychange',resume);
   window.addEventListener(GAME_DATA_REFRESH_EVENT,changed);
-  return()=>{alive.current=false;request.current++;clearInterval(timer);clearTimeout(pending);document.removeEventListener('visibilitychange',resume);window.removeEventListener(GAME_DATA_REFRESH_EVENT,changed)};
+  return()=>{alive.current=false;request.current++;stopPolling();document.removeEventListener('visibilitychange',resume);window.removeEventListener(GAME_DATA_REFRESH_EVENT,changed)};
  },[gameId,enabled,refresh]);
  return {budgetPulse:enabled&&pulse?.game_id===gameId?pulse:null,budgetPulseError:enabled?error:'',refreshBudgetPulse:refresh};
 }
