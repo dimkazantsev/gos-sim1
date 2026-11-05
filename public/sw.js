@@ -11,8 +11,8 @@ const IMAGE_CACHE='gos-id-pwa-public-images-'+CACHE_VERSION;
 const BASE=(self.location.pathname||'/sw.js').replace(/\/sw\.js$/,'').replace(/\/$/,'');
 const OFFLINE=BASE+'/offline.html';
 const MAX_ASSETS=80;
-const MAX_PUBLIC_IMAGES=96;
-const MAX_PUBLIC_IMAGE_BYTES=750000;
+const MAX_PUBLIC_IMAGES=48;
+const MAX_PUBLIC_IMAGE_BYTES=500000;
 // Preload nothing new: images are fetched and stored only on actual demand.
 const PUBLIC_IMAGE_FOLDERS=['/emblems/','/event-art/','/event-comics/','/republic-art/','/medals/','/pwa/'];
 const PRELOAD=[OFFLINE,BASE+'/pwa/icon-192.png'];
