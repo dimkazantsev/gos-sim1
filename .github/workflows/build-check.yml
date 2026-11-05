@@ -303,6 +303,8 @@ on:
       - 'supabase/migrations/*crisis_baseline*'
       - 'components/game/CivicDiscussion.tsx'
       - 'components/game/useRepublicGame.ts'
+      - 'supabase/migrations/20261105170000_vote_ballot_private_throttled_invalidation.sql'
+      - 'scripts/vote-ballot-private-pulse-100-check.cjs'
       - 'components/game/partyProfileSummary.ts'
       - 'scripts/party-profile-payload-40-check.cjs'
       - 'components/game/formalDocumentSummary.ts'
@@ -414,6 +416,7 @@ jobs:
       - run: node scripts/brand-overview-check.cjs
       - run: node scripts/overview-live-posts-check.cjs
       - run: node scripts/republic-game-resilience-check.cjs
+      - run: node scripts/vote-ballot-private-pulse-100-check.cjs
       - run: node scripts/game-identity-access-check.cjs
       - run: node scripts/classroom-telemetry-projection-rls-check.cjs
       - run: node scripts/classroom-journal-pagination-check.cjs
