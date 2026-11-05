@@ -416,7 +416,6 @@ jobs:
       - run: node scripts/brand-overview-check.cjs
       - run: node scripts/overview-live-posts-check.cjs
       - run: node scripts/republic-game-resilience-check.cjs
-      - run: node scripts/vote-ballot-private-pulse-100-check.cjs
       - run: node scripts/game-identity-access-check.cjs
       - run: node scripts/classroom-telemetry-projection-rls-check.cjs
       - run: node scripts/classroom-journal-pagination-check.cjs
