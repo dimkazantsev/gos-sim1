@@ -23,7 +23,7 @@ assert(sql.includes('REVOKE ALL ON FUNCTION private.broadcast_game_parties_inval
 async function pgCheck(){
  const db=new PGlite();
  try{
-  await db.exec('CREATE SCHEMA private;CREATE SCHEMA realtime;');
+  await db.exec('CREATE ROLE anon;CREATE ROLE authenticated;CREATE SCHEMA private;CREATE SCHEMA realtime;');
   await db.exec('CREATE TABLE realtime.messages(topic text,event text,payload jsonb,is_private boolean);');
   await db.exec("CREATE FUNCTION realtime.send(data jsonb,ev text,room text,priv boolean) RETURNS void LANGUAGE plpgsql AS $$BEGIN INSERT INTO realtime.messages(topic,event,payload,is_private) VALUES(room,ev,data,priv);END$$;");
   await db.exec('CREATE TABLE public.game_parties(id uuid PRIMARY KEY,game_id uuid,name text);');
