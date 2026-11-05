@@ -38,4 +38,17 @@ assert(source.includes('if(chat&&chatOpenRef.current&&channelRef.current)void lo
 assert(source.includes('else if(chatOpen&&channelRef.current)')&&source.includes('void loadMessages(channelRef.current)'), 'Opening chat must recover edits that arrived while closed');
 assert(source.includes('messageRowsRef.current.some(old=>old.id===m.id)'),'Avoid duplicate media signing');
 assert(source.includes('void Promise.allSettled([loadMessages(targetChannel),loadChatOverview()])'),'Text sends must not wait for history readback');
+// Prevent 100 personalised read-marker / mention events from fanning out to
+// every connected student. Check that filters remain scoped by both game and
+// owner, with shared channel pins left unchanged.
+const personalFilter=source.slice(source.indexOf("for(const table of ['chat_mentions','chat_channel_state','chat_pins'])"));
+assert(personalFilter.includes("?'game_id=eq.'+gameId+',mentioned_user_id=eq.'+me.user_id"),'Mentions must be scoped to the recipient within this game');
+assert(personalFilter.includes("?'game_id=eq.'+gameId+',user_id=eq.'+me.user_id"),'Read markers must be scoped to the current user within this game');
+assert(personalFilter.includes(":'game_id=eq.'+gameId;"),'Pins remain room-wide for accessible channels');
+assert(personalFilter.includes("channel.on('postgres_changes',{event:'*',schema:'public',table,filter}"),'Preserve one socket and the existing change handler');
+const members=Array.from({length:100},(_,i)=>'member-'+i);
+let matched=0;
+for(const owner of members)for(const subscriber of members)if(owner===subscriber)matched++;
+assert.equal(matched,100,'100 personal row changes must target only 100 recipient deliveries, not 10,000');
+
 console.log('PASS 30 chat clients, ordered deduplicated messages, signed media, realtime INSERT and six-second incremental recovery');

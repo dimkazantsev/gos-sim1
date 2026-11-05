@@ -569,7 +569,16 @@ export function useRepublicGame(gameId:string){
    dirtyOverview=true;schedule();
   });
   for(const table of ['chat_mentions','chat_channel_state','chat_pins']){
-   channel.on('postgres_changes',{event:'*',schema:'public',table,filter:'game_id=eq.'+gameId},payload=>{
+   // Chat unread state and mentions belong to the current user, not every
+   // participant in the room. Keep game isolation AND personal targeting in
+   // the server-side Postgres Changes filter. No extra socket/subscription.
+   // Pins remain game-scoped because their visibility is channel-based.
+   const filter=table==='chat_mentions'
+    ?'game_id=eq.'+gameId+',mentioned_user_id=eq.'+me.user_id
+    :table==='chat_channel_state'
+     ?'game_id=eq.'+gameId+',user_id=eq.'+me.user_id
+     :'game_id=eq.'+gameId;
+   channel.on('postgres_changes',{event:'*',schema:'public',table,filter},payload=>{
     if(table==='chat_pins'){
      const next=payload.new as Partial<ChatPin>|null,previous=payload.old as Partial<ChatPin>|null;
      if(chatOpenRef.current&&channelRef.current&&
