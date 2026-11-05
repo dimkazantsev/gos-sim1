@@ -35,12 +35,17 @@ BEGIN
  RETURNING vote_id INTO v_sent;
 
  IF v_sent IS NOT NULL THEN
-  PERFORM realtime.send(
-   jsonb_build_object('vote_id',v_vote),
-   'ballots_changed',
-   'gos-id-live:'||v_game::text,
-   true
-  );
+  -- Messaging outages must not roll back a confirmed game ballot.
+  BEGIN
+   PERFORM realtime.send(
+    jsonb_build_object('vote_id',v_vote),
+    'ballots_changed',
+    'gos-id-live:'||v_game::text,
+    true
+   );
+  EXCEPTION WHEN OTHERS THEN
+   NULL; -- The existing bounded client recovery handles missed pulses.
+  END;
  END IF;
  RETURN NULL;
 END;
