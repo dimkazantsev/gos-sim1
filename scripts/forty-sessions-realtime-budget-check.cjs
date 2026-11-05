@@ -14,7 +14,8 @@ for(let i=0;i<files.length;i++){
  assert.equal(sf.parseDiagnostics.length,0,files[i]+' syntax regression');
 }
 const [sync,game,client]=contents;
-assert(sync.includes('if(hasPushCoverage&&gameRealtimeConnected(gameId)&&now-lastFallbackAt<connectedReconcileMs)return'));
+assert(sync.includes('if(hasPushCoverage&&gameRealtimeConnected(gameId!)&&now-lastFallbackAt<connectedReconcileMs)return'));
+assert(sync.includes('function pausePolling()')&&sync.includes('function startPolling()'),'Only visible stage widgets run periodic timers');
 assert(sync.includes('eventOnly?900000:180000'),'Healthy event widgets use a sparse 15-minute safety reconciliation');
 assert(game.includes('setGameRealtimeConnection(gameId,liveConnected)'));
 assert(game.includes('setGameRealtimeConnection(gameId,false)'));
