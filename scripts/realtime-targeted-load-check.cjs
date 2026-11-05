@@ -66,7 +66,7 @@ async function checks(){
  const delayedTally=v.hold('game_ballots');v.emit('game_votes',other,'UPDATE');await v.advance(3100);await v.render().castVoteAllocation(open,1,0,0);delayedTally.resolve();await v.settle();await v.advance(3100);
  assert(v.render().ballots.some(row=>row.vote_id==='other'),'A concurrent own vote requeues the other vote tally instead of dropping it');
  v.fixture('game_ballots',[{vote_id:'own',voter_id:'student-voter',choice:'yes',weight:1},{vote_id:'other',voter_id:'student-voter',choice:'no',weight:2}]);
- await v.advance(9100);assert.equal(v.render().ballots.find(row=>row.vote_id==='other').weight,2,'An ordinary ballot without a vote-table event arrives through the visible six-second recovery');
+ v.broadcast('gos-id-live:game-a','ballots_changed',{vote_id:'other'});await v.advance(9100);assert.equal(v.render().ballots.find(row=>row.vote_id==='other').weight,2,'An ordinary ballot without a vote-table update arrives through the private scoped pulse');
  v.visible('hidden');const hiddenBallots=v.stats().started.game_ballots;await v.advance(20000);assert.equal(v.stats().started.game_ballots,hiddenBallots,'Hidden voting screens must not poll ballots');v.visible('visible');
  v.fixture('game_votes',[{...open,status:'closed'}]);const prior=v.readCount('games'),pendingBallots=v.hold('game_ballots');
  const closing=v.render().castVoteAllocation(open,1,0,0);await tick();v.emit('game_votes',{...open,status:'closed'},'UPDATE');v.render();pendingBallots.resolve();await closing;

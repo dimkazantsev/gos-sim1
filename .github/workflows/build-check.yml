@@ -303,6 +303,8 @@ on:
       - 'supabase/migrations/*crisis_baseline*'
       - 'components/game/CivicDiscussion.tsx'
       - 'components/game/useRepublicGame.ts'
+      - 'supabase/migrations/20261105170000_vote_ballot_private_throttled_invalidation.sql'
+      - 'scripts/vote-ballot-private-pulse-100-check.cjs'
       - 'components/game/partyProfileSummary.ts'
       - 'scripts/party-profile-payload-40-check.cjs'
       - 'components/game/formalDocumentSummary.ts'

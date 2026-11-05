@@ -19,7 +19,7 @@ assert(sync.includes('eventOnly?900000:180000'),'Healthy event widgets use a spa
 assert(game.includes('setGameRealtimeConnection(gameId,liveConnected)'));
 assert(game.includes('setGameRealtimeConnection(gameId,false)'));
 assert(game.includes('if(liveConnected&&now-lastChatRecoveryAt<60000)return'));
-assert(game.includes('chatRecovery=setInterval(recoverVisibleChatAndBallots,6000)'),'Disconnected chat and ballot recovery retains the original six-second cadence');
+assert(game.includes('chatRecovery=setInterval(recoverVisibleChatAndBallots,6000)'),'Chat recovery retains the original six-second cadence; ballots use private push and rare fallback');
 assert(game.includes('const initialRecoveryDelay=500+recoveryHash%5500'),'Per-client initial recovery phase must prevent a synchronized classroom burst');
 assert(client.includes("me?.kind==='student'&&view!=='events'?game?.id:undefined,['event_assignments'"),'Event badges use the shared socket, only for students outside the visible events feed');
 assert(client.includes("useGameTableSync(!previewMode&&g.coreLoaded&&me?.kind==='student'?game?.id:undefined,['blitz_assignments']"),'Blitz badges use the same bounded game scheduler');
