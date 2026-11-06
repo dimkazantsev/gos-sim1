@@ -19,7 +19,8 @@ assert.deepEqual(latencies(Array.from({length:100},(_,i)=>i+1)),{n:100,p95_ms:95
   const ballots=await db.query('select count(*)::int as n from public.game_ballots where vote_id=$1',[fortyId]);
   assert.equal(ballots.rows[0].n,40);
   await db.query("select set_config('request.jwt.claim.sub',$1,false)",[studentId(1)]);
-  await assert.rejects(db.query('select public.cast_vote_allocation($1,1,0,0)',[fortyId]),/Голосование завершено/);
+  await db.query('select public.cast_vote_allocation($1,1,0,0)',[fortyId]); // exact retry after close is read-only
+  await assert.rejects(db.query('select public.cast_vote_allocation($1,0,1,0)',[fortyId]),/Голосование завершено/);
   await db.query("select set_config('request.jwt.claim.sub',$1,false)",[studentId(1)]);
   await db.query('select public.cast_vote_allocation($1,1,0,0)',[raceId]);
   // Isolated audit counts actual physical row mutations rather than keys.
