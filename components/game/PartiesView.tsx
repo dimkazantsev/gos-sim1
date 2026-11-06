@@ -27,13 +27,15 @@ export default function PartiesView({g}:{g:ReturnTypeRepublic}){
  const registrationPackageRef=useRef<HTMLDetailsElement>(null);
  const [documentNotice,setDocumentNotice]=useState<{partyId:string;docKind:PartyDocument['doc_kind'];kind:'success'|'error';message:string}|null>(null);
  const [inviteFeedback,setInviteFeedback]=useState<{partyId:string;kind:'success'|'error';message:string}|null>(null);
+ const [membershipUser,setMembershipUser]=useState(''),[membershipBusy,setMembershipBusy]=useState(false);
+ const [membershipFeedback,setMembershipFeedback]=useState<{partyId:string;kind:'success'|'error';message:string}|null>(null);
  const stageOne=g.stages.find(s=>s.stage_no===1);
  const partyFormationOpen=isStageWorkOpen(g.game,stageOne);
  const partyStageCompleted=stageOne?.status==='completed';
  const partyStagePaused=stageOne?.status==='open'&&!partyFormationOpen&&g.game?.status!=='lobby';
  const partyStageBadge=partyStageCompleted?'Этап 01 завершён':partyFormationOpen?'Этап 01 открыт':partyStagePaused?'Этап 01 приостановлен':'Этап 01 ещё не открыт';
  const partyStageNotice=partyStageCompleted
-  ?(teacher?'Первый этап завершён. Преподаватель может исправлять регистрационные документы независимо от этапа.':'Первый этап завершён. Формирование партий и работа с регистрационными документами в рамках этого этапа завершены. Сведения о партиях и результаты доступны для просмотра.')
+  ?(teacher?'Первый этап завершён. Преподаватель может управлять составом партий и исправлять регистрационные документы на последующих этапах.':'Первый этап завершён. Формирование партий и работа с регистрационными документами в рамках этого этапа завершены. Сведения о партиях и результаты доступны для просмотра.')
   :partyStagePaused
    ?(teacher?'Первый этап приостановлен. Преподаватель может продолжать актуализацию документов зарегистрированных партий.':'Первый этап приостановлен. Изменения временно недоступны. Сведения о партиях и результаты можно просматривать.')
    :'Первый этап ещё не открыт. Работа с партиями начнётся после его открытия преподавателем. Пока доступны сведения о партиях и результатах.';
@@ -63,6 +65,7 @@ export default function PartiesView({g}:{g:ReturnTypeRepublic}){
   latestDocs.filter(d=>['charter','program','symbol','congress_minutes'].includes(d.doc_kind)&&d.status==='accepted'):[],free=members.filter(m=>m.kind==='student'&&!m.roster_archived_at&&!m.team),pending=partyInvitations.filter(i=>i.party_id===selected?.id&&i.status==='pending'),inbox=partyInvitations.filter(i=>i.invited_user_id===me?.user_id&&i.status==='pending');
  const reviewedCount=DOCS.filter(kind=>latestDocs.some(d=>d.doc_kind===kind.kind&&d.status==='accepted')).length;
  const canInvite=partyFormationOpen&&!!selected&&!!me&&!me.roster_archived_at&&(teacher||me.kind==='student'&&me.team===selected.name);
+ const membershipCandidates=teacher&&partyStageCompleted&&selected?members.filter(m=>m.kind==='student'&&!m.roster_archived_at&&m.team!==selected.name):[];
  const inviteClosed=!!selected?.leader_user_id;
  const workflowCount=partyInvitations.filter(i=>i.game_id===g.game?.id&&i.status==='pending'&&i.invited_user_id===me?.user_id).length;
  const canRename=!!selected&&!!me&&(teacher||selected.leader_user_id===me.user_id);
@@ -122,6 +125,32 @@ export default function PartiesView({g}:{g:ReturnTypeRepublic}){
    setInviteFeedback({partyId,kind:'error',message});g.setError(message);
   }finally{setBusy(false)}
  }
+ async function managePartyMember(action:'enroll'|'remove',userId:string){
+  if(!teacher||!partyStageCompleted||!selected||membershipBusy)return;
+  const member=members.find(m=>m.user_id===userId);
+  if(!member||member.kind!=='student'||member.roster_archived_at)return;
+  if(action==='enroll'&&member.team===selected.name||action==='remove'&&member.team!==selected.name)return;
+  if(action==='remove'){
+   const warning='Исключить «'+member.full_name+'» из партии «'+selected.name+'»?'
+    +(member.user_id===selected.leader_user_id?' Полномочия председателя партии прекратятся.':'')
+    +' Мандаты между оставшимися членами партии перераспределятся.';
+   if(!window.confirm(warning))return;
+  }
+  if(action==='enroll'&&member.team&&
+   !window.confirm('Перевести «'+member.full_name+'» из партии «'+member.team+'» в «'+selected.name+'»?'
+    +' Если участник возглавляет прежнюю партию, место председателя освободится. Мандаты партий будут перераспределены.'))return;
+  const partyId=selected.id;
+  setMembershipBusy(true);setMembershipFeedback(null);
+  try{
+   let failure='Не удалось изменить состав партии.';
+   const ok=await g.teacherManagePartyMember(partyId,userId,action,message=>{failure=message});
+   if(ok)setMembershipUser('');
+   setMembershipFeedback({partyId,kind:ok?'success':'error',
+    message:ok?(action==='enroll'?'Участник зачислен в партию.':'Участник исключён из партии.'):failure});
+  }catch(error){
+   setMembershipFeedback({partyId,kind:'error',message:userError(error)||'Не удалось изменить состав партии.'});
+  }finally{setMembershipBusy(false)}
+ }
  function canDeleteParty(p:typeof parties[number]){return !!me&&(teacher||(p.created_by===me.user_id&&p.registration_status!=='registered'))}
  async function removeParty(p:typeof parties[number]){
   if(!canDeleteParty(p)||deletingPartyId)return;
@@ -139,7 +168,7 @@ export default function PartiesView({g}:{g:ReturnTypeRepublic}){
   {!partyFormationOpen&&<div className="gosPartyStageWarning" role="status">{partyStageNotice}</div>}
   {inbox.length>0&&<section className="civicPartyInbox"><h2>Приглашения в партии <span className="gosPartyCount">{workflowCount}</span></h2>{inbox.map(i=><article key={i.id}><b>{parties.find(p=>p.id===i.party_id)?.name||'Партия'}</b><button className="primary" disabled={!partyFormationOpen||me?.kind!=='student'||!!me.roster_archived_at} onClick={()=>void g.respondPartyInvitation(i.id,true)}>Принять</button><button className="secondary" disabled={!partyFormationOpen||me?.kind!=='student'} onClick={()=>void g.respondPartyInvitation(i.id,false)}>Отклонить</button></article>)}</section>}
   <input className="civicPartySearch" aria-label="Поиск партий" placeholder="Название, идеология или программа" value={query} onChange={e=>setQuery(e.target.value)}/>
-  <section className="civicPartyTiles" aria-label="Публичные партии">{ranked.map(p=><article className={selected?.id===p.id?'civicPartyTile active':'civicPartyTile'} key={p.id}><button type="button" className="civicPartyTileSelect" onClick={()=>{setSelectedId(p.id);setDescription(p.description||'');setInviteUser('');setInviteFeedback(null)}}><span className="civicPartyLogo" style={{background:p.color}}>{p.logo_url?<img src={p.logo_url} alt=""/>:p.name.slice(0,1)}</span><span className="civicPartyTileCopy"><b>{p.name}</b><small>{p.ideology||'Идеология не указана'}</small><small>{statusLabel[p.registration_status]}</small></span><span className="civicPartyTileStats"><b>{p.support}%</b> поддержка · <b>{p.mandates}</b> мандатов</span></button>{canDeleteParty(p)&&<button type="button" className="civicPartyDelete" aria-label={'Удалить партию «'+p.name+'»'} title={teacher?'Удалить партию':'Удалить свою партию до регистрации'} disabled={deletingPartyId===p.id} onClick={()=>void removeParty(p)}>{deletingPartyId===p.id?<span aria-hidden="true">…</span>:<Trash2 size={17}/>}</button>}</article>)}{!ranked.length&&<p>Партии не найдены.</p>}</section>
+  <section className="civicPartyTiles" aria-label="Публичные партии">{ranked.map(p=><article className={selected?.id===p.id?'civicPartyTile active':'civicPartyTile'} key={p.id}><button type="button" className="civicPartyTileSelect" onClick={()=>{setSelectedId(p.id);setDescription(p.description||'');setInviteUser('');setInviteFeedback(null);setMembershipUser('');setMembershipFeedback(null)}}><span className="civicPartyLogo" style={{background:p.color}}>{p.logo_url?<img src={p.logo_url} alt=""/>:p.name.slice(0,1)}</span><span className="civicPartyTileCopy"><b>{p.name}</b><small>{p.ideology||'Идеология не указана'}</small><small>{statusLabel[p.registration_status]}</small></span><span className="civicPartyTileStats"><b>{p.support}%</b> поддержка · <b>{p.mandates}</b> мандатов</span></button>{canDeleteParty(p)&&<button type="button" className="civicPartyDelete" aria-label={'Удалить партию «'+p.name+'»'} title={teacher?'Удалить партию':'Удалить свою партию до регистрации'} disabled={deletingPartyId===p.id} onClick={()=>void removeParty(p)}>{deletingPartyId===p.id?<span aria-hidden="true">…</span>:<Trash2 size={17}/>}</button>}</article>)}{!ranked.length&&<p>Партии не найдены.</p>}</section>
   {selected&&<section className="civicPartyPublic"><header><span className="civicPartyLogo" style={{background:selected.color}}>{selected.logo_url?<img src={selected.logo_url} alt={'Эмблема: '+selected.name}/>:selected.name.slice(0,1)}</span><div><h2>{selected.name}</h2><p>{selected.ideology||'Идеология не указана'}</p></div><span>{statusLabel[selected.registration_status]}</span></header><p className="civicPartyDescription">{selected.description||'Публичное описание пока не опубликовано.'}</p><div className="civicPartyFacts"><span><b>{selected.support}%</b> поддержка</span><span><b>{selected.mandates}</b> мандатов</span><span><b>{staff.length}</b> участников</span></div>
    <div className="civicPartyLeader"><span className="eventVoter"><ProfileAvatar name={leader?.full_name||'Не назначен'} src={profileByUser.get(leader?.user_id||'')?.avatar_url}/></span><div><small>Председатель партии</small><b>{leader?.full_name||'Не назначен'}</b></div></div>
    <PartyChairElection g={g} party={selected}/>
@@ -169,7 +198,26 @@ export default function PartiesView({g}:{g:ReturnTypeRepublic}){
     {!inviteClosed&&inviteFeedback?.partyId===selected.id&&<p className={'civicPartyInviteFeedback '+(inviteFeedback.kind==='error'?'isError':'isSuccess')} role={inviteFeedback.kind==='error'?'alert':'status'}>{inviteFeedback.message}</p>}
     {pending.map(i=><div className="civicPendingInvite" key={i.id}><span>{g.names[i.invited_user_id]}</span><IconAction variant="remove" label="Отменить приглашение" onClick={()=>void g.cancelPartyInvitation(i.id)}/></div>)}
    </details>}
-   <details className="civicPartyRoster"><PartyDisclosureSummary icon={UsersRound} title="Состав партии" meta={staff.length+' участников'}/><ul>{staff.map(m=><li key={m.user_id}><span className="eventVoter"><ProfileAvatar name={m.full_name} src={profileByUser.get(m.user_id)?.avatar_url}/></span><div><b>{m.full_name}</b><small>{m.user_id===selected.leader_user_id?'Председатель партии «'+selected.name+'»':m.role_title||'Участник'}</small></div><span>{mandateByUser.get(m.user_id)?.base_mandates||0} мандатов</span></li>)}</ul></details>
+   <details className="civicPartyRoster"><PartyDisclosureSummary icon={UsersRound} title="Состав партии" meta={staff.length+' участников'}/>
+     {staff.length?<ul>{staff.map(m=><li key={m.user_id}><span className="eventVoter"><ProfileAvatar name={m.full_name} src={profileByUser.get(m.user_id)?.avatar_url}/></span>
+      <div><b>{m.full_name}</b><small>{m.user_id===selected.leader_user_id?'Председатель партии «'+selected.name+'»':m.role_title||'Участник'}</small></div>
+      <span>{mandateByUser.get(m.user_id)?.base_mandates||0} мандатов</span>
+      {teacher&&partyStageCompleted&&<IconAction variant="remove" label={'Исключить '+m.full_name+' из партии'} disabled={membershipBusy} onClick={()=>void managePartyMember('remove',m.user_id)}/>}
+     </li>)}</ul>:<p className="civicPartyRosterEmpty">В партии пока нет участников.</p>}
+     {teacher&&partyStageCompleted&&<div className="civicPartyMemberManager">
+      <strong>Управление составом</strong>
+      <p>Преподаватель может зачислять и исключать участников на любом последующем этапе. Мандаты перераспределяются, завершённые голосования и оценки сохраняются.</p>
+      <div className="civicPartyMemberManagerActions">
+       <StyledSelect label="Участник" value={membershipUser} disabled={membershipBusy} wide wrap
+        onChange={value=>{setMembershipUser(value);setMembershipFeedback(null)}}
+        options={[{value:'',label:'Выберите участника'},...membershipCandidates.map(m=>({value:m.user_id,label:m.full_name+' · '+(m.team||'Без партии')}))]}/>
+       <button className="primary" type="button" disabled={membershipBusy||!membershipCandidates.some(m=>m.user_id===membershipUser)}
+        onClick={()=>void managePartyMember('enroll',membershipUser)}>{membershipBusy?'Сохранение…':'Зачислить'}</button>
+      </div>
+      {membershipFeedback?.partyId===selected.id&&<p className={'civicPartyInviteFeedback '+(membershipFeedback.kind==='error'?'isError':'isSuccess')}
+       role={membershipFeedback.kind==='error'?'alert':'status'}>{membershipFeedback.message}</p>}
+     </div>}
+    </details>
    {(canEditDescription||canUploadLogo)&&<details className="civicPartyEditor"><PartyDisclosureSummary icon={PencilLine} title="Оформление партии" meta="Эмблема и публичное описание"/>{canEditDescription&&<><label>Описание<textarea rows={4} value={description||selected.description||''} onChange={e=>setDescription(e.target.value)}/></label><button className="secondary" disabled={busy} onClick={()=>void saveDescription()}>Сохранить описание</button></>}{canUploadLogo&&<PartyLogoEditor key={selected.id} partyName={selected.name} disabled={busy} onSave={saveLogo}/>}</details>}
    {(own||(selected.registration_status==='registered'&&certificateIssued))&&
     <div className="gosPartyStageFieldset"><JusticeDocuments g={g} partyId={selected.id}/></div>}
