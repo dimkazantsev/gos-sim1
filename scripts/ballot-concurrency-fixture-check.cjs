@@ -1,7 +1,7 @@
 'use strict';
 const assert=require('node:assert/strict');
 const {PGlite}=require('@electric-sql/pglite');
-const {bootstrap,prepareRuns,studentId,gameId,voteId,fortyId,raceId,latencies,assertDisposable}=require('./ballot-concurrency-postgres-check.cjs');
+const {bootstrap,prepareRuns,studentId,gameId,voteId,fortyId,retryId,raceId,latencies,assertDisposable}=require('./ballot-concurrency-postgres-check.cjs');
 assert.throws(()=>assertDisposable({}),/isolated/);
 assert.throws(()=>assertDisposable({GITHUB_ACTIONS:'true',GOS_BALLOT_DISPOSABLE:'YES',PGHOST:'db.example.com',PGDATABASE:'gos_vote_concurrency_fixture'}),/isolated/);
 assert.deepEqual(latencies(Array.from({length:100},(_,i)=>i+1)),{n:100,p95_ms:95,p99_ms:99});
