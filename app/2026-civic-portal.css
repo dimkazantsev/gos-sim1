@@ -334,3 +334,19 @@
 .gosShareLinkHint{margin:0;color:var(--gs-muted,#586784);font-size:12px;line-height:1.55}
 .gosShareNotice{margin:0;color:var(--gs-ink-2,#344467);font-size:13px}
 @media(max-width:560px){.gosShareModalBody{padding:18px 14px}.gosShareLinkControl{grid-template-columns:minmax(0,1fr)}.gosShareLinkControl>button{width:100%}}
+
+/* Индивидуальная ссылка восстановления. Токены и отступы ГОС.ID, без библиотек. */
+.teacherReentryFields{display:grid;gap:12px;min-width:0}
+.teacherReentryFields label{display:grid;gap:6px;font-size:13px;font-weight:700;color:var(--gs-ink,#172447)}
+.teacherReentryFields input{min-width:0;width:100%;box-sizing:border-box}
+.teacherReentryLinkResult{display:grid;gap:10px;min-width:0;padding:14px;border:1px solid var(--gs-border,#dce3f0);border-radius:12px;background:var(--gs-surface-soft,#f4f6fc)}
+.teacherReentryLinkResult input{min-width:0;width:100%;font-size:12px}
+.teacherReentryLinkResult small{font-size:12px;line-height:1.55;color:var(--gs-muted,#586784)}
+.teacherReentryLinkResult .primary{justify-self:start}
+.participantReentryScreen{display:grid;place-items:center;min-height:100dvh;background:var(--gs-bg,#f3f5fb);padding:16px;color:var(--gs-ink,#172447)}
+.participantReentryCard{width:min(100%,480px);min-width:0;padding:28px;border-radius:20px}
+.participantReentryBrand{display:flex;align-items:center;gap:12px;margin-bottom:24px;font-size:21px}
+.participantReentryCard h1{margin-bottom:14px;font-size:clamp(23px,4vw,28px)}
+.participantReentryCard p{color:var(--gs-muted,#586784);line-height:1.6}
+.participantReentryCard .primary{width:100%}
+@media(max-width:560px){.participantReentryCard{padding:20px}.teacherReentryLinkResult .primary{width:100%}}

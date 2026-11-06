@@ -809,7 +809,7 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
         <input id="gos-share-profile" aria-label="Пригласительная ссылка в личный профиль участника" readOnly value={inviteUrl} onFocus={e=>e.target.select()}/>
         <button type="button" className="primary" onClick={()=>void copySharedLink(inviteUrl,'profile')}>Копировать</button>
        </div>
-       <p className="gosShareLinkHint">Участник с действующим доступом откроет свой профиль. Для первого входа потребуются ФИО, группа и приглашение участника.</p>
+       <p className="gosShareLinkHint">Обычная ссылка: открывает личный профиль при действующем доступе. Для ранее удалённого студента преподаватель создаёт персональную ссылку в разделе «Участники и доступ».</p>
       </div>
      </div>
      {shareNotice&&<p className="gosShareNotice" role="status">{shareNotice}</p>}

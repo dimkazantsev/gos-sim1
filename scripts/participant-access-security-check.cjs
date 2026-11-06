@@ -11,6 +11,16 @@ assert.match(restore,/delete from public\.game_member_access_blocks/,'Restore re
 assert.match(restore,/update public\.game_members set roster_archived_at=null/,'Restore reopens membership');
 assert.match(restore,/p_confirm_name is distinct from v_member\.full_name/,'Restore retains exact member confirmation');
 assert.match(ui,/Восстановить доступ/,'Teacher can reinstate a single participant');
+const personal=fs.readFileSync('supabase/migrations/20261106130540_personal_participant_reentry.sql','utf8');
+const entry=fs.readFileSync('app/page.tsx','utf8');
+for(const phrase of ["private.is_game_teacher(p_game_id)","v_member.kind<>'student'","v_grant.used_at IS NOT NULL","v_grant.expires_at<=now()","extensions.gen_random_bytes(24)","extensions.digest(v_token,'sha256')","interval '24 hours'","FOR UPDATE","INSERT INTO public.game_members","roster_archived_at=NULL","used_at=now()","REVOKE ALL ON FUNCTION public.redeem_participant_reentry(text) FROM PUBLIC,anon"])
+ assert(personal.includes(phrase),'Personal one-time recovery contract: '+phrase);
+assert(ui.includes('teacher_issue_participant_reentry')&&ui.includes("selected.action==='reentry_link'"),'Personal link for selected blocked member only');
+assert(ui.includes("link.hash='reentry='+data"),'Bearer link secret stays in URL fragment');
+assert(entry.includes("supabase.rpc('redeem_participant_reentry'"),'Entry consumes single-use token');
+assert(entry.includes("router.replace('/game/'+String(redeemed.data)+'?section=profile')"),'Open own participant profile');
+assert(entry.includes('reentryStarted.current=true'),'Single-flight claim; no polling');
+assert(entry.includes('window.history.replaceState'),'Secret is scrubbed after redemption');
 
 assert.match(sql,/private\.is_game_teacher\(p_game_id\)/,'Read/write RPC must check teacher role');
 assert.match(sql,/p_user_id=v_actor or p_user_id=v_owner/,'Self and owner must be protected');

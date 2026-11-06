@@ -58,7 +58,34 @@ export default function Home(){
  const [savedGameCodes,setSavedGameCodes]=useState<string[]>([]);
  const [returningGames,setReturningGames]=useState<Array<{id:string;kind:'student'|'observer';code:string;title:string}>>([]);
  const [fromSharedLink,setFromSharedLink]=useState(false);
+ const [reentryState,setReentryState]=useState<'idle'|'pending'|'error'>('idle');
+ const [reentryError,setReentryError]=useState('');
+ const reentryStarted=useRef(false);
  useEffect(()=>setFromSharedLink(!!incomingSectionSuffix()),[]);
+ useEffect(()=>{
+  const token=new URLSearchParams(window.location.hash.replace(/^#/,'')).get('reentry');
+  if(!token||reentryStarted.current)return;
+  reentryStarted.current=true;
+  if(!/^[a-f0-9]{48}$/.test(token)){
+   setReentryError('Ссылка восстановления повреждена. Попросите преподавателя создать новую.');
+   setReentryState('error');return;
+  }
+  setReentryState('pending');
+  void (async()=>{
+   try{
+    const {data}=await supabase.auth.getSession();
+    if(!data.session?.user?.id){
+     const created=await supabase.auth.signInAnonymously();
+     if(created.error)throw created.error;
+    }
+    const redeemed=await supabase.rpc('redeem_participant_reentry',{p_token:token});
+    if(redeemed.error)throw redeemed.error;
+    if(!/^[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}$/i.test(String(redeemed.data)))throw new Error('Сервер не подтвердил восстановление.');
+    window.history.replaceState(window.history.state,'',window.location.pathname+window.location.search);
+    router.replace('/game/'+String(redeemed.data)+'?section=profile');
+   }catch(reason){setReentryError(readableError(reason));setReentryState('error');}
+  })();
+ },[router]);
  useEffect(()=>{
   const requested=new URLSearchParams(window.location.search).get('teacher');
   if(requested==='1'){setTeacherLogin(true);setPersonalLogin(true);setMode('teacher')}
@@ -288,6 +315,17 @@ export default function Home(){
   }catch(e){setError(readableError(e))}
   finally{unlockEntry()}
  }
+ if(reentryState!=='idle')return <main className="participantReentryScreen">
+  <section className="surface participantReentryCard" role={reentryState==='error'?'alert':'status'}>
+   <div className="participantReentryBrand"><BrandIdentity tagline/></div>
+   <h1>Восстановление доступа к игре</h1>
+   <p>{reentryState==='pending'?'Проверяем персональную ссылку преподавателя и открываем Ваш профиль…':reentryError}</p>
+   {reentryState==='pending'?<span className="spinner" aria-hidden="true"/>:<>
+    <p>Если ссылка использована или срок её действия истёк, обратитесь к преподавателю за новой.</p>
+    <button type="button" className="primary" onClick={()=>window.location.reload()}>Повторить проверку</button>
+   </>}
+  </section>
+ </main>;
  return <main className="entryPage">
   <a className="skipLink" href="#entry-form">Перейти ко входу</a>
   <header className="entryHeader"><a className="wordmark" href="/" aria-label={BRAND_NAME+" — главная"}><BrandIdentity tagline/></a><span className="entryEdition">Лаборатория государственного управления <i>2026</i></span></header>
