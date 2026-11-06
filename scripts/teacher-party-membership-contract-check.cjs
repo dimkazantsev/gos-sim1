@@ -5,6 +5,8 @@ const assert=require('node:assert/strict');
 const root=path.resolve(__dirname,'..');
 const read=file=>fs.readFileSync(path.join(root,file),'utf8');
 const sql=read('supabase/migrations/20261106131500_teacher_party_membership_after_stage_one.sql');
+const insertSafeGuard=read('supabase/migrations/20261106133500_teacher_party_invitation_insert_guard.sql');
+assert(insertSafeGuard.includes("IF tg_table_name='party_invitations' AND tg_op='UPDATE' THEN"),'Invitation guard must test trigger action before touching OLD');
 const ui=read('components/game/PartiesView.tsx');
 const hook=read('components/game/useRepublicGame.ts');
 const css=read('app/2026-civic-portal.css');
