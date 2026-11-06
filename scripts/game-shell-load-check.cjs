@@ -13,9 +13,16 @@ for(const screen of deferred){
  assert(!source.includes("import "+screen+" from './game/"+screen+"';"),
   screen+' must not be bundled eagerly by the game shell');
 }
-for(const essential of ['DashboardView','ProfileView','ChatPanel','StageComics'])
+for(const essential of ['DashboardView','ProfileView','StageComics'])
  assert(source.includes("import "+essential+" from './game/"+essential+"';"),
   essential+' must remain immediately available at login/onboarding');
+// The emergency chat pause must not download ChatPanel for every student.
+// When chat is restored, it may continue to load only when the chat opens.
+const chatPaused=/export const CHAT_PAUSED\\s*=\\s*true/.test(fs.readFileSync('lib/featureFreeze.ts','utf8'));
+const eagerChat=source.includes("import ChatPanel from './game/ChatPanel';");
+const lazyChat=source.includes("const ChatPanel=dynamic(()=>import('./game/ChatPanel'),{loading:sectionLoading});");
+assert(eagerChat||lazyChat,'ChatPanel must remain accessible after resumption');
+if(chatPaused)assert(lazyChat&&!eagerChat,'Paused chat must not be bundled with the game shell');
 assert(source.includes("import dynamic from 'next/dynamic';"),
  'Next.js must resolve each view to a separate lazy chunk');
 
