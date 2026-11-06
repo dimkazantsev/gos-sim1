@@ -132,9 +132,9 @@ export default function TeacherParticipantRoster({g}:{g:ReturnTypeRepublic}){
     <button type="button" className="primary" onClick={()=>void navigator.clipboard.writeText(reentryUrl).then(()=>setStatus('Ссылка скопирована. Отправьте её лично участнику.'),()=>setDialogError('Выделите ссылку и скопируйте вручную.'))}><Copy size={16}/> Копировать ссылку</button>
     <small>Не публикуйте ссылку в общем чате: первый открывший её получит доступ к игре.</small>
    </div>}
-   {dialogError&&<p className="teacherRosterDialogError" role="alert">{dialogError}</p>
+   {dialogError&&<p className="teacherRosterDialogError" role="alert">{dialogError}</p>}
    <div className="teacherRosterDialogActions">
-    {!reentryUrl&&<button className={selected.action==='restore'||selected.action==='reentry_link'?'primary':'danger'} type="button" disabled={busy||confirmation!==selected.entry.full_name||selected.action==='reentry_link'&&(reentryName.trim().length<5||!reentryGroup.trim())} onClick={()=>void submit()}>{busy?'Выполняется…':selected.action==='restore'?'Восстановить доступ':selected.action==='reentry_link'?'Создать ссылку':'Подтвердить'}</button>
+    {!reentryUrl&&<button className={selected.action==='restore'||selected.action==='reentry_link'?'primary':'danger'} type="button" disabled={busy||confirmation!==selected.entry.full_name||selected.action==='reentry_link'&&(reentryName.trim().length<5||!reentryGroup.trim())} onClick={()=>void submit()}>{busy?'Выполняется…':selected.action==='restore'?'Восстановить доступ':selected.action==='reentry_link'?'Создать ссылку':'Подтвердить'}</button>}
     <button type="button" disabled={busy} onClick={closeDialog}>Отмена</button>
    </div>
   </dialog>}
