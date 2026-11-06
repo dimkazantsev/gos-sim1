@@ -52,6 +52,7 @@ export default function Home(){
  const [mode,setMode]=useState<'student'|'teacher'|'guest'>('student'),[createMode,setCreateMode]=useState(false);
  const [gameTitle,setGameTitle]=useState('Республика Политология'),[studentCode,setStudentCode]=useState(''),[fio,setFio]=useState(''),[group,setGroup]=useState(''),[gameCode,setGameCode]=useState(''),[invite,setInvite]=useState(''),[busy,setBusy]=useState(false),[error,setError]=useState('');
  const [showCode,setShowCode]=useState(false);
+ const [blockedIdentity,setBlockedIdentity]=useState('');
  const [personalLogin,setPersonalLogin]=useState(false);
  const [teacherLogin,setTeacherLogin]=useState(false);
  const [loginEmail,setLoginEmail]=useState(''),[loginPassword,setLoginPassword]=useState(''),[loginGameCode,setLoginGameCode]=useState(''),[recoverySent,setRecoverySent]=useState(false);
@@ -144,6 +145,7 @@ export default function Home(){
 
  async function submit(e:FormEvent){
   e.preventDefault();if(!lockEntry())return;
+  setBlockedIdentity('');
   try{
    const name=fio.trim(),code=gameCode.trim(),access=invite.trim(),students=studentCode.trim();
    if(name.length<2)throw new Error('Введите ФИО.');
@@ -192,7 +194,15 @@ export default function Home(){
    }else{
     const r=await supabase.rpc('join_game_as_role',{p_game_code:code,p_invite_code:access,p_full_name:name,p_group_name:mode==='student'?group.trim():null,p_expected_kind:mode==='guest'?'observer':mode});if(r.error)throw r.error;saveSuccessfulGameCode(code);window.sessionStorage.setItem('gos-id:last-entry-role',mode);router.push('/game/'+r.data+incomingSectionSuffix());
    }
-  }catch(e){setError(readableError(e))}finally{unlockEntry()}
+  }catch(e){
+   const message=readableError(e);
+   if(message.includes('Доступ к игре закрыт преподавателем')){
+    // Read current identity only after the blocked login; no polling.
+    const active=await supabase.auth.getSession();
+    if(active.data.session?.user?.id)setBlockedIdentity(active.data.session.user.id);
+   }
+   setError(message);
+  }finally{unlockEntry()}
  }
 
  // Re-enter by the already authenticated identity, not by name or a shared
@@ -359,7 +369,7 @@ export default function Home(){
         }}>{game.title} · {game.code} · {game.kind==='observer'?'Гость':'Участник'}</button>)}
        </div>}
       </>}
-      {error&&<div className="errorBox" role="alert">{error}</div>}
+      {error&&<div className="errorBox" role="alert">{error}{blockedIdentity&&<p className="entryBlockedIdentity">Передайте преподавателю идентификатор для восстановления доступа: <code>{blockedIdentity}</code></p>}</div>}
       <button className="primary entrySubmit" disabled={busy}>{busy?<><LoaderCircle className="spin" aria-hidden="true"/>Подключаемся…</>:<>{mode==='teacher'&&createMode?'Создать игру':'Войти в игру'}<ArrowRight aria-hidden="true"/></>}</button>
      </fieldset>
      <GameEntryQr/>
