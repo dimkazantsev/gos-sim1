@@ -60,6 +60,11 @@ function scanAssets(dir){
    [...content.replace(/<script\b[^>]*>[\s\S]*?<\/script>|<style\b[^>]*>[\s\S]*?<\/style>|<code\b[^>]*>[\s\S]*?<\/code>/gi,'').matchAll(/>([^<>]+)</g)].map(m=>m[1]);
   for(const value of values){
    if(file.endsWith(path.join('app','icon.svg'))&&value==='ID')continue;
+   // The offline shell copies the approved ID-only emblem from BrandIdentity.
+   // Keep this exception limited to the exact mark with the ГОС.ID wordmark.
+   if(file.endsWith(path.join('public','offline.html'))&&value.trim()==='ID'
+      &&/<span class="brandMark" aria-hidden="true">ID<\/span>/.test(content)
+      &&/<strong>ГОС\.ID<\/strong>/.test(content))continue;
    const text=value.replace(/&[a-zA-Z#0-9]+;|\b[A-Z][A-Z0-9-]*\d[A-Z0-9-]*\b/g,'');
    const found=words(text);if(found)findings.push(path.relative(root,file)+' — '+found.join(', '));
   }
