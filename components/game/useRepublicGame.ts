@@ -93,6 +93,7 @@ export function useRepublicGame(gameId:string){
  const politicalOlderLoaded=useRef(false),politicalPagePending=useRef(false),politicalFullMode=useRef(false);
  const votesRef=useRef(votes);votesRef.current=votes;
  const changedFormalIds=useRef(new Set<string>()),changedVoteIds=useRef(new Set<string>());
+ const activeBallotSubmissions=useRef(new Set<string>()); // one in-flight write per user/game/vote
  // Only changed-party IDs cross the private game socket; SQL remains RLS-scoped.
  const changedPartyIds=useRef(new Set<string>()),partyDeltaNeedsFull=useRef(false),partyDeltaVersion=useRef(0);
  const [loading,setLoading]=useState(true),[error,setErrorRaw]=useState(''),[chatOpen,setChatOpen]=useState(false),[activeView,setActiveView]=useState<View>('dashboard');
@@ -346,7 +347,7 @@ export function useRepublicGame(gameId:string){
   initialCoreReads.current.clear();
   reusedEntryMemberScope.current='';
   realtimeDirtyTables.current.clear();
-  changedFormalIds.current.clear();changedVoteIds.current.clear();
+  changedFormalIds.current.clear();changedVoteIds.current.clear();activeBallotSubmissions.current.clear();
   changedPartyIds.current.clear();partyDeltaNeedsFull.current=false;partyDeltaVersion.current=0;
   if(readReceipt.current.timer!==null)clearTimeout(readReceipt.current.timer);
   readReceipt.current={scope:'',timer:null,running:false,queued:false,lastAt:0};
@@ -2905,24 +2906,29 @@ export function useRepublicGame(gameId:string){
  }
  async function castVoteAllocation(v:Vote,yes:number,no:number,abstain:number){
   if(!me||!canVote(v))return false;
-  const r=await supabase.rpc('cast_vote_allocation',{p_vote_id:v.id,p_yes:yes,p_no:no,p_abstain:abstain});
-  if(r.error){setError(r.error.message);return false}
-  let closed=false;
-  await readSafely(['votes'],async ticket=>{
-   const [vo,ba]=await Promise.all([
-    limitedCoreRead(supabase.from('game_votes').select('*').eq('game_id',gameId).eq('id',v.id).maybeSingle()),
-    limitedCoreRead(supabase.from('game_ballots').select(GAME_BALLOT_COLUMNS).eq('vote_id',v.id))
-   ]);
-   if(!readActive(ticket))return;
-   closed=vo.data?.status==='closed';
-   if(!readCurrent(ticket))return;
-   requireSuccessful([vo,ba]);
-   if(vo.data){const confirmed=vo.data as Vote;setVotes(previous=>[...previous.filter(row=>row.id!==v.id),confirmed].sort((a,b)=>b.opened_at.localeCompare(a.opened_at)))}
-   setBallots(previous=>[...previous.filter(row=>row.vote_id!==v.id),...(ba.data||[]) as Ballot[]]);
-  });
-  // The last registered ballot may close a procedure and change offices or documents.
-  if(closed)await refresh();else notifyGameDataRefresh(gameId,'game_votes');
-  return true;
+  const key=gameId+':'+me.user_id+':'+v.id;
+  if(activeBallotSubmissions.current.has(key))return false;
+  activeBallotSubmissions.current.add(key);
+  try{
+   const r=await supabase.rpc('cast_vote_allocation',{p_vote_id:v.id,p_yes:yes,p_no:no,p_abstain:abstain});
+   if(r.error){setError(r.error.message);return false}
+   let closed=false;
+   await readSafely(['votes'],async ticket=>{
+    const [vo,ba]=await Promise.all([
+     limitedCoreRead(supabase.from('game_votes').select('*').eq('game_id',gameId).eq('id',v.id).maybeSingle()),
+     limitedCoreRead(supabase.from('game_ballots').select(GAME_BALLOT_COLUMNS).eq('vote_id',v.id))
+    ]);
+    if(!readActive(ticket))return;
+    closed=vo.data?.status==='closed';
+    if(!readCurrent(ticket))return;
+    requireSuccessful([vo,ba]);
+    if(vo.data){const confirmed=vo.data as Vote;setVotes(previous=>[...previous.filter(row=>row.id!==v.id),confirmed].sort((a,b)=>b.opened_at.localeCompare(a.opened_at)))}
+    setBallots(previous=>[...previous.filter(row=>row.vote_id!==v.id),...(ba.data||[]) as Ballot[]]);
+   });
+   // The last registered ballot may close a procedure and change offices or documents.
+   if(closed)await refresh();else notifyGameDataRefresh(gameId,'game_votes');
+   return true;
+  }finally{activeBallotSubmissions.current.delete(key)}
  }
  async function castVote(v:Vote,choice:'yes'|'no'|'abstain',quantity?:number){const n=quantity??ballotWeight(v);return castVoteAllocation(v,choice==='yes'?n:0,choice==='no'?n:0,choice==='abstain'?n:0)}
  async function setStudentMandates(partyId:string,allocations:Record<string,number>|null){

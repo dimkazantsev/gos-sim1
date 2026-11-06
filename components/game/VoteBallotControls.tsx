@@ -1,11 +1,12 @@
 'use client';
-import {useEffect,useState} from 'react';
+import {useEffect,useRef,useState} from 'react';
 import type {Vote,Ballot} from './types';
 export default function VoteBallotControls({vote,maxWeight,canCast,ballot,onSubmit}:{vote:Vote;maxWeight:number;canCast:boolean;ballot?:Ballot;onSubmit:(yes:number,no:number,abstain:number)=>Promise<boolean>}){
  const [partial,setPartial]=useState(false),[split,setSplit]=useState(false),[quantity,setQuantity]=useState(maxWeight),[yes,setYes]=useState(0),[no,setNo]=useState(0),[abstain,setAbstain]=useState(0),[busy,setBusy]=useState(false);
+ const submitting=useRef(false); // synchronous guard before React re-renders
  useEffect(()=>setQuantity(maxWeight),[maxWeight]);
  const integer=(v:number)=>Number.isInteger(v)&&v>=0,amount=partial?quantity:maxWeight,total=yes+no+abstain,valid=split?[yes,no,abstain].every(integer)&&total>0&&total<=maxWeight&&(!abstain||vote.allow_abstain):integer(amount)&&amount>0&&amount<=maxWeight;
- async function send(y:number,n:number,a:number){if(!valid||!canCast||busy)return;setBusy(true);try{await onSubmit(y,n,a)}finally{setBusy(false)}}
+ async function send(y:number,n:number,a:number){if(!valid||!canCast||submitting.current)return;submitting.current=true;setBusy(true);try{await onSubmit(y,n,a)}finally{submitting.current=false;setBusy(false)}}
  const submitted=ballot?{yes:ballot.yes_weight??(ballot.choice==='yes'?ballot.weight:0),no:ballot.no_weight??(ballot.choice==='no'?ballot.weight:0),abstain:ballot.abstain_weight??(ballot.choice==='abstain'?ballot.weight:0)}:null;
  return <section className="civicBallot civicBallotModern" aria-label="Подать голоса">
   <div className="civicBallotTop">
