@@ -6,7 +6,7 @@ import {userError} from '@/lib/userError';
 import type {ReturnTypeRepublic} from './viewTypes';
 
 type Entry={user_id:string;full_name:string;kind:string;role_title:string|null;joined_at:string;roster_archived_at:string|null;access_action:'excluded'|'profile_erased'|null;blocked_at:string|null;last_seen_at:string|null};
-type Action='exclude'|'erase_profile';
+type Action='exclude'|'erase_profile'|'restore';
 export default function TeacherParticipantRoster({g}:{g:ReturnTypeRepublic}){
  const gameId=g.game?.id;
  const [entries,setEntries]=useState<Entry[]>([]);
@@ -57,7 +57,9 @@ export default function TeacherParticipantRoster({g}:{g:ReturnTypeRepublic}){
    if(error){setDialogError('Операция не выполнена: '+userError(error));return;}
    setSelected(null);setConfirmation('');
    await refresh();
-   setStatus('Изменения сохранены. Для участников с действующей сессией доступ прекращается при следующем запросе, защищённом серверной проверкой.');
+   setStatus(selected.action==='restore'
+    ?'Доступ восстановлен. Участник может войти под своей прежней учётной записью. Если профиль был очищен, его потребуется заполнить заново.'
+    :'Изменения сохранены. Для участников с действующей сессией доступ прекращается при следующем запросе, защищённом серверной проверкой.');
   }catch(error){
    setDialogError('Не удалось выполнить операцию: '+userError(error));
   }finally{setBusy(false);}
@@ -82,19 +84,24 @@ export default function TeacherParticipantRoster({g}:{g:ReturnTypeRepublic}){
     {' · '}Последняя активность: {e.last_seen_at?new Date(e.last_seen_at).toLocaleString('ru-RU'):'Не зафиксирована'}</small></div>
     {!protectedUser&&<div className="teacherRosterActions">
      {!e.access_action&&<button type="button" className="secondary" disabled={busy} onClick={()=>openDialog(e,'exclude')}><UserX size={16}/> Исключить</button>}
+     {e.access_action&&<button type="button" className="secondary" disabled={busy} onClick={()=>openDialog(e,'restore')}><RefreshCw size={16}/> Восстановить доступ</button>}
      {e.access_action!=='profile_erased'&&<button type="button" className="danger" disabled={busy} onClick={()=>openDialog(e,'erase_profile')}><Trash2 size={16}/> Очистить профиль и доступ</button>}
     </div>}
    </article>})}
    {!loading&&rows.length===0&&<p>Совпадений нет.</p>}
   </div>
   {selected&&<dialog ref={dialogRef} aria-labelledby="teacher-roster-dialog-title" aria-describedby="teacher-roster-dialog-copy" className="teacherRosterDialog" onCancel={event=>{event.preventDefault();closeDialog()}}>
-   <h3 id="teacher-roster-dialog-title"><ShieldAlert size={20}/> {selected.action==='exclude'?'Исключить участника':'Очистить профиль участника'}</h3>
-   <p id="teacher-roster-dialog-copy"><b>{selected.entry.full_name}</b>. {selected.action==='exclude'?'Доступ к этой игре будет заблокирован; история и профиль сохранятся.':'Доступ будет заблокирован, имя и данные игрового профиля очищены. Исторические игровые записи и учётная запись для входа сохранятся.'}</p>
+   <h3 id="teacher-roster-dialog-title"><ShieldAlert size={20}/> {selected.action==='exclude'?'Исключить участника':selected.action==='restore'?'Восстановить доступ':'Очистить профиль участника'}</h3>
+   <p id="teacher-roster-dialog-copy"><b>{selected.entry.full_name}</b>. {selected.action==='exclude'
+    ?'Доступ к этой игре будет заблокирован; история и профиль сохранятся.'
+    :selected.action==='restore'
+     ?'Прежней учётной записи будет вновь разрешён вход в эту игру. Удалённые персональные сведения не восстановятся автоматически; игровые результаты и история останутся без изменений.'
+     :'Доступ будет заблокирован, имя и данные игрового профиля очищены. Исторические игровые записи и учётная запись для входа сохранятся.'}</p>
    <p className="teacherRosterTargetId">Идентификатор выбранной записи: <code>{selected.entry.user_id}</code></p>
    <label className="teacherRosterConfirm">Введите ФИО в точности: {selected.entry.full_name}<input ref={confirmationRef} autoComplete="off" value={confirmation} onChange={e=>setConfirmation(e.target.value)}/></label>
    {dialogError&&<p className="teacherRosterDialogError" role="alert">{dialogError}</p>}
    <div className="teacherRosterDialogActions">
-    <button className="danger" type="button" disabled={busy||confirmation!==selected.entry.full_name} onClick={()=>void submit()}>{busy?'Выполняется…':'Подтвердить'}</button>
+    <button className={selected.action==='restore'?'primary':'danger'} type="button" disabled={busy||confirmation!==selected.entry.full_name} onClick={()=>void submit()}>{busy?'Выполняется…':selected.action==='restore'?'Восстановить доступ':'Подтвердить'}</button>
     <button type="button" disabled={busy} onClick={closeDialog}>Отмена</button>
    </div>
   </dialog>}

@@ -242,6 +242,7 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
   sharedChatHandled.current=true;
  },[navigationHydrated,g.me?.user_id,g.channels,gameId]);
  const [shareUrl,setShareUrl]=useState('');
+ const [inviteUrl,setInviteUrl]=useState('');
  const [shareNotice,setShareNotice]=useState('');
  const shareDialog=useDialog(!!shareUrl,()=>setShareUrl(''));
  function shareCurrentScreen(){
@@ -253,7 +254,20 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
   if(currentScreen.stageNo)u.searchParams.set('stage',String(currentScreen.stageNo));
   if(currentScreen.documentId)u.searchParams.set('document',currentScreen.documentId);
   if(currentScreen.voteId)u.searchParams.set('vote',currentScreen.voteId);
-  setShareNotice('');setShareUrl(u.toString());
+  // Game-scoped entry link; never place an invitation secret or password in a URL.
+  const landing=new URL(u.origin+(u.hostname==='dimkazantsev.github.io'?'/gos-sim1/visit/':'/'));
+  landing.searchParams.set('section','profile');
+  landing.searchParams.set('game',gameId);
+  if(g.game?.game_code)landing.searchParams.set('gameCode',g.game.game_code);
+  setShareNotice('');setShareUrl(u.toString());setInviteUrl(landing.toString());
+ }
+ async function copySharedLink(url:string,kind:'section'|'profile'){
+  try{
+   await navigator.clipboard.writeText(url);
+   setShareNotice(kind==='section'?'Основная ссылка скопирована.':'Приглашение в игру скопировано.');
+  }catch{
+   setShareNotice('Выделите ссылку в соответствующем поле и скопируйте вручную.');
+  }
  }
  const currentScreen=screenHistory.entries[screenHistory.index];
  const view=currentScreen.view;
@@ -779,11 +793,26 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
   {shareUrl&&<div className="eventCaseBackdrop" onMouseDown={e=>{if(e.target===e.currentTarget)setShareUrl('')}}>
    <section className="eventCaseModal" ref={shareDialog} role="dialog" tabIndex={-1} aria-modal="true" aria-label="Ссылка и QR-код на текущий раздел">
     <header className="eventModalHeader"><h2>Поделиться разделом</h2><button type="button" className="secondary" onClick={()=>setShareUrl('')}>Закрыть</button></header>
-    <div className="eventModalBody" style={{display:'grid',gap:16,justifyItems:'center',padding:24}}>
+    <div className="eventModalBody gosShareModalBody">
      <img width={192} height={192} alt="QR-код ссылки на текущий раздел ГОС.ID" src={'https://api.qrserver.com/v1/create-qr-code/?size=192x192&data='+encodeURIComponent(shareUrl)}/>
-     <input aria-label="Ссылка на текущий раздел" readOnly value={shareUrl} onFocus={e=>e.target.select()} style={{width:'100%',maxWidth:520}}/>
-     <button type="button" className="primary" onClick={()=>void navigator.clipboard.writeText(shareUrl).then(()=>setShareNotice('Ссылка скопирована'),()=>setShareNotice('Выделите ссылку в поле и скопируйте вручную.'))}>Копировать ссылку</button>
-     {shareNotice&&<p role="status">{shareNotice}</p>}
+     <div className="gosShareLinkList">
+      <div className="gosShareLinkRow">
+       <label htmlFor="gos-share-section">Основная ссылка на раздел</label>
+       <div className="gosShareLinkControl">
+        <input id="gos-share-section" aria-label="Основная ссылка на текущий раздел" readOnly value={shareUrl} onFocus={e=>e.target.select()}/>
+        <button type="button" className="secondary" onClick={()=>void copySharedLink(shareUrl,'section')}>Копировать</button>
+       </div>
+      </div>
+      <div className="gosShareLinkRow">
+       <label htmlFor="gos-share-profile">Приглашение в игру · Мой профиль</label>
+       <div className="gosShareLinkControl">
+        <input id="gos-share-profile" aria-label="Пригласительная ссылка в личный профиль участника" readOnly value={inviteUrl} onFocus={e=>e.target.select()}/>
+        <button type="button" className="primary" onClick={()=>void copySharedLink(inviteUrl,'profile')}>Копировать</button>
+       </div>
+       <p className="gosShareLinkHint">Участник с действующим доступом откроет свой профиль. Для первого входа потребуются ФИО, группа и приглашение участника.</p>
+      </div>
+     </div>
+     {shareNotice&&<p className="gosShareNotice" role="status">{shareNotice}</p>}
     </div>
    </section>
   </div>}

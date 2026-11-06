@@ -69,6 +69,16 @@ export default function Home(){
   setSavedGameCodes(codes);
   setLoginGameCode(current=>current||codes[0]||'');
  },[]);
+ useEffect(()=>{
+  // Public game code only; the private participant invitation never appears in the URL.
+  const search=new URLSearchParams(window.location.search);
+  if(search.get('section')!=='profile')return;
+  const code=search.get('gameCode')||'';
+  if(/^[A-Z0-9.-]{2,80}$/i.test(code)){
+   setGameCode(code.toUpperCase());
+   setLoginGameCode(code.toUpperCase());
+  }
+ },[]);
  function saveSuccessfulGameCode(code:string){
   setSavedGameCodes(rememberGameCode(code));
  }
@@ -84,10 +94,16 @@ export default function Home(){
     const {data:auth,error:authError}=await supabase.auth.getSession();
     if(!active||authError||!auth.session?.user?.id)return;
     const userId=auth.session.user.id;
-    const rows=await supabase.from('game_members').select('game_id')
-     .eq('user_id',userId).is('roster_archived_at',null).limit(2);
+    const linkedGame=new URLSearchParams(window.location.search).get('game')||'';
+    const target=/^[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}$/i.test(linkedGame)?linkedGame:'';
+    let membership=supabase.from('game_members').select('game_id')
+     .eq('user_id',userId).is('roster_archived_at',null);
+    if(target)membership=membership.eq('game_id',target);
+    const rows=await membership.limit(2);
     if(!active||rows.error)return;
     if(rows.data?.length===1){router.replace('/game/'+rows.data[0].game_id+incomingSectionSuffix());return}
+    // A targeted invitation must never open a different saved game by mistake.
+    if(target)return;
     // Multiple games require a game selection; do not open a random game.
     const saved=readRememberedGameCodes();
     if(saved.length!==1)return;

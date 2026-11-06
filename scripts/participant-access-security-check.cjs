@@ -3,6 +3,15 @@ const sql=fs.readFileSync('supabase/migrations/20261013191740_teacher_participan
 const guard=fs.readFileSync('supabase/migrations/20261013192104_teacher_participant_null_action_guard_20261014.sql','utf8');
 assert.match(guard,/p_action is null or p_action not in/,'Null action must never erase a profile');
 const ui=fs.readFileSync('components/game/TeacherParticipantRoster.tsx','utf8');
+const restore=fs.readFileSync('supabase/migrations/20261106193600_teacher_restore_excluded_participant.sql','utf8');
+assert.match(restore,/private\.is_game_teacher\(p_game_id\)/,'Only a game teacher can restore a blocked account');
+assert.match(restore,/p_action='restore'/,'Restore is a separate explicit teacher action');
+assert.match(restore,/v_member\.roster_archived_at is null/,'Only archived accounts can be restored');
+assert.match(restore,/delete from public\.game_member_access_blocks/,'Restore removes the targeted block');
+assert.match(restore,/update public\.game_members set roster_archived_at=null/,'Restore reopens membership');
+assert.match(restore,/p_confirm_name is distinct from v_member\.full_name/,'Restore retains exact member confirmation');
+assert.match(ui,/Восстановить доступ/,'Teacher can reinstate a single participant');
+
 assert.match(sql,/private\.is_game_teacher\(p_game_id\)/,'Read/write RPC must check teacher role');
 assert.match(sql,/p_user_id=v_actor or p_user_id=v_owner/,'Self and owner must be protected');
 assert.match(sql,/v_member\.kind='teacher'/,'Teacher target must be protected');

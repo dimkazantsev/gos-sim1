@@ -322,3 +322,15 @@
  .civicPartyRoster li>.gsIconAction{margin-left:0}
  .civicPartyMemberManagerActions>.primary{width:100%}
 }
+
+/* Ссылки раздела и личного профиля: действующие токены ГОС.ID. */
+.gosShareModalBody{display:grid;justify-items:center;gap:18px;padding:24px;min-width:0}
+.gosShareLinkList{display:grid;gap:16px;width:100%;max-width:640px;min-width:0}
+.gosShareLinkRow{display:grid;gap:8px;min-width:0}
+.gosShareLinkRow>label{font-size:13px;font-weight:750;color:var(--gs-ink,#172447)}
+.gosShareLinkControl{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:10px;min-width:0}
+.gosShareLinkControl>input{min-width:0;width:100%;margin:0;font-size:13px}
+.gosShareLinkControl>button{min-height:46px;white-space:nowrap}
+.gosShareLinkHint{margin:0;color:var(--gs-muted,#586784);font-size:12px;line-height:1.55}
+.gosShareNotice{margin:0;color:var(--gs-ink-2,#344467);font-size:13px}
+@media(max-width:560px){.gosShareModalBody{padding:18px 14px}.gosShareLinkControl{grid-template-columns:minmax(0,1fr)}.gosShareLinkControl>button{width:100%}}
