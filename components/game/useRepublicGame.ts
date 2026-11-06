@@ -1,11 +1,12 @@
 'use client';
 import {userError} from '@/lib/userError';
+import {CHAT_PAUSED,TELEGRAM_PAUSED} from '@/lib/featureFreeze';
 import {notifyGameDataRefresh,notifySectionUpdates,setGameRealtimeConnection} from './useGameTableSync';
 import {assetFailureBackoffMs} from './assetFailureBackoff';
 import {boundedChatWrite} from '@/lib/boundedChatWrite';
 import {useBudgetPulse,withBudgetIncome} from './useBudgetPulse';
 import {VOTING_BODIES,bodyQuorum} from './votingBodies';
-import {useEffect,useMemo,useRef,useState} from 'react';
+import {useEffect,useMemo,useRef,useState,type Dispatch,type SetStateAction} from 'react';
 import {useRouter} from 'next/navigation';
 import {supabase} from '@/lib/supabase';
 import {readLocalGameSnapshot,writeLocalGameSnapshot,deleteLocalGameSnapshot} from '@/lib/localGameSnapshot';
@@ -61,6 +62,8 @@ async function within<T>(promise:PromiseLike<T>,ms=BOOTSTRAP_TIMEOUT_MS,label='Ð
  finally{if(timer)clearTimeout(timer)}
 }
 
+const frozenChatSetter:Dispatch<SetStateAction<boolean>>=()=>{};
+
 export function useRepublicGame(gameId:string){
  const router=useRouter();
  const setError=(value:unknown)=>setErrorRaw(userError(value));
@@ -96,7 +99,8 @@ export function useRepublicGame(gameId:string){
  const activeBallotSubmissions=useRef(new Set<string>()); // one in-flight write per user/game/vote
  // Only changed-party IDs cross the private game socket; SQL remains RLS-scoped.
  const changedPartyIds=useRef(new Set<string>()),partyDeltaNeedsFull=useRef(false),partyDeltaVersion=useRef(0);
- const [loading,setLoading]=useState(true),[error,setErrorRaw]=useState(''),[chatOpen,setChatOpen]=useState(false),[activeView,setActiveView]=useState<View>('dashboard');
+ const [loading,setLoading]=useState(true),[error,setErrorRaw]=useState(''),[chatOpen,setChatOpenState]=useState(false),[activeView,setActiveView]=useState<View>('dashboard');
+ const setChatOpen=CHAT_PAUSED?frozenChatSetter:setChatOpenState;
  const [profileGameId,setProfileGameId]=useState('');
  const [coreLoaded,setCoreLoaded]=useState(false);
  const [introAccountSeen,setIntroAccountSeen]=useState(false);
@@ -141,7 +145,7 @@ export function useRepublicGame(gameId:string){
  // Share only in-flight overview reads across chat, Realtime and reconnect handlers.
  const chatOverviewReads=useRef(new Map<string,Promise<ChatOverview[]>>());
  function scheduleRealtimeChatOverview(){
-  if(overviewRealtimeTimer.current!==null)return;
+  if(CHAT_PAUSED||overviewRealtimeTimer.current!==null)return;
   // Message bodies arrive via the game Realtime socket; this RPC updates
   // only the derived chat overview. Coalesce bursts from 100 clients without
   // delaying delivery of messages or explicit read receipts.
@@ -297,6 +301,7 @@ export function useRepublicGame(gameId:string){
   });
  }
  async function kickTelegramDispatch(){
+  if(TELEGRAM_PAUSED)return;
   if(typeof window==='undefined'||!me?.user_id||Date.now()-lastTelegramDispatch.current<12000)return;
   lastTelegramDispatch.current=Date.now();
   try{
@@ -578,6 +583,7 @@ export function useRepublicGame(gameId:string){
   });
   // Render the authorised INSERT payload immediately rather than waiting
   // for another PostgREST query. RLS still governs Realtime visibility.
+  if(!CHAT_PAUSED){
   channel.on('postgres_changes',{event:'*',schema:'public',table:'chat_messages',filter:'game_id=eq.'+gameId},payload=>{
    if(!currentConnection())return;
    if(payload.eventType==='INSERT'){
@@ -639,6 +645,7 @@ export function useRepublicGame(gameId:string){
     }else dirtyOverview=true;
     schedule();
    });
+  }
   }
   function acceptCoreDelta(table:string,payload:{eventType:string;new:Record<string,unknown>}){
    if(!currentConnection()||!alive.current)return true;
@@ -966,7 +973,7 @@ export function useRepublicGame(gameId:string){
   function startPeriodicPolling(){
    if(disposed||document.visibilityState!=='visible')return;
    if(poll===null)poll=setInterval(recoveryTick,30000+pollJitter);
-   if(chatRecovery===null&&startChatRecovery===null)
+   if(!CHAT_PAUSED&&chatRecovery===null&&startChatRecovery===null)
     startChatRecovery=setTimeout(()=>{
      startChatRecovery=null;
      if(disposed||document.visibilityState!=='visible')return;
@@ -2170,6 +2177,7 @@ export function useRepublicGame(gameId:string){
  }
 
  async function refreshChatDirectory(){
+  if(CHAT_PAUSED)return;
   const uid=authUser.current;
   if(!uid||acceptedMember.current?.game_id!==gameId)return;
   await readSafely(['channels','members'],async ticket=>{
@@ -2190,6 +2198,7 @@ export function useRepublicGame(gameId:string){
  }
 
  async function loadChatOverview(){
+  if(CHAT_PAUSED)return [];
   const uid=authUser.current;
   if(!uid)return [];
   // An explicit overview read supersedes a queued Realtime reconciliation.

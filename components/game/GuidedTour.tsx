@@ -1,5 +1,6 @@
 'use client';
 import {useEffect,useRef,useState} from 'react';
+import {CHAT_PAUSED} from '@/lib/featureFreeze';
 import {createPortal} from 'react-dom';
 import {ArrowDown,ArrowRight,ArrowUpRight,Compass,X} from 'lucide-react';
 import type {View} from './types';
@@ -23,7 +24,8 @@ const PARTICIPANT_STEPS:TourStep[]=[
 ];
 const TEACHER_STEP:TourStep={target:'teacher',title:'Управление Республикой',body:'Панель преподавателя предназначена для контроля этапов, игровых процедур, действий участников и оценивания. Доступ к ней есть только у пользователей с соответствующими правами; в режиме просмотра студента преподавательские операции блокируются.',hint:'Откройте «Управление».'};
 export function getTourSteps(teacher:boolean):TourStep[]{
- return teacher?[...PARTICIPANT_STEPS.slice(0,-1),TEACHER_STEP,PARTICIPANT_STEPS[PARTICIPANT_STEPS.length-1]]:PARTICIPANT_STEPS;
+ const steps=CHAT_PAUSED?PARTICIPANT_STEPS.filter(step=>step.target!=='chat'):PARTICIPANT_STEPS;
+ return teacher?[...steps.slice(0,-1),TEACHER_STEP,steps[steps.length-1]]:steps;
 }
 type Rect=TourRect;
 function visible(button:HTMLElement){

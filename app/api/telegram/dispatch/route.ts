@@ -1,4 +1,5 @@
 import {NextResponse} from 'next/server';
+import {TELEGRAM_PAUSED} from '@/lib/featureFreeze';
 import {telegramVisibleChatChannels} from '@/lib/server/telegramVisibleChatChannels';
 import {telegramGroupNotices,telegramSystemNotice} from '@/lib/server/telegramNotice';
 import {runtimeConfig,telegramSend} from '@/lib/server/telegram';
@@ -23,11 +24,16 @@ export async function GET(request:Request){
  const provided=request.headers.get('authorization');
  if(!provided||!((cron&&provided==='Bearer '+cron)||(dbWake&&provided==='Bearer '+dbWake)))
   return new Response('Unauthorized',{status:401});
+ if(TELEGRAM_PAUSED)return NextResponse.json({ok:true,paused:true});
  return dispatchOutbox();
 }
 export async function POST(request:Request){
  const origin=request.headers.get('origin');
  if(origin&&!ALLOWED_ORIGINS.has(origin))return new Response('Forbidden',{status:403});
+ if(TELEGRAM_PAUSED){
+  if(!request.headers.get('authorization')?.startsWith('Bearer '))return new Response('Unauthorized',{status:401});
+  return NextResponse.json({ok:true,paused:true},{headers:cors(request)});
+ }
  const response=await authenticatedDispatch(request);
  const headers=new Headers(response.headers);
  for(const [key,value] of Object.entries(cors(request)))headers.set(key,value);
@@ -57,6 +63,7 @@ async function authenticatedDispatch(request:Request){
  return dispatchOutbox(gameId);
 }
 async function dispatchOutbox(gameId?:string){
+ if(TELEGRAM_PAUSED)return NextResponse.json({ok:true,paused:true});
  let config:ReturnType<typeof runtimeConfig>;try{config=runtimeConfig()}catch{return NextResponse.json({error:'Сервис не настроен'},{status:503})}
  let queue=config.db.from('telegram_outbox').select('id,game_id,user_id,body,attempts,category,channel_id,source_id').is('sent_at',null).lt('attempts',5).lte('next_attempt_at',new Date().toISOString());
  if(gameId)queue=queue.eq('game_id',gameId);

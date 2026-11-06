@@ -1,4 +1,5 @@
 import {NextResponse} from 'next/server';
+import {TELEGRAM_PAUSED} from '@/lib/featureFreeze';
 import {telegramCabinetCard} from '@/lib/server/telegramCabinet';
 import {handleTelegramAppeal} from '@/lib/server/telegramAppealWorkflow';
 import {telegramVisibleChatChannels} from '@/lib/server/telegramVisibleChatChannels';
@@ -12,6 +13,8 @@ export async function POST(request:Request){
  let config:ReturnType<typeof runtimeConfig>;
  try{config=runtimeConfig()}catch{return NextResponse.json({error:'Сервис не настроен'},{status:503})}
  if(request.headers.get('x-telegram-bot-api-secret-token')!==config.secret)return new Response('Unauthorized',{status:401});
+ // Acknowledge genuine Telegram updates without any game DB reads or bot sends.
+ if(TELEGRAM_PAUSED)return NextResponse.json({ok:true,paused:true});
  let update:TelegramUpdate;try{update=await request.json() as TelegramUpdate}catch{return new Response('Bad payload',{status:400})}
  const callback=update.callback_query;
  const message=update.message||callback?.message;

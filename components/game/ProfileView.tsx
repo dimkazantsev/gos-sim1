@@ -22,6 +22,7 @@ import ProfileOffices from './ProfileOffices';
 import {useGameOfficeCatalog} from './useGameOfficeCatalog';
 import {gameOfficeRoleList} from './gameOfficeCatalog';
 import TelegramConnection from './TelegramConnection';
+import {TELEGRAM_PAUSED} from '@/lib/featureFreeze';
 import AssignedTasks from './AssignedTasks';
 import {ListTodo} from 'lucide-react';
 import type {ProfileSetupStatus,ProfileSetupField} from './profileSetup';
@@ -259,7 +260,7 @@ export default function ProfileView({g,targetUserId,onOpenProfile,onOwnProfile,o
     {targetProfile?.bio&&<div className="profileBioPreview"><small>Описание</small><p>{targetProfile.bio}</p></div>}
    </aside>
   </section>
-  {own&&game&&<TelegramConnection gameId={game.id} teacher={teacher}/>}
+  {own&&game&&(TELEGRAM_PAUSED?<section className="surface" style={{padding:20,marginTop:20}} role="status"><h2 style={{fontSize:19,margin:'0 0 8px'}}>Телеграм — ГОС.ID</h2><p>Временно приостановлен для уменьшения нагрузки. Привязка аккаунта и настройки сохранены.</p></section>:<TelegramConnection gameId={game.id} teacher={teacher}/>)}
   {own&&game&&<ProfileDocumentLinks gameId={game.id} userId={me.user_id}/>}
   {own&&teacher&&<>
    <TeacherGameSessions displayName={me.full_name} currentGameId={game?.id}/>

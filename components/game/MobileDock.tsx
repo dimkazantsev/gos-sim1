@@ -34,7 +34,7 @@ type Gesture={
  pinTimer:ReturnType<typeof setTimeout>|null;
 };
 
-export default function MobileDock({items,activeView,storageKey,editing,setEditing,onNavigate,onAll,onChat,chatOpen=false,chatUnreadCount=0,chatMentionCount=0,allOpen=false,tourTarget}: {
+export default function MobileDock({items,activeView,storageKey,editing,setEditing,onNavigate,onAll,onChat,chatOpen=false,chatPaused=false,chatUnreadCount=0,chatMentionCount=0,allOpen=false,tourTarget}: {
  items:MobileDockItem[];
  activeView:View;
  storageKey:string;
@@ -44,6 +44,7 @@ export default function MobileDock({items,activeView,storageKey,editing,setEditi
  onAll:()=>void;
  onChat?:()=>void;
  chatOpen?:boolean;
+ chatPaused?:boolean;
  chatUnreadCount?:number;
  chatMentionCount?:number;
  allOpen?:boolean;
@@ -247,8 +248,8 @@ export default function MobileDock({items,activeView,storageKey,editing,setEditi
      <span className="mobileDockLabel">{item.shortLabel||item.label}</span>
     </button>)}
     {onChat&&<button type="button" className={'mobileDockChat mobileDockItem '+(chatOpen?'active':'')}
-     aria-controls="game-chat" aria-expanded={chatOpen} aria-label={chatOpen?'Закрыть чат':'Открыть чат'}
-     onClick={()=>{setOptimisticView(null);onChat?.()}}><span className="mobileDockIcon"><MessageCircle aria-hidden="true"/>{chatUnreadCount>0&&<i className={'mobileChatUnread '+(chatMentionCount>0?'hasMention':'')} aria-label={(chatMentionCount>0?'Упоминаний: '+chatMentionCount+'. ':'')+'Непрочитанных сообщений: '+chatUnreadCount}>{chatUnreadCount>99?'99+':chatUnreadCount}</i>}</span><span className="mobileDockLabel">Чат</span></button>}
+     aria-controls="game-chat" aria-expanded={chatOpen} disabled={chatPaused} title={chatPaused?'Чат временно приостановлен':chatOpen?'Закрыть чат':'Открыть чат'} aria-label={chatPaused?'Чат временно приостановлен':chatOpen?'Закрыть чат':'Открыть чат'}
+     onClick={()=>{setOptimisticView(null);onChat?.()}}><span className="mobileDockIcon"><MessageCircle aria-hidden="true"/>{!chatPaused&&chatUnreadCount>0&&<i className={'mobileChatUnread '+(chatMentionCount>0?'hasMention':'')} aria-label={(chatMentionCount>0?'Упоминаний: '+chatMentionCount+'. ':'')+'Непрочитанных сообщений: '+chatUnreadCount}>{chatUnreadCount>99?'99+':chatUnreadCount}</i>}</span><span className="mobileDockLabel">Чат</span></button>}
    </div>
    <div className="mobileDockFixed">
     {pinnedItems.length>0&&<div className="mobileDockPinned" aria-label="Закреплённые разделы">

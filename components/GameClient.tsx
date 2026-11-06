@@ -1,5 +1,6 @@
 'use client';
 import {userError} from '@/lib/userError';
+import {CHAT_PAUSED} from '@/lib/featureFreeze';
 import {IconAction} from './ui/IconAction';
 import {BrandIdentity,BrandName} from './ui/BrandIdentity';
 import ChatToggleButton from './game/ChatToggleButton';
@@ -29,7 +30,7 @@ import RepublicComic from './game/RepublicComic';
 import StageComics from './game/StageComics';
 import GuidedTour,{getTourSteps,type TourTarget} from './game/GuidedTour';
 import {useIntroProgress} from './game/introProgress';
-import ChatPanel from './game/ChatPanel';
+
 
 
 import {AchievementCelebration} from './game/Achievements';
@@ -46,6 +47,7 @@ import {useSavedGameState,savedString} from './game/useSavedGameState';
 // immediately available. Inactive panels must not inflate initial JavaScript
 // transferred to every student, teacher and observer.
 const sectionLoading=()=> <div className="emptyState" role="status">Открываем раздел…</div>;
+const ChatPanel=dynamic(()=>import('./game/ChatPanel'),{loading:sectionLoading});
 const PoliticalWallView=dynamic(()=>import('./game/PoliticalWallView'),{loading:sectionLoading});
 const CrisisRoom=dynamic(()=>import('./game/CrisisRoom'),{loading:sectionLoading});
 const StagesView=dynamic(()=>import('./game/StagesView'),{loading:sectionLoading});
@@ -234,7 +236,7 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
  useEffect(()=>{
   if(sharedChatHandled.current||!navigationHydrated||!g.me||g.me.kind==='observer'||typeof window==='undefined'||typeof URLSearchParams==='undefined')return;
   const q=new URLSearchParams(window.location.search);
-  if(q.get('openChat')!=='1')return;
+  if(CHAT_PAUSED||q.get('openChat')!=='1')return;
   if(!g.channels.length)return;
   const desired=q.get('channel')||'';
   if(desired&&g.channels.some(c=>c.id===desired))g.setChannelId(desired);
@@ -438,6 +440,7 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
   if(onboardingRequired)navigate('profile',undefined,true);
  }
  function toggleTourChat(){
+  if(CHAT_PAUSED)return;
   const opening=!chatOpen;
   setChatOpen(opening);
   if(tourMode==='tour'&&opening&&getTourSteps(!!teacher)[tourIndex]?.target==='chat')setTourIndex(x=>x+1);
@@ -780,13 +783,13 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
     </main>
    </div>
 
-   {chatOpen&&<ChatPanel g={vg} readOnly={observer} draft={chatDrafts[chatDraftKey]||''} onDraftChange={text=>setChatDrafts(current=>({...current,[chatDraftKey]:text}))} onOpenMember={uid=>{g.setChatOpen(false);navigateProfile(uid)}}/>}
+   {!CHAT_PAUSED&&chatOpen&&<ChatPanel g={vg} readOnly={observer} draft={chatDrafts[chatDraftKey]||''} onDraftChange={text=>setChatDrafts(current=>({...current,[chatDraftKey]:text}))} onOpenMember={uid=>{g.setChatOpen(false);navigateProfile(uid)}}/>}
   </div></TeacherNavigationProvider>
 
   {mobileMenuOpen&&<div className="mobileMoreBackdrop" onClick={()=>setMobileMenuOpen(false)}>
    <section ref={mobileDialogRef} tabIndex={-1} className="mobileMoreSheet" role="dialog" aria-modal="true" onClick={e=>e.stopPropagation()} aria-label="Все разделы">
     <header><div><small>НАВИГАЦИЯ</small><b>Все разделы игры</b></div><IconAction onClick={()=>setMobileMenuOpen(false)} label="Закрыть меню"/></header>
-    <div className="mobileAllGrid">{teacher&&!previewMode&&<button type="button" onClick={openTeacherGameChooser}><Landmark aria-hidden="true"/><span>Мои игры</span></button>}{nav.map(([k,label])=><button key={k} type="button" aria-current={view===k?'page':undefined} className={view===k?'active':''} data-tour-view={k} onClick={()=>navigate(k,undefined,false,true)}>{navIcon(k)}<span>{label}</span></button>)}<button type="button" data-tour-view="chat" className={chatOpen?'active':''} aria-haspopup="dialog" onClick={()=>{setMobileMenuOpen(false);toggleTourChat()}}><span className="mobileMenuChatIcon"><MessageCircle aria-hidden="true"/>{g.chatUnreadCount>0&&<i className={g.chatMentionCount>0?'hasMention':''}>{g.chatUnreadCount>99?'99+':g.chatUnreadCount}</i>}</span><span>Чат</span></button></div>
+    <div className="mobileAllGrid">{teacher&&!previewMode&&<button type="button" onClick={openTeacherGameChooser}><Landmark aria-hidden="true"/><span>Мои игры</span></button>}{nav.map(([k,label])=><button key={k} type="button" aria-current={view===k?'page':undefined} className={view===k?'active':''} data-tour-view={k} onClick={()=>navigate(k,undefined,false,true)}>{navIcon(k)}<span>{label}</span></button>)}<button type="button" data-tour-view="chat" className={chatOpen?'active':''} disabled={CHAT_PAUSED} title={CHAT_PAUSED?'Чат временно приостановлен':'Открыть чат'} aria-haspopup="dialog" onClick={()=>{setMobileMenuOpen(false);toggleTourChat()}}><span className="mobileMenuChatIcon"><MessageCircle aria-hidden="true"/>{g.chatUnreadCount>0&&<i className={g.chatMentionCount>0?'hasMention':''}>{g.chatUnreadCount>99?'99+':g.chatUnreadCount}</i>}</span><span>Чат</span></button></div>
     <footer className="mobileAccount"><div><b>{shownMe.full_name}</b><span>{shownMe.role_title||(teacher?'Преподаватель':'Участник')}</span></div>{previewMode?<button className="secondary" onClick={()=>{setViewAs('');setMobileMenuOpen(false)}}>К преподавателю</button>:<button className="secondary" onClick={logout}><LogOut aria-hidden="true"/>Выйти</button>}</footer>
    </section>
   </div>}
@@ -842,5 +845,5 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
   <AchievementCelebration gameId={gameId} userId={me?.user_id} enabled={g.coreLoaded&&me?.kind==='student'&&!previewMode&&!introOpen&&!stageComicOpen}/>
   <StageComics key={gameId+':'+me?.user_id} gameId={gameId} userId={me?.user_id||''} stages={g.stages} enabled={g.coreLoaded&&!g.loading&&!previewMode&&!introOpen&&!onboardingRequired&&tourMode==='idle'} onOpenChange={setStageComicOpen}/>
   <RepublicComic gameId={gameId} intro open={introOpen} onClose={()=>void finishIntro()}/>
-  <MobileDock items={dockItems} activeView={view} storageKey={'gos-sims-dock:'+shownMe.user_id+(teacher&&!previewMode?':teacher':':student')} editing={mobileDockEditing} setEditing={setMobileDockEditing} tourTarget={tourMode==='tour'?getTourSteps(!!teacher)[tourIndex]?.target:undefined} onNavigate={k=>{if(k==='profile')setSelectedProfileId('');navigate(k,undefined,false,true)}} onChat={()=>{setMobileMenuOpen(false);toggleTourChat()}} chatOpen={chatOpen} chatUnreadCount={g.chatUnreadCount} chatMentionCount={g.chatMentionCount} allOpen={mobileMenuOpen} onAll={()=>{setChatOpen(false);setMobileMenuOpen(true)}}/></div>;
+  <MobileDock items={dockItems} activeView={view} storageKey={'gos-sims-dock:'+shownMe.user_id+(teacher&&!previewMode?':teacher':':student')} editing={mobileDockEditing} setEditing={setMobileDockEditing} tourTarget={tourMode==='tour'?getTourSteps(!!teacher)[tourIndex]?.target:undefined} onNavigate={k=>{if(k==='profile')setSelectedProfileId('');navigate(k,undefined,false,true)}} onChat={()=>{setMobileMenuOpen(false);toggleTourChat()}} chatOpen={chatOpen} chatPaused={CHAT_PAUSED} chatUnreadCount={g.chatUnreadCount} chatMentionCount={g.chatMentionCount} allOpen={mobileMenuOpen} onAll={()=>{setChatOpen(false);setMobileMenuOpen(true)}}/></div>;
 }
