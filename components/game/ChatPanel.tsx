@@ -451,7 +451,6 @@ export default function ChatPanel({g,draft:text,onDraftChange:setText,previewCha
     </button>
    </div>
   </section>}
-  <div className="chatRetentionNotice" role="note" style={{padding:"10px 16px",borderTop:"1px solid #dce5f2",background:"#f6f9fe",color:"#52678b",fontSize:12,lineHeight:1.5}}>Аудио и видео хранятся 1 час после отправки, затем автоматически удаляются.</div>
   {chatMediaError&&<div className="chatLocalError chatMediaError" role="alert"><span>{chatMediaError}</span></div>}
   {localError&&<div className="chatLocalError" role="alert"><span>{localError}</span><button type="button" aria-label="Скрыть ошибку" onClick={()=>setLocalError('')}><X size={16}/></button></div>}
   {!readOnly?<div className="chatCompose chatComposeCompact">

@@ -399,3 +399,43 @@
  .simChat.gsChatV2 .chatComposeCompact .chatProcessTags>summary {display:none}
  .simChat.gsChatV2 .chatComposeCompact .chatProcessTags>small {display:block;margin-bottom:8px}
 }
+
+/* Desktop chat: the same # control as on phones, in compact and expanded modes.
+   No new markup, subscriptions or changes to phone styles. */
+@media (min-width:761px) {
+ .simChat.gsChatV2 .chatCompose.chatComposeCompact {position:relative;overflow:visible}
+ .simChat.gsChatV2 .chatComposeActions .chatProcessTagMobileButton {
+  display:inline-grid;
+  place-items:center;
+  font-size:21px;
+  font-weight:700;
+  line-height:1;
+ }
+ .simChat.gsChatV2 .chatComposeCompact .chatProcessTags {
+  position:absolute;
+  z-index:12;
+  display:none;
+  left:12px;
+  right:auto;
+  bottom:calc(100% + 6px);
+  width:min(340px,calc(100% - 24px));
+  min-width:0;
+  max-width:none;
+  max-height:min(44dvh,250px);
+  margin:0;
+  padding:11px 12px;
+  border:1px solid #dce5f2;
+  border-radius:12px;
+  background:#fff;
+  box-shadow:0 10px 30px rgba(22,43,82,.12);
+  overflow-y:auto;
+ }
+ .simChat.gsChatV2 .chatComposeCompact .chatProcessTags[open] {display:block}
+ .simChat.gsChatV2 .chatComposeCompact .chatProcessTags>summary {display:none}
+ .simChat.gsChatV2 .chatComposeCompact .chatProcessTags>small {display:block;margin:0 0 8px;padding:0}
+ .simChat.gsChatV2 .chatComposeCompact .chatProcessTags>div {padding:0}
+ .simChat.gsChatV2.chatExpanded .chatCompose.chatComposeCompact .chatProcessTags {
+  width:min(340px,calc(100% - 24px));
+  margin:0;
+ }
+}
