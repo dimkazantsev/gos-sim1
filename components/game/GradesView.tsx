@@ -52,9 +52,12 @@ export default function GradesView({g,compact=false,onOpenProfile,onPublicScores
  const [debriefStage,setDebriefStage]=useState<number|null>(null);
  const [expiredNoticeStage,setExpiredNoticeStage]=useState<number|null>(null);
  const expiredNoticeRef=useDialog(expiredNoticeStage!==null,()=>setExpiredNoticeStage(null));
- const authScope=[game?.id,me?.user_id].join(':');
- const [identity,setIdentity]=useState<{scope:string;id:string}|null>(null);
- const authId=identity?.scope===authScope?identity.id:null;
+ // The game hook already checks the active authenticated user's membership
+ // through get_my_game_identity. Reuse that verified identity: a second
+ // auth.getUser() on every profile/grades mount causes classroom Auth storms.
+ // Teacher "view as student" retains the REAL verified user id, not the
+ // simulated student's id, so private student scores remain inaccessible.
+ const authId=g.verifiedUserId;
  const loadScope=[game?.id,me?.user_id,me?.kind,teacher,compact,authId].join(':');
  const activeScope=useRef(loadScope),acceptedRowsScope=useRef(''),acceptedDebriefScope=useRef(''),selectedScope=useRef('');activeScope.current=loadScope;
  const reads=useRef({scope:loadScope,promise:null as Promise<void>|null,queued:false,controller:null as AbortController|null});
@@ -195,14 +198,6 @@ export default function GradesView({g,compact=false,onOpenProfile,onPublicScores
   }catch(error){if(request===loadRequest.current&&activeScope.current===requestedScope)g.setError(error instanceof Error?error.message:String(error))}
   finally{clearTimeout(timeout);if(readState.controller===controller)readState.controller=null}
  }
- useEffect(()=>{
-  let active=true,timeout:ReturnType<typeof setTimeout>|undefined;
-  void Promise.race([
-   supabase.auth.getUser(),
-   new Promise<never>((_,reject)=>{timeout=setTimeout(()=>reject(new Error('Не удалось подтвердить аккаунт вовремя. Показаны только публичные оценки.')),12000)})
-  ]).then(x=>{if(active)setIdentity({scope:authScope,id:x.data.user?.id||''})}).catch(error=>{if(active){setIdentity({scope:authScope,id:''});g.setError(error instanceof Error?error.message:String(error))}}).finally(()=>clearTimeout(timeout));
-  return()=>{active=false;clearTimeout(timeout)};
- },[authScope]);
  useEffect(()=>{
   setSelected(null);setEvidence(null);setRuns([]);setLoadingEvidence(false);setDebrief('');
   return()=>{loadRequest.current++;evidenceRequest.current++;readState.controller?.abort()};

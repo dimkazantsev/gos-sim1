@@ -46,6 +46,18 @@ function pendingQuery(pending){return{select(){return this;},eq(){return this;},
   assert.equal(seen.length,0,'An old game or role cannot publish private data into the new scope');
  }
  assert(source.includes("useGameTableSync(authId===null?undefined:game?.id,['stage_assessments','stage_debriefs'],load,loadScope"),'Shared refresh must follow current account, game and role');
+ const gameShell=fs.readFileSync('components/game/useRepublicGame.ts','utf8');
+ const gameClient=fs.readFileSync('components/GameClient.tsx','utf8');
+ assert(gameShell.includes('me:visibleMe,verifiedUserId:visibleMe?.user_id??null,'),
+  'Verified auth identity must be derived from the current accepted game member');
+ assert(source.includes('const authId=g.verifiedUserId;')&&!source.includes('supabase.auth.getUser('),
+  'Grades must reuse the game identity and never make a redundant Auth verification request');
+ assert(gameClient.includes('...g,')&&gameClient.includes('me:student,'),
+  'Teacher student preview must carry the REAL auth identity, not impersonate the student');
+ assert(source.includes("me?.kind==='student'&&authId===me.user_id"),
+  'Only the signed-in student can fetch private assessments and debriefs');
+ assert(source.includes('authId===null?undefined:game?.id'),
+  'No verified identity must mean no grade refresh');
  assert(!source.includes("channel('grades-view:"),'Unpublished assessments must not create a useless channel');
  console.log('PASS assessment load: stale teacher/student/scope replies ignored; one public projection; scoped shared refresh');
 })().catch(error=>{console.error(error);process.exitCode=1;});
