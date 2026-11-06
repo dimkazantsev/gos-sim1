@@ -114,8 +114,9 @@ async function main(){
   assert(all.every(r=>r.ok),'100 concurrent independent authenticated votes: '+JSON.stringify(all.filter(r=>!r.ok).slice(0,8)));
   assert.deepEqual(await state(voteId),{status:'closed',yes:100,cast:100,count:100,distinct:100},'100 distinct votes: no losses or duplicates');
   assert((await cast(students[0],voteId)).ok,'An identical retry after final automatic closure is a read-only success');
-  const afterClose=await cast(students[0],voteId);
-  assert(!afterClose.ok&&/Голосование завершено/.test(afterClose.error||''),'Closed vote must refuse late repeat');
+  const changedAfterClose=await students[0].client.rpc('cast_vote_allocation',{p_vote_id:voteId,p_yes:0,p_no:1,p_abstain:0});
+  assert(changedAfterClose.error&&/Голосование завершено/.test(changedAfterClose.error.message||''),'Closed vote must refuse changed ballot');
+  assert.deepEqual(await state(voteId),{status:'closed',yes:100,cast:100,count:100,distinct:100},'Closed result remains immutable after rejected change');
   const repeats=await Promise.all(Array.from({length:30},()=>cast(students[0],retryId)));
   assert(repeats.every(r=>r.ok),'All same-student retries must be accepted before final close');
   assert.deepEqual(await state(retryId),{status:'open',yes:0,cast:0,count:1,distinct:1},'30 simultaneous retries preserve one ballot');
