@@ -83,7 +83,7 @@ export default function TeacherParticipantRoster({g}:{g:ReturnTypeRepublic}){
  if(!g.teacher||!gameId)return null;
  return <section className="surface teacherParticipantRoster" aria-label="Участники и доступ">
   <div className="surfaceHead teacherRosterHead"><div><small>ДОСТУП К ИГРЕ</small><h2>Участники и доступ</h2>
-  <p>Все зарегистрированные пользователи текущей игры, включая исключённых. Для обезличенного профиля найдите запись по идентификатору, который студент видит при заблокированном входе. Очистка профиля не удаляет общую учётную запись или исторические документы.</p></div><b className="teacherRosterCount">{entries.filter(e=>e.access_action!=='profile_erased').length}</b></div>
+  <p>Все зарегистрированные пользователи текущей игры, включая исключённых. Для обезличенного профиля найдите запись по идентификатору, который студент видит при заблокированном входе. Очистка профиля не удаляет общую учётную запись для входа или исторические документы.</p></div><b className="teacherRosterCount">{entries.filter(e=>e.access_action!=='profile_erased').length}</b></div>
   <div className="teacherRosterToolbar">
    <input type="search" aria-label="Поиск участника" placeholder="ФИО, должность, идентификатор" value={search} onChange={e=>setSearch(e.target.value)}/>
    <select aria-label="Фильтр роли" value={filter} onChange={e=>setFilter(e.target.value)}>
