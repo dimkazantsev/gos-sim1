@@ -5,6 +5,7 @@ on:
       - '.github/workflows/ballot-auth-100-local.yml'
       - 'scripts/ballot-auth-100-local.cjs'
       - 'scripts/ballot-concurrency-postgres-check.cjs'
+      - 'supabase/migrations/20261106120000_vote_idempotent_concurrent_cast.sql'
 permissions:
   contents: read
 concurrency:

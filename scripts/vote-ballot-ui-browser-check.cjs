@@ -21,6 +21,7 @@ assert(src.includes('total>0&&total<=maxWeight'),'Combined split votes must stay
 assert(src.includes('integer(amount)&&amount>0&&amount<=maxWeight'),'One-choice votes must use a valid subset of mandates');
 assert(src.includes('!canCast||!valid||busy'),'Server voting rules still disable invalid actions');
 assert(src.includes('await onSubmit(y,n,a)'),'Ballot submission keeps the established RPC pathway');
+assert(src.includes('submitting.current=true')&&src.includes('submitting.current=false'),'A synchronous guard stops two clicks before the first React render');
 assert(css.includes('var(--gs-accent)')&&css.includes('var(--gs-border)'),'Use approved project tokens');
 assert(css.includes(':focus-within')&&css.includes('focus')||css.includes(':focus-within'),'Keyboard focus is visible');
 const cssBundle=['app/design-tokens.css','app/globals.css','app/design-views.css','app/2026-civic-portal.css','app/vote-ballot-panel.css'].map(file=>fs.readFileSync(path.join(root,file),'utf8')).join('\n');

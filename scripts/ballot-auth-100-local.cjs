@@ -113,6 +113,7 @@ async function main(){
   const all=await Promise.all(students.map(s=>cast(s,voteId)));
   assert(all.every(r=>r.ok),'100 concurrent independent authenticated votes: '+JSON.stringify(all.filter(r=>!r.ok).slice(0,8)));
   assert.deepEqual(await state(voteId),{status:'closed',yes:100,cast:100,count:100,distinct:100},'100 distinct votes: no losses or duplicates');
+  assert((await cast(students[0],voteId)).ok,'An identical retry after final automatic closure is a read-only success');
   const afterClose=await cast(students[0],voteId);
   assert(!afterClose.ok&&/Голосование завершено/.test(afterClose.error||''),'Closed vote must refuse late repeat');
   const repeats=await Promise.all(Array.from({length:30},()=>cast(students[0],retryId)));

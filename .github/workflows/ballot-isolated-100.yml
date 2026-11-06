@@ -6,6 +6,7 @@ on:
       - '.github/workflows/ballot-isolated-100.yml'
       - 'scripts/ballot-concurrency-fixture-check.cjs'
       - 'scripts/ballot-concurrency-postgres-check.cjs'
+      - 'supabase/migrations/20261106120000_vote_idempotent_concurrent_cast.sql'
 permissions:
   contents: read
 jobs:

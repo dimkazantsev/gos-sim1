@@ -19,7 +19,7 @@ function actualFunction(file,name,delimiter){
 }
 function bootstrap(count){
  assert([40,100].includes(count));
- const cast=actualFunction('20261021210700_legacy_signed_program_agenda_ballot_compatibility.sql','public.cast_vote_allocation','$function$');
+ const cast=actualFunction('20261106120000_vote_idempotent_concurrent_cast.sql','public.cast_vote_allocation','$function$');
  const finalize=actualFunction('20261017000500_vote_auto_close_full_registered_quorum.sql','private.finalize_procedural_vote','$function$');
  const close=actualFunction('20261017000500_vote_auto_close_full_registered_quorum.sql','public.close_procedural_vote','$manual$');
  const auto=actualFunction('20261017000500_vote_auto_close_full_registered_quorum.sql','private.close_vote_after_last_registered_ballot','$auto$');
@@ -102,10 +102,14 @@ async function run(){
   assert.deepEqual(state,{count,status:'closed',yes:count,cast:count},'No lost ballots and closure must count all ballots');
   report.waves[count]=latencies(records.map(r=>Number(r.ms)));
  }
+ await sql("create table public.qa_ballot_write_counts(vote_id uuid primary key, writes integer not null default 0);\ncreate function public.qa_track_ballot_write() returns trigger language plpgsql as $qa$\nbegin\n insert into public.qa_ballot_write_counts(vote_id,writes) values(new.vote_id,1)\n on conflict(vote_id) do update set writes=public.qa_ballot_write_counts.writes+1;\n return null;\nend;$qa$;\ncreate trigger qa_track_ballot_write after insert or update of choice,weight,yes_weight,no_weight,abstain_weight on public.game_ballots for each row execute function public.qa_track_ballot_write();");
  const retry=await wave(Array(40).fill(1),retryId);
  assert(retry.every(r=>r.ok),'Simultaneous retries should succeed while the remaining electorate has not voted');
  const retried=JSON.parse(await sql(`select json_build_object('count',(select count(*) from public.game_ballots where vote_id='${retryId}'),'status',status)::text from public.game_votes where id='${retryId}';`));
  assert.deepEqual(retried,{count:1,status:'open'},'Retrying one voter must not produce duplicate ballots');
+ const physicalWrites=await sql(`select writes from public.qa_ballot_write_counts where vote_id='${retryId}';`);
+ assert.equal(physicalWrites,'1','40 concurrent identical RPCs must perform only ONE ballot write');
+ await sql('drop trigger qa_track_ballot_write on public.game_ballots; drop function public.qa_track_ballot_write();');
  report.waves.same_voter_retries=latencies(retry.map(r=>Number(r.ms)));
  const race=await wave(Array.from({length:100},(_,i)=>i+1),raceId,true);
  const accepted=race.filter(r=>r.ok),rejected=race.filter(r=>!r.ok);
