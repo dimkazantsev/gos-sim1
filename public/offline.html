@@ -1,2 +1,41 @@
-<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#2453e6"><title>Нет соединения — ГОС.ID</title><style>
-*{box-sizing:border-box}body{margin:0;min-height:100dvh;display:grid;place-items:center;padding:24px;background:#f7f9fd;color:#12264b;font:500 16px/1.55 system-ui,Arial,sans-serif}.panel{width:min(100%,440px);padding:30px;border:1px solid #d5e0f5;background:white;border-radius:22px;box-shadow:0 8px 30px #0e2a6512}.mark{display:grid;place-items:center;width:64px;height:64px;border-radius:15px;background:#2453e6;color:#fff;font-weight:900;font-size:32px}h1{font-size:24px;margin:24px 0 8px}p{color:#566b8b;margin:0 0 24px}a{display:block;text-align:center;padding:14px;border-radius:12px;background:#2453e6;color:white;font-weight:750;text-decoration:none}small{display:block;margin-top:16px;color:#657a96}</style></head><body><main class="panel"><div class="mark">ГОС.ID</div><h1>Нет соединения с сервером</h1><p>Проверьте интернет и повторите подключение. Игровые ответы, голосования и документы не сохраняются офлайн.</p><a href="/">Повторить подключение</a><small>ГОС.ID · Цифровая платформа России</small></main></body></html>
+<!doctype html>
+<html lang="ru">
+<head>
+ <meta charset="utf-8">
+ <meta name="viewport" content="width=device-width,initial-scale=1">
+ <meta name="theme-color" content="#2453e6">
+ <meta name="color-scheme" content="light">
+ <title>Нет соединения — ГОС.ID</title>
+ <style>
+  /* Самостоятельная офлайн-страница: повторяет утверждённые токены и логотип ГОС.ID. */
+  :root{color-scheme:light;--bg:#f3f5fb;--surface:#fff;--ink:#172447;--muted:#586784;--border:#dce3f0;--accent:#2453e6;--accent-strong:#183fae;--shadow:0 12px 36px #1724470c}
+  *{box-sizing:border-box}
+  html{min-height:100%;background:var(--bg)}
+  body{margin:0;min-height:100vh;min-height:100dvh;display:grid;place-items:center;padding:24px 16px;background:var(--bg);color:var(--ink);font:500 15px/1.6 'Manrope Variable','Segoe UI',Arial,sans-serif;-webkit-font-smoothing:antialiased}
+  .offlineCard{width:min(100%,480px);min-width:0;padding:32px;border:1px solid var(--border);border-radius:24px;background:var(--surface);box-shadow:var(--shadow)}
+  .brandLockup{display:flex;align-items:center;gap:13px;min-width:0}
+  .brandMark{display:inline-flex;align-items:center;justify-content:center;flex:none;width:46px;height:46px;border-radius:12px;background:var(--accent);color:#fff;font-size:23px;font-weight:900;line-height:1;letter-spacing:-.045em;white-space:nowrap}
+  .brandCopy{display:flex;flex-direction:column;min-width:0;gap:3px;line-height:1.08}
+  .brandCopy strong{color:#08090d;font-size:22px;font-weight:850;letter-spacing:-.035em;white-space:nowrap}
+  .brandCopy small{color:#596274;font-size:11px;line-height:1.35;font-weight:500}
+  h1{margin:30px 0 12px;color:var(--ink);font-size:clamp(22px,4.6vw,26px);line-height:1.25;letter-spacing:-.035em;font-weight:750;overflow-wrap:break-word}
+  p{margin:0 0 24px;color:var(--muted);font-size:15px;line-height:1.65;overflow-wrap:break-word}
+  .retry{display:flex;align-items:center;justify-content:center;width:100%;min-height:48px;padding:12px 18px;border:1px solid var(--accent);border-radius:11px;background:var(--accent);color:#fff;font-size:14px;font-weight:750;line-height:1.4;text-align:center;text-decoration:none;transition:background .18s ease,border-color .18s ease}
+  .retry:hover{background:var(--accent-strong);border-color:var(--accent-strong)}
+  .retry:focus-visible{outline:3px solid var(--accent);outline-offset:3px}
+  @media(max-width:480px){.offlineCard{padding:24px;border-radius:20px}.brandMark{width:42px;height:42px;border-radius:11px;font-size:21px}.brandCopy strong{font-size:20px}h1{margin-top:26px;font-size:23px}p{font-size:14px}}
+  @media(prefers-reduced-motion:reduce){.retry{transition:none}}
+ </style>
+</head>
+<body>
+ <main class="offlineCard" aria-labelledby="offline-title">
+  <div class="brandLockup" aria-label="ГОС.ID · Цифровая платформа России">
+   <span class="brandMark" aria-hidden="true">ID</span>
+   <span class="brandCopy"><strong>ГОС.ID</strong><small>Цифровая платформа России</small></span>
+  </div>
+  <h1 id="offline-title">Нет соединения с сервером</h1>
+  <p>Проверьте интернет и повторите подключение. Игровые ответы, голосования и документы не сохраняются офлайн.</p>
+  <a class="retry" href="/">Повторить подключение</a>
+ </main>
+</body>
+</html>
