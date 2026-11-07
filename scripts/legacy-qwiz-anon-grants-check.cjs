@@ -31,7 +31,7 @@ async function main(){
   await db.exec('CREATE ROLE anon; CREATE ROLE authenticated; CREATE ROLE service_role;');
   for(const fn of funcs)await db.exec('CREATE FUNCTION '+fn+' RETURNS integer LANGUAGE sql SECURITY DEFINER AS $$ SELECT 1 $$;');
   await db.exec('CREATE FUNCTION public.get_my_game_identity(p_game uuid) RETURNS integer LANGUAGE sql SECURITY DEFINER AS $$ SELECT 1 $$;');
-  const allowed=async(role,signature)=>{const result=await db.query("SELECT has_function_privilege($1,$2,'EXECUTE') AS allowed",[role,signature]);return result.rows[0].allowed};
+  const allowed=async(role,signature)=>{const name=signature.slice('public.'.length,signature.indexOf('(')),args=signature.slice(signature.indexOf('(')+1,-1);const result=await db.query("SELECT has_function_privilege($1,p.oid,'EXECUTE') AS allowed FROM pg_proc p JOIN pg_namespace n ON n.oid=p.pronamespace WHERE n.nspname='public' AND p.proname=$2 AND pg_get_function_identity_arguments(p.oid)=$3",[role,name,args]);assert.equal(result.rows.length,1,'Exact function resolved: '+signature);return result.rows[0].allowed};
   for(const fn of funcs){assert(await allowed('anon',fn),'Mock baseline anon callable: '+fn);assert(await allowed('authenticated',fn));assert(await allowed('service_role',fn))}
   await db.exec(sql);
   for(const fn of funcs){
