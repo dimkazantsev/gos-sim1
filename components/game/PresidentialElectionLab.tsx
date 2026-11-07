@@ -123,19 +123,19 @@ export default function PresidentialElectionLab({g}:{g:ReturnTypeRepublic}){
   const [a,b,p,d]=await Promise.all([
    supabase.from('presidential_election_settings').select('*').eq('game_id',game.id).abortSignal(controller.signal).maybeSingle(),
    supabase.from('presidential_candidates').select('*').eq('game_id',game.id).is('archived_at',null).order('created_at').abortSignal(controller.signal),
-   supabase.from('presidential_candidate_program_points').select('*').eq('game_id',game.id).order('point_no').abortSignal(controller.signal),
+   supabase.from('presidential_candidate_program_points').select('id,candidate_id,point_no,body').eq('game_id',game.id).order('point_no').abortSignal(controller.signal),
    supabase.from('presidential_candidate_documents').select('*').eq('game_id',game.id).is('archived_at',null).order('created_at').abortSignal(controller.signal)
   ]);
   if(!current())return;
   const [sg,sb,cd,cn]=await Promise.all([
-   supabase.from('presidential_support_group').select('*').eq('game_id',game.id).order('created_at').abortSignal(controller.signal),
-   supabase.from('presidential_signature_batches').select('*').eq('game_id',game.id).order('direction_label').abortSignal(controller.signal),
+   supabase.from('presidential_support_group').select('id,candidate_id,supporter_user_id').eq('game_id',game.id).order('created_at').abortSignal(controller.signal),
+   supabase.from('presidential_signature_batches').select('id,candidate_id,direction_label,signatures').eq('game_id',game.id).order('direction_label').abortSignal(controller.signal),
    supabase.from('presidential_cec_decisions').select('*').eq('game_id',game.id).order('created_at',{ascending:false}).abortSignal(controller.signal),
-   supabase.from('presidential_cec_private_notes').select('*').eq('game_id',game.id).order('created_at',{ascending:false}).abortSignal(controller.signal)
+   supabase.from('presidential_cec_private_notes').select('decision_id,candidate_id,private_summary').eq('game_id',game.id).order('created_at',{ascending:false}).abortSignal(controller.signal)
   ]);
   if(!current())return;
   const [pp,sd]=await Promise.all([
-   supabase.from('presidential_candidate_private_profiles').select('*').eq('game_id',game.id).abortSignal(controller.signal),
+   supabase.from('presidential_candidate_private_profiles').select('candidate_id,birth_date,birth_place,contact_phone,contact_email,address_text,passport_note').eq('game_id',game.id).abortSignal(controller.signal),
    supabase.rpc('get_presidential_student_system_vote',{p_game_id:game.id}).abortSignal(controller.signal)
   ]);
   if(!current())return;
