@@ -2,7 +2,7 @@
 import {userError} from '@/lib/userError';
 import {IconAction} from '../ui/IconAction';
 import {useEffect,useMemo,useRef,useState} from 'react';
-import {createScopedSignedAssetCache} from './scopedSignedAssetCache';
+import {createScopedSignedAssetBatchCache} from './scopedSignedAssetBatchCache';
 import {prepareCandidatePhoto} from './prepareCandidatePhoto';
 import {supabase} from '@/lib/supabase';
 import type {ReturnTypeRepublic} from './viewTypes';
@@ -46,10 +46,14 @@ function preserveDrafts<T>(drafts:Record<string,T>,previous:Record<string,T>,nex
 
 export default function PresidentialElectionLab({g}:{g:ReturnTypeRepublic}){
  const {game,me,teacher,members,parties,currentStage,setError}=g;
- const signedAsset=useMemo(()=>createScopedSignedAssetCache(async path=>{
+ const signedAssets=useMemo(()=>createScopedSignedAssetBatchCache(async paths=>{
+  const {data,error}=await supabase.storage.from('game-assets').createSignedUrls(paths,3600);
+  if(error)throw error;
+  return Object.fromEntries(paths.map((path,index)=>[path,data?.[index]?.signedUrl||null]));
+ },async path=>{
   const {data,error}=await supabase.storage.from('game-assets').createSignedUrl(path,3600);
   return error?null:data?.signedUrl||null;
- }),[game?.id,me?.user_id]);
+ }),[game?.id,me?.user_id,me?.kind,me?.role_title,me?.roster_archived_at,teacher]);
  const [settings,setSettings]=useState<Settings|null>(null);
  const [systemDecisionComplete,setSystemDecisionComplete]=useState(false);
  const [candidates,setCandidates]=useState<Candidate[]>([]);
@@ -142,14 +146,14 @@ export default function PresidentialElectionLab({g}:{g:ReturnTypeRepublic}){
    const rows=(b.data||[]) as Candidate[];setCandidates(rows);const request=++photoRequest.current;
    const next:typeof review=Object.fromEntries(rows.map(x=>[x.id,{status:x.registration_status==='registered'?'registered':x.registration_status==='rejected'?'rejected':'revision',errors:String(x.legal_error_count),penalty:String(x.rating_penalty),publicSummary:x.registration_public_summary||'',privateSummary:''}]));
    const previous=serverDrafts.current.review;serverDrafts.current.review=next;setReview(v=>preserveDrafts(v,previous,next));
-   void Promise.all(rows.filter(x=>x.photo_path).map(async x=>[x.id,(await signedAsset(x.photo_path!))||''] as const)).then(pairs=>{if(current()&&request===photoRequest.current)setPhotoUrls(Object.fromEntries(pairs.filter(x=>x[1])))}).catch(error=>{if(current()&&request===photoRequest.current)setError(userError(error))});
+   void signedAssets.getMany(rows.map(x=>x.photo_path)).then(urls=>{if(current()&&request===photoRequest.current)setPhotoUrls(Object.fromEntries(rows.filter(x=>x.photo_path&&urls[x.photo_path]).map(x=>[x.id,urls[x.photo_path!]!])))}).catch(error=>{if(current()&&request===photoRequest.current)setError(userError(error))});
   }
   if(!p.error)setPoints((p.data||[]) as ProgramPoint[]);
   if(!d.error){
    const docs=(d.data||[]) as CandidateDoc[];
    setCandidateDocs(v=>docs.map(x=>({...x,url:v.find(old=>old.id===x.id&&old.storage_path===x.storage_path)?.url})));
    const next=Object.fromEntries(docs.map(x=>[x.id,x.extracted_text||'']));const previous=serverDrafts.current.text;serverDrafts.current.text=next;setDocTextDraft(v=>preserveDrafts(v,previous,next));
-   void Promise.all(docs.map(async x=>({...x,url:await signedAsset(x.storage_path)}))).then(rows=>{if(current())setCandidateDocs(v=>v.map(x=>({...x,url:rows.find(row=>row.id===x.id&&row.storage_path===x.storage_path)?.url||x.url})))}).catch(error=>{if(current())setError(userError(error))});
+   void signedAssets.getMany(docs.map(x=>x.storage_path)).then(urls=>{if(current())setCandidateDocs(v=>v.map(x=>({...x,url:urls[x.storage_path]||x.url})))}).catch(error=>{if(current())setError(userError(error))});
   }
   if(!sg.error)setSupporters((sg.data||[]) as Supporter[]);
   if(!sb.error)setSignatureBatches((sb.data||[]) as SignatureBatch[]);
