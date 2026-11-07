@@ -2,6 +2,12 @@
  * Synthetic replies and virtual time: this is not HTTP/Auth/Realtime or server capacity evidence. */
 const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path'),vm=require('node:vm'),ts=require('typescript');
 const root=path.resolve(__dirname,'..');
+const stage6Source=fs.readFileSync(path.join(root,'components/game/PresidentialElectionLab.tsx'),'utf8');
+const requiredProjections=["supabase.from('presidential_candidate_program_points').select('id,candidate_id,point_no,body')","supabase.from('presidential_support_group').select('id,candidate_id,supporter_user_id')","supabase.from('presidential_signature_batches').select('id,candidate_id,direction_label,signatures')","supabase.from('presidential_cec_private_notes').select('decision_id,candidate_id,private_summary')","supabase.from('presidential_candidate_private_profiles').select('candidate_id,birth_date,birth_place,contact_phone,contact_email,address_text,passport_note')"];
+for(const query of requiredProjections)assert(stage6Source.includes(query),'Stage 6 projection must retain its explicit required fields: '+query);
+for(const table of ['presidential_candidate_program_points','presidential_support_group','presidential_signature_batches','presidential_cec_private_notes','presidential_candidate_private_profiles']){
+ assert(!stage6Source.includes("supabase.from('"+table+"').select('*')"),'Stage 6 must not fetch every column of '+table);
+}
 const compile=file=>ts.transpileModule(fs.readFileSync(path.join(root,file),'utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022,jsx:ts.JsxEmit.ReactJSX}}).outputText;
 const component=compile('components/game/PresidentialElectionLab.tsx'),shared=compile('components/game/useGameTableSync.ts'),assets=compile('components/game/scopedSignedAssetBatchCache.ts');
 const tick=async()=>{for(let i=0;i<100;i++)await Promise.resolve()};
