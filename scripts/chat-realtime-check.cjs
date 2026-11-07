@@ -45,7 +45,10 @@ const personalFilter=source.slice(source.indexOf("for(const table of ['chat_ment
 assert(personalFilter.includes("?'game_id=eq.'+gameId+',mentioned_user_id=eq.'+me.user_id"),'Mentions must be scoped to the recipient within this game');
 assert(personalFilter.includes("?'game_id=eq.'+gameId+',user_id=eq.'+me.user_id"),'Read markers must be scoped to the current user within this game');
 assert(personalFilter.includes(":'game_id=eq.'+gameId;"),'Pins remain room-wide for accessible channels');
-assert(personalFilter.includes("channel.on('postgres_changes',{event:'*',schema:'public',table,filter}"),'Preserve one socket and the existing change handler');
+// The shared game socket projects small invalidation payloads. Pins must retain
+// channel_id for active-channel refresh, while private markers carry only game_id.
+const compactSubscriptions=personalFilter.replace(/\s+/g,'');
+assert(compactSubscriptions.includes("channel.on('postgres_changes',{event:'*',schema:'public',table,filter,select:table==='chat_pins'?['game_id','channel_id']:['game_id']},payload=>{"),'Keep scoped chat invalidations and minimal column projection');
 const members=Array.from({length:100},(_,i)=>'member-'+i);
 let matched=0;
 for(const owner of members)for(const subscriber of members)if(owner===subscriber)matched++;
