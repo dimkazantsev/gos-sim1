@@ -121,7 +121,36 @@ async function model(mode){
  for(const r of sessions){await r.settle();const m=r.metrics();sum.reads+=m.reads;sum.signs+=m.signs;sum.bytes+=m.bytes;sum.maxDatabasePerClient=Math.max(sum.maxDatabasePerClient,m.maxDb);sum.maxStoragePerClient=Math.max(sum.maxStoragePerClient,m.maxSigns);sum.maxCombinedPerClient=Math.max(sum.maxCombinedPerClient,m.maxTotal);r.close()}
  return sum;
 }
+async function signingBatchUnit(){
+ const context={exports:{},Promise,Map,Set,Math,Date};
+ vm.createContext(context);
+ vm.runInContext('(function(exports){'+assets+'})(exports)',context);
+ const factory=context.exports.createScopedSignedAssetBatchCache;
+ assert.equal(typeof factory,'function');
+ let now=0,batches=0,singles=0;
+ const cache=factory(async paths=>{batches++;return Object.fromEntries(paths.map(p=>[p,'signed:'+p]))},async path=>{singles++;return 'single:'+path},{now:()=>now});
+ const [a,b]=await Promise.all([cache.getMany(['a','b','a']),cache.getMany(['b','c'])]);
+ assert.equal(batches,1,'Concurrent paths share one Storage batch');
+ assert.equal(a.a,'signed:a');assert.equal(b.c,'signed:c');
+ await cache.getMany(['a','c']);assert.equal(batches,1,'Stable capabilities stay in per-mount cache');
+ now+=46*60*1000;
+ await cache.getMany(['a']);assert.equal(batches,2,'Expiring URLs refresh before Storage expiry');
+ assert.equal(singles,0,'Successful batches issue no extra per-file requests');
+ let quotaFallbacks=0;
+ const blocked=factory(async()=>{throw Object.assign(new Error('quota'),{status:402})},async()=>{quotaFallbacks++;return 'unexpected'});
+ const quota=await blocked.getMany(['quota-a','quota-b']);
+ assert.equal(quotaFallbacks,0,'HTTP 402 must never fan out into single-file retries');
+ assert.equal(quota['quota-a'],null);
+ let active=0,peak=0;
+ const fallback=factory(async()=>{throw new Error('Storage batch unavailable')},async path=>{
+  active++;peak=Math.max(peak,active);await Promise.resolve();active--;return 'fallback:'+path;
+ },{batchSize:4,maxParallel:2});
+ const recovered=await fallback.getMany(Array.from({length:16},(_,i)=>'path-'+i));
+ assert.equal(recovered['path-15'],'fallback:path-15','A failed batch retains accessible individual files');
+ assert(peak<=4,'Fallback across concurrent batches remains bounded to four HTTP calls');
+}
 async function main(){
+ await signingBatchUnit();
  const checks=await regressions(),burst=await model('burst'),idle=await model('idle');
  assert.equal(burst.reads,800,'Forty initial loads plus one coalesced burst load each');assert(burst.signs<=80,'Forty participants issue at most two batched Storage requests each');assert.equal(idle.reads,2800,'Twenty virtual minutes include initial load plus six 3-minute reconciliation loads per client');
  console.log(JSON.stringify({environment:'Actual full TSX and hook; synthetic replies; 40 isolated virtual clients. No HTTP, Auth, Realtime delivery or database load.',normalTeacherConcurrency:checks,burst,idle,limits:'Database/RPC and signed assets each have a separate four-request bound. A 12s deadline releases only logical single-flight; a transport ignoring abort can still overlap on the server.',idleCost:'The previous unpublished-channel panel had no fallback. This new visible reconciliation intentionally adds six complete reads per client in 20 minutes.',checks:['unused readiness absent','teacher audits retained','separate I/O bounds with photos/documents','hidden suspension and visible recovery','foreign game/table filtering','own mutation trailing reload','scope abort and teacher downgrade','old mutation cannot clear a new-scope draft or continue RPCs','timeout release with ignored abort','partial errors preserve data','held old photo signing cannot overwrite a newer same-scope photo','dirty text/private/review retained atomically and clean entries updated','unmount cleanup']},null,2));
