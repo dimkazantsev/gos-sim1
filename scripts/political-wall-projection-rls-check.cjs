@@ -4,6 +4,10 @@ const {PGlite}=require('@electric-sql/pglite');
 const sql=fs.readFileSync(path.join(__dirname,'..','supabase/migrations/20261029150000_political_wall_projection_invoker.sql'),'utf8');
 const paging=fs.readFileSync(path.join(__dirname,'..','supabase/migrations/20261031100000_metric_history_50_paging.sql'),'utf8');
 const wallPages=fs.readFileSync(path.join(__dirname,'..','supabase/migrations/20261031120000_political_wall_paged_projection.sql'),'utf8');
+const sharedScan=fs.readFileSync(path.join(__dirname,'..','supabase/migrations/20261107163500_political_wall_share_visible_actor_scan.sql'),'utf8');
+assert(sharedScan.includes('STABLE SECURITY INVOKER'),'Optimized page remains RLS-protected');
+assert(sharedScan.includes('actor_pool as materialized')&&sharedScan.includes('from actor_pool p'),'Count and actor picker share one authorized scan');
+assert(sharedScan.includes("'total_posts',(select count(*) from actor_pool)"),'Post total must keep original RLS semantics');
 assert(wallPages.includes('security invoker')&&wallPages.includes('private.is_game_member(p_game_id)')&&wallPages.includes('limit 11'));
 assert(wallPages.includes('m.post_id in (select id from page)')&&wallPages.includes('l.post_id in (select id from page)'));
 assert(wallPages.includes('from public.political_posts p')&&wallPages.includes('revoke all on function public.get_political_wall_page'));
@@ -49,7 +53,7 @@ async function main(){
   await db.query("insert into public.state_metric_history select ('00000000-0000-4000-8000-'||lpad((4000+n)::text,12,'0'))::uuid,$1,'2026-10-01'::timestamptz+n*interval '1 minute' from generate_series(1,3002)n",[game]);
   await db.query("insert into public.party_support_history select ('00000000-0000-4000-8000-'||lpad((8000+n)::text,12,'0'))::uuid,$1,'2026-10-01'::timestamptz+n*interval '1 minute' from generate_series(1,70)n",[game]);
   await db.query("insert into public.state_metrics values($1,$2,1,10)",[id(600),game]);
-  await db.exec(sql);await db.exec(paging);await db.exec(wallPages);
+  await db.exec(sql);await db.exec(paging);await db.exec(wallPages);await db.exec(sharedScan);
   async function as(n){await db.exec('reset role');await db.query("select set_config('request.jwt.claim.sub',$1,false)",[n?id(n):'']);await db.exec('set role authenticated');}
   async function read(g=game){return (await db.query('select public.get_political_wall_projection($1) value',[g])).rows[0].value;}
   for(let n=1;n<=42;n++){

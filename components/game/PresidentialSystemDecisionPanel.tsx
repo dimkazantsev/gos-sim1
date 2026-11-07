@@ -3,6 +3,7 @@ import {userError} from '@/lib/userError';
 import {useEffect,useState} from 'react';
 import {MessageCircle,ClipboardCheck,Vote,LibraryBig} from 'lucide-react';
 import {supabase} from '@/lib/supabase';
+import {useGameTableSync} from './useGameTableSync';
 import type {ReturnTypeRepublic} from './viewTypes';
 import type {View} from './types';
 
@@ -33,16 +34,17 @@ export default function PresidentialSystemDecisionPanel({g,onOpenVotes,onNavigat
   if(!r.error)setRows((r.data||[]) as Proposal[]);
   if(!reg.error)setRegistrations(reg.data||[]);
  }
- useEffect(()=>{void load()},[game?.id,stageNo]);
  useEffect(()=>{if(stageNo===7)setElectionDate(storedElectionDate)},[stageNo,storedElectionDate]);
- useEffect(()=>{
-  if(!game)return;
-  const ch=supabase.channel('presidential-system:'+game.id+':'+stageNo)
-   .on('postgres_changes',{event:'*',schema:'public',table:'presidential_system_proposals',filter:'game_id=eq.'+game.id},()=>void load())
-   .on('postgres_changes',{event:'*',schema:'public',table:'institution_session_registrations',filter:'game_id=eq.'+game.id},()=>void load())
-   .subscribe();
-  return()=>{void supabase.removeChannel(ch)}
- },[game?.id,stageNo]);
+ // Neither table participates in the postgres_changes publication. Reuse the
+ // existing game-scoped invalidation listener and bounded visible reconciliation
+ // rather than opening an inert, additional Realtime channel for every player.
+ // Stage 7 renders the already supplied SF resolution only; it never needs
+ // the stage-6 proposal and attendance queries.
+ useGameTableSync(stageNo===6&&me?.user_id?game?.id:undefined,
+  // Proposal mutations also create a bill and a vote; those published tables
+  // invalidate the view on the shared game channel for other connected users.
+  ['presidential_system_proposals','institution_session_registrations','formal_documents','game_votes'],
+  load,[game?.id,me?.user_id,stageNo].join(':'),undefined,3000,180000);
 
  if(!game||!me)return null;
  const activeGame=game;

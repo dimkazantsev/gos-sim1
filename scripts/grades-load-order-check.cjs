@@ -12,6 +12,7 @@ function make(deps){
  const out={},env={supabase:deps.supabase,game:{id:'test-game'},teacher:deps.teacher,me:deps.me,authId:deps.authId,
   compact:false,loadScope:'scope',activeScope:deps.activeScope||{current:'scope'},loadRequest:deps.loadRequest,
   acceptedRowsScope:{current:''},acceptedDebriefScope:{current:''},publicScoresCallback:{current:deps.onPublicScores},
+  ASSESSMENT_COLUMNS:'id,game_id,stage_no,user_id,auto_score,final_score,status,criterion_law,criterion_strategy,criterion_debrief,public_rationale,last_run_type,last_auto_at,revision_count,teacher_note,finalized_at',
   readState:{controller:null},g:{setError:error=>{throw Error('Unexpected loader error: '+error);}},setRows:deps.setRows,setDebriefRows:deps.setDebriefRows,AbortSignal,AbortController,setTimeout,clearTimeout,exports:out};
  new Function(...Object.keys(env),compiled)(...Object.values(env));return out.load;
 }
