@@ -38,7 +38,9 @@ export default function PresidentialSystemDecisionPanel({g,onOpenVotes,onNavigat
  // Neither table participates in the postgres_changes publication. Reuse the
  // existing game-scoped invalidation listener and bounded visible reconciliation
  // rather than opening an inert, additional Realtime channel for every player.
- useGameTableSync(me?.user_id?game?.id:undefined,
+ // Stage 7 renders the already supplied SF resolution only; it never needs
+ // the stage-6 proposal and attendance queries.
+ useGameTableSync(stageNo===6&&me?.user_id?game?.id:undefined,
   // Proposal mutations also create a bill and a vote; those published tables
   // invalidate the view on the shared game channel for other connected users.
   ['presidential_system_proposals','institution_session_registrations','formal_documents','game_votes'],
