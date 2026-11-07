@@ -270,6 +270,8 @@ on:
       - 'scripts/metric-chart-check.cjs'
       - 'scripts/metric-history-pagination-check.cjs'
       - 'scripts/political-wall-projection-rls-check.cjs'
+      - 'scripts/legacy-qwiz-anon-grants-check.cjs'
+      - 'supabase/migrations/20261108000500_restrict_legacy_qwiz_anon_rpc.sql'
       - 'supabase/migrations/20261031100000_metric_history_50_paging.sql'
       - 'app/impact-workbench.css'
       - 'supabase/migrations/20261024193000_state_pulse_game_realtime.sql'
@@ -501,6 +503,7 @@ jobs:
       - run: node scripts/metric-chart-check.cjs
       - run: node scripts/metric-history-pagination-check.cjs
       - run: node scripts/political-wall-projection-rls-check.cjs
+      - run: node scripts/legacy-qwiz-anon-grants-check.cjs
       - run: node scripts/political-publisher-catalog-check.cjs
       - run: node scripts/access-codes-civic-actor-check.cjs
       - run: node scripts/all-invitations-layout-check.cjs
