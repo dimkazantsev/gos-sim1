@@ -636,7 +636,10 @@ export function useRepublicGame(gameId:string){
     :table==='chat_channel_state'
      ?'game_id=eq.'+gameId+',user_id=eq.'+me.user_id
      :'game_id=eq.'+gameId;
-   channel.on('postgres_changes',{event:'*',schema:'public',table,filter},payload=>{
+   // The remaining chat events only invalidate counters. Pin updates also
+   // need channel_id; message contents stay on their separate full subscription.
+   channel.on('postgres_changes',{event:'*',schema:'public',table,filter,
+    select:table==='chat_pins'?['game_id','channel_id']:['game_id']},payload=>{
     if(table==='chat_pins'){
      const next=payload.new as Partial<ChatPin>|null,previous=payload.old as Partial<ChatPin>|null;
      if(chatOpenRef.current&&channelRef.current&&
@@ -685,8 +688,13 @@ export function useRepublicGame(gameId:string){
    }
    return false;
   }
+  // Invalidation-only subscriptions need no row bodies. The three direct
+  // delta handlers retain complete payloads so votes, stages and document
+  // changes still update immediately without additional PostgREST reads.
   for(const table of ['game_stages','party_invitations','party_chair_ballots','formal_documents','political_posts','game_votes','blitz_assignments','stage_deadline_rules']){
-   channel.on('postgres_changes',{event:'*',schema:'public',table,filter:'game_id=eq.'+gameId},payload=>{
+   const fullDelta=table==='game_stages'||table==='formal_documents'||table==='game_votes';
+   channel.on('postgres_changes',{event:'*',schema:'public',table,filter:'game_id=eq.'+gameId,
+    ...(fullDelta?{}:{select:['game_id']})},payload=>{
     if(!currentConnection())return;
     if('game_id' in payload.new&&payload.new.game_id!==gameId)return;
     dirtyTables.add(table);
@@ -749,7 +757,8 @@ export function useRepublicGame(gameId:string){
   // KSRF proposals use this existing authorised game socket, not five widget channels.
   // Only interested stage views refresh their proposal lists.
   for(const table of ['parliamentary_election_rules','regional_election_rules']){
-   channel.on('postgres_changes',{event:'*',schema:'public',table,filter:'game_id=eq.'+gameId},()=>notifyGameDataRefresh(gameId,table));
+   channel.on('postgres_changes',{event:'*',schema:'public',table,filter:'game_id=eq.'+gameId,
+    select:['game_id']},()=>notifyGameDataRefresh(gameId,table));
   }
   // Five low-frequency Duma procedure tables share one authorised Broadcast
   // invalidation instead of five per-client Postgres Changes bindings. Only
