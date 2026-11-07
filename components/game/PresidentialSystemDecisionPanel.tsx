@@ -34,13 +34,14 @@ export default function PresidentialSystemDecisionPanel({g,onOpenVotes,onNavigat
   if(!r.error)setRows((r.data||[]) as Proposal[]);
   if(!reg.error)setRegistrations(reg.data||[]);
  }
- useEffect(()=>{void load()},[game?.id,stageNo]);
  useEffect(()=>{if(stageNo===7)setElectionDate(storedElectionDate)},[stageNo,storedElectionDate]);
  // Neither table participates in the postgres_changes publication. Reuse the
  // existing game-scoped invalidation listener and bounded visible reconciliation
  // rather than opening an inert, additional Realtime channel for every player.
  useGameTableSync(me?.user_id?game?.id:undefined,
-  ['presidential_system_proposals','institution_session_registrations'],
+  // Proposal mutations also create a bill and a vote; those published tables
+  // invalidate the view on the shared game channel for other connected users.
+  ['presidential_system_proposals','institution_session_registrations','formal_documents','game_votes'],
   load,[game?.id,me?.user_id,stageNo].join(':'),undefined,3000,180000);
 
  if(!game||!me)return null;
