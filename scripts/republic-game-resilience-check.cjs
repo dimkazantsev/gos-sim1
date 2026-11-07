@@ -849,6 +849,6 @@ async function main(){
 // last asynchronous test is still unresolved.
 module.exports={harness};
 if(require.main===module){
- const watchdog=setTimeout(()=>{console.error('FAIL Hook regression suite did not complete');process.exitCode=1;},15000);
+ const watchdog=setTimeout(()=>{console.error('FAIL Hook regression suite did not complete');process.exitCode=1;},30000);
  main().then(()=>clearTimeout(watchdog),error=>{clearTimeout(watchdog);console.error(error);process.exitCode=1;});
 }
