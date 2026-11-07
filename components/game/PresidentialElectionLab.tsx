@@ -146,7 +146,7 @@ export default function PresidentialElectionLab({g}:{g:ReturnTypeRepublic}){
    const rows=(b.data||[]) as Candidate[];setCandidates(rows);const request=++photoRequest.current;
    const next:typeof review=Object.fromEntries(rows.map(x=>[x.id,{status:x.registration_status==='registered'?'registered':x.registration_status==='rejected'?'rejected':'revision',errors:String(x.legal_error_count),penalty:String(x.rating_penalty),publicSummary:x.registration_public_summary||'',privateSummary:''}]));
    const previous=serverDrafts.current.review;serverDrafts.current.review=next;setReview(v=>preserveDrafts(v,previous,next));
-   void signedAssets.getMany(rows.map(x=>x.photo_path)).then(urls=>{if(current()&&request===photoRequest.current)setPhotoUrls(Object.fromEntries(rows.filter(x=>x.photo_path&&urls[x.photo_path]).map(x=>[x.id,urls[x.photo_path!]])))}).catch(error=>{if(current()&&request===photoRequest.current)setError(userError(error))});
+   void signedAssets.getMany(rows.map(x=>x.photo_path)).then(urls=>{if(current()&&request===photoRequest.current)setPhotoUrls(Object.fromEntries(rows.filter(x=>x.photo_path&&urls[x.photo_path]).map(x=>[x.id,urls[x.photo_path!]!])))}).catch(error=>{if(current()&&request===photoRequest.current)setError(userError(error))});
   }
   if(!p.error)setPoints((p.data||[]) as ProgramPoint[]);
   if(!d.error){
