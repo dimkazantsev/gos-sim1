@@ -38,7 +38,7 @@ export function createScopedSignedAssetBatchCache(
      complete(path,url);
     }
    };
-   await Promise.all(Array.from({length:Math.min(4,paths.length)},worker));
+   await Promise.all(Array.from({length:Math.min(2,paths.length)},worker));
   }
  }
  function pump(){
