@@ -72,7 +72,7 @@ export default function StateProgramLab({g}:{g:ReturnTypeRepublic}){
    setSelectedGoals(saved.length>=5?saved:[...saved,...Array(5-saved.length).fill('')]);
   }
  }
- useEffect(()=>{if(selectedId)void refreshReadiness(selectedId)},[selectedId,viewScope]);
+ useEffect(()=>{if(selectedId&&game&&programs.some(p=>p.id===selectedId&&p.game_id===game.id))void refreshReadiness(selectedId)},[selectedId,viewScope]);
  useGameTableSync(game?.id,['state_programs','state_program_goals','state_program_components','state_program_expenses','state_program_budget_commitments','presidential_addresses','presidential_priorities','state_program_budget_years','institution_assignments','institution_units'],load,viewScope);
  if(!game||!me)return null;
  const selected=creating?undefined:programs.find(p=>p.id===selectedId),publishedAddress=addresses.find(x=>x.status==='published'),activeAddress=addresses.find(x=>x.status==='draft')||publishedAddress;
