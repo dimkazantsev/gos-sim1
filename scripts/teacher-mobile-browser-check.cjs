@@ -6,6 +6,8 @@ const path=require('node:path');
 const {chromium}=require('playwright-core');
 const root=path.resolve(__dirname,'..');
 const preview=path.join(root,'.design-review','gos-sim-preview.html');
+// The production chat feature is intentionally suspended; don't expect an overlay from GameClient.
+const chatPaused=/export const CHAT_PAUSED\s*=\s*true\b/.test(fs.readFileSync(path.join(root,'lib/featureFreeze.ts'),'utf8'));
 const shotDir=path.join(root,'.design-review','screenshots');
 const chrome=[process.env.CHROME_BIN,'/usr/bin/google-chrome','/usr/bin/chromium','/usr/bin/chromium-browser','/opt/google/chrome/chrome'].find(p=>p&&fs.existsSync(p));
 if(!chrome)throw Error('Chrome/Chromium missing for teacher mobile check');
@@ -37,6 +39,9 @@ async function main(){
     assert(!header.connection,'Removed connection indicator must not remain in the mobile header');
     for(const part of header.parts)assert(part.left>=-2&&part.right<=header.width+2,'Header overflows at '+width+': '+JSON.stringify(header));
     await page.locator('#screen').selectOption('chat');
+    if(chatPaused){
+     assert.equal(await frame.locator('.gsChatV2').count(),0,'Paused chat must not mount in the classroom layout');
+    }else{
     // The sheet deliberately slides up; assert final position after the animation.
     await frame.locator('.gsChatV2').evaluate(async el=>{
      await Promise.all(el.getAnimations().map(animation=>animation.finished.catch(()=>{})));
@@ -50,6 +55,7 @@ async function main(){
     });
     assert(chatGeometry.chat.top>=chatGeometry.headerBottom-2&&chatGeometry.chat.top<=chatGeometry.headerBottom+30,'Chat must remain below the header without overlapping it: '+JSON.stringify(chatGeometry));
     assert(chatGeometry.chat.bottom<=chatGeometry.dock.top+2&&chatGeometry.chat.bottom>=chatGeometry.dock.top-34,'Chat must end above dock with a small intentional gap: '+JSON.stringify(chatGeometry));
+    }
    }
    await page.locator('#screen').selectOption('teacher-stages');
    await frame.locator('.teacherCommand .teacherStageManager').waitFor();

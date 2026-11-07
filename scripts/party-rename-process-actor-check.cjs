@@ -34,3 +34,14 @@ assert.ok(migration.includes("select distinct on (lower(btrim(role_title)))"),'R
 assert.ok(wall.includes('seenActorLabels')&&wall.includes("120000);"),'Picker must deduplicate and reduce redundant polling');
 assert.ok(wall.includes("useGameTableSync("),'Actor refresh still listens for live game changes');
 console.log('PASS guarded party rename; game membership, chat and cache links; teacher catalogue and unique actors; guest denial and throttled fallback.');
+
+// Current wrapper delegates the authorization decision to the already guarded label helper.
+const fastActors=fs.readFileSync('supabase/migrations/20261107163000_process_actor_deduplicate_activation.sql','utf8');
+assert.match(fastActors,/create or replace function public\.get_process_actors\(p_game_id uuid\)/i);
+assert.match(fastActors,/STABLE SECURITY DEFINER/i);
+assert.match(fastActors,/if not private\.is_game_member\(p_game_id\)/i);
+assert.match(fastActors,/v_teacher:=private\.is_game_teacher\(p_game_id\)/i);
+assert.match(fastActors,/if not v_teacher and k='ksrf' then continue;end if;/i,'Keep existing KSRF teacher-only display');
+assert.match(fastActors,/label:=private\.process_actor_label\(p_game_id,k\)/i,'Keep authoritative actor authorization');
+assert.ok(!fastActors.includes('not private.process_actor_active_now(p_game_id,k)'), 'Avoid duplicate active-role check before label helper');
+console.log('PASS actor picker keeps secure label path and teacher-only KSRF without redundant activation checks');

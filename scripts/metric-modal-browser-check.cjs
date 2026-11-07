@@ -412,8 +412,8 @@ async function main(){
    console.log('PASS real Chromium '+result.kind+' MediaRecorder: '+result.mime+', '+result.size+' bytes');
   }
   await mediaPage.close();
-  // The chat panel uses the same close geometry as all modal headers.
-  await page.locator('#screen').selectOption('chat');
+  // Test the actual ChatPanel fixture even when the classroom chat feature is paused.
+  await page.locator('#screen').selectOption('chat-panel');
   const chatClose=page.frameLocator('#preview').locator('.chatTop').getByRole('button',{name:'Закрыть чат'});
   assert.equal(await chatClose.count(),1,'Chat uses the shared close control');
   assert(await chatClose.locator('svg').isVisible(),'Chat close icon remains visible');
