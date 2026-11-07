@@ -26,6 +26,8 @@ type Run={id:number;assessment_id:string;run_type:string;auto_score:number;crite
 type Debrief={id:string;game_id:string;stage_no:number;user_id:string;body:string;updated_at:string};
 export type PublicGradeScore=Pick<Assessment,'user_id'|'stage_no'|'auto_score'|'final_score'|'status'>;
 
+const ASSESSMENT_COLUMNS='id,game_id,stage_no,user_id,auto_score,final_score,status,criterion_law,criterion_strategy,criterion_debrief,public_rationale,last_run_type,last_auto_at,revision_count,teacher_note,finalized_at';
+
 const STAGES=Array.from({length:16},(_,i)=>i+1);
 const shownScore=(a?:Assessment)=>a?(a.status==='final'?(a.final_score??a.auto_score):a.auto_score):null;
 const level=(n:number)=>n>=3?'Высокий':n>=2?'Средний':n>0?'Низкий':'Нет участия';
@@ -99,13 +101,24 @@ export default function GradesView({g,compact=false,onOpenProfile,onPublicScores
  const students=members.filter(m=>m.kind==='student');
  const activeStudentCount=students.filter(m=>!m.roster_archived_at).length;
  const gradeByStudent=useMemo(()=>{
+  const totals=new Map<string,{sum:number;final:number;graded:number}>();
+  for(const a of rows){
+   const stats=totals.get(a.user_id)||{sum:0,final:0,graded:0};
+   stats.sum+=shownScore(a)??0;
+   if(a.status==='final')stats.final++;
+   stats.graded++;
+   totals.set(a.user_id,stats);
+  }
   const map=new Map<string,{sum:number;average:number|null;final:number;graded:number}>();
   for(const student of students){
-   const selected=rows.filter(a=>a.user_id===student.user_id),sum=selected.reduce((v,a)=>v+(shownScore(a)??0),0);
-   map.set(student.user_id,{sum,average:selected.length?sum/selected.length:null,final:selected.filter(a=>a.status==='final').length,graded:selected.length});
+   const stats=totals.get(student.user_id);
+   const sum=stats?.sum??0,graded=stats?.graded??0;
+   map.set(student.user_id,{sum,average:graded?sum/graded:null,final:stats?.final??0,graded});
   }
   return map;
  },[rows,members]);
+ // One indexed lookup for all 16 cells per student, not a full-array scan per cell.
+ const assessmentLookup=useMemo(()=>new Map(rows.map(a=>[a.user_id+':'+a.stage_no,a] as const)),[rows]);
  const teams=[...new Set(students.map(s=>s.team||s.group_name||'').filter(Boolean))].sort((a,b)=>a.localeCompare(b,'ru'));
  const sortedStudents=students.filter(s=>{
   const stats=gradeByStudent.get(s.user_id);
@@ -148,7 +161,7 @@ export default function GradesView({g,compact=false,onOpenProfile,onPublicScores
     let failed=false;
     for(let page=0;page<50;page++){
      const offset=page*1000;
-     const r=await supabase.from('stage_assessments').select('*').eq('game_id',game.id).order('stage_no').order('user_id').range(offset,offset+999).abortSignal(signal);
+     const r=await supabase.from('stage_assessments').select(ASSESSMENT_COLUMNS).eq('game_id',game.id).order('stage_no').order('user_id').range(offset,offset+999).abortSignal(signal);
      if(!current())return;
      if(r.error){g.setError(r.error.message);failed=true;break}
      collected.push(...((r.data||[]) as Assessment[]));
@@ -179,7 +192,7 @@ export default function GradesView({g,compact=false,onOpenProfile,onPublicScores
       public_rationale:'',last_run_type:'',last_auto_at:null,revision_count:0,
       teacher_note:null,finalized_at:null}));
     if(me?.kind==='student'&&authId===me.user_id){
-     const own=await supabase.from('stage_assessments').select('*').eq('game_id',game.id).eq('user_id',me.user_id).order('stage_no').abortSignal(signal);
+     const own=await supabase.from('stage_assessments').select(ASSESSMENT_COLUMNS).eq('game_id',game.id).eq('user_id',me.user_id).order('stage_no').abortSignal(signal);
      if(!current())return;
      if(!own.error){
       const map=new Map(safeRows.map(a=>[a.user_id+':'+a.stage_no,a]));
@@ -264,7 +277,7 @@ export default function GradesView({g,compact=false,onOpenProfile,onPublicScores
  },[assessment?.id,assessment?.auto_score,assessment?.status,teacher]);
 
  async function syncTeacherDraft(assessmentId:string){
-  const fresh=await supabase.from('stage_assessments').select('*').eq('id',assessmentId).single();
+  const fresh=await supabase.from('stage_assessments').select(ASSESSMENT_COLUMNS).eq('id',assessmentId).single();
   if(!fresh.error&&fresh.data){
    const a=fresh.data as Assessment;
    setEditScore(finalScoreChoice(a));
@@ -369,7 +382,7 @@ export default function GradesView({g,compact=false,onOpenProfile,onPublicScores
      <div className="gradesStudentCell">{onOpenProfile?<button type="button" className="gradesProfileLink" onClick={()=>onOpenProfile(s.user_id)} aria-label={s.full_name} title={s.full_name}><span className="gradesNameFull">{s.full_name}</span><span className="gradesNameShort" aria-hidden="true">{s.full_name.trim().split(/\s+/)[0]||s.full_name}</span></button>:<b className="gradesStudentName" title={s.full_name}><span className="gradesNameFull">{s.full_name}</span><span className="gradesNameShort" aria-hidden="true">{s.full_name.trim().split(/\s+/)[0]||s.full_name}</span></b>}<small>{s.team||'Без партии'} · {s.role_title||'Роль не назначена'}</small></div>
      <span className="gradeTotal">{gradeByStudent.get(s.user_id)?.graded?formatGradeScore(gradeByStudent.get(s.user_id)?.sum):'—'}</span>
      <span className="gradeTotal">{formatGradeScore(gradeByStudent.get(s.user_id)?.average)}</span>
-     {STAGES.map(n=>{const a=rows.find(x=>x.user_id===s.user_id&&x.stage_no===n),v=shownScore(a);return <button key={n} className={a?.status||'empty'} onClick={()=>void open(s.user_id,n)} aria-label={s.full_name+', этап '+n+', '+(v===null?'нет оценки':formatGradeScore(v))}><b>{formatGradeScore(v)}</b><small>{a?.status==='final'?'итог':a?'авто':''}</small></button>})}
+     {STAGES.map(n=>{const a=assessmentLookup.get(s.user_id+':'+n),v=shownScore(a);return <button key={n} className={a?.status||'empty'} onClick={()=>void open(s.user_id,n)} aria-label={s.full_name+', этап '+n+', '+(v===null?'нет оценки':formatGradeScore(v))}><b>{formatGradeScore(v)}</b><small>{a?.status==='final'?'итог':a?'авто':''}</small></button>})}
     </div>)}
    </div>
   </section>
