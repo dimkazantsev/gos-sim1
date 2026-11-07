@@ -127,16 +127,21 @@ export default function PresidentialElectionLab({g}:{g:ReturnTypeRepublic}){
    supabase.from('presidential_candidate_documents').select('*').eq('game_id',game.id).is('archived_at',null).order('created_at').abortSignal(controller.signal)
   ]);
   if(!current())return;
-  const [sg,sb,cd,cn]=await Promise.all([
+  const [sg,sb,cd]=await Promise.all([
    supabase.from('presidential_support_group').select('*').eq('game_id',game.id).order('created_at').abortSignal(controller.signal),
    supabase.from('presidential_signature_batches').select('*').eq('game_id',game.id).order('direction_label').abortSignal(controller.signal),
-   supabase.from('presidential_cec_decisions').select('*').eq('game_id',game.id).order('created_at',{ascending:false}).abortSignal(controller.signal),
-   supabase.from('presidential_cec_private_notes').select('*').eq('game_id',game.id).order('created_at',{ascending:false}).abortSignal(controller.signal)
+   supabase.from('presidential_cec_decisions').select('*').eq('game_id',game.id).order('created_at',{ascending:false}).abortSignal(controller.signal)
   ]);
   if(!current())return;
-  const [pp,sd]=await Promise.all([
+  const [pp,sd,cn]=await Promise.all([
    supabase.from('presidential_candidate_private_profiles').select('*').eq('game_id',game.id).abortSignal(controller.signal),
-   supabase.rpc('get_presidential_student_system_vote',{p_game_id:game.id}).abortSignal(controller.signal)
+   supabase.rpc('get_presidential_student_system_vote',{p_game_id:game.id}).abortSignal(controller.signal),
+   // No CEC decisions means no confidential notes can appear in the registry.
+   // Keep the original RLS-protected read whenever decisions exist or the
+   // decisions read failed, preserving the existing failure/refresh semantics.
+   cd.error||(cd.data||[]).length>0
+    ? supabase.from('presidential_cec_private_notes').select('*').eq('game_id',game.id).order('created_at',{ascending:false}).abortSignal(controller.signal)
+    : Promise.resolve({data:[] as CecPrivateNote[],error:null})
   ]);
   if(!current())return;
   const error=[a,b,p,d,sg,sb,cd,cn,pp,sd].find(x=>x.error)?.error;if(error)setError(userError(error));
