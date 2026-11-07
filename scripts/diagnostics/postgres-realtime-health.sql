@@ -41,6 +41,32 @@ WHERE restart_lsn IS NOT NULL ORDER BY slot_name;
 SELECT pubname, count(*) AS published_tables
 FROM pg_publication_tables GROUP BY pubname ORDER BY pubname;
 
+-- Actual Postgres Changes registrations (not WebSocket connection count).
+-- Snapshot may be zero when no game clients are connected. Never treat the
+-- number of subscriptions as the number of players or as Broadcast listeners.
+-- Expose only aggregate counts, never JWT claims or subscriber identifiers.
+SELECT count(*) AS postgres_change_registrations,
+       count(DISTINCT entity) AS subscribed_tables
+FROM realtime.subscription;
+
+SELECT entity::regclass::text AS table_name,
+       count(*) AS registrations
+FROM realtime.subscription
+GROUP BY entity ORDER BY registrations DESC, table_name
+LIMIT 30;
+
+-- Pool and application breakdown. These database sessions are NOT Supabase
+-- Auth browser sessions; visible Auth requests and Realtime sockets require
+-- their respective platform reports to count accurately.
+SELECT coalesce(nullif(usename,''),'(unknown)') AS database_role,
+       coalesce(nullif(application_name,''),'(none)') AS application,
+       count(*) AS connections,
+       count(*) FILTER (WHERE state='active') AS active_connections
+FROM pg_stat_activity
+WHERE datname=current_database()
+GROUP BY 1,2 ORDER BY connections DESC, application
+LIMIT 25;
+
 SELECT stats_reset, xact_commit, xact_rollback, deadlocks, temp_files,
        pg_size_pretty(temp_bytes) AS temp_bytes_cumulative
 FROM pg_stat_database WHERE datname=current_database();
