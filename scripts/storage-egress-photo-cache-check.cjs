@@ -53,7 +53,7 @@ function loadModule(file,extra={}){
  const lab=fs.readFileSync('components/game/PresidentialElectionLab.tsx','utf8');
  const docs=fs.readFileSync('components/game/DocumentsView.tsx','utf8');
  assert(zero.includes('signedAsset(path)')&&zero.includes('loading="lazy"'));
- assert(lab.includes("createScopedSignedAssetCache")&&lab.includes("cacheControl:'3600'"));
+ assert(lab.includes("createScopedSignedAssetBatchCache")&&lab.includes("cacheControl:'3600'"));
  assert(lab.includes('prepareCandidatePhoto(file)'));
  assert(docs.includes('signedAsset(row.signature_path)'));
  assert(fs.readFileSync('components/game/PartyUnregisteredFiles.tsx','utf8').includes('signedAsset(path)'));
