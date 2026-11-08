@@ -1,6 +1,7 @@
-/** Temporary load-shedding switch for the 2026-11-06 classroom incident.
- * Keep the game, authorization, ballots, and general Realtime live.
- * Revert only after comparing actual Supabase request rates and timeout logs.
+/** Temporary load-shedding switches introduced 2026-11-06.
+ * In-game chat restored 2026-11-08 after compute upgrade at owner's request.
+ * Keep lazy chat loading, bounded requests, paging, and existing Realtime.
+ * Telegram remains paused with its DB notification triggers disabled.
  */
-export const CHAT_PAUSED = true;
+export const CHAT_PAUSED = false;
 export const TELEGRAM_PAUSED = true;
