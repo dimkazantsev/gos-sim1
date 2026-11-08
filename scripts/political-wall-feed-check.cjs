@@ -33,6 +33,16 @@ assert(source.includes('nextPoliticalPostCount(current,filtered.length)'),'Show-
 assert(source.includes('Показать ещё'),'Standard expand action must be visible');
 assert(source.includes('Свернуть до 10'),'Collapse action must remain possible');
 assert(source.includes('role="status"'),'Counter must announce displayed/total posts');
+// Users who only read the feed must not trigger get_process_actors or its expensive role checks.
+assert(source.includes('const [actorLookupActive,setActorLookupActive]=useState(false)'),
+ 'Actor catalog must stay inactive until the publication composer opens');
+assert(source.includes('useGameTableSync(!readOnly&&actorLookupActive?game?.id:undefined'),
+ 'Readers and guests must not make the actor permissions RPC');
+assert(source.includes('onToggle={event=>setActorLookupActive(event.currentTarget.open)}'),
+ 'Opening and closing the existing composer must gate actor refresh without design changes');
+assert(source.includes("supabase.rpc('get_process_actors',{p_game_id:game.id})"),
+ 'Publisher selection still obtains the complete server-authorized actor list');
+console.log('PASS actor catalog is loaded only while composing a publication');
 console.log('PASS process feed component wiring');
 
 

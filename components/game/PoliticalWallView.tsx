@@ -49,11 +49,13 @@ export default function PoliticalWallView({g,onOpenVotes,onOpenDocument,onNaviga
  const {game,me,teacher,currentStage,politicalPosts,politicalPostTotal,politicalActorOptions,politicalHasOlder,politicalOlderLoading,politicalSearchLoading,politicalMedia,postFormalLinks,formalDocuments,votes,profiles,names,availableActors}=g;
  const [processType,setProcessType]=useState('statement'),[actorKey,setActorKey]=useState('');
  const [serverActors,setServerActors]=useState<{key:string;label:string}[]|null>(null);
+  // Don't query the privileged actor catalog for every reader of the political feed.
+  const [actorLookupActive,setActorLookupActive]=useState(false);
  const [actorSearch,setActorSearch]=useState('');
  const actorScope=(game?.id||'')+':'+(me?.user_id||'')+':'+(me?.role_title||'')+':'+readOnly;
  const activeActorScope=useRef(actorScope);activeActorScope.current=actorScope;
  useEffect(()=>setServerActors(null),[actorScope]);
- useGameTableSync(readOnly?undefined:game?.id,['game_members','game_office_assignments','game_parties','institution_assignments','institution_units'],async()=>{
+ useGameTableSync(!readOnly&&actorLookupActive?game?.id:undefined,['game_members','game_office_assignments','game_parties','institution_assignments','institution_units'],async()=>{
   if(!game?.id)return;const requestedScope=actorScope;
   const r=await supabase.rpc('get_process_actors',{p_game_id:game.id});
   if(requestedScope===activeActorScope.current&&!r.error&&Array.isArray(r.data))setServerActors(r.data);
@@ -299,7 +301,7 @@ export default function PoliticalWallView({g,onOpenVotes,onOpenDocument,onNaviga
   </section>
   {!teacher&&!readOnly&&<section className="wallStageTask"><div className="wallStageTaskNo">{String(stageNo).padStart(2,'0')}</div><div className="wallStageTaskCopy"><small>Текущий этап</small><h2>{stageAction.title}</h2><p>{stageAction.body}</p></div><button className="primary" onClick={()=>onNavigate(stageAction.target)}>{stageAction.button}</button></section>}
 
-  {!readOnly&&<details ref={composer} className="wallComposer surface">
+  {!readOnly&&<details ref={composer} className="wallComposer surface" onToggle={event=>setActorLookupActive(event.currentTarget.open)}>
    <summary><span className="processSummaryIcon"><Plus size={20}/></span><span><b>Создать публикацию</b><small>Текст, документы, медиа и голосование</small></span><ChevronDown size={20}/></summary>
    <div className="processComposerBody">
     <div className="wallComposerIdentity"><div className="wallAvatar"><PublisherAvatar actorKey={publisherKey} label={publisherLabel} partyLogo={composerParty?.logo_url} avatar={mine?.avatar_url} gender={mine?.gender}/></div><div className="wallActorPicker">
