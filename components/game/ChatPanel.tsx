@@ -77,6 +77,7 @@ export default function ChatPanel({g,draft:text,onDraftChange:setText,previewCha
  const [pendingFile,setPendingFile]=useState<{file:File;gameId:string;channelId:string;userId:string}|null>(null);
  const [recordElapsed,setRecordElapsed]=useState(0);
  const [overlay,setOverlay]=useState(false);
+ const [phonePortal,setPhonePortal]=useState(false);
  const [expanded,setExpanded]=useState(false);
  const [processTagsOpen,setProcessTagsOpen]=useState(false);
  useEffect(()=>{
@@ -189,11 +190,12 @@ export default function ChatPanel({g,draft:text,onDraftChange:setText,previewCha
 
  useEffect(()=>{
   const media=window.matchMedia('(max-width:1099px)');
-  const update=()=>setOverlay(media.matches&&!window.matchMedia('(max-width:900px)').matches);
+  const phone=window.matchMedia('(max-width:900px)');
+  const update=()=>{setOverlay(media.matches&&!phone.matches);setPhonePortal(phone.matches)};
   update();
-  media.addEventListener('change',update);
+  media.addEventListener('change',update);phone.addEventListener('change',update);
   previousFocus.current=document.activeElement instanceof HTMLElement?document.activeElement:null;
-  return()=>{media.removeEventListener('change',update);previousFocus.current?.isConnected&&previousFocus.current.focus()};
+  return()=>{media.removeEventListener('change',update);phone.removeEventListener('change',update);previousFocus.current?.isConnected&&previousFocus.current.focus()};
  },[]);
  useEffect(()=>{
   if(channelId!==lastChannel.current){
@@ -267,6 +269,15 @@ export default function ChatPanel({g,draft:text,onDraftChange:setText,previewCha
    if(!mobile.matches&&!tablet.matches){
     node.style.removeProperty('height');node.style.removeProperty('top');node.style.removeProperty('bottom');return;
    }
+   // Closing the Android keyboard does not always immediately restore visualViewport.
+   // Once no text field is focused, discard the old inline keyboard geometry and
+   // let the CSS bottom-anchored 100dvh chat fill the browser's available area.
+   const active=document.activeElement;
+   const isEditing=!!active&&node.contains(active)&&active.matches('input,textarea,[contenteditable="true"]');
+   if(mobile.matches&&!isEditing){
+    node.style.removeProperty('height');node.style.removeProperty('top');node.style.removeProperty('bottom');
+    sizeComposer();return;
+   }
    const mediumTablet=mobile.matches&&window.matchMedia('(min-width:761px) and (max-width:900px)').matches;
    const headerHeight=mediumTablet?(document.querySelector<HTMLElement>('.simTop')?.getBoundingClientRect().height||0):0;
    // The visible viewport shrinks above the Android/iOS keyboard; the fixed
@@ -291,18 +302,22 @@ export default function ChatPanel({g,draft:text,onDraftChange:setText,previewCha
   align();
   viewport?.addEventListener('resize',schedule);viewport?.addEventListener('scroll',schedule);
   window.addEventListener('resize',schedule);window.addEventListener('orientationchange',schedule);
+  window.addEventListener('pageshow',schedule);
+  document.addEventListener('visibilitychange',schedule);
   document.addEventListener('focusin',onFocus);document.addEventListener('focusout',onFocus);
   mobile.addEventListener('change',schedule);tablet.addEventListener('change',schedule);
   return()=>{
    viewport?.removeEventListener('resize',schedule);viewport?.removeEventListener('scroll',schedule);
    window.removeEventListener('resize',schedule);window.removeEventListener('orientationchange',schedule);
+   window.removeEventListener('pageshow',schedule);
+   document.removeEventListener('visibilitychange',schedule);
    document.removeEventListener('focusin',onFocus);document.removeEventListener('focusout',onFocus);
    mobile.removeEventListener('change',schedule);tablet.removeEventListener('change',schedule);
    if(frame)window.cancelAnimationFrame(frame);
    if(focusTimer!==null)window.clearTimeout(focusTimer);
    node.style.removeProperty('height');node.style.removeProperty('top');node.style.removeProperty('bottom');
   };
- },[expanded,overlay]);
+ },[expanded,overlay,phonePortal]);
  const scrollToLatest=()=>{if(list.current){list.current.scrollTop=list.current.scrollHeight;follow.current=true;setJumpVisible(false)}};
  async function send(){
   const attachment=readyFile;
@@ -547,6 +562,6 @@ export default function ChatPanel({g,draft:text,onDraftChange:setText,previewCha
    </div>
   </div>:<div className="chatGuestNote">Гостевой режим: просмотр переписки без отправки сообщений.</div>}
  </aside>;
- return overlay||expanded?createPortal(chatView,document.body):chatView;
+ return overlay||expanded||phonePortal?createPortal(chatView,document.body):chatView;
 }
 function MessageIcon(){return <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M20 11.5a8 8 0 0 1-8 8 8.2 8.2 0 0 1-3.5-.8L4 20l1.3-4.4A8 8 0 1 1 20 11.5Z"/></svg>}

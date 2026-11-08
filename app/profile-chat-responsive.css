@@ -485,4 +485,6 @@
   border-radius:0;
  }
  body:has(#game-chat) .mobileDock {display:none}
+ /* While composing, Chrome must not scroll the underlying game underneath a portaled chat. */
+ body:has(#game-chat) {overflow:hidden;overscroll-behavior:none}
 }
