@@ -262,7 +262,7 @@ export default function ChatPanel({g,draft:text,onDraftChange:setText,previewCha
   const mobile=window.matchMedia('(max-width:900px)');
   const tablet=window.matchMedia('(min-width:901px) and (max-width:1099px)');
   let frame=0;
-  let focusTimer:ReturnType<typeof setTimeout>|null=null;
+  let focusTimer:number|null=null;
   const align=()=>{
    if(!mobile.matches&&!tablet.matches){
     node.style.removeProperty('height');node.style.removeProperty('top');node.style.removeProperty('bottom');return;
