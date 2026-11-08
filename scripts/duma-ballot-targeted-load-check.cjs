@@ -75,6 +75,20 @@ async function main(){
  }
  const timeout=await ready();timeout.hold();base=timeout.metrics().reads;timeout.emit('office_personal_ballots');await timeout.advance(3001);await timeout.advance(12001);assert(timeout.errors.length,'Timed out targeted reads report an error');const stalled=timeout.metrics().reads;await timeout.advance(6000);assert.equal(timeout.metrics().reads,stalled,'A timeout cannot start a hot loop');timeout.hold(false);timeout.revision(1);timeout.event('online');await timeout.advance(3001);await timeout.settle();assert.equal(timeout.state(0)[0].status,'finished');timeout.release();await timeout.settle();assert.equal(timeout.state(0)[0].status,'finished','A response ignoring abort cannot restore the old round');assert.equal(timeout.state(3).length,2);timeout.close();
  const churn=await ready();const prior=JSON.stringify([churn.state(0),churn.state(2),churn.state(3)]);churn.alternate(true);base=churn.metrics().reads;churn.emit('office_personal_ballots');await churn.advance(3001);await churn.settle();const churnReads=churn.metrics().reads;assert.equal(churnReads-base,21,'Two full retries are the upper limit for continually changing results');assert(churn.errors.some(e=>String(e).includes('продолжают меняться')));assert.equal(JSON.stringify([churn.state(0),churn.state(2),churn.state(3)]),prior,'Unstable reads do not replace the last coherent result');await churn.advance(10000);assert.equal(churn.metrics().reads,churnReads,'Repeated changes do not cause an infinite hot loop');churn.alternate(false);churn.revision(1);churn.emit('office_personal_ballots');await churn.advance(3001);await churn.settle();assert.equal(churn.state(0)[0].status,'finished','A later signal reconciles the pending snapshot');assert.equal(churn.state(3).length,2);churn.close();
+ // Bounded 100-participant virtual classroom: initial snapshot + one burst.
+ // Synthetic request counts only; this does NOT measure a real Supabase socket limit.
+ const hundred=Array.from({length:100},(_,i)=>realm('duma',false,{user:'student-'+i}));
+ await tick();
+ for(const client of hundred){await client.settle();await client.advance(3001);await client.settle()}
+ const hundredStartup=hundred.reduce((sum,client)=>sum+client.metrics().reads,0);
+ assert.equal(hundredStartup,900,'100 virtual participants require 9 initial reads each');
+ for(const client of hundred)for(let i=0;i<8;i++)client.emit('office_personal_ballots');
+ for(const client of hundred){await client.advance(3001);await client.settle()}
+ const hundredAfter=hundred.reduce((sum,client)=>sum+client.metrics().reads,0);
+ const hundredBurst=hundredAfter-hundredStartup;
+ assert.equal(hundredBurst,300,'A burst of eight updates per client coalesces to three reads each');
+ for(const client of hundred)client.close();
+ console.log('GOS_ID_DUMA_100_VIRTUAL '+JSON.stringify({participants:100,initialReads:hundredStartup,ballotUpdatesDelivered:800,followupReads:hundredBurst,synthetic:true,realConnections:0}));
  console.log(JSON.stringify({environment:'40 isolated component realms with different synthetic user IDs, 20 virtual minutes, eight personal-ballot invalidations/s delivered to each; synthetic data, no Auth/HTTP/database load',baseline:baseline||null,before,after,checks:['secret ballot closure and both inter-query orderings','teacher/observer scope simulation','different table events retained','unknown/DELETE signal safety','first subscription/reconnect isolation','online/visibility full recovery','each read failure and 12-second timeout','two bounded reconciliation retries','own mutation full reconciliation']},null,2));
 }
 main().catch(error=>{console.error(error);process.exitCode=1});

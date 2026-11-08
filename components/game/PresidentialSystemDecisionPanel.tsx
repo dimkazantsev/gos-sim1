@@ -1,6 +1,6 @@
 'use client';
 import {userError} from '@/lib/userError';
-import {useEffect,useState} from 'react';
+import {useEffect,useRef,useState} from 'react';
 import {MessageCircle,ClipboardCheck,Vote,LibraryBig} from 'lucide-react';
 import {supabase} from '@/lib/supabase';
 import {useGameTableSync} from './useGameTableSync';
@@ -18,6 +18,11 @@ export default function PresidentialSystemDecisionPanel({g,onOpenVotes,onNavigat
  const [rationale,setRationale]=useState('');
  const [electionDate,setElectionDate]=useState('');
  const [registrations,setRegistrations]=useState<Array<{user_id:string;institution_key:string;stage_no:number}>>([]);
+ const requestedScope=[game?.id,me?.user_id,me?.kind,me?.role_title,stageNo].join(':');
+ const activeScope=useRef(requestedScope);activeScope.current=requestedScope;
+ const requestEpoch=useRef(0);
+ // A previous game's or role's pending response must never fill this procedure.
+ useEffect(()=>{requestEpoch.current++;setRows([]);setRegistrations([])},[requestedScope]);
  const [busy,setBusy]=useState(false);
  const ledParty=parties.find(p=>p.leader_user_id===me?.user_id);
  const canPropose=teacher||!!ledParty;
@@ -27,16 +32,19 @@ export default function PresidentialSystemDecisionPanel({g,onOpenVotes,onNavigat
 
  async function load(){
   if(!game)return;
+  const ticket=++requestEpoch.current,scope=requestedScope;
   const [r,reg]=await Promise.all([
    supabase.from('presidential_system_proposals').select('*').eq('game_id',game.id).order('created_at',{ascending:false}),
    supabase.from('institution_session_registrations').select('user_id,institution_key,stage_no').eq('game_id',game.id).eq('stage_no',stageNo).eq('institution_key',sessionBody)
   ]);
+  if(ticket!==requestEpoch.current||scope!==activeScope.current)return;
   if(!r.error)setRows((r.data||[]) as Proposal[]);
   if(!reg.error)setRegistrations(reg.data||[]);
  }
  useEffect(()=>{if(stageNo===7)setElectionDate(storedElectionDate)},[stageNo,storedElectionDate]);
- // Neither table participates in the postgres_changes publication. Reuse the
- // existing game-scoped invalidation listener and bounded visible reconciliation
+ // Proposal rows are not in the postgres_changes publication. Linked
+ // registration, document and vote changes use the existing shared game listener,
+ // with bounded visible reconciliation
  // rather than opening an inert, additional Realtime channel for every player.
  // Stage 7 renders the already supplied SF resolution only; it never needs
  // the stage-6 proposal and attendance queries.
@@ -44,7 +52,7 @@ export default function PresidentialSystemDecisionPanel({g,onOpenVotes,onNavigat
   // Proposal mutations also create a bill and a vote; those published tables
   // invalidate the view on the shared game channel for other connected users.
   ['presidential_system_proposals','institution_session_registrations','formal_documents','game_votes'],
-  load,[game?.id,me?.user_id,stageNo].join(':'),undefined,3000,180000);
+  load,requestedScope,undefined,3000,180000);
 
  if(!game||!me)return null;
  const activeGame=game;
