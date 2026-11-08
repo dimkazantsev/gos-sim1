@@ -21,6 +21,7 @@ assert(transport.includes('encodeChatAttachmentText(fileName,input.caption)'),'F
 assert(panel.includes('useLayoutEffect(sizeComposer,[text,readyFile])'),'Long input resized before paint');
 assert(panel.includes("const priority='important'"),'Viewport positioning overrides legacy mobile !important CSS');
 assert(css.includes('font-size:16px!important'),'iOS should not zoom for a 13px field');
+assert(css.includes('max-height:calc(100% - 66px)'),'iOS composer must not be clipped to 35dvh');
 const chrome=[process.env.CHROME_BIN,'/usr/bin/google-chrome','/usr/bin/chromium','/usr/bin/chromium-browser'].find(p=>p&&fs.existsSync(p));
 if(!chrome)throw Error('Chromium is required');
 (async()=>{

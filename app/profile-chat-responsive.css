@@ -459,3 +459,12 @@
  border:0;border-radius:8px;background:transparent;color:var(--gs-ink);
 }
 .simChat.gsChatV2 .chatAttachmentCaption{width:100%;max-width:100%;overflow-wrap:anywhere}
+
+/* The old 35dvh composer cap clips its actions above the iOS keyboard.
+   Use the actual chat height instead; the textarea caps itself separately. */
+@media(max-width:900px){
+ .simChat.gsChatV2 .chatCompose.chatComposeCompact{
+  max-height:calc(100% - 66px);
+  overflow:visible;
+ }
+}
