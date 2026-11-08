@@ -10,6 +10,7 @@ import {BookOpen,ChevronDown,CircleAlert,ExternalLink,FileText,PencilLine,Plus,T
 import StyledSelect from '../ui/StyledSelect';
 import ProfileAvatar from './ProfileAvatar';
 import PartyLogoEditor from './PartyLogoEditor';
+import PartyMandateEditor from './PartyMandateEditor';
 import type {PartyDocument} from './types';
 import type {ReturnTypeRepublic} from './viewTypes';
 const DOCS:{kind:PartyDocument['doc_kind'];title:string;template:string}[]=[{kind:'application',title:'Заявление о регистрации',template:'party_application'},{kind:'charter',title:'Устав',template:'party_charter'},{kind:'program',title:'Программа',template:'party_program'},{kind:'fee',title:'Сведения об уплате госпошлины',template:'party_fee'},{kind:'symbol',title:'Символика',template:'party_symbol'},{kind:'congress_minutes',title:'Учредительный съезд',template:'party_congress'}];
@@ -214,6 +215,7 @@ export default function PartiesView({g}:{g:ReturnTypeRepublic}){
        <button className="primary" type="button" disabled={membershipBusy||!membershipCandidates.some(m=>m.user_id===membershipUser)}
         onClick={()=>void managePartyMember('enroll',membershipUser)}>{membershipBusy?'Сохранение…':'Зачислить'}</button>
       </div>
+      <PartyMandateEditor key={selected.id} g={g} party={selected}/>
       {membershipFeedback?.partyId===selected.id&&<p className={'civicPartyInviteFeedback '+(membershipFeedback.kind==='error'?'isError':'isSuccess')}
        role={membershipFeedback.kind==='error'?'alert':'status'}>{membershipFeedback.message}</p>}
      </div>}
