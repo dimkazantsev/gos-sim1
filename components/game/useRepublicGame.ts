@@ -2966,8 +2966,13 @@ export function useRepublicGame(gameId:string){
  }
  async function castVote(v:Vote,choice:'yes'|'no'|'abstain',quantity?:number){const n=quantity??ballotWeight(v);return castVoteAllocation(v,choice==='yes'?n:0,choice==='no'?n:0,choice==='abstain'?n:0)}
  async function setStudentMandates(partyId:string,allocations:Record<string,number>|null){
-  if(!teacher)return false;const r=await supabase.rpc('set_student_mandates',{p_party_id:partyId,p_allocations:allocations});
-  if(r.error){setError(r.error.message);return false}await refresh();return true;
+  if(!teacher)return false;
+  const r=await supabase.rpc('set_student_mandates',{p_party_id:partyId,p_allocations:allocations});
+  if(r.error){setError(r.error.message);return false}
+  // Refresh the affected party/roster projection, not all stages and documents.
+  await loadPartyRepresentation();
+  notifyGameDataRefresh(gameId,'party_member_mandates');
+  return true;
  }
  async function closeVote(id:string,note?:string){
   const procedure=votes.find(v=>v.id===id)?.procedure_key;
