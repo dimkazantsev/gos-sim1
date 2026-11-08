@@ -256,33 +256,50 @@ export default function ChatPanel({g,draft:text,onDraftChange:setText,previewCha
   return()=>document.removeEventListener('pointerdown',click);
  },[attachOpen]);
  useEffect(()=>{
-  const viewport=window.visualViewport,node=panel.current;
-  if(!viewport||!node)return;
+  const node=panel.current;
+  if(!node)return;
+  const viewport=window.visualViewport;
   const mobile=window.matchMedia('(max-width:900px)');
   const tablet=window.matchMedia('(min-width:901px) and (max-width:1099px)');
+  let frame=0;
+  let focusTimer:number|null=null;
   const align=()=>{
    if(!mobile.matches&&!tablet.matches){
     node.style.removeProperty('height');node.style.removeProperty('top');node.style.removeProperty('bottom');return;
    }
-   // Chat covers the full phone screen: never reserve space for the hidden application dock.
-   // Reserve the actual 84px toolbar on medium tablets while allowing for visualViewport
-   // changes due to virtual keyboards and zoom. Phone behavior remains unchanged.
    const mediumTablet=mobile.matches&&window.matchMedia('(min-width:761px) and (max-width:900px)').matches;
    const headerHeight=mediumTablet?(document.querySelector<HTMLElement>('.simTop')?.getBoundingClientRect().height||0):0;
-   // Legacy mobile geometry uses !important; adapt the live sheet with the same
-   // priority only on tablets, preserving the normal phone and desktop styles.
+   // The visible viewport shrinks above the Android/iOS keyboard; the fixed
+   // composer must follow it, not the dock or a stale 100dvh calculation.
+   const height=viewport?viewport.height-headerHeight:window.innerHeight-headerHeight;
+   const top=viewport?.offsetTop??0;
    const priority='important';
-   node.style.setProperty('height',Math.max(0,viewport.height-headerHeight)+'px',priority);
-   node.style.setProperty('top',(viewport.offsetTop+headerHeight)+'px',priority);
+   node.style.setProperty('height',Math.max(0,height)+'px',priority);
+   node.style.setProperty('top',(top+headerHeight)+'px',priority);
    if(mobile.matches)node.style.setProperty('bottom','auto',priority);else node.style.removeProperty('bottom');
    sizeComposer();
   };
+  // Coalesce keyboard-animation resize/scroll events into one layout update per frame.
+  const schedule=()=>{if(frame)return;frame=window.requestAnimationFrame(()=>{frame=0;align()})};
+  // Some Android keyboards finish closing after focusout, without a window resize.
+  // One follow-up measurement handles that transition; no polling is needed.
+  const onFocus=()=>{
+   schedule();
+   if(focusTimer!==null)window.clearTimeout(focusTimer);
+   focusTimer=window.setTimeout(()=>{focusTimer=null;schedule()},350);
+  };
   align();
-  viewport.addEventListener('resize',align);viewport.addEventListener('scroll',align);
-  mobile.addEventListener('change',align);tablet.addEventListener('change',align);
+  viewport?.addEventListener('resize',schedule);viewport?.addEventListener('scroll',schedule);
+  window.addEventListener('resize',schedule);window.addEventListener('orientationchange',schedule);
+  document.addEventListener('focusin',onFocus);document.addEventListener('focusout',onFocus);
+  mobile.addEventListener('change',schedule);tablet.addEventListener('change',schedule);
   return()=>{
-   viewport.removeEventListener('resize',align);viewport.removeEventListener('scroll',align);
-   mobile.removeEventListener('change',align);tablet.removeEventListener('change',align);
+   viewport?.removeEventListener('resize',schedule);viewport?.removeEventListener('scroll',schedule);
+   window.removeEventListener('resize',schedule);window.removeEventListener('orientationchange',schedule);
+   document.removeEventListener('focusin',onFocus);document.removeEventListener('focusout',onFocus);
+   mobile.removeEventListener('change',schedule);tablet.removeEventListener('change',schedule);
+   if(frame)window.cancelAnimationFrame(frame);
+   if(focusTimer!==null)window.clearTimeout(focusTimer);
    node.style.removeProperty('height');node.style.removeProperty('top');node.style.removeProperty('bottom');
   };
  },[expanded,overlay]);
