@@ -3236,13 +3236,13 @@ export function useRepublicGame(gameId:string){
    return false;
   }
  }
- async function storeChatAttachment(blob:Blob,fileName:string,mime:string,kind:'file'|ChatMediaKind,targetChannel:string,voiceMeta?:{duration?:number;waveform?:number[]}){
+ async function storeChatAttachment(blob:Blob,fileName:string,mime:string,kind:'file'|ChatMediaKind,targetChannel:string,voiceMeta?:{duration?:number;waveform?:number[]},caption=''){
   if(!me||!targetChannel){setChatMediaError('Канал недоступен. Повторно откройте чат.');return false}
   const ticket:ReadTicket={gameId,epoch:readEpoch.current,versions:{}};
   if(!readActive(ticket)||authUser.current!==me.user_id)return false;
   setChatMediaError('');
   const result=await sendChatMedia({
-   blob,fileName,mime,kind,voiceMeta,gameId,channelId:targetChannel,userId:me.user_id,
+   blob,fileName,mime,kind,voiceMeta,caption,gameId,channelId:targetChannel,userId:me.user_id,
    pending:pendingChatUploads.current.get(blob),generateId:()=>crypto.randomUUID(),
    onPhase:phase=>{if(readActive(ticket))setChatMediaPhase(phase)},
    transport:{
@@ -3275,11 +3275,11 @@ export function useRepublicGame(gameId:string){
   }
   return true;
  }
- async function sendChatFile(file:File){
+ async function sendChatFile(file:File,caption=''){
   const target=channelId;
   if(!me||!target)return false;
   const mime=inferChatMime(file);
-  return storeChatAttachment(file,file.name,mime,uploadedChatKind(mime),target);
+  return storeChatAttachment(file,file.name,mime,uploadedChatKind(mime),target,undefined,caption);
  }
  function discardRecording(){
   if(videoLimitTimer.current){clearTimeout(videoLimitTimer.current);videoLimitTimer.current=null}
