@@ -10,6 +10,7 @@ on:
       - 'lib/boundedSessionRefresh.ts'
       - 'scripts/verify-supabase-auth-live.mjs'
       - 'scripts/prepare-github-pages.mjs'
+      - 'scripts/report-pages-css.cjs'
       - 'scripts/github-pages-check.mjs'
       - 'scripts/finalize-github-pages-social.mjs'
       - 'scripts/verify-github-pages-live.mjs'
@@ -60,6 +61,8 @@ jobs:
       - run: node scripts/install-github-pages-fallback.mjs
       - run: node scripts/finalize-github-pages-social.mjs
       - run: node scripts/github-pages-check.mjs
+      - name: Measure built CSS without network or extra builds
+        run: node scripts/report-pages-css.cjs
       - uses: actions/upload-pages-artifact@v3
         with:
           path: .pages-build/out

@@ -5,6 +5,9 @@ const migration = fs.readFileSync('supabase/migrations/20261020001000_stage10_mi
 const lab = fs.readFileSync('components/game/StateProgramLab.tsx','utf8');
 const editor = fs.readFileSync('components/game/StateProgramEditor.tsx','utf8');
 assert(lab.includes("institution_assignments").valueOf());
+assert(lab.includes('teacher?Promise.resolve({data:[] as MinistryAssignment[],error:null})'),'Teachers must skip ministry assignment reads');
+assert(lab.includes('teacher?Promise.resolve({data:[] as MinistryUnit[],error:null})'),'Teachers must skip ministry unit reads');
+assert(lab.includes("supabase.from('institution_assignments')")&&lab.includes("supabase.from('institution_units')"),'Participant ministry eligibility reads remain available');
 assert(lab.includes("appointedColleague"));
 assert(lab.includes("selected.responsible_minister_id"));
 assert(editor.includes("expected_updated_at:program.updated_at"));

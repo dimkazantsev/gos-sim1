@@ -47,8 +47,12 @@ export default function StateProgramLab({g}:{g:ReturnTypeRepublic}){
    supabase.from('presidential_addresses').select('*').eq('game_id',game.id).order('created_at',{ascending:false}),
    supabase.from('presidential_priorities').select('*').eq('game_id',game.id).order('priority_no'),
    supabase.from('state_program_budget_years').select('*,amount_text:amount::text').eq('game_id',game.id).order('budget_year'),
-   supabase.from('institution_assignments').select('unit_id,user_id').eq('game_id',game.id).eq('unit_kind','ministry'),
-   supabase.from('institution_units').select('id,head_user_id').eq('game_id',game.id).eq('unit_kind','ministry')
+   // Only participants need ministry membership to inherit a minister's editing rights.
+   // Teachers already have these rights; avoid two unnecessary REST reads per refresh.
+   teacher?Promise.resolve({data:[] as MinistryAssignment[],error:null}):
+    supabase.from('institution_assignments').select('unit_id,user_id').eq('game_id',game.id).eq('unit_kind','ministry'),
+   teacher?Promise.resolve({data:[] as MinistryUnit[],error:null}):
+    supabase.from('institution_units').select('id,head_user_id').eq('game_id',game.id).eq('unit_kind','ministry')
   ]);
   if(!current())return;const failed=results.find(x=>x.error);if(failed?.error){setError(failed.error);return;}
   const [p,gl,c,e,a,pr,by,assigned,units]=results;
