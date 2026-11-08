@@ -43,6 +43,13 @@ async function check(){
   assert.ok((response.headers.get('content-type')||'').includes('text/html'),item.name+' must be HTML');
   checkHead(await response.text(),item.name);
  }
+ // A green deployment status is not enough: GitHub Pages must expose this exact release.
+ // The per-commit query avoids a stale CDN response for release.json.
+ if(process.env.GITHUB_SHA){
+  const releaseResponse=await get(canonical+'release.json?commit='+encodeURIComponent(process.env.GITHUB_SHA));
+  const release=await releaseResponse.json();
+  assert.equal(release.release,process.env.GITHUB_SHA,'Live GitHub Pages is serving an older commit');
+ }
  const route=await get(canonical+'visit/');
  const routeHtml=await route.text();
  assert.ok(routeHtml.includes('property="og:title" content="'+title+'"'),'Shared visit page must show the current title');
