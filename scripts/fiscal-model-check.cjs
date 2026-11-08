@@ -2,12 +2,16 @@ const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('n
 const root=path.resolve(__dirname,'..'),resolve=Module._resolveFilename;
 Module._resolveFilename=function(request,...args){return resolve.call(this,request.startsWith('@/')?path.join(root,request.slice(2)):request,...args)};
 require.extensions['.ts']=(module,file)=>module._compile(ts.transpileModule(fs.readFileSync(file,'utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,esModuleInterop:true,target:ts.ScriptTarget.ES2022}}).outputText,file);
-const {fiscalForecast,fiscalTotal}=require('../components/game/fiscalMath'),{metricQuantity,scenarioMoney}=require('../lib/formatQuantity');
+const {fiscalEnvironment,fiscalForecast,fiscalTotal}=require('../components/game/fiscalMath'),{metricQuantity,scenarioMoney}=require('../lib/formatQuantity');
 const region={region_code:'54',enterprises:1000,employees_per_firm:10,monthly_wage:50000,profit_per_firm:3,consumption_per_firm:4,expenditure:20000,transfer_in:3000,debt:4000,compliance:1,activity_multiplier:1,cost_multiplier:1,profile:'resources'};
 const context={policy:{key_rate:16,fx_rate:80,oil_price:75,cutoff_price:60,inflation:6,federal_expenditure:500000,municipal_expenditure:200000,baseline_economy:50,baseline_trust:50},metrics:{economy:50,public_trust:50},can_change_rate:false};
 const baseline=fiscalForecast(region,[],undefined,context);
 assert.equal(baseline.lines.find(t=>t.key==='profit').amount,750,'1000 firms × 3 million profit × 25% = 750 million');
 const changed=p=>({...context,policy:{...context.policy,...p}});
+assert.equal(fiscalEnvironment(changed({activity_override:150})).activity,1.5,'Teacher manual activity overrides the automatic formula');
+assert.equal(fiscalEnvironment(changed({key_rate:32,activity_override:150})).activity,1.5,'Other macro settings do not overwrite teacher activity');
+assert.equal(fiscalEnvironment(changed({activity_override:null})).activity,fiscalEnvironment(context).activity,'Clearing the override restores the automatic formula');
+assert(fiscalForecast(region,[],undefined,changed({activity_override:150})).federal>baseline.federal,'Manual activity affects tax forecasts');
 const credit=fiscalForecast(region,[],undefined,changed({key_rate:22}));
 assert(credit.federal<baseline.federal,'Expensive credit reduces model activity and receipts');
 assert(credit.expenditure>baseline.expenditure,'Debt servicing responds to key rate');
