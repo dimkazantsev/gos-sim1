@@ -271,11 +271,12 @@ export default function ChatPanel({g,draft:text,onDraftChange:setText,previewCha
    const headerHeight=mediumTablet?(document.querySelector<HTMLElement>('.simTop')?.getBoundingClientRect().height||0):0;
    // The visible viewport shrinks above the Android/iOS keyboard; the fixed
    // composer must follow it, not the dock or a stale 100dvh calculation.
-   const height=viewport?.height??window.innerHeight;
+   const height=viewport?viewport.height-headerHeight:window.innerHeight-headerHeight;
    const top=viewport?.offsetTop??0;
-   node.style.setProperty('height',Math.max(0,height-headerHeight)+'px','important');
-   node.style.setProperty('top',(top+headerHeight)+'px','important');
-   if(mobile.matches)node.style.setProperty('bottom','auto','important');else node.style.removeProperty('bottom');
+   const priority='important';
+   node.style.setProperty('height',Math.max(0,height)+'px',priority);
+   node.style.setProperty('top',(top+headerHeight)+'px',priority);
+   if(mobile.matches)node.style.setProperty('bottom','auto',priority);else node.style.removeProperty('bottom');
    sizeComposer();
   };
   // Coalesce keyboard-animation resize/scroll events into one layout update per frame.
