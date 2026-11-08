@@ -5,6 +5,13 @@ const sql=fs.readFileSync(path.join(__dirname,'..','supabase/migrations/20261029
 const paging=fs.readFileSync(path.join(__dirname,'..','supabase/migrations/20261031100000_metric_history_50_paging.sql'),'utf8');
 const wallPages=fs.readFileSync(path.join(__dirname,'..','supabase/migrations/20261031120000_political_wall_paged_projection.sql'),'utf8');
 const sharedScan=fs.readFileSync(path.join(__dirname,'..','supabase/migrations/20261107163500_political_wall_share_visible_actor_scan.sql'),'utf8');
+const optimized=fs.readFileSync(path.join(__dirname,'..','supabase/migrations/20261108135000_wall_cursor_and_teacher_catalog_cost.sql'),'utf8');
+assert(optimized.includes('STABLE SECURITY INVOKER')&&optimized.includes('actor_pool as materialized'),'Cursor optimization must retain RLS');
+assert(optimized.includes("'total_posts',case when p_cursor_created_at is null then (select count(*) from actor_pool) else null end"),'Cursor must not recount the entire feed');
+assert(optimized.includes('STABLE SECURITY DEFINER')&&optimized.includes("gm.kind<>'observer'"),'Teacher catalog keeps original membership gate');
+for(const title of ['Министерство по социальной политике','Министерство по экономической политике','Министерство по внешней политике','Министерство по обороне и внутренней безопасности','Министерство по внутренней политике и государству'])
+ assert(optimized.includes(title),'Only the five approved ministries remain');
+assert(!optimized.includes("label:=private.process_actor_label(p_game_id,k);\n   result:=result||jsonb_build_array(jsonb_build_object('key',k,'label',label));\n  end loop;\n end if;\n -- Only game-instantiated"),'Portfolio loop must not repeat five permission checks');
 assert(sharedScan.includes('STABLE SECURITY INVOKER'),'Optimized page remains RLS-protected');
 assert(sharedScan.includes('actor_pool as materialized')&&sharedScan.includes('from actor_pool p'),'Count and actor picker share one authorized scan');
 assert(sharedScan.includes("'total_posts',(select count(*) from actor_pool)"),'Post total must keep original RLS semantics');
@@ -53,7 +60,7 @@ async function main(){
   await db.query("insert into public.state_metric_history select ('00000000-0000-4000-8000-'||lpad((4000+n)::text,12,'0'))::uuid,$1,'2026-10-01'::timestamptz+n*interval '1 minute' from generate_series(1,3002)n",[game]);
   await db.query("insert into public.party_support_history select ('00000000-0000-4000-8000-'||lpad((8000+n)::text,12,'0'))::uuid,$1,'2026-10-01'::timestamptz+n*interval '1 minute' from generate_series(1,70)n",[game]);
   await db.query("insert into public.state_metrics values($1,$2,1,10)",[id(600),game]);
-  await db.exec(sql);await db.exec(paging);await db.exec(wallPages);await db.exec(sharedScan);
+  await db.exec(sql);await db.exec(paging);await db.exec(wallPages);await db.exec(sharedScan);await db.exec(optimized);
   async function as(n){await db.exec('reset role');await db.query("select set_config('request.jwt.claim.sub',$1,false)",[n?id(n):'']);await db.exec('set role authenticated');}
   async function read(g=game){return (await db.query('select public.get_political_wall_projection($1) value',[g])).rows[0].value;}
   for(let n=1;n<=42;n++){
@@ -94,6 +101,8 @@ async function main(){
    const last=first.posts.at(-1);
    const second=await readPage(game,last);
    assert.equal(second.posts.length,10,'One more click = ten posts, not 250');
+   assert.equal(second.total_posts,null,'Cursor pages must not rescan all RLS-visible posts');
+   assert.deepEqual(second.actor_options,[],'Cursor pages must not rebuild author options');
    assert.equal(second.metric_history.length,0,'History metrics should not repeat on each older page');
    assert.equal(second.support_history.length,0);
    assert(!second.posts.some(x=>first.posts.some(p=>p.id===x.id)),'Cursor pages cannot overlap');
