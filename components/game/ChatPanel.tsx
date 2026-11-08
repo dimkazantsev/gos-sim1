@@ -17,6 +17,7 @@ import {chatHandles} from './chatHandles';
 import {supabase} from '@/lib/supabase';
 import {userError} from '@/lib/userError';
 import {buildChatEntries,formatChatTime,isChatAttachment,matchChatMessage} from './chatUtils';
+import {decodeChatAttachmentText} from './chatMediaTransport';
 
 const FILE_ACCEPT='image/*,audio/*,video/*,.pdf,.doc,.docx,.txt,.xlsx,.ppt,.pptx';
 const MAX_FILE_SIZE=CHAT_MAX_FILE_BYTES;
@@ -37,18 +38,19 @@ function visibleChatMedia(m:Message,now:number){
  return (m.kind!=='audio'&&m.kind!=='video')||new Date(m.created_at).getTime()+60*60*1000>now;
 }
 function ChatAttachment({message:m,onRefresh}:{message:Message;onRefresh?:(messageId:string,path:string)=>Promise<string|null>}){
+ const fileName=decodeChatAttachmentText(m.text||'').fileName;
  if(!m.url)return <div className="chatAttachmentUnavailable">
   <span>Не удалось открыть вложение</span>
   {m.storage_path&&onRefresh&&<button type="button" onClick={()=>void onRefresh(m.id,m.storage_path!)}>Обновить ссылку</button>}
  </div>;
- if(m.kind==='audio'||m.mime_type?.startsWith('audio/'))return <ChatVoicePlayer src={m.url} messageId={m.id} durationHint={m.voice_meta?.duration} waveform={m.voice_meta?.waveform} fileName={m.text||'Голосовое сообщение'} onRefresh={m.storage_path&&onRefresh?()=>onRefresh(m.id,m.storage_path!):undefined} />;
+ if(m.kind==='audio'||m.mime_type?.startsWith('audio/'))return <ChatVoicePlayer src={m.url} messageId={m.id} durationHint={m.voice_meta?.duration} waveform={m.voice_meta?.waveform} fileName={fileName||'Голосовое сообщение'} onRefresh={m.storage_path&&onRefresh?()=>onRefresh(m.id,m.storage_path!):undefined} />;
  if(m.kind==='video'||m.mime_type?.startsWith('video/'))return <ChatVideoNote src={m.url}/>;
  if(m.mime_type?.startsWith('image/')){
-  return <a className="chatPhoto" href={m.url} target="_blank" rel="noopener noreferrer" aria-label="Открыть изображение в новой вкладке"><img src={m.url} alt={m.text||'Изображение из чата'} loading="lazy"/></a>;
+  return <a className="chatPhoto" href={m.url} target="_blank" rel="noopener noreferrer" aria-label="Открыть изображение в новой вкладке"><img src={m.url} alt={fileName||'Изображение из чата'} loading="lazy"/></a>;
  }
  return <a className="chatDocument" href={m.url} target="_blank" rel="noopener noreferrer">
   <span className="chatDocumentIcon"><FileText aria-hidden="true"/></span>
-  <span className="chatDocumentName"><b>{m.text||'Вложенный документ'}</b><small>{m.mime_type?.includes('pdf')?'PDF':m.mime_type?.includes('word')?'Документ':m.mime_type?.includes('spreadsheet')?'Таблица':'Файл'} · Открыть</small></span>
+  <span className="chatDocumentName"><b>{fileName||'Вложенный документ'}</b><small>{m.mime_type?.includes('pdf')?'PDF':m.mime_type?.includes('word')?'Документ':m.mime_type?.includes('spreadsheet')?'Таблица':'Файл'} · Открыть</small></span>
   <span className="chatDocumentArrow" aria-hidden="true">↗</span>
  </a>;
 }
@@ -72,6 +74,7 @@ export default function ChatPanel({g,draft:text,onDraftChange:setText,previewCha
  const [retentionClock,setRetentionClock]=useState(()=>Date.now());
  useEffect(()=>{const id=window.setInterval(()=>setRetentionClock(Date.now()),15000);return()=>window.clearInterval(id)},[]);
  const [uploading,setUploading]=useState(false);
+ const [pendingFile,setPendingFile]=useState<{file:File;gameId:string;channelId:string;userId:string}|null>(null);
  const [recordElapsed,setRecordElapsed]=useState(0);
  const [overlay,setOverlay]=useState(false);
  const [expanded,setExpanded]=useState(false);
@@ -98,6 +101,7 @@ export default function ChatPanel({g,draft:text,onDraftChange:setText,previewCha
  const list=useRef<HTMLDivElement>(null);
  const restoreHistoryScroll=useRef<{channel:string;height:number;top:number;oldest:string;created:string}|null>(null);
  const composer=useRef<HTMLTextAreaElement>(null);
+ const draftRef=useRef(text);draftRef.current=text;
  const liveCamera=useRef<HTMLVideoElement>(null);
  const mediaHoldTimer=useRef<ReturnType<typeof setTimeout>|null>(null);
  const mediaHold=useRef<{kind:'audio'|'video';started:boolean;released:boolean}|null>(null);
@@ -113,6 +117,8 @@ export default function ChatPanel({g,draft:text,onDraftChange:setText,previewCha
  const pendingSend=useRef(false);
  const panel=useDialog(overlay||expanded,()=>{if(expanded)setExpanded(false);else setChatOpen(false)});
  const channel=channels.find(c=>c.id===channelId);
+ const readyFile=pendingFile?.channelId===channelId&&pendingFile.gameId===g.game?.id&&pendingFile.userId===me?.user_id?pendingFile:null;
+ useEffect(()=>setPendingFile(null),[channelId,g.game?.id,me?.user_id]);
  const showProcessTags=channel?.kind==='public'&&channel.name!=='Вне игры';
  const chatPins=useMemo(()=>allPins.filter(p=>p.channel_id===channelId),[allPins,channelId]);
  const pinnedMessages=useMemo(()=>allPinnedMessages.filter(m=>m.channel_id===channelId&&visibleChatMedia(m,retentionClock)),[allPinnedMessages,channelId,retentionClock]);
@@ -221,12 +227,16 @@ export default function ChatPanel({g,draft:text,onDraftChange:setText,previewCha
   const loaded=await loadOlderChatMessages();
   if(!loaded)restoreHistoryScroll.current=null;
  }
- useEffect(()=>{
-  if(!composer.current)return;
-  const node=composer.current;
-  node.style.height='auto';
-  node.style.height=Math.min(136,Math.max(44,node.scrollHeight))+'px';
- },[text]);
+ function sizeComposer(){
+  const node=composer.current;if(!node)return;
+  // Adjust before paint; leave room for buttons while iOS keyboard is visible.
+  // Longer drafts scroll inside the native textarea without moving the toolbar.
+  const available=window.visualViewport?.height||window.innerHeight;
+  node.style.height='44px';
+  const cap=Math.max(44,Math.min(136,Math.floor(available*.28)));
+  node.style.height=Math.min(cap,Math.max(44,node.scrollHeight))+'px';
+ }
+ useLayoutEffect(sizeComposer,[text,readyFile]);
  useEffect(()=>{if(searchOpen)searchInput.current?.focus()},[searchOpen]);
  useEffect(()=>{
   if(!recordingStartedAt){setRecordElapsed(0);return}
@@ -261,10 +271,11 @@ export default function ChatPanel({g,draft:text,onDraftChange:setText,previewCha
    const headerHeight=mediumTablet?(document.querySelector<HTMLElement>('.simTop')?.getBoundingClientRect().height||0):0;
    // Legacy mobile geometry uses !important; adapt the live sheet with the same
    // priority only on tablets, preserving the normal phone and desktop styles.
-   const priority=mediumTablet?'important':'';
+   const priority='important';
    node.style.setProperty('height',Math.max(0,viewport.height-headerHeight)+'px',priority);
    node.style.setProperty('top',(viewport.offsetTop+headerHeight)+'px',priority);
    if(mobile.matches)node.style.setProperty('bottom','auto',priority);else node.style.removeProperty('bottom');
+   sizeComposer();
   };
   align();
   viewport.addEventListener('resize',align);viewport.addEventListener('scroll',align);
@@ -277,26 +288,36 @@ export default function ChatPanel({g,draft:text,onDraftChange:setText,previewCha
  },[expanded,overlay]);
  const scrollToLatest=()=>{if(list.current){list.current.scrollTop=list.current.scrollHeight;follow.current=true;setJumpVisible(false)}};
  async function send(){
-  if(pendingSend.current||sending||uploading||chatLoading||!text.trim()||!channelId)return;
-  const sentText=text,fromChannel=channelId,mentions=mentionedUsers(text);
+  const attachment=readyFile;
+  if(pendingSend.current||sending||uploading||chatLoading||(!text.trim()&&!attachment)||!channelId)return;
+  const sentText=text,fromChannel=channelId;
   pendingSend.current=true;setSending(true);setLocalError('');
+  if(attachment)setUploading(true);
   try{
-   const ok=await sendText(sentText,fromChannel,mentions);
+   const ok=attachment
+    ?await sendChatFile(attachment.file,sentText)
+    :await sendText(sentText,fromChannel,mentionedUsers(sentText));
    if(ok){
-    if(lastChannel.current===fromChannel&&text===sentText)setText('');
-    follow.current=true;
-    requestAnimationFrame(scrollToLatest);
-   }else setLocalError('Нет подтверждения отправки. Сообщение могло сохраниться — проверьте историю перед повторной отправкой.');
+    if(lastChannel.current===fromChannel){
+     if(draftRef.current===sentText)setText('');
+     if(attachment)setPendingFile(current=>current?.file===attachment.file?null:current);
+    }
+    follow.current=true;requestAnimationFrame(scrollToLatest);
+   }else if(attachment)setLocalError('Не удалось отправить вложение. Файл и текст сохранены для повторной отправки.');
+   else setLocalError('Нет подтверждения отправки. Сообщение могло сохраниться — проверьте историю перед повторной отправкой.');
   }catch{setLocalError('Сообщение не отправлено. Повторите попытку.')}
-  finally{pendingSend.current=false;setSending(false);if(!overlay)composer.current?.focus()}
+  finally{
+   pendingSend.current=false;setSending(false);setUploading(false);
+   // Avoid reopening the iOS keyboard after tapping Send.
+   if(!window.matchMedia('(max-width:900px)').matches&&!overlay)composer.current?.focus();
+  }
  }
- async function upload(file:File){
-  if(!channelId||uploading||recordingSaving)return;
+ function stageAttachment(file:File){
+  if(!channelId||!g.game?.id||!me?.user_id||uploading||sending||recordingSaving)return;
   if(file.size>MAX_FILE_SIZE){setLocalError('Файл превышает 25 МБ. Выберите файл меньшего размера.');return}
-  setLocalError('');setUploading(true);setAttachOpen(false);
-  try{const ok=await sendChatFile(file);if(!ok)setLocalError('Вложение не отправлено. Подробности ниже.');else requestAnimationFrame(scrollToLatest)}
-  catch{setLocalError('Файл не отправлен. Повторите попытку.')}
-  finally{setUploading(false);if(uploadInput.current)uploadInput.current.value=''}
+  setLocalError('');setAttachOpen(false);
+  setPendingFile({file,gameId:g.game.id,channelId,userId:me.user_id});
+  if(uploadInput.current)uploadInput.current.value='';
  }
  async function togglePin(m:Message){
   if(pinBusy)return;
@@ -397,6 +418,7 @@ export default function ChatPanel({g,draft:text,onDraftChange:setText,previewCha
     entries.map(({message:m,startsDay,startsGroup,own,day,dayLabel})=>{
      const name=names[m.author_id]||'Система';
      const attachment=isChatAttachment(m);
+     const caption=attachment?decodeChatAttachmentText(m.text||'').caption:'';
      const showText=!!m.text&&(m.kind==='text'||m.kind==='system');
      return <div className="chatEntry" key={m.id} data-chat-date={day}>
       {startsDay&&<div className="chatDateSeparator"><span>{dayLabel}</span></div>}
@@ -411,6 +433,7 @@ export default function ChatPanel({g,draft:text,onDraftChange:setText,previewCha
         <div className="chatBubble">
          {showText&&<p>{highlightChatText(m.text||'',search)}</p>}
          {attachment&&<ChatAttachment message={m} onRefresh={refreshChatMediaUrl}/>}
+         {caption&&<p className="chatAttachmentCaption">{highlightChatText(caption,search)}</p>}
          {m.kind==='system'&&!showText&&<p>Системное сообщение</p>}
          {!startsGroup&&<time className="chatInlineTime" dateTime={m.created_at}>{formatChatTime(m.created_at)}</time>}
         </div>
@@ -456,11 +479,15 @@ export default function ChatPanel({g,draft:text,onDraftChange:setText,previewCha
   {!readOnly?<div className="chatCompose chatComposeCompact">
    {mentionMatch&&<div className="chatAddressList chatMentionList" aria-label="Упомянуть участника"><small><AtSign size={14} aria-hidden="true"/> Упомянуть в текущем чате</small>{mentionSuggestions.map(x=><button type="button" key={x.member.user_id} onClick={()=>insertMention(x.member.user_id)}><b>{x.member.full_name}</b><span>{x.member.role_title||x.member.team||'Участник'}</span></button>)}{!mentionSuggestions.length&&<span>Участник не найден.</span>}</div>}
    {showProcessTags&&<details id="chat-process-tags" className="chatProcessTags" open={processTagsOpen} onToggle={e=>setProcessTagsOpen(e.currentTarget.open)}><summary>Сообщение для политического процесса</summary><small>Добавьте тег, чтобы направить сообщение в публичную ленту.</small><div aria-label="Теги сообщения">{PROCESS_TAGS.map(t=><button type="button" key={t.key} onClick={()=>{if(!text.includes('#'+t.key))setText(text+(text?' ':'')+'#'+t.key);if(window.matchMedia('(max-width:760px)').matches)setProcessTagsOpen(false);composer.current?.focus()}}>{t.label}</button>)}</div></details>}
+   {readyFile&&<div className="chatPendingAttachment" aria-label="Подготовлено вложение">
+    <Paperclip aria-hidden="true" size={16}/><span title={readyFile.file.name}>{readyFile.file.name} · {formatBytes(readyFile.file.size)}</span>
+    <button type="button" disabled={sending||uploading} aria-label="Убрать вложение" onClick={()=>setPendingFile(null)}><X size={17} aria-hidden="true"/></button>
+   </div>}
    <div className="chatInputRow">
-    <textarea ref={composer} aria-label="Ваше сообщение" rows={1} value={text} onChange={e=>setText(e.target.value)}
+    <textarea ref={composer} aria-label="Ваше сообщение" rows={1} enterKeyHint="enter" value={text} onChange={e=>setText(e.target.value)}
      placeholder={channelId?'Сообщение · @фамилия для упоминания':'Выберите чат'}
      disabled={!channelId||chatLoading} readOnly={sending} aria-busy={sending}
-     onKeyDown={e=>{if(e.key==='Enter'&&!e.shiftKey&&!e.nativeEvent.isComposing){e.preventDefault();void send()}}}/>
+     onKeyDown={e=>{if(e.key==='Enter'&&(e.ctrlKey||e.metaKey)&&!e.nativeEvent.isComposing){e.preventDefault();void send()}}}/>
    </div>
    <div className="chatComposeActions">
     <div className="chatAttachWrap" ref={attachWrap}>
@@ -474,7 +501,7 @@ export default function ChatPanel({g,draft:text,onDraftChange:setText,previewCha
       </button>
      </div>}
      <input ref={uploadInput} type="file" hidden accept={FILE_ACCEPT} aria-label="Выбрать файл для чата"
-      onChange={e=>{const file=e.target.files?.[0];if(file)void upload(file)}}/>
+      onChange={e=>{const file=e.target.files?.[0];if(file)stageAttachment(file)}}/>
     </div>
     <button type="button" className={'chatIconButton chatMediaShortcut '+(recording==='audio'?'isRecording':'')}
      disabled={!channelId||uploading||chatLoading||recordingSaving||!!recordingPreview||recording==='video'}
@@ -498,7 +525,7 @@ export default function ChatPanel({g,draft:text,onDraftChange:setText,previewCha
     {(uploading||recordingSaving||recording)&&<span className="chatComposerHint" aria-live="polite">
      {uploading?'Загружается вложение…':recordingSaving?(chatMediaPhase==='analyzing'?'Анализируется запись…':chatMediaPhase==='uploading'?'Загружается запись…':'Публикуется сообщение…'):'Идёт запись…'}
     </span>}
-    <button type="button" className="chatSendButton iconOnly" disabled={sending||uploading||chatLoading||!text.trim()||!channelId}
+    <button type="button" className="chatSendButton iconOnly" disabled={sending||uploading||chatLoading||(!text.trim()&&!readyFile)||!channelId}
      onClick={()=>void send()} aria-label="Отправить сообщение" title="Отправить"><Send aria-hidden="true" size={20}/></button>
    </div>
   </div>:<div className="chatGuestNote">Гостевой режим: просмотр переписки без отправки сообщений.</div>}

@@ -12,7 +12,7 @@ mod.require=id=>id==='@/lib/userError'?errorExports:requireOriginal(id);
 mod._compile(ts.transpileModule(fs.readFileSync(file,'utf8'),{
  compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}
 }).outputText,file);
-const {sendChatMedia}=mod.exports;
+const {sendChatMedia,encodeChatAttachmentText,decodeChatAttachmentText}=mod.exports;
 const blob=new Blob(['valid media bytes'],{type:'audio/webm;codecs=opus'});
 function input(overrides={}){
  let n=0;const calls={uploads:[],inserts:[],exists:[]};const existing=new Set();
@@ -33,6 +33,14 @@ async function run(){
  assert.equal(success.calls.inserts[0].kind,'audio');
  assert.equal(success.calls.inserts[0].storage_path,success.calls.uploads[0].path);
  console.log('PASS audio blob uploads with bare Storage MIME and publishes original codec metadata');
+ const captioned=input({kind:'file',fileName:'отчёт.pdf',caption:'Первая строка\nВторая строка'});
+ const withCaption=await sendChatMedia(captioned.args);
+ assert(withCaption.ok);
+ assert.equal(captioned.calls.inserts.length,1,'File and caption share one row');
+ assert.deepEqual(decodeChatAttachmentText(captioned.calls.inserts[0].text),{fileName:'отчёт.pdf',caption:'Первая строка\nВторая строка'});
+ assert.equal(encodeChatAttachmentText('файл.png',''),'файл.png');
+ assert.deepEqual(decodeChatAttachmentText('старый.docx'),{fileName:'старый.docx',caption:''});
+ console.log('PASS captioned attachment uses one upload and one message; old media stays readable');
  const wave=input({voiceMeta:{duration:3.2,waveform:Array(36).fill(45)}});
  const waveSent=await sendChatMedia(wave.args);
  assert(waveSent.ok);

@@ -16,7 +16,7 @@ export type MediaTransport={
  exists:(messageId:string)=>Promise<boolean>;
 };
 export type MediaSendInput={
- blob:Blob;fileName:string;mime:string;kind:MediaKind;voiceMeta?:{duration?:number;waveform?:number[]}|null;
+ blob:Blob;fileName:string;mime:string;kind:MediaKind;voiceMeta?:{duration?:number;waveform?:number[]}|null;caption?:string;
  gameId:string;channelId:string;userId:string;
  pending?:PendingMediaUpload;generateId:()=>string;
  onPhase?:(phase:MediaUploadPhase)=>void;
@@ -26,6 +26,15 @@ export type MediaSendResult=
  |{ok:true;pending:PendingMediaUpload}
  |{ok:false;stage:'validation'|'upload'|'message';error:string;pending?:PendingMediaUpload};
 
+/** One media object and one existing message row for file and its caption. */
+export function encodeChatAttachmentText(fileName:string,caption=''){
+ const title=fileName.replace(/[\r\n]+/g,' ').trim(),note=caption.trim();
+ return note?title+'\n\n'+note:title;
+}
+export function decodeChatAttachmentText(value:string){
+ const at=value.indexOf('\n\n');
+ return at<0?{fileName:value,caption:''}:{fileName:value.slice(0,at),caption:value.slice(at+2)};
+}
 export async function sendChatMedia(input:MediaSendInput):Promise<MediaSendResult>{
  const {blob,fileName,mime,kind,gameId,channelId,userId,transport}=input;
  if(!blob.size)return{ok:false,stage:'validation',error:'Запись пуста. Запишите сообщение ещё раз.'};
@@ -53,7 +62,7 @@ export async function sendChatMedia(input:MediaSendInput):Promise<MediaSendResul
  input.onPhase?.('saving');
  const record:MediaRecord={
   id:pending.messageId,game_id:gameId,channel_id:channelId,author_id:userId,
-  kind,text:fileName,storage_path:pending.path,mime_type:mime||null,...(kind==='audio'&&input.voiceMeta?{voice_meta:input.voiceMeta}:{})
+  kind,text:encodeChatAttachmentText(fileName,input.caption),storage_path:pending.path,mime_type:mime||null,...(kind==='audio'&&input.voiceMeta?{voice_meta:input.voiceMeta}:{})
  };
  try{
   const result=await transport.insert(record);
