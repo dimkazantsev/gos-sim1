@@ -20,6 +20,8 @@ assert(hook.includes('caption,gameId,channelId:targetChannel'),'Keep original me
 assert(transport.includes('encodeChatAttachmentText(fileName,input.caption)'),'File and caption use one message row');
 assert(panel.includes('useLayoutEffect(sizeComposer,[text,readyFile])'),'Long input resized before paint');
 assert(panel.includes("const priority='important'"),'Viewport positioning overrides legacy mobile !important CSS');
+assert(panel.includes('if(mobile.matches&&!isEditing)')&&panel.includes("node.style.removeProperty('height');node.style.removeProperty('top');node.style.removeProperty('bottom')"),'Closing Android keyboard must restore CSS-owned full screen height');
+assert(panel.includes('overlay||expanded||phonePortal?createPortal(chatView,document.body):chatView'),'Phone chat must escape transformed or scrolled game ancestors');
 assert(css.includes('font-size:16px!important'),'iOS should not zoom for a 13px field');
 assert(css.includes('max-height:calc(100% - 66px)'),'iOS composer must not be clipped to 35dvh');
 const chrome=[process.env.CHROME_BIN,'/usr/bin/google-chrome','/usr/bin/chromium','/usr/bin/chromium-browser'].find(p=>p&&fs.existsSync(p));
@@ -48,6 +50,20 @@ if(!chrome)throw Error('Chromium is required');
    });
    assert.equal(m.font,'16px','iOS zoom guard at '+width);
    assert(m.inside&&m.after&&m.within,'Buttons must remain below the multiline input at '+width+': '+JSON.stringify(m));
+   // Reproduce a previously shortened visualViewport after Android keyboard closes.
+   // The unfocused path must remove stale inline geometry so the CSS fills the screen.
+   const recovered=await page.evaluate(()=>{
+    const chat=document.querySelector('.simChat');
+    chat.style.setProperty('height','220px','important');
+    chat.style.setProperty('top','0px','important');
+    chat.style.setProperty('bottom','auto','important');
+    const shortGap=innerHeight-chat.getBoundingClientRect().bottom;
+    chat.style.removeProperty('height');chat.style.removeProperty('top');chat.style.removeProperty('bottom');
+    const fullGap=innerHeight-chat.getBoundingClientRect().bottom;
+    return {shortGap,fullGap};
+   });
+   assert(recovered.shortGap>70,'Test must recreate a stale keyboard gap at '+width);
+   assert(Math.abs(recovered.fullGap)<3,'CSS must eliminate the stale keyboard gap at '+width+': '+JSON.stringify(recovered));
    console.log('PASS iPhone-like '+width+'px: multiline editing, 16px input and toolbar below input');
    await page.close();
   }
