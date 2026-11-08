@@ -83,6 +83,7 @@ on:
       - 'app/release-notice.css'
       - 'app/api/telegram/dispatch/route.ts'
       - 'components/game/ChatPanel.tsx'
+      - 'scripts/chat-iphone-composer-check.cjs'
       - 'components/PwaRegistrar.tsx'
       - 'public/sw.js'
       - 'lib/boundedSessionRefresh.ts'
@@ -484,6 +485,7 @@ jobs:
       - run: node scripts/chat-realtime-check.cjs
       - run: node scripts/chat-history-pagination-check.cjs
       - run: node scripts/chat-media-transport-check.cjs
+      - run: node scripts/chat-iphone-composer-check.cjs
       - run: node scripts/telegram-onboarding-check.cjs
       - run: node scripts/telegram-activation-verification-check.cjs
       - run: node scripts/telegram-expanded-check.cjs
