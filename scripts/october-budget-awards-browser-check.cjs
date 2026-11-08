@@ -23,7 +23,7 @@ import type {ReturnTypeRepublic} from '../../components/game/viewTypes';
 const initial=${JSON.stringify(fixture)};initial.members[1].full_name="Миронова Анна";initial.members[2].full_name="Миронова Людмила";initial.members[3].full_name="Илья Тихонов";
 export default function Test(){const [data,setData]=useState(initial),[view,setView]=useState('budget'),[template,setTemplate]=useState(''),[comic,setComic]=useState(false),[notice,setNotice]=useState(''),[chatDraft,setChatDraft]=useState(''),[chatChannel,setChatChannel]=useState(initial.channelId);
  useEffect(()=>{document.body.dataset.iterationReady='yes'},[]);useEffect(()=>{document.body.dataset.iterationTeacher=String(data.teacher)},[data.teacher]);
- const g={...data,refreshDocuments:async(id:string)=>{if(!data.formalDocuments.some((doc:any)=>doc.id===id))throw Error('Unknown selected fixture document')},setError:setNotice,channelId:chatChannel,messages:[],setChannelId:setChatChannel,setChatOpen:(open:boolean)=>{if(!open)setView('budget')},sendText:async(text:string,target=chatChannel,mentions:string[]=[] )=>{setNotice(JSON.stringify({text,channel:target,mentions}));return true},refreshChatDirectory:async()=>setData(old=>({...old,channels:[...initial.channels,...initial.members.slice(1).map(m=>({id:'direct-'+m.user_id,name:m.full_name,kind:'private'}))]})),refresh:async()=>setData(old=>({...old,channels:[...initial.channels,...initial.members.slice(1).map(m=>({id:'direct-'+m.user_id,name:m.full_name,kind:'private'}))]})),createFormalDocument:async(p:any,file?:File)=>{setNotice(JSON.stringify({...p,fileName:file?.name}));const doc={...initial.formalDocuments[0],id:'iteration-doc',title:p.title,body_text:p.bodyText,doc_type:p.docType,subject_key:p.subjectKey,subject_label:p.subjectLabel,author_id:data.me.user_id,stage_no:p.stageNo,status_code:'draft',status_label:'Черновик',metadata:p.metadata};setData(old=>({...old,formalDocuments:[doc,...old.formalDocuments]}));return doc.id}} as unknown as ReturnTypeRepublic;
+ const g={...data,refreshDocuments:async(id:string)=>{if(!data.formalDocuments.some((doc:any)=>doc.id===id))throw Error('Unknown selected fixture document')},setError:setNotice,channelId:chatChannel,messages:[],setChannelId:setChatChannel,setChatOpen:(open:boolean)=>{if(!open)setView('budget')},sendText:async(text:string,target=chatChannel,mentions:string[]=[] )=>{setNotice(JSON.stringify({text,channel:target,mentions}));return true},sendChatFile:async(file:File,caption='')=>{setNotice(JSON.stringify({fileName:file.name,caption,channel:chatChannel}));return true},refreshChatDirectory:async()=>setData(old=>({...old,channels:[...initial.channels,...initial.members.slice(1).map(m=>({id:'direct-'+m.user_id,name:m.full_name,kind:'private'}))]})),refresh:async()=>setData(old=>({...old,channels:[...initial.channels,...initial.members.slice(1).map(m=>({id:'direct-'+m.user_id,name:m.full_name,kind:'private'}))]})),createFormalDocument:async(p:any,file?:File)=>{setNotice(JSON.stringify({...p,fileName:file?.name}));const doc={...initial.formalDocuments[0],id:'iteration-doc',title:p.title,body_text:p.bodyText,doc_type:p.docType,subject_key:p.subjectKey,subject_label:p.subjectLabel,author_id:data.me.user_id,stage_no:p.stageNo,status_code:'draft',status_label:'Черновик',metadata:p.metadata};setData(old=>({...old,formalDocuments:[doc,...old.formalDocuments]}));return doc.id}} as unknown as ReturnTypeRepublic;
  return <main style={{padding:16,maxWidth:1200,margin:'0 auto'}}><nav aria-label='Проверка итерации' style={{display:'flex',gap:8,flexWrap:'wrap',marginBottom:16}}>{['budget','stage','awards','teacher-awards','chat'].map(v=><button key={v} onClick={()=>setView(v)}>{({budget:'Бюджет',stage:'Этап',awards:'Награды','teacher-awards':'Управление наградами',chat:'Чат'} as any)[v]}</button>)}<button onClick={()=>setData(old=>({...old,teacher:!old.teacher,me:old.teacher?initial.members[1]:initial.me}))}>{data.teacher?'Режим студента':'Режим преподавателя'}</button><button onClick={()=>setComic(true)}>Комиксы</button></nav>
  {view==='budget'&&<BudgetView g={g} onOpenDocument={()=>setView('registry')} onOpenEvents={()=>setNotice('События открыты')}/>}
  {view==='stage'&&<StageArtifacts g={g} stage={data.stages[9]} onCreateDocument={key=>{setTemplate(key);setView('registry')}} onOpenDocument={()=>setView('registry')} onOpenVotes={()=>setNotice('Голосования')} onNavigate={()=>setView('budget')} onOpenWork={()=>setView('work')}/>}
@@ -88,8 +88,31 @@ const search=page.getByRole('searchbox',{name:'Поиск сообщений и�
 await page.locator('.chatPeopleResults button').filter({hasText:'Илья Тихонов'}).click();
 await page.waitForFunction(()=>document.querySelector('[aria-label="Ваше сообщение"]')!==null);
 assert.equal(calls.filter(x=>x.rpc==='open_direct_conversation').at(-1).p_recipient,'student-2');
-await input.fill('Уточните сроки');await input.press('Enter');
+await input.fill('Уточните');
+const beforeEnter=await page.locator('#iteration-output').textContent();
+await input.press('Enter');
+assert.equal(await input.inputValue(),'Уточните\n','Enter inserts a newline instead of sending');
+assert.equal(await page.locator('#iteration-output').textContent(),beforeEnter,'Enter does not publish');
+await input.type('сроки');
+await page.getByRole('button',{name:'Отправить сообщение',exact:true}).click();
 await page.waitForFunction(()=>document.querySelector('#iteration-output')?.textContent?.includes('direct-student-2'));
-dm=JSON.parse(await page.locator('#iteration-output').textContent());assert.equal(dm.channel,'direct-student-2');assert.equal(dm.text,'Уточните сроки');
+dm=JSON.parse(await page.locator('#iteration-output').textContent());
+assert.equal(dm.channel,'direct-student-2');assert.equal(dm.text,'Уточните\nсроки');
+const beforeFile=await page.locator('#iteration-output').textContent();
+// The browser fixture runs inside Next dev mode; its diagnostic portal can
+// intercept the paperclip click. The picker handler is tested by setting the
+// actual hidden file input; separate chat geometry checks cover button visibility.
+assert(await page.getByRole('button',{name:'Прикрепить файл',exact:true}).isVisible());
+await page.locator('input[type=file][aria-label="Выбрать файл для чата"]').setInputFiles({
+ name:'заявка.pdf',mimeType:'application/pdf',buffer:Buffer.from('%PDF-1.4\n')
+});
+await page.getByLabel('Подготовлено вложение').waitFor();
+assert.equal(await page.locator('#iteration-output').textContent(),beforeFile,'File selection must not send a separate message');
+await input.fill('Пояснение к файлу');
+await page.getByRole('button',{name:'Отправить сообщение',exact:true}).click();
+await page.waitForFunction(()=>document.querySelector('#iteration-output')?.textContent?.includes('"fileName":"заявка.pdf"'));
+dm=JSON.parse(await page.locator('#iteration-output').textContent());
+assert.equal(dm.channel,'direct-student-2');
+assert.equal(dm.caption,'Пояснение к файлу','Attachment and caption sent together');
 await page.getByRole('button',{name:'Закрыть чат',exact:true}).click();assert.deepEqual(errors,[],'No React/runtime errors at '+width);console.log('PASS '+width+'px: 89 regions, rate/parameters, case, 60 public medals, stage draft linkage, archive');await page.unrouteAll({behavior:'ignoreErrors'});await context.close();}}
 finally{try{await closeTestBrowser(browser)}finally{try{await stopTestServer(server)}finally{cleanTestRoute(root,route)}}}})().catch(e=>{console.error(e);console.error(logs);process.exitCode=1});
