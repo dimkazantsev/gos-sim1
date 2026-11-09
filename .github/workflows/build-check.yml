@@ -163,6 +163,8 @@ on:
       - 'scripts/stage-auto-document-extension-score-check.cjs'
       - 'scripts/stage-decision-vote-document-chain-check.cjs'
       - 'scripts/verified-decision-acts-check.cjs'
+      - 'scripts/stage5-one-vote-one-resolution-check.cjs'
+      - 'supabase/migrations/20261110032600_stage5_one_ghost_vote_one_resolution.sql'
       - 'scripts/stage15-crisis-linked-document-check.cjs'
       - 'scripts/formal-institutional-approval-rights-check.cjs'
       - 'scripts/restore-stage4-teacher-minutes-check.cjs'
@@ -404,6 +406,7 @@ jobs:
       - run: node scripts/stage-auto-document-extension-score-check.cjs
       - run: node scripts/stage-decision-vote-document-chain-check.cjs
       - run: node scripts/verified-decision-acts-check.cjs
+      - run: node scripts/stage5-one-vote-one-resolution-check.cjs
       - run: node scripts/stage15-crisis-linked-document-check.cjs
       - run: node scripts/formal-institutional-approval-rights-check.cjs
       - run: node scripts/restore-stage4-teacher-minutes-check.cjs
