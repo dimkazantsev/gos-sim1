@@ -6,6 +6,7 @@ const {chromium}=require('playwright-core');
 const panel=fs.readFileSync('components/game/ChatPanel.tsx','utf8');
 const picker=fs.readFileSync('components/game/ChatChannelDropdown.tsx','utf8');
 const css=fs.readFileSync('app/profile-chat-responsive.css','utf8');
+const responsiveSiteCss=fs.readFileSync('app/design-readability.css','utf8')+fs.readFileSync('app/mobile-nav-polish.css','utf8')+fs.readFileSync('app/teacher-ui-polish.css','utf8');
 assert(panel.includes('className="chatHeadIcon chatExpandTrigger"')&&panel.includes('onClick={()=>setExpanded(value=>!value)}'),'The message icon must expand chat');
 assert(panel.includes('createPortal(chatView,document.body)'),'Expanded chat must escape the page stacking context');
 assert(panel.includes('expanded={expanded}'));
@@ -92,5 +93,45 @@ async function metrics(page){return page.evaluate(()=>{
   }
   console.log('PASS chat '+width+'px: desktop expansion or phone compact actions and no bottom gap');
   await page.close();
- }}finally{await browser.close()}
+ }
+ // Regression: on phones ChatPanel is portaled to body. The legacy sticky
+ // application header has z-index:89 and used to cover the channel picker
+ // because mobile-nav-polish set the chat to z-index:85.
+ for(const width of [320,390,430,760]){
+  const page=await browser.newPage({viewport:{width,height:780},isMobile:true,hasTouch:true});
+  const phoneFixture='<!doctype html><html lang="ru"><head><meta name="viewport" content="width=device-width,initial-scale=1"><style>'+
+   'body{margin:0}.simWorkspace.chatOpen .simTop{position:sticky;top:0;z-index:89;height:70px;background:#fff}' +
+   '.simChat.gsChatV2 .chatMessages{flex:1;min-height:0}.chatChannelPicker{flex:1;min-width:0}' +
+   responsiveSiteCss+css+'</style></head><body>'+
+   '<div class="simWorkspace chatOpen"><div id="siteHeader" class="simTop">ГОС.ID — навигация</div></div>'+
+   '<aside id="game-chat" class="simChat gsChatV2"><header class="chatTop" id="chatHeader">'+
+   '<span class="chatHeadIcon chatPhoneHeadIcon">☰</span><div class="chatHeadText chatChannelPicker">'+
+   '<span class="chatEyebrow">Общение</span><button class="chatChannelTrigger" id="chooseChannel" type="button">Вне игры</button></div>'+
+   '<button id="searchChat" class="chatIconButton" type="button">Поиск</button><button id="closeChat" type="button">×</button></header>'+
+   '<div class="chatPinnedWrap" id="chatPins">Закреплено</div><div class="chatMessages" id="chatMessages">Сообщения</div>'+
+   '<div class="chatCompose chatComposeCompact" id="chatCompose"><div class="chatInputRow"><textarea></textarea></div></div></aside>'+
+   '<script>window.selectedChannel=false;window.closedChat=false;document.getElementById("chooseChannel").onclick=()=>window.selectedChannel=true;document.getElementById("closeChat").onclick=()=>window.closedChat=true;</script>'+
+   '</body></html>';
+  await page.setContent(phoneFixture);
+  const geometry=await page.evaluate(()=>{
+   const panel=document.getElementById('game-chat'),head=document.getElementById('chatHeader'),pins=document.getElementById('chatPins');
+   const site=document.getElementById('siteHeader'),button=document.getElementById('chooseChannel');
+   const bounds=head.getBoundingClientRect(),b=button.getBoundingClientRect(),pinBounds=pins.getBoundingClientRect();
+   const target=document.elementFromPoint(b.left+b.width/2,b.top+b.height/2);
+   return {headerTop:bounds.top,headerHeight:bounds.height,pinsTop:pinBounds.top,headerBottom:bounds.bottom,
+    chatZ:Number(getComputedStyle(panel).zIndex),siteZ:Number(getComputedStyle(site).zIndex),
+    pickerVisible:target===button||button.contains(target),panelBottom:panel.getBoundingClientRect().bottom,viewport:innerHeight};
+  });
+  assert(geometry.headerTop>=-1&&geometry.headerTop<3&&geometry.headerHeight>=54,'Channel header must fill top of phone '+width+': '+JSON.stringify(geometry));
+  assert(geometry.chatZ>geometry.siteZ&&geometry.pickerVisible,'Chat header must appear above sticky game toolbar at '+width+': '+JSON.stringify(geometry));
+  assert(geometry.pinsTop>=geometry.headerBottom-2,'Pinned messages stay below channel header at '+width);
+  assert(Math.abs(geometry.panelBottom-geometry.viewport)<3,'Phone chat still fills screen at '+width);
+  await page.locator('#chooseChannel').click({timeout:2500});
+  assert(await page.evaluate(()=>window.selectedChannel),'Channel switcher is operable at '+width);
+  await page.locator('#closeChat').click({timeout:2500});
+  assert(await page.evaluate(()=>window.closedChat),'Chat close control is operable at '+width);
+  console.log('PASS portaled phone header '+width+'px: above game header; channel and close controls clickable');
+  await page.close();
+ }
+ }finally{await browser.close()}
 })().catch(e=>{console.error(e);process.exitCode=1});
