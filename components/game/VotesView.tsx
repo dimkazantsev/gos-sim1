@@ -132,7 +132,7 @@ export default function VotesView({g,onOpenDocument,onOpenStages,focusId,onClear
   if(ok){setTitle('');setBody('');setFormalId('')}
  }
 
- function canDelete(v:Vote){return !!me&&(teacher||v.created_by===me.user_id)}
+ function canDelete(v:Vote){return v.result_code!=='superseded'&&!!me&&(teacher||v.created_by===me.user_id)}
  function canClose(v:Vote){
   if(teacher)return true;
   if(!me)return false;
@@ -287,7 +287,7 @@ export default function VotesView({g,onOpenDocument,onOpenStages,focusId,onClear
      {v.voting_mode==='mandate'&&canVote(v)&&<small className="myMandateWeight">Ваш вес в этом голосовании: <b>{v.institution_key==='gd'?gdPresentWeight(v):partyMandates.find(x=>x.user_id===me?.user_id)?.effective_mandates||0}</b> присутствующих депутатских голосов.</small>}
      {canClose(v)&&<button className="primary closeProceduralVote" disabled={busy===v.id} onClick={async()=>{if(!confirm('Закрыть голосование и зафиксировать результат?'))return;setBusy(v.id);await closeVote(v.id);setBusy('')}}>{busy===v.id?'Подсчитываю…':'Закрыть и применить результат →'}</button>}
     </div>:<div className={'finalVoteDecision '+(v.result_code||'')}>
-     <div><small>ИТОГОВОЕ РЕШЕНИЕ</small><strong>{v.result_label||'Голосование завершено'}</strong>{v.decision_note&&<p>{v.decision_note}</p>}</div>
+     <div><small>{v.result_code==='superseded'?'АРХИВ · БЕЗ ПРАВОВЫХ ПОСЛЕДСТВИЙ':'ИТОГОВОЕ РЕШЕНИЕ'}</small><strong>{v.result_label||'Голосование завершено'}</strong>{v.decision_note&&<p>{v.decision_note}</p>}</div>
      <div><span>За <b>{v.result_yes??t.yes}</b></span><span>Против <b>{v.result_no??t.no}</b></span><span>Воздержались <b>{v.result_abstain??t.abstain}</b></span></div>
     </div>}
 
