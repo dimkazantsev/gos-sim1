@@ -164,7 +164,7 @@ on:
       - 'scripts/stage-decision-vote-document-chain-check.cjs'
       - 'scripts/verified-decision-acts-check.cjs'
       - 'scripts/stage5-one-vote-one-resolution-check.cjs'
-      - 'supabase/migrations/20261110032600_stage5_one_ghost_vote_one_resolution.sql'
+      - 'supabase/migrations/20261109210227_stage5_one_ghost_vote_one_resolution.sql'
       - 'scripts/stage15-crisis-linked-document-check.cjs'
       - 'scripts/formal-institutional-approval-rights-check.cjs'
       - 'scripts/restore-stage4-teacher-minutes-check.cjs'
