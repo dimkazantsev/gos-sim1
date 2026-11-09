@@ -25,6 +25,8 @@ DECLARE
  p public.ghost_voting_policies%ROWTYPE;
  doc_id uuid;
  candidate_count integer;
+ previous_status text;
+ previous_owner text;
 BEGIN
  SELECT * INTO v FROM public.game_votes WHERE id=p_vote_id FOR UPDATE;
  IF v.id IS NULL OR v.stage_no<>5 OR v.procedure_key<>'ghost_policy'
@@ -61,7 +63,7 @@ BEGIN
    WHEN 'allowed' THEN d.body_text ~* 'разреш' ELSE false END);
  IF candidate_count<>1 THEN RETURN NULL; END IF;
 
- SELECT d.id INTO doc_id FROM public.formal_documents d
+ SELECT d.id,d.status_code,d.current_owner_key INTO doc_id,previous_status,previous_owner FROM public.formal_documents d
  WHERE d.game_id=v.game_id AND d.stage_no=5
   AND d.doc_type='gd_resolution' AND d.workflow_key='gd_resolution'
   AND d.subject_key='gd' AND d.status_code IN ('draft','agenda')
@@ -93,8 +95,8 @@ BEGIN
  INSERT INTO public.formal_document_history
   (document_id,game_id,actor_id,action,from_status,to_status,from_owner,to_owner,note)
  SELECT doc_id,v.game_id,NULL,
-  'Постановление связано с принятым решением этапа 05', 'agenda','adopted',
-  'gd_council','gd_staff',
+  'Постановление связано с принятым решением этапа 05', previous_status,'adopted',
+  previous_owner,'gd_staff',
   'Первичное голосование: '||v.id||'; результат: '||v.result_label||
   '. Повторного голосования по тому же решению не требуется.';
  RETURN doc_id;
