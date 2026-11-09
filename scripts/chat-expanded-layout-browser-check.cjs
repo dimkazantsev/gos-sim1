@@ -113,6 +113,9 @@ async function metrics(page){return page.evaluate(()=>{
    '<script>window.selectedChannel=false;window.closedChat=false;document.getElementById("chooseChannel").onclick=()=>window.selectedChannel=true;document.getElementById("closeChat").onclick=()=>window.closedChat=true;</script>'+
    '</body></html>';
   await page.setContent(phoneFixture);
+  // Wait for the existing 230ms mobileChatReveal animation before reading
+  // visual geometry; an opening panel intentionally starts offscreen.
+  await page.locator('#game-chat').evaluate(async el=>{await Promise.all(el.getAnimations().map(a=>a.finished))});
   const geometry=await page.evaluate(()=>{
    const panel=document.getElementById('game-chat'),head=document.getElementById('chatHeader'),pins=document.getElementById('chatPins');
    const site=document.getElementById('siteHeader'),button=document.getElementById('chooseChannel');
