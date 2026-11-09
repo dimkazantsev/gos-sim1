@@ -474,6 +474,9 @@
 @media (max-width:760px) {
  .simChat.gsChatV2,
  .simWorkspace:has(.viewAsSwitcher) .simChat.gsChatV2 {
+  /* Above the application's sticky header (z-index:89), even when portaled
+     directly to <body>. Keep the existing chat visual system unchanged. */
+  z-index:200;
   position:fixed;
   inset:0;
   width:100%;
