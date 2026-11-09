@@ -2,7 +2,7 @@ const assert=require('node:assert/strict');
 const fs=require('node:fs');
 const {PGlite}=require('@electric-sql/pglite');
 
-const migration=fs.readFileSync('supabase/migrations/20261110032600_stage5_one_ghost_vote_one_resolution.sql','utf8');
+const migration=fs.readFileSync('supabase/migrations/20261109210227_stage5_one_ghost_vote_one_resolution.sql','utf8');
 const types=fs.readFileSync('components/game/types.ts','utf8');
 const view=fs.readFileSync('components/game/DocumentsView.tsx','utf8');
 const votes=fs.readFileSync('components/game/VotesView.tsx','utf8');
