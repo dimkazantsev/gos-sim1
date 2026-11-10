@@ -22,7 +22,7 @@ async function run(){
    "CREATE TABLE public.game_region_party_control(game_id uuid,region_code text,party_id uuid);",
    "CREATE TABLE public.event_assignments(id uuid PRIMARY KEY DEFAULT gen_random_uuid(),case_id uuid,game_id uuid,recipient_id uuid,created_by uuid,status text DEFAULT 'pending',created_at timestamptz DEFAULT now());",
    "CREATE TABLE public.event_case_outcomes(case_id uuid);",
-   "CREATE FUNCTION private.apply_event_trust(uuid) RETURNS void LANGUAGE plpgsql AS $begin return;end;$;",
+   "CREATE FUNCTION private.apply_event_trust(uuid) RETURNS void LANGUAGE plpgsql AS $$begin return;end;$$;",
    "CREATE FUNCTION private.ensure_event_case_routing(uuid) RETURNS integer LANGUAGE sql AS $$select 0$$;"
   ].join('\n'));
   await db.exec(migration);
