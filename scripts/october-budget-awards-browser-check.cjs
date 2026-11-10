@@ -48,7 +48,7 @@ await page.route('https://*.supabase.co/**',async route=>{const url=route.reques
  if(rpc==='set_fiscal_policy')Object.assign(policy,p.p_values,{updated_at:new Date().toISOString()});
  if(rpc==='get_achievement_catalog_counts')response={total:awardCatalog.length,open:awardCatalog.filter(a=>!a.hidden).length,hidden:awardCatalog.filter(a=>a.hidden).length};
  if(rpc==='get_teacher_achievements')response=awardCatalog;
- if(rpc==='get_teacher_achievement_stats')response=[{user_id:initial.members[1].user_id,opened:awardCatalog[0].hidden?0:1,hidden:awardCatalog[0].hidden?2:1,total:2},{user_id:initial.members[2].user_id,opened:2,hidden:0,total:2}];
+ if(rpc==='get_teacher_achievement_stats')response=[{user_id:fixture.members[1].user_id,opened:awardCatalog[0].hidden?0:1,hidden:awardCatalog[0].hidden?2:1,total:2},{user_id:fixture.members[2].user_id,opened:2,hidden:0,total:2}];
  if(rpc==='set_achievement_visibility')awardCatalog.find(a=>a.id===p.p_achievement_id).hidden=p.p_hidden;
  if(rpc==='get_fiscal_legal_plans')response={plans:[{id:'budget-scenario',title:'Учебный федеральный бюджет',budget_year:2027,source_note:'Учебные миллионы рублей',revenue:12000,expenditure:15000,balance:-3000,debt_end:3500,financing:500,legal_status:'ready',document_id:'budget-doc',registry_no:'ФБ-2027-1',document_status:'Первое чтение',allocations:[{program_id:'program-1',title:'Научное развитие',ministry:'Министерство образования',amount:7000}]}],programs:[{id:'program-1',title:'Научное развитие',ministry:'Министерство образования',total_budget:7000,vote_id:null}]};
  if(rpc==='list_regional_cases')response=[{id:'regional-case-54',title:'Научный аванс',status:'ready',comic_scene:{region_code:'54'}}];
@@ -80,7 +80,7 @@ assert.equal(calls.filter(x=>x.rpc==='get_teacher_achievement_stats').length,0,'
 await page.locator('.teacherAwardsStats .blitzSectionToggle').click();
 await page.locator('.teacherAwardsStats .blitzStatsTable tbody tr').first().waitFor();
 assert.equal(calls.filter(x=>x.rpc==='get_teacher_achievement_stats').length,1,'One lazy aggregate for opened statistics');
-assert.equal(await page.locator('.teacherAwardsStats .blitzStatsTable tbody tr').count(),initial.members.filter(m=>m.kind==='student').length);
+assert.equal(await page.locator('.teacherAwardsStats .blitzStatsTable tbody tr').count(),fixture.members.filter(m=>m.kind==='student').length);
 assert.deepEqual(await page.locator('.teacherAwardsStats .blitzStatsTable tbody tr').first().locator('td').allInnerTexts(),['1','1','2'],'Both visible and secret earned awards count, not whole catalog');
 await page.locator('.teacherAwardsStats .blitzSectionToggle').click();
 await page.locator('.teacherAwardsStats .blitzSectionToggle').click();
