@@ -149,7 +149,7 @@ on:
       - 'components/game/EventChoicePanel.tsx'
       - 'scripts/event-single-correct-explanation-check.cjs'
       - 'scripts/regional-party-case-competence-check.cjs'
-      - 'supabase/migrations/20261110164500_regional_party_competent_fair_dispatch.sql'
+      - 'supabase/migrations/20261110153512_regional_party_competent_fair_dispatch.sql'
       - 'components/game/EventCollaboration.tsx'
       - 'components/game/EventWorkspace.tsx'
       - 'components/game/ClassroomJournal.tsx'

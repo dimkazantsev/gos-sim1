@@ -1,7 +1,7 @@
 const assert=require('node:assert/strict');
 const fs=require('node:fs');
 const {PGlite}=require('@electric-sql/pglite');
-const path='supabase/migrations/20261110164500_regional_party_competent_fair_dispatch.sql';
+const path='supabase/migrations/20261110153512_regional_party_competent_fair_dispatch.sql';
 const migration=fs.readFileSync(path,'utf8');
 const uid=n=>'a0000000-0000-0000-0000-'+String(n).padStart(12,'0');
 
