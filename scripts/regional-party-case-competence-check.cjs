@@ -22,7 +22,7 @@ async function run(){
    "CREATE TABLE public.game_region_party_control(game_id uuid,region_code text,party_id uuid);",
    "CREATE TABLE public.event_assignments(id uuid PRIMARY KEY DEFAULT gen_random_uuid(),case_id uuid,game_id uuid,recipient_id uuid,created_by uuid,status text DEFAULT 'pending',created_at timestamptz DEFAULT now());",
    "CREATE TABLE public.event_case_outcomes(case_id uuid);",
-   "CREATE FUNCTION private.apply_event_trust(uuid) RETURNS void LANGUAGE sql AS $$select null::void$$;",
+   "CREATE FUNCTION private.apply_event_trust(uuid) RETURNS void LANGUAGE plpgsql AS $begin return;end;$;",
    "CREATE FUNCTION private.ensure_event_case_routing(uuid) RETURNS integer LANGUAGE sql AS $$select 0$$;"
   ].join('\n'));
   await db.exec(migration);
@@ -54,7 +54,7 @@ async function run(){
   await db.query("UPDATE public.event_auto_settings SET last_run_at=now()-interval '2 hours' WHERE game_id=$1",[game]);
   const tooSoon=(await db.query('SELECT private.run_game_autopilot($1) AS value',[game])).rows[0].value;
   assert.equal(tooSoon.reason,'game_cooldown');
-  assert.equal((await db.query('SELECT count(*) AS n FROM public.event_assignments WHERE game_id=$1',[game])).rows[0].n,1);
+  assert.equal((await db.query('SELECT count(*)::int AS n FROM public.event_assignments WHERE game_id=$1',[game])).rows[0].n,1);
 
   await db.query("UPDATE public.event_auto_settings SET last_run_at=now()-interval '2 hours',last_dispatched_at=now()-interval '13 hours' WHERE game_id=$1",[game]);
   const second=(await db.query('SELECT private.run_game_autopilot($1) AS value',[game])).rows[0].value;
@@ -79,7 +79,7 @@ async function run(){
   await db.query("INSERT INTO public.game_region_party_control VALUES($1,'03',$2)",[game2,party2]);
   const noGov=(await db.query('SELECT private.run_game_autopilot($1) AS value',[game2])).rows[0].value;
   assert.equal(noGov.sent,0);
-  assert.equal((await db.query('SELECT count(*) AS n FROM public.event_assignments WHERE game_id=$1',[game2])).rows[0].n,0);
+  assert.equal((await db.query('SELECT count(*)::int AS n FROM public.event_assignments WHERE game_id=$1',[game2])).rows[0].n,0);
   console.log('PASS: party routing, one-per-game cooldown, legal regional office, party rotation, no unqualified decisions, no extra cron.');
  }finally{await db.close()}
 }
