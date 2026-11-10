@@ -36,15 +36,19 @@ export default function TeacherAwards({g}:{g:ReturnTypeRepublic}){
   if(!g.teacher||!gameId||!statsOpen||!students.length||statsForGame===gameId)return;
   let live=true;
   setStatsBusy(true);setStatsError('');
-  void supabase.rpc('get_teacher_achievement_stats',{p_game_id:gameId}).then(({data,error:loadError})=>{
-   if(!live)return;
-   setStatsBusy(false);
-   if(loadError){setStatsError(userError(loadError));return}
-   setStats((data||[]) as StudentAwardStats[]);
-   setStatsForGame(gameId);
-  }).catch(loadError=>{
-   if(live){setStatsBusy(false);setStatsError(userError(loadError))}
-  });
+  void (async()=>{
+   try{
+    const {data,error:loadError}=await supabase.rpc('get_teacher_achievement_stats',{p_game_id:gameId});
+    if(!live)return;
+    if(loadError){setStatsError(userError(loadError));return}
+    setStats((data||[]) as StudentAwardStats[]);
+    setStatsForGame(gameId);
+   }catch(loadError){
+    if(live)setStatsError(userError(loadError));
+   }finally{
+    if(live)setStatsBusy(false);
+   }
+  })();
   return ()=>{live=false};
  },[gameId,g.teacher,statsOpen,students.length,statsForGame,statsRevision]);
 
