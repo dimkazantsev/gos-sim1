@@ -111,7 +111,7 @@ BEGIN
  THEN RAISE EXCEPTION 'Маршрутизация неполна: всего %, региональных %',v_existing,v_regional; END IF;
  RETURN v_added;
 END;
-$function$
+$function$;
 
 
 -- Existing run_game_autopilot RPC, executed by the SAME hourly pg_cron job:
@@ -214,7 +214,7 @@ begin
  where game_id=p_game;
  perform private.apply_event_trust(p_game);
  return jsonb_build_object('sent',dispatched,'checked_at',v_now);
-end $function$
+end $function$;
 
 
 -- Update only as-yet-unissued, validated cases in the active game.
