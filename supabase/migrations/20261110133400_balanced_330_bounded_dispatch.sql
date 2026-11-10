@@ -3,6 +3,7 @@
 -- Schema: one timestamp in the existing settings row, no new client RPCs or
 -- subscriptions. This replaces, not duplicates, the existing hourly dispatcher.
 -- Earlier migration fixes 330 approved source cases and their individual roles.
+-- The six purpose-built crisis cases remain first available at stage 15.
 SET LOCAL statement_timeout = '15s';
 
 DO $verify$
@@ -40,7 +41,7 @@ CREATE OR REPLACE FUNCTION private.ensure_event_case_routing(p_game uuid)
  SET search_path TO 'public', 'private', 'pg_temp'
 AS $function$
 DECLARE
- v_stage_codes constant text:='eaae9999eeeaa989eaea99aa9a9aa849aa59eaa999a99aa4e99e5999a5e9ae998ae99959e9eee99e999ee99e9e9e9eae998e89ee9eee99e9a94ea98a99aae86e9d44e6d8a695de9aadddddddddddddddddddgdddddddddddddgdddddddddddgddddddgddddddddgddddddddddddddddgdddddddgddcc4ccccc1177ccccccbabbaaaaaaaagbbbddcbccbcbbcccceacb1bccbbcbbad4e4dddddddddddddddddddddddddddddd';
+ v_stage_codes constant text:='eaae9999eeeaa989eaeaf9aa9a9aa849aa59eaaf9fa99aa4e99e5999a5e9ae998ae99959e9eee99e999ee99e9e9e9eae998e89ee9eee99e9a94ea98affaae86efd44e6d8a695de9aadddddddddddddddddddgdddddddddddddgdddddddddddgddddddgddddddddgddddddddddddddddgdddddddgddcc4ccccc1177ccccccbabbaaaaaaaagbbbddcbccbcbbcccceacb1bccbbcbbad4e4dddddddddddddddddddddddddddddd';
  v_org_codes constant text:='56857777575897g77g58d46g9g79bg83g95986gd4867a6b1gd3514ba8d5gb5dbg857gb1h5g555g7555g557g5g575g59577g5g7757555775797g59g68949d5bb54bg857b68g4gb5468eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeifiii0ffff22fffffffffffffffffffffffffffffiffiiiiffff0fiifffff8bg57eeeeeeeeeeeeeeeeeeeeeeeecccccc';
  v_total int;v_known int;v_existing int;v_added int:=0;v_regional int;
 BEGIN
@@ -228,7 +229,7 @@ WITH numbered AS (
  WHERE ec.game_id='068dac89-00ea-447a-96bf-0cb11d85014a'
 ), proposals AS (
  SELECT n.game_id,n.id,
-  strpos('0123456789abcdefghijklmnopqrstuv',substr('eaae9999eeeaa989eaea99aa9a9aa849aa59eaa999a99aa4e99e5999a5e9ae998ae99959e9eee99e999ee99e9e9e9eae998e89ee9eee99e9a94ea98a99aae86e9d44e6d8a695de9aadddddddddddddddddddgdddddddddddddgdddddddddddgddddddgddddddddgddddddddddddddddgdddddddgddcc4ccccc1177ccccccbabbaaaaaaaagbbbddcbccbcbbcccceacb1bccbbcbbad4e4dddddddddddddddddddddddddddddd',n.rn::int,1))-1 AS new_stage
+  strpos('0123456789abcdefghijklmnopqrstuv',substr('eaae9999eeeaa989eaeaf9aa9a9aa849aa59eaaf9fa99aa4e99e5999a5e9ae998ae99959e9eee99e999ee99e9e9e9eae998e89ee9eee99e9a94ea98affaae86efd44e6d8a695de9aadddddddddddddddddddgdddddddddddddgdddddddddddgddddddgddddddddgddddddddddddddddgdddddddgddcc4ccccc1177ccccccbabbaaaaaaaagbbbddcbccbcbbcccceacb1bccbbcbbad4e4dddddddddddddddddddddddddddddd',n.rn::int,1))-1 AS new_stage
  FROM numbered n
 )
 UPDATE public.event_case_routing r
