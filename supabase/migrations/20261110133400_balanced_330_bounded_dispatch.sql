@@ -219,6 +219,8 @@ end $function$;
 
 -- Update only as-yet-unissued, validated cases in the active game.
 -- All already assigned, resolved or historically documented cases are immutable.
+-- One previously assigned document/protocol case remains on its old stage 09 in
+-- the current game, but new games use the approved earlier stage 04.
 WITH numbered AS (
  SELECT ec.game_id,ec.id,ec.case_key,
         row_number() OVER (PARTITION BY ec.game_id ORDER BY ec.case_key) AS rn
@@ -244,7 +246,8 @@ BEGIN
  SELECT count(*),count(*) FILTER(WHERE earliest_stage<=5)
  INTO v_count,v_changed FROM public.event_case_routing
  WHERE game_id='068dac89-00ea-447a-96bf-0cb11d85014a';
- IF v_count<>330 OR v_changed<>16 THEN
+ -- An already assigned case (bank-records) retains its historical stage 09.
+ IF v_count<>330 OR v_changed<>15 THEN
   RAISE EXCEPTION 'Route verification failed: count %, early %',v_count,v_changed;
  END IF;
  SELECT count(*) INTO v_audit FROM public.event_case_routing
