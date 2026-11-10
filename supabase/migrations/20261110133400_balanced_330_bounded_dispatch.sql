@@ -10,14 +10,21 @@ DO $verify$
 DECLARE
   v_count int; v_hash text;
 BEGIN
+  IF (SELECT count(*) FROM public.games gx WHERE gx.status='running'
+   AND (SELECT count(*) FROM public.event_case_routing rx WHERE rx.game_id=gx.id)=330)<>1
+  THEN RAISE EXCEPTION 'Expected one active 330-case game; abort ambiguous rerouting'; END IF;
   SELECT count(*),md5(string_agg(ec.case_key||':'||r.earliest_stage,',' ORDER BY ec.case_key))
    INTO v_count,v_hash
   FROM public.event_case_routing r JOIN public.event_cases ec ON ec.id=r.case_id
-  WHERE r.game_id='068dac89-00ea-447a-96bf-0cb11d85014a';
+  WHERE r.game_id=(SELECT g0.id FROM public.games g0 WHERE g0.status='running'
+ AND (SELECT count(*) FROM public.event_case_routing x0 WHERE x0.game_id=g0.id)=330
+ ORDER BY g0.created_at DESC LIMIT 1);
   IF v_count<>330 OR v_hash<>'81daae4aa7dbe53df45311c9cd34c0a4' THEN
     RAISE EXCEPTION 'Routing changed since review; abort, expected 330 unchanged source cases';
   END IF;
-  IF (SELECT count(*) FROM public.event_cases WHERE game_id='068dac89-00ea-447a-96bf-0cb11d85014a')<>330
+  IF (SELECT count(*) FROM public.event_cases WHERE game_id=(SELECT g0.id FROM public.games g0 WHERE g0.status='running'
+ AND (SELECT count(*) FROM public.event_case_routing x0 WHERE x0.game_id=g0.id)=330
+ ORDER BY g0.created_at DESC LIMIT 1))<>330
   THEN RAISE EXCEPTION 'Case bank changed; refuse incomplete rebalancing'; END IF;
 END $verify$;
 
@@ -226,7 +233,9 @@ WITH numbered AS (
  SELECT ec.game_id,ec.id,ec.case_key,
         row_number() OVER (PARTITION BY ec.game_id ORDER BY ec.case_key) AS rn
  FROM public.event_cases ec
- WHERE ec.game_id='068dac89-00ea-447a-96bf-0cb11d85014a'
+ WHERE ec.game_id=(SELECT g0.id FROM public.games g0 WHERE g0.status='running'
+ AND (SELECT count(*) FROM public.event_case_routing x0 WHERE x0.game_id=g0.id)=330
+ ORDER BY g0.created_at DESC LIMIT 1)
 ), proposals AS (
  SELECT n.game_id,n.id,
   strpos('0123456789abcdefghijklmnopqrstuv',substr('eaae9999eeeaa989eaeaf9aa9a9aa849aa59eaaf9fa99aa4e99e5999a5e9ae998ae99959e9eee99e999ee99e9e9e9eae998e89ee9eee99e9a94ea98affaae86efd44e6d8a695de9aadddddddddddddddddddgdddddddddddddgdddddddddddgddddddgddddddddgddddddddddddddddgdddddddgddcc4ccccc1177ccccccbabbaaaaaaaagbbbddcbccbcbbcccceacb1bccbbcbbad4e4dddddddddddddddddddddddddddddd',n.rn::int,1))-1 AS new_stage
@@ -246,17 +255,23 @@ DECLARE v_count int;v_changed int;v_audit int; v_assigned int;
 BEGIN
  SELECT count(*),count(*) FILTER(WHERE earliest_stage<=5)
  INTO v_count,v_changed FROM public.event_case_routing
- WHERE game_id='068dac89-00ea-447a-96bf-0cb11d85014a';
+ WHERE game_id=(SELECT g0.id FROM public.games g0 WHERE g0.status='running'
+ AND (SELECT count(*) FROM public.event_case_routing x0 WHERE x0.game_id=g0.id)=330
+ ORDER BY g0.created_at DESC LIMIT 1);
  -- An already assigned case (bank-records) retains its historical stage 09.
  IF v_count<>330 OR v_changed<>15 THEN
   RAISE EXCEPTION 'Route verification failed: count %, early %',v_count,v_changed;
  END IF;
  SELECT count(*) INTO v_audit FROM public.event_case_routing
- WHERE game_id='068dac89-00ea-447a-96bf-0cb11d85014a' AND earliest_stage=16 AND latest_stage=16;
+ WHERE game_id=(SELECT g0.id FROM public.games g0 WHERE g0.status='running'
+ AND (SELECT count(*) FROM public.event_case_routing x0 WHERE x0.game_id=g0.id)=330
+ ORDER BY g0.created_at DESC LIMIT 1) AND earliest_stage=16 AND latest_stage=16;
  IF v_audit<>8 THEN RAISE EXCEPTION 'Final audit cases lost: %',v_audit; END IF;
  SELECT count(*) INTO v_assigned FROM public.event_assignments a
  JOIN public.event_case_routing r ON r.case_id=a.case_id AND r.game_id=a.game_id
- WHERE a.game_id='068dac89-00ea-447a-96bf-0cb11d85014a'
+ WHERE a.game_id=(SELECT g0.id FROM public.games g0 WHERE g0.status='running'
+ AND (SELECT count(*) FROM public.event_case_routing x0 WHERE x0.game_id=g0.id)=330
+ ORDER BY g0.created_at DESC LIMIT 1)
   AND r.earliest_stage IN(4,5,6,16);
  IF v_assigned<>0 THEN
   RAISE EXCEPTION 'Historical case was rescheduled: %',v_assigned;
