@@ -14,6 +14,7 @@ function deferred(){let resolve;const promise=new Promise(done=>resolve=done);re
 
 function harness({effects=false,compiledCode=code}={}){
  const slots=[],pendingEffects=[],channels=[],timers=new Map(),listeners=new Map(),counts=new Map(),holds=new Map(),failures=new Set(),failureCodes=new Map();
+ let roomLeaveHold=null;
  let cursor=0,dirty=false,revision=1,user='teacher-a',memberKind='teacher',gameId='game-a',authCallback,authError=null,clock=0,requests=0,disposed=false,recorders=0,stoppedTracks=0,withBallots=false,assetPaths=false,signed=0,activeSigns=0,peakSigns=0,batchCalls=0;
  let virtualNow=Date.parse('2026-10-26T00:00:00Z'),responseBytes=0,aborted=0,ignoreAbort=false,failFuturePresenceTrack=false;
  const started=new Map(),notices=[],docListeners=new Map(),fixtures=new Map(),queryLog=[],rpcFailures=new Map();
@@ -35,7 +36,7 @@ function harness({effects=false,compiledCode=code}={}){
   },
   realtime:{setAuth:async()=>{}},
   channel(topic,options){const handlers=[],presence={tracks:0,untracks:0,payloads:[],result:failFuturePresenceTrack?'error':'ok',nextHold:null,heldTrack:null};const channel={topic,options,presence,on(kind,filter,callback){handlers.push({kind,filter,callback});return this;},subscribe(callback){this.statusCallback=callback;callback?.('SUBSCRIBED');return this;},track:async payload=>{presence.tracks++;presence.payloads.push(payload);if(presence.nextHold){const hold=presence.nextHold;presence.nextHold=null;presence.heldTrack=hold;await hold.promise;presence.heldTrack=null;}return presence.result;},untrack:async()=>{presence.untracks++;return 'ok';},handlers};channels.push(channel);return channel;},
-  removeChannel:async channel=>{const index=channels.indexOf(channel);if(index!==-1)channels.splice(index,1);},
+  removeChannel:async channel=>{const hold=roomLeaveHold;if(hold)await hold.promise;const index=channels.indexOf(channel);if(index!==-1)channels.splice(index,1);},
   from(table){
    requests++;const number=(counts.get(table)||0)+1;counts.set(table,number);
    const snapshot={revision,user,gameId,memberKind},fixtureSnapshot=fixtures.has(table)?JSON.parse(JSON.stringify(fixtures.get(table))):null;
@@ -269,6 +270,8 @@ function harness({effects=false,compiledCode=code}={}){
   channelsInfo(){return channels.map(channel=>({topic:channel.topic,private:channel.options?.config?.private===true,tracked:channel.presence.tracks,untracked:channel.presence.untracks,presencePayloads:channel.presence.payloads,handlers:channel.handlers.map(item=>({kind:item.kind,event:item.filter.event,table:item.filter.table}))}))},
   channelStatus(status){for(const channel of channels)channel.statusCallback?.(status)},
   holdNextPresenceTrack(){for(const channel of channels)channel.presence.nextHold=deferred()},
+  holdRoomLeave(){roomLeaveHold=deferred()},
+  releaseRoomLeave(){roomLeaveHold?.resolve();roomLeaveHold=null},
   releasePresenceTrack(){for(const channel of channels)channel.presence.heldTrack?.resolve()},
   failPresenceTrack(){failFuturePresenceTrack=true;for(const channel of channels)channel.presence.result='error'},
   auth(event,nextUser){user=nextUser;const before=requests;authCallback?.(event,nextUser?{user:{id:nextUser}}:null);assert.equal(requests,before,'Auth callback must schedule Supabase I/O outside its synchronous callback.');},
