@@ -86,6 +86,24 @@ async function main(){
    assert(h.stats().activeIntervals>=2,
     'Timers resume only after the page is visible');
   }
+  // The old channel may take seconds to acknowledge its leave. In that case
+  // no duplicate room may be constructed until the leave is complete.
+  const delayed=harness({effects:true});
+  try{
+   await delayed.settle();
+   delayed.holdRoomLeave();
+   delayed.visible('hidden');
+   await delayed.advance(300001);
+   assert.equal(delayed.channelsInfo().length,1,'Old room remains until the server ACK');
+   delayed.visible('visible');
+   await delayed.settle();
+   assert.equal(delayed.channelsInfo().length,1,'No replacement room while old leave is pending');
+   delayed.releaseRoomLeave();
+   await delayed.settle();
+   assert.equal(delayed.channelsInfo().length,1,'Precisely one new private room after delayed leave');
+   assert(delayed.channelsInfo()[0].private,'A rejoined room must still be private');
+  }finally{delayed.releaseRoomLeave();delayed.dispose()}
+  console.log('PASS: delayed unsubscribe acknowledgment cannot create overlapping same-topic rooms.');
   console.log('PASS: 100 clients, 4 minutes hidden retain push, 10 minutes hidden release 100 private subscriptions, 0 REST requests.');
   console.log('PASS: 100 clients reconnect one private game channel with scoped recovery and no full game bootstrap.');
  }finally{clients.forEach(h=>h.dispose());}
