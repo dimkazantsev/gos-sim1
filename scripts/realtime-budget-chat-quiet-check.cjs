@@ -3,7 +3,7 @@
 const assert=require('node:assert/strict');
 const fs=require('node:fs');
 const {PGlite}=require('@electric-sql/pglite');
-const migration=fs.readFileSync('supabase/migrations/20261111133000_political_broadcast_idle_telegram.sql','utf8');
+const migration=fs.readFileSync('supabase/migrations/20261111130451_political_broadcast_idle_telegram.sql','utf8');
 const game=fs.readFileSync('components/game/useRepublicGame.ts','utf8');
 const budget=fs.readFileSync('components/game/useBudgetPulse.ts','utf8');
 const freeze=fs.readFileSync('lib/featureFreeze.ts','utf8');
