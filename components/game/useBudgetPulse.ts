@@ -13,17 +13,34 @@ export const budgetModeLabel=(mode:BudgetPulse['mode'])=>({baseline:'Исход�
 export function useBudgetPulse(gameId:string,enabled:boolean){
  const [pulse,setPulse]=useState<BudgetPulse|null>(null),[error,setError]=useState('');
  const scope=useRef({gameId,enabled}),request=useRef(0),alive=useRef(false);
+ // One calculation in flight per mounted game view. Concurrent invalidations
+ // request at most one trailing reconciliation, rather than a new RPC each.
+ const inFlight=useRef<{gameId:string;rerun:boolean;promise:Promise<void>}|null>(null);
  scope.current={gameId,enabled};
  const refresh=useCallback(async()=>{
   if(!enabled||!gameId||!alive.current)return;
-  const ticket=++request.current;
-  try{
-   const r=await supabase.rpc('get_budget_pulse',{p_game_id:gameId});
-   if(!alive.current||ticket!==request.current||scope.current.gameId!==gameId||!scope.current.enabled)return;
-   if(r.error)throw r.error;
-   if(r.data?.game_id!==gameId||!Number.isFinite(Number(r.data?.calculation?.revenue)))throw new Error('Не удалось получить общий расчет доходов бюджета.');
-   setPulse(r.data as BudgetPulse);setError('');
-  }catch(e){if(alive.current&&ticket===request.current&&scope.current.gameId===gameId)setError(userError(e));}
+  const running=inFlight.current;
+  if(running?.gameId===gameId){
+   running.rerun=true; // A save during a slow read must not be lost.
+   return running.promise;
+  }
+  const state={gameId,rerun:false,promise:Promise.resolve()};
+  const work=async()=>{
+   do{
+    state.rerun=false;
+    const ticket=++request.current;
+    try{
+     const r=await supabase.rpc('get_budget_pulse',{p_game_id:gameId});
+     if(!alive.current||ticket!==request.current||scope.current.gameId!==gameId||!scope.current.enabled)return;
+     if(r.error)throw r.error;
+     if(r.data?.game_id!==gameId||!Number.isFinite(Number(r.data?.calculation?.revenue)))throw new Error('Не удалось получить общий расчет доходов бюджета.');
+     setPulse(r.data as BudgetPulse);setError('');
+    }catch(e){if(alive.current&&ticket===request.current&&scope.current.gameId===gameId)setError(userError(e));}
+   }while(state.rerun&&alive.current&&scope.current.enabled&&scope.current.gameId===gameId);
+  };
+  state.promise=work();
+  inFlight.current=state;
+  try{await state.promise}finally{if(inFlight.current===state)inFlight.current=null}
  },[gameId,enabled]);
  useEffect(()=>{
   alive.current=true;setPulse(null);setError('');
