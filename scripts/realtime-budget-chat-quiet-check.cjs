@@ -5,6 +5,7 @@ const fs=require('node:fs');
 const {PGlite}=require('@electric-sql/pglite');
 const migration=fs.readFileSync('supabase/migrations/20261111130451_political_broadcast_idle_telegram.sql','utf8');
 const batchMigration=fs.readFileSync('supabase/migrations/20261111142758_political_statement_invalidation.sql','utf8');
+const receiptMigration=fs.readFileSync('supabase/migrations/20261111145000_chat_read_receipt_noop.sql','utf8');
 const game=fs.readFileSync('components/game/useRepublicGame.ts','utf8');
 const budget=fs.readFileSync('components/game/useBudgetPulse.ts','utf8');
 const freeze=fs.readFileSync('lib/featureFreeze.ts','utf8');
@@ -66,7 +67,45 @@ async function run(){
   assert.deepEqual(batchRows.slice(1,3).map(x=>x.topic).sort(),['gos-id-live:'+gameA,'gos-id-live:'+gameB].sort(),'Both rooms are invalidated on move');
   assert.equal(batchRows[3].topic,'gos-id-live:'+gameB,'One notice for 100 deleted posts');
   assert(batchRows.every(x=>x.is_private&&x.event==='political_posts_changed'&&JSON.stringify(x.payload)==='{"table":"political_posts"}'),'Batch signal contains no post contents');
-  console.log('PASS: metadata-only private notices, 100 rows to one per room/statement, cross-game moves, no-row changes, muted Telegram, unchanged stage cron, budget/chat guards.');
+  // Scope/authorization fixtures for the real mark_chat_channel_read SQL.
+  // Repeated reads of an unchanged conversation must produce zero UPDATE events.
+  const uid='00000000-0000-4000-8000-000000000105';
+  const channelA='00000000-0000-4000-8000-000000000106';
+  const channelB='00000000-0000-4000-8000-000000000107';
+  await db.exec("CREATE SCHEMA auth; CREATE FUNCTION auth.uid() RETURNS uuid LANGUAGE sql STABLE AS $ SELECT '00000000-0000-4000-8000-000000000105'::uuid $;");
+  await db.exec('CREATE TABLE public.chat_channels(id uuid PRIMARY KEY,game_id uuid NOT NULL);');
+  await db.exec('CREATE TABLE public.chat_messages(id uuid PRIMARY KEY,game_id uuid NOT NULL,channel_id uuid NOT NULL,created_at timestamptz NOT NULL DEFAULT now());');
+  await db.exec('CREATE INDEX chat_messages_channel_created_idx ON public.chat_messages(channel_id,created_at);');
+  await db.exec('CREATE TABLE public.chat_channel_state(game_id uuid NOT NULL,channel_id uuid NOT NULL,user_id uuid NOT NULL,last_read_at timestamptz,updated_at timestamptz NOT NULL DEFAULT now(),PRIMARY KEY(channel_id,user_id));');
+  await db.exec('CREATE TABLE public.chat_mentions(id uuid PRIMARY KEY,game_id uuid NOT NULL,channel_id uuid NOT NULL,mentioned_user_id uuid NOT NULL,read_at timestamptz);');
+  await db.exec("CREATE FUNCTION private.can_access_channel(cid uuid) RETURNS boolean LANGUAGE sql STABLE AS $ SELECT EXISTS(SELECT 1 FROM public.chat_channels WHERE id=cid AND game_id='00000000-0000-4000-8000-000000000101'::uuid) $;");
+  await db.exec('CREATE TABLE public.receipt_write_log(id integer GENERATED ALWAYS AS IDENTITY PRIMARY KEY);');
+  await db.exec('CREATE FUNCTION public.log_receipt_write() RETURNS trigger LANGUAGE plpgsql AS $ BEGIN INSERT INTO public.receipt_write_log DEFAULT VALUES; RETURN NEW; END $;');
+  await db.exec('CREATE TRIGGER log_receipt_write AFTER INSERT OR UPDATE ON public.chat_channel_state FOR EACH ROW EXECUTE FUNCTION public.log_receipt_write();');
+  await db.query('INSERT INTO public.chat_channels VALUES($1,$2),($3,$4)',[channelA,gameA,channelB,gameB]);
+  await db.exec(receiptMigration);
+  await db.query('SELECT public.mark_chat_channel_read($1::uuid)',[channelA]);
+  const writes=async()=>Number((await db.query('SELECT count(*)::integer AS n FROM public.receipt_write_log')).rows[0].n);
+  assert.equal(await writes(),1,'First channel read creates its state once');
+  await db.query('SELECT public.mark_chat_channel_read($1::uuid) FROM generate_series(1,100)',[channelA]);
+  assert.equal(await writes(),1,'100 redundant reads produce no Realtime-visible UPDATE');
+  // A message newer than the previous receipt still marks as read immediately.
+  await db.query("UPDATE public.chat_channel_state SET last_read_at=now()-interval '1 day' WHERE channel_id=$1 AND user_id=$2",[channelA,uid]);
+  const before=await writes();
+  await db.query("INSERT INTO public.chat_messages VALUES('00000000-0000-4000-8000-000000000108',$1,$2,now())",[gameA,channelA]);
+  await db.query('SELECT public.mark_chat_channel_read($1::uuid)',[channelA]);
+  assert.equal(await writes(),before+1,'A new message causes a new read receipt');
+  // Mentions on old messages must still be acknowledged without writing state.
+  await db.query("UPDATE public.chat_channel_state SET last_read_at=now()+interval '1 day' WHERE channel_id=$1 AND user_id=$2",[channelA,uid]);
+  const beforeMention=await writes();
+  await db.query("INSERT INTO public.chat_mentions VALUES('00000000-0000-4000-8000-000000000109',$1,$2,$3,NULL)",[gameA,channelA,uid]);
+  await db.query('SELECT public.mark_chat_channel_read($1::uuid)',[channelA]);
+  assert.equal(await writes(),beforeMention,'Mention-only read does not rewrite channel state');
+  const mention=(await db.query("SELECT read_at IS NOT NULL AS is_read FROM public.chat_mentions WHERE channel_id=$1",[channelA])).rows[0];
+  assert(mention.is_read,'Mention-only read still marks the mention');
+  await assert.rejects(db.query('SELECT public.mark_chat_channel_read($1::uuid)',[channelB]),/Нет доступа к диалогу/);
+  assert.equal(await writes(),beforeMention,'Inaccessible game must not write receipt');
+  console.log('PASS: political batch signals, 100 unchanged chat reads -> zero UPDATEs, prompt new-message receipts, independent mentions, cross-game access check.');
  }finally{await db.close();}
 }
 run().catch(err=>{console.error(err);process.exitCode=1});
