@@ -691,7 +691,7 @@ export function useRepublicGame(gameId:string){
   // Invalidation-only subscriptions need no row bodies. The three direct
   // delta handlers retain complete payloads so votes, stages and document
   // changes still update immediately without additional PostgREST reads.
-  for(const table of ['game_stages','party_invitations','party_chair_ballots','formal_documents','political_posts','game_votes','blitz_assignments','stage_deadline_rules']){
+  for(const table of ['game_stages','party_invitations','party_chair_ballots','formal_documents','game_votes','blitz_assignments','stage_deadline_rules']){
    const fullDelta=table==='game_stages'||table==='formal_documents'||table==='game_votes';
    channel.on('postgres_changes',{event:'*',schema:'public',table,filter:'game_id=eq.'+gameId,
     ...(fullDelta?{}:{select:['game_id']})},payload=>{
@@ -722,6 +722,14 @@ export function useRepublicGame(gameId:string){
    invalidatePartyRows();
    dirtyTables.add('game_parties');
    reconcileTables.add('game_parties');
+   schedule();
+  });
+  // Political post contents remain protected by RLS; only an invalidation
+  // signal is sent through the existing authenticated game channel.
+  channel.on('broadcast',{event:'political_posts_changed'},payload=>{
+   if(!currentConnection()||payload.payload?.table!=='political_posts')return;
+   dirtyTables.add('political_posts');
+   if(activeViewRef.current==='actions')reconcileTables.add('political_posts');
    schedule();
   });
   channel.on('broadcast',{event:'party_documents_changed'},payload=>{
@@ -964,7 +972,9 @@ export function useRepublicGame(gameId:string){
    if(liveConnected&&now-lastChatRecoveryAt<60000)return;
    lastChatRecoveryAt=now;
    if(channelRef.current)void loadRecentChatMessages(channelRef.current);
-   void loadChatOverview();
+   // Realtime already pushes unread counters on a healthy connection;
+   // the shared three-minute check and reconnect still restore missed data.
+   if(!liveConnected)void loadChatOverview();
   };
   // Spread identical six-second recovery work across the classroom, instead
   // of making 100 devices hit PostgREST at the same wall-clock instant.
