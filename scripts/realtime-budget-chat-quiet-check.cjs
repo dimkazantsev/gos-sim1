@@ -4,6 +4,7 @@ const assert=require('node:assert/strict');
 const fs=require('node:fs');
 const {PGlite}=require('@electric-sql/pglite');
 const migration=fs.readFileSync('supabase/migrations/20261111130451_political_broadcast_idle_telegram.sql','utf8');
+const batchMigration=fs.readFileSync('supabase/migrations/20261111141500_political_statement_invalidation.sql','utf8');
 const game=fs.readFileSync('components/game/useRepublicGame.ts','utf8');
 const budget=fs.readFileSync('components/game/useBudgetPulse.ts','utf8');
 const freeze=fs.readFileSync('lib/featureFreeze.ts','utf8');
@@ -21,6 +22,7 @@ assert(budget.includes('if(running?.gameId===gameId)'),'Overlapping budget reads
 assert(budget.includes('running.rerun=true'),'Updates received during a slow read require a trailing reconciliation');
 assert(budget.includes('}while(state.rerun&&alive.current'),'Queued refresh remains bounded to an active game view');
 assert(!migration.includes('ALTER PUBLICATION')&&!migration.includes('DROP TABLE'),'No new replicated user tables');
+assert(!batchMigration.includes('ALTER PUBLICATION')&&!batchMigration.includes('DROP TABLE'),'Batch change preserves publication and user data');
 assert(migration.includes('REVOKE ALL ON FUNCTION private.broadcast_political_posts_invalidation()'),'Trigger function not executable by clients');
 async function run(){
  const db=new PGlite();
@@ -34,6 +36,7 @@ async function run(){
   await db.exec("CREATE FUNCTION cron.alter_job(job_id bigint,schedule text DEFAULT NULL,command text DEFAULT NULL,database text DEFAULT NULL,username text DEFAULT NULL,active boolean DEFAULT NULL) RETURNS void LANGUAGE plpgsql AS $$BEGIN UPDATE cron.job SET active=$6 WHERE jobid=$1;END$$;");
   await db.exec("INSERT INTO cron.job VALUES(10,'gos_id_telegram_dispatch',true,'select private.request_telegram_dispatch()'),(9,'gos_stage_close',true,'select public.close_expired_game_stages()');");
   await db.exec(migration);
+  await db.exec(batchMigration);
   const jobs=(await db.query("SELECT jobname,active FROM cron.job ORDER BY jobid")).rows;
   assert.equal(jobs.find(x=>x.jobname==='gos_id_telegram_dispatch').active,false,'Pause only Telegram dispatch');
   assert.equal(jobs.find(x=>x.jobname==='gos_stage_close').active,true,'Stage closure unaffected');
@@ -49,7 +52,18 @@ async function run(){
   assert.deepEqual(rows.map(x=>x.topic),['gos-id-live:'+gameA,'gos-id-live:'+gameA,'gos-id-live:'+gameB,'gos-id-live:'+gameA,'gos-id-live:'+gameB]);
   assert(rows.every(x=>x.is_private&&x.event==='political_posts_changed'),'Never use public Realtime');
   assert(rows.every(x=>JSON.stringify(x.payload)==='{"table":"political_posts"}'),'Never broadcast contents or secrets');
-  console.log('PASS: private metadata-only broadcast, moved games, saved posts, muted Telegram, unchanged stage cron, budget/chat guards.');
+  // 100 posts in one SQL statement must not cause 100 private room signals.
+  await db.query("INSERT INTO public.political_posts(id,game_id,body) SELECT ('00000000-0000-4000-8000-'||lpad(i::text,12,'0'))::uuid,$1,'Batch secret '||i FROM generate_series(1,100) i",[gameA]);
+  await db.query('UPDATE public.political_posts SET game_id=$1 WHERE game_id=$2',[gameB,gameA]);
+  await db.query('DELETE FROM public.political_posts WHERE game_id=$1',[gameB]);
+  await db.query("UPDATE public.political_posts SET body='missing' WHERE id='00000000-0000-4000-8000-000000999999'");
+  const batchRows=(await db.query('SELECT topic,event,payload,is_private FROM realtime.messages ORDER BY ctid')).rows.slice(rows.length);
+  assert.equal(batchRows.length,4,'Batch insert, move across two rooms and delete generate four total notices');
+  assert.equal(batchRows[0].topic,'gos-id-live:'+gameA,'One notice for 100 inserted posts');
+  assert.deepEqual(batchRows.slice(1,3).map(x=>x.topic).sort(),['gos-id-live:'+gameA,'gos-id-live:'+gameB].sort(),'Both rooms are invalidated on move');
+  assert.equal(batchRows[3].topic,'gos-id-live:'+gameB,'One notice for 100 deleted posts');
+  assert(batchRows.every(x=>x.is_private&&x.event==='political_posts_changed'&&JSON.stringify(x.payload)==='{"table":"political_posts"}'),'Batch signal contains no post contents');
+  console.log('PASS: metadata-only private notices, 100 rows to one per room/statement, cross-game moves, no-row changes, muted Telegram, unchanged stage cron, budget/chat guards.');
  }finally{await db.close();}
 }
 run().catch(err=>{console.error(err);process.exitCode=1});
