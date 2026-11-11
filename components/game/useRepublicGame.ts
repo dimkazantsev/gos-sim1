@@ -1,7 +1,7 @@
 'use client';
 import {userError} from '@/lib/userError';
 import {CHAT_PAUSED,TELEGRAM_PAUSED} from '@/lib/featureFreeze';
-import {notifyGameDataRefresh,notifySectionUpdates,setGameRealtimeConnection} from './useGameTableSync';
+import {gameRealtimeConnected,notifyGameDataRefresh,notifySectionUpdates,setGameRealtimeConnection} from './useGameTableSync';
 import {assetFailureBackoffMs} from './assetFailureBackoff';
 import {boundedChatWrite} from '@/lib/boundedChatWrite';
 import {useBudgetPulse,withBudgetIncome} from './useBudgetPulse';
@@ -2258,7 +2258,10 @@ export function useRepublicGame(gameId:string){
    receipt.queued=false;receipt.running=true;receipt.lastAt=Date.now();
    try{
     const r=await within(supabase.rpc('mark_chat_channel_read',{p_channel_id:cid}));
-    if(receipt===readReceipt.current&&!r.error)scheduleRealtimeChatOverview();
+    // The successful RPC always writes chat_channel_state, whose scoped
+    // Postgres Changes handler already refreshes the overview when connected.
+    // Keep an explicit fallback when Realtime is unavailable.
+    if(receipt===readReceipt.current&&!r.error&&!gameRealtimeConnected(gameId))scheduleRealtimeChatOverview();
    }catch{/* An optional read receipt must not interrupt message delivery. */}
    finally{
     receipt.running=false;
