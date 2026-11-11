@@ -34,7 +34,9 @@ export function useBudgetPulse(gameId:string,enabled:boolean){
   let pending:ReturnType<typeof setTimeout>|undefined,lastAutomaticAt=Date.now();
   let dirtyWhileHidden=document.visibilityState!=='visible';
   let timer:ReturnType<typeof setInterval>|null=null;
-  const intervalMs=60000+Math.floor(Math.random()*15000);
+  // Event-driven updates stay immediate. A passive budget check is needed
+  // less often because the current RPC recalculates and can write state.
+  const intervalMs=180000+Math.floor(Math.random()*30000);
   if(!dirtyWhileHidden)void refresh();
   function automatic(force=false){
    if(document.visibilityState!=='visible'){dirtyWhileHidden=true;return}
@@ -59,9 +61,8 @@ export function useBudgetPulse(gameId:string,enabled:boolean){
   const resume=()=>{
    if(document.visibilityState!=='visible'){stopPolling();return}
    startPolling();
-   // One budget read after a hidden change or a stale minute; short tab
-   // switches do not re-run the expensive projection.
-   if(dirtyWhileHidden||Date.now()-lastAutomaticAt>=60000)automatic(dirtyWhileHidden);
+   // A dirty hidden tab still refreshes on return; otherwise wait 3 min.
+   if(dirtyWhileHidden||Date.now()-lastAutomaticAt>=180000)automatic(dirtyWhileHidden);
   };
   startPolling();
   document.addEventListener('visibilitychange',resume);
