@@ -15,6 +15,9 @@ assert(picker.includes('const showOptions=expanded||open'));
 assert(!picker.includes('onExpand')&&picker.includes('if(open){setOpen(false);return}'),'Channel picker must not expand the chat');
 assert(picker.includes('visibleChatChannels(channels,safeOverview)'));
 assert(!css.includes('@import'),'No additional network assets');
+assert(panel.includes('className="chatResizeGrip"')&&panel.includes('setPointerCapture(e.pointerId)')&&panel.includes('onLostPointerCapture'),'Chat resize captures pointers and releases on cancel');
+assert(panel.includes("e.key==='ArrowUp'?24:-24")&&panel.includes('manualComposerHeight.current!==null'),'Keyboard control and manual height persist during typing');
+assert(css.includes('touch-action:none')&&css.includes('max-height:none!important;resize:none'),'Touch-enabled resize escapes old 104px height cap');
 assert(css.includes('width:min(calc(100% - 70px),1060px)'),'Expanded long message width grows without unbounded lines');
 assert(panel.includes('expanded&&<button type="button" className="chatIconButton"'),'Collapse action reuses existing icon style');
 assert(panel.includes("viewport.height-headerHeight")&&!panel.includes("dockHeight"),'Phone chat must not reserve hidden application dock space');
@@ -32,8 +35,13 @@ const markup=['<!doctype html><html lang="ru"><head><meta name="viewport" conten
 '<div class="chatHeadText chatChannelPicker chatChannelSidebar" id="channels"><span class="chatEyebrow">Общение</span><b class="chatSidebarHeading">Беседы</b><button class="chatChannelTrigger">Публичная политика</button><div class="chatChannelMenu chatMenuExpandedOnly" id="menu" role="menu"><div class="chatChannelOptionRow"><button>Публичная политика</button></div><div class="chatChannelOptionRow"><button>Вне игры</button></div></div></div>',
 '<div class="chatExpandedTitle" id="title"><b>Публичная политика</b><small>Общение</small></div><button aria-label="Закрыть чат">×</button></header>',
 '<div class="chatMessages" id="messages"><div class="chatMsg theirs"><div class="chatMessageColumn" id="receivedColumn"><div class="chatBubble" id="longBubble">Длинное сообщение с несколькими абзацами о рассмотрении государственной инициативы, обсуждении предложений участников и оценке документально подтверждённых решений. Государственные органы обсуждают перспективы развития, порядок представления материалов и последствия принятых решений для дальнейшей политической работы. Позиции сторон остаются различными, а опубликованная информация должна быть понятной всем участникам общественной дискуссии без изменения утверждённой процедуры принятия решений и полномочий органов Республики.</div></div></div><div class="chatMsg mine"><div class="chatMessageColumn"><div class="chatBubble">Сообщение для проверки удобной ширины</div></div></div></div>',
-'<div class="chatCompose chatComposeCompact" id="compose"><details class="chatProcessTags" id="tags"><summary>Сообщение для политического процесса</summary><small>Выберите тег</small><div><button>#вопрос</button></div></details><div class="chatInputRow" id="inputRow"><textarea aria-label="Сообщение"></textarea></div><div class="chatComposeActions" id="actions"><button>Файл</button><button>Микрофон</button><button>Камера</button><button class="chatIconButton chatProcessTagMobileButton" id="tagButton">#</button><button class="chatSendButton iconOnly" id="send">Отправить</button></div></div></aside>',
-'<script>document.getElementById("expand").onclick=()=>document.getElementById("chat").classList.toggle("chatExpanded");</script></body></html>'].join('');
+'<div class="chatCompose chatComposeCompact" id="compose"><button class="chatResizeGrip" id="resizeGrip" aria-label="Изменить высоту поля сообщения"><span></span></button><details class="chatProcessTags" id="tags"><summary>Сообщение для политического процесса</summary><small>Выберите тег</small><div><button>#вопрос</button></div></details><div class="chatInputRow" id="inputRow"><textarea aria-label="Сообщение"></textarea></div><div class="chatComposeActions" id="actions"><button>Файл</button><button>Микрофон</button><button>Камера</button><button class="chatIconButton chatProcessTagMobileButton" id="tagButton">#</button><button class="chatSendButton iconOnly" id="send">Отправить</button></div></div></aside>',
+'<script>document.getElementById("expand").onclick=()=>document.getElementById("chat").classList.toggle("chatExpanded");'+
+'const handle=document.getElementById("resizeGrip"),field=document.querySelector("#inputRow textarea");let start=null;'+
+'handle.onpointerdown=e=>{start={y:e.clientY,height:field.getBoundingClientRect().height};handle.setPointerCapture(e.pointerId);e.preventDefault()};'+
+'handle.onpointermove=e=>{if(!start)return;const chatHeight=document.getElementById("chat").clientHeight;const cap=Math.max(44,Math.min(520,Math.floor(innerHeight*.6),Math.floor(chatHeight*.58),chatHeight-210));field.style.height=Math.max(44,Math.min(cap,start.height+start.y-e.clientY))+"px"};'+
+'handle.onpointerup=e=>{start=null;if(handle.hasPointerCapture(e.pointerId))handle.releasePointerCapture(e.pointerId)};'+
+'</script></body></html>'].join('');
 async function metrics(page){return page.evaluate(()=>{
  const ids=['chat','channels','menu','messages','compose','title','expand','phoneIcon','tagButton','tags','inputRow','actions','send','receivedColumn','longBubble'];
  const r=Object.fromEntries(ids.map(id=>{const e=document.getElementById(id),b=e.getBoundingClientRect();return [id,{left:b.left,right:b.right,top:b.top,bottom:b.bottom,width:b.width,height:b.height,display:getComputedStyle(e).display}]}));
@@ -86,6 +94,20 @@ async function metrics(page){return page.evaluate(()=>{
    const tagDisplay=await page.evaluate(()=>getComputedStyle(document.getElementById('tags')).display);
    assert(tagDisplay!=='none','Existing process tags remain available via # at '+width);
   }
+  // Pull the upper border up: message history and sending controls stay visible.
+  const field=page.locator('#inputRow textarea');
+  const originalHeight=await field.evaluate(el=>el.getBoundingClientRect().height);
+  const grip=await page.locator('#resizeGrip').boundingBox();
+  assert(grip,'Resize grip visible at '+width);
+  const gx=grip.x+grip.width/2,gy=grip.y+grip.height/2;
+  await page.mouse.move(gx,gy);await page.mouse.down();
+  await page.mouse.move(gx,gy-120,{steps:6});await page.mouse.up();
+  const grown=await field.evaluate(el=>el.getBoundingClientRect().height);
+  const resized=await metrics(page);
+  assert(grown>originalHeight+40,'Dragging upward expands the field at '+width+': '+originalHeight+' -> '+grown);
+  assert(resized.r.messages.height>30,'Messages stay visible at '+width);
+  assert(resized.r.actions.top>=resized.r.inputRow.bottom-1,'Toolbar remains below input at '+width);
+  assert(resized.r.actions.bottom<=resized.r.chat.bottom+1,'Send button remains on screen at '+width);
   if(width>760){
    await page.click('#expand');
    const restored=await metrics(page);
