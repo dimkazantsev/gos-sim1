@@ -106,6 +106,11 @@ export function useRepublicGame(gameId:string){
  const [introAccountSeen,setIntroAccountSeen]=useState(false);
  const [chatMediaError,setChatMediaError]=useState(''),[chatMediaPhase,setChatMediaPhase]=useState<MediaUploadPhase>('idle');
  const [recording,setRecording]=useState<ChatMediaKind|null>(null),[recordingPreview,setRecordingPreview]=useState<RecordingPreview|null>(null),[recordingSaving,setRecordingSaving]=useState(false),[recordingStartedAt,setRecordingStartedAt]=useState<number|null>(null),[realtimeState,setRealtimeState]=useState<'connecting'|'connected'|'disconnected'>('disconnected');
+ // After five minutes hidden, remove the private channel and its server-side
+ // Postgres Changes registrations. An active screen always retains push.
+ const [realtimeIdleSuspended,setRealtimeIdleSuspended]=useState(false);
+ const realtimeIdleWakeGame=useRef<string|null>(null);
+ const realtimeLeavePending=useRef<Promise<unknown>|null>(null);
  const liveRef=useRef<ReturnType<typeof supabase.channel>|null>(null),channelRef=useRef(''),recorder=useRef<MediaRecorder|null>(null),chunks=useRef<Blob[]>([]),activeViewRef=useRef<View>('dashboard'),chatOpenRef=useRef(false);
  activeViewRef.current=activeView;chatOpenRef.current=chatOpen;
  const realtimeReloadTimer=useRef<ReturnType<typeof setTimeout>|null>(null),realtimeReloadRunning=useRef(false),realtimeReloadQueued=useRef(false),realtimeReloadVersion=useRef(0),lastFullReloadAt=useRef(0);
@@ -473,10 +478,40 @@ export function useRepublicGame(gameId:string){
  },[gameId]);
 
  useEffect(()=>{
+  if(!me?.user_id||me.game_id!==gameId)return;
+  let idleTimer:ReturnType<typeof setTimeout>|null=null;
+  const onVisibility=()=>{
+   if(idleTimer!==null){clearTimeout(idleTimer);idleTimer=null}
+   if(document.visibilityState==='hidden'){
+    idleTimer=setTimeout(()=>{
+     idleTimer=null;
+     if(document.visibilityState!=='hidden')return;
+     realtimeIdleWakeGame.current=gameId;
+     setRealtimeIdleSuspended(true);
+    },300000);
+   }else{
+    // The previous channel must leave before a new room with the same topic
+    // is constructed: RealtimeClient removes channels by topic on close.
+    void Promise.resolve(realtimeLeavePending.current).catch(()=>{}).then(()=>{
+     if(document.visibilityState==='visible')setRealtimeIdleSuspended(false);
+    });
+   }
+  };
+  document.addEventListener('visibilitychange',onVisibility);
+  onVisibility();
+  return()=>{
+   if(idleTimer!==null)clearTimeout(idleTimer);
+   document.removeEventListener('visibilitychange',onVisibility);
+  };
+ },[gameId,me?.user_id,me?.game_id]);
+
+ useEffect(()=>{
   // Keep the single authoritative Realtime channel and presence even in
   // lightweight entry, so teachers can see who is connected immediately.
   // Full SQL bootstrap stays deferred until a section is requested.
-  if(!me?.user_id||me.game_id!==gameId)return;
+  if(!me?.user_id||me.game_id!==gameId||realtimeIdleSuspended)return;
+  const resumeAfterIdle=realtimeIdleWakeGame.current===gameId;
+  if(resumeAfterIdle)realtimeIdleWakeGame.current=null;
   let disposed=false,scheduled=false;
   const subscriptionEpoch=readEpoch.current;
   const currentConnection=()=>!disposed&&subscriptionEpoch===readEpoch.current&&activeGameRef.current===gameId&&authUser.current===me.user_id;
@@ -878,7 +913,10 @@ export function useRepublicGame(gameId:string){
   setRealtimeState('connecting');
   // A private Realtime topic needs the user's current JWT before joining.
   // Keep the original single game channel and its offline/visible-tab recovery.
-  void supabase.realtime.setAuth().then(()=>{
+  void Promise.resolve(realtimeLeavePending.current)
+   .catch(()=>{/* Keep private-only retry on next recovery. */})
+   .then(()=>supabase.realtime.setAuth())
+   .then(()=>{
    if(!currentConnection())return;
    channel.subscribe(status=>{
     if(disposed)return;
@@ -1001,14 +1039,20 @@ export function useRepublicGame(gameId:string){
     },initialRecoveryDelay);
   }
   startPeriodicPolling();
+  if(resumeAfterIdle){
+   // A new private socket cannot replay events that arrived while hidden.
+   // Reconcile just the visible screen, open votes and scoped authority.
+   hiddenAt=Date.now()-30000;
+   resumePending();
+  }
   return()=>{
    disposed=true;clearTimeout(teacherEventTimer);clearTimeout(ballotBurstTimer);clearTimeout(timer);clearTimeout(partyDocumentBurstTimer);if(networkPresenceTimer!==null)clearTimeout(networkPresenceTimer);stopPeriodicPolling();
    document.removeEventListener('visibilitychange',resumePending);
    setGameRealtimeConnection(gameId,false);
    if(liveRef.current===channel)liveRef.current=null;
-   void supabase.removeChannel(channel);
+   realtimeLeavePending.current=supabase.removeChannel(channel).catch(()=>{});
   };
- },[gameId,me?.user_id,me?.kind,me?.role_title,me?.team,me?.group_name,me?.roster_archived_at]);
+ },[gameId,me?.user_id,me?.kind,me?.role_title,me?.team,me?.group_name,me?.roster_archived_at,realtimeIdleSuspended]);
 
  useEffect(()=>()=>{
   const rec=recorder.current;

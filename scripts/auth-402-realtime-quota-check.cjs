@@ -113,7 +113,7 @@ sectionEnv.document.visibilityState='hidden';pollClock+=60_000;sectionTick();
 assert.equal(sectionReads,2,'Hidden tabs do not poll');
 
 
-assert(source.includes('void supabase.realtime.setAuth().then(()=>{'),'Private Broadcast must authenticate before subscribing');
+assert(source.includes('.then(()=>supabase.realtime.setAuth())')&&source.indexOf('.then(()=>supabase.realtime.setAuth())')<source.indexOf('channel.subscribe(status=>{'),'Private Broadcast must authenticate before subscribing; previous room leave completes first');
 assert(source.includes('channel.subscribe(status=>{'),'Existing single channel still carries health status');
 assert(source.includes('setGameRealtimeConnection(gameId,liveConnected)'),'Room connection health remains shared');
 const from=source.indexOf('  const pollJitter=');
