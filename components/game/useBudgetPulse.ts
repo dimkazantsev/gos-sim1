@@ -31,7 +31,7 @@ export function useBudgetPulse(gameId:string,enabled:boolean){
     const ticket=++request.current;
     try{
      const r=await supabase.rpc('get_budget_pulse',{p_game_id:gameId});
-     if(!alive.current||ticket!==request.current||scope.current.gameId!==gameId||!scope.current.enabled)return;
+     if(!alive.current||ticket!==request.current||scope.current.gameId!==gameId||!scope.current.enabled)continue;
      if(r.error)throw r.error;
      if(r.data?.game_id!==gameId||!Number.isFinite(Number(r.data?.calculation?.revenue)))throw new Error('Не удалось получить общий расчет доходов бюджета.');
      setPulse(r.data as BudgetPulse);setError('');
