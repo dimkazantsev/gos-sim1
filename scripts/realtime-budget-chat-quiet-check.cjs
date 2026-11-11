@@ -49,7 +49,10 @@ async function run(){
   await db.query('DELETE FROM public.political_posts WHERE id=$1',[post]);
   const rows=(await db.query('SELECT topic,event,payload,is_private FROM realtime.messages ORDER BY ctid')).rows;
   assert.equal(rows.length,5,'Insert, update, cross-game update, delete send five notices');
-  assert.deepEqual(rows.map(x=>x.topic),['gos-id-live:'+gameA,'gos-id-live:'+gameA,'gos-id-live:'+gameB,'gos-id-live:'+gameA,'gos-id-live:'+gameB]);
+  assert.equal(rows[0].topic,'gos-id-live:'+gameA);
+  assert.equal(rows[1].topic,'gos-id-live:'+gameA);
+  assert.deepEqual(rows.slice(2,4).map(x=>x.topic).sort(),['gos-id-live:'+gameA,'gos-id-live:'+gameB].sort(),'Both games receive a notice on transfer; order is unspecified');
+  assert.equal(rows[4].topic,'gos-id-live:'+gameB);
   assert(rows.every(x=>x.is_private&&x.event==='political_posts_changed'),'Never use public Realtime');
   assert(rows.every(x=>JSON.stringify(x.payload)==='{"table":"political_posts"}'),'Never broadcast contents or secrets');
   // 100 posts in one SQL statement must not cause 100 private room signals.
