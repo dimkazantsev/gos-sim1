@@ -102,6 +102,8 @@ export default function ChatPanel({g,draft:text,onDraftChange:setText,previewCha
  const list=useRef<HTMLDivElement>(null);
  const restoreHistoryScroll=useRef<{channel:string;height:number;top:number;oldest:string;created:string}|null>(null);
  const composer=useRef<HTMLTextAreaElement>(null);
+ const manualComposerHeight=useRef<number|null>(null);
+ const composerDrag=useRef<{y:number;height:number}|null>(null);
  const draftRef=useRef(text);draftRef.current=text;
  const liveCamera=useRef<HTMLVideoElement>(null);
  const mediaHoldTimer=useRef<ReturnType<typeof setTimeout>|null>(null);
@@ -229,10 +231,19 @@ export default function ChatPanel({g,draft:text,onDraftChange:setText,previewCha
   const loaded=await loadOlderChatMessages();
   if(!loaded)restoreHistoryScroll.current=null;
  }
+ function maxComposerHeight(){
+  const viewportHeight=window.visualViewport?.height||window.innerHeight;
+  const chatHeight=panel.current?.clientHeight||viewportHeight;
+  // Reserve space for the header, messages and send toolbar.
+  return Math.max(44,Math.min(520,Math.floor(viewportHeight*.6),Math.floor(chatHeight*.58),chatHeight-210));
+ }
  function sizeComposer(){
   const node=composer.current;if(!node)return;
-  // Adjust before paint; leave room for buttons while iOS keyboard is visible.
-  // Longer drafts scroll inside the native textarea without moving the toolbar.
+  if(manualComposerHeight.current!==null){
+   node.style.height=Math.min(maxComposerHeight(),Math.max(44,manualComposerHeight.current))+'px';
+   return;
+  }
+  // Keep the original compact auto-height until the user drags the border.
   const available=window.visualViewport?.height||window.innerHeight;
   node.style.height='44px';
   const cap=Math.max(44,Math.min(136,Math.floor(available*.28)));
@@ -509,6 +520,36 @@ export default function ChatPanel({g,draft:text,onDraftChange:setText,previewCha
   {chatMediaError&&<div className="chatLocalError chatMediaError" role="alert"><span>{chatMediaError}</span></div>}
   {localError&&<div className="chatLocalError" role="alert"><span>{localError}</span><button type="button" aria-label="Скрыть ошибку" onClick={()=>setLocalError('')}><X size={16}/></button></div>}
   {!readOnly?<div className="chatCompose chatComposeCompact">
+   <button type="button" className="chatResizeGrip"
+    aria-label="Изменить высоту поля сообщения" title="Потяните вверх или вниз; можно использовать стрелки"
+    onPointerDown={e=>{
+     if(e.pointerType==='mouse'&&e.button!==0)return;
+     const height=composer.current?.getBoundingClientRect().height;if(!height)return;
+     composerDrag.current={y:e.clientY,height};
+     e.currentTarget.setPointerCapture(e.pointerId);
+     e.preventDefault();
+    }}
+    onPointerMove={e=>{
+     const drag=composerDrag.current;if(!drag)return;
+     manualComposerHeight.current=Math.max(44,Math.min(maxComposerHeight(),drag.height+drag.y-e.clientY));
+     sizeComposer();
+    }}
+    onPointerUp={e=>{
+     composerDrag.current=null;
+     if(e.currentTarget.hasPointerCapture(e.pointerId))e.currentTarget.releasePointerCapture(e.pointerId);
+    }}
+    onPointerCancel={e=>{
+     composerDrag.current=null;
+     if(e.currentTarget.hasPointerCapture(e.pointerId))e.currentTarget.releasePointerCapture(e.pointerId);
+    }}
+    onLostPointerCapture={()=>{composerDrag.current=null}}
+    onKeyDown={e=>{
+     if(e.key!=='ArrowUp'&&e.key!=='ArrowDown')return;
+     e.preventDefault();
+     const height=manualComposerHeight.current??composer.current?.getBoundingClientRect().height??44;
+     manualComposerHeight.current=Math.max(44,Math.min(maxComposerHeight(),height+(e.key==='ArrowUp'?24:-24)));
+     sizeComposer();
+    }}><span aria-hidden="true"/></button>
    {mentionMatch&&<div className="chatAddressList chatMentionList" aria-label="Упомянуть участника"><small><AtSign size={14} aria-hidden="true"/> Упомянуть в текущем чате</small>{mentionSuggestions.map(x=><button type="button" key={x.member.user_id} onClick={()=>insertMention(x.member.user_id)}><b>{x.member.full_name}</b><span>{x.member.role_title||x.member.team||'Участник'}</span></button>)}{!mentionSuggestions.length&&<span>Участник не найден.</span>}</div>}
    {showProcessTags&&<details id="chat-process-tags" className="chatProcessTags" open={processTagsOpen} onToggle={e=>setProcessTagsOpen(e.currentTarget.open)}><summary>Сообщение для политического процесса</summary><small>Добавьте тег, чтобы направить сообщение в публичную ленту.</small><div aria-label="Теги сообщения">{PROCESS_TAGS.map(t=><button type="button" key={t.key} onClick={()=>{if(!text.includes('#'+t.key))setText(text+(text?' ':'')+'#'+t.key);if(window.matchMedia('(max-width:760px)').matches)setProcessTagsOpen(false);composer.current?.focus()}}>{t.label}</button>)}</div></details>}
    {readyFile&&<div className="chatPendingAttachment" aria-label="Подготовлено вложение">
