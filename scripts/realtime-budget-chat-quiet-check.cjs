@@ -12,6 +12,7 @@ assert(game.includes("channel.on('broadcast',{event:'political_posts_changed'}")
 assert(!game.includes("'formal_documents','political_posts','game_votes'"),'Legacy political per-subscriber RLS removed');
 assert(game.includes("if(activeViewRef.current==='actions')reconcileTables.add('political_posts')"),'Only open wall refreshes contents');
 assert(game.includes("if(!liveConnected)void loadChatOverview();"),'Healthy chat avoids duplicate overview query');
+assert(game.includes('!gameRealtimeConnected(gameId))scheduleRealtimeChatOverview()'),'Receipt relies on authorised chat_channel_state changes while live; disconnected fallback survives');
 assert(game.includes("dirtyOverview=true;"),'Three-minute overview reconciliation preserved');
 assert(game.includes("chatRecovery=setInterval(recoverVisibleChatAndBallots,6000)"),'Offline chat recovery retained');
 assert(budget.includes('180000+Math.floor(Math.random()*30000)'), 'Budget check moves to 3–3.5 min');
