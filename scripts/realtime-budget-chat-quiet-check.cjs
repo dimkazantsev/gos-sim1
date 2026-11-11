@@ -72,15 +72,15 @@ async function run(){
   const uid='00000000-0000-4000-8000-000000000105';
   const channelA='00000000-0000-4000-8000-000000000106';
   const channelB='00000000-0000-4000-8000-000000000107';
-  await db.exec("CREATE SCHEMA auth; CREATE FUNCTION auth.uid() RETURNS uuid LANGUAGE sql STABLE AS $ SELECT '00000000-0000-4000-8000-000000000105'::uuid $;");
+  await db.exec("CREATE SCHEMA auth; CREATE FUNCTION auth.uid() RETURNS uuid LANGUAGE sql STABLE AS $body$ SELECT '00000000-0000-4000-8000-000000000105'::uuid $body$;");
   await db.exec('CREATE TABLE public.chat_channels(id uuid PRIMARY KEY,game_id uuid NOT NULL);');
   await db.exec('CREATE TABLE public.chat_messages(id uuid PRIMARY KEY,game_id uuid NOT NULL,channel_id uuid NOT NULL,created_at timestamptz NOT NULL DEFAULT now());');
   await db.exec('CREATE INDEX chat_messages_channel_created_idx ON public.chat_messages(channel_id,created_at);');
   await db.exec('CREATE TABLE public.chat_channel_state(game_id uuid NOT NULL,channel_id uuid NOT NULL,user_id uuid NOT NULL,last_read_at timestamptz,updated_at timestamptz NOT NULL DEFAULT now(),PRIMARY KEY(channel_id,user_id));');
   await db.exec('CREATE TABLE public.chat_mentions(id uuid PRIMARY KEY,game_id uuid NOT NULL,channel_id uuid NOT NULL,mentioned_user_id uuid NOT NULL,read_at timestamptz);');
-  await db.exec("CREATE FUNCTION private.can_access_channel(cid uuid) RETURNS boolean LANGUAGE sql STABLE AS $ SELECT EXISTS(SELECT 1 FROM public.chat_channels WHERE id=cid AND game_id='00000000-0000-4000-8000-000000000101'::uuid) $;");
+  await db.exec("CREATE FUNCTION private.can_access_channel(cid uuid) RETURNS boolean LANGUAGE sql STABLE AS $body$ SELECT EXISTS(SELECT 1 FROM public.chat_channels WHERE id=cid AND game_id='00000000-0000-4000-8000-000000000101'::uuid) $body$;");
   await db.exec('CREATE TABLE public.receipt_write_log(id integer GENERATED ALWAYS AS IDENTITY PRIMARY KEY);');
-  await db.exec('CREATE FUNCTION public.log_receipt_write() RETURNS trigger LANGUAGE plpgsql AS $ BEGIN INSERT INTO public.receipt_write_log DEFAULT VALUES; RETURN NEW; END $;');
+  await db.exec('CREATE FUNCTION public.log_receipt_write() RETURNS trigger LANGUAGE plpgsql AS $body$ BEGIN INSERT INTO public.receipt_write_log DEFAULT VALUES; RETURN NEW; END $body$;');
   await db.exec('CREATE TRIGGER log_receipt_write AFTER INSERT OR UPDATE ON public.chat_channel_state FOR EACH ROW EXECUTE FUNCTION public.log_receipt_write();');
   await db.query('INSERT INTO public.chat_channels VALUES($1,$2),($3,$4)',[channelA,gameA,channelB,gameB]);
   await db.exec(receiptMigration);
