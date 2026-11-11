@@ -489,7 +489,13 @@ export function useRepublicGame(gameId:string){
      realtimeIdleWakeGame.current=gameId;
      setRealtimeIdleSuspended(true);
     },300000);
-   }else setRealtimeIdleSuspended(false);
+   }else{
+    // The previous channel must leave before a new room with the same topic
+    // is constructed: RealtimeClient removes channels by topic on close.
+    void Promise.resolve(realtimeLeavePending.current).catch(()=>{}).then(()=>{
+     if(document.visibilityState==='visible')setRealtimeIdleSuspended(false);
+    });
+   }
   };
   document.addEventListener('visibilitychange',onVisibility);
   onVisibility();
