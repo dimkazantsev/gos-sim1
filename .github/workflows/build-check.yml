@@ -86,6 +86,9 @@ on:
       - 'app/release-notice.css'
       - 'app/api/telegram/dispatch/route.ts'
       - 'components/game/ChatPanel.tsx'
+      - 'components/game/useBudgetPulse.ts'
+      - 'supabase/migrations/*political_broadcast_idle_telegram.sql'
+      - 'scripts/realtime-budget-chat-quiet-check.cjs'
       - 'scripts/chat-iphone-composer-check.cjs'
       - 'components/PwaRegistrar.tsx'
       - 'public/sw.js'
@@ -381,6 +384,7 @@ jobs:
       - run: npm run typecheck
       - run: node scripts/classroom-signal-noise-check.cjs
       - run: node scripts/classroom-load-optimization-check.cjs
+      - run: node scripts/realtime-budget-chat-quiet-check.cjs
       - run: node scripts/stage-analysis-final-hour-check.cjs
       - run: node scripts/game-shell-load-check.cjs
       - run: node scripts/party-profile-payload-40-check.cjs

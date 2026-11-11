@@ -259,6 +259,8 @@ function harness({effects=false,compiledCode=code}={}){
     callback({event:'party_documents_changed',payload:{table:'party_documents'}});
    if(table==='game_parties'&&kind==='broadcast'&&filter.event==='game_parties_changed'&&channel.topic==='gos-id-live:'+gameId)
     callback({event:'game_parties_changed',payload:{table:'game_parties'}});
+   if(table==='political_posts'&&kind==='broadcast'&&filter.event==='political_posts_changed'&&channel.topic==='gos-id-live:'+gameId)
+    callback({event:'political_posts_changed',payload:{table:'political_posts'}});
    if(kind==='postgres_changes'&&filter.table===table&&filter.event!=='DELETE')
     callback({eventType:eventType||(table==='chat_messages'?'UPDATE':'INSERT'),new:{game_id:gameId,...row}});
   }},
