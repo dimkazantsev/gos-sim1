@@ -16,6 +16,9 @@ assert(game.includes("dirtyOverview=true;"),'Three-minute overview reconciliatio
 assert(game.includes("chatRecovery=setInterval(recoverVisibleChatAndBallots,6000)"),'Offline chat recovery retained');
 assert(budget.includes('180000+Math.floor(Math.random()*30000)'), 'Budget check moves to 3–3.5 min');
 assert(budget.includes("window.addEventListener(GAME_DATA_REFRESH_EVENT,changed)"),'Event-driven budget refresh stays immediate');
+assert(budget.includes('if(running?.gameId===gameId)'),'Overlapping budget reads share one in-flight operation');
+assert(budget.includes('running.rerun=true'),'Updates received during a slow read require a trailing reconciliation');
+assert(budget.includes('}while(state.rerun&&alive.current'),'Queued refresh remains bounded to an active game view');
 assert(!migration.includes('ALTER PUBLICATION')&&!migration.includes('DROP TABLE'),'No new replicated user tables');
 assert(migration.includes('REVOKE ALL ON FUNCTION private.broadcast_political_posts_invalidation()'),'Trigger function not executable by clients');
 async function run(){
