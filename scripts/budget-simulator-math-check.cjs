@@ -80,7 +80,7 @@ console.log('PASS Budget: verified 2026 totals, 14 sectors, borrowing vs income,
  * PGlite database, without Supabase credentials or production writes. */
 (async()=>{
  const {PGlite}=require('@electric-sql/pglite');
- const migration=fs.readFileSync(path.join(root,'supabase/migrations/20261112080500_budget_case_seed_guard.sql'),'utf8');
+ const migration=fs.readFileSync(path.join(root,'supabase/migrations/20261112012920_budget_case_seed_guard.sql'),'utf8');
  assert(migration.includes('if v_templates_missing then perform private.seed_budget_cases(p_game_id);end if;'));
  assert(migration.includes('if v_regions_missing then perform private.seed_budget_regional_cases(p_game_id);end if;'));
  assert(migration.includes('perform private.apply_budget_simulator_plan(p_game_id,row_id)'),
