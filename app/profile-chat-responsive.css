@@ -501,9 +501,10 @@
  max-height:none!important;resize:none;overflow-y:auto;
 }
 .simChat.gsChatV2 .chatComposeCompact .chatResizeGrip{
- position:absolute;top:-12px;left:10px;right:10px;z-index:5;
+ position:absolute;top:-24px;left:50%;right:auto;z-index:5;
+ transform:translateX(-50%);
  display:flex;align-items:center;justify-content:center;
- width:calc(100% - 20px);height:24px;padding:0;
+ width:96px;height:20px;padding:0;
  border:0;background:transparent;cursor:ns-resize;touch-action:none;
 }
 .simChat.gsChatV2 .chatComposeCompact .chatResizeGrip span{
