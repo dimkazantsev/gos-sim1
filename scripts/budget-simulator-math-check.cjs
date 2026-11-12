@@ -74,3 +74,49 @@ assert(cases.every(c=>c.situation.length>=500&&c.effect_plan.options.every(o=>o.
 assert.equal(new Set([...cases,...old].map(c=>c.case_key)).size,cases.length+old.length);
 assert.equal(new Set([...cases,...old].map(c=>c.situation.replace(/\s+/g,' ').trim().toLowerCase())).size,cases.length+old.length);
 console.log('PASS Budget: verified 2026 totals, 14 sectors, borrowing vs income, interest vs principal, transfers vs loans, financing closure, enterprises, taxes, oil, rates, inflation, FX, risks, surplus, reserves and 14 distinct legal cases');
+
+
+/* Budget seeding guard: execute the real SQL helper against an isolated
+ * PGlite database, without Supabase credentials or production writes. */
+(async()=>{
+ const {PGlite}=require('@electric-sql/pglite');
+ const migration=fs.readFileSync(path.join(root,'supabase/migrations/20261112012920_budget_case_seed_guard.sql'),'utf8');
+ assert(migration.includes('if v_templates_missing then perform private.seed_budget_cases(p_game_id);end if;'));
+ assert(migration.includes('if v_regions_missing then perform private.seed_budget_regional_cases(p_game_id);end if;'));
+ assert(migration.includes('perform private.apply_budget_simulator_plan(p_game_id,row_id)'),
+  'Published budget plans must still apply');
+ assert(migration.includes('perform private.apply_budget_financial_outcome(p_game_id,row_id)'),
+  'Resolved financial cases must still apply');
+ assert(migration.includes('perform private.dispatch_budget_risks(p_game_id)'),
+  'Deferred risk dispatch stays enabled');
+ assert(migration.includes('REVOKE ALL ON FUNCTION private.budget_seed_status(uuid)'),
+  'Private guard is not exposed to clients');
+ const helper=migration.slice(
+  migration.indexOf('CREATE OR REPLACE FUNCTION private.budget_seed_status('),
+  migration.indexOf('REVOKE ALL ON FUNCTION private.budget_seed_status(')).trim();
+ const keys=[...new Set([...helper.matchAll(/'budget-region-2026-[^']+'/g)].map(m=>m[0].slice(1,-1)))];
+ assert.equal(keys.length,16,'Catalog contains 16 canonical regional budget cases');
+ const db=new PGlite();
+ try{
+  await db.exec('CREATE SCHEMA private; CREATE TABLE private.budget_case_templates(case_key text PRIMARY KEY);');
+  await db.exec('CREATE TABLE public.event_cases(game_id uuid NOT NULL,case_key text NOT NULL,UNIQUE(game_id,case_key));');
+  await db.exec(helper);
+  const a='00000000-0000-4000-8000-000000000101',b='00000000-0000-4000-8000-000000000102';
+  const status=async(game)=> (await db.query('SELECT * FROM private.budget_seed_status($1::uuid)',[game])).rows[0];
+  await db.query("INSERT INTO private.budget_case_templates VALUES('budget-demo-a'),('budget-demo-b')");
+  assert.deepEqual(status?Object.values(await status(a)):[],[true,true],'An empty game must seed both collections');
+  for(const key of ['budget-demo-a','budget-demo-b',...keys])await db.query('INSERT INTO public.event_cases VALUES($1,$2)',[a,key]);
+  assert.deepEqual(Object.values(await status(a)),[false,false],'Completed sets do not run seed routines');
+  assert.deepEqual(Object.values(await status(b)),[true,true],'Another game cannot reuse another game\'s seeded state');
+  await db.query('DELETE FROM public.event_cases WHERE game_id=$1 AND case_key=$2',[a,keys[0]]);
+  assert.deepEqual(Object.values(await status(a)),[false,true],'A missing regional case must reseed');
+  await db.query('INSERT INTO public.event_cases VALUES($1,$2)',[a,keys[0]]);
+  await db.query("DELETE FROM public.event_cases WHERE game_id=$1 AND case_key='budget-demo-a'",[a]);
+  assert.deepEqual(Object.values(await status(a)),[true,false],'A missing template must reseed');
+  await db.query('INSERT INTO public.event_cases VALUES($1,$2)',[a,'budget-demo-a']);
+  for(let i=0;i<100;i++)assert.deepEqual(Object.values(await status(a)),[false,false]);
+  assert.equal((await db.query('SELECT COUNT(*)::int AS n FROM public.event_cases WHERE game_id=$1',[a])).rows[0].n,18,
+   '100 repeated views do not mutate any case rows');
+  console.log('PASS: Budget seed guard, 16 canonical cases, 100 no-op reads, cross-game isolation, partial-seed repair, preserved financial side effects');
+ }finally{await db.close()}
+})().catch(err=>{console.error(err);process.exitCode=1});
