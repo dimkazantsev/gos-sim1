@@ -186,7 +186,7 @@ console.log('PASS Budget: verified 2026 totals, 14 sectors, borrowing vs income,
    No production writes, no live Supabase accounts, no new service required. */
 (async()=>{
  const {PGlite}=require('@electric-sql/pglite');
- const migration=fs.readFileSync(path.join(root,'supabase/migrations/20261112083000_budget_forecast_fingerprint_cache.sql'),'utf8');
+ const migration=fs.readFileSync(path.join(root,'supabase/migrations/20261112035305_budget_forecast_fingerprint_cache.sql'),'utf8');
  const signature=migration.slice(migration.indexOf('CREATE OR REPLACE FUNCTION private.budget_forecast_signature('),migration.indexOf('REVOKE ALL ON FUNCTION private.budget_forecast_signature('));
  const pulse=migration.slice(migration.indexOf('CREATE OR REPLACE FUNCTION public.get_budget_pulse('));
  assert.equal((migration.match(/CREATE TABLE private.budget_forecast_cache/g)||[]).length,1);
