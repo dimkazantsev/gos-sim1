@@ -2,7 +2,7 @@
 import {useEffect,useLayoutEffect,useMemo,useRef,useState} from 'react';
 import type {ReactNode} from 'react';
 import {createPortal} from 'react-dom';
-import {ArrowDown,AtSign,Download,FileText,Mic,Minimize2,Paperclip,Pin,PinOff,Search,Send,Square,Trash2,UserRound,Video,X} from 'lucide-react';
+import {ArrowDown,AtSign,Copy,Download,FileText,Mic,Minimize2,Paperclip,Pencil,Pin,PinOff,Search,Send,Square,Trash2,UserRound,Video,X} from 'lucide-react';
 import {CHAT_MAX_FILE_BYTES,formatRecordingDuration} from './recordingMedia';
 import {IconAction} from '../ui/IconAction';
 import ChatChannelDropdown from './ChatChannelDropdown';
@@ -22,6 +22,7 @@ import {decodeChatAttachmentText} from './chatMediaTransport';
 const FILE_ACCEPT='image/*,audio/*,video/*,.pdf,.doc,.docx,.txt,.xlsx,.ppt,.pptx';
 const MAX_FILE_SIZE=CHAT_MAX_FILE_BYTES;
 const COMPOSER_HEIGHT_STORAGE_KEY='gos-id.chat.composer-height.v1';
+const EXPANDED_COMPOSER_HEIGHT_STORAGE_KEY='gos-id.chat.composer-height.expanded.v1';
 function highlightChatText(value:string,search:string):ReactNode{
  const query=search.trim();if(!query)return value;
  const haystack=value.toLocaleLowerCase('ru-RU'),needle=query.toLocaleLowerCase('ru-RU');
@@ -57,8 +58,8 @@ function ChatAttachment({message:m,onRefresh}:{message:Message;onRefresh?:(messa
 }
 
 export default function ChatPanel({g,draft:text,onDraftChange:setText,previewChannelOpen=false,previewPinsOpen=false,onOpenMember,readOnly=false}:{g:ReturnTypeRepublic;draft:string;onDraftChange:(next:string)=>void;previewChannelOpen?:boolean;previewPinsOpen?:boolean;onOpenMember?:(userId:string)=>void;readOnly?:boolean}){
- const {channels,channelId,setChannelId,messages,chatPins:allPins,pinnedMessages:allPinnedMessages,setChatPin,refreshChatMediaUrl,chatLoading,hasOlderChatMessages,olderChatLoading,loadOlderChatMessages,names,recording,recordingPreview,recordingSaving,chatMediaError,chatMediaPhase,recordingStartedAt,recordingStream,discardRecording,sendRecordingPreview,setChatOpen,sendText,sendChatFile,toggleRecording,me,teacher,chatOverview,setChatChannelPinned}=g;
- useEffect(()=>{setSelectedMessages([]);setProcessTagsOpen(false)},[channelId]);
+ const {channels,channelId,setChannelId,messages,chatPins:allPins,pinnedMessages:allPinnedMessages,setChatPin,editChatMessage,refreshChatMediaUrl,chatLoading,hasOlderChatMessages,olderChatLoading,loadOlderChatMessages,names,recording,recordingPreview,recordingSaving,chatMediaError,chatMediaPhase,recordingStartedAt,recordingStream,discardRecording,sendRecordingPreview,setChatOpen,sendText,sendChatFile,toggleRecording,me,teacher,chatOverview,setChatChannelPinned}=g;
+ useEffect(()=>{setSelectedMessages([]);setProcessTagsOpen(false);setEditingMessageId(null);setEditValue('')},[channelId]);
  useEffect(()=>()=>{if(selectHoldTimer.current)clearTimeout(selectHoldTimer.current)},[]);
   const socialChannelsReady=g.channels.some(c=>c.kind==='public'&&c.name==='Публичная политика')&&g.channels.some(c=>c.kind==='public'&&c.name==='Вне игры');
  useEffect(()=>{
@@ -91,6 +92,9 @@ export default function ChatPanel({g,draft:text,onDraftChange:setText,previewCha
  const [searchOpen,setSearchOpen]=useState(false);
  const [pinsOpen,setPinsOpen]=useState(previewPinsOpen);
  const [pinBusy,setPinBusy]=useState<string|null>(null);
+ const [editingMessageId,setEditingMessageId]=useState<string|null>(null);
+ const [editValue,setEditValue]=useState('');
+ const [editBusy,setEditBusy]=useState(false);
  const [selectedMessages,setSelectedMessages]=useState<string[]>([]);
  const [deletingMessages,setDeletingMessages]=useState(false);
  const selectHoldTimer=useRef<ReturnType<typeof setTimeout>|null>(null);
@@ -104,7 +108,7 @@ export default function ChatPanel({g,draft:text,onDraftChange:setText,previewCha
  const restoreHistoryScroll=useRef<{channel:string;height:number;top:number;oldest:string;created:string}|null>(null);
  const composer=useRef<HTMLTextAreaElement>(null);
  const manualComposerHeight=useRef<number|null>(null);
- const composerHeightRestored=useRef(false);
+ const composerHeightMode=useRef<'compact'|'expanded'|null>(null);
  const composerDrag=useRef<{y:number;height:number}|null>(null);
  const draftRef=useRef(text);draftRef.current=text;
  const liveCamera=useRef<HTMLVideoElement>(null);
@@ -251,24 +255,27 @@ export default function ChatPanel({g,draft:text,onDraftChange:setText,previewCha
   const cap=Math.max(44,Math.min(136,Math.floor(available*.28)));
   node.style.height=Math.min(cap,Math.max(44,node.scrollHeight))+'px';
  }
+ function composerHeightStorageKey(){return expanded?EXPANDED_COMPOSER_HEIGHT_STORAGE_KEY:COMPOSER_HEIGHT_STORAGE_KEY}
  function saveComposerHeight(){
   const height=manualComposerHeight.current;
   if(height===null)return;
-  try{window.localStorage.setItem(COMPOSER_HEIGHT_STORAGE_KEY,String(Math.round(height)))}catch{/* Browser storage may be unavailable; the current size still works. */}
+  try{window.localStorage.setItem(composerHeightStorageKey(),String(Math.round(height)))}catch{/* Keep the active size if storage is unavailable. */}
  }
  useLayoutEffect(()=>{
-  if(!composerHeightRestored.current){
-   composerHeightRestored.current=true;
+  const mode=expanded?'expanded':'compact';
+  if(composerHeightMode.current!==mode){
+   composerHeightMode.current=mode;
+   manualComposerHeight.current=null;
    try{
-    const stored=window.localStorage.getItem(COMPOSER_HEIGHT_STORAGE_KEY);
+    const stored=window.localStorage.getItem(composerHeightStorageKey());
     if(stored!==null){
      const height=Number(stored);
      if(Number.isFinite(height)&&height>=44&&height<=520)manualComposerHeight.current=height;
     }
-   }catch{/* Preserve the existing automatic sizing when storage is blocked. */}
+   }catch{/* Fall back to automatic height when local storage is disabled. */}
   }
   sizeComposer();
- },[text,readyFile]);
+ },[text,readyFile,expanded]);
  useEffect(()=>{if(searchOpen)searchInput.current?.focus()},[searchOpen]);
  useEffect(()=>{
   if(!recordingStartedAt){setRecordElapsed(0);return}
@@ -380,6 +387,33 @@ export default function ChatPanel({g,draft:text,onDraftChange:setText,previewCha
   setLocalError('');setAttachOpen(false);
   setPendingFile({file,gameId:g.game.id,channelId,userId:me.user_id});
   if(uploadInput.current)uploadInput.current.value='';
+ }
+ function canEditMessage(m:Message){return !readOnly&&m.kind==='text'&&m.author_id===me?.user_id}
+ function startEditing(m:Message){
+  if(!canEditMessage(m)||editBusy)return;
+  setEditingMessageId(m.id);setEditValue(m.text||'');setLocalError('');
+ }
+ function cancelEditing(){if(editBusy)return;setEditingMessageId(null);setEditValue('')}
+ async function saveEditing(){
+  if(!editingMessageId||editBusy)return;
+  const current=messages.find(m=>m.id===editingMessageId&&m.channel_id===channelId);
+  if(!current||!canEditMessage(current)){cancelEditing();return}
+  const value=editValue.trim();
+  if(!value||value.length>20000){setLocalError('Текст сообщения должен содержать от 1 до 20000 символов.');return}
+  if(value===current.text?.trim()){cancelEditing();return}
+  setEditBusy(true);setLocalError('');
+  try{
+   const ok=await editChatMessage(current.id,value,mentionedUsers(value));
+   if(ok){setEditingMessageId(null);setEditValue('')}
+   else setLocalError('Не удалось подтвердить редактирование. Проверьте сообщение перед повторной попыткой.');
+  }catch{setLocalError('Не удалось изменить сообщение.')}
+  finally{setEditBusy(false)}
+ }
+ async function copyChatMessage(m:Message){
+  const value=m.kind==='text'||m.kind==='system'?m.text||'':decodeChatAttachmentText(m.text||'').caption;
+  if(!value)return;
+  try{await navigator.clipboard.writeText(value)}
+  catch{setLocalError('Не удалось скопировать сообщение. Проверьте разрешения браузера.')}
  }
  async function togglePin(m:Message){
   if(pinBusy)return;
@@ -493,14 +527,32 @@ export default function ChatPanel({g,draft:text,onDraftChange:setText,previewCha
        <div className="chatMessageColumn">
         {startsGroup&&<div className="chatAuthor">{onOpenMember&&g.members.some(member=>member.user_id===m.author_id)?<button type="button" className="chatAuthorProfile" onClick={()=>onOpenMember(m.author_id)}>{own?'Вы':name}</button>:<b>{own?'Вы':name}</b>}<time dateTime={m.created_at}>{formatChatTime(m.created_at)}</time></div>}
         <div className="chatBubble">
-         {showText&&<p>{highlightChatText(m.text||'',search)}</p>}
+         {editingMessageId===m.id?<div className="chatInlineEditor">
+          <textarea aria-label="Редактировать сообщение" value={editValue} rows={3} maxLength={20000} disabled={editBusy}
+           onChange={e=>setEditValue(e.target.value)}
+           onKeyDown={e=>{if(e.key==='Escape'){e.stopPropagation();cancelEditing()}else if(e.key==='Enter'&&(e.ctrlKey||e.metaKey)){e.preventDefault();void saveEditing()}}}/>
+          <div className="chatInlineEditActions">
+           <button type="button" disabled={editBusy} onClick={cancelEditing}>Отмена</button>
+           <button type="button" className="chatInlineEditSave" disabled={editBusy||!editValue.trim()||editValue.length>20000} onClick={()=>void saveEditing()}>{editBusy?'Сохранение…':'Сохранить'}</button>
+          </div>
+         </div>:showText&&<p>{highlightChatText(m.text||'',search)}</p>}
          {attachment&&<ChatAttachment message={m} onRefresh={refreshChatMediaUrl}/>}
          {caption&&<p className="chatAttachmentCaption">{highlightChatText(caption,search)}</p>}
          {m.kind==='system'&&!showText&&<p>Системное сообщение</p>}
          {!startsGroup&&<time className="chatInlineTime" dateTime={m.created_at}>{formatChatTime(m.created_at)}</time>}
+
         </div>
+        {selectedMessages.length===0&&<div className="chatMessageActions" role="group" aria-label="Действия с сообщением">
+         <button type="button" aria-label="Копировать сообщение" title="Копировать" disabled={!m.text||(attachment&&!caption)} onClick={()=>void copyChatMessage(m)}><Copy size={16} aria-hidden="true"/></button>
+         {canEditMessage(m)&&<button type="button" aria-label="Редактировать сообщение" title="Редактировать" disabled={editBusy} onClick={()=>startEditing(m)}><Pencil size={16} aria-hidden="true"/></button>}
+         {!readOnly&&<button type="button" className={chatPins.some(p=>p.message_id===m.id)?'isPinned':''}
+          disabled={!!pinBusy||(chatPins.length>=12&&!chatPins.some(p=>p.message_id===m.id))||(chatPins.some(p=>p.message_id===m.id&&p.pinned_by!==me?.user_id)&&!teacher)}
+          aria-label={chatPins.some(p=>p.message_id===m.id)?'Открепить сообщение':'Закрепить сообщение'}
+          aria-pressed={chatPins.some(p=>p.message_id===m.id)}
+          title={chatPins.some(p=>p.message_id===m.id)?'Открепить':'Закрепить'}
+          onClick={()=>void togglePin(m)}><Pin size={16} aria-hidden="true"/></button>}
+        </div>}
        </div>
-       {selectedMessages.length===0&&<button type="button" className={'chatPinAction '+(chatPins.some(p=>p.message_id===m.id)?'isPinned':'')} disabled={!!pinBusy||(chatPins.length>=12&&!chatPins.some(p=>p.message_id===m.id))||(chatPins.some(p=>p.message_id===m.id&&p.pinned_by!==me?.user_id)&&!teacher)} aria-label={chatPins.some(p=>p.message_id===m.id)?'Открепить сообщение':'Закрепить сообщение'} aria-pressed={chatPins.some(p=>p.message_id===m.id)} title={chatPins.some(p=>p.message_id===m.id)?'Открепить':'Закрепить'} onClick={()=>void togglePin(m)}><Pin size={15} aria-hidden="true"/></button>}
       </article>
      </div>;
     })}
