@@ -444,3 +444,25 @@
   overflow-wrap:anywhere;
 }
 #stage6-cec .candidatePointComposer button:disabled{cursor:not-allowed;opacity:.6}
+
+/* Scenario nominee: existing CEC visual system and consistent card gutters. */
+#stage6-cec .candidateCard > .scenarioCandidateSetup{margin:0 18px 16px}
+#stage6-cec .scenarioCandidateSetup > header{
+ display:flex;align-items:center;justify-content:space-between;
+ gap:10px;flex-wrap:wrap;min-width:0;margin-bottom:10px;
+}
+#stage6-cec .scenarioCandidateSetup > header small{
+ color:var(--cec-blue);font-size:11px;font-weight:800;letter-spacing:.06em;
+}
+#stage6-cec .scenarioCandidateSetup > header h4{
+ color:var(--cec-ink);font-size:14px;line-height:1.4;margin:3px 0 0;
+}
+#stage6-cec .scenarioCandidateSetup > header > span{font-size:12px;color:var(--cec-muted)}
+#stage6-cec .scenarioCandidateSetup .cecSubmissionActions{padding:12px 0 0}
+#stage6-cec .scenarioCandidateSetup .cecDocumentAccessNote{
+ flex:1 1 240px;min-width:0;margin:0;overflow-wrap:anywhere;
+}
+@container cec-stage6 (max-width:540px){
+ #stage6-cec .candidateCard > .scenarioCandidateSetup{margin:0 10px 12px}
+ #stage6-cec .scenarioCandidateSetup .cecSubmissionActions > button{width:100%}
+}
