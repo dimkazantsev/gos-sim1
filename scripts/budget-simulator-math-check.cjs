@@ -180,3 +180,102 @@ console.log('PASS Budget: verified 2026 totals, 14 sectors, borrowing vs income,
   console.log('PASS: Budget pulse plan selection matches full simulator for empty, cross-game, 35-plan, draft and no-draft cases; shared side effects and economic calculation retained');
  }finally{await db.close()}
 })().catch(e=>{console.error(e);process.exitCode=1});
+
+
+/* Test actual Postgres signature logic against a tiny isolated PGlite schema.
+   No production writes, no live Supabase accounts, no new service required. */
+(async()=>{
+ const {PGlite}=require('@electric-sql/pglite');
+ const migration=fs.readFileSync(path.join(root,'supabase/migrations/20261112035305_budget_forecast_fingerprint_cache.sql'),'utf8');
+ const signature=migration.slice(migration.indexOf('CREATE OR REPLACE FUNCTION private.budget_forecast_signature('),migration.indexOf('REVOKE ALL ON FUNCTION private.budget_forecast_signature('));
+ const pulse=migration.slice(migration.indexOf('CREATE OR REPLACE FUNCTION public.get_budget_pulse('));
+ assert.equal((migration.match(/CREATE TABLE private.budget_forecast_cache/g)||[]).length,1);
+ assert(migration.includes('ALTER TABLE private.budget_forecast_cache ENABLE ROW LEVEL SECURITY'));
+ assert(migration.includes('REVOKE ALL ON private.budget_forecast_cache FROM PUBLIC,anon,authenticated'));
+ assert(migration.includes('REVOKE ALL ON FUNCTION private.budget_forecast_signature(uuid,jsonb)'));
+ assert(pulse.indexOf('perform private.prepare_budget_simulator(p_game_id)')<pulse.indexOf('v_signature:=private.budget_forecast_signature(p_game_id,draft)'),'Financial consequences always apply before cache lookup');
+ assert(pulse.indexOf('perform pg_advisory_xact_lock(')<pulse.indexOf('v_signature:=private.budget_forecast_signature('),'The old per-game lock protects cache fill');
+ assert(pulse.includes('calculation:=private.calculate_budget_simulator(p_game_id,draft);'),'A changed input still uses the exact original calculator');
+ assert(pulse.includes('where c.game_id=p_game_id and c.input_signature=v_signature'),'No cross-game cache hits');
+ assert(pulse.includes('where budget_forecast_cache.input_signature is distinct from excluded.input_signature'),'No write on a cache hit');
+ assert(pulse.includes("select * into latest from budget_income_history")&&pulse.includes('insert into budget_income_history('),'Fresh history remains outside the forecast cache');
+ assert(pulse.includes("update state_metrics set label='Доходы бюджета'"),'Budget metric write guard retained');
+ assert(!signature.includes("metric_key='budget'"),'The derived budget metric must not invalidate its own cache');
+ const db=new PGlite();
+ try{
+  await db.exec("CREATE ROLE anon; CREATE ROLE authenticated; CREATE SCHEMA private;");
+  const ddl=[
+   'CREATE TABLE public.games(id uuid PRIMARY KEY,status text)',
+   'CREATE TABLE private.budget_baseline(year integer PRIMARY KEY,data jsonb)',
+   'CREATE TABLE public.budget_simulator_state(game_id uuid PRIMARY KEY,revenue_adjustment numeric)',
+   'CREATE TABLE public.game_fiscal_policy(game_id uuid PRIMARY KEY,key_rate numeric)',
+   'CREATE TABLE public.game_fiscal_regions(game_id uuid,region_code text,enterprises numeric,PRIMARY KEY(game_id,region_code))',
+   'CREATE TABLE public.game_fiscal_rates(game_id uuid,region_code text,tax_key text,rate numeric,PRIMARY KEY(game_id,region_code,tax_key))',
+   'CREATE TABLE public.state_metrics(id uuid PRIMARY KEY,game_id uuid,metric_key text,value numeric)',
+   'CREATE TABLE public.budget_transfer_requests(id uuid PRIMARY KEY,game_id uuid,event_case_id uuid,region_code text,amount numeric)',
+   'CREATE TABLE public.event_cases(id uuid PRIMARY KEY,game_id uuid,title text)',
+   'CREATE TABLE public.fiscal_region_reference(code text PRIMARY KEY,name text)',
+   'CREATE TABLE public.state_programs(id uuid PRIMARY KEY,game_id uuid,title text)',
+   'CREATE TABLE public.state_program_goals(id uuid PRIMARY KEY,game_id uuid,indicator_name text)',
+   'CREATE TABLE public.state_program_components(id uuid PRIMARY KEY,game_id uuid,title text)',
+   'CREATE TABLE public.state_program_expenses(id uuid PRIMARY KEY,game_id uuid,amount numeric)',
+   'CREATE TABLE public.state_program_budget_commitments(program_id uuid,budget_year integer,game_id uuid,amount numeric,PRIMARY KEY(program_id,budget_year))'
+  ];
+  for(const stmt of ddl)await db.exec(stmt);
+  await db.exec(migration.slice(migration.indexOf('CREATE TABLE private.budget_forecast_cache('),migration.indexOf('-- Per-game signature')));
+  await db.exec(signature);
+  const a='00000000-0000-4000-8000-000000000101',b='00000000-0000-4000-8000-000000000102';
+  await db.query("INSERT INTO public.games VALUES($1,'active'),($2,'active')",[a,b]);
+  await db.query("INSERT INTO private.budget_baseline VALUES(2026,'{\"2026\":true}'::jsonb)");
+  const draft={title:'Исходный прогноз',financing:{ofz_fixed:60}};
+  const sig=async(g=a,d=draft)=>(await db.query('SELECT private.budget_forecast_signature($1::uuid,$2::jsonb) AS sig',[g,JSON.stringify(d)])).rows[0].sig;
+  const initial=await sig();
+  assert.equal(initial,await sig());
+  assert.notEqual(initial,await sig(a,{...draft,note:'Changed'}),'Changing the selected draft invalidates');
+  await db.query("INSERT INTO public.state_metrics VALUES ('00000000-0000-4000-8000-000000000111',$1,'budget',12)",[a]);
+  assert.equal(initial,await sig(),'The derived budget metric must not cause a cache storm');
+  await db.query("UPDATE public.state_metrics SET value=13 WHERE game_id=$1 AND metric_key='budget'",[a]);
+  assert.equal(initial,await sig(),'Budget history synchronization does not invalidate');
+  const sources=[
+   ["state","INSERT INTO public.budget_simulator_state VALUES($1,15)"],
+   ["policy","INSERT INTO public.game_fiscal_policy VALUES($1,16)"],
+   ["region","INSERT INTO public.game_fiscal_regions VALUES($1,'54',100)"],
+   ["rate","INSERT INTO public.game_fiscal_rates VALUES($1,'00','vat',22)"],
+   ["economy","INSERT INTO public.state_metrics VALUES ('00000000-0000-4000-8000-000000000112',$1,'economy',50)"],
+   ["program","INSERT INTO public.state_programs VALUES('00000000-0000-4000-8000-000000000211',$1,'Программа')"],
+   ["goal","INSERT INTO public.state_program_goals VALUES('00000000-0000-4000-8000-000000000212',$1,'Показатель')"],
+   ["component","INSERT INTO public.state_program_components VALUES('00000000-0000-4000-8000-000000000213',$1,'Компонент')"],
+   ["expense","INSERT INTO public.state_program_expenses VALUES('00000000-0000-4000-8000-000000000214',$1,100)"],
+   ["commitment","INSERT INTO public.state_program_budget_commitments VALUES('00000000-0000-4000-8000-000000000211',2026,$1,100)"]
+  ];
+  let previous=await sig();
+  for(const [name,statement] of sources){
+   await db.query(statement,[a]);
+   const next=await sig();
+   assert.notEqual(next,previous,name+' changes the budget signature');
+   previous=next;
+  }
+  await db.query("INSERT INTO public.event_cases VALUES('00000000-0000-4000-8000-000000000321',$1,'Ситуация')",[a]);
+  assert.equal(previous,await sig(),'Unreferenced event case is not a calculation input');
+  await db.query("INSERT INTO public.fiscal_region_reference VALUES('54','Область')");
+  assert.equal(previous,await sig(),'Unreferenced region name is not a calculation input');
+  await db.query("INSERT INTO public.budget_transfer_requests VALUES('00000000-0000-4000-8000-000000000322',$1,'00000000-0000-4000-8000-000000000321','54',500)",[a]);
+  const withTransfer=await sig();
+  assert.notEqual(withTransfer,previous,'Transfer changes the signature');
+  await db.query("UPDATE public.event_cases SET title='Новая ситуация' WHERE game_id=$1",[a]);
+  const withCase=await sig();
+  assert.notEqual(withCase,withTransfer,'Related event label changes the calculation payload');
+  await db.query("UPDATE public.fiscal_region_reference SET name='Новая область' WHERE code='54'");
+  const withRegion=await sig();
+  assert.notEqual(withRegion,withCase,'Transfer region name changes the payload');
+  await db.query("INSERT INTO public.state_metrics VALUES ('00000000-0000-4000-8000-000000000113',$1,'economy',77)",[b]);
+  assert.equal(withRegion,await sig(a),'Another game cannot invalidate this game');
+  await db.query("UPDATE private.budget_baseline SET data='{\"2026\":false}'::jsonb WHERE year=2026");
+  assert.notEqual(withRegion,await sig(),'The baseline invalidates all cached forecasts');
+  await db.query('INSERT INTO private.budget_forecast_cache(game_id,input_signature,calculation) VALUES($1,$2,$3::jsonb)',[a,initial,JSON.stringify({revenue:42})]);
+  assert.equal((await db.query("SELECT calculation->>'revenue' AS rev FROM private.budget_forecast_cache WHERE game_id=$1",[a])).rows[0].rev,'42');
+  const row=(await db.query("SELECT relrowsecurity AS enabled FROM pg_class WHERE oid='private.budget_forecast_cache'::regclass")).rows[0];
+  assert(row.enabled,'Private cache table has RLS enabled');
+  console.log('PASS: Budget cache signature invalidates for all calculation inputs and linked transfer labels, isolates games, ignores derived budget metric, RLS enabled');
+ }finally{await db.close()}
+})().catch(e=>{console.error(e);process.exitCode=1});
