@@ -120,3 +120,63 @@ console.log('PASS Budget: verified 2026 totals, 14 sectors, borrowing vs income,
   console.log('PASS: Budget seed guard, 16 canonical cases, 100 no-op reads, cross-game isolation, partial-seed repair, preserved financial side effects');
  }finally{await db.close()}
 })().catch(err=>{console.error(err);process.exitCode=1});
+
+
+/* Read-only plan-selection parity with the pre-optimization simulator,
+ * and strict preservation of the mutating preparation phase. */
+(async()=>{
+ const {PGlite}=require('@electric-sql/pglite');
+ const source=fs.readFileSync(path.join(root,'supabase/migrations/20261112033448_budget_pulse_lean_read_split.sql'),'utf8');
+ const helper=source.slice(source.indexOf('CREATE OR REPLACE FUNCTION private.prepare_budget_simulator'),
+  source.indexOf('REVOKE ALL ON FUNCTION private.prepare_budget_simulator'));
+ const simulator=source.slice(source.indexOf('CREATE OR REPLACE FUNCTION public.get_budget_simulator'),
+  source.indexOf('CREATE OR REPLACE FUNCTION public.get_budget_pulse'));
+ const pulse=source.slice(source.indexOf('CREATE OR REPLACE FUNCTION public.get_budget_pulse'));
+ assert(helper.includes('private.is_game_member(p_game_id)'),'Original member check remains inside shared preparer');
+ assert(helper.includes('private.ensure_budget_simulator(p_game_id)'),'First-time initialization remains');
+ assert(helper.includes('private.seed_budget_cases(p_game_id)')&&helper.includes('private.seed_budget_regional_cases(p_game_id)'),'Missing case recovery remains');
+ assert(helper.includes('private.apply_budget_simulator_plan(p_game_id,row_id)'),'Published plan application remains');
+ assert(helper.includes('private.apply_budget_financial_outcome(p_game_id,row_id)'),'Resolved budget outcome application remains');
+ assert(helper.includes('private.dispatch_budget_risks(p_game_id)'),'Due financial risk dispatch remains');
+ assert(source.includes('REVOKE ALL ON FUNCTION private.prepare_budget_simulator(uuid)'),'Private preparer cannot be called directly by users');
+ assert(simulator.includes("return jsonb_build_object('state'")&&simulator.includes("'regional_events'")&&simulator.includes("'contracts'")&&simulator.includes("'ledger'"),'Full simulator response remains unchanged');
+ assert(!pulse.includes('simulation:=public.get_budget_simulator('),'Budget pulse must not build full simulator response');
+ assert(pulse.includes("perform pg_advisory_xact_lock(hashtextextended('gos-budget-pulse:'"),'The budget pulse serialization lock remains');
+ assert(pulse.includes('private.calculate_budget_simulator(p_game_id,draft)'),'The economic calculation is unchanged');
+ assert(pulse.includes('insert into budget_income_history(')&&pulse.includes('update state_metrics'),'History and metric synchronization are preserved');
+ const from=pulse.indexOf(' select x into plan\n from jsonb_array_elements((');
+ const to=pulse.indexOf(';\n if plan is null',from);
+ assert(from>0&&to>from,'Extract the actual fast plan selection from the migration');
+ const sql=pulse.slice(from,to).replace('select x into plan','select x').replaceAll('p_game_id','$1');
+ const db=new PGlite();
+ try{
+  await db.exec("CREATE TABLE public.budget_simulator_plans(id uuid PRIMARY KEY,game_id uuid NOT NULL,status text,updated_at timestamptz,document_id uuid,title text,draft jsonb,revision integer);");
+  await db.exec("CREATE TABLE public.formal_documents(id uuid PRIMARY KEY,registry_no text);");
+  const gameA='00000000-0000-4000-8000-000000000101',gameB='00000000-0000-4000-8000-000000000102',gameEmpty='00000000-0000-4000-8000-000000000103';
+  const oldPlans=async(g)=>(await db.query(
+   "select coalesce(jsonb_agg(to_jsonb(p) order by p.updated_at desc),'[]'::jsonb) as plans from (select pl.*,d.registry_no from public.budget_simulator_plans pl left join public.formal_documents d on d.id=pl.document_id where pl.game_id=$1 order by pl.updated_at desc limit 30)p",[g])).rows[0].plans;
+  const parity=async(g)=>{
+   const old=await oldPlans(g);
+   const expected=old.filter(p=>p.status==='draft')[0]||old[0]||null;
+   const got=(await db.query(sql,[g])).rows[0]?.x||null;
+   assert.deepEqual(got,expected,'Plan and all its fields must match the original 30-plan JSON selection');
+  };
+  await parity(gameEmpty);
+  await db.query("INSERT INTO public.formal_documents VALUES('00000000-0000-4000-8000-000000000905','Б-001')");
+  for(let i=1;i<=35;i++){
+   const id='00000000-0000-4000-8000-'+String(i).padStart(12,'0');
+   await db.query('INSERT INTO public.budget_simulator_plans VALUES ($1,$2,$3,$4,$5,$6,$7,$8)',[
+    id,gameA,i===2||i===29?'draft':i%3===0?'published':'document',
+    new Date(Date.UTC(2026,0,1,0,i)).toISOString(),i===29?'00000000-0000-4000-8000-000000000905':null,
+    'План '+i,{title:'План '+i,financing:{ofz_fixed:i}},i
+   ]);
+  }
+  await db.query("INSERT INTO public.budget_simulator_plans VALUES ('00000000-0000-4000-8000-000000000800',$1,'draft',now(),NULL,'Чужой план','{}',1)",[gameB]);
+  await parity(gameA);await parity(gameB);await parity(gameEmpty);
+  await db.query("UPDATE public.budget_simulator_plans SET status='published' WHERE game_id=$1 AND status='draft'",[gameA]);
+  await parity(gameA);
+  await db.query("DELETE FROM public.budget_simulator_plans WHERE game_id=$1 AND id='00000000-0000-4000-8000-000000000035'",[gameA]);
+  await parity(gameA);
+  console.log('PASS: Budget pulse plan selection matches full simulator for empty, cross-game, 35-plan, draft and no-draft cases; shared side effects and economic calculation retained');
+ }finally{await db.close()}
+})().catch(e=>{console.error(e);process.exitCode=1});
