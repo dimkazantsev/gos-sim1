@@ -21,6 +21,7 @@ import {decodeChatAttachmentText} from './chatMediaTransport';
 
 const FILE_ACCEPT='image/*,audio/*,video/*,.pdf,.doc,.docx,.txt,.xlsx,.ppt,.pptx';
 const MAX_FILE_SIZE=CHAT_MAX_FILE_BYTES;
+const COMPOSER_HEIGHT_STORAGE_KEY='gos-id.chat.composer-height.v1';
 function highlightChatText(value:string,search:string):ReactNode{
  const query=search.trim();if(!query)return value;
  const haystack=value.toLocaleLowerCase('ru-RU'),needle=query.toLocaleLowerCase('ru-RU');
@@ -103,6 +104,7 @@ export default function ChatPanel({g,draft:text,onDraftChange:setText,previewCha
  const restoreHistoryScroll=useRef<{channel:string;height:number;top:number;oldest:string;created:string}|null>(null);
  const composer=useRef<HTMLTextAreaElement>(null);
  const manualComposerHeight=useRef<number|null>(null);
+ const composerHeightRestored=useRef(false);
  const composerDrag=useRef<{y:number;height:number}|null>(null);
  const draftRef=useRef(text);draftRef.current=text;
  const liveCamera=useRef<HTMLVideoElement>(null);
@@ -249,7 +251,24 @@ export default function ChatPanel({g,draft:text,onDraftChange:setText,previewCha
   const cap=Math.max(44,Math.min(136,Math.floor(available*.28)));
   node.style.height=Math.min(cap,Math.max(44,node.scrollHeight))+'px';
  }
- useLayoutEffect(sizeComposer,[text,readyFile]);
+ function saveComposerHeight(){
+  const height=manualComposerHeight.current;
+  if(height===null)return;
+  try{window.localStorage.setItem(COMPOSER_HEIGHT_STORAGE_KEY,String(Math.round(height)))}catch{/* Browser storage may be unavailable; the current size still works. */}
+ }
+ useLayoutEffect(()=>{
+  if(!composerHeightRestored.current){
+   composerHeightRestored.current=true;
+   try{
+    const stored=window.localStorage.getItem(COMPOSER_HEIGHT_STORAGE_KEY);
+    if(stored!==null){
+     const height=Number(stored);
+     if(Number.isFinite(height)&&height>=44&&height<=520)manualComposerHeight.current=height;
+    }
+   }catch{/* Preserve the existing automatic sizing when storage is blocked. */}
+  }
+  sizeComposer();
+ },[text,readyFile]);
  useEffect(()=>{if(searchOpen)searchInput.current?.focus()},[searchOpen]);
  useEffect(()=>{
   if(!recordingStartedAt){setRecordElapsed(0);return}
@@ -535,6 +554,7 @@ export default function ChatPanel({g,draft:text,onDraftChange:setText,previewCha
      sizeComposer();
     }}
     onPointerUp={e=>{
+     if(composerDrag.current)saveComposerHeight();
      composerDrag.current=null;
      if(e.currentTarget.hasPointerCapture(e.pointerId))e.currentTarget.releasePointerCapture(e.pointerId);
     }}
@@ -549,6 +569,7 @@ export default function ChatPanel({g,draft:text,onDraftChange:setText,previewCha
      const height=manualComposerHeight.current??composer.current?.getBoundingClientRect().height??44;
      manualComposerHeight.current=Math.max(44,Math.min(maxComposerHeight(),height+(e.key==='ArrowUp'?24:-24)));
      sizeComposer();
+     saveComposerHeight();
     }}><span aria-hidden="true"/></button>
    {mentionMatch&&<div className="chatAddressList chatMentionList" aria-label="Упомянуть участника"><small><AtSign size={14} aria-hidden="true"/> Упомянуть в текущем чате</small>{mentionSuggestions.map(x=><button type="button" key={x.member.user_id} onClick={()=>insertMention(x.member.user_id)}><b>{x.member.full_name}</b><span>{x.member.role_title||x.member.team||'Участник'}</span></button>)}{!mentionSuggestions.length&&<span>Участник не найден.</span>}</div>}
    {showProcessTags&&<details id="chat-process-tags" className="chatProcessTags" open={processTagsOpen} onToggle={e=>setProcessTagsOpen(e.currentTarget.open)}><summary>Сообщение для политического процесса</summary><small>Добавьте тег, чтобы направить сообщение в публичную ленту.</small><div aria-label="Теги сообщения">{PROCESS_TAGS.map(t=><button type="button" key={t.key} onClick={()=>{if(!text.includes('#'+t.key))setText(text+(text?' ':'')+'#'+t.key);if(window.matchMedia('(max-width:760px)').matches)setProcessTagsOpen(false);composer.current?.focus()}}>{t.label}</button>)}</div></details>}
