@@ -274,6 +274,35 @@ console.log('PASS Budget: verified 2026 totals, 14 sectors, borrowing vs income,
   assert.notEqual(withRegion,await sig(),'The baseline invalidates all cached forecasts');
   await db.query('INSERT INTO private.budget_forecast_cache(game_id,input_signature,calculation) VALUES($1,$2,$3::jsonb)',[a,initial,JSON.stringify({revenue:42})]);
   assert.equal((await db.query("SELECT calculation->>'revenue' AS rev FROM private.budget_forecast_cache WHERE game_id=$1",[a])).rows[0].rev,'42');
+  // 100 logical readers of the actual migration's cache+signature lookup.
+  // No production writes and no claim of 100 independent DB connections.
+  const queryCached="SELECT c.calculation AS result FROM private.budget_forecast_cache c WHERE c.game_id=$1 AND c.input_signature=private.budget_forecast_signature($1::uuid,$2::jsonb)";
+  const currentSignature=await sig(a);
+  await db.query("UPDATE private.budget_forecast_cache SET input_signature=$2,calculation=$3::jsonb WHERE game_id=$1",[a,currentSignature,JSON.stringify({revenue:2026,expenditure:3030})]);
+  const read100=async()=>Promise.all(Array.from({length:100},()=>db.query(queryCached,[a,JSON.stringify(draft)])));
+  const beforeReads=(await db.query('SELECT xmin::text AS tx FROM private.budget_forecast_cache WHERE game_id=$1',[a])).rows[0].tx;
+  const hits=await read100();
+  assert.equal(hits.length,100,'All 100 synthetic clients completed their cache lookups');
+  assert(hits.every(r=>r.rows.length===1&&Number(r.rows[0].result.revenue)===2026),'Each of 100 clients sees the same current forecast');
+  const afterReads=(await db.query('SELECT xmin::text AS tx FROM private.budget_forecast_cache WHERE game_id=$1',[a])).rows[0].tx;
+  assert.equal(afterReads,beforeReads,'100 cache hits do not write to the cached row');
+  const foreign=(await db.query(queryCached,[b,JSON.stringify(draft)])).rows;
+  assert.equal(foreign.length,0,'A foreign game cannot access another game\'s result');
+  await db.query('UPDATE public.game_fiscal_regions SET enterprises=enterprises+1 WHERE game_id=$1',[a]);
+  const stale=await read100();
+  assert(stale.every(r=>r.rows.length===0),'After a fiscal source update, all 100 reads reject the stale forecast');
+  const changedSignature=await sig(a);
+  assert.notEqual(changedSignature,currentSignature,'A fiscal change must invalidate the signature');
+  // Emulate one successful re-calculation fill; the real function performs
+  // this under its existing per-game advisory transaction lock.
+  await db.query("UPDATE private.budget_forecast_cache SET input_signature=$2,calculation=$3::jsonb WHERE game_id=$1",[a,changedSignature,JSON.stringify({revenue:2027,expenditure:3030})]);
+  const restored=await read100();
+  assert(restored.every(r=>r.rows.length===1&&Number(r.rows[0].result.revenue)===2027),'100 clients read the replacement forecast');
+  const afterFill=(await db.query('SELECT xmin::text AS tx FROM private.budget_forecast_cache WHERE game_id=$1',[a])).rows[0].tx;
+  const repeat=await read100();
+  assert(repeat.every(r=>r.rows.length===1),'Repeated reads stay available');
+  assert.equal((await db.query('SELECT xmin::text AS tx FROM private.budget_forecast_cache WHERE game_id=$1',[a])).rows[0].tx,afterFill,'Repeated 100-reader wave produces no write');
+  console.log('PASS: 100 synthetic concurrent cache lookups, zero writes on hits, 100 stale misses after fiscal change, isolated game, 100 fresh replacement hits');
   const row=(await db.query("SELECT relrowsecurity AS enabled FROM pg_class WHERE oid='private.budget_forecast_cache'::regclass")).rows[0];
   assert(row.enabled,'Private cache table has RLS enabled');
   console.log('PASS: Budget cache signature invalidates for all calculation inputs and linked transfer labels, isolates games, ignores derived budget metric, RLS enabled');
