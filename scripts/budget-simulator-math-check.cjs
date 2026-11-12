@@ -126,7 +126,7 @@ console.log('PASS Budget: verified 2026 totals, 14 sectors, borrowing vs income,
  * and strict preservation of the mutating preparation phase. */
 (async()=>{
  const {PGlite}=require('@electric-sql/pglite');
- const source=fs.readFileSync(path.join(root,'supabase/migrations/20261112035000_budget_pulse_lean_read_split.sql'),'utf8');
+ const source=fs.readFileSync(path.join(root,'supabase/migrations/20261112033448_budget_pulse_lean_read_split.sql'),'utf8');
  const helper=source.slice(source.indexOf('CREATE OR REPLACE FUNCTION private.prepare_budget_simulator'),
   source.indexOf('REVOKE ALL ON FUNCTION private.prepare_budget_simulator'));
  const simulator=source.slice(source.indexOf('CREATE OR REPLACE FUNCTION public.get_budget_simulator'),
