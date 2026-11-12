@@ -650,6 +650,8 @@ export function useRepublicGame(gameId:string){
       else{
        setMessages(rows=>rows.map(row=>row.id===next.id
         ?{...row,...next,url:row.storage_path===next.storage_path?row.url||null:null}:row));
+       setPinnedMessages(rows=>rows.map(row=>row.id===next.id
+        ?{...row,...next,url:row.storage_path===next.storage_path?row.url||null:null}:row));
        if(next.storage_path&&next.storage_path!==previous.storage_path)
         void signedAssetUrl('game-media',next.storage_path).then(url=>{
          if(currentConnection()&&channelRef.current===next.channel_id&&url)
@@ -2497,6 +2499,25 @@ export function useRepublicGame(gameId:string){
    if(readCurrent(ticket)&&channelRef.current===cid){setChatPins(pins);setPinnedMessages(media)}
   });
  }
+ async function editChatMessage(messageId:string,nextText:string,mentionedUserIds:string[]=[]){
+  const current=messageRowsRef.current.find(row=>row.id===messageId);
+  if(!me||!current||current.kind!=='text'||current.author_id!==authUser.current||!nextText.trim())return false;
+  try{
+   // One bounded RPC; update both local projections without a full game reload.
+   const response=await boundedChatWrite(signal=>supabase.rpc('edit_chat_message',{
+    p_message_id:messageId,p_text:nextText,p_mentioned_users:mentionedUserIds
+   }).abortSignal(signal));
+   if(response.error){setError(userError(response.error));return false}
+   const updated=String(response.data??nextText.trim());
+   setMessages(rows=>rows.map(row=>row.id===messageId?{...row,text:updated}:row));
+   setPinnedMessages(rows=>rows.map(row=>row.id===messageId?{...row,text:updated}:row));
+   setChatOverview(rows=>rows.map(row=>row.channel_id===current.channel_id&&row.last_message_at===current.created_at&&row.last_message_author_id===current.author_id?{...row,last_message_text:updated}:row));
+   return true;
+  }catch(e){
+   // A timeout may happen after a committed edit; Realtime will reconcile it.
+   setError(userError(e));return false;
+  }
+ }
  async function setChatPin(messageId:string,pin:boolean){
   if(!me||!channelId)return false;
   const original=chatPins;
@@ -3437,5 +3458,5 @@ export function useRepublicGame(gameId:string){
  }
 
  return {coreLoaded,chatDirectoryLoaded,refreshChatDirectory,openDetailedDashboard:()=>{if(authUser.current&&acceptedMember.current)void loadCoreForView()},gdMandateCapacity,gdEffectivePresence,game:game?.id===gameId?game:null,me:visibleMe,verifiedUserId:visibleMe?.user_id??null,metrics:sharedMetrics,budgetPulse,budgetPulseError,refreshBudgetPulse,activeView,setActiveView,hydrateTeacherWorkspace,events,members,officeAssignments,channels,channelId,setChannelId,messages,hasOlderChatMessages,olderChatLoading,loadOlderChatMessages,chatPins,pinnedMessages,chatOverview,chatUnreadCount:chatOverview.reduce((sum,row)=>sum+Number(row.unread_count||0),0),chatMentionCount:chatOverview.reduce((sum,row)=>sum+Number(row.mention_count||0),0),setChatChannelPinned,markChatRead,chatLoading,stages,parties,votes,ballots,evaluations,crises,documents,activities,presence,profiles,profilesLoaded:profileGameId===gameId,introAccountSeen,partyDocuments,loadSelectedPartyDocuments,loadPartyOfficialDocuments,loadPartyOfficialHistory,partyInvitations,partyMandates,partyAgreements,politicalPosts,politicalPostTotal,politicalActorOptions,politicalHasOlder,politicalOlderLoading,politicalSearchLoading,loadOlderPoliticalPosts,setPoliticalWallFullSearch,politicalMedia,loadPoliticalMediaUrl,postFormalLinks,metricHistory:sharedMetricHistory,partySupportHistory,impactRules,impactLedger,formalDocuments,formalHistory,loading,error,setError,chatOpen,setChatOpen,recording,recordingPreview,recordingSaving,chatMediaError,chatMediaPhase,recordingStartedAt,recordingStream:recordingStream.current,realtimeState,teacher,names,currentStage,myEvaluations,averageVsn,
-  refresh,refreshDocuments,refreshEventEffects,logout,touchPresence,logActivity,setTurn,setTurnMinutes,openStage,manageStage,nextStage,resetStageProgress,configureStageDeadline,setStageDeadline,availableActors,createPoliticalPost,updatePoliticalPost,addMediaToPoliticalPost,acceptPoliticalPost,rejectPoliticalPost,approvePostImpact,createVoteFromPost,updateImpactRule,revertImpactEntry,createParty,voteForPartyChair,updateParty,renameParty,setPartyLeader,setPartyMandates,updatePartyStatistics,inviteToParty,respondPartyInvitation,cancelPartyInvitation,removePartyMember,teacherManagePartyMember,proposePartyAgreement,respondPartyAgreement,submitPartyRegistration,reviewPartyRegistration,applyPartyGhostLoss,drawGhostVoting,clearPartyGhostLoss,applyGhostVotingBatch,deleteParty,updateMember,createVote,canVote,ballotWeight,castVote,castVoteAllocation,setStudentMandates,closeVote,deleteVote,tally,quorum,setEvaluation,publishEvent,triggerCrisis,ghostVoting,createDocument,updateMetric,saveProfile,saveSignature,loadOwnSignaturePreview,savePartyIdentity,uploadPartyDocument,reviewPartyDocument,deletePartyDocument,createFormalDocument,deleteFormalDocument,advanceFormalDocument,updateFormalDraft,vetoFormalDocument,resolveBudgetConciliation,startBudgetRejectionBranch,sendText,sendChatFile,setChatPin,refreshChatMediaUrl,toggleRecording,discardRecording,sendRecordingPreview};
+  refresh,refreshDocuments,refreshEventEffects,logout,touchPresence,logActivity,setTurn,setTurnMinutes,openStage,manageStage,nextStage,resetStageProgress,configureStageDeadline,setStageDeadline,availableActors,createPoliticalPost,updatePoliticalPost,addMediaToPoliticalPost,acceptPoliticalPost,rejectPoliticalPost,approvePostImpact,createVoteFromPost,updateImpactRule,revertImpactEntry,createParty,voteForPartyChair,updateParty,renameParty,setPartyLeader,setPartyMandates,updatePartyStatistics,inviteToParty,respondPartyInvitation,cancelPartyInvitation,removePartyMember,teacherManagePartyMember,proposePartyAgreement,respondPartyAgreement,submitPartyRegistration,reviewPartyRegistration,applyPartyGhostLoss,drawGhostVoting,clearPartyGhostLoss,applyGhostVotingBatch,deleteParty,updateMember,createVote,canVote,ballotWeight,castVote,castVoteAllocation,setStudentMandates,closeVote,deleteVote,tally,quorum,setEvaluation,publishEvent,triggerCrisis,ghostVoting,createDocument,updateMetric,saveProfile,saveSignature,loadOwnSignaturePreview,savePartyIdentity,uploadPartyDocument,reviewPartyDocument,deletePartyDocument,createFormalDocument,deleteFormalDocument,advanceFormalDocument,updateFormalDraft,vetoFormalDocument,resolveBudgetConciliation,startBudgetRejectionBranch,sendText,sendChatFile,editChatMessage,setChatPin,refreshChatMediaUrl,toggleRecording,discardRecording,sendRecordingPreview};
 }
