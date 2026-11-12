@@ -273,7 +273,7 @@ console.log('PASS Budget: verified 2026 totals, 14 sectors, borrowing vs income,
   await db.query("UPDATE private.budget_baseline SET data='{\"2026\":false}'::jsonb WHERE year=2026");
   assert.notEqual(withRegion,await sig(),'The baseline invalidates all cached forecasts');
   await db.query('INSERT INTO private.budget_forecast_cache(game_id,input_signature,calculation) VALUES($1,$2,$3::jsonb)',[a,initial,JSON.stringify({revenue:42})]);
-  assert.equal((await db.query('SELECT calculation->>\\'revenue\\' AS rev FROM private.budget_forecast_cache WHERE game_id=$1',[a])).rows[0].rev,'42');
+  assert.equal((await db.query("SELECT calculation->>'revenue' AS rev FROM private.budget_forecast_cache WHERE game_id=$1",[a])).rows[0].rev,'42');
   const row=(await db.query("SELECT relrowsecurity AS enabled FROM pg_class WHERE oid='private.budget_forecast_cache'::regclass")).rows[0];
   assert(row.enabled,'Private cache table has RLS enabled');
   console.log('PASS: Budget cache signature invalidates for all calculation inputs and linked transfer labels, isolates games, ignores derived budget metric, RLS enabled');
