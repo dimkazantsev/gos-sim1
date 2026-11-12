@@ -2,7 +2,7 @@
 import {useEffect,useLayoutEffect,useMemo,useRef,useState} from 'react';
 import type {ReactNode} from 'react';
 import {createPortal} from 'react-dom';
-import {ArrowDown,AtSign,Copy,Download,FileText,Mic,Minimize2,Paperclip,Pencil,Pin,PinOff,Search,Send,Square,Trash2,UserRound,Video,X} from 'lucide-react';
+import {ArrowDown,AtSign,Check,Copy,Download,FileText,Mic,Minimize2,Paperclip,Pencil,Pin,PinOff,Search,Send,Square,Trash2,UserRound,Video,X} from 'lucide-react';
 import {CHAT_MAX_FILE_BYTES,formatRecordingDuration} from './recordingMedia';
 import {IconAction} from '../ui/IconAction';
 import ChatChannelDropdown from './ChatChannelDropdown';
@@ -138,7 +138,9 @@ export default function ChatPanel({g,draft:text,onDraftChange:setText,previewCha
  // Search applies to loaded messages; history reads remain explicit.
  const canLoadHistory=hasOlderChatMessages&&!hasFilter;
  const handles=chatHandles(g.members).filter(x=>x.member.user_id!==me?.user_id);
- const mentionMatch=text.match(/(?:^|\s)@([а-яёa-z0-9_-]*)$/i);
+ const composerText=editingMessageId===null?text:editValue;
+ function setComposerText(next:string){if(editingMessageId===null)setText(next);else setEditValue(next)}
+ const mentionMatch=composerText.match(/(?:^|\s)@([а-яёa-z0-9_-]*)$/i);
  const mentionQuery=(mentionMatch?.[1]||'').toLocaleLowerCase('ru-RU');
  const mentionSuggestions=mentionMatch?handles.filter(x=>x.handle.startsWith(mentionQuery)||x.aliases.some(a=>a.startsWith(mentionQuery))).slice(0,8):[];
  const peopleResults=search.trim().length>0?handles.filter(x=>{
@@ -150,8 +152,8 @@ export default function ChatPanel({g,draft:text,onDraftChange:setText,previewCha
   const surname=person.member.full_name.trim().split(/\s+/)[0]||person.surname;
   const duplicateSurname=handles.filter(x=>(x.member.full_name.trim().split(/\s+/)[0]||'').toLocaleLowerCase('ru-RU')===surname.toLocaleLowerCase('ru-RU')).length>1;
   const mentionLabel=duplicateSurname?person.handle:surname;
-  const prefix=text.slice(0,text.length-mentionMatch[0].length)+(mentionMatch[0].startsWith(' ')?' ':'');
-  setText(prefix+'@'+mentionLabel+' ');requestAnimationFrame(()=>composer.current?.focus());
+  const prefix=composerText.slice(0,composerText.length-mentionMatch[0].length)+(mentionMatch[0].startsWith(' ')?' ':'');
+  setComposerText(prefix+'@'+mentionLabel+' ');requestAnimationFrame(()=>composer.current?.focus());
  }
  function mentionedUsers(value:string){
   const tokens=[...value.matchAll(/@([\p{L}\d_-]+)/gu)].map(m=>m[1].toLocaleLowerCase('ru-RU'));
@@ -275,7 +277,7 @@ export default function ChatPanel({g,draft:text,onDraftChange:setText,previewCha
    }catch{/* Fall back to automatic height when local storage is disabled. */}
   }
   sizeComposer();
- },[text,readyFile,expanded]);
+ },[text,editValue,editingMessageId,readyFile,expanded]);
  useEffect(()=>{if(searchOpen)searchInput.current?.focus()},[searchOpen]);
  useEffect(()=>{
   if(!recordingStartedAt){setRecordElapsed(0);return}
@@ -357,6 +359,7 @@ export default function ChatPanel({g,draft:text,onDraftChange:setText,previewCha
  },[expanded,overlay,phonePortal]);
  const scrollToLatest=()=>{if(list.current){list.current.scrollTop=list.current.scrollHeight;follow.current=true;setJumpVisible(false)}};
  async function send(){
+  if(editingMessageId){await saveEditing();return}
   const attachment=readyFile;
   if(pendingSend.current||sending||uploading||chatLoading||(!text.trim()&&!attachment)||!channelId)return;
   const sentText=text,fromChannel=channelId;
@@ -390,8 +393,13 @@ export default function ChatPanel({g,draft:text,onDraftChange:setText,previewCha
  }
  function canEditMessage(m:Message){return !readOnly&&m.kind==='text'&&m.author_id===me?.user_id}
  function startEditing(m:Message){
-  if(!canEditMessage(m)||editBusy)return;
+  if(!canEditMessage(m)||editBusy||sending||uploading||recording||recordingPreview||recordingSaving)return;
   setEditingMessageId(m.id);setEditValue(m.text||'');setLocalError('');
+  setAttachOpen(false);setProcessTagsOpen(false);
+  requestAnimationFrame(()=>{
+   const node=composer.current;if(!node)return;
+   node.focus();node.setSelectionRange(node.value.length,node.value.length);
+  });
  }
  function cancelEditing(){if(editBusy)return;setEditingMessageId(null);setEditValue('')}
  async function saveEditing(){
@@ -462,7 +470,8 @@ export default function ChatPanel({g,draft:text,onDraftChange:setText,previewCha
  }
  function resetSearch(){setSearch('');setOnlyFiles(false);setSearchOpen(false);follow.current=true;requestAnimationFrame(scrollToLatest)}
  const chatView=<aside id="game-chat" ref={panel} tabIndex={-1} className={'simChat gsChatV2'+(expanded?' chatExpanded':'')} role={overlay||expanded?'dialog':'region'} aria-modal={overlay||expanded?true:undefined} aria-label="Командный чат" onKeyDown={e=>{if(e.key==='Escape'){
-  if(attachOpen){e.stopPropagation();setAttachOpen(false);attachmentButton.current?.focus()}
+  if(editingMessageId){e.stopPropagation();cancelEditing()}
+  else if(attachOpen){e.stopPropagation();setAttachOpen(false);attachmentButton.current?.focus()}
   else if(searchOpen){e.stopPropagation();resetSearch()}
   else{e.stopPropagation();if(expanded)setExpanded(false);else setChatOpen(false)}
  }}}>
@@ -528,15 +537,7 @@ export default function ChatPanel({g,draft:text,onDraftChange:setText,previewCha
         {startsGroup&&<div className="chatAuthor">{onOpenMember&&g.members.some(member=>member.user_id===m.author_id)?<button type="button" className="chatAuthorProfile" onClick={()=>onOpenMember(m.author_id)}>{own?'Вы':name}</button>:<b>{own?'Вы':name}</b>}<time dateTime={m.created_at}>{formatChatTime(m.created_at)}</time></div>}
         <div className="chatMessageContent">
          <div className="chatBubble">
-         {editingMessageId===m.id?<div className="chatInlineEditor">
-          <textarea aria-label="Редактировать сообщение" value={editValue} rows={3} maxLength={20000} disabled={editBusy}
-           onChange={e=>setEditValue(e.target.value)}
-           onKeyDown={e=>{if(e.key==='Escape'){e.stopPropagation();cancelEditing()}else if(e.key==='Enter'&&(e.ctrlKey||e.metaKey)){e.preventDefault();void saveEditing()}}}/>
-          <div className="chatInlineEditActions">
-           <button type="button" disabled={editBusy} onClick={cancelEditing}>Отмена</button>
-           <button type="button" className="chatInlineEditSave" disabled={editBusy||!editValue.trim()||editValue.length>20000} onClick={()=>void saveEditing()}>{editBusy?'Сохранение…':'Сохранить'}</button>
-          </div>
-         </div>:showText&&<p>{highlightChatText(m.text||'',search)}</p>}
+         {showText&&<p>{highlightChatText(m.text||'',search)}</p>}
          {attachment&&<ChatAttachment message={m} onRefresh={refreshChatMediaUrl}/>}
          {caption&&<p className="chatAttachmentCaption">{highlightChatText(caption,search)}</p>}
          {m.kind==='system'&&!showText&&<p>Системное сообщение</p>}
@@ -625,23 +626,29 @@ export default function ChatPanel({g,draft:text,onDraftChange:setText,previewCha
      sizeComposer();
      saveComposerHeight();
     }}><span aria-hidden="true"/></button>
+   {editingMessageId&&<div className="chatEditBanner" role="status">
+    <Pencil size={17} aria-hidden="true"/>
+    <div className="chatEditBannerText"><b>Редактирование сообщения</b><span>{messages.find(m=>m.id===editingMessageId)?.text||'Сообщение'}</span></div>
+    <button type="button" disabled={editBusy} onClick={cancelEditing} aria-label="Отменить редактирование" title="Отменить редактирование"><X size={18} aria-hidden="true"/></button>
+   </div>}
    {mentionMatch&&<div className="chatAddressList chatMentionList" aria-label="Упомянуть участника"><small><AtSign size={14} aria-hidden="true"/> Упомянуть в текущем чате</small>{mentionSuggestions.map(x=><button type="button" key={x.member.user_id} onClick={()=>insertMention(x.member.user_id)}><b>{x.member.full_name}</b><span>{x.member.role_title||x.member.team||'Участник'}</span></button>)}{!mentionSuggestions.length&&<span>Участник не найден.</span>}</div>}
-   {showProcessTags&&<details id="chat-process-tags" className="chatProcessTags" open={processTagsOpen} onToggle={e=>setProcessTagsOpen(e.currentTarget.open)}><summary>Сообщение для политического процесса</summary><small>Добавьте тег, чтобы направить сообщение в публичную ленту.</small><div aria-label="Теги сообщения">{PROCESS_TAGS.map(t=><button type="button" key={t.key} onClick={()=>{if(!text.includes('#'+t.key))setText(text+(text?' ':'')+'#'+t.key);if(window.matchMedia('(max-width:760px)').matches)setProcessTagsOpen(false);composer.current?.focus()}}>{t.label}</button>)}</div></details>}
-   {readyFile&&<div className="chatPendingAttachment" aria-label="Подготовлено вложение">
+   {showProcessTags&&<details id="chat-process-tags" className="chatProcessTags" open={processTagsOpen} onToggle={e=>setProcessTagsOpen(e.currentTarget.open)}><summary>Сообщение для политического процесса</summary><small>Добавьте тег, чтобы направить сообщение в публичную ленту.</small><div aria-label="Теги сообщения">{PROCESS_TAGS.map(t=><button type="button" key={t.key} onClick={()=>{if(!composerText.includes('#'+t.key))setComposerText(composerText+(composerText?' ':'')+'#'+t.key);if(window.matchMedia('(max-width:760px)').matches)setProcessTagsOpen(false);composer.current?.focus()}}>{t.label}</button>)}</div></details>}
+   {!editingMessageId&&readyFile&&<div className="chatPendingAttachment" aria-label="Подготовлено вложение">
     <Paperclip aria-hidden="true" size={16}/><span title={readyFile.file.name}>{readyFile.file.name} · {formatBytes(readyFile.file.size)}</span>
     <button type="button" disabled={sending||uploading} aria-label="Убрать вложение" onClick={()=>setPendingFile(null)}><X size={17} aria-hidden="true"/></button>
    </div>}
    <div className="chatInputRow">
-    <textarea ref={composer} aria-label="Ваше сообщение" rows={1} enterKeyHint="enter" value={text} onChange={e=>setText(e.target.value)}
-     placeholder={channelId?'Сообщение · @фамилия для упоминания':'Выберите чат'}
-     disabled={!channelId||chatLoading} readOnly={sending} aria-busy={sending}
+    <textarea ref={composer} aria-label={editingMessageId?'Редактировать сообщение':'Ваше сообщение'} rows={1} enterKeyHint="enter" value={composerText} onChange={e=>setComposerText(e.target.value)}
+     placeholder={editingMessageId?'Изменить сообщение':channelId?'Сообщение · @фамилия для упоминания':'Выберите чат'}
+     maxLength={editingMessageId?20000:undefined}
+     disabled={!channelId||chatLoading} readOnly={sending||editBusy} aria-busy={sending||editBusy}
      onKeyDown={e=>{if(e.key==='Enter'&&(e.ctrlKey||e.metaKey)&&!e.nativeEvent.isComposing){e.preventDefault();void send()}}}/>
    </div>
    <div className="chatComposeActions">
     <div className="chatAttachWrap" ref={attachWrap}>
      <button type="button" ref={attachmentButton} className={'chatIconButton chatAttachButton '+(attachOpen?'active':'')}
       aria-label="Прикрепить файл" aria-haspopup="menu" aria-expanded={attachOpen}
-      disabled={!channelId||uploading||chatLoading||!!recording||!!recordingPreview||recordingSaving}
+      disabled={!!editingMessageId||!channelId||uploading||chatLoading||!!recording||!!recordingPreview||recordingSaving}
       onClick={()=>setAttachOpen(v=>!v)}><Paperclip aria-hidden="true"/></button>
      {attachOpen&&<div className="chatAttachMenu" role="menu" aria-label="Добавить в чат">
       <button type="button" role="menuitem" onClick={()=>{setAttachOpen(false);uploadInput.current?.click()}}>
@@ -652,7 +659,7 @@ export default function ChatPanel({g,draft:text,onDraftChange:setText,previewCha
       onChange={e=>{const file=e.target.files?.[0];if(file)stageAttachment(file)}}/>
     </div>
     <button type="button" className={'chatIconButton chatMediaShortcut '+(recording==='audio'?'isRecording':'')}
-     disabled={!channelId||uploading||chatLoading||recordingSaving||!!recordingPreview||recording==='video'}
+     disabled={!!editingMessageId||!channelId||uploading||chatLoading||recordingSaving||!!recordingPreview||recording==='video'}
      aria-label={recording==='audio'?'Завершить запись аудио':'Записать аудиосообщение'}
      title={recording==='audio'?'Завершить запись':'Короткое нажатие — запись, удержание — записать и отправить'}
      onPointerDown={e=>{if(e.pointerType!=='mouse'||e.button===0)beginHold('audio')}}
@@ -661,7 +668,7 @@ export default function ChatPanel({g,draft:text,onDraftChange:setText,previewCha
      <Mic aria-hidden="true" size={19}/>
     </button>
     <button type="button" className={'chatIconButton chatMediaShortcut '+(recording==='video'?'isRecording':'')}
-     disabled={!channelId||uploading||chatLoading||recordingSaving||!!recordingPreview||recording==='audio'}
+     disabled={!!editingMessageId||!channelId||uploading||chatLoading||recordingSaving||!!recordingPreview||recording==='audio'}
      aria-label={recording==='video'?'Завершить запись видео':'Записать видеосообщение'}
      title={recording==='video'?'Завершить запись':'Короткое нажатие — запись, удержание — записать и отправить'}
      onPointerDown={e=>{if(e.pointerType!=='mouse'||e.button===0)beginHold('video')}}
@@ -673,8 +680,10 @@ export default function ChatPanel({g,draft:text,onDraftChange:setText,previewCha
     {(uploading||recordingSaving||recording)&&<span className="chatComposerHint" aria-live="polite">
      {uploading?'Загружается вложение…':recordingSaving?(chatMediaPhase==='analyzing'?'Анализируется запись…':chatMediaPhase==='uploading'?'Загружается запись…':'Публикуется сообщение…'):'Идёт запись…'}
     </span>}
-    <button type="button" className="chatSendButton iconOnly" disabled={sending||uploading||chatLoading||(!text.trim()&&!readyFile)||!channelId}
-     onClick={()=>void send()} aria-label="Отправить сообщение" title="Отправить"><Send aria-hidden="true" size={20}/></button>
+    <button type="button" className="chatSendButton iconOnly"
+     disabled={editingMessageId?editBusy||chatLoading||!composerText.trim()||!channelId:sending||uploading||chatLoading||(!text.trim()&&!readyFile)||!channelId}
+     onClick={()=>void send()} aria-label={editingMessageId?'Сохранить изменения':'Отправить сообщение'} title={editingMessageId?'Сохранить изменения':'Отправить'}>
+     {editingMessageId?<Check aria-hidden="true" size={20}/>:<Send aria-hidden="true" size={20}/>}</button>
    </div>
   </div>:<div className="chatGuestNote">Гостевой режим: просмотр переписки без отправки сообщений.</div>}
  </aside>;
