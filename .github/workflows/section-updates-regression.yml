@@ -1,0 +1,28 @@
+name: Section updates RPC regression
+on:
+  push:
+    branches:
+      - 'perf/section-updates-one-marker-scan-20261028'
+    paths:
+      - 'scripts/section-updates-benchmark.cjs'
+      - 'supabase/migrations/20261028010000_section_updates_single_marker_scan.sql'
+      - '.github/workflows/section-updates-regression.yml'
+  pull_request:
+    paths:
+      - 'scripts/section-updates-benchmark.cjs'
+      - 'supabase/migrations/20261028010000_section_updates_single_marker_scan.sql'
+      - '.github/workflows/section-updates-regression.yml'
+permissions:
+  contents: read
+jobs:
+  compare:
+    runs-on: ubuntu-latest
+    timeout-minutes: 9
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci --no-audit --no-fund
+      - run: node scripts/section-updates-benchmark.cjs

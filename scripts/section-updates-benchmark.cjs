@@ -10,8 +10,12 @@ const sections=['documents','votes','events','actions','parties','stages','teach
 const variables=['d','v','e','a','p','s','t','h'];
 const lines=original.match(/ select coalesce\(max\(seen_at\).*?;\r?\n/g)||[];
 assert.equal(lines.length,8,'Reproduction requires eight original section marker reads');
-const aggregate=' select '+sections.map(key=>`coalesce(max(seen_at) filter(where section_key='${key}'),'-infinity')`).join(',')+' into '+variables.join(',')+' from section_reads where game_id=p_game_id and user_id=u;\n';
-const candidate=original.replace('public.get_section_updates(','public.get_section_updates_single_reads(').replace(lines.join(''),aggregate);
+const migrationPath=path.join(root,'supabase/migrations/20261028010000_section_updates_single_marker_scan.sql');
+assert(fs.existsSync(migrationPath),'The production single-marker migration must exist');
+const migration=fs.readFileSync(migrationPath,'utf8');
+assert.equal((migration.match(/from section_reads where game_id=p_game_id and user_id=u/gi)||[]).length,1,'The production RPC must scan section_reads once');
+assert(sections.every(key=>migration.includes("section_key='"+key+"'")),'All eight badge markers must be retained');
+const candidate=migration.replace('public.get_section_updates(','public.get_section_updates_single_reads(');
 const id=n=>'00000000-0000-4000-8000-'+String(n).padStart(12,'0');
 const game=id(1000),foreignGame=id(1001),teacher=id(41),observer=id(42);
 async function main(){
