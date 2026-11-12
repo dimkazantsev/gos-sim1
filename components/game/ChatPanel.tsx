@@ -526,7 +526,8 @@ export default function ChatPanel({g,draft:text,onDraftChange:setText,previewCha
        {!own&&<span className={'chatAvatar '+(!startsGroup?'placeholder':'')} aria-hidden="true">{startsGroup?initials(name):''}</span>}
        <div className="chatMessageColumn">
         {startsGroup&&<div className="chatAuthor">{onOpenMember&&g.members.some(member=>member.user_id===m.author_id)?<button type="button" className="chatAuthorProfile" onClick={()=>onOpenMember(m.author_id)}>{own?'Вы':name}</button>:<b>{own?'Вы':name}</b>}<time dateTime={m.created_at}>{formatChatTime(m.created_at)}</time></div>}
-        <div className="chatBubble">
+        <div className="chatMessageContent">
+         <div className="chatBubble">
          {editingMessageId===m.id?<div className="chatInlineEditor">
           <textarea aria-label="Редактировать сообщение" value={editValue} rows={3} maxLength={20000} disabled={editBusy}
            onChange={e=>setEditValue(e.target.value)}
@@ -552,6 +553,7 @@ export default function ChatPanel({g,draft:text,onDraftChange:setText,previewCha
           title={chatPins.some(p=>p.message_id===m.id)?'Открепить':'Закрепить'}
           onClick={()=>void togglePin(m)}><Pin size={16} aria-hidden="true"/></button>}
         </div>}
+        </div>
        </div>
       </article>
      </div>;
