@@ -12,7 +12,7 @@ const layout=fs.readFileSync(path.join(root,'app/layout.tsx'),'utf8');
 const app=fs.readFileSync(path.join(root,'components/GameClient.tsx'),'utf8');
 const parsed=ts.createSourceFile('DocumentsView.tsx',code,ts.ScriptTarget.ES2022,true,ts.ScriptKind.TSX);
 assert.equal(parsed.parseDiagnostics.length,0,'Document view must parse as TSX');
-assert(code.includes("const selected=useMemo(()=>detailOpen?(filtered.find(d=>d.id===selectedId)||filtered[0]):undefined,[filtered,selectedId,detailOpen])"),'Closed registry cannot select first document and issue detail queries');
+assert(code.includes("const selectedSummary=useMemo(()=>detailOpen?(filtered.find(d=>d.id===selectedId)||filtered[0]):undefined,[filtered,selectedId,detailOpen])")&&code.includes("const selected=detailPending?undefined:selectedSummary;")&&code.includes("if(!detailOpen||!selectedSummary||typeof g.ensureFormalDocument!=='function')return;"),'Closed registry must not select or fetch a full document; pending document must not render as complete');
 assert(code.includes("setDetailOpen(false);setSelectedId('');onSelectDocument?.();setEditing(false);setScrollOpenedDocument(false)"),'Back button closes detail, clears selection and navigation focus');
 assert(code.includes('hidden={!detailOpen}'),'Document detail must continue to use hidden state');
 assert(code.includes('hidden={detailOpen}'),'Registry must be shown when detail closes');
