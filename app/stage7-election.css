@@ -221,3 +221,7 @@
 .stage7Election .campaignAttachmentPreview a{display:inline-flex;align-items:center;gap:7px;color:#315efb}
 .stage7Election .campaignAttachments + p{margin-top:12px}
 @media(max-width:620px){.stage7Election .campaignMetadata>div{grid-template-columns:1fr;gap:3px}}
+
+/* Этап 7: форма подачи в ЦИК над реестром, одна колонка на всех экранах. */
+.stage7Election .stage7Grid.campaignStack{grid-template-columns:minmax(0,1fr)}
+.stage7Election .campaignStack .campaignQueue{max-height:none;overflow:visible;padding-right:0}

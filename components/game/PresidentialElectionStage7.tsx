@@ -313,7 +313,7 @@ export default function PresidentialElectionStage7({g}:{g:ReturnTypeRepublic}){
   <nav className={'stage7Tabs '+(pollApproved?'':'withoutPoll')} aria-label="Разделы этапа 7"><button className={activeTab==='campaign'?'active':''} onClick={()=>setTab('campaign')}><span>01</span>Кампания</button>{pollApproved&&<button className={activeTab==='poll'?'active':''} onClick={()=>setTab('poll')}><span>02</span>Соцопрос избирателей</button>}<button className={activeTab==='complaints'?'active':''} onClick={()=>setTab('complaints')}><span>{pollApproved?'03':'02'}</span>Жалобы в ЦИК</button><button className={activeTab==='results'?'active':''} onClick={()=>setTab('results')}><span>{pollApproved?'04':'03'}</span>Итоги и инаугурация</button></nav>
   {notice&&<div className="stage7Notice">{notice}</div>}
 
-  {activeTab==='campaign'&&<div className="stage7Grid">
+  {activeTab==='campaign'&&<div className="stage7Grid campaignStack">
    <section className="stage7Panel campaignComposer"><div className="stage7PanelHead"><div><small>ПОДАЧА В ЦИК</small><h3>Агитационный материал</h3><p>Форма повторяет публикацию в «Политическом процессе», но без НПА и голосований. До публикации материал проходит проверку и модерацию ЦИК.</p></div><FileUp size={24}/></div>
     {mine.length?<div className="campaignForm">
      <label>Кандидат<select value={selectedCandidate?.id||''} onChange={e=>setCandidateId(e.target.value)}>{mine.map(c=><option key={c.id} value={c.id}>{c.display_name}</option>)}</select></label><label>Тип материала<select value={materialType} onChange={e=>setMaterialType(e.target.value)}>{Object.entries(MATERIAL_LABELS).map(([k,v])=><option key={k} value={k}>{v}</option>)}</select></label>
