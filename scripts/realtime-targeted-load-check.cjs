@@ -29,7 +29,7 @@ async function checks(){
  assert.equal(registry.length,1,'One scoped RPC replaces two direct document/history reads');
  assert.equal(JSON.stringify(registry[0].ins.document_ids),JSON.stringify(['new']),'Fetch only changed document/history rows');
  assert.equal((after.started['rpc:get_formal_registry_projection']||0)-(before.started['rpc:get_formal_registry_projection']||0),1,'Exactly one targeted registry RPC; initial list now uses RLS-scoped summary select');
- assert.equal(h.render().formalDocuments.length,2);assert.equal(h.render().formalHistory.length,2,'Unchanged history is retained');
+ assert.equal(h.render().formalDocuments.length,2);assert.equal(h.render().formalHistory.length,1,'Unopened document history stays lazy; only the changed document history is fetched');
  const old=h.hold('formal_registry');const earlier=h.render().refreshDocuments('new');await tick();
  rows[1]=doc('new','Последняя редакция');h.fixture('formal_documents',rows);h.emit('formal_documents',rows[1],'UPDATE');await h.advance(3100);old.resolve();await earlier;
  assert.equal(h.render().formalDocuments.find(d=>d.id==='new').title,'Последняя редакция','An old register read cannot overwrite an accepted newer document delta');
