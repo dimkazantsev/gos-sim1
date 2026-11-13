@@ -71,7 +71,10 @@ export function useRepublicGame(gameId:string){
  const [officeRows,setOfficeRows]=useState<GameOfficeAssignment[]>([]);
  const activeGameRef=useRef(gameId),readEpoch=useRef(0),readVersions=useRef<Partial<Record<ReadScope,number>>>({}),alive=useRef(true),authUser=useRef<string|null|undefined>(undefined),acceptedMember=useRef<Member|null>(null);
  const formalFullVersion=useRef('');
- if(activeGameRef.current!==gameId){activeGameRef.current=gameId;readEpoch.current++;formalFullVersion.current=''}
+ // Full document and history are fetched only when one document is opened.
+ const formalDetailVersions=useRef(new Map<string,string>());
+ const formalDetailReads=useRef(new Map<string,Promise<boolean>>());
+ if(activeGameRef.current!==gameId){activeGameRef.current=gameId;readEpoch.current++;formalFullVersion.current='';formalDetailVersions.current.clear();formalDetailReads.current.clear()}
  const members=useMemo(()=>currentGameMembers(memberRows,gameId),[memberRows,gameId]);
  const [chatDirectoryLoaded,setChatDirectoryLoaded]=useState(false);
  const [channels,setChannels]=useState<Channel[]>([]),[channelId,setChannelId]=useState(''),[messages,setMessages]=useState<Message[]>([]),[chatPins,setChatPins]=useState<ChatPin[]>([]),[pinnedMessages,setPinnedMessages]=useState<Message[]>([]),[chatOverview,setChatOverview]=useState<ChatOverview[]>([]),[chatLoading,setChatLoading]=useState(false);
@@ -351,7 +354,7 @@ export function useRepublicGame(gameId:string){
  }
  function formalVersion(rows:FormalDocument[]){return rows.length?rows.map(d=>d.id+':'+d.updated_at).sort().join('|'):'empty'}
  function clearGameData(){
-  formalFullVersion.current='';acceptedMember.current=null;
+  formalFullVersion.current='';formalDetailVersions.current.clear();formalDetailReads.current.clear();acceptedMember.current=null;
   chatOverviewReads.current.clear();
   rosterReads.current.clear();
   initialCoreReads.current.clear();
@@ -2027,6 +2030,22 @@ export function useRepublicGame(gameId:string){
   });
  }
  async function loadFormalRegistry(ids?:string[]){
+  if(!ids){
+   // The cards need identifiers, routing and status, never full document text,
+   // metadata or every history entry. One RLS-protected SELECT for the list.
+   await readSafely(['formal'],async ticket=>{
+    const result=await limitedCoreRead(supabase.from('formal_documents')
+     .select(FORMAL_DOCUMENT_SUMMARY_COLUMNS).eq('game_id',gameId)
+     .order('updated_at',{ascending:false}));
+    if(!readCurrent(ticket))return;
+    requireSuccessful([result]);
+    const summaries=(result.data||[]) as FormalDocumentSummary[];
+    if(formalFullVersion.current!==formalVersion(summaries as FormalDocument[]))
+     formalFullVersion.current='';
+    setFormalDocuments(previous=>mergeFormalDocumentSummaries(previous,summaries));
+   });
+   return;
+  }
   await readSafely(['formal'],async ticket=>{
    // One consistent RLS-scoped snapshot, also supporting narrow ID refresh.
    // Only a missing RPC may use the old two reads during schema rollout.
@@ -2065,6 +2084,9 @@ export function useRepublicGame(gameId:string){
    if(ids)for(const id of ids)changedFormalIds.current.delete(id);
    const rows=(fd.data||[]) as FormalDocument[];
    if(!ids)formalFullVersion.current=formalVersion(rows);
+   // Cache only the fully authorised revision. A later change invalidates
+   // this stamp, even when the list arrives from Realtime as summaries.
+   if(ids)for(const row of rows)formalDetailVersions.current.set(row.id,row.updated_at);
    // Render the register independently from Storage availability.
    setFormalDocuments(previous=>{
     const cached=new Map(previous.map(row=>[row.id,row]));
@@ -2087,6 +2109,20 @@ export function useRepublicGame(gameId:string){
    });
    if(fd.data?.some(doc=>doc.status_code==='published'&&doc.metadata?.budget_simulator_plan_id))void syncBudget();
   });
+ }
+ function formalDocumentReady(id:string,version:string){
+  return formalDetailVersions.current.get(id)===version;
+ }
+ function ensureFormalDocument(id:string,version:string):Promise<boolean>{
+  if(formalDocumentReady(id,version))return Promise.resolve(true);
+  const key=gameId+':'+(authUser.current||'')+':'+readEpoch.current+':'+id+':'+version;
+  const existing=formalDetailReads.current.get(key);
+  if(existing)return existing;
+  // Deduplicate simultaneous opens while preserving each user's RLS.
+  const pending=loadFormalRegistry([id]).then(()=>formalDocumentReady(id,version))
+   .finally(()=>{if(formalDetailReads.current.get(key)===pending)formalDetailReads.current.delete(key)});
+  formalDetailReads.current.set(key,pending);
+  return pending;
  }
  // Media URLs are signed only when their card approaches the viewport.
  // The feed RPC returns RLS-filtered metadata. Never sign files for hidden
@@ -3458,5 +3494,5 @@ export function useRepublicGame(gameId:string){
  }
 
  return {coreLoaded,chatDirectoryLoaded,refreshChatDirectory,openDetailedDashboard:()=>{if(authUser.current&&acceptedMember.current)void loadCoreForView()},gdMandateCapacity,gdEffectivePresence,game:game?.id===gameId?game:null,me:visibleMe,verifiedUserId:visibleMe?.user_id??null,metrics:sharedMetrics,budgetPulse,budgetPulseError,refreshBudgetPulse,activeView,setActiveView,hydrateTeacherWorkspace,events,members,officeAssignments,channels,channelId,setChannelId,messages,hasOlderChatMessages,olderChatLoading,loadOlderChatMessages,chatPins,pinnedMessages,chatOverview,chatUnreadCount:chatOverview.reduce((sum,row)=>sum+Number(row.unread_count||0),0),chatMentionCount:chatOverview.reduce((sum,row)=>sum+Number(row.mention_count||0),0),setChatChannelPinned,markChatRead,chatLoading,stages,parties,votes,ballots,evaluations,crises,documents,activities,presence,profiles,profilesLoaded:profileGameId===gameId,introAccountSeen,partyDocuments,loadSelectedPartyDocuments,loadPartyOfficialDocuments,loadPartyOfficialHistory,partyInvitations,partyMandates,partyAgreements,politicalPosts,politicalPostTotal,politicalActorOptions,politicalHasOlder,politicalOlderLoading,politicalSearchLoading,loadOlderPoliticalPosts,setPoliticalWallFullSearch,politicalMedia,loadPoliticalMediaUrl,postFormalLinks,metricHistory:sharedMetricHistory,partySupportHistory,impactRules,impactLedger,formalDocuments,formalHistory,loading,error,setError,chatOpen,setChatOpen,recording,recordingPreview,recordingSaving,chatMediaError,chatMediaPhase,recordingStartedAt,recordingStream:recordingStream.current,realtimeState,teacher,names,currentStage,myEvaluations,averageVsn,
-  refresh,refreshDocuments,refreshEventEffects,logout,touchPresence,logActivity,setTurn,setTurnMinutes,openStage,manageStage,nextStage,resetStageProgress,configureStageDeadline,setStageDeadline,availableActors,createPoliticalPost,updatePoliticalPost,addMediaToPoliticalPost,acceptPoliticalPost,rejectPoliticalPost,approvePostImpact,createVoteFromPost,updateImpactRule,revertImpactEntry,createParty,voteForPartyChair,updateParty,renameParty,setPartyLeader,setPartyMandates,updatePartyStatistics,inviteToParty,respondPartyInvitation,cancelPartyInvitation,removePartyMember,teacherManagePartyMember,proposePartyAgreement,respondPartyAgreement,submitPartyRegistration,reviewPartyRegistration,applyPartyGhostLoss,drawGhostVoting,clearPartyGhostLoss,applyGhostVotingBatch,deleteParty,updateMember,createVote,canVote,ballotWeight,castVote,castVoteAllocation,setStudentMandates,closeVote,deleteVote,tally,quorum,setEvaluation,publishEvent,triggerCrisis,ghostVoting,createDocument,updateMetric,saveProfile,saveSignature,loadOwnSignaturePreview,savePartyIdentity,uploadPartyDocument,reviewPartyDocument,deletePartyDocument,createFormalDocument,deleteFormalDocument,advanceFormalDocument,updateFormalDraft,vetoFormalDocument,resolveBudgetConciliation,startBudgetRejectionBranch,sendText,sendChatFile,editChatMessage,setChatPin,refreshChatMediaUrl,toggleRecording,discardRecording,sendRecordingPreview};
+  refresh,refreshDocuments,formalDocumentReady,ensureFormalDocument,refreshEventEffects,logout,touchPresence,logActivity,setTurn,setTurnMinutes,openStage,manageStage,nextStage,resetStageProgress,configureStageDeadline,setStageDeadline,availableActors,createPoliticalPost,updatePoliticalPost,addMediaToPoliticalPost,acceptPoliticalPost,rejectPoliticalPost,approvePostImpact,createVoteFromPost,updateImpactRule,revertImpactEntry,createParty,voteForPartyChair,updateParty,renameParty,setPartyLeader,setPartyMandates,updatePartyStatistics,inviteToParty,respondPartyInvitation,cancelPartyInvitation,removePartyMember,teacherManagePartyMember,proposePartyAgreement,respondPartyAgreement,submitPartyRegistration,reviewPartyRegistration,applyPartyGhostLoss,drawGhostVoting,clearPartyGhostLoss,applyGhostVotingBatch,deleteParty,updateMember,createVote,canVote,ballotWeight,castVote,castVoteAllocation,setStudentMandates,closeVote,deleteVote,tally,quorum,setEvaluation,publishEvent,triggerCrisis,ghostVoting,createDocument,updateMetric,saveProfile,saveSignature,loadOwnSignaturePreview,savePartyIdentity,uploadPartyDocument,reviewPartyDocument,deletePartyDocument,createFormalDocument,deleteFormalDocument,advanceFormalDocument,updateFormalDraft,vetoFormalDocument,resolveBudgetConciliation,startBudgetRejectionBranch,sendText,sendChatFile,editChatMessage,setChatPin,refreshChatMediaUrl,toggleRecording,discardRecording,sendRecordingPreview};
 }
