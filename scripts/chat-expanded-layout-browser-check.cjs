@@ -1,5 +1,6 @@
 'use strict';
 /* Focused CSS/browser test: no Supabase connection, no extra requests. */
+require('./chat-scroll-anchor-check.cjs');
 const fs=require('node:fs');
 const assert=require('node:assert/strict');
 const {chromium}=require('playwright-core');

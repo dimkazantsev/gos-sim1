@@ -18,6 +18,8 @@ import {supabase} from '@/lib/supabase';
 import {userError} from '@/lib/userError';
 import {buildChatEntries,formatChatTime,isChatAttachment,matchChatMessage} from './chatUtils';
 import {decodeChatAttachmentText} from './chatMediaTransport';
+import {captureChatScroll,restoreChatScroll} from './chatScrollPosition';
+import type {ChatScrollPosition} from './chatScrollPosition';
 
 const FILE_ACCEPT='image/*,audio/*,video/*,.pdf,.doc,.docx,.txt,.xlsx,.ppt,.pptx';
 const MAX_FILE_SIZE=CHAT_MAX_FILE_BYTES;
@@ -85,7 +87,7 @@ export default function ChatPanel({g,draft:text,onDraftChange:setText,previewCha
  useEffect(()=>{
   if(!expanded)return;
   const phone=window.matchMedia('(max-width:760px)');
-  const collapse=()=>{if(phone.matches)setExpanded(false)};
+  const collapse=()=>{if(phone.matches)changeExpanded(false)};
   phone.addEventListener('change',collapse);collapse();
   return()=>phone.removeEventListener('change',collapse);
  },[expanded]);
@@ -106,6 +108,8 @@ export default function ChatPanel({g,draft:text,onDraftChange:setText,previewCha
  const [localError,setLocalError]=useState('');
  const list=useRef<HTMLDivElement>(null);
  const restoreHistoryScroll=useRef<{channel:string;height:number;top:number;oldest:string;created:string}|null>(null);
+ const modeScrollRestore=useRef<ChatScrollPosition|null>(null);
+ const suppressModeScroll=useRef(false);
  const composer=useRef<HTMLTextAreaElement>(null);
  const manualComposerHeight=useRef<number|null>(null);
  const composerHeightMode=useRef<'compact'|'expanded'|null>(null);
@@ -124,7 +128,7 @@ export default function ChatPanel({g,draft:text,onDraftChange:setText,previewCha
  const follow=useRef(true);
  const lastChannel=useRef(channelId);
  const pendingSend=useRef(false);
- const panel=useDialog(overlay||expanded,()=>{if(expanded)setExpanded(false);else setChatOpen(false)});
+ const panel=useDialog(overlay||expanded,()=>{if(expanded)changeExpanded(false);else setChatOpen(false)});
  const channel=channels.find(c=>c.id===channelId);
  const readyFile=pendingFile?.channelId===channelId&&pendingFile.gameId===g.game?.id&&pendingFile.userId===me?.user_id?pendingFile:null;
  useEffect(()=>setPendingFile(null),[channelId,g.game?.id,me?.user_id]);
@@ -214,11 +218,51 @@ export default function ChatPanel({g,draft:text,onDraftChange:setText,previewCha
    setLocalError('');setJumpVisible(false);
   }
  },[channelId]);
- useEffect(()=>{
-  if(hasFilter)return;
+ // Commit-phase scroll, before painting: opening a channel shows its newest
+ // loaded message. A user reading older history is never dragged away.
+ useLayoutEffect(()=>{
   const el=list.current;
-  if(el&&follow.current){el.scrollTop=el.scrollHeight;setJumpVisible(false)}
- },[messages,channelId,hasFilter]);
+  if(el&&!hasFilter&&follow.current&&!modeScrollRestore.current&&!restoreHistoryScroll.current){
+   el.scrollTop=el.scrollHeight;setJumpVisible(false);
+  }
+ },[messages,channelId,hasFilter,chatLoading]);
+ // Switching between compact and expanded chat reflows every wrapped line.
+ // Capture the visible message before React moves the portal, then restore it
+ // using its new geometry (or keep the very bottom pinned).
+ useLayoutEffect(()=>{
+  const el=list.current;if(!el)return;
+  const saved=modeScrollRestore.current;
+  if(saved){
+   restoreChatScroll(el,saved);
+   follow.current=saved.atBottom;
+   setJumpVisible(!saved.atBottom&&!hasFilter&&channelMessages.length>0);
+   modeScrollRestore.current=null;
+  }else if(follow.current&&!hasFilter)el.scrollTop=el.scrollHeight;
+  const frame=window.requestAnimationFrame(()=>{
+   if(list.current!==el)return;
+   if(saved)restoreChatScroll(el,saved);
+   else if(follow.current&&!hasFilter)el.scrollTop=el.scrollHeight;
+   suppressModeScroll.current=false;
+  });
+  return()=>window.cancelAnimationFrame(frame);
+ },[expanded]);
+ // One local observer while visible, coalesced to one animation frame. Covers
+ // keyboard/composer resizing without polling or additional Supabase traffic.
+ useEffect(()=>{
+  const el=list.current;
+  if(!el||typeof ResizeObserver==='undefined')return;
+  let frame=0;
+  const observer=new ResizeObserver(()=>{
+   if(frame)return;
+   frame=window.requestAnimationFrame(()=>{
+    frame=0;
+    if(list.current===el&&follow.current&&!hasFilter&&!modeScrollRestore.current)
+     el.scrollTop=el.scrollHeight;
+   });
+  });
+  observer.observe(el);
+  return()=>{observer.disconnect();if(frame)window.cancelAnimationFrame(frame)};
+ },[expanded,channelId,hasFilter]);
  useLayoutEffect(()=>{
   const anchor=restoreHistoryScroll.current,el=list.current;
   if(!anchor||!el||anchor.channel!==channelId)return;
@@ -357,6 +401,13 @@ export default function ChatPanel({g,draft:text,onDraftChange:setText,previewCha
    node.style.removeProperty('height');node.style.removeProperty('top');node.style.removeProperty('bottom');
   };
  },[expanded,overlay,phonePortal]);
+ function changeExpanded(next:boolean){
+  if(next===expanded)return;
+  const el=list.current;
+  modeScrollRestore.current=el?captureChatScroll(el,follow.current):null;
+  suppressModeScroll.current=true;
+  setExpanded(next);
+ }
  const scrollToLatest=()=>{if(list.current){list.current.scrollTop=list.current.scrollHeight;follow.current=true;setJumpVisible(false)}};
  async function send(){
   if(editingMessageId){await saveEditing();return}
@@ -464,7 +515,7 @@ export default function ChatPanel({g,draft:text,onDraftChange:setText,previewCha
   resetSearch();
   requestAnimationFrame(()=>{
    const node=list.current?.querySelector<HTMLElement>('[data-message-id="'+CSS.escape(m.id)+'"]');
-   if(node)node.scrollIntoView({block:'center',behavior:'smooth'});
+   if(node){follow.current=false;setJumpVisible(true);node.scrollIntoView({block:'center',behavior:'smooth'});}
    else{setPinsOpen(true);setLocalError('Сообщение находится вне загруженной истории. Материал доступен в закреплениях.')}
   });
  }
@@ -473,15 +524,15 @@ export default function ChatPanel({g,draft:text,onDraftChange:setText,previewCha
   if(editingMessageId){e.stopPropagation();cancelEditing()}
   else if(attachOpen){e.stopPropagation();setAttachOpen(false);attachmentButton.current?.focus()}
   else if(searchOpen){e.stopPropagation();resetSearch()}
-  else{e.stopPropagation();if(expanded)setExpanded(false);else setChatOpen(false)}
+  else{e.stopPropagation();if(expanded)changeExpanded(false);else setChatOpen(false)}
  }}}>
   <header className="chatTop">
-   <button type="button" className="chatHeadIcon chatExpandTrigger" onClick={()=>setExpanded(value=>!value)} aria-label={expanded?'Свернуть чат':'Развернуть чат'} title={expanded?'Свернуть чат':'Развернуть чат'} aria-pressed={expanded}><MessageIcon/></button>
+   <button type="button" className="chatHeadIcon chatExpandTrigger" onClick={()=>changeExpanded(!expanded)} aria-label={expanded?'Свернуть чат':'Развернуть чат'} title={expanded?'Свернуть чат':'Развернуть чат'} aria-pressed={expanded}><MessageIcon/></button>
    <span className="chatHeadIcon chatPhoneHeadIcon" aria-hidden="true"><MessageIcon/></span>
    <ChatChannelDropdown channels={channels} value={channelId} onChange={setChannelId} overview={chatOverview} onPin={setChatChannelPinned} initialOpen={previewChannelOpen} expanded={expanded}/>
    {expanded&&<div className="chatExpandedTitle"><b>{channel?.name||'Общение'}</b><small>Общение</small></div>}
    <button type="button" className={'chatIconButton chatSearchToggle '+(searchOpen?'active':'')} onClick={()=>searchOpen?resetSearch():setSearchOpen(true)} aria-label={searchOpen?'Закрыть поиск':'Поиск в чате'} aria-pressed={searchOpen} title="Поиск"><Search aria-hidden="true"/></button>
-   {expanded&&<button type="button" className="chatIconButton" onClick={()=>setExpanded(false)} aria-label="Свернуть чат" title="Свернуть чат"><Minimize2 aria-hidden="true"/></button>}
+   {expanded&&<button type="button" className="chatIconButton" onClick={()=>changeExpanded(false)} aria-label="Свернуть чат" title="Свернуть чат"><Minimize2 aria-hidden="true"/></button>}
    <IconAction onClick={()=>setChatOpen(false)} label="Закрыть чат"/>
   </header>
   {selectedMessages.length>0&&<div className="chatSelectionBar" role="toolbar" aria-label="Выбранные сообщения">
@@ -515,7 +566,7 @@ export default function ChatPanel({g,draft:text,onDraftChange:setText,previewCha
    </div>
    {peopleResults.length>0&&<div className="chatPeopleResults" aria-label="Найденные участники"><small>Люди</small>{peopleResults.map(x=><button type="button" key={x.member.user_id} disabled={sending} onClick={()=>void openPersonChat(x.member.user_id)}><span className="chatPersonAvatar"><UserRound size={16} aria-hidden="true"/></span><span><b>{x.member.full_name}</b><small>{x.member.role_title||x.member.team||'Участник'}</small></span><em>Написать</em></button>)}</div>}
   </div>}
-  <div className="chatMessages" ref={list} role="log" aria-label="Сообщения" aria-live={hasFilter?'off':'polite'} aria-relevant="additions" onScroll={()=>{const el=list.current;if(!el)return;const nearBottom=el.scrollHeight-el.scrollTop-el.clientHeight<85;follow.current=nearBottom;setJumpVisible(!nearBottom&&!hasFilter&&channelMessages.length>0)}}>
+  <div className="chatMessages" ref={list} role="log" aria-label="Сообщения" aria-live={hasFilter?'off':'polite'} aria-relevant="additions" onLoadCapture={()=>{const el=list.current;if(el&&follow.current&&!hasFilter)el.scrollTop=el.scrollHeight}} onScroll={()=>{const el=list.current;if(!el||suppressModeScroll.current)return;const nearBottom=el.scrollHeight-el.scrollTop-el.clientHeight<85;follow.current=nearBottom;setJumpVisible(!nearBottom&&!hasFilter&&channelMessages.length>0)}}>
    {canLoadHistory&&<button type="button" className="chatHistoryMore" disabled={olderChatLoading||chatLoading} aria-busy={olderChatLoading} onClick={()=>void loadEarlierHistory()}>
     {olderChatLoading?'Загружаем…':'Загрузить предыдущие сообщения'}
    </button>}
