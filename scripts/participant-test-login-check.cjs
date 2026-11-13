@@ -53,6 +53,7 @@ function harness(initialSession,changeIdentity=false,signupError=null,teacherAcc
  function apply(predicate,value){const entry=nodes(tree,predicate)[0];assert(entry,'Input missing');
   entry.props.onChange({target:{value,checked:value}});render();}
  render();
+ nodes(tree,n=>n.type==='button'&&label(n).includes('Первый вход по приглашению'))[0].props.onClick();render();
  apply(n=>n.type==='input'&&n.props.name==='fullName','Новый Участник Тестовый');
  apply(n=>n.type==='input'&&n.props.name==='gameCode','CODE');
  apply(n=>n.type==='input'&&n.props.id==='invite-code','STUDENT');

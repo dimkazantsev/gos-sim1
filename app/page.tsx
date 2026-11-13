@@ -53,7 +53,8 @@ export default function Home(){
  const [gameTitle,setGameTitle]=useState('Республика Политология'),[studentCode,setStudentCode]=useState(''),[fio,setFio]=useState(''),[group,setGroup]=useState(''),[gameCode,setGameCode]=useState(''),[invite,setInvite]=useState(''),[busy,setBusy]=useState(false),[error,setError]=useState('');
  const [showCode,setShowCode]=useState(false);
  const [blockedIdentity,setBlockedIdentity]=useState('');
- const [personalLogin,setPersonalLogin]=useState(false);
+ const [personalLogin,setPersonalLogin]=useState(true);
+ const [rememberMe,setRememberMe]=useState(false);
  const [teacherLogin,setTeacherLogin]=useState(false);
  const [loginEmail,setLoginEmail]=useState(''),[loginPassword,setLoginPassword]=useState(''),[loginGameCode,setLoginGameCode]=useState(''),[recoverySent,setRecoverySent]=useState(false);
  const [savedGameCodes,setSavedGameCodes]=useState<string[]>([]);
@@ -62,6 +63,12 @@ export default function Home(){
  const [reentryState,setReentryState]=useState<'idle'|'pending'|'error'>('idle');
  const [reentryError,setReentryError]=useState('');
  const reentryStarted=useRef(false);
+ useEffect(()=>{
+  try{
+   const saved=window.localStorage.getItem('gos-id:remembered-login-email')||'';
+   if(saved&&/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(saved)){setLoginEmail(saved);setRememberMe(true)}
+  }catch{/* Private browsing does not prevent entering credentials. */}
+ },[]);
  useEffect(()=>setFromSharedLink(!!incomingSectionSuffix()),[]);
  useEffect(()=>{
   const token=new URLSearchParams(window.location.hash.replace(/^#/,'')).get('reentry');
@@ -257,29 +264,40 @@ export default function Home(){
   finally{unlockEntry()}
  }
 
+ function openAuthorizedGame(gameId:string){
+  const section=incomingSectionSuffix();
+  if(window.location.hostname?.endsWith('.github.io')){
+   window.location.assign('/gos-sim1/?game='+encodeURIComponent(gameId)+(section?'&'+section.slice(1):''));
+  }else router.push('/game/'+encodeURIComponent(gameId)+section);
+ }
+ function saveRememberPreference(){
+  try{
+   if(rememberMe)window.localStorage.setItem('gos-id:remembered-login-email',loginEmail.trim().toLowerCase());
+   else window.localStorage.removeItem('gos-id:remembered-login-email');
+  }catch{/* Access to storage is optional; the browser password manager is separate. */}
+ }
  async function login(e:FormEvent){
   e.preventDefault();if(!lockEntry())return;
   let phase:'authentication'|'session'|'game'='authentication';
   try{
    if(typeof navigator!=='undefined'&&!navigator.onLine)throw new Error('Устройство не подключено к интернету. Проверьте сеть.');
-   // Explicit password login must not depend on a stored refresh token.
-   // getSession() may auto-refresh an old local session before checking the
-   // credentials entered in this form, so a transient refresh-token 504 can
-   // incorrectly block a valid password login.
-   let authError:unknown=null,session:null|{access_token:string;refresh_token:string}=null;
+   // Password authentication never uses an old stored refresh token.
+   // A fresh client preserves the bounded retry only for transient Auth failures.
+   let authError:unknown=null,session:null|{access_token:string;refresh_token:string}=null,userId='';
    const loginClient=createPasswordAuthClient();
    for(let attempt=0;attempt<2;attempt++){
     const auth=await loginClient.auth.signInWithPassword({email:loginEmail.trim().toLowerCase(),password:loginPassword});
     if(!auth.error&&auth.data.session){
      authError=null;
      session={access_token:auth.data.session.access_token,refresh_token:auth.data.session.refresh_token};
+     userId=auth.data.session.user?.id||auth.data.user?.id||'';
      break;
     }
     authError=auth.error||new Error('Сервер авторизации не вернул сессию.');
     if(!isTransientAuthError(authError)||attempt===1)throw authError;
     await new Promise(resolve=>setTimeout(resolve,900));
    }
-   if(authError||!session)throw authError||new Error('Сервер авторизации не вернул сессию.');
+   if(authError||!session||!userId)throw authError||new Error('Не удалось подтвердить личность пользователя.');
    phase='session';
    for(let attempt=0;attempt<2;attempt++){
     const adopted=await supabase.auth.setSession(session);
@@ -288,29 +306,56 @@ export default function Home(){
     await new Promise(resolve=>setTimeout(resolve,900));
    }
    phase='game';
-   if(teacherLogin){
-    router.push('/teacher');
+   // The teacher role is read from the protected profile, never inferred from
+   // the email, the selected role on the landing page or mutable user_metadata.
+   const profile=await supabase.from('teacher_profiles')
+    .select('last_game_id').eq('user_id',userId).maybeSingle();
+   if(profile.error)throw profile.error;
+   if(profile.data){
+    const index=await supabase.rpc('list_my_teacher_games');
+    if(index.error)throw index.error;
+    const teacherGames=((index.data as {games?:Array<{id:string;status:string}>}|null)?.games||[])
+     .filter(game=>game?.id&&game.status!=='archived');
+    if(teacherGames.length===0){
+     saveRememberPreference();
+     router.push('/teacher');
+     return;
+    }
+    let remembered='';
+    try{remembered=window.localStorage.getItem('gos-id:teacher-last-game')||''}catch{}
+    const target=teacherGames.find(game=>game.id===profile.data.last_game_id)
+     ||teacherGames.find(game=>game.id===remembered)||teacherGames[0];
+    // This RPC verifies the server-side membership and does not grant arbitrary
+    // teacher rights. The game list must also contain the selected game.
+    const access=await supabase.rpc('ensure_my_game_access',{p_game:target.id});
+    if(access.error)throw access.error;
+    if(target.id!==profile.data.last_game_id){
+     const saved=await supabase.from('teacher_profiles').update({last_game_id:target.id}).eq('user_id',userId);
+     if(saved.error)throw saved.error;
+    }
+    try{window.localStorage.setItem('gos-id:teacher-last-game',target.id)}catch{}
+    saveRememberPreference();
+    openAuthorizedGame(target.id);
     return;
    }
-   // PostgREST can temporarily return 503 while rebuilding its schema cache.
-   // Resume is idempotent, unlike join_game_with_code which records an audit event.
-   let resumedGameId='';
-   for(let attempt=0;attempt<3;attempt++){
-    const r=await supabase.rpc('resume_member_game_as_role',{p_game_code:loginGameCode.trim(),p_expected_kind:mode==='guest'?'observer':'student'});
-    if(!r.error){
-     if(!r.data)throw new Error('Сервер не подтвердил участие в игре.');
-     resumedGameId=String(r.data);break;
-    }
-    const detail=[r.error.code,r.error.message].filter(Boolean).join(' ');
-    const retry=/PGRST00[0-3]|schema cache|temporarily unavailable|Нет ответа от сервера|fetch failed|network/i.test(detail)||r.error.code==='503'||r.error.code==='504';
-    if(!retry||attempt===2)throw r.error;
-    await new Promise(resolve=>setTimeout(resolve,800*(attempt+1)));
-   }
-   saveSuccessfulGameCode(loginGameCode);
-    router.push('/game/'+resumedGameId+incomingSectionSuffix());
+   // Returning participants and guests use the same two-field form. Only
+   // their own unarchived memberships are candidates for direct navigation.
+   const membership=await supabase.from('game_members')
+    .select('game_id,kind,joined_at').eq('user_id',userId)
+    .in('kind',['student','observer']).is('roster_archived_at',null)
+    .order('joined_at',{ascending:false}).limit(20);
+   if(membership.error)throw membership.error;
+   const games=membership.data||[];
+   if(games.length===0)throw new Error('Для этой учётной записи не найдена активная игра. Обратитесь к преподавателю.');
+   let preferred='';
+   try{preferred=window.localStorage.getItem('gos-id:last-member-game:'+userId)||''}catch{}
+   const selected=games.find(item=>item.game_id===preferred)||games[0];
+   if(!selected?.game_id)throw new Error('Не удалось определить доступную игру.');
+   try{window.localStorage.setItem('gos-id:last-member-game:'+userId,selected.game_id)}catch{}
+   saveRememberPreference();
+   openAuthorizedGame(selected.game_id);
   }catch(e){
-   const message=readableError(e);
-   setError((phase==='authentication'?'Проверка учётной записи: ':phase==='session'?'Проверка сессии: ':'Открытие игровой сессии: ')+message);
+   setError((phase==='authentication'?'Проверка учётной записи: ':phase==='session'?'Проверка сессии: ':'Открытие игровой сессии: ')+readableError(e));
   }finally{unlockEntry()}
  }
  async function recover(){
@@ -377,33 +422,17 @@ export default function Home(){
     </form>}
     {fromSharedLink&&<p className="entryLinkAdvice">Ссылка из Телеграма открывает нужный раздел без повторного входа только в браузере, где Вы уже авторизованы. Если Телеграм открыл отдельное окно, выберите в его меню «Открыть в браузере» и используйте ссылку там. Данные для входа по ссылке не передаются.</p>}
     {personalLogin&&<form id="entry-form" className="entryForm" onSubmit={login} aria-busy={busy}>
-     <div className="entryFormIntro"><span className="overline">{teacherLogin?'КАБИНЕТ ПРЕПОДАВАТЕЛЯ':'ЛИЧНАЯ УЧЁТНАЯ ЗАПИСЬ'}</span><h2>{teacherLogin?'Вход преподавателя':'Вход по паролю'}</h2><p>{teacherLogin?'Войдите по подтверждённой почте и личному паролю. Код игры не нужен: доступные игры будут в Вашем кабинете.':'Используйте подтверждённую почту и пароль, указанные в игровом профиле. Ваши мандаты и действия сохранятся.'}</p></div>
-     <button type="button" className="entryPersonalSwitch" onClick={()=>{setPersonalLogin(false);setTeacherLogin(false);setError('')}}><LockKeyhole size={16}/> Вернуться ко входу по коду</button>
+     <div className="entryFormIntro"><span className="overline">ЛИЧНАЯ УЧЁТНАЯ ЗАПИСЬ</span><h2>Войти с личным паролем</h2><p>Введите почту и личный пароль. ГОС.ID откроет игру, доступную Вашей учётной записи, с сохранением Ваших полномочий.</p></div>
+     <button type="button" className="entryPersonalSwitch" onClick={()=>{setPersonalLogin(false);setTeacherLogin(false);setError('')}}><LockKeyhole size={16}/> Первый вход по приглашению</button>
      <fieldset disabled={busy}>
       <legend className="srOnly">Данные личной учётной записи</legend>
-      <button type="button" className="entryPersonalSwitch" aria-pressed={teacherLogin} onClick={()=>{setTeacherLogin(!teacherLogin);setError('')}}><Landmark size={16}/>{teacherLogin?'Вход участника в конкретную игру':'Войти как преподаватель — без кода игры'}</button>
-      {!teacherLogin&&<div className="entryField entryRememberedGameField">
-       <label htmlFor="personal-game-code">Код игры</label>
-       <input id="personal-game-code" name="gameCode" autoComplete="off" autoCapitalize="none" autoCorrect="off" spellCheck={false} required minLength={2} value={loginGameCode} onChange={e=>setLoginGameCode(e.target.value)} placeholder="Код Вашей игры"/>
-       {savedGameCodes.length>1&&<label className="entryRememberedGameSelect">Ранее открытые игры
-        <select aria-label="Выбрать сохранённый код игры" value={savedGameCodes.includes(loginGameCode)?loginGameCode:''} onChange={e=>setLoginGameCode(e.target.value)}>
-         <option value="">Выберите сохранённый код</option>
-         {savedGameCodes.map(code=><option key={code} value={code}>{code}</option>)}
-        </select>
-       </label>}
-       <div className="entryRememberedGameHint">
-        <small>Код автоматически сохраняется в этом браузере после успешного входа. На другом устройстве его нужно ввести один раз.</small>
-        {savedGameCodes.includes(loginGameCode)&&<button type="button" className="entryForgetGameCode" disabled={busy} onClick={()=>{
-         setSavedGameCodes(forgetRememberedGameCode(loginGameCode));
-         setLoginGameCode('');
-        }}>Забыть код</button>}
-       </div>
-      </div>}
-      <label className="entryField">Электронная почта<input required type="email" autoComplete="username" value={loginEmail} onChange={e=>setLoginEmail(e.target.value)} placeholder="Ваш адрес почты"/></label>
-      <label className="entryField">Личный пароль<input required type="password" autoComplete="current-password" value={loginPassword} onChange={e=>setLoginPassword(e.target.value)} placeholder="Ваш личный пароль"/></label>
+      <label className="entryField">Электронная почта<input required type="email" autoComplete={rememberMe?'username':'off'} value={loginEmail} onChange={e=>setLoginEmail(e.target.value)} placeholder="Ваш адрес почты"/></label>
+      <label className="entryField">Личный пароль<input required type="password" autoComplete={rememberMe?'current-password':'off'} value={loginPassword} onChange={e=>setLoginPassword(e.target.value)} placeholder="Ваш личный пароль"/></label>
+      <label className="entryRememberMe"><input type="checkbox" checked={rememberMe} onChange={e=>setRememberMe(e.target.checked)}/><span>Запомнить меня</span></label>
+      <p className="entryRememberHelp">Почта сохранится на этом устройстве. Пароль может запомнить только менеджер паролей браузера — ГОС.ID его не сохраняет.</p>
       {error&&<div className="errorBox" role="alert">{error}</div>}
       {recoverySent&&<div className="entryRecoveryNotice" role="status">Если этот адрес привязан к игре, письмо со ссылкой для смены пароля будет отправлено.</div>}
-      <button type="submit" className="primary entrySubmit" disabled={busy}>{busy?'Проверка…':teacherLogin?'Войти в кабинет преподавателя':'Войти в мою игру'}<ArrowRight size={18}/></button>
+      <button type="submit" className="primary entrySubmit" disabled={busy}>{busy?'Проверка…':'Войти в мою игру'}<ArrowRight size={18}/></button>
       <button type="button" className="entryForgot" disabled={busy} onClick={()=>void recover()}>Забыли пароль? Отправить ссылку для восстановления</button>
      </fieldset>
      <GameEntryQr/>

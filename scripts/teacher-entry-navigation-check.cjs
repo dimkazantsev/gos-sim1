@@ -13,7 +13,8 @@ for(const [name,source] of [['public entry',home],['teacher',teacher]]){
 const preLogin=home.split(' async function submit(')[0];
 assert(!preLogin.includes("router.replace('/teacher')"),'Public landing must not redirect teachers on mount');
 assert(!preLogin.includes("from('teacher_profiles').select('user_id')"),'Public landing must not query teacher profile on mount');
-assert(home.includes("if(teacherLogin){\n    router.push('/teacher');"),'The personal teacher login remains an explicit path');
+assert(home.includes("const [personalLogin,setPersonalLogin]=useState(true)"),'Password login is the default path');
+assert(home.includes("rpc('ensure_my_game_access'")&&home.includes("rpc('list_my_teacher_games'"),'Teacher login verifies server rights before entering the last game');
 assert(home.includes("if(!incomingSectionSuffix())return;"),'Shared game links remain explicit navigation');
 assert(staticBuild.includes("writeFileSync(resolve(target,'components/StaticLanding.tsx'),home)"),'Static GitHub Pages landing reflects the unredirected source');
 assert(teacher.includes('className="simShell teacherZeroShell teacherZeroLoadingShell"'), 'Loading uses the existing game shell');

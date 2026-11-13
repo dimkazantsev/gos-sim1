@@ -28,7 +28,7 @@ assert(creationGuard.includes('REVOKE ALL ON FUNCTION public.create_game_session
 assert(sessions.includes('<SessionManager session={game}')&&!sessions.includes('archive_my_teacher_game'),'Single management row replaces redundant Archive button; server archive RPC remains available for deletion');
 assert(!agenda.includes('className="civicMeetingSteps"'),'Agenda does not repeat established five-step route');
 assert(!home.includes("router.replace('/teacher')")&&!home.includes("if(live&&!p.error&&p.data)router.replace('/teacher')"),'The public entry never redirects a signed-in teacher without explicit action');
-assert(home.includes("router.push('/teacher')"),'Explicit teacher password login still opens the permanent cabinet');
+assert(home.includes("router.push('/teacher')")&&home.includes("openAuthorizedGame(target.id)"),'Teacher password opens last authorized game or empty permanent cabinet');
 assert(stage.includes('StageMeetingProcedureFlow'),'All active meeting stages share the same guide');
 for(const k of ['Повестка','Регистрация','Рассмотрение','Решения и голосования','Итоговые документы'])assert(guide.includes(k),k);
 assert(lab.includes('prepare_regional_agreement_from_calculation'),'Explicit agreement import');
