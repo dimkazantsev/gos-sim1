@@ -109,8 +109,7 @@ begin
  values(p_game_id,'macro',gen_random_uuid()::text,
    case when is_teacher then 'Параметры сценария: ' else 'Решение Банка России: ' end||trim(p_reason),
    old_row,new_row,auth.uid());
-end$function$
-
+end$function$;
 
 revoke all on function public.set_fiscal_policy(uuid,jsonb,text) from public,anon;
 grant execute on function public.set_fiscal_policy(uuid,jsonb,text) to authenticated;
