@@ -515,6 +515,7 @@ jobs:
       - run: npm run design:check
       - run: node scripts/interface-contract-check.cjs
       - run: node scripts/political-wall-feed-check.cjs
+      - run: node scripts/cec-complaint-political-post-check.cjs
       - run: node scripts/metric-chart-check.cjs
       - run: node scripts/metric-history-pagination-check.cjs
       - run: node scripts/political-wall-projection-rls-check.cjs

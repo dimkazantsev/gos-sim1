@@ -278,3 +278,21 @@
   align-self:start;
  }
 }
+
+/* Official CEC replies: nested in the existing Political Process publication. */
+.processPortal .cecComplaintPost{display:grid;gap:18px;min-width:0}
+.processPortal .cecComplaintSubject{display:grid;gap:8px;padding:0 0 18px;border-bottom:1px solid #edf1f6}
+.processPortal .cecComplaintPost h3{margin:0;color:#17314f;font-size:14px;font-weight:750;line-height:1.5}
+.processPortal .cecComplaintPost p{margin:0;font-size:14px;line-height:1.8;color:#29435f;white-space:pre-wrap;overflow-wrap:anywhere}
+.processPortal .cecComplaintDecision{min-width:0;padding:16px;border:1px solid #e0e7f1;border-radius:12px;background:#f8faff}
+.processPortal .cecComplaintDecision>strong{display:block;margin:10px 0 12px;color:#17314f;font-size:14px;line-height:1.6}
+.processPortal .cecComplaintDecision details{padding-top:12px;border-top:1px solid #e0e7f1}
+.processPortal .cecComplaintDecision summary{display:flex;align-items:center;gap:7px;min-height:40px;width:max-content;max-width:100%;padding:4px 0;cursor:pointer;color:#2453e6;font-size:13px;font-weight:700;list-style:none}
+.processPortal .cecComplaintDecision summary::-webkit-details-marker{display:none}
+.processPortal .cecComplaintDecision details[open] summary svg{transform:rotate(180deg)}
+.processPortal .cecComplaintFullResponse{padding-top:12px;min-width:0}
+.processPortal .cecComplaintFullResponse .postRichText{font-size:14px;line-height:1.8;white-space:pre-wrap}
+@media(max-width:650px){
+ .processPortal .cecComplaintPost{gap:14px}
+ .processPortal .cecComplaintDecision{padding:14px}
+}
