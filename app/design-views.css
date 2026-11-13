@@ -35,3 +35,34 @@
 .labControls{min-width:0;border:0;padding:0;margin:0}.readOnlyNote{padding:16px 18px;border:1px solid #e7bfd6;border-radius:12px;background:var(--gs-pink-soft);color:var(--gs-pink-ink);font-size:14px}
 /* Shared audience screen */
 .publicScreen{background:var(--gs-bg);color:var(--gs-ink);padding:28px;min-height:100dvh}.publicTop{border-bottom:1px solid var(--gs-border);padding:0 0 24px;margin-bottom:26px;background:none;gap:24px}.publicBrand>span{background:var(--gs-accent);color:white;border-radius:13px}.publicBrand b{color:var(--gs-ink);font-size:27px;letter-spacing:-.055em}.publicBrand small{font-size:12px;color:var(--gs-muted)}.publicGame b{color:var(--gs-ink);font-size:20px}.publicGame span{color:var(--gs-muted);font-size:14px}.publicClock>b{font:600 38px var(--gs-font-mono);color:var(--gs-ink)}.publicLive{color:var(--gs-amber);font-size:12px;background:var(--gs-amber-soft);border-color:#ebd6b3}.publicLive.on{color:var(--gs-green);background:var(--gs-green-soft);border-color:#c6e0d3}.publicClock button{color:var(--gs-ink);background:white;border:1px solid var(--gs-border);font-size:13px}.publicStage{padding:36px 40px;background:var(--gs-accent);color:white;border:0;border-radius:22px;box-shadow:none;margin-bottom:24px}.publicStage h1{font-size:clamp(34px,4vw,58px);color:white;line-height:1.12;font-weight:750}.publicStage p{color:#e3eaff;font-size:18px;line-height:1.7}.publicStage small{color:#d8e3ff;font-size:12px;letter-spacing:.1em}.publicStage .stageNumber{color:#b2c5ff;font-size:100px;font-weight:600;opacity:.8}.publicMetrics{grid-template-columns:repeat(6,minmax(0,1fr));gap:16px}.publicMetrics article{padding:24px;background:white;border:1px solid var(--gs-border);border-radius:16px;box-shadow:none}.publicMetrics span{font-size:14px;color:var(--gs-muted)}.publicMetrics b{font-size:36px;color:var(--gs-ink);letter-spacing:-.04em}.publicMetrics article>div{background:#edf1fb;height:4px}.publicMetrics article>div>i{background:var(--gs-accent)}.publicGrid,.publicBottomGrid{gap:22px;margin-top:24px}.publicMainCard,.publicVoteCard,.publicParties,.publicTimeline,.publicCrisis{padding:28px;border:1px solid var(--gs-border);border-radius:20px;background:white;box-shadow:none;color:var(--gs-ink)}.publicMainCard>small,.publicVoteCard>small,.publicSectionHead small{color:var(--gs-muted);font-size:12px;letter-spacing:.08em}.publicMainCard h2,.publicVoteCard h2{color:var(--gs-ink);font-size:28px;line-height:1.25}.publicMainCard p,.publicVoteCard p,.publicCrisis p{color:var(--gs-muted);font-size:16px;line-height:1.75}.publicMainCard time,.publicTimeline time{color:var(--gs-muted);font-size:13px}.publicEmpty{color:var(--gs-muted);font-size:16px;padding:24px 0}.publicParty{padding:14px 0;border-color:var(--gs-border)}.publicParty b{font-size:16px;color:var(--gs-ink)}.publicParty em{color:var(--gs-accent)}.publicParty small{font-size:12px;color:var(--gs-muted)}.publicSectionHead b{color:var(--gs-ink)}.publicQuorum{border-color:var(--gs-border);background:var(--gs-surface-soft);color:var(--gs-ink)}.publicQuorum b.ok{color:var(--gs-green)}.publicQuorum b.wait{color:var(--gs-amber)}.publicVoteScore b{font-size:40px}.publicVoteScore span{font-size:12px}.publicVoteBar{background:#f3bdd0}.publicVoteBar i{background:var(--gs-accent)}.publicCrisis.active{background:var(--gs-red-soft);border-color:#e7acb7}.publicCrisis h3{color:var(--gs-red)}
+
+/* Compact, deferred game entry only. Keep the regular dashboard unchanged.
+   Center the desktop shortcut buttons without changing their visual identity. */
+@media(min-width:901px){
+ .quickEntryOverview .missionBottom{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);
+  align-items:center;
+  gap:10px;
+ }
+ .quickEntryOverview .missionButton{
+  grid-column:2;
+  justify-self:center;
+  max-width:100%;
+ }
+ .quickEntryOverview .missionNumber{
+  grid-column:3;
+  justify-self:end;
+ }
+ .quickEntryOverview .agendaCard{
+  display:flex;
+  flex-direction:column;
+ }
+ .quickEntryOverview .agendaAction{
+  width:min(100%,520px);
+  margin-inline:auto;
+  grid-template-columns:minmax(0,1fr) 17px;
+  text-align:center;
+ }
+ .quickEntryOverview .agendaAction>span:first-child{min-width:0}
+}

@@ -752,7 +752,7 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
       {actionError.notice}
      {view==='dashboard'&&(g.coreLoaded||teacher
       ?<DashboardView g={vg} onOpenProfile={navigateProfile} onNavigate={v=>navigate(v,v==='stages'?{stageNo:currentStage?.stage_no||game.current_round}:undefined)}/>
-      :<div className="overviewPage" aria-label="Быстрый вход в игру">
+      :<div className="overviewPage quickEntryOverview" aria-label="Быстрый вход в игру">
        <header className="overviewHeading"><div><span className="overline">{game.title}</span><h1>Вы вошли в игру.</h1></div></header>
        <section className="missionCard" aria-labelledby="fast-entry-title">
         <div className="missionTop"><span className="overline">ЭТАП / {String(game.current_round||1).padStart(2,'0')}</span>
