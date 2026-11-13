@@ -117,12 +117,12 @@ const securityPanel=readFileSync(join(built,'components/game/ProfileSecurityPane
 assert.ok(securityPanel.includes('NEXT_PUBLIC_GAME_API_ORIGIN')&&securityPanel.includes("origin+'/auth/update-password'"),'Game profile email recovery must use the application server');
 const staticLanding=readFileSync(join(built,'components/StaticLanding.tsx'),'utf8');
 assert.ok(staticLanding.includes(base+'/?game='),'Dynamic game entry must use the static route.');
-for(const variable of ['r.data','resumedGameId']){
- assert.ok(staticLanding.includes('window.location.assign('+JSON.stringify(base+'/?game=')+'+'+variable+"+(incomingSectionSuffix()?'&'+incomingSectionSuffix().slice(1):''))"),
-  'Pages entry must navigate directly to the static game route: '+variable);
- assert.ok(!staticLanding.includes("router.push('/game/'+"+variable+")"),
-  'Pages must not navigate to an unsupported dynamic game route: '+variable);
-}
+assert.ok(staticLanding.includes('window.location.assign('+JSON.stringify(base+'/?game=')+"+r.data+(incomingSectionSuffix()?'&'+incomingSectionSuffix().slice(1):''))"),
+ 'First-time game entry must use the static game route.');
+assert.ok(staticLanding.includes('window.location.assign('+JSON.stringify(base+'/?game=')+"+encodeURIComponent(gameId)+(section?'&'+section.slice(1):''))"),
+ 'Password game entry must use the static game route for the verified account.');
+assert.ok(staticLanding.includes("window.location.hostname?.endsWith('.github.io')"),
+ 'The static game route must be selected only on GitHub Pages.');
 const documents=readFileSync(join(built,'components/game/DocumentsView.tsx'),'utf8');
 assert.ok(!documents.includes("fetch('/api/"),'A static host cannot serve document POST requests.');
 assert.ok(documents.includes('NEXT_PUBLIC_GAME_API_ORIGIN'),'Use the shared API for PDF/DOCX extraction.');
