@@ -39,7 +39,7 @@ function highlightChatText(value:string,search:string):ReactNode{
 }
 function formatBytes(size:number){return size<1024*1024?Math.max(1,Math.round(size/1024))+' КБ':(size/1024/1024).toFixed(1)+' МБ';}
 function visibleChatMedia(m:Message,now:number){
- return (m.kind!=='audio'&&m.kind!=='video')||new Date(m.created_at).getTime()+60*60*1000>now;
+ return new Date(m.created_at).getTime()+30*24*60*60*1000>now;
 }
 function ChatAttachment({message:m,onRefresh}:{message:Message;onRefresh?:(messageId:string,path:string)=>Promise<string|null>}){
  const fileName=decodeChatAttachmentText(m.text||'').fileName;
@@ -76,7 +76,7 @@ export default function ChatPanel({g,draft:text,onDraftChange:setText,previewCha
  },[g.game?.id,g.chatDirectoryLoaded,socialChannelsReady]);
  const [sending,setSending]=useState(false);
  const [retentionClock,setRetentionClock]=useState(()=>Date.now());
- useEffect(()=>{const id=window.setInterval(()=>setRetentionClock(Date.now()),15000);return()=>window.clearInterval(id)},[]);
+ useEffect(()=>{const id=window.setInterval(()=>setRetentionClock(Date.now()),60*60*1000);return()=>window.clearInterval(id)},[]);
  const [uploading,setUploading]=useState(false);
  const [pendingFile,setPendingFile]=useState<{file:File;gameId:string;channelId:string;userId:string}|null>(null);
  const [recordElapsed,setRecordElapsed]=useState(0);

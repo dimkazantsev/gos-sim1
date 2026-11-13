@@ -2,7 +2,7 @@ import {createClient} from '@supabase/supabase-js';
 import {NextResponse} from 'next/server';
 export const runtime='nodejs';
 export const dynamic='force-dynamic';
-const RETENTION_HOURS=24;
+const RETENTION_DAYS=30;
 const BATCH=80;
 /** Idempotent, admin-only retention: remove Storage object BEFORE its DB row. */
 export async function GET(request:Request){
@@ -12,12 +12,12 @@ export async function GET(request:Request){
  const key=process.env.SUPABASE_SECRET_KEY||process.env.SUPABASE_SERVICE_ROLE_KEY;
  if(!url||!key)return NextResponse.json({error:'Очистка хранилища не настроена'},{status:503});
  const db=createClient(url,key,{auth:{persistSession:false,autoRefreshToken:false}});
- const cutoff=new Date(Date.now()-RETENTION_HOURS*60*60*1000).toISOString();
+ const cutoff=new Date(Date.now()-RETENTION_DAYS*24*60*60*1000).toISOString();
  const {data, error}=await db.from('chat_messages').select('id,game_id,channel_id,author_id,storage_path,kind,created_at')
-  .in('kind',['audio','video']).lt('created_at',cutoff).not('storage_path','is',null)
+  .in('kind',['file','audio','video']).lt('created_at',cutoff).not('storage_path','is',null)
   .order('created_at',{ascending:true}).limit(BATCH);
  if(error){console.error('Expired media scan failed',error.code);return NextResponse.json({error:'Не удалось проверить файлы'},{status:500})}
- if(!data?.length)return NextResponse.json({ok:true,expired:0,removed:0,retention_hours:RETENTION_HOURS});
+ if(!data?.length)return NextResponse.json({ok:true,expired:0,removed:0,retention_days:RETENTION_DAYS});
  // Reject unexpected paths; never remove arbitrary items via a privileged bucket API.
  const rows=data.filter(row=>{
   const p=(row.storage_path||'').split('/');
@@ -36,10 +36,10 @@ export async function GET(request:Request){
  }
  const ids=rows.map(row=>row.id);
  const deleted=await db.from('chat_messages').delete().in('id',ids)
-  .in('kind',['audio','video']).lt('created_at',cutoff).select('id');
+  .in('kind',['file','audio','video']).lt('created_at',cutoff).select('id');
  if(deleted.error){
   console.error('Expired chat media DB cleanup failed',deleted.error.code);
   return NextResponse.json({error:'Не удалось очистить записи; операцию можно повторить',expired:rows.length},{status:500});
  }
- return NextResponse.json({ok:true,retention_hours:RETENTION_HOURS,expired:data.length,removed:deleted.data?.length||0,more_possible:data.length>=BATCH});
+ return NextResponse.json({ok:true,retention_days:RETENTION_DAYS,expired:data.length,removed:deleted.data?.length||0,more_possible:data.length>=BATCH});
 }
