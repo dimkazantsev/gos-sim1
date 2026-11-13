@@ -10,7 +10,7 @@ assert.equal(baseline.lines.find(t=>t.key==='profit').amount,750,'1000 firms × 
 const changed=p=>({...context,policy:{...context.policy,...p}});
 assert.equal(fiscalEnvironment(changed({activity_override:150})).activity,1.5,'Teacher manual activity overrides the automatic formula');
 const manual=changed({activity_override:150,activity_reference:fiscalEnvironment(context).activity});
-assert.equal(fiscalEnvironment(manual).activity,1.5,'Teacher's 150% is shown immediately without a jump');
+assert.equal(fiscalEnvironment(manual).activity,1.5,"Teacher's 150% is shown immediately without a jump");
 assert(fiscalEnvironment({...manual,policy:{...manual.policy,key_rate:32}}).activity<1.5,'After a manual baseline, more expensive credit reduces activity');
 assert(fiscalEnvironment({...manual,metrics:{...manual.metrics,economy:60}}).activity>1.5,'After a manual baseline, a better economy increases activity');
 assert.equal(fiscalEnvironment(changed({activity_override:79,activity_reference:fiscalEnvironment(context).activity})).activity,.79,'79% is preserved as a starting level');
