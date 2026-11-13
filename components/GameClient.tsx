@@ -753,19 +753,33 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
      {view==='dashboard'&&(g.coreLoaded||teacher
       ?<DashboardView g={vg} onOpenProfile={navigateProfile} onNavigate={v=>navigate(v,v==='stages'?{stageNo:currentStage?.stage_no||game.current_round}:undefined)}/>
       :<div className="overviewPage quickEntryOverview" aria-label="Быстрый вход в игру">
-       <header className="overviewHeading"><div><span className="overline">{game.title}</span><h1>Вы вошли в игру.</h1></div></header>
        <section className="missionCard" aria-labelledby="fast-entry-title">
         <div className="missionTop"><span className="overline">ЭТАП / {String(game.current_round||1).padStart(2,'0')}</span>
          <span className={'missionState '+(game.turn_open?'open':'paused')}><span/>{game.turn_open?'Ход открыт':'Пауза'}</span></div>
         <h2 id="fast-entry-title">Выберите, что хотите открыть</h2>
         <p>Данные разделов загружаются только при переходе в них. Это снижает нагрузку при одновременном входе участников.</p>
-        <div className="missionBottom"><button className="missionButton" onClick={()=>navigate('stages')}>Этапы и задачи <ArrowUpRight aria-hidden="true"/></button>
-         <span className="missionNumber" aria-hidden="true">{String(game.current_round||1).padStart(2,'0')}</span></div>
+        <div className="missionBottom">
+         <div className="quickEntryPrimaryActions">
+          <button type="button" className="missionButton" onClick={()=>navigate('stages')}>Этапы и задачи <ArrowUpRight aria-hidden="true"/></button>
+          <button type="button" className="missionButton" onClick={()=>g.openDetailedDashboard()}>Полный обзор игры <ArrowUpRight aria-hidden="true"/></button>
+         </div>
+         <span className="missionNumber" aria-hidden="true">{String(game.current_round||1).padStart(2,'0')}</span>
+        </div>
        </section>
-       <section className="agendaCard" aria-label="Другие разделы">
+       <section className="agendaCard quickEntrySections" aria-label="Разделы игры">
         <div className="sectionTop"><span className="overline">РАЗДЕЛЫ ИГРЫ</span></div>
-        <button className="agendaAction" onClick={()=>g.openDetailedDashboard()}><span><b>Полный обзор игры</b><small>Этапы, голосования и показатели</small></span><ArrowRight aria-hidden="true"/></button>
-        <button className="agendaAction" onClick={()=>navigate('profile')}><span><b>Мой профиль</b><small>Личные данные и документы</small></span><ArrowRight aria-hidden="true"/></button>
+        <div className="quickEntrySectionLinks">
+         <button type="button" className="agendaAction" onClick={()=>navigate('profile')}>
+          <span className="agendaIcon blue"><UserRound aria-hidden="true"/></span>
+          <span><b>Мой профиль</b><small>Личные данные и документы</small></span>
+          <ArrowRight aria-hidden="true"/>
+         </button>
+         <button type="button" className="agendaAction" onClick={()=>navigate('actions')}>
+          <span className="agendaIcon blue"><Landmark aria-hidden="true"/></span>
+          <span><b>Политический процесс</b><small>Публикации, органы и государственные решения</small></span>
+          <ArrowRight aria-hidden="true"/>
+         </button>
+        </div>
        </section>
       </div>)}
      {view!=='dashboard'&&!g.coreLoaded&&!teacher&&sectionLoading()}
