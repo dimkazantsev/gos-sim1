@@ -211,7 +211,7 @@ export default function ChatPanel({g,draft:text,onDraftChange:setText,previewCha
   previousFocus.current=document.activeElement instanceof HTMLElement?document.activeElement:null;
   return()=>{media.removeEventListener('change',update);phone.removeEventListener('change',update);previousFocus.current?.isConnected&&previousFocus.current.focus()};
  },[]);
- useEffect(()=>{
+ useLayoutEffect(()=>{
   if(channelId!==lastChannel.current){
    lastChannel.current=channelId;restoreHistoryScroll.current=null;follow.current=true;
    setSearch('');setOnlyFiles(false);setSearchOpen(false);setAttachOpen(false);setPinsOpen(false);
