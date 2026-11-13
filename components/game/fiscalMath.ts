@@ -1,14 +1,18 @@
 import catalog from '@/data/taxes-2026.json';
 export type FiscalRegion={game_id:string;region_code:string;name:string;profile:string;disputed:boolean;budget_year:number;enterprises:number;employees_per_firm:number;monthly_wage:number;profit_per_firm:number;consumption_per_firm:number;expenditure:number;transfer_in:number;budget_credit_cash?:number;debt:number;compliance:number;activity_multiplier:number;cost_multiplier:number;observations:Record<string,number|null>;source_url:string;source_year:number};
 export type FiscalRate={region_code:string;tax_key:string;rate:number};
-export type FiscalPolicy={key_rate:number;fx_rate:number;oil_price:number;cutoff_price:number;inflation:number;federal_expenditure:number;municipal_expenditure:number;baseline_economy:number;baseline_trust:number;activity_override?:number|null;updated_at:string};
+export type FiscalPolicy={key_rate:number;fx_rate:number;oil_price:number;cutoff_price:number;inflation:number;federal_expenditure:number;municipal_expenditure:number;baseline_economy:number;baseline_trust:number;activity_override?:number|null;activity_reference?:number|null;updated_at:string};
 export type FiscalContext={policy:FiscalPolicy;metrics:Record<string,number>;can_change_rate:boolean};
 const clamp=(v:number,min:number,max:number)=>Math.max(min,Math.min(max,v));
 export function fiscalEnvironment(c?:FiscalContext|null){
  if(!c)return {activity:1,cost:1,fx:80,uncertainty:.04};
  const p=c.policy,economy=(c.metrics.economy??p.baseline_economy)-p.baseline_economy,trust=(c.metrics.public_trust??p.baseline_trust)-p.baseline_trust;
  const fx=p.fx_rate*clamp(1-economy*.001-trust*.001-(p.key_rate-16)*.0015,.75,1.3);
- const activity=p.activity_override!=null?p.activity_override/100:clamp(1-(p.key_rate-16)*.007+economy*.002+trust*.001-(fx/80-1)*.06,.65,1.4);
+ // A manual value is a new starting level, not a permanent freeze.
+ // The reference factor is captured when the teacher sets that level.
+ const automatic=clamp(1-(p.key_rate-16)*.007+economy*.002+trust*.001-(fx/80-1)*.06,.65,1.4);
+ const reference=p.activity_reference!=null&&p.activity_reference>0?p.activity_reference:automatic;
+ const activity=p.activity_override!=null?clamp(p.activity_override/100*automatic/reference,0,10):automatic;
  const cost=clamp(1+(p.inflation-6)*.004+(fx/80-1)*.02,.7,1.6);
  const uncertainty=clamp(.04+Math.abs(economy)*.001+Math.abs(trust)*.001+Math.abs(p.inflation-6)*.003,.025,.2);
  return {activity,cost,fx,uncertainty};

@@ -382,6 +382,9 @@ jobs:
       - run: node scripts/classroom-overload-safety-check.cjs
       - run: node scripts/classroom-final-recovery-check.cjs
       - run: npm run typecheck
+      - run: node scripts/fiscal-model-check.cjs
+      - run: node scripts/fiscal-macro-save-check.cjs
+      - run: node scripts/fiscal-relative-activity-sql-check.cjs
       - run: node scripts/classroom-signal-noise-check.cjs
       - run: node scripts/classroom-load-optimization-check.cjs
       - run: node scripts/realtime-budget-chat-quiet-check.cjs
@@ -527,7 +530,6 @@ jobs:
       - run: node scripts/saved-invitations-check.cjs
       - run: node scripts/crisis-baseline-check.cjs
 
-      - run: node scripts/fiscal-model-check.cjs
       - run: node scripts/event-card-browser-check.cjs
       - run: npm run design:preview
       - name: Responsive all-screen geometry audit

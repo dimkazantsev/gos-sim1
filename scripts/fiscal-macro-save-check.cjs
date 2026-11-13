@@ -12,6 +12,10 @@ assert(form.includes("supabase.rpc('set_fiscal_policy'"),'Preserve server-author
 assert(form.includes('.abortSignal(abort.signal)')&&form.includes('18000'),'Bound connection wait');
 assert(form.includes("saving.current")&&form.includes('finally{'),'Prevent duplicate submissions and always release button');
 assert(form.includes('onSaved(changed)')&&!form.includes('await onSaved()'),'Never block save confirmation on budget recalculation');
+assert(form.includes('const requestValues={...changed}')&&form.includes('p_values:requestValues'),
+ 'Only the teacher-entered fields are sent; reference is computed by the server');
+assert(form.includes('changed.activity_reference=')&&form.includes('activity_override:null'),
+ 'The confirmed manual base must be shown immediately with its new reference');
 assert(form.includes('Решение сохранено.')&&form.includes('role="status"'),'Show confirmed writes');
 assert(form.includes('Для сохранения необходимо указать основание решения')&&form.includes('disabled={busy}'), 'Explain required rationale rather than silently disabling the button');
 assert(!form.includes('disabled={busy||reason.trim().length<8}'),'Do not hide validation behind a disabled button');
