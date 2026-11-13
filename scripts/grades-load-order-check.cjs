@@ -60,5 +60,12 @@ function pendingQuery(pending){return{select(){return this;},eq(){return this;},
  assert(source.includes('authId===null?undefined:game?.id'),
   'No verified identity must mean no grade refresh');
  assert(!source.includes("channel('grades-view:"),'Unpublished assessments must not create a useless channel');
+ assert(source.includes("useState<'surname'|'name'|'sum'|'average'|'final'|'graded'>('sum')"),
+  'By default, participants are sorted by total score, not by surname');
+ assert(source.includes('const [gradeAsc,setGradeAsc]=useState(false);'),
+  'By default, the greatest total score is displayed first');
+ assert(source.includes("gradeSort==='sum'?(av?.sum||0)-(bv?.sum||0)")&&
+  source.includes('return (gradeAsc?cmp:-cmp)||a.full_name.localeCompare(b.full_name'),
+  'Existing comparator, tie-breaker and user-selected directions are preserved');
  console.log('PASS assessment load: stale teacher/student/scope replies ignored; one public projection; scoped shared refresh');
 })().catch(error=>{console.error(error);process.exitCode=1;});

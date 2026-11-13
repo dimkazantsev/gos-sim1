@@ -94,8 +94,8 @@ export default function GradesView({g,compact=false,onOpenProfile,onPublicScores
  },[teacher,compact,game?.id,authId,loadScope]);
  const [gradeSearch,setGradeSearch]=useState('');
  const [gradeTeam,setGradeTeam]=useState('');
- const [gradeSort,setGradeSort]=useState<'surname'|'name'|'sum'|'average'|'final'|'graded'>('surname');
- const [gradeAsc,setGradeAsc]=useState(true);
+ const [gradeSort,setGradeSort]=useState<'surname'|'name'|'sum'|'average'|'final'|'graded'>('sum');
+ const [gradeAsc,setGradeAsc]=useState(false);
  const [gradeOnlyPending,setGradeOnlyPending]=useState(false);
  const [gradesScrolled,setGradesScrolled]=useState(false);
  const students=members.filter(m=>m.kind==='student');
