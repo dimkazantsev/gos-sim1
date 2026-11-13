@@ -41,6 +41,44 @@ function inaugurationDateLabel(value:string){
 const MATERIAL_LABELS:Record<string,string>={poster:'Плакат',leaflet:'Листовка',video:'Видео',audio:'Аудио',news:'Новость',other:'Другое'};
 const SYSTEM_NAMES={relative:'Относительное большинство',absolute:'Абсолютное большинство',qualified:'Квалифицированное большинство',preferential:'Преференциальная система'} as const;
 
+
+function CampaignMaterialAttachments({files,signAsset}:{files:Material['files'];signAsset:(path:string|null|undefined)=>Promise<string|null>}){
+ const [selected,setSelected]=useState<number|null>(null);
+ const [url,setUrl]=useState('');
+ const [loading,setLoading]=useState(false);
+ const [failure,setFailure]=useState('');
+ const pending=useRef(0);
+ useEffect(()=>()=>{pending.current++},[]);
+ const selectedFile=selected===null?null:files[selected]||null;
+ async function showFile(index:number){
+  const file=files[index];
+  if(!file?.storage_path||loading)return;
+  if(selected===index&&url){setSelected(null);setUrl('');return}
+  const version=++pending.current;
+  setSelected(index);setUrl('');setFailure('');setLoading(true);
+  try{
+   const signed=await signAsset(file.storage_path);
+   if(pending.current!==version)return;
+   if(!signed){setFailure('Нет доступа к вложению или срок его хранения истёк.');return}
+   setUrl(signed);
+  }catch{
+   if(pending.current===version)setFailure('Не удалось открыть вложение.');
+  }finally{
+   if(pending.current===version)setLoading(false);
+  }
+ }
+ const kind=selectedFile?.media_kind||(selectedFile?.mime_type?.startsWith('image/')?'image':selectedFile?.mime_type?.startsWith('video/')?'video':selectedFile?.mime_type?.startsWith('audio/')?'audio':'file');
+ return <div className="campaignAttachments">
+  <small>ВЛОЖЕНИЯ · {files.length}</small>
+  <div className="campaignAttachmentList">{files.map((file,index)=><button type="button" key={file.storage_path||index} className={selected===index?'active':''} aria-pressed={selected===index} disabled={loading} onClick={()=>void showFile(index)}><FileUp size={15}/><span>{file.file_name||'Вложение '+(index+1)}</span></button>)}</div>
+  {selectedFile&&<div className="campaignAttachmentPreview" aria-live="polite">
+   {loading&&<span>Открываем вложение…</span>}
+   {failure&&<span>{failure}</span>}
+   {url&&(kind==='image'?<img src={url} alt={selectedFile.file_name||'Изображение агитационного материала'} loading="lazy" decoding="async"/>:kind==='video'?<video controls preload="none" src={url}/>:kind==='audio'?<audio controls preload="none" src={url}/>:<a href={url} target="_blank" rel="noopener noreferrer"><ExternalLink size={15}/>Открыть файл</a>)}
+  </div>}
+ </div>;
+}
+
 export default function PresidentialElectionStage7({g}:{g:ReturnTypeRepublic}){
  const {game,me,teacher,members,parties,setError}=g;
  const gameId=game?.id||'';
@@ -288,8 +326,18 @@ export default function PresidentialElectionStage7({g}:{g:ReturnTypeRepublic}){
    <section className="stage7Panel"><div className="stage7PanelHead"><div><small>РЕЕСТР</small><h3>Материалы кампании</h3><p>{teacher?'Панель ЦИК: зафиксируйте ошибки и официальный ответ, при необходимости назначьте штраф. Одобрение публикует материал автоматически.':'Следите за статусом отправленных материалов.'}</p></div><Landmark size={24}/></div>
      <div className="campaignQueue">{materials.filter(m=>teacher||mine.some(c=>c.id===m.candidate_id)).map(m=>{const c=registered.find(x=>x.id===m.candidate_id);return <article key={m.id} className={'campaignCard '+m.status}>
       <div className="campaignCardTop"><div className="candidateMini">{photoUrls[m.candidate_id]?<img src={photoUrls[m.candidate_id]} alt="" loading="lazy" decoding="async"/>:<span>{(c?.display_name||'?').slice(0,1)}</span>}<div><small>{MATERIAL_LABELS[m.material_type]||'Агитационный материал'}</small><b>{c?.display_name||'Кандидат'}</b></div></div><em>{m.status==='pending'?'На проверке ЦИК':m.status==='approved'?'Одобрено ЦИК':'Отклонено ЦИК'}</em></div>
-      <h4>{m.title}</h4><p>{m.body}</p>
-      {(m.print_run>0||m.imprint_text)&&<div className="campaignImprint">{m.print_run>0&&<span>Тираж: <b>{m.print_run.toLocaleString('ru-RU')}</b></span>}{m.imprint_text&&<span>{m.imprint_text}</span>}</div>}
+      <h4>{m.title}</h4>
+      {teacher&&<div className="campaignImprint campaignMetadata">
+       <div><span>Тираж</span><b>{m.print_run>0?m.print_run.toLocaleString('ru-RU'):'Не указан'}</b></div>
+       <div><span>Дата изготовления</span><b>{m.production_date?(/^\d{4}-\d{2}-\d{2}$/.test(m.production_date)?m.production_date.slice(8,10)+'.'+m.production_date.slice(5,7)+'.'+m.production_date.slice(0,4):m.production_date):'Не указана'}</b></div>
+       <div><span>Выходные данные</span><b>{m.imprint_text||'Не указаны'}</b></div>
+       <div><span>Изготовитель / распространитель</span><b>{m.publisher_name||'Не указан'}</b></div>
+       <div><span>Внешняя ссылка</span><b>{m.external_url&&/^https?:\/\/\S+$/i.test(m.external_url)?<a href={m.external_url} target="_blank" rel="noopener noreferrer">{m.external_url}<ExternalLink size={13}/></a>:m.external_url||'Не указана'}</b></div>
+      </div>}
+      {teacher&&Array.isArray(m.files)&&m.files.length>0&&<CampaignMaterialAttachments key={viewScope+':'+m.id} files={m.files} signAsset={signedAsset}/>}
+      <p>{m.body}</p>
+      {!teacher&&(m.print_run>0||m.imprint_text)&&<div className="campaignImprint">{m.print_run>0&&<span>Тираж: <b>{m.print_run.toLocaleString('ru-RU')}</b></span>}{m.imprint_text&&<span>{m.imprint_text}</span>}</div>}
+      {!teacher&&Array.isArray(m.files)&&m.files.length>0&&<CampaignMaterialAttachments key={viewScope+':'+m.id} files={m.files} signAsset={signedAsset}/>} 
       {(m.cec_errors||m.cec_response||m.review_note||Number(m.penalty_points)>0)&&<div className="cecDecisionSummary">
        {m.cec_errors&&<div><small>ОШИБКИ / НАРУШЕНИЯ</small><p>{m.cec_errors}</p></div>}
        {m.cec_response&&<div><small>ОТВЕТ ЦИК</small><p>{m.cec_response}</p></div>}

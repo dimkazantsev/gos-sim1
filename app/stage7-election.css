@@ -200,3 +200,24 @@
 .stage7Election .ceremonyConfirmSection button{min-height:52px;width:100%;border-radius:13px;white-space:normal;text-align:center}
 .stage7Election .ceremonyConfirmHint{margin:0;padding:13px 15px;border:1px solid #c8d8fa;border-radius:12px;background:#f2f6ff;color:#284570;font-size:13px;font-weight:600;line-height:1.55;overflow-wrap:anywhere}
 @media(max-width:620px){.stage7Election .ceremonyConfirmSection button{min-height:50px}.stage7Election .ceremonyConfirmHint{padding:12px}}
+
+/* Материалы кампании: существующие токены ГОС.ID, реквизиты ЦИК до длинного текста. */
+.stage7Election .campaignMetadata{gap:8px;font-size:12px}
+.stage7Election .campaignMetadata>div{display:grid;grid-template-columns:minmax(110px,.42fr) minmax(0,1fr);align-items:start;gap:10px}
+.stage7Election .campaignMetadata>div>span{color:var(--muted)}
+.stage7Election .campaignMetadata b{font-weight:700;color:var(--body);overflow-wrap:anywhere}
+.stage7Election .campaignMetadata a{color:#315efb;display:inline-flex;align-items:center;gap:5px;overflow-wrap:anywhere;word-break:break-word}
+.stage7Election .campaignAttachments{display:grid;gap:9px;margin-top:12px;min-width:0}
+.stage7Election .campaignAttachments>small{font-size:11px;font-weight:900;color:var(--muted)}
+.stage7Election .campaignAttachmentList{display:grid;gap:7px}
+.stage7Election .campaignAttachmentList button{display:flex;align-items:center;gap:8px;min-width:0;width:100%;border:1px solid var(--line);border-radius:10px;background:#fbfcfe;padding:9px 11px;color:var(--body);font-size:12px;text-align:left;cursor:pointer}
+.stage7Election .campaignAttachmentList button.active{border-color:#b9caff;background:#eef3ff}
+.stage7Election .campaignAttachmentList button:focus-visible{outline:2px solid #315efb;outline-offset:2px}
+.stage7Election .campaignAttachmentList button:disabled{cursor:wait}
+.stage7Election .campaignAttachmentList button span{min-width:0;overflow-wrap:anywhere}
+.stage7Election .campaignAttachmentList button svg{flex-shrink:0}
+.stage7Election .campaignAttachmentPreview{min-width:0;border:1px solid var(--line);border-radius:12px;padding:11px;background:#fff;color:var(--muted);font-size:12px}
+.stage7Election .campaignAttachmentPreview :is(img,video,audio){display:block;max-width:100%;width:100%;height:auto;max-height:420px;object-fit:contain}
+.stage7Election .campaignAttachmentPreview a{display:inline-flex;align-items:center;gap:7px;color:#315efb}
+.stage7Election .campaignAttachments + p{margin-top:12px}
+@media(max-width:620px){.stage7Election .campaignMetadata>div{grid-template-columns:1fr;gap:3px}}
