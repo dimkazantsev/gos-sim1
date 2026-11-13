@@ -46,7 +46,7 @@ let home=readFileSync(resolve(target,'app/page.tsx'),'utf8');
 // Static Pages uses ?game=... instead of Vercel's /game/:id route.
 // Preserve validated Telegram section/deep-link parameters on every transition.
 for(const [method,target] of [
- ['push','r.data'],['push','resumedGameId'],
+ ['push','r.data'],
  ['replace','rows.data[0].game_id'],['replace','String(resume.data)']
 ]){
  const original="router."+method+"('/game/'+"+target+"+incomingSectionSuffix())";
@@ -55,6 +55,8 @@ for(const [method,target] of [
   "window.location.assign("+JSON.stringify(base+'/?game=')+"+"+target+
   "+(incomingSectionSuffix()?'&'+incomingSectionSuffix().slice(1):''))");
 }
+if(!home.includes("window.location.hostname?.endsWith('.github.io')")||!home.includes("openAuthorizedGame("))throw Error('Static account game navigation is missing');
+home=home.replaceAll("'/gos-sim1/?game='",JSON.stringify(base+'/?game='));
 home=home.replaceAll('href="/"','href='+JSON.stringify(base+'/'));
 writeFileSync(resolve(target,'components/StaticLanding.tsx'),home);
 writeFileSync(resolve(target,'components/StaticGame.tsx'),`'use client';

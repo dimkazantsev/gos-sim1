@@ -314,6 +314,7 @@ export default function Home(){
    if(profile.data){
     const index=await supabase.rpc('list_my_teacher_games');
     if(index.error)throw index.error;
+    const lastTeacherGame=profile.data.last_game_id;
     const teacherGames=((index.data as {games?:Array<{id:string;status:string}>}|null)?.games||[])
      .filter(game=>game?.id&&game.status!=='archived');
     if(teacherGames.length===0){
@@ -323,13 +324,13 @@ export default function Home(){
     }
     let remembered='';
     try{remembered=window.localStorage.getItem('gos-id:teacher-last-game')||''}catch{}
-    const target=teacherGames.find(game=>game.id===profile.data.last_game_id)
+    const target=teacherGames.find(game=>game.id===lastTeacherGame)
      ||teacherGames.find(game=>game.id===remembered)||teacherGames[0];
     // This RPC verifies the server-side membership and does not grant arbitrary
     // teacher rights. The game list must also contain the selected game.
     const access=await supabase.rpc('ensure_my_game_access',{p_game:target.id});
     if(access.error)throw access.error;
-    if(target.id!==profile.data.last_game_id){
+    if(target.id!==lastTeacherGame){
      const saved=await supabase.from('teacher_profiles').update({last_game_id:target.id}).eq('user_id',userId);
      if(saved.error)throw saved.error;
     }
