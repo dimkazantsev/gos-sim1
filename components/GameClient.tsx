@@ -618,10 +618,10 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
  
 
  useEffect(()=>{
-  if(!me||!g.coreLoaded||previewMode||me.kind==='observer')return;
+  if(!me||!g.coreLoaded||previewMode)return;
   const labels:Record<View,string>={dashboard:'Обзор игры',stages:'Этапы',parties:'Партия',votes:'Голосование',documents:'НПА / Формальные институты',actions:'Политический процесс',grades:'Оценки',profile:'Мой профиль',teacher:'Управление',events:'Ситуационные решения',budget:'Бюджет'};
   // The database journal is noncritical to joining. Distribute the FIRST
-  // SQL write across students so 100 arrivals do not hit PostgreSQL together.
+  // SQL write across users so 100 arrivals do not hit PostgreSQL together.
   // Realtime Presence already announces who is online immediately.
   // Preserve the same deadline if the student switches views while joining.
   const scope=gameId+':'+me.user_id;

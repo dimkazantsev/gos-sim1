@@ -93,14 +93,16 @@ export default function ClassroomJournal({g}:{g:ReturnTypeRepublic}){
  const [sort,setSort]=useState<Sort>('recent');
  const [scope,setScope]=useState<Scope>(teacher?'all':'mine');
  const [onlyOnline,setOnlyOnline]=useState(false);
- const studentMembers=members.filter(m=>m.kind==='student');
- const lastMap=new Map(studentMembers.map(m=>[m.user_id,presence.find(p=>p.user_id===m.user_id)]));
+ const audienceMembers=useMemo(()=>members.filter(m=>m.kind==='student'||m.kind==='observer'),[members]);
+ const audienceById=useMemo(()=>new Map(audienceMembers.map(m=>[m.user_id,m] as const)),[audienceMembers]);
+ const presenceById=useMemo(()=>new Map(presence.map(p=>[p.user_id,p] as const)),[presence]);
+ const lastMap=useMemo(()=>new Map(audienceMembers.map(m=>[m.user_id,presenceById.get(m.user_id)] as const)),[audienceMembers,presenceById]);
  const isOnline=(id:string)=>{const p=lastMap.get(id);return !!p&&Date.now()-new Date(p.last_seen_at).getTime()<90000};
  const allowed=useMemo(()=>loaded.filter(a=>(!cutoff||a.created_at>cutoff)&&(teacher||a.actor_id===me?.user_id)),[loaded,teacher,me?.user_id,cutoff]);
  const visible=useMemo(()=>{
   const q=search.trim().toLocaleLowerCase('ru');
   const xs=allowed.filter(a=>{
-   const member=studentMembers.find(m=>m.user_id===a.actor_id);
+   const member=audienceById.get(a.actor_id);
    if(teacher&&scope==='mine'&&a.actor_id!==me?.user_id)return false;
    if(teacher&&memberFilter&&a.actor_id!==memberFilter)return false;
    if(teacher&&onlyOnline&&!isOnline(a.actor_id))return false;
@@ -110,18 +112,18 @@ export default function ClassroomJournal({g}:{g:ReturnTypeRepublic}){
   return xs.sort((a,b)=>{
    if(sort==='recent')return new Date(b.created_at).getTime()-new Date(a.created_at).getTime();
    if(sort==='oldest')return new Date(a.created_at).getTime()-new Date(b.created_at).getTime();
-   const am=studentMembers.find(m=>m.user_id===a.actor_id);
-   const bm=studentMembers.find(m=>m.user_id===b.actor_id);
+   const am=audienceById.get(a.actor_id);
+   const bm=audienceById.get(b.actor_id);
    if(sort==='online')return Number(isOnline(b.actor_id))-Number(isOnline(a.actor_id))||new Date(b.created_at).getTime()-new Date(a.created_at).getTime();
    const part=(m:typeof am)=>sort==='surname'?(m?.full_name.split(' ')[0]||''):(m?.full_name.split(' ')[1]||m?.full_name||'');
    return part(am).localeCompare(part(bm),'ru')||new Date(b.created_at).getTime()-new Date(a.created_at).getTime();
   });
- },[allowed,search,memberFilter,viewFilter,sort,scope,onlyOnline,members,presence]);
- const onlineCount=studentMembers.filter(m=>isOnline(m.user_id)).length;
+ },[allowed,search,memberFilter,viewFilter,sort,scope,onlyOnline,audienceById,lastMap]);
+ const onlineCount=audienceMembers.filter(m=>isOnline(m.user_id)).length;
  const uniqueViews=[...new Set(allowed.map(a=>a.view_key).filter((s):s is string=>!!s))].sort();
  function exportCsv(){
   const header=['Время','Участник','Раздел','Тип','Событие'];
-  const rows=visible.map(a=>[new Date(a.created_at).toLocaleString('ru-RU'),members.find(m=>m.user_id===a.actor_id)?.full_name||'Участник',gameViewLabel(a.view_key),gameValueLabel(a.event_type,'Игровое действие'),a.label]);
+  const rows=visible.map(a=>[new Date(a.created_at).toLocaleString('ru-RU'),(members.find(m=>m.user_id===a.actor_id)?.full_name||'Участник')+(members.find(m=>m.user_id===a.actor_id)?.kind==='observer'?' · Гость':''),gameViewLabel(a.view_key),gameValueLabel(a.event_type,'Игровое действие'),a.label]);
   const contents=[header,...rows].map(row=>row.map(v=>'"'+String(v).replaceAll('"','""')+'"').join(';')).join('\r\n');
   const blob=new Blob(['\ufeff'+contents],{type:'text/csv;charset=utf-8'});
   const url=URL.createObjectURL(blob);
@@ -132,7 +134,7 @@ export default function ClassroomJournal({g}:{g:ReturnTypeRepublic}){
  return <section className="classroomJournal" aria-label="Журнал активности">
   <header className="journalHeader">
    <div><small>АКТИВНОСТЬ И ПРИСУТСТВИЕ</small><h2>{teacher?'Журнал аудитории':'Мой журнал действий'}</h2>
-    <p>{teacher?'Участники, текущий раздел и история действий в одном месте.':'Ваши действия и переходы по разделам игры.'}</p></div>
+    <p>{teacher?'Участники и гости, текущий раздел и история посещений в одном месте.':'Ваши действия и переходы по разделам игры.'}</p></div>
    <div className="journalCounters"><span><UsersRound size={16} aria-hidden="true"/>{teacher?onlineCount+' онлайн':'Личный журнал'}</span>
     <span><Activity size={16} aria-hidden="true"/>{visible.length} загружено</span>
     {teacher&&<button type="button" disabled={clearing} onClick={()=>void clearHistory()} title="Сбросить видимую историю, сохранив данные оценивания"><Trash2 size={16} aria-hidden="true"/>{clearing?'Очистка…':'Очистить историю'}</button>}
@@ -141,8 +143,8 @@ export default function ClassroomJournal({g}:{g:ReturnTypeRepublic}){
   </header>
   <div className="journalToolbar">
    <label className="journalSearch"><Search size={17} aria-hidden="true"/><input type="search" value={search} onChange={e=>setSearch(e.target.value)} placeholder="Поиск по журналу" aria-label="Поиск по журналу"/></label>
-   {teacher&&<StyledSelect className="journalParticipantFilter" label="Участник" value={memberFilter} onChange={setMemberFilter}
-    options={[{value:'',label:'Все участники'},...studentMembers.map(m=>({value:m.user_id,label:m.full_name}))]}/>}
+   {teacher&&<StyledSelect className="journalParticipantFilter" label="Пользователь" value={memberFilter} onChange={setMemberFilter}
+    options={[{value:'',label:'Все участники и гости'},...audienceMembers.map(m=>({value:m.user_id,label:m.full_name}))]}/>}
    <StyledSelect label="Раздел" value={viewFilter} onChange={setViewFilter}
     options={[{value:'',label:'Все разделы'},...uniqueViews.map(v=>({value:v,label:gameViewLabel(v)}))]}/>
    <StyledSelect label="Сортировка" value={sort} onChange={v=>setSort(v as Sort)}
@@ -151,9 +153,9 @@ export default function ClassroomJournal({g}:{g:ReturnTypeRepublic}){
    {teacher&&<label className="journalCheck"><input type="checkbox" checked={onlyOnline} onChange={e=>setOnlyOnline(e.target.checked)}/> Только онлайн</label>}
    {teacher&&<label className="journalCheck"><input type="checkbox" checked={scope==='mine'} onChange={e=>setScope(e.target.checked?'mine':'all')}/> Мои действия</label>}
   </div>
-  {teacher&&<div className="journalPresence" aria-label="Присутствие студентов">
-   {studentMembers.map(m=>{const p=lastMap.get(m.user_id);const online=isOnline(m.user_id);return <button type="button" key={m.user_id} className={memberFilter===m.user_id?'selected':''} onClick={()=>setMemberFilter(memberFilter===m.user_id?'':m.user_id)}>
-    <span className={online?'journalOnline':'journalOffline'}/><strong>{m.full_name}</strong><small>{p?(gameViewLabel(p.current_view)):'Нет данных'}</small>
+  {teacher&&<div className="journalPresence" aria-label="Присутствие участников и гостей">
+   {audienceMembers.map(m=>{const p=lastMap.get(m.user_id);const online=isOnline(m.user_id);return <button type="button" key={m.user_id} className={memberFilter===m.user_id?'selected':''} onClick={()=>setMemberFilter(memberFilter===m.user_id?'':m.user_id)}>
+    <span className={online?'journalOnline':'journalOffline'}/><strong>{m.full_name}</strong><small>{m.kind==='observer'?'Гость · ':''}{p?gameViewLabel(p.current_view):'Нет данных'}</small>
    </button>})}
   </div>}
   <div className="journalFeed" role="region" aria-label="Записи журнала" tabIndex={0}>
@@ -163,7 +165,7 @@ export default function ClassroomJournal({g}:{g:ReturnTypeRepublic}){
     return <article key={a.id} className="gosJournalRecord">
      <time className="gosJournalRecordTime" dateTime={a.created_at}>{new Date(a.created_at).toLocaleString('ru-RU',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'})}</time>
      <div className="gosJournalRecordBody">
-      <strong className="gosJournalRecordAuthor">{m?.full_name||'Участник'}</strong>
+      <strong className="gosJournalRecordAuthor">{m?.full_name||'Участник'}{m?.kind==='observer'?' · Гость':''}</strong>
       <span className="gosJournalRecordSection">{gameViewLabel(a.view_key)}</span>
       <p className="gosJournalRecordAction">{a.label}</p>
      </div>
