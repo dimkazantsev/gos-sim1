@@ -93,9 +93,13 @@ export default function ClassroomJournal({g}:{g:ReturnTypeRepublic}){
  const [sort,setSort]=useState<Sort>('recent');
  const [scope,setScope]=useState<Scope>(teacher?'all':'mine');
  const [onlyOnline,setOnlyOnline]=useState(false);
- const audienceMembers=useMemo(()=>members.filter(m=>m.kind==='student'||m.kind==='observer'),[members]);
- const guestMembers=useMemo(()=>audienceMembers.filter(m=>m.kind==='observer'),[audienceMembers]);
+ const audienceMembers=useMemo(()=>[
+  ...members.filter(m=>m.kind==='student'),
+  ...members.filter(m=>m.kind==='observer')
+ ],[members]);
  const studentMembers=useMemo(()=>audienceMembers.filter(m=>m.kind==='student'),[audienceMembers]);
+ const guestMembers=useMemo(()=>audienceMembers.filter(m=>m.kind==='observer'),[audienceMembers]);
+ const displayedAudience=memberFilter==='group:students'?studentMembers:memberFilter==='group:guests'?guestMembers:audienceMembers;
  const audienceById=useMemo(()=>new Map(audienceMembers.map(m=>[m.user_id,m] as const)),[audienceMembers]);
  const presenceById=useMemo(()=>new Map(presence.map(p=>[p.user_id,p] as const)),[presence]);
  const lastMap=useMemo(()=>new Map(audienceMembers.map(m=>[m.user_id,presenceById.get(m.user_id)] as const)),[audienceMembers,presenceById]);
@@ -106,7 +110,12 @@ export default function ClassroomJournal({g}:{g:ReturnTypeRepublic}){
   const xs=allowed.filter(a=>{
    const member=audienceById.get(a.actor_id);
    if(teacher&&scope==='mine'&&a.actor_id!==me?.user_id)return false;
-   if(teacher&&memberFilter&&a.actor_id!==memberFilter)return false;
+   if(teacher&&memberFilter){
+    if(memberFilter==='group:students'&&member?.kind!=='student')return false;
+    if(memberFilter==='group:guests'&&member?.kind!=='observer')return false;
+    if(memberFilter==='group:audience'&&member?.kind!=='student'&&member?.kind!=='observer')return false;
+    if(!memberFilter.startsWith('group:')&&a.actor_id!==memberFilter)return false;
+   }
    if(teacher&&onlyOnline&&!isOnline(a.actor_id))return false;
    if(viewFilter&&a.view_key!==viewFilter)return false;
    return !q||[member?.full_name||'',a.label,a.event_type,gameValueLabel(a.event_type,'Игровое действие'),gameViewLabel(a.view_key)].some(s=>s.toLocaleLowerCase('ru').includes(q));
@@ -155,7 +164,14 @@ export default function ClassroomJournal({g}:{g:ReturnTypeRepublic}){
   <div className="journalToolbar">
    <label className="journalSearch"><Search size={17} aria-hidden="true"/><input type="search" value={search} onChange={e=>setSearch(e.target.value)} placeholder="Поиск по журналу" aria-label="Поиск по журналу"/></label>
    {teacher&&<StyledSelect className="journalParticipantFilter" label="Пользователь" value={memberFilter} onChange={setMemberFilter}
-    options={[{value:'',label:'Все участники и гости'},...audienceMembers.map(m=>({value:m.user_id,label:m.full_name}))]}/>}
+    options={[
+     {value:'',label:'Все'},
+     {value:'group:students',label:'Участники'},
+     {value:'group:guests',label:'Гости'},
+     {value:'group:audience',label:'Участники и гости'},
+     ...studentMembers.map(m=>({value:m.user_id,label:'Участник · '+m.full_name})),
+     ...guestMembers.map(m=>({value:m.user_id,label:'Гость · '+m.full_name}))
+    ]}/>}
    <StyledSelect label="Раздел" value={viewFilter} onChange={setViewFilter}
     options={[{value:'',label:'Все разделы'},...uniqueViews.map(v=>({value:v,label:gameViewLabel(v)}))]}/>
    <StyledSelect label="Сортировка" value={sort} onChange={v=>setSort(v as Sort)}
@@ -164,19 +180,8 @@ export default function ClassroomJournal({g}:{g:ReturnTypeRepublic}){
    {teacher&&<label className="journalCheck"><input type="checkbox" checked={onlyOnline} onChange={e=>setOnlyOnline(e.target.checked)}/> Только онлайн</label>}
    {teacher&&<label className="journalCheck"><input type="checkbox" checked={scope==='mine'} onChange={e=>setScope(e.target.checked?'mine':'all')}/> Мои действия</label>}
   </div>
-  {teacher&&<div className="journalAudience">
-   {guestMembers.length>0&&<div className="journalAudienceGroup">
-    <h3>Гости <span>{guestMembers.length}</span></h3>
-    <div className="journalPresence journalGuestPresence" aria-label="Зарегистрированные гости">
-     {guestMembers.map(audienceCard)}
-    </div>
-   </div>}
-   <div className="journalAudienceGroup">
-    <h3>Участники <span>{studentMembers.length}</span></h3>
-    <div className="journalPresence" aria-label="Присутствие участников">
-     {studentMembers.map(audienceCard)}
-    </div>
-   </div>
+  {teacher&&<div className="journalPresence" aria-label="Участники и гости: сначала участники, затем гости">
+   {displayedAudience.map(audienceCard)}
   </div>}
   <div className="journalFeed" role="region" aria-label="Записи журнала" tabIndex={0}>
    {ownBusy&&!teacher&&<p role="status">Загрузка личного журнала…</p>}
