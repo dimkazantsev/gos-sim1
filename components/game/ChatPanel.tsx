@@ -59,7 +59,7 @@ function ChatAttachment({message:m,onRefresh}:{message:Message;onRefresh?:(messa
  </a>;
 }
 
-export default function ChatPanel({g,draft:text,onDraftChange:setText,previewChannelOpen=false,previewPinsOpen=false,onOpenMember,readOnly=false}:{g:ReturnTypeRepublic;draft:string;onDraftChange:(next:string)=>void;previewChannelOpen?:boolean;previewPinsOpen?:boolean;onOpenMember?:(userId:string)=>void;readOnly?:boolean}){
+export default function ChatPanel({g,draft:text,onDraftChange:setText,previewChannelOpen=false,previewPinsOpen=false,onOpenMember,readOnly=false,expandOnOpen=false}:{g:ReturnTypeRepublic;draft:string;onDraftChange:(next:string)=>void;previewChannelOpen?:boolean;previewPinsOpen?:boolean;onOpenMember?:(userId:string)=>void;readOnly?:boolean;expandOnOpen?:boolean}){
  const {channels,channelId,setChannelId,messages,chatPins:allPins,pinnedMessages:allPinnedMessages,setChatPin,editChatMessage,refreshChatMediaUrl,chatLoading,hasOlderChatMessages,olderChatLoading,loadOlderChatMessages,names,recording,recordingPreview,recordingSaving,chatMediaError,chatMediaPhase,recordingStartedAt,recordingStream,discardRecording,sendRecordingPreview,setChatOpen,sendText,sendChatFile,toggleRecording,me,teacher,chatOverview,setChatChannelPinned}=g;
  useEffect(()=>{setSelectedMessages([]);setProcessTagsOpen(false);setEditingMessageId(null);setEditValue('')},[channelId]);
  useEffect(()=>()=>{if(selectHoldTimer.current)clearTimeout(selectHoldTimer.current)},[]);
@@ -82,7 +82,7 @@ export default function ChatPanel({g,draft:text,onDraftChange:setText,previewCha
  const [recordElapsed,setRecordElapsed]=useState(0);
  const [overlay,setOverlay]=useState(false);
  const [phonePortal,setPhonePortal]=useState(false);
- const [expanded,setExpanded]=useState(false);
+ const [expanded,setExpanded]=useState(expandOnOpen);
  const [processTagsOpen,setProcessTagsOpen]=useState(false);
  useEffect(()=>{
   if(!expanded)return;
@@ -408,6 +408,7 @@ export default function ChatPanel({g,draft:text,onDraftChange:setText,previewCha
   suppressModeScroll.current=true;
   setExpanded(next);
  }
+ useEffect(()=>{if(expandOnOpen)changeExpanded(true)},[expandOnOpen]);
  const scrollToLatest=()=>{if(list.current){list.current.scrollTop=list.current.scrollHeight;follow.current=true;setJumpVisible(false)}};
  async function send(){
   if(editingMessageId){await saveEditing();return}

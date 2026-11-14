@@ -3,12 +3,18 @@ import {MessageCircle} from 'lucide-react';
 import {CHAT_PAUSED} from '@/lib/featureFreeze';
 
 /** Shared top-bar action, also rendered in responsive design tests. */
-export default function ChatToggleButton({chatOpen,onToggle,unreadCount=0,mentionCount=0}:{chatOpen:boolean;onToggle:()=>void;unreadCount?:number;mentionCount?:number}){
+export default function ChatToggleButton({chatOpen,onToggle,onExpand,unreadCount=0,mentionCount=0}:{chatOpen:boolean;onToggle:()=>void;onExpand?:()=>void;unreadCount?:number;mentionCount?:number}){
  const title=CHAT_PAUSED?'Чат временно приостановлен':chatOpen?'Закрыть чат':'Открыть чат';
  return <button
   type="button"
   className={`topChatButton ${chatOpen?'active':''}`}
-  onClick={onToggle}
+  onClick={event=>{
+   // A double click also emits two click events. Ignore the second so the
+   // compact chat is not closed immediately before the expand command.
+   if(onExpand&&event.button===0&&event.detail===2)return;
+   onToggle();
+  }}
+  onDoubleClick={event=>{if(event.button===0)onExpand?.()}}
   disabled={CHAT_PAUSED}
   aria-label={title}
   title={title}

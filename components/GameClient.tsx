@@ -286,6 +286,8 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
  useEffect(()=>{try{setSidebarOrder(JSON.parse(window.localStorage.getItem('gos-sims-sidebar:'+gameId)||'[]'))}catch{setSidebarOrder([])}},[gameId]);
  const [crisisExpanded,setCrisisExpanded]=useState(false);
  const [chatDrafts,setChatDrafts]=useState<Record<string,string>>({});
+ const [expandChatFromTop,setExpandChatFromTop]=useState(false);
+ useEffect(()=>{if(!g.chatOpen)setExpandChatFromTop(false)},[g.chatOpen]);
  const mobileDialogRef=useDialog(mobileMenuOpen,()=>setMobileMenuOpen(false));
  const [pendingEvents,setPendingEvents]=useState(0);
  const [pendingBlitz,setPendingBlitz]=useState(0);
@@ -441,9 +443,16 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
  }
  function toggleTourChat(){
   if(CHAT_PAUSED)return;
+  setExpandChatFromTop(false);
   const opening=!chatOpen;
   setChatOpen(opening);
   if(tourMode==='tour'&&opening&&getTourSteps(!!teacher)[tourIndex]?.target==='chat')setTourIndex(x=>x+1);
+ }
+ function expandTopChat(){
+  if(CHAT_PAUSED)return;
+  setExpandChatFromTop(true);
+  setChatOpen(true);
+  if(tourMode==='tour'&&!chatOpen&&getTourSteps(!!teacher)[tourIndex]?.target==='chat')setTourIndex(x=>x+1);
  }
  useEffect(()=>{
   if(!game||!me||observer||previewMode||g.loading||!g.profilesLoaded||!navigationHydrated||introOpen||!introSeen||!onboardingRequired)return;
@@ -735,7 +744,7 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
      </div>}
     </div>}
 
-     <ChatToggleButton chatOpen={chatOpen} onToggle={toggleTourChat} unreadCount={g.chatUnreadCount} mentionCount={g.chatMentionCount}/>
+     <ChatToggleButton chatOpen={chatOpen} onToggle={toggleTourChat} onExpand={expandTopChat} unreadCount={g.chatUnreadCount} mentionCount={g.chatMentionCount}/>
    </header>
    </GameHeader>
 
@@ -797,7 +806,7 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
     </main>
    </div>
 
-   {!CHAT_PAUSED&&chatOpen&&<ChatPanel g={vg} readOnly={observer} draft={chatDrafts[chatDraftKey]||''} onDraftChange={text=>setChatDrafts(current=>({...current,[chatDraftKey]:text}))} onOpenMember={uid=>{g.setChatOpen(false);navigateProfile(uid)}}/>}
+   {!CHAT_PAUSED&&chatOpen&&<ChatPanel g={vg} readOnly={observer} expandOnOpen={expandChatFromTop} draft={chatDrafts[chatDraftKey]||''} onDraftChange={text=>setChatDrafts(current=>({...current,[chatDraftKey]:text}))} onOpenMember={uid=>{g.setChatOpen(false);navigateProfile(uid)}}/>}
   </div></TeacherNavigationProvider>
 
   {mobileMenuOpen&&<div className="mobileMoreBackdrop" onClick={()=>setMobileMenuOpen(false)}>
