@@ -379,6 +379,7 @@ jobs:
       - run: node scripts/private-game-presence-100-clients-check.cjs
       - run: node scripts/blitz-network-resilience-check.cjs
       - run: node scripts/performance-modules-check.cjs
+      - run: node scripts/classroom-request-cadence-check.cjs
       - run: node scripts/classroom-overload-safety-check.cjs
       - run: node scripts/classroom-final-recovery-check.cjs
       - run: npm run typecheck
