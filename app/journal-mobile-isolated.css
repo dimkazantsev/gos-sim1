@@ -77,3 +77,19 @@
   flex:1 1 auto;width:100%;max-width:100%;
  }
 }
+
+/* Registered guests stay visible above the horizontally scrolling student roster. */
+.classroomJournal .journalAudience{display:grid;gap:13px;min-width:0}
+.classroomJournal .journalAudienceGroup{min-width:0}
+.classroomJournal .journalAudienceGroup h3{
+ display:flex;align-items:baseline;gap:8px;margin:0 0 7px;
+ color:#35516f;font-size:12px;font-weight:750;line-height:1.4
+}
+.classroomJournal .journalAudienceGroup h3 span{color:#7187a4;font-size:11px;font-weight:650}
+.classroomJournal .journalPresence.journalGuestPresence{
+ display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,214px),1fr));
+ gap:10px;max-width:100%;overflow-x:visible;touch-action:auto
+}
+.classroomJournal .journalGuestPresence button{
+ box-sizing:border-box;min-width:0;width:100%;max-width:100%;flex-basis:auto
+}

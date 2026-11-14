@@ -94,6 +94,8 @@ export default function ClassroomJournal({g}:{g:ReturnTypeRepublic}){
  const [scope,setScope]=useState<Scope>(teacher?'all':'mine');
  const [onlyOnline,setOnlyOnline]=useState(false);
  const audienceMembers=useMemo(()=>members.filter(m=>m.kind==='student'||m.kind==='observer'),[members]);
+ const guestMembers=useMemo(()=>audienceMembers.filter(m=>m.kind==='observer'),[audienceMembers]);
+ const studentMembers=useMemo(()=>audienceMembers.filter(m=>m.kind==='student'),[audienceMembers]);
  const audienceById=useMemo(()=>new Map(audienceMembers.map(m=>[m.user_id,m] as const)),[audienceMembers]);
  const presenceById=useMemo(()=>new Map(presence.map(p=>[p.user_id,p] as const)),[presence]);
  const lastMap=useMemo(()=>new Map(audienceMembers.map(m=>[m.user_id,presenceById.get(m.user_id)] as const)),[audienceMembers,presenceById]);
@@ -130,6 +132,15 @@ export default function ClassroomJournal({g}:{g:ReturnTypeRepublic}){
   const anchor=document.createElement('a');anchor.href=url;anchor.download='gos-id-journal.csv';anchor.click();
   URL.revokeObjectURL(url);
  }
+ function audienceCard(m:(typeof audienceMembers)[number]){
+  const p=lastMap.get(m.user_id),online=isOnline(m.user_id);
+  return <button type="button" key={m.user_id} className={memberFilter===m.user_id?'selected':''}
+   onClick={()=>setMemberFilter(memberFilter===m.user_id?'':m.user_id)}>
+   <span className={online?'journalOnline':'journalOffline'}/>
+   <strong title={m.full_name}>{m.full_name}</strong>
+   <small>{m.kind==='observer'?'Гость · ':''}{p?gameViewLabel(p.current_view):m.kind==='observer'?'Нет записей':'Нет данных'}</small>
+  </button>;
+ }
  if(!me)return null;
  return <section className="classroomJournal" aria-label="Журнал активности">
   <header className="journalHeader">
@@ -153,10 +164,19 @@ export default function ClassroomJournal({g}:{g:ReturnTypeRepublic}){
    {teacher&&<label className="journalCheck"><input type="checkbox" checked={onlyOnline} onChange={e=>setOnlyOnline(e.target.checked)}/> Только онлайн</label>}
    {teacher&&<label className="journalCheck"><input type="checkbox" checked={scope==='mine'} onChange={e=>setScope(e.target.checked?'mine':'all')}/> Мои действия</label>}
   </div>
-  {teacher&&<div className="journalPresence" aria-label="Присутствие участников и гостей">
-   {audienceMembers.map(m=>{const p=lastMap.get(m.user_id);const online=isOnline(m.user_id);return <button type="button" key={m.user_id} className={memberFilter===m.user_id?'selected':''} onClick={()=>setMemberFilter(memberFilter===m.user_id?'':m.user_id)}>
-    <span className={online?'journalOnline':'journalOffline'}/><strong>{m.full_name}</strong><small>{m.kind==='observer'?'Гость · ':''}{p?gameViewLabel(p.current_view):'Нет данных'}</small>
-   </button>})}
+  {teacher&&<div className="journalAudience">
+   {guestMembers.length>0&&<div className="journalAudienceGroup">
+    <h3>Гости <span>{guestMembers.length}</span></h3>
+    <div className="journalPresence journalGuestPresence" aria-label="Зарегистрированные гости">
+     {guestMembers.map(audienceCard)}
+    </div>
+   </div>}
+   <div className="journalAudienceGroup">
+    <h3>Участники <span>{studentMembers.length}</span></h3>
+    <div className="journalPresence" aria-label="Присутствие участников">
+     {studentMembers.map(audienceCard)}
+    </div>
+   </div>
   </div>}
   <div className="journalFeed" role="region" aria-label="Записи журнала" tabIndex={0}>
    {ownBusy&&!teacher&&<p role="status">Загрузка личного журнала…</p>}
