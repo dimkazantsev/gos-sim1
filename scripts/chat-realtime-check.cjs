@@ -35,7 +35,10 @@ assert(source.includes('chatRecovery=setInterval(recoverVisibleChatAndBallots,60
 assert(source.includes('startChatRecovery=setTimeout(')&&source.includes('function stopPeriodicPolling()'),'Chat still staggers first recovery, but stops the interval while hidden');
 assert(source.includes("else if(payload.eventType==='UPDATE')")&&source.includes('next.channel_id===channelRef.current'),'Handle UPDATE only for the selected channel or previously visible moved messages');
 assert(source.includes('if(chat&&chatOpenRef.current&&channelRef.current){lastChatRecoveryAt=Date.now();void loadMessages(channelRef.current)}'),'Chat edits use one current-channel read and reset the fallback cadence');
-assert(source.includes('else if(chatOpen&&channelRef.current)')&&source.includes('void loadMessages(channelRef.current)'), 'Opening chat must recover edits that arrived while closed');
+assert(source.includes("},[chatOpen,channelId]);")&&source.includes("void loadMessages(channelId,true);")&&source.includes("void loadChatPins(channelId);"),
+ 'Opening or switching chats must reconcile messages and pins with a single initial fetch');
+assert(!source.includes("void loadMessages(channelId,true);void loadChatPins(channelId);void markChatRead(channelId);"),
+ 'Channel initialization must not duplicate the opening effect');
 assert(source.includes('messageRowsRef.current.some(old=>old.id===m.id)'),'Avoid duplicate media signing');
 assert(source.includes('void Promise.allSettled([loadMessages(targetChannel),loadChatOverview()])'),'Text sends must not wait for history readback');
 // Prevent 100 personalised read-marker / mention events from fanning out to

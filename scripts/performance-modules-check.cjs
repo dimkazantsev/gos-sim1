@@ -11,7 +11,7 @@ function compile(file,old=false){const key=String(old)+file;if(!compiled.has(key
 // The abortable RPC wraps additional Promise layers; flush their microtasks
 // before advancing the synthetic clock to the next 45-second polling tick.
 const tick=async()=>{for(let i=0;i<40;i++)await Promise.resolve()};
-function realm(file,old=false,{hidden=false,issueError=false,slowIssue=false,slowMutation=false,deliveryStatus=0}={}){
+function realm(file,old=false,{hidden=false,issueError=false,slowIssue=false,slowMutation=false,deliveryStatus=0,connected=true}={}){
  let now=Date.parse('2026-10-25T12:00:00Z'),cursor=0,nextId=0,resolveIssue,resolveMutation;
  const hooks=[],effects=[],timers=new Map(),calls=[],listeners={window:new Map(),document:new Map()};
  const equal=(a,b)=>!!a&&!!b&&a.length===b.length&&a.every((x,i)=>Object.is(x,b[i]));
@@ -64,13 +64,14 @@ function realm(file,old=false,{hidden=false,issueError=false,slowIssue=false,slo
   return{};
  };
  vm.createContext(context);
- vm.runInContext('(function(exports,require){'+transpile(current('components/game/useGameTableSync.ts'))+'})(exports,require)',context);sync={...context.exports};sync.setGameRealtimeConnection('test-game',true);
+ vm.runInContext('(function(exports,require){'+transpile(current('components/game/useGameTableSync.ts'))+'})(exports,require)',context);sync={...context.exports};sync.setGameRealtimeConnection('test-game',connected);
  context.exports={};
  let code=compile(file,old);if(file.endsWith('NewsProposals.tsx'))code+='\nexports.ProposalFiles=ProposalFiles;';
  vm.runInContext('(function(exports,require){'+code+'})(exports,require)',context);
  return{calls,render(name,props){cursor=0;const tree=context.exports[name](props);while(effects.length)effects.shift()();return tree},
   async advance(ms){const until=now+ms;for(;;){const due=[...timers].filter(([,t])=>t.at<=until).sort((a,b)=>a[1].at-b[1].at)[0];if(!due)break;now=due[1].at;if(due[1].interval)due[1].at+=due[1].interval;else timers.delete(due[0]);due[1].fn();await tick()}now=until;await tick()},
   visible(value){document.visibilityState=value?'visible':'hidden';document.dispatchEvent({type:'visibilitychange'})},
+  assignment(table='blitz_assignments'){window.dispatchEvent({type:sync.GAME_DATA_REFRESH_EVENT,detail:{gameId:'test-game',table}})},
   releaseIssue(){resolveIssue?.()},
   releaseMutation(){resolveMutation?.()},
   close(){for(const h of hooks)h?.cleanup?.();assert.equal(timers.size,0,'Unmount cancels intervals');for(const map of Object.values(listeners))for(const fns of map.values())assert.equal(fns.size,0,'Unmount removes listeners')}
@@ -78,7 +79,7 @@ function realm(file,old=false,{hidden=false,issueError=false,slowIssue=false,slo
 }
 const count=(r,name)=>r.calls.filter(c=>c.name===name).length;
 function find(tree,predicate){if(!tree)return;if(Array.isArray(tree)){for(const child of tree){const found=find(child,predicate);if(found)return found}}else if(typeof tree==='object'){if(predicate(tree))return tree;return find(tree.props?.children,predicate)}}
-async function blitz(old=false){const sessions=Array.from({length:40},()=>realm('components/game/Blitz.tsx',old));for(let i=0;i<sessions.length;i++)sessions[i].render('BlitzOverlay',{gameId:'test-game',userId:'00000000-0000-4000-8000-'+String(i).padStart(12,'0'),enabled:true});await tick();for(const r of sessions)await r.advance(20*60000);const times=new Map();for(const r of sessions){const calls=r.calls.filter(c=>c.name==='blitz_open_recent');for(let i=1;i<calls.length;i++){assert(calls[i].at-calls[i-1].at<=45000,'Each delivery gap stays within 45 seconds');const bucket=Math.floor(calls[i].at/1000);times.set(bucket,(times.get(bucket)||0)+1)}}const counts={issue:sessions.reduce((n,r)=>n+count(r,'blitz_issue_today'),0),open:sessions.reduce((n,r)=>n+count(r,'blitz_open_recent'),0),peakPollingPerSecond:Math.max(...times.values())};for(const r of sessions)r.close();return counts}
+async function blitz(old=false){const sessions=Array.from({length:40},()=>realm('components/game/Blitz.tsx',old));for(let i=0;i<sessions.length;i++)sessions[i].render('BlitzOverlay',{gameId:'test-game',userId:'00000000-0000-4000-8000-'+String(i).padStart(12,'0'),enabled:true});await tick();for(const r of sessions)await r.advance(20*60000);const times=new Map();for(const r of sessions){const calls=r.calls.filter(c=>c.name==='blitz_open_recent');for(let i=1;i<calls.length;i++){assert(calls[i].at-calls[i-1].at<=(old?45000:225000),old?'Old delivery gap exceeded 45 seconds':'Connected Realtime safety gap exceeded 225 seconds');const bucket=Math.floor(calls[i].at/1000);times.set(bucket,(times.get(bucket)||0)+1)}}const counts={issue:sessions.reduce((n,r)=>n+count(r,'blitz_issue_today'),0),open:sessions.reduce((n,r)=>n+count(r,'blitz_open_recent'),0),peakPollingPerSecond:Math.max(...times.values())};for(const r of sessions)r.close();return counts}
 async function inbox(old=false){const sessions=Array.from({length:40},()=>realm('components/game/DocumentTools.tsx',old));for(const r of sessions)r.render('DocumentInbox',{gameId:'test-game',userId:'student',members:[],documents:[],onOpen(){}});await tick();for(let iteration=0;iteration<60;iteration++)for(const r of sessions){await r.advance(20000);r.render('DocumentInbox',{gameId:'test-game',userId:'student',members:[],documents:[],onOpen(){}});await tick()}const reads=sessions.reduce((n,r)=>n+count(r,'formal_document_deliveries'),0);for(const r of sessions)r.close();return reads}
 async function media(old=false){const sessions=Array.from({length:40},()=>realm('components/game/NewsProposals.tsx',old));const props=()=>({files:[{storage_path:'game/synthetic-file',file_name:'test.pdf',media_kind:'file'}]});for(const r of sessions)r.render('ProposalFiles',props());await tick();for(let iteration=0;iteration<60;iteration++)for(const r of sessions){await r.advance(20000);r.render('ProposalFiles',props());await tick()}const reads=sessions.reduce((n,r)=>n+count(r,'signedUrl'),0);for(const r of sessions)r.close();return reads}
 async function main(){
@@ -96,6 +97,23 @@ async function main(){
  assert(degradedOpenRequests<=1100,'100 degraded clients must not keep a 45-second request storm');
  assert(degradedOpenRequests>=100,'Every client gets its original first delivery attempt');
  for(const session of degraded)session.close();
+ // The 45-second recovery is retained whenever the shared socket disconnects.
+ const offline=realm('components/game/Blitz.tsx',false,{connected:false});
+ offline.render('BlitzOverlay',{gameId:'test-game',userId:'offline-student',enabled:true});
+ await tick();await offline.advance(20*60000);
+ const offlineReads=offline.calls.filter(call=>call.name==='blitz_open_recent');
+ assert(offlineReads.length>=26&&offlineReads.length<=29,'Disconnected Blitz recovery must retain the original 45-second cadence');
+ for(let i=1;i<offlineReads.length;i++)assert(offlineReads[i].at-offlineReads[i-1].at<=45000);
+ offline.close();
+ // Realtime assignment signal opens a new question immediately, without polling.
+ const pushed=realm('components/game/Blitz.tsx');
+ pushed.render('BlitzOverlay',{gameId:'test-game',userId:'push-student',enabled:true});
+ await tick();const beforePush=count(pushed,'blitz_open_recent');
+ pushed.assignment('chat_messages');await pushed.advance(600);
+ assert.equal(count(pushed,'blitz_open_recent'),beforePush,'Unrelated Realtime events never open Blitz');
+ pushed.assignment();await pushed.advance(600);
+ assert.equal(count(pushed,'blitz_open_recent'),beforePush+1,'A new Blitz assignment triggers an immediate bounded delivery');
+ pushed.close();
  const quota=realm('components/game/Blitz.tsx',false,{deliveryStatus:402});
  quota.render('BlitzOverlay',{gameId:'test-game',userId:'quota-student',enabled:true});
  await tick();await quota.advance(20*60000);
@@ -104,11 +122,11 @@ async function main(){
  const chatSource=current('components/game/useRepublicGame.ts');
  assert(chatSource.includes('An explicit overview read supersedes a queued Realtime reconciliation.'),
   'Explicit chat overview must invalidate stale scheduled overview reads');
- assert(after.blitz.open>=1080&&after.blitz.open<=1120,'Delivery retains its 45-second maximum gap with at most one extra check per client');assert(after.blitz.peakPollingPerSecond<=8,'Polling starts are distributed across the classroom');assert(after.inbox<=840,'Inbox retains a 60–75s fallback when its table is not in the live Realtime publication, without document-identity reloads');assert.equal(after.media,40,'Unchanged attachments reuse still-valid signed links');
- if(before){assert(after.blitz.issue<before.blitz.issue);assert.equal(after.blitz.open,before.blitz.open);assert(after.inbox<before.inbox/2);assert(before.media>after.media*20)}
- if(blitzBefore){assert.equal(after.blitz.issue,blitzBefore.issue);assert(after.blitz.open>=blitzBefore.open&&after.blitz.open<=blitzBefore.open+40);assert(after.blitz.peakPollingPerSecond<=blitzBefore.peakPollingPerSecond)}
+ assert(after.blitz.open>=240&&after.blitz.open<=360,'Healthy connected Blitz checks must be reduced while retaining a 3-minute safety fallback');assert(after.blitz.peakPollingPerSecond<=8,'Polling starts are distributed across the classroom');assert(after.inbox<=840,'Inbox retains a 60–75s fallback when its table is not in the live Realtime publication, without document-identity reloads');assert.equal(after.media,40,'Unchanged attachments reuse still-valid signed links');
+ if(before){assert(after.blitz.issue<before.blitz.issue);assert(after.blitz.open<before.blitz.open,'Healthy connected polling must be reduced against baseline');assert(after.inbox<before.inbox/2);assert(before.media>after.media*20)}
+ if(blitzBefore){assert.equal(after.blitz.issue,blitzBefore.issue);assert(after.blitz.open<blitzBefore.open,'Connected push replaces frequent old polling');assert(after.blitz.peakPollingPerSecond<=blitzBefore.peakPollingPerSecond)}
  const hidden=realm('components/game/Blitz.tsx',false,{hidden:true});hidden.render('BlitzOverlay',{gameId:'test-game',enabled:true});await tick();await hidden.advance(20*60000);assert.equal(hidden.calls.length,0,'Hidden tabs cannot prepare or start timed questions');hidden.visible(true);await tick();assert.equal(count(hidden,'blitz_issue_today'),1);assert.equal(count(hidden,'blitz_open_recent'),1);hidden.close();
- const failed=realm('components/game/Blitz.tsx',false,{issueError:true});failed.render('BlitzOverlay',{gameId:'test-game',enabled:true});await tick();await failed.advance(20*60000);assert(count(failed,'blitz_issue_today')<=5,'Failed preparation retries at most every five minutes, never every 45 seconds');assert(count(failed,'blitz_open_recent')>20,'Already assigned questions remain deliverable despite issuance failure');failed.close();
+ const failed=realm('components/game/Blitz.tsx',false,{issueError:true});failed.render('BlitzOverlay',{gameId:'test-game',enabled:true});await tick();await failed.advance(20*60000);assert(count(failed,'blitz_issue_today')<=5,'Failed preparation retries at most every five minutes, never every 45 seconds');assert(count(failed,'blitz_open_recent')>=5,'Already assigned questions retain healthy Realtime safety checks despite issuance failure');failed.close();
  const slow=realm('components/game/Blitz.tsx',false,{slowIssue:true});slow.render('BlitzOverlay',{gameId:'test-game',enabled:true});await tick();await slow.advance(135000);assert.equal(count(slow,'blitz_issue_today'),1,'Slow preparation stays single-flight');slow.visible(false);slow.releaseIssue();await tick();assert(count(slow,'blitz_open_recent')>=1,'A stalled preparation is released without indefinitely blocking delivery');slow.close();
  const boundary=realm('components/game/Blitz.tsx');boundary.render('BlitzOverlay',{gameId:'test-game',enabled:true});await tick();await boundary.advance(9*60*60000+45000);assert.equal(count(boundary,'blitz_issue_today'),2,'Moscow midnight starts the next assignment day');boundary.close();
  const identity=realm('components/game/Blitz.tsx');identity.render('BlitzOverlay',{gameId:'test-game',userId:'student-A',enabled:true});await tick();identity.render('BlitzOverlay',{gameId:'test-game',userId:'student-B',enabled:true});await tick();assert.equal(count(identity,'blitz_issue_today'),2,'A different authenticated student gets independent daily preparation');identity.close();
@@ -135,6 +153,6 @@ async function main(){
  for(const file of ['BudgetAmendments','DocumentTools','DocumentsView','NewsProposals','PoliticalWallView','EventCollaboration','ClassroomJournal','BlitzKnowledgeScore','CivicDiscussion']){
   const source=current('components/game/'+file+'.tsx');const sf=ts.createSourceFile(file+'.tsx',source,ts.ScriptTarget.Latest,true,ts.ScriptKind.TSX);assert.equal(sf.parseDiagnostics.length,0,file+' syntax');assert(source.includes('useGameTableSync('),file+' uses shared invalidation');assert(!/setInterval\(/.test(source),file+' must not add an independent interval');
  }
- console.log(JSON.stringify({environment:'40 independent component-effect realms plus 100 degraded clients, 20 virtual minutes, synthetic replies; no production/Auth/HTTP load',before,blitzBefore,after,degradedOpenRequests,checks:['hidden timed questions','midnight rollover','stage opening prepares newly eligible assignments','slow request single-flight','failed backfill bounded','delivery cadence preserved','unchanged attachment signing','signed URL automatic expiry renewal','hidden signed links wait for visibility','unchanged document identities','civic submission single-flight','old civic save preserves new user/target draft','read-only civic mutations blocked']},null,2));
+ console.log(JSON.stringify({environment:'40 independent component-effect realms plus 100 degraded clients, 20 virtual minutes, synthetic replies; no production/Auth/HTTP load',before,blitzBefore,after,degradedOpenRequests,checks:['hidden timed questions','midnight rollover','stage opening prepares newly eligible assignments','slow request single-flight','failed backfill bounded','connected Blitz 3-minute safety poll','45-second disconnected recovery','Realtime assignment immediate delivery','unchanged attachment signing','signed URL automatic expiry renewal','hidden signed links wait for visibility','unchanged document identities','civic submission single-flight','old civic save preserves new user/target draft','read-only civic mutations blocked']},null,2));
 }
 main().catch(error=>{console.error(error);process.exitCode=1});
