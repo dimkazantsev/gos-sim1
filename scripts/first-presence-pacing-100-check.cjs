@@ -26,6 +26,7 @@ assert(effect.includes("firstPresenceWriteDelay(me.user_id)"));
 assert(effect.includes("if(initialSqlPresence.current.scope!==scope)"),'A view change must not restart admission pacing');
 assert(effect.includes("clearTimeout(first)"),'Unloading a view must cancel old writes');
 assert(effect.includes("document.visibilityState==='visible'&&isReady()"),'Background tabs must not send SQL presence writes');
-assert(effect.includes("const id=setInterval(visible,60000+Math.floor(Math.random()*12000))"),'Steady-state presence interval stays unchanged');
+assert(effect.includes("const heartbeatMs=68000+firstPresenceWriteDelay(me.user_id)%6000"),'Steady-state heartbeat must remain inside the journal 90s freshness window');
+assert(effect.includes("const id=setInterval(visible,heartbeatMs)"),'Heartbeat uses deterministic pacing');
 assert(effect.includes("void touchPresence(view,'Открыл раздел"),'First admitted visit must still be recorded');
 console.log(JSON.stringify({status:'PASS',scope:'isolated deterministic scheduling only, not Supabase Auth/DB performance',clients:100,delaysMs:{min:Math.min(...delays),max:Math.max(...delays)},perSecond:bins,peakPerSecond:Math.max(...bins),earliestWriteMs:2000,latestWriteBeforeMs:17000,productionRequests:0}));

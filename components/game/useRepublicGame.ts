@@ -941,6 +941,8 @@ export function useRepublicGame(gameId:string){
       notifyGameDataRefresh(gameId,'event_assignments');
       notifyGameDataRefresh(gameId,'event_collaboration_invites');
       notifyGameDataRefresh(gameId,'event_discussion_messages');
+      // Offline-created Blitz assignments may have been missed during outage.
+      notifyGameDataRefresh(gameId,'blitz_assignments');
       // Reconcile missed pulses once after the existing socket reconnects.
       if(['votes','stages','teacher'].includes(activeViewRef.current)){
        const openVotes=votesRef.current.filter(v=>v.status==='open');
@@ -1076,19 +1078,18 @@ export function useRepublicGame(gameId:string){
   loadingOlderChatRef.current=false;
   setHasOlderChatMessages(false);setOlderChatLoading(false);
   setChatPins([]);setPinnedMessages([]);
-  // Don't load message bodies for a closed panel.
-  if(channelId&&chatOpen){
-   void loadMessages(channelId,true);void loadChatPins(channelId);void markChatRead(channelId);
-  }else setChatLoading(false);
+  // A channel change resets state here, but must not start a second fetch.
+  // The effect below owns one initial read for both opening and switching.
+  if(!channelId||!chatOpen)setChatLoading(false);
  },[channelId]);
- // Reconcile changes missed while closed. Switching channels already loads history.
+ // Reconcile after opening or changing the selected conversation once.
+ // These two events often happen in the same render on first chat entry.
  useEffect(()=>{
-  if(chatOpen&&channelRef.current&&oldestChatCursor.current===null)
-   void loadMessages(channelRef.current,true);
-  else if(chatOpen&&channelRef.current)
-   void loadMessages(channelRef.current);
-  if(chatOpen&&channelRef.current)void loadChatPins(channelRef.current);
- },[chatOpen]);
+  if(!chatOpen||!channelId)return;
+  void loadMessages(channelId,true);
+  void loadChatPins(channelId);
+  void markChatRead(channelId);
+ },[chatOpen,channelId]);
  useEffect(()=>{if(chatOpen&&channelId)void markChatRead(channelId)},[chatOpen,channelId,messages.length]);
  useEffect(()=>{
   // The chat header and composer must reflect exactly the same selected ID.

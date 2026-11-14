@@ -32,7 +32,13 @@ export function useSectionUpdates(gameId:string|undefined,userId:string|undefine
     if(r.status===402)blocked=true;
     if(r.error&&['PGRST003','57014'].includes(r.error.code))recoveryAfter=Date.now()+120000;
     else if(r.status>=500)recoveryAfter=Date.now()+90000;
-    if(live&&!r.error&&r.data&&startedVersion===optimisticVersion.current)setCounts(r.data as Record<string,number>);
+    // A successful event-driven refresh already satisfies the safety poll.
+    // Do not send another get_section_updates just because the old fallback
+    // timer expired during active Realtime traffic.
+    if(live&&!r.error&&r.data&&startedVersion===optimisticVersion.current){
+     lastFallbackAt=Date.now();
+     setCounts(r.data as Record<string,number>);
+    }
    }catch{recoveryAfter=Date.now()+30000}
    finally{running=false;if(queued&&live){queued=false;schedule()}}
   }

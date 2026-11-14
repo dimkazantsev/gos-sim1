@@ -644,7 +644,11 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
   const first=setTimeout(()=>{
    if(document.visibilityState==='visible')void touchPresence(view,'Открыл раздел «'+labels[view]+'»');
   },remaining);
-  const id=setInterval(visible,60000+Math.floor(Math.random()*12000));
+  // Keep the SQL online stamp under the journal's existing 90s freshness
+  // boundary, but avoid an unnecessary ~60s heartbeat on quiet screens.
+  // Stable per-user jitter also avoids synchronous writes after remounts.
+  const heartbeatMs=68000+firstPresenceWriteDelay(me.user_id)%6000;
+  const id=setInterval(visible,heartbeatMs);
   document.addEventListener('visibilitychange',visible);
   return()=>{clearTimeout(first);clearInterval(id);document.removeEventListener('visibilitychange',visible)};
  },[gameId,view,me?.user_id,previewMode,g.coreLoaded]);

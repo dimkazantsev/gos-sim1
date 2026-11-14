@@ -6,6 +6,7 @@ import {RefreshCw,X} from 'lucide-react';
 import {useDialog} from '../ui/useDialog';
 import {supabase} from '@/lib/supabase';
 import {blitzBoundedRequest} from './blitzRequest';
+import {GAME_DATA_REFRESH_EVENT,gameRealtimeConnected} from './useGameTableSync';
 type Row={server_now?:string;remaining_at_receipt?:number;receipt_monotonic?:number;id:string;question:string|null;topic:string;options:string[]|null;stage_no:number;available_at?:string;started_at?:string|null;deadline?:string;answered_at?:string|null;chosen_index?:number|null;correct_index?:number|null;is_correct?:boolean|null;explanation?:string|null;legal_act?:string|null;article?:string|null;source_url?:string|null};
 // Серверные часы определяют оставшийся срок; время телефона не используется как доказательство.
 const BLITZ_RECEIVE_GRACE_MS=2000;
@@ -32,13 +33,14 @@ function remainingBlitzSeconds(row:Row){return Math.max(0,Math.min(20,Math.ceil(
 const legal=(r:Row)=>r.source_url&&/^https:\/\//.test(r.source_url)?<a href={r.source_url} target="_blank" rel="noopener noreferrer">{r.legal_act}, {r.article} ↗</a>:<span>{r.legal_act} {r.article}</span>;
 export function BlitzOverlay({gameId,userId,stageKey='',enabled}:{gameId:string;userId?:string;stageKey?:string;enabled:boolean}){
  const refreshBusy=useRef(false),answerBusy=useRef(false),selectedQueued=useRef('');
+ const missedAssignmentSignal=useRef(false);
  const timeoutFinalized=useRef('');
  const since=useRef(new Date().toISOString()),issuedDay=useRef(''),issueRetryAfter=useRef(0);
  const archiveShowing=useRef(false);
  // Suppress automatic retries during a backend outage without delaying healthy
  // 45-second delivery or retrying an exhausted quota (HTTP 402).
  const deliveryFailures=useRef(0),deliveryRetryAfter=useRef(0),deliveryQuotaBlocked=useRef(false);
- useEffect(()=>{const opened=()=>{archiveShowing.current=true},closed=()=>{archiveShowing.current=false};window.addEventListener('blitz:archive-open',opened);window.addEventListener('blitz:archive-close',closed);return()=>{window.removeEventListener('blitz:archive-open',opened);window.removeEventListener('blitz:archive-close',closed)}},[]);
+ useEffect(()=>{const opened=()=>{archiveShowing.current=true},closed=()=>{archiveShowing.current=false;window.dispatchEvent(new Event('blitz:resume'))};window.addEventListener('blitz:archive-open',opened);window.addEventListener('blitz:archive-close',closed);return()=>{window.removeEventListener('blitz:archive-open',opened);window.removeEventListener('blitz:archive-close',closed)}},[]);
  const [card,setCard]=useState<Row|null>(null),[feedback,setFeedback]=useState<Row|null>(null),[time,setTime]=useState(20),[busy,setBusy]=useState(false),[error,setError]=useState('');
  useEffect(()=>{since.current=new Date().toISOString();issuedDay.current='';issueRetryAfter.current=0;setCard(null);setFeedback(null)},[gameId,userId]);
  // A new stage is a new delivery scope. HTTP 402 remains blocked across stages.
@@ -46,6 +48,10 @@ export function BlitzOverlay({gameId,userId,stageKey='',enabled}:{gameId:string;
  useEffect(()=>{
   if(!enabled||card||feedback)return;
   let stopped=false;
+  let assignmentSignalTimer:ReturnType<typeof setTimeout>|null=null;
+  // A healthy shared socket carries each student's own RLS-filtered assignment.
+  // Retain a 45s disconnected fallback and a 3-minute connected safety check.
+  let lastHealthyFallbackAt=Date.now();
   function deferDelivery(status:number,code?:string){
    if(status===402){deliveryQuotaBlocked.current=true;return}
    if(status===0||status===429||status>=500||code==='PGRST003'||code==='57014'){
@@ -53,10 +59,10 @@ export function BlitzOverlay({gameId,userId,stageKey='',enabled}:{gameId:string;
     deliveryRetryAfter.current=Date.now()+Math.min(180_000,45_000*2**(deliveryFailures.current-1));
    }
   }
-  async function refresh(selectedId=''){
+  async function refresh(selectedId='',queueOnSignal=false){
    if(document.visibilityState!=='visible'||archiveShowing.current&&!selectedId)return;
    if(deliveryQuotaBlocked.current||(!selectedId&&Date.now()<deliveryRetryAfter.current))return;
-   if(refreshBusy.current){if(selectedId)selectedQueued.current=selectedId;return}
+   if(refreshBusy.current){if(selectedId)selectedQueued.current=selectedId;else if(queueOnSignal)missedAssignmentSignal.current=true;return}
    refreshBusy.current=true;
    try{
     // Assignment preparation is idempotent, but its backfill must not run on every delivery check.
@@ -93,19 +99,49 @@ export function BlitzOverlay({gameId,userId,stageKey='',enabled}:{gameId:string;
     refreshBusy.current=false;
     const queued=selectedQueued.current;selectedQueued.current='';
     if(queued&&!stopped)void refresh(queued);
+    else if(missedAssignmentSignal.current&&!stopped){missedAssignmentSignal.current=false;void refresh()}
    }
   }
   void refresh();
   const jitter=userId?[...userId].reduce((hash,char)=>(Math.imul(hash^char.charCodeAt(0),16777619))>>>0,2166136261)%15000:0;
   let id:number|undefined;
+  const periodic=()=>{
+   if(document.visibilityState!=='visible')return;
+   const now=Date.now();
+   if(gameRealtimeConnected(gameId)&&now-lastHealthyFallbackAt<180000)return;
+   lastHealthyFallbackAt=now;
+   void refresh();
+  };
   const first=window.setTimeout(()=>{
-   if(document.visibilityState==='visible')void refresh();
-   id=window.setInterval(()=>{if(document.visibilityState==='visible')void refresh()},45000);
+   periodic();
+   id=window.setInterval(periodic,45000);
   },45000-jitter);
   const request=(event:Event)=>void refresh((event as CustomEvent<{assignmentId?:string}>).detail?.assignmentId||'');
-  const resume=()=>{if(document.visibilityState==='visible')void refresh()};
-  window.addEventListener('blitz:open',request);document.addEventListener('visibilitychange',resume);
-  return()=>{stopped=true;window.clearTimeout(first);window.clearInterval(id);window.removeEventListener('blitz:open',request);document.removeEventListener('visibilitychange',resume)}
+  const assignmentChanged=(event:Event)=>{
+   const detail=(event as CustomEvent<{gameId?:string;table?:string}>).detail;
+   if(detail?.gameId!==gameId||detail.table!=='blitz_assignments'||assignmentSignalTimer!==null)return;
+   // Coalesce nearby RLS-authorised changes without missing a signal in flight.
+   assignmentSignalTimer=setTimeout(()=>{
+    assignmentSignalTimer=null;
+    if(stopped||document.visibilityState!=='visible')return;
+    lastHealthyFallbackAt=Date.now();
+    void refresh('',true);
+   },400);
+  };
+  const resume=()=>{if(document.visibilityState==='visible'){lastHealthyFallbackAt=Date.now();void refresh()}};
+  window.addEventListener('blitz:open',request);
+  window.addEventListener('blitz:resume',resume);
+  window.addEventListener(GAME_DATA_REFRESH_EVENT,assignmentChanged);
+  document.addEventListener('visibilitychange',resume);
+  return()=>{
+   stopped=true;missedAssignmentSignal.current=false;
+   window.clearTimeout(first);window.clearInterval(id);
+   if(assignmentSignalTimer!==null)clearTimeout(assignmentSignalTimer);
+   window.removeEventListener('blitz:open',request);
+   window.removeEventListener('blitz:resume',resume);
+   window.removeEventListener(GAME_DATA_REFRESH_EVENT,assignmentChanged);
+   document.removeEventListener('visibilitychange',resume);
+  }
  },[gameId,userId,stageKey,enabled,!!card,!!feedback]);
  useEffect(()=>{if(!card?.deadline)return;const f=()=>setTime(remainingBlitzSeconds(card));f();const id=setInterval(f,250);return()=>clearInterval(id)},[card?.deadline]);
  async function answer(choice:number){
