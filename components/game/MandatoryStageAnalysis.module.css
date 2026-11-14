@@ -1,14 +1,18 @@
-.backdrop{position:fixed;inset:0;z-index:30000;background:rgba(13,31,58,.64);display:flex;align-items:center;justify-content:center;padding:16px;overscroll-behavior:contain}
-.dialog{width:min(100%,720px);max-height:calc(100dvh - 32px);overflow:auto;background:var(--surface,#fff);color:var(--ink,#172b44);border:1px solid #dce4ef;border-radius:22px;box-shadow:0 24px 75px rgba(10,30,65,.25);outline:none}
-.heading{padding:24px 28px 18px;border-bottom:1px solid #e7edf4}
-.heading small{font-size:11px;font-weight:800;letter-spacing:.09em;color:#476b91}
-.heading h2{font-size:clamp(20px,3vw,27px);line-height:1.25;margin:10px 0}
-.heading p{margin:0;color:#53657a;line-height:1.55;font-size:14px}
-.content{padding:22px 28px}.counter{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:16px;font-size:14px;color:#47617a}
+.card{width:100%;min-width:0;box-sizing:border-box;margin:0 0 15px;padding:0;background:var(--surface,#fff);color:var(--ink,#172b44);border:1px solid #dce4ef;border-radius:16px;box-shadow:0 4px 18px #1d36540a}
+.heading{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;padding:18px 20px 12px}
+.heading>div{min-width:0}
+.heading small{display:block;font-size:11px;font-weight:800;letter-spacing:.09em;color:#476b91}
+.heading h2{font-size:clamp(17px,2vw,21px);line-height:1.3;margin:7px 0;color:#244161}
+.heading p{margin:0;color:#53657a;line-height:1.5;font-size:13px}
+.heading button{flex-shrink:0;min-height:36px}
+.clock{padding:0 20px 13px;color:#4c6886;font-size:13px}
+.clock strong{color:#244161;font-variant-numeric:tabular-nums}
+.content{padding:16px 20px;border-top:1px solid #e7edf4}
 .content label{display:block;font-size:14px;font-weight:700;line-height:1.5;margin-bottom:9px}
-.content textarea{display:block;width:100%;min-height:180px;resize:vertical;box-sizing:border-box;border:1px solid #c9d7e6;border-radius:12px;background:#fff;color:#172b44;padding:14px;font:inherit;line-height:1.6}
+.content textarea{display:block;width:100%;min-height:155px;resize:vertical;box-sizing:border-box;border:1px solid #c9d7e6;border-radius:10px;background:#fff;color:#172b44;padding:12px;font:inherit;line-height:1.5}
 .content textarea:focus-visible{outline:2px solid #315efb;outline-offset:2px}
-.hint{font-size:12px;color:#63758e;margin:8px 0 0}.error{margin:0 28px 12px;color:#a02630;font-size:13px}
-.footer{padding:16px 28px 22px;display:flex;justify-content:flex-end;border-top:1px solid #e7edf4}
-.footer button{min-height:44px}
-@media(max-width:600px){.backdrop{padding:8px}.dialog{border-radius:16px;max-height:calc(100dvh - 16px)}.heading{padding:18px 16px 14px}.content{padding:16px}.footer{padding:14px 16px}.footer button{width:100%}.content textarea{min-height:160px}}
+.hint{font-size:12px;color:#63758e;margin:8px 0 0}
+.error{margin:0 20px 12px;color:#a02630;font-size:13px}
+.footer{padding:12px 20px 16px;display:flex;justify-content:flex-end;border-top:1px solid #e7edf4}
+.footer button{min-height:40px}
+@media(max-width:600px){.heading{padding:15px 14px 10px;gap:9px;flex-wrap:wrap}.heading button{margin-left:auto}.clock{padding:0 14px 12px}.content{padding:14px}.footer{padding:12px 14px}.footer button{width:100%}.content textarea{min-height:145px}}

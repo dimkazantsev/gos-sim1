@@ -9,6 +9,7 @@ import dynamic from 'next/dynamic';
 import {ArrowRight,ArrowUpRight,BookOpenText,CalendarDays,ChevronDown,ChevronLeft,ChevronRight,Eye,FileText,GraduationCap,GripVertical,Landmark,LayoutDashboard,LogOut,Menu,MessageCircle,Radio,Settings2,Share2,ShieldCheck,UserRound,Wallet,Vote as VoteIcon} from 'lucide-react';
 import {useRepublicGame} from './game/useRepublicGame';
 import {firstPresenceWriteDelay} from './game/firstPresenceWriteDelay';
+import {stageAnalysisPhase} from './game/stageAnalysisWindow';
 import {useActionErrorPlacement} from './game/useActionErrorPlacement';
 import {TurnCountdownPill} from './game/TurnClock';
 import type {Member,View,Vote} from './game/types';
@@ -48,6 +49,7 @@ import {useSavedGameState,savedString} from './game/useSavedGameState';
 // transferred to every student, teacher and observer.
 const sectionLoading=()=> <div className="emptyState" role="status">Открываем раздел…</div>;
 const ChatPanel=dynamic(()=>import('./game/ChatPanel'),{loading:sectionLoading});
+const MandatoryStageAnalysis=dynamic(()=>import('./game/MandatoryStageAnalysis'),{loading:()=>null});
 const PoliticalWallView=dynamic(()=>import('./game/PoliticalWallView'),{loading:sectionLoading});
 const CrisisRoom=dynamic(()=>import('./game/CrisisRoom'),{loading:sectionLoading});
 const StagesView=dynamic(()=>import('./game/StagesView'),{loading:sectionLoading});
@@ -757,6 +759,9 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
     {!previewMode&&g.crises.some(c=>c.status==='active')&&<section className="crisisNotice"><div><b>В республике активен кризис</b><span>{g.crises.find(c=>c.status==='active')?.crisis_type}</span></div><button className="secondary" aria-expanded={crisisExpanded} onClick={()=>setCrisisExpanded(!crisisExpanded)}>{crisisExpanded?'Свернуть штаб':'Открыть кризисный штаб'}</button>{crisisExpanded&&<div className="crisisNoticeBody"><CrisisRoom g={g}/></div>}</section>}
 
     <main id="game-main" tabIndex={-1} onClickCapture={actionError.onClickCapture} onSubmitCapture={actionError.onSubmitCapture} onChangeCapture={actionError.onChangeCapture} className={`simMain ${chatOpen?'chatOpen':''} ${previewMode?'studentPreviewMain':''}`}>
+     {!teacher&&!previewMode&&me.kind==='student'&&g.coreLoaded&&
+      g.stages.some(s=>stageAnalysisPhase(s,Date.now())==='active')&&
+      <MandatoryStageAnalysis gameId={gameId} userId={me.user_id} stages={g.stages}/>}
      {error&&!actionError.localized&&<div className="errorBox closable" role="alert"><span>{error}</span><IconAction onClick={()=>setError('')} label="Закрыть сообщение об ошибке"/></div>}
       {actionError.notice}
      {view==='dashboard'&&(g.coreLoaded||teacher
