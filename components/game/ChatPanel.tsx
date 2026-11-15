@@ -62,7 +62,6 @@ function ChatAttachment({message:m,onRefresh}:{message:Message;onRefresh?:(messa
 export default function ChatPanel({g,draft:text,onDraftChange:setText,previewChannelOpen=false,previewPinsOpen=false,onOpenMember,readOnly=false,expandOnOpen=false}:{g:ReturnTypeRepublic;draft:string;onDraftChange:(next:string)=>void;previewChannelOpen?:boolean;previewPinsOpen?:boolean;onOpenMember?:(userId:string)=>void;readOnly?:boolean;expandOnOpen?:boolean}){
  const {channels,channelId,setChannelId,messages,chatPins:allPins,pinnedMessages:allPinnedMessages,setChatPin,editChatMessage,refreshChatMediaUrl,chatLoading,hasOlderChatMessages,olderChatLoading,loadOlderChatMessages,names,recording,recordingPreview,recordingSaving,chatMediaError,chatMediaPhase,recordingStartedAt,recordingStream,discardRecording,sendRecordingPreview,setChatOpen,sendText,sendChatFile,toggleRecording,me,teacher,chatOverview,setChatChannelPinned}=g;
  useEffect(()=>{setSelectedMessages([]);setProcessTagsOpen(false);setEditingMessageId(null);setEditValue('');setReplyingTo(null)},[channelId]);
- useEffect(()=>()=>{if(selectHoldTimer.current)clearTimeout(selectHoldTimer.current)},[]);
   const socialChannelsReady=g.channels.some(c=>c.kind==='public'&&c.name==='Публичная политика')&&g.channels.some(c=>c.kind==='public'&&c.name==='Вне игры');
  useEffect(()=>{
   if(!g.game?.id||!g.chatDirectoryLoaded||socialChannelsReady)return;
@@ -100,8 +99,8 @@ export default function ChatPanel({g,draft:text,onDraftChange:setText,previewCha
  const [editBusy,setEditBusy]=useState(false);
  const [selectedMessages,setSelectedMessages]=useState<string[]>([]);
  const [deletingMessages,setDeletingMessages]=useState(false);
- const selectHoldTimer=useRef<ReturnType<typeof setTimeout>|null>(null);
- const selectHoldActivated=useRef(false);
+ // A genuine mouse right-click enters bulk selection. Touch long-press stays native for text copying.
+ const rightClickPending=useRef<string|null>(null);
  const [search,setSearch]=useState('');
  const [onlyFiles,setOnlyFiles]=useState(false);
  const [attachOpen,setAttachOpen]=useState(false);
@@ -520,16 +519,6 @@ export default function ChatPanel({g,draft:text,onDraftChange:setText,previewCha
   if(!canDeleteMessage(m))return;
   setSelectedMessages(current=>current.includes(m.id)?current.filter(id=>id!==m.id):[...current,m.id]);
  }
- function beginMessageSelection(m:Message){
-  if(!canDeleteMessage(m))return;
-  if(selectHoldTimer.current)clearTimeout(selectHoldTimer.current);
-  selectHoldActivated.current=false;
-  selectHoldTimer.current=setTimeout(()=>{selectHoldActivated.current=true;setSelectedMessages(current=>current.includes(m.id)?current:[...current,m.id])},420);
- }
- function cancelMessageSelectionHold(){
-  if(selectHoldTimer.current)clearTimeout(selectHoldTimer.current);
-  selectHoldTimer.current=null;
- }
  async function deleteSelectedMessages(){
   if(!selectedMessages.length||deletingMessages)return;
   setDeletingMessages(true);setLocalError('');
@@ -610,10 +599,23 @@ export default function ChatPanel({g,draft:text,onDraftChange:setText,previewCha
      return <div className="chatEntry" key={m.id} data-chat-date={day}>
       {startsDay&&<div className="chatDateSeparator"><span>{dayLabel}</span></div>}
       <article className={'chatMsg '+(own?'mine':'theirs')+(startsGroup?' groupStart':' grouped')+(selectedMessages.includes(m.id)?' selected':'')+(canDeleteMessage(m)?' selectable':'')} data-message-id={m.id} aria-label={name+', '+formatChatTime(m.created_at)} aria-selected={selectedMessages.includes(m.id)}
-       onPointerDown={e=>{if((e.target as HTMLElement).closest('button,a,input,textarea,select'))return;beginMessageSelection(m)}}
-       onPointerUp={cancelMessageSelectionHold} onPointerCancel={cancelMessageSelectionHold} onPointerLeave={cancelMessageSelectionHold}
-       onContextMenu={e=>{if(!canDeleteMessage(m))return;e.preventDefault();cancelMessageSelectionHold();setSelectedMessages(current=>current.includes(m.id)?current:[...current,m.id])}}
-       onClick={e=>{if(selectHoldActivated.current){selectHoldActivated.current=false;return}if(!selectedMessages.length||!canDeleteMessage(m)||(e.target as HTMLElement).closest('button,a,input,textarea,select'))return;toggleMessageSelection(m)}}
+       onPointerDown={e=>{rightClickPending.current=e.pointerType==='mouse'&&e.button===2?m.id:null}}
+       onContextMenu={e=>{
+        // Touch long-press and the keyboard context menu keep the browser's
+        // native text selection/copy actions. Only a real right mouse click
+        // selects or deselects a deletable message.
+        if(e.button!==2||rightClickPending.current!==m.id||!canDeleteMessage(m)||
+          (e.target as HTMLElement).closest('button,a,input,textarea,select'))return;
+        e.preventDefault();
+        rightClickPending.current=null;
+        toggleMessageSelection(m);
+       }}
+       onClick={e=>{
+        if(!selectedMessages.length||!canDeleteMessage(m)||
+          (e.target as HTMLElement).closest('button,a,input,textarea,select')||
+          window.getSelection()?.toString())return;
+        toggleMessageSelection(m);
+       }}
        onDoubleClick={e=>{if(e.button!==0||(e.target as HTMLElement).closest('button,a,input,textarea,select'))return;startReply(m)}}>
        {!own&&<span className={'chatAvatar '+(!startsGroup?'placeholder':'')} aria-hidden="true">{startsGroup?initials(name):''}</span>}
        <div className="chatMessageColumn">

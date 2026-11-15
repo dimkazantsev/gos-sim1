@@ -58,6 +58,17 @@ let matched=0;
 for(const owner of members)for(const subscriber of members)if(owner===subscriber)matched++;
 assert.equal(matched,100,'100 personal row changes must target only 100 recipient deliveries, not 10,000');
 
+const chatSelectionCss=fs.readFileSync('app/profile-chat-responsive.css','utf8');
+assert(!panel.includes('selectHoldTimer')&&!panel.includes('beginMessageSelection(')&&
+ !panel.includes('selectHoldActivated'), 'Long press must not start bulk selection');
+assert(panel.includes("rightClickPending.current=e.pointerType==='mouse'&&e.button===2?m.id:null"),
+ 'Only a genuine right mouse click can arm message bulk selection');
+assert(panel.includes('e.button!==2||rightClickPending.current!==m.id||!canDeleteMessage(m)')&&
+ panel.includes('toggleMessageSelection(m);'), 'Right mouse context click toggles eligible messages');
+assert(panel.includes("window.getSelection()?.toString()"), 'Copying selected text never toggles bulk deletion');
+assert(chatSelectionCss.includes('-webkit-user-select:text')&&
+ chatSelectionCss.includes('-webkit-touch-callout:default'),
+ 'Long touch preserves native text selection and copy menu');
 assert(panel.includes('onDoubleClick={e=>{if(e.button!==0') && panel.includes('startReply(m)'),
  'Reply is available by left-button double click and a mobile-accessible action');
 assert(panel.includes("role=\"status\" aria-label=\"Ответ на сообщение\""),

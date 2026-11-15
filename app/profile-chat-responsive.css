@@ -638,3 +638,10 @@
 .simChat.gsChatV2 .chatReplyQuote:hover{filter:brightness(.97)}
 .simChat.gsChatV2 .chatReplyQuote:focus-visible{outline:2px solid var(--gs-accent);outline-offset:2px}
 @media(max-width:650px){.simChat.gsChatV2 .chatComposeCompact .chatReplyBanner{padding:8px 10px}.simChat.gsChatV2 .chatReplyQuote{max-width:100%}}
+
+/* Native text selection for copying part of a message, including touch hold.
+   The separate mouse right-click handler retains bulk message deletion. */
+.simChat.gsChatV2 .chatBubble p,
+.simChat.gsChatV2 .chatAttachmentCaption{
+ user-select:text;-webkit-user-select:text;-webkit-touch-callout:default;
+}
