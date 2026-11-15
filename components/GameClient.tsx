@@ -63,6 +63,7 @@ const EventWorkspace=dynamic(()=>import('./game/EventWorkspace'),{loading:sectio
 const BudgetView=dynamic(()=>import('./game/BudgetView'),{loading:sectionLoading});
 
 const GENERIC_STUDENT='__generic_student_preview__';
+const GENERIC_GUEST='__generic_guest_preview__';
 type ScreenLocation={view:View;stageNo:number;documentId:string;voteId?:string;templateKey?:string};
 const SCREEN_VIEWS=['dashboard','stages','parties','votes','documents','grades','actions','profile','events','teacher','budget'];
 function validScreenHistory(value:unknown){
@@ -115,6 +116,7 @@ function buildStudentPreview(g:ReturnTypeRepublic,student:Member){
  const visiblePartyDocs=party?g.partyDocuments.filter(d=>d.party_id===party.id):[];
 
  function canVote(v:Vote){
+  if(student.kind==='observer')return false;
   if(v.electorate_snapshot?.weights){
    return Number(v.electorate_snapshot.weights[student.user_id]||0)>0
     &&(v.institution_key!=='gd'||g.gdMandateCapacity(student.user_id)>0);
@@ -150,7 +152,7 @@ function buildStudentPreview(g:ReturnTypeRepublic,student:Member){
   partyDocuments:visiblePartyDocs,
   myEvaluations:evaluations,
   averageVsn:average,
-  availableActors:()=>actorsForStudent(student),
+  availableActors:()=>student.kind==='observer'?[]:actorsForStudent(student),
   canVote,
   logout:blockedVoid,
   setTurn:blockedVoid,
@@ -411,12 +413,19 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
   game_id:game.id,user_id:GENERIC_STUDENT,full_name:'Студент · предпросмотр',group_name:null,
   kind:'student',role_title:'Участник',team:null,score:0,joined_at:new Date(0).toISOString(),party_joined_at:null
  }:undefined;
+ const genericGuest:Member|undefined=teacher&&game?{
+  game_id:game.id,user_id:GENERIC_GUEST,full_name:'Гость · предпросмотр',group_name:null,
+  kind:'observer',role_title:'Гость',team:null,score:0,joined_at:new Date(0).toISOString(),party_joined_at:null
+ }:undefined;
  const previewStudent=teacher&&viewAs
   ? viewAs===GENERIC_STUDENT
     ? genericStudent
-    : g.members.find(m=>m.user_id===viewAs&&m.kind==='student')
+    : viewAs===GENERIC_GUEST
+      ? genericGuest
+      : g.members.find(m=>m.user_id===viewAs&&m.kind==='student')
   : undefined;
  const previewMode=!!previewStudent;
+ const previewGuest=previewStudent?.kind==='observer';
  const observer=me?.kind==='observer';
  const myProfile=g.profiles.find(p=>p.user_id===me?.user_id);
  const {open:introOpen,seen:introSeen,finish:closeIntro,syncError:introSyncError}=useIntroProgress({
@@ -686,7 +695,7 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
   order.splice(fromIndex,1);order.splice(toIndex,0,from);setSidebarOrder(order);
   try{window.localStorage.setItem('gos-sims-sidebar:'+gameId,JSON.stringify(order))}catch{}
  }
- return <div className={'simShell '+(previewMode?'studentPreviewShell':'')+(observer?' observerShell':'')}>
+ return <div className={'simShell '+(previewMode?'studentPreviewShell':'')+(observer||previewGuest?' observerShell':'')}>
   <a className="skipLink" href="#game-main">Перейти к содержимому</a>
   <aside className="simSidebar">
    <div className="sidebarBrand">
@@ -735,16 +744,17 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
     </div>
 
     {teacher&&<div className={'viewAsSwitcher '+(previewMode?'active':'')} ref={viewAsRef}>
-     <button type="button" className="viewAsTrigger" aria-haspopup="menu" aria-expanded={viewAsOpen} aria-controls={viewAsOpen?'game-view-as-menu':undefined} aria-label={'Режим просмотра: '+(!viewAs?'Преподаватель':viewAs===GENERIC_STUDENT?'Студент':previewStudent?.full_name||'Студент')} onClick={()=>setViewAsOpen(open=>!open)}>
+     <button type="button" className="viewAsTrigger" aria-haspopup="menu" aria-expanded={viewAsOpen} aria-controls={viewAsOpen?'game-view-as-menu':undefined} aria-label={'Режим просмотра: '+(!viewAs?'Преподаватель':viewAs===GENERIC_STUDENT?'Студент':viewAs===GENERIC_GUEST?'Гость':previewStudent?.full_name||'Студент')} onClick={()=>setViewAsOpen(open=>!open)}>
       <Eye className="viewAsMobileIcon" aria-hidden="true"/><span className="viewAsTriggerText">
        <span className="viewAsLabel">РЕЖИМ ПРОСМОТРА</span>
-       <strong className="viewAsValue">{!viewAs?'Преподаватель':viewAs===GENERIC_STUDENT?'Студент':previewStudent?.full_name||'Студент'}</strong>
+       <strong className="viewAsValue">{!viewAs?'Преподаватель':viewAs===GENERIC_STUDENT?'Студент':viewAs===GENERIC_GUEST?'Гость':previewStudent?.full_name||'Студент'}</strong>
       </span>
       <ChevronDown className="viewAsChevron" aria-hidden="true"/>
      </button>
      {viewAsOpen&&<div className="viewAsMenu" id="game-view-as-menu" role="menu" aria-label="Выбрать режим просмотра" onKeyDown={onPreviewMenuKeyDown}>
       <button type="button" role="menuitemradio" aria-checked={!viewAs} className={!viewAs?'selected':''} onClick={()=>selectViewAs('')}>Преподаватель</button>
       <button type="button" role="menuitemradio" aria-checked={viewAs===GENERIC_STUDENT} className={viewAs===GENERIC_STUDENT?'selected':''} onClick={()=>selectViewAs(GENERIC_STUDENT)}>Студент</button>
+      <button type="button" role="menuitemradio" aria-checked={viewAs===GENERIC_GUEST} className={viewAs===GENERIC_GUEST?'selected':''} onClick={()=>selectViewAs(GENERIC_GUEST)}>Гость</button>
       {g.members.some(m=>m.kind==='student')&&<div role="separator" className="viewAsMenuDivider">Конкретный студент</div>}
       {g.members.filter(m=>m.kind==='student').map(m=><button type="button" key={m.user_id} role="menuitemradio" aria-checked={viewAs===m.user_id} className={viewAs===m.user_id?'selected':''} title={m.full_name+(m.role_title?' · '+m.role_title:'')} onClick={()=>selectViewAs(m.user_id)}>{m.full_name}{m.role_title&&<small>{m.role_title}</small>}</button>)}
      </div>}
@@ -755,7 +765,7 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
    </GameHeader>
 
    {previewMode&&<div className="studentPreviewBanner">
-    <div><Eye aria-hidden="true"/><p><b>Режим студента:</b> {shownMe.full_name}{shownMe.team?' · '+shownMe.team:''}{shownMe.role_title?' · '+shownMe.role_title:''}. <strong>Действия от его имени заблокированы.</strong></p></div>
+    <div><Eye aria-hidden="true"/><p><b>{previewGuest?'Режим гостя:':'Режим студента:'}</b> {shownMe.full_name}{shownMe.team?' · '+shownMe.team:''}{shownMe.role_title?' · '+shownMe.role_title:''}. <strong>Действия от его имени заблокированы.</strong></p></div>
     <button onClick={()=>setViewAs('')}>Вернуться к преподавателю</button>
    </div>}
 
@@ -815,7 +825,7 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
     </main>
    </div>
 
-   {!CHAT_PAUSED&&chatOpen&&<ChatPanel g={vg} readOnly={observer} expandOnOpen={expandChatFromTop} draft={chatDrafts[chatDraftKey]||''} onDraftChange={text=>setChatDrafts(current=>({...current,[chatDraftKey]:text}))} onOpenMember={uid=>{g.setChatOpen(false);navigateProfile(uid)}}/>}
+   {!CHAT_PAUSED&&chatOpen&&<ChatPanel g={vg} readOnly={observer||!!previewGuest} expandOnOpen={expandChatFromTop} draft={chatDrafts[chatDraftKey]||''} onDraftChange={text=>setChatDrafts(current=>({...current,[chatDraftKey]:text}))} onOpenMember={uid=>{g.setChatOpen(false);navigateProfile(uid)}}/>}
   </div></TeacherNavigationProvider>
 
   {mobileMenuOpen&&<div className="mobileMoreBackdrop" onClick={()=>setMobileMenuOpen(false)}>

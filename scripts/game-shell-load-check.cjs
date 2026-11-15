@@ -55,6 +55,17 @@ assert(eventDiscussion.includes('60000,0,caseId'),'Only the expanded discussion 
 
 assert(source.includes("window.addEventListener('blitz:updated',changed)"),'A local blitz answer still invalidates the shared badge immediately');
 assert(source.includes("g.me?.kind+':'+!!viewAs"),'Role changes invalidate the previous counter scope');
+// The teacher preview must include a guest role, not reuse the student's write permissions.
+assert(source.includes("const GENERIC_GUEST='__generic_guest_preview__'"),'Guest preview selection has its own identifier');
+assert(source.includes("kind:'observer',role_title:'Гость'"),'Guest preview uses the observer role');
+assert(source.includes('aria-checked={viewAs===GENERIC_GUEST}')&&source.includes('onClick={()=>selectViewAs(GENERIC_GUEST)}>Гость</button>'),
+ 'Teacher can select the guest role from the existing menu');
+assert(source.includes("if(student.kind==='observer')return false;"),'Guest preview must never vote');
+assert(source.includes("availableActors:()=>student.kind==='observer'?[]"),'Guest preview must never acquire publication actors');
+assert(source.includes('readOnly={observer||!!previewGuest}'),'Guest preview chat is always read-only');
+assert(source.includes("previewGuest?'Режим гостя:':'Режим студента:'"),'Guest preview must be clearly labelled');
+assert(source.includes('observer||previewGuest?\' observerShell\''),
+ 'Guest preview reuses the established guest styles');
 function compile(node,env){
  const script=ts.transpileModule('module.exports='+node.getText(ast),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}}).outputText;
  const context={module:{exports:{}},...env};vm.runInNewContext(script,context);return {fn:context.module.exports,context};
@@ -112,7 +123,7 @@ async function main(){
   const cleanup=fn();
   assert.equal(initialDelay,2000,'Optional SQL presence is delayed after entry');
   assert.equal(calls.length,0,'No immediate database write during a 100-client login burst');
-  assert(delay>=60000&&delay<72000);
+  assert(delay>=68000&&delay<74000,'Presence remains below the existing 90-second online threshold');
   now+=initialDelay;first();assert.equal(calls.length,1,'First SQL write is preserved once admitted');
   tick();assert.equal(calls.length,2);document.visibilityState='hidden';
   for(let minute=0;minute<20;minute++)tick();assert.equal(calls.length,2,'Hidden sessions send zero twenty-minute presence writes');
