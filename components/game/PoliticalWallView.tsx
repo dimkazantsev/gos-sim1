@@ -1,7 +1,7 @@
 'use client';
 import {userError} from '@/lib/userError';
 import {useEffect,useMemo,useRef,useState} from 'react';
-import {BookOpenText,ChevronDown,FilePlus2,Link2,Newspaper,Pencil,Plus,SlidersHorizontal,Trash2,Vote,X} from 'lucide-react';
+import {ArrowUp,BookOpenText,ChevronDown,FilePlus2,Link2,Newspaper,Pencil,Plus,SlidersHorizontal,Trash2,Vote,X} from 'lucide-react';
 import {supabase} from '@/lib/supabase';
 import {BRAND_NAME} from '@/components/ui/BrandIdentity';
 import type {ReturnTypeRepublic} from './viewTypes';
@@ -85,6 +85,30 @@ export default function PoliticalWallView({g,onOpenVotes,onOpenDocument,onNaviga
  const [search,setSearch]=useState(''),[filterActor,setFilterActor]=useState(''),[filterType,setFilterType]=useState(''),[filterStage,setFilterStage]=useState('');
  const [visiblePostCount,setVisiblePostCount]=useState(POLITICAL_POST_BATCH_SIZE);
  const postFeedRef=useRef<HTMLElement>(null);
+ const processTopRef=useRef<HTMLDivElement>(null);
+ const [showBackToTop,setShowBackToTop]=useState(false);
+ useEffect(()=>{
+  // Only the visible feed installs this passive listener. One frame per
+  // scroll burst and one boolean state change at the visibility threshold.
+  let frame=0;
+  const update=()=>setShowBackToTop((processTopRef.current?.getBoundingClientRect().top??0)<-420);
+  const onScroll=()=>{
+   if(frame)return;
+   frame=window.requestAnimationFrame(()=>{frame=0;update()});
+  };
+  update();
+  window.addEventListener('scroll',onScroll,{passive:true});
+  window.addEventListener('resize',onScroll);
+  return()=>{
+   window.removeEventListener('scroll',onScroll);
+   window.removeEventListener('resize',onScroll);
+   if(frame)window.cancelAnimationFrame(frame);
+  };
+ },[]);
+ function scrollToProcessTop(){
+  const reduceMotion=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  processTopRef.current?.scrollIntoView({behavior:reduceMotion?'auto':'smooth',block:'start'});
+ }
  const hasFeedFilters=!!(search.trim()||filterActor||filterType||filterStage);
  useEffect(()=>{if(game?.id&&typeof g.setPoliticalWallFullSearch==='function')g.setPoliticalWallFullSearch(hasFeedFilters)},[game?.id,hasFeedFilters]);
  async function showMorePoliticalPosts(){
@@ -295,7 +319,7 @@ export default function PoliticalWallView({g,onOpenVotes,onOpenDocument,onNaviga
  const publisherKey=actor?.key||'participant',publisherLabel=actor?.label||me.full_name;
  const composerParty=g.parties.find(p=>p.name===publisherLabel||actor?.key==='party:'+p.id||actor?.key==='faction:'+p.id);
  const mine=profiles.find(p=>p.user_id===me.user_id);
- return <div className="wallPage processPortal">
+ return <><div ref={processTopRef} className="wallPage processPortal">
   <section className="wallHero">
    <div><small>Официальная лента игры</small><h1>Политический процесс</h1><p>События, документы и действия участников. Регистрация, смена этапов и итоги голосований появляются автоматически.</p></div>
    <div className="wallHeroStats"><div><strong>{politicalPostTotal||politicalPosts.length}</strong><span>Публикаций в ленте</span></div><div><strong>{formalDocuments.length}</strong><span>Документов в реестре</span></div><div><strong>{votes.filter(v=>v.status==='open').length}</strong><span>Открытых голосований</span></div></div>
@@ -398,5 +422,5 @@ export default function PoliticalWallView({g,onOpenVotes,onOpenDocument,onNaviga
    {politicalSearchLoading&&hasFeedFilters&&<p role="status" className="wallFeedInfo">Загружаем публикации для поиска…</p>}
   </>
   {metricPost&&<div className="eventCaseBackdrop processMetricBackdrop" onMouseDown={e=>{if(e.target===e.currentTarget)setMetricPost(null)}}><section ref={metricDialog} className="eventCaseModal processMetricDialog" tabIndex={-1} role="dialog" aria-modal="true" aria-label="Показатели публикации"><header className="eventModalHeader"><div><small>Публикация</small><h3>{metricPost.title}</h3></div><button className="eventModalClose" aria-label="Закрыть редактор показателей" onClick={()=>setMetricPost(null)}><X size={20}/></button></header><div className="eventModalBody"><TeacherMetricStudio key={metricPost.id} g={g} postId={metricPost.id}/></div></section></div>}
- </div>;
+ </div>{showBackToTop&&<button type="button" className="processScrollTop" aria-label="Наверх — к началу политического процесса" title="Наверх" onClick={scrollToProcessTop}><ArrowUp size={22} aria-hidden="true"/></button>}</>;
 }

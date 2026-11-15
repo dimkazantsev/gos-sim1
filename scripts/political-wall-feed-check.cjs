@@ -96,3 +96,29 @@ console.log('PASS: process media and discussions are loaded only when needed');
 
 assert(source.includes("!readOnly&&!storyPost&&<div className=\"wallPostActions\""),'Story news has no voting, NPA or metric manipulation controls');
 assert(source.includes("!storyPost&&<CivicDiscussion"),'Story news does not mount per-post discussion projection or background queries');
+
+/* Lightweight scroll-to-top contract: no data fetches or extra subscriptions. */
+const processCss=fs.readFileSync(path.join(root,'app/2026-political-process.css'),'utf8');
+assert(source.includes('const [showBackToTop,setShowBackToTop]=useState(false)'),
+ 'The button must remain hidden until the political feed is scrolled');
+assert(source.includes('window.addEventListener(\'scroll\',onScroll,{passive:true})')&&
+ source.includes('window.removeEventListener(\'scroll\',onScroll)'),
+ 'A passive, cleaned-up listener tracks scroll without a polling timer');
+assert(source.includes('window.requestAnimationFrame(()=>{frame=0;update()})')&&
+ source.includes('window.cancelAnimationFrame(frame)'),
+ 'Scroll updates are frame-coalesced and cancelled on unmount');
+assert(source.includes('processTopRef.current?.scrollIntoView({behavior:reduceMotion?\'auto\':\'smooth\',block:\'start\'})'),
+ 'Click scrolls to the section start and respects reduced motion');
+assert(source.includes('aria-label="Наверх — к началу политического процесса"')&&
+ source.includes('{showBackToTop&&<button'),
+ 'An accessible floating button appears only below the threshold');
+assert(processCss.includes('.simMain > .processScrollTop{')&&processCss.includes('position:fixed')&&
+ source.includes('</div>{showBackToTop&&<button'),
+
+ 'Button stays fixed rather than moving with publication cards');
+assert(processCss.includes('bottom:calc(96px + env(safe-area-inset-bottom,0px))'),
+ 'Mobile button clears the navigation dock and phone safe area');
+assert(processCss.includes('.simMain.chatOpen > .processScrollTop'),
+ 'Desktop button moves away from the open chat panel');
+assert(!source.includes("supabase.from('processScrollTop')"),'Scroll control must not use Supabase');
+console.log('PASS Political Process fixed scroll-to-top, mobile dock, chat and reduced motion');
