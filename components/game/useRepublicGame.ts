@@ -3335,11 +3335,14 @@ export function useRepublicGame(gameId:string){
   await loadFormalRegistry();return true;
  }
 
- async function sendText(text:string,targetChannel=channelId,mentionedUserIds:string[]=[]){
+ async function sendText(text:string,targetChannel=channelId,mentionedUserIds:string[]=[],replyToId?:string){
   if(!me||!targetChannel||!text.trim())return false;
   try{
    const r=await boundedChatWrite(signal=>
-    supabase.rpc('send_chat_text',{p_game:gameId,p_channel:targetChannel,p_text:text.trim(),p_mentioned_users:mentionedUserIds}).abortSignal(signal));
+    (replyToId
+     ?supabase.rpc('send_chat_reply',{p_game:gameId,p_channel:targetChannel,p_text:text.trim(),p_mentioned_users:mentionedUserIds,p_reply_to:replyToId})
+     :supabase.rpc('send_chat_text',{p_game:gameId,p_channel:targetChannel,p_text:text.trim(),p_mentioned_users:mentionedUserIds})
+    ).abortSignal(signal));
    if(r.error){setError(userError(r.error));return false}
    rememberChatChannel(targetChannel,me.user_id);
    void Promise.allSettled([loadMessages(targetChannel),loadChatOverview()]);

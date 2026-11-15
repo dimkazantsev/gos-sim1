@@ -2,7 +2,7 @@
 import {useEffect,useLayoutEffect,useMemo,useRef,useState} from 'react';
 import type {ReactNode} from 'react';
 import {createPortal} from 'react-dom';
-import {ArrowDown,AtSign,Check,Copy,Download,FileText,Mic,Minimize2,Paperclip,Pencil,Pin,PinOff,Search,Send,Square,Trash2,UserRound,Video,X} from 'lucide-react';
+import {ArrowDown,AtSign,Check,Copy,Download,FileText,Mic,Minimize2,Paperclip,Pencil,Pin,PinOff,Reply,Search,Send,Square,Trash2,UserRound,Video,X} from 'lucide-react';
 import {CHAT_MAX_FILE_BYTES,formatRecordingDuration} from './recordingMedia';
 import {IconAction} from '../ui/IconAction';
 import ChatChannelDropdown from './ChatChannelDropdown';
@@ -61,7 +61,7 @@ function ChatAttachment({message:m,onRefresh}:{message:Message;onRefresh?:(messa
 
 export default function ChatPanel({g,draft:text,onDraftChange:setText,previewChannelOpen=false,previewPinsOpen=false,onOpenMember,readOnly=false,expandOnOpen=false}:{g:ReturnTypeRepublic;draft:string;onDraftChange:(next:string)=>void;previewChannelOpen?:boolean;previewPinsOpen?:boolean;onOpenMember?:(userId:string)=>void;readOnly?:boolean;expandOnOpen?:boolean}){
  const {channels,channelId,setChannelId,messages,chatPins:allPins,pinnedMessages:allPinnedMessages,setChatPin,editChatMessage,refreshChatMediaUrl,chatLoading,hasOlderChatMessages,olderChatLoading,loadOlderChatMessages,names,recording,recordingPreview,recordingSaving,chatMediaError,chatMediaPhase,recordingStartedAt,recordingStream,discardRecording,sendRecordingPreview,setChatOpen,sendText,sendChatFile,toggleRecording,me,teacher,chatOverview,setChatChannelPinned}=g;
- useEffect(()=>{setSelectedMessages([]);setProcessTagsOpen(false);setEditingMessageId(null);setEditValue('')},[channelId]);
+ useEffect(()=>{setSelectedMessages([]);setProcessTagsOpen(false);setEditingMessageId(null);setEditValue('');setReplyingTo(null)},[channelId]);
  useEffect(()=>()=>{if(selectHoldTimer.current)clearTimeout(selectHoldTimer.current)},[]);
   const socialChannelsReady=g.channels.some(c=>c.kind==='public'&&c.name==='Публичная политика')&&g.channels.some(c=>c.kind==='public'&&c.name==='Вне игры');
  useEffect(()=>{
@@ -96,6 +96,7 @@ export default function ChatPanel({g,draft:text,onDraftChange:setText,previewCha
  const [pinBusy,setPinBusy]=useState<string|null>(null);
  const [editingMessageId,setEditingMessageId]=useState<string|null>(null);
  const [editValue,setEditValue]=useState('');
+ const [replyingTo,setReplyingTo]=useState<Message|null>(null);
  const [editBusy,setEditBusy]=useState(false);
  const [selectedMessages,setSelectedMessages]=useState<string[]>([]);
  const [deletingMessages,setDeletingMessages]=useState(false);
@@ -141,7 +142,7 @@ export default function ChatPanel({g,draft:text,onDraftChange:setText,previewCha
  const hasFilter=!!search.trim()||onlyFiles;
  // Search applies to loaded messages; history reads remain explicit.
  const canLoadHistory=hasOlderChatMessages&&!hasFilter;
- const handles=chatHandles(g.members).filter(x=>x.member.user_id!==me?.user_id);
+ const handles=useMemo(()=>chatHandles(g.members).filter(x=>x.member.user_id!==me?.user_id),[g.members,me?.user_id]);
  const composerText=editingMessageId===null?text:editValue;
  function setComposerText(next:string){if(editingMessageId===null)setText(next);else setEditValue(next)}
  const mentionMatch=composerText.match(/(?:^|\s)@([а-яёa-z0-9_-]*)$/i);
@@ -158,6 +159,33 @@ export default function ChatPanel({g,draft:text,onDraftChange:setText,previewCha
   const mentionLabel=duplicateSurname?person.handle:surname;
   const prefix=composerText.slice(0,composerText.length-mentionMatch[0].length)+(mentionMatch[0].startsWith(' ')?' ':'');
   setComposerText(prefix+'@'+mentionLabel+' ');requestAnimationFrame(()=>composer.current?.focus());
+ }
+ function replyExcerpt(message:Message){
+  if(message.kind==='audio')return 'Голосовое сообщение';
+  if(message.kind==='video')return 'Видеосообщение';
+  if(message.kind==='file')return 'Прикреплённый файл';
+  return (message.text||'Сообщение').trim().slice(0,160)||'Сообщение';
+ }
+ function startReply(message:Message){
+  if(readOnly||selectedMessages.length||sending||uploading||editBusy||recording||recordingPreview||recordingSaving)return;
+  setEditingMessageId(null);setEditValue('');setReplyingTo(message);setLocalError('');
+  setAttachOpen(false);setProcessTagsOpen(false);
+  const person=handles.find(h=>h.member.user_id===message.author_id);
+  if(person){
+   const surname=person.member.full_name.trim().split(/\s+/)[0]||person.surname;
+   const same=handles.filter(h=>h.member.full_name.trim().split(/\s+/)[0].toLocaleLowerCase('ru-RU')===surname.toLocaleLowerCase('ru-RU')).length;
+   const mention='@'+(same>1?person.handle:surname);
+   const existing=draftRef.current;
+   if(!existing.toLocaleLowerCase('ru-RU').includes(mention.toLocaleLowerCase('ru-RU')))
+    setText(mention+' '+existing);
+  }
+  requestAnimationFrame(()=>composer.current?.focus());
+ }
+ function jumpToChatMessage(messageId:string){
+  const target=Array.from(list.current?.querySelectorAll<HTMLElement>('[data-message-id]')||[])
+   .find(node=>node.dataset.messageId===messageId);
+  if(!target){setLocalError('Исходное сообщение не загружено. При необходимости откройте более ранние сообщения.');return}
+  target.scrollIntoView({behavior:window.matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth',block:'center'});
  }
  function mentionedUsers(value:string){
   const tokens=[...value.matchAll(/@([\p{L}\d_-]+)/gu)].map(m=>m[1].toLocaleLowerCase('ru-RU'));
@@ -413,17 +441,19 @@ export default function ChatPanel({g,draft:text,onDraftChange:setText,previewCha
  async function send(){
   if(editingMessageId){await saveEditing();return}
   const attachment=readyFile;
+  if(replyingTo&&attachment){setLocalError('Для ответа с цитированием сначала уберите вложение или отмените ответ.');return}
   if(pendingSend.current||sending||uploading||chatLoading||(!text.trim()&&!attachment)||!channelId)return;
-  const sentText=text,fromChannel=channelId;
+  const sentText=text,fromChannel=channelId,replyTarget=replyingTo;
   pendingSend.current=true;setSending(true);setLocalError('');
   if(attachment)setUploading(true);
   try{
    const ok=attachment
     ?await sendChatFile(attachment.file,sentText)
-    :await sendText(sentText,fromChannel,mentionedUsers(sentText));
+    :await sendText(sentText,fromChannel,mentionedUsers(sentText),replyTarget?.id);
    if(ok){
     if(lastChannel.current===fromChannel){
      if(draftRef.current===sentText)setText('');
+     if(replyTarget)setReplyingTo(current=>current?.id===replyTarget.id?null:current);
      if(attachment)setPendingFile(current=>current?.file===attachment.file?null:current);
     }
     follow.current=true;requestAnimationFrame(scrollToLatest);
@@ -446,7 +476,7 @@ export default function ChatPanel({g,draft:text,onDraftChange:setText,previewCha
  function canEditMessage(m:Message){return !readOnly&&m.kind==='text'&&m.author_id===me?.user_id}
  function startEditing(m:Message){
   if(!canEditMessage(m)||editBusy||sending||uploading||recording||recordingPreview||recordingSaving)return;
-  setEditingMessageId(m.id);setEditValue(m.text||'');setLocalError('');
+  setReplyingTo(null);setEditingMessageId(m.id);setEditValue(m.text||'');setLocalError('');
   setAttachOpen(false);setProcessTagsOpen(false);
   requestAnimationFrame(()=>{
    const node=composer.current;if(!node)return;
@@ -583,12 +613,17 @@ export default function ChatPanel({g,draft:text,onDraftChange:setText,previewCha
        onPointerDown={e=>{if((e.target as HTMLElement).closest('button,a,input,textarea,select'))return;beginMessageSelection(m)}}
        onPointerUp={cancelMessageSelectionHold} onPointerCancel={cancelMessageSelectionHold} onPointerLeave={cancelMessageSelectionHold}
        onContextMenu={e=>{if(!canDeleteMessage(m))return;e.preventDefault();cancelMessageSelectionHold();setSelectedMessages(current=>current.includes(m.id)?current:[...current,m.id])}}
-       onClick={e=>{if(selectHoldActivated.current){selectHoldActivated.current=false;return}if(!selectedMessages.length||!canDeleteMessage(m)||(e.target as HTMLElement).closest('button,a,input,textarea,select'))return;toggleMessageSelection(m)}}>
+       onClick={e=>{if(selectHoldActivated.current){selectHoldActivated.current=false;return}if(!selectedMessages.length||!canDeleteMessage(m)||(e.target as HTMLElement).closest('button,a,input,textarea,select'))return;toggleMessageSelection(m)}}
+       onDoubleClick={e=>{if(e.button!==0||(e.target as HTMLElement).closest('button,a,input,textarea,select'))return;startReply(m)}}>
        {!own&&<span className={'chatAvatar '+(!startsGroup?'placeholder':'')} aria-hidden="true">{startsGroup?initials(name):''}</span>}
        <div className="chatMessageColumn">
         {startsGroup&&<div className="chatAuthor">{onOpenMember&&g.members.some(member=>member.user_id===m.author_id)?<button type="button" className="chatAuthorProfile" onClick={()=>onOpenMember(m.author_id)}>{own?'Вы':name}</button>:<b>{own?'Вы':name}</b>}<time dateTime={m.created_at}>{formatChatTime(m.created_at)}</time></div>}
         <div className="chatMessageContent">
          <div className="chatBubble">
+         {m.reply_to_id&&<button type="button" className="chatReplyQuote" onClick={()=>jumpToChatMessage(m.reply_to_id!)} title="Перейти к исходному сообщению">
+          <strong>{m.reply_author_id===me?.user_id?'Вы':names[m.reply_author_id||'']||'Участник'}</strong>
+          <span>{m.reply_excerpt||'Сообщение'}</span>
+         </button>}
          {showText&&<p>{highlightChatText(m.text||'',search)}</p>}
          {attachment&&<ChatAttachment message={m} onRefresh={refreshChatMediaUrl}/>}
          {caption&&<p className="chatAttachmentCaption">{highlightChatText(caption,search)}</p>}
@@ -597,6 +632,7 @@ export default function ChatPanel({g,draft:text,onDraftChange:setText,previewCha
 
         </div>
         {selectedMessages.length===0&&<div className="chatMessageActions" role="group" aria-label="Действия с сообщением">
+         {!readOnly&&m.kind!=='system'&&<button type="button" aria-label="Ответить на сообщение" title="Ответить" disabled={sending||editBusy} onClick={()=>startReply(m)}><Reply size={16} aria-hidden="true"/></button>}
          <button type="button" aria-label="Копировать сообщение" title="Копировать" disabled={!m.text||(attachment&&!caption)} onClick={()=>void copyChatMessage(m)}><Copy size={16} aria-hidden="true"/></button>
          {canEditMessage(m)&&<button type="button" aria-label="Редактировать сообщение" title="Редактировать" disabled={editBusy} onClick={()=>startEditing(m)}><Pencil size={16} aria-hidden="true"/></button>}
          {!readOnly&&<button type="button" className={chatPins.some(p=>p.message_id===m.id)?'isPinned':''}
@@ -682,6 +718,11 @@ export default function ChatPanel({g,draft:text,onDraftChange:setText,previewCha
     <Pencil size={17} aria-hidden="true"/>
     <div className="chatEditBannerText"><b>Редактирование сообщения</b><span>{messages.find(m=>m.id===editingMessageId)?.text||'Сообщение'}</span></div>
     <button type="button" disabled={editBusy} onClick={cancelEditing} aria-label="Отменить редактирование" title="Отменить редактирование"><X size={18} aria-hidden="true"/></button>
+   </div>}
+   {!editingMessageId&&replyingTo&&<div className="chatReplyBanner" role="status" aria-label="Ответ на сообщение">
+    <Reply size={17} aria-hidden="true"/>
+    <div className="chatReplyBannerText"><b>Ответ: {replyingTo.author_id===me?.user_id?'Вы':names[replyingTo.author_id]||'Участник'}</b><span>{replyExcerpt(replyingTo)}</span></div>
+    <button type="button" disabled={sending} onClick={()=>setReplyingTo(null)} aria-label="Отменить ответ" title="Отменить ответ"><X size={18} aria-hidden="true"/></button>
    </div>}
    {mentionMatch&&<div className="chatAddressList chatMentionList" aria-label="Упомянуть участника"><small><AtSign size={14} aria-hidden="true"/> Упомянуть в текущем чате</small>{mentionSuggestions.map(x=><button type="button" key={x.member.user_id} onClick={()=>insertMention(x.member.user_id)}><b>{x.member.full_name}</b><span>{x.member.role_title||x.member.team||'Участник'}</span></button>)}{!mentionSuggestions.length&&<span>Участник не найден.</span>}</div>}
    {showProcessTags&&<details id="chat-process-tags" className="chatProcessTags" open={processTagsOpen} onToggle={e=>setProcessTagsOpen(e.currentTarget.open)}><summary>Сообщение для политического процесса</summary><small>Добавьте тег, чтобы направить сообщение в публичную ленту.</small><div aria-label="Теги сообщения">{PROCESS_TAGS.map(t=><button type="button" key={t.key} onClick={()=>{if(!composerText.includes('#'+t.key))setComposerText(composerText+(composerText?' ':'')+'#'+t.key);if(window.matchMedia('(max-width:760px)').matches)setProcessTagsOpen(false);composer.current?.focus()}}>{t.label}</button>)}</div></details>}

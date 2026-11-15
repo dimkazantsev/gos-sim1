@@ -27,6 +27,7 @@ const media=make('voice','public','2026-10-14T06:00:03Z',{kind:'audio',storage_p
 const unchanged=mergeChatMessages([media],[{...media,url:undefined}]);
 assert.equal(unchanged[0].url,'signed','Repeated Realtime payload must preserve signed media');
 assert.equal(mergeChatMessages([media],[{...media,url:'updated'}])[0].url,'updated');
+const panel=fs.readFileSync('components/game/ChatPanel.tsx','utf8');
 const source=fs.readFileSync('components/game/useRepublicGame.ts','utf8');
 assert(source.includes("table:'chat_messages'")&&source.includes("payload.eventType==='INSERT'"),'Subscribe to message payloads directly');
 assert(source.includes('setMessages(previous=>mergeChatMessages(previous,[row],chatWindowLimit()))'),'Render incoming chat messages immediately and retain explicitly paged history');
@@ -57,4 +58,17 @@ let matched=0;
 for(const owner of members)for(const subscriber of members)if(owner===subscriber)matched++;
 assert.equal(matched,100,'100 personal row changes must target only 100 recipient deliveries, not 10,000');
 
+assert(panel.includes('onDoubleClick={e=>{if(e.button!==0') && panel.includes('startReply(m)'),
+ 'Reply is available by left-button double click and a mobile-accessible action');
+assert(panel.includes("role=\"status\" aria-label=\"Ответ на сообщение\""),
+ 'Composer shows a cancellable reply preview');
+assert(panel.includes('m.reply_to_id&&<button')&&panel.includes('jumpToChatMessage(m.reply_to_id!)'),
+ 'Stored replies display a linked source quote');
+assert(panel.includes("if(readOnly||selectedMessages.length"),'Guest and selection mode must not start replies');
+assert(source.includes("supabase.rpc('send_chat_reply'"),'A reply is sent in one RPC');
+const replySql=fs.readFileSync('supabase/migrations/20261115143500_chat_replies.sql','utf8');
+assert(replySql.includes("channel_id=p_channel and created_at>now()-interval '30 days'"),
+ 'The reply source must belong to the same accessible conversation and retention window');
+assert(replySql.includes("kind='observer'"),'Guest writes must remain forbidden in SQL');
+assert(replySql.includes('grant execute on function public.send_chat_reply'), 'Reply function is explicitly granted');
 console.log('PASS 30 chat clients, ordered deduplicated messages, signed media, realtime INSERT and six-second incremental recovery');
