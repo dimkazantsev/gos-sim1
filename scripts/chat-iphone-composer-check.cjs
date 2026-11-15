@@ -64,7 +64,19 @@ if(!chrome)throw Error('Chromium is required');
    });
    assert(recovered.shortGap>70,'Test must recreate a stale keyboard gap at '+width);
    assert(Math.abs(recovered.fullGap)<3,'CSS must eliminate the stale keyboard gap at '+width+': '+JSON.stringify(recovered));
-   console.log('PASS iPhone-like '+width+'px: multiline editing, 16px input and toolbar below input');
+   const replyCss=fs.readFileSync('app/profile-chat-responsive.css','utf8');
+assert(replyCss.includes('.simChat.gsChatV2 .chatComposeCompact .chatReplyBanner{'),
+ 'Reply composer banner must inherit the established edit banner layout');
+assert(replyCss.includes('width:100%;max-width:100%;min-width:0;box-sizing:border-box'),
+ 'Reply preview must stay within a narrow or expanded chat composer');
+assert(replyCss.includes('flex:1 1 0%;flex-direction:column;gap:2px;'),
+ 'Reply author and excerpt flex without displacing the cancel control');
+assert(replyCss.includes('flex:0 0 32px;width:32px;height:32px;min-width:32px;min-height:32px;')&&
+ replyCss.includes('margin:0 0 0 auto;padding:0;'),
+ 'Cancel X remains aligned to the right and has fixed icon dimensions');
+assert(replyCss.includes('background:transparent;color:var(--gs-muted);cursor:pointer;line-height:1'),
+ 'Cancel X has no permanent blue button tile');
+console.log('PASS iPhone-like '+width+'px: multiline editing, 16px input and toolbar below input');
    await page.close();
   }
  }finally{await browser.close()}
