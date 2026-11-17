@@ -19,36 +19,54 @@ export default function BudgetView({g,readOnly=false,onOpenDocument,onOpenEvents
  const [ready,setReady]=useState(false),[busy,setBusy]=useState(false),[canPropose,setCanPropose]=useState(false),[notice,setNotice]=useState(''),[error,setError]=useState('');
  const [taxLevel,setTaxLevel]=useState<'federal'|'regional'|'municipal'>('federal'),[taxSearch,setTaxSearch]=useState(''),[regionCode,setRegionCode]=useState('54'),[taxKey,setTaxKey]=useState('vat'),[rate,setRate]=useState('22'),[parameters,setParameters]=useState<Record<string,string>>({});
  const scope=[g.game?.id,g.me?.user_id].join('|'),live=useRef(scope),sequence=useRef(0),parameterDirty=useRef(false);live.current=scope;
+ const mounted=useRef(true),reads=useRef<{scope:string;promise:Promise<void>;cancel:()=>void}|null>(null);
  const availableTaxes=catalog.taxes.filter(t=>t.level===taxLevel),tax=catalog.taxes.find(t=>t.key===taxKey)!,region=regions.find(r=>r.region_code===regionCode);
  const editableTax=tax.default_rate!==null,filteredTaxes=availableTaxes.filter(t=>t.label.toLocaleLowerCase('ru-RU').includes(taxSearch.trim().toLocaleLowerCase('ru-RU')));
  const taxChangeCount=availableTaxes.filter(t=>t.default_rate!==null).length;
  function chooseTaxLevel(level:'federal'|'regional'|'municipal'){setTaxLevel(level);setTaxSearch('');const first=catalog.taxes.find(t=>t.level===level);if(first)setTaxKey(first.key);}
  const currentRate=rates.find(r=>r.tax_key===taxKey&&r.region_code===(tax.level==='federal'?'00':regionCode))?.rate??tax.default_rate??0;
- useEffect(()=>{sequence.current++;setReady(false);setRegions([]);setRates([]);setContext(null);setPrograms([]);setProposals([]);setError('');setNotice('');parameterDirty.current=false;},[scope]);
- async function load(){
-  if(!g.game)return;const requested=scope,version=++sequence.current;
-  try{const [f,m,p]=await Promise.all([supabase.rpc('get_fiscal_budget',{p_game_id:g.game.id}),supabase.rpc('get_fiscal_context',{p_game_id:g.game.id}),supabase.rpc('get_signed_state_program_budget',{p_game_id:g.game.id})]);if(live.current!==requested||version!==sequence.current)return;
+ useEffect(()=>{mounted.current=true;sequence.current++;setReady(false);setBusy(false);setRegions([]);setRates([]);setContext(null);setPrograms([]);setProposals([]);setError('');setNotice('');parameterDirty.current=false;return()=>{mounted.current=false;sequence.current++;reads.current?.cancel();reads.current=null;};},[scope]);
+ function load(fresh=false):Promise<void>{
+  if(!g.game||!mounted.current||live.current!==scope)return Promise.resolve();
+  if(!fresh&&reads.current?.scope===scope)return reads.current.promise;
+  const requested=scope,version=++sequence.current,gameId=g.game.id,abort=new AbortController();
+  reads.current?.cancel();
+  let timeout:ReturnType<typeof setTimeout>|undefined,cancel=()=>{};
+  const promise=(async()=>{
+  try{const [f,m,p]=await Promise.race([
+   Promise.all([supabase.rpc('get_fiscal_budget',{p_game_id:gameId}).abortSignal(abort.signal),supabase.rpc('get_fiscal_context',{p_game_id:gameId}).abortSignal(abort.signal),supabase.rpc('get_signed_state_program_budget',{p_game_id:gameId}).abortSignal(abort.signal)]),
+   new Promise<never>((_,reject)=>{
+    cancel=()=>{clearTimeout(timeout);abort.abort();reject(new Error('Обновление бюджета отменено.'));};
+    timeout=setTimeout(()=>{abort.abort();reject(new Error('Не удалось обновить бюджет за 18 секунд. Повторите попытку.'));},18000);
+   })
+  ]);if(!mounted.current||live.current!==requested||version!==sequence.current)return;
    const failure=f.error||m.error||p.error;if(failure){setError(userError(failure));return;}
    if(!f.data||!m.data){setError('Не удалось получить общие исходные данные бюджета. Обновите раздел.');return;}
    setRegions(f.data.regions||[]);setRates(f.data.rates||[]);setProposals(f.data.proposals||[]);setCanPropose(!!f.data.can_propose);setContext(m.data);setPrograms(p.data||[]);setReady(true);setError('');
-  }catch(e){if(live.current===requested&&version===sequence.current)setError(userError(e));}
+  }catch(e){if(mounted.current&&live.current===requested&&version===sequence.current)setError(userError(e));}
+  })().finally(()=>{clearTimeout(timeout);if(reads.current?.cancel===cancel)reads.current=null;});
+  reads.current={scope,promise,cancel};
+  return promise;
  }
- useGameTableSync(g.game?.id,['game_fiscal_policy','game_fiscal_regions','game_fiscal_rates','fiscal_rate_proposals','fiscal_change_ledger','state_metrics','state_programs','state_program_budget_commitments'],load,scope);
+ useGameTableSync(g.game?.id,['game_fiscal_policy','game_fiscal_regions','game_fiscal_rates','fiscal_rate_proposals','fiscal_change_ledger','state_metrics','state_programs','state_program_budget_commitments'],()=>load(true),scope);
  useEffect(()=>{setRate(String(currentRate))},[currentRate,taxKey,regionCode,scope]);
  useEffect(()=>{if(!region||parameterDirty.current)return;setParameters(Object.fromEntries(['enterprises','employees_per_firm','monthly_wage','profit_per_firm','consumption_per_firm','expenditure','transfer_in','debt','compliance'].map(k=>[k,String(region[k as keyof FiscalRegion])])));},[region]);
- async function propose(){if(!g.game||readOnly||busy||!canPropose||!editableTax)return;const value=Number(rate);if(!rate.trim()||!Number.isFinite(value)||value<0||(tax.min_rate!==null&&value<tax.min_rate)||(tax.max_rate!==null&&value>tax.max_rate)){setError('Укажите допустимую числовую ставку.');return;}setBusy(true);try{const r=await supabase.rpc('propose_fiscal_rate',{p_game_id:g.game.id,p_region:regionCode,p_tax:taxKey,p_rate:value});if(r.error)setError(userError(r.error));else{setNotice('Инициатива зарегистрирована. Изменение ставки требует принятия соответствующего нормативного акта и его вступления в силу.');await load();}}catch(e){setError(userError(e));}finally{setBusy(false);}}
- async function apply(id:string){if(readOnly||busy||!g.teacher)return;setBusy(true);try{const r=await supabase.rpc('apply_fiscal_rate_proposal',{p_proposal:id,p_document:null});if(r.error)setError(userError(r.error));else{setNotice('Опубликованный налоговый акт учтён. Доходы пересчитаны.');await load();}}catch(e){setError(userError(e));}finally{setBusy(false);}}
- async function saveParameters(){if(!g.game||readOnly||busy||!g.teacher)return;const values=Object.fromEntries(Object.entries(parameters).map(([k,v])=>[k,Number(v)]));if(Object.entries(parameters).some(([k,v])=>!v.trim()||!Number.isFinite(values[k]))){setError('Заполните числовые параметры региона.');return;}setBusy(true);try{const r=await supabase.rpc('set_fiscal_parameters',{p_game_id:g.game.id,p_region:regionCode,p_values:values});if(r.error)setError(userError(r.error));else{parameterDirty.current=false;setNotice('Исходные параметры региона сохранены в экономическом сценарии.');await load();}}catch(e){setError(userError(e));}finally{setBusy(false);}}
+ async function propose(){if(!g.game||readOnly||busy||!canPropose||!editableTax)return;const value=Number(rate);if(!rate.trim()||!Number.isFinite(value)||value<0||(tax.min_rate!==null&&value<tax.min_rate)||(tax.max_rate!==null&&value>tax.max_rate)){setError('Укажите допустимую числовую ставку.');return;}setBusy(true);try{const r=await supabase.rpc('propose_fiscal_rate',{p_game_id:g.game.id,p_region:regionCode,p_tax:taxKey,p_rate:value});if(r.error)setError(userError(r.error));else{setNotice('Инициатива зарегистрирована. Изменение ставки требует принятия соответствующего нормативного акта и его вступления в силу.');await load(true);}}catch(e){setError(userError(e));}finally{setBusy(false);}}
+ async function apply(id:string){if(readOnly||busy||!g.teacher)return;setBusy(true);try{const r=await supabase.rpc('apply_fiscal_rate_proposal',{p_proposal:id,p_document:null});if(r.error)setError(userError(r.error));else{setNotice('Опубликованный налоговый акт учтён. Доходы пересчитаны.');await load(true);}}catch(e){setError(userError(e));}finally{setBusy(false);}}
+ async function saveParameters(){if(!g.game||readOnly||busy||!g.teacher)return;const values=Object.fromEntries(Object.entries(parameters).map(([k,v])=>[k,Number(v)]));if(Object.entries(parameters).some(([k,v])=>!v.trim()||!Number.isFinite(values[k]))){setError('Заполните числовые параметры региона.');return;}setBusy(true);try{const r=await supabase.rpc('set_fiscal_parameters',{p_game_id:g.game.id,p_region:regionCode,p_values:values});if(r.error)setError(userError(r.error));else{parameterDirty.current=false;setNotice('Исходные параметры региона сохранены в экономическом сценарии.');await load(true);}}catch(e){setError(userError(e));}finally{setBusy(false);}}
  const labels:Record<string,string>={enterprises:'Предприятия, ед.',employees_per_firm:'Работники на предприятие, чел.',monthly_wage:'Средняя зарплата в месяц, ₽',profit_per_firm:'Прибыль на предприятие, млн ₽ в год',consumption_per_firm:'Оборот на предприятие, млн ₽ в год',expenditure:'Расходы региона, млн ₽',transfer_in:'Ранее полученные трансферты, млн ₽',debt:'Исходный долг региона, млн ₽',compliance:'Собираемость, от 0 до 1'};
  return <div className="budgetPage"><header className="budgetHero"><div><small>ЭТАП 13 · ФЕДЕРАЛЬНЫЙ БЮДЖЕТ</small><h1>Бюджет</h1><p>Макроэкономические параметры и пять последовательных шагов от расчёта доходов до закона. События, госпрограммы и региональные заявки связаны с общими расходами.</p></div><button type="button" className="secondary" onClick={()=>void load()} disabled={busy}><RefreshCw size={18}/> Обновить данные</button></header>
   {error&&<p role="alert" className="budgetNotice">{error}</p>}
   {!ready?<p role="status">Загружаем общие исходные данные бюджета…</p>:<><FiscalMacroPanel g={g} context={context} readOnly={readOnly} onSaved={changed=>{
+   if(!mounted.current||live.current!==scope)return;
    // Keep the editor responsive once the server has committed the decision.
    // Discard a pre-save budget read that could otherwise overwrite new figures.
    sequence.current++;
+   reads.current?.cancel();
+   reads.current=null;
    setContext(previous=>previous?{...previous,policy:{...previous.policy,...changed,updated_at:new Date().toISOString()}}:previous);
    void g.refreshBudgetPulse?.();
-  }}/><FederalBudgetSimulator key={scope} g={g} context={context} regions={regions} rates={rates} programs={programs} readOnly={readOnly} onOpenDocument={onOpenDocument} onOpenEvents={onOpenEvents} onOpenVotes={onOpenVotes} onOpenStage={onOpenStage} onSaved={load}/>
+  }}/><FederalBudgetSimulator key={scope} g={g} context={context} regions={regions} rates={rates} programs={programs} readOnly={readOnly} onOpenDocument={onOpenDocument} onOpenEvents={onOpenEvents} onOpenVotes={onOpenVotes} onOpenStage={onOpenStage} onSaved={()=>load(true)}/>
    <section className="surface budgetMethod budgetTaxWorkspace" aria-label="Налоговые решения и региональные параметры">
      <header className="budgetTaxHeader"><div><small>НОРМАТИВНЫЕ РЕШЕНИЯ</small><h2>Налоговые инициативы</h2><p>Сначала выбирают налог и оценивают последствия. Изменение ставки учитывается только после вступления соответствующего НПА в силу.</p></div></header>
      <div className="budgetTaxSwitch" role="group" aria-label="Уровень налогового решения">
@@ -77,3 +95,5 @@ export default function BudgetView({g,readOnly=false,onOpenDocument,onOpenEvents
    </section><BudgetChangeRegistry g={g} readOnly={readOnly} onOpenDocument={onOpenDocument}/></>}
  </div>;
 }
+
+
