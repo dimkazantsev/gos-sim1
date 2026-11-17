@@ -1,0 +1,28 @@
+name: GOS / independent Supabase endpoint safety
+on:
+  pull_request:
+    paths:
+      - 'docs/BACKEND-ISOLATION-20261030.md'
+      - 'scripts/verify-isolated-supabase.cjs'
+      - 'scripts/verify-isolated-supabase.test.cjs'
+      - '.github/workflows/gos-backend-boundary-qa.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  boundary:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 4
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: node --test scripts/verify-isolated-supabase.test.cjs
+      - name: Reject shared QWIZ endpoint (synthetic)
+        run: |
+          QWIZ_NEW_SUPABASE_URL=https://bderfrcfuhnutuoyudje.supabase.co node scripts/verify-isolated-supabase.cjs && exit 1 || test $? -eq 1
+      - name: Accept independent QWIZ endpoint (synthetic)
+        env:
+          QWIZ_NEW_SUPABASE_URL: https://qwiz-independent-fixture.supabase.co
+        run: node scripts/verify-isolated-supabase.cjs
