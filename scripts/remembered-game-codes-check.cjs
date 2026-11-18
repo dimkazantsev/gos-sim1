@@ -40,7 +40,11 @@ assert.deepEqual(rememberGameCode('8.414',null),[],'SSR does not access window')
 const home=fs.readFileSync('app/page.tsx','utf8');
 const css=fs.readFileSync('app/entry-qr.css','utf8');
 assert(home.includes('setLoginGameCode(current=>current||codes[0]||\'\')'),'Returning users see last game code');
-assert(home.includes("supabase.rpc('resume_member_game_as_role'"),'Registered users resume only under their selected server-validated role');
+assert(home.includes("const profile=await supabase.from('teacher_profiles')") &&
+ home.includes("const membership=await supabase.from('game_members')") &&
+ home.includes(".in('kind',['student','observer'])") &&
+ home.includes("supabase.rpc('list_my_teacher_games')"),
+ 'Registered users resume only through protected teacher profile or RLS-scoped student/observer membership');
 assert(home.includes('saveSuccessfulGameCode(loginGameCode);'),'Personal login records game on successful resume');
 assert.equal((home.match(/saveSuccessfulGameCode\(code\);router\.push/g)||[]).length,1,'Participant joins remember their game');
 assert(fs.readFileSync('components/game/TeacherGameSessions.tsx','utf8').includes('rememberGameCode(code);'),'Teacher game creation remembers the new nonsecret game identifier');

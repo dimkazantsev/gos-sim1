@@ -77,6 +77,38 @@ function harness({teacher=false,teacherGames=[{id:'old-game',status:'open'},{id:
 }
 async function main(){
  const pass=async(name,fn)=>{try{await fn();console.log('PASS '+name)}catch(e){console.error('FAIL '+name+': '+e.stack);process.exitCode=1}};
+
+ await pass('Password Auth allows a delayed first response without duplicate calls',async()=>{
+  const mod={};
+  const compiled=ts.transpileModule(fs.readFileSync('lib/authTransport.ts','utf8'),{
+   compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}
+  }).outputText;
+  let scheduled=0,fireDeadline=()=>{},respond=()=>{};
+  new Function('exports','setTimeout','clearTimeout','AbortController','URL',compiled)(
+   mod,(fn,ms)=>{scheduled=ms;fireDeadline=fn;return 1},()=>{},AbortController,URL);
+  const password=mod.fetchWithAuthTimeout('https://example.supabase.co/auth/v1/token?grant_type=password',
+   {method:'POST'},(_url,init)=>new Promise(resolve=>{
+    assert(!init.signal.aborted,'Valid delayed sign-in must not be aborted prematurely');
+    respond=()=>resolve({status:200});
+   }));
+  assert.equal(scheduled,45000,'Password request must survive the old 12-second limit');
+  respond();assert.equal((await password).status,200);
+  const verify=mod.fetchWithAuthTimeout('https://example.supabase.co/auth/v1/user',
+   {method:'GET'},(_url,init)=>new Promise((_resolve,reject)=>{
+    init.signal.addEventListener('abort',()=>reject(new Error('aborted')),{once:true});
+   }));
+  assert.equal(scheduled,30000,'Verification has a finite, separate deadline');
+  fireDeadline();
+  await assert.rejects(verify,/Сервер авторизации не ответил за 30 секунд/);
+  assert.equal(mod.isTransientAuthError({message:'Сервер авторизации не ответил за 45 секунд. Повторите вход.'}),false,
+   'A fully elapsed password request must not be automatically duplicated');
+ });
+ await pass('A timed-out password request is not submitted twice',async()=>{
+  const h=harness({responses:[{data:{session:null},error:{message:'Сервер авторизации не ответил за 45 секунд. Повторите вход.'}}]});
+  nodes(h.render(),n=>n.type==='input'&&n.props.type==='email')[0].props.onChange({target:{value:'probe@example.com'}});h.render();
+  nodes(h.render(),n=>n.type==='input'&&n.props.type==='password')[0].props.onChange({target:{value:'fixture-pass'}});h.render();
+  await h.submit();assert.equal(h.calls.auth,1);assert.deepEqual(h.navigation,[]);
+ });
  await pass('Personal password login is the default; no game code or role switch',async()=>{
   const h=harness();assert.equal(h.fields().filter(x=>x.type==='email').length,1);
   assert.equal(h.fields().filter(x=>x.type==='password').length,1);
