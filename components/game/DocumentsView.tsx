@@ -367,7 +367,7 @@ export default function DocumentsView({g,focusId,createTemplate,createStageNo,on
   const personalSigner=['gd_deputy','sf_member','region','ks','vs'].includes(s.key);
   const holder=personalSigner?me:(members.find(m=>s.roleHints.some(h=>(m.role_title||'').toLowerCase().includes(h)))||me);const signatureMeta=formalSignature(s.key,holder?.full_name||me?.full_name||'');
   setBusy(true);
-  const id=await createFormalDocument({stageNo:createStageNo||currentStage?.stage_no||12,title:title.trim(),docType:t.key,subjectKey:s.key,subjectLabel:s.label,bodyText:body,workflowKey:t.workflow,metadata:{institution:s.label,issuer_name:issuer.trim()||s.label,acting_office_id:actingOffice?.id||null,acting_office_title:actingOffice?.role||null,acting_user_id:actingOffice?.userId||null,place:place.trim()||'Москва',template_key:templateKey,recognized:recognized||null,created_in_editor:!file}},file||undefined);
+  const id=await createFormalDocument({stageNo:createStageNo||currentStage?.stage_no||12,title:title.trim(),docType:t.key,subjectKey:s.key,subjectLabel:s.label,bodyText:body,workflowKey:t.workflow,metadata:{institution:s.label,issuer_name:issuer.trim()||s.label,acting_office_id:actingOffice?.id||null,acting_office_title:actingOffice?.role||null,acting_user_id:actingOffice?.userId||null,place:place.trim()||'Москва',template_key:templateKey,recognized:recognized||null,created_in_editor:!file,registry_independent:!createStageNo&&!createTemplate}},file||undefined);
   let packageErrors:string[]=[];
   if(id&&t.workflow==='bill')packageErrors=await savePreparedBillPackage(id);
   setBusy(false);
