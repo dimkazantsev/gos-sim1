@@ -155,7 +155,7 @@ export default function TeacherStageManager({g,onOpenStage}:{
  const selectedError=stageReadinessError?.scope===scope&&stageReadinessError.stageNo===selectedStageNo?stageReadinessError.message:readinessError;
  const targetStage=typeof resetTarget==='number'?stages.find(s=>s.stage_no===resetTarget):null;
  const all=resetTarget==='all';
- const canReset=resetTarget!==null&&!busy&&(!all||confirmation.trim()==='СБРОСИТЬ');
+ const canReset=resetTarget!==null&&!busy&&confirmation.trim()==='СБРОСИТЬ';
  function askReset(target:ResetTarget){
   if(!teacher||target===null)return;
   setNotice('');setError('');setConfirmation('');setResetTarget(target);
@@ -166,7 +166,7 @@ export default function TeacherStageManager({g,onOpenStage}:{
   try{
    const ok=await resetStageProgress(all?null:resetTarget as number);
    if(!ok){setError('Не удалось сбросить этапы. Проверьте сообщение об ошибке в верхней части приложения.');return}
-   setNotice(all?'Все этапы сброшены. Ход остановлен.':'Этап '+resetTarget+' сброшен.');
+   setNotice(all?'Все этапы сброшены. Ход остановлен.':'Этап '+resetTarget+': связанные результаты аннулированы.');
    if(all){setFilter('all');setSearch('')}
    setReadinessSnapshot(null);setStageReadinessSnapshot(null);
    setResetTarget(null);setConfirmation('');
@@ -265,14 +265,14 @@ export default function TeacherStageManager({g,onOpenStage}:{
     <h2 id="teacher-reset-title">{all?'Сбросить все 16 этапов?':'Сбросить этап '+resetTarget+'?'}</h2>
     <p id="teacher-reset-description">{all
      ?'Все этапы снова станут закрытыми, их сроки будут очищены. Игровой ход остановится, а следующий запуск начнётся с первого этапа.'
-     :'Статус, дедлайн и даты прохождения этапа «'+(targetStage?.title||'')+'» будут очищены. Если этап текущий, игровой ход остановится.'}</p>
+     :'Сбросить этап «'+(targetStage?.title||'')+'» вместе с голосованиями, документами, оценками и связанными результатами? Действие необратимо.'}</p>
     <div className="teacherResetPreserve"><CheckCircle2 size={17} aria-hidden="true"/>
-     <span>Документы, голосования, действия и оценки студентов сохранятся. Остальные этапы при одиночном сбросе не изменяются.</span>
+     <span>{all?'Работы и оценки сохранятся: общий сброс изменяет только статусы этапов.':'Результаты выбранного этапа будут аннулированы; остальные этапы и кабинет преподавателя сохранятся.'}</span>
     </div>
-    {all&&<label className="teacherResetWord">Для подтверждения введите <strong>СБРОСИТЬ</strong>
+    <label className="teacherResetWord">Для подтверждения введите <strong>СБРОСИТЬ</strong>
      <input type="text" value={confirmation} onChange={e=>setConfirmation(e.target.value)} placeholder="СБРОСИТЬ"
       autoComplete="off" spellCheck={false} disabled={busy}/>
-    </label>}
+    </label>
     {error&&<p className="teacherResetError" role="alert">{error}</p>}
     <div className="teacherResetDialogActions">
      <button type="button" className="teacherResetCancel" onClick={closeDialog} disabled={busy}>Отмена</button>

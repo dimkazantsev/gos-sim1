@@ -79,7 +79,7 @@ export default function StagesView({g,onOpenVotes,onOpenDocument,onCreateDocumen
  const resetStage=resetTarget==='all'?null:resetTarget;
  const resetStageRecord=typeof resetTarget==='number'?stages.find(s=>s.stage_no===resetTarget):null;
  const resetIsAll=resetTarget==='all';
- const canConfirmReset=resetTarget!==null&&!resetBusy&&(!resetIsAll||resetConfirmation.trim()==='СБРОСИТЬ');
+ const canConfirmReset=resetTarget!==null&&!resetBusy&&resetConfirmation.trim()==='СБРОСИТЬ';
  function requestReset(target:number|'all'){
   if(!teacher||readOnly)return;
   setResetNotice('');
@@ -92,7 +92,7 @@ export default function StagesView({g,onOpenVotes,onOpenDocument,onCreateDocumen
   try{
    const ok=await g.resetStageProgress(resetStage);
    if(ok){
-    setResetNotice(resetIsAll?'Статусы и сроки всех этапов сброшены. Игровой таймер остановлен.':('Этап '+resetStage+' сброшен.'));
+    setResetNotice(resetIsAll?'Статусы и сроки всех этапов сброшены. Игровой таймер остановлен.':('Этап '+resetStage+': связанные результаты аннулированы.'));
     setResetTarget(null);
     setResetConfirmation('');
     if(resetIsAll){setStageFilter('all');setPhaseFilter(null);setStageSearch('')}
@@ -246,11 +246,11 @@ export default function StagesView({g,onOpenVotes,onOpenDocument,onCreateDocumen
     <h2 id="stage-reset-title">{resetIsAll?'Сбросить все этапы?':'Сбросить этап '+resetTarget+'?'}</h2>
     <p id="stage-reset-description">{resetIsAll
      ?'Все 16 этапов вернутся в закрытое состояние. Текущий этап будет сброшен, а игровой таймер остановится.'
-     :'Статус, дата открытия, дата завершения и дедлайн этапа «'+(resetStageRecord?.title||'')+'» будут очищены. Если это текущий этап, игровой таймер остановится.'}</p>
-    <div className="stageResetKeep"><BookOpenText size={17} aria-hidden="true"/><span>Документы, результаты голосований, действия студентов и оценки сохранятся. Сброс касается только статусов и сроков этапов.</span></div>
-    {resetIsAll&&<label className="stageResetConfirmLabel">Для подтверждения введите <strong>СБРОСИТЬ</strong>
+     :'Сбросить этап «'+(resetStageRecord?.title||'')+'» вместе с его голосованиями, документами, оценками и связанными результатами? Действие необратимо.'}</p>
+    <div className="stageResetKeep"><BookOpenText size={17} aria-hidden="true"/><span>{resetIsAll?'Все этапы будут закрыты, но работы и оценки студентов сохранятся.':'Данные других этапов сохранятся. Начисленные автоматические эффекты выбранного этапа будут отменены.'}</span></div>
+    <label className="stageResetConfirmLabel">Для подтверждения введите <strong>СБРОСИТЬ</strong>
      <input type="text" value={resetConfirmation} onChange={e=>setResetConfirmation(e.target.value)} autoComplete="off" spellCheck={false} placeholder="СБРОСИТЬ" disabled={resetBusy}/>
-    </label>}
+    </label>
     <div className="stageResetDialogActions">
      <button type="button" className="stageResetCancel" disabled={resetBusy} onClick={()=>{setResetTarget(null);setResetConfirmation('')}}>Отмена</button>
      <button type="button" className="stageResetConfirm" disabled={!canConfirmReset} onClick={()=>void confirmReset()}>{resetBusy?'Выполняется…':resetIsAll?'Сбросить все этапы':'Сбросить этап'}</button>
