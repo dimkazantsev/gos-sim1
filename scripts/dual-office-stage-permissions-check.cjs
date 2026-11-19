@@ -58,7 +58,7 @@ assert.equal(mixed.some(title=>title.includes('председател')&&title.i
 assert.equal(mixed.some(title=>title.includes('председател')&&title.includes('правительств')),true,
  'PM retains its own authority');
 
-const match=a.match(/CREATE OR REPLACE FUNCTION private\.has_effective_role_like[\s\S]*?\$f\$;/);
+const match=a.match(/CREATE OR REPLACE FUNCTION private\.has_effective_role_like[\s\S]*?\$(?:function|f)\$;/);
 assert(match,'Reusable office-role helper definition missing');
 (async()=>{
  const db=new PGlite();
