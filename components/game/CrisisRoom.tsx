@@ -10,7 +10,7 @@ import type {ReturnTypeRepublic} from './viewTypes';
 import styles from './CrisisRoom.module.css';
 
 type InfoRequest={id:string;crisis_id:string;game_id:string;requester_id:string;question:string;answer:string|null;status:'pending'|'answered';created_at:string;answered_at:string|null};
-type CrisisResponse={id:string;crisis_id:string;game_id:string;user_id:string;role_title:string|null;action_plan:string;legal_basis:string|null;resources:string|null;public_message:string|null;teacher_note:string|null;status:'submitted'|'reviewed';created_at:string;updated_at:string};
+type CrisisResponse={id:string;crisis_id:string;game_id:string;user_id:string;role_title:string|null;action_plan:string;legal_basis:string|null;resources:string|null;public_message:string|null;teacher_note:string|null;status:'submitted'|'reviewed';published_post_id:string|null;published_at:string|null;created_at:string;updated_at:string};
 type RoleConsequence={game_id:string;user_id:string;crisis_id:string|null;status:'active'|'suspended'|'arrested'|'detained'|'deceased'|'incapacitated';reason:string|null;until_at:string|null;set_at:string};
 
 type CrisisIntensity=keyof typeof INTENSITY_LABEL;
@@ -160,8 +160,23 @@ export default function CrisisRoom({g}:{g:ReturnTypeRepublic}){
   if(r.error)setError(userError(r.error));else{responseDirty.current=false;await load()}setBusy(false);
  }
  async function review(id:string){
-  setBusy(true);const saved=responses.find(x=>x.id===id);const r=await supabase.rpc('review_crisis_response',{p_response_id:id,p_teacher_note:(reviewDraft[id]??saved?.teacher_note??'').trim()||null});
-  if(r.error)setError(userError(r.error));else await load();setBusy(false);
+  if(busy)return;
+  setBusy(true);
+  try{
+   const saved=responses.find(x=>x.id===id);
+   const note=(reviewDraft[id]??saved?.teacher_note??'').trim();
+   if(note.length<10){setError('Укажите ответ преподавателя не короче 10 символов.');return;}
+   const r=await supabase.rpc('review_crisis_response',{p_response_id:id,p_teacher_note:note});
+   if(r.error)setError(userError(r.error));else await load();
+  }finally{setBusy(false)}
+ }
+ async function publishReview(id:string){
+  if(busy||!teacher)return;
+  setBusy(true);
+  try{
+   const r=await supabase.rpc('publish_reviewed_crisis_response',{p_response_id:id});
+   if(r.error)setError(userError(r.error));else await load();
+  }finally{setBusy(false)}
  }
  async function resolve(){
   setBusy(true);const r=await supabase.rpc('resolve_crisis',{p_crisis_id:active.id,p_resolution_note:resolution.trim()||null});
@@ -188,9 +203,28 @@ export default function CrisisRoom({g}:{g:ReturnTypeRepublic}){
    </article>
 
    <article className="crisisResponsePanel">
-    <div className="crisisSectionHead"><div><small>{teacher?'РЕАКЦИИ ОРГАНОВ ВЛАСТИ':'ВАША РЕАКЦИЯ'}</small><h3>{teacher?'Оперативные решения':'План действий'}</h3></div>{!teacher&&<span>{myResponse?.status==='reviewed'?'Проверено':myResponse?'Отправлено':'Черновик'}</span>}</div>
-    {teacher?<div className="crisisResponseList">{responses.length===0?<div className="crisisEmpty">Решения участников ещё не поступили.</div>:responses.map(r=><article key={r.id}><header><div><b>{members.find(m=>m.user_id===r.user_id)?.full_name||'Участник'}</b><span>{r.role_title||'Роль не назначена'}</span></div><em>{r.status==='reviewed'?'Проверено':'Ждёт проверки'}</em></header><section><small>ДЕЙСТВИЯ</small><p>{r.action_plan}</p></section>{r.legal_basis&&<section><small>ПРАВОВОЕ ОСНОВАНИЕ</small><p>{r.legal_basis}</p></section>}{r.resources&&<section><small>РЕСУРСЫ</small><p>{r.resources}</p></section>}{r.public_message&&<section><small>ПУБЛИЧНАЯ КОММУНИКАЦИЯ</small><p>{r.public_message}</p></section>}<div className="crisisReview"><textarea rows={2} value={reviewDraft[r.id]??r.teacher_note??''} onChange={e=>setReviewDraft(v=>({...v,[r.id]:e.target.value}))} placeholder="Комментарий преподавателя"/><button disabled={busy} onClick={()=>void review(r.id)}>Зафиксировать разбор</button></div></article>)}</div>
-    :<div className="crisisResponseForm"><label>1 · Управленческое решение<textarea rows={5} value={plan} onChange={e=>{responseDirty.current=true;setPlan(e.target.value)}} placeholder="Что именно вы делаете сейчас, кто исполняет и в какой последовательности?"/></label><label>2 · Полномочия и правовое основание<textarea rows={3} value={legal} onChange={e=>{responseDirty.current=true;setLegal(e.target.value)}} placeholder="На каком полномочии, норме или компетенции основано решение?"/></label><label>3 · Ресурсы и ограничения<textarea rows={3} value={resources} onChange={e=>{responseDirty.current=true;setResources(e.target.value)}} placeholder="Люди, бюджет, информация, время, инфраструктура, риски…"/></label><label>4 · Публичная коммуникация<textarea rows={3} value={message} onChange={e=>{responseDirty.current=true;setMessage(e.target.value)}} placeholder="Что ваш орган сообщает гражданам и другим институтам?"/></label><button className="primary" disabled={busy||plan.trim().length<20} onClick={()=>void submit()}>{myResponse?'Обновить решение':'Отправить решение'}</button>{myResponse?.teacher_note&&<div className="crisisTeacherFeedback"><b>Комментарий преподавателя</b><p>{myResponse.teacher_note}</p></div>}</div>}
+    <div className="crisisSectionHead"><div><small>{teacher?'РЕАКЦИИ ОРГАНОВ ВЛАСТИ':'ВАША РЕАКЦИЯ'}</small><h3>{teacher?'Оперативные решения':'План действий'}</h3></div>{!teacher&&<span>{myResponse?.published_post_id?'Опубликовано':myResponse?.status==='reviewed'?'Проверено':myResponse?'Отправлено':'Черновик'}</span>}</div>
+    {teacher?<div className="crisisResponseList">{responses.length===0?<div className="crisisEmpty">Решения участников ещё не поступили.</div>:responses.map(r=><article key={r.id}><header><div><b>{members.find(m=>m.user_id===r.user_id)?.full_name||'Участник'}</b><span>{r.role_title||'Роль не назначена'}</span></div><em>{r.published_post_id?'Опубликовано':r.status==='reviewed'?'Ожидает публикации':'Ждёт проверки'}</em></header><section><small>ДЕЙСТВИЯ</small><p>{r.action_plan}</p></section>{r.legal_basis&&<section><small>ПРАВОВОЕ ОСНОВАНИЕ</small><p>{r.legal_basis}</p></section>}{r.resources&&<section><small>РЕСУРСЫ</small><p>{r.resources}</p></section>}{r.public_message&&<section><small>ПУБЛИЧНАЯ КОММУНИКАЦИЯ</small><p>{r.public_message}</p></section>}<div className="crisisReview">
+     <textarea rows={2} aria-label="Ответ преподавателя" disabled={!!r.published_post_id}
+      value={reviewDraft[r.id]??r.teacher_note??''}
+      onChange={e=>setReviewDraft(v=>({...v,[r.id]:e.target.value}))}
+      placeholder="Ответ преподавателя (обязателен перед публикацией)"/>
+     <button type="button" disabled={busy||!!r.published_post_id||(reviewDraft[r.id]??r.teacher_note??'').trim().length<10}
+      onClick={()=>void review(r.id)}>{r.published_post_id?'Ответ сохранён':'Сохранить ответ'}</button>
+    </div>
+    {r.published_post_id
+     ?<p className={styles.crisisNewsPublished} role="status">Новость опубликована в ленте ГОС.ID. Ответ и решение сохранены.</p>
+     :r.status==='reviewed'&&r.teacher_note?.trim()&&<div className={styles.crisisNewsApproval}>
+       <div><strong>Новость подготовлена к публикации</strong>
+        <p>«{active.crisis_type}»: предложение {r.role_title||'участника'}, обоснование, ресурсы, публичное сообщение и сохранённый ответ преподавателя. Выполнение предложений не подтверждается автоматически.</p>
+        {(reviewDraft[r.id]??r.teacher_note).trim()!==r.teacher_note.trim()&&<small>Сначала сохраните изменённый ответ.</small>}
+       </div>
+       <button type="button" className="primary"
+        disabled={busy||(reviewDraft[r.id]??r.teacher_note).trim()!==r.teacher_note.trim()}
+        onClick={()=>void publishReview(r.id)}>Подтвердить публикацию</button>
+      </div>}
+   </article>)}</div>
+    :<div className="crisisResponseForm"><label>1 · Управленческое решение<textarea rows={5} value={plan} onChange={e=>{responseDirty.current=true;setPlan(e.target.value)}} placeholder="Что именно вы делаете сейчас, кто исполняет и в какой последовательности?"/></label><label>2 · Полномочия и правовое основание<textarea rows={3} value={legal} onChange={e=>{responseDirty.current=true;setLegal(e.target.value)}} placeholder="На каком полномочии, норме или компетенции основано решение?"/></label><label>3 · Ресурсы и ограничения<textarea rows={3} value={resources} onChange={e=>{responseDirty.current=true;setResources(e.target.value)}} placeholder="Люди, бюджет, информация, время, инфраструктура, риски…"/></label><label>4 · Публичная коммуникация<textarea rows={3} value={message} onChange={e=>{responseDirty.current=true;setMessage(e.target.value)}} placeholder="Что ваш орган сообщает гражданам и другим институтам?"/></label><button className="primary" disabled={busy||plan.trim().length<20||!!myResponse?.published_post_id} onClick={()=>void submit()}>{myResponse?.published_post_id?'Решение опубликовано':myResponse?'Обновить решение':'Отправить решение'}</button>{myResponse?.teacher_note&&<div className="crisisTeacherFeedback"><b>Ответ преподавателя</b><p>{myResponse.teacher_note}</p></div>}</div>}
    </article>
   </div>
 

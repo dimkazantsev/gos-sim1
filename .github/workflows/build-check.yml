@@ -374,6 +374,8 @@ jobs:
           cache: npm
           cache-dependency-path: package.json
       - run: npm ci --no-audit --no-fund
+      - name: Новость по решению кризиса после ответа преподавателя
+        run: node scripts/crisis-response-news-approval-check.cjs
       - name: Все этапы · проверка доступных голосов
         run: node scripts/gd-vote-allowance-all-stages-check.cjs
       - name: Редактирование НПА до первого голоса

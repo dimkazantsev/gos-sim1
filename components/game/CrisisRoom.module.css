@@ -174,3 +174,27 @@
   justify-self:start;
  }
 }
+
+/* Crisis decision → teacher's response → explicitly approved editorial news.
+   All information is already available in the existing crisis-responses fetch. */
+.crisisNewsApproval{
+ display:flex;align-items:center;justify-content:space-between;gap:14px;
+ min-width:0;margin-top:10px;padding:12px 14px;
+ border:1px solid var(--gs-border,#dce3f0);border-radius:var(--gs-radius-sm,11px);
+ background:var(--gs-bg-elevated,#f9faff);
+}
+.crisisNewsApproval>div{flex:1;min-width:0}
+.crisisNewsApproval strong{color:var(--gs-ink,#172447);font-size:13px}
+.crisisNewsApproval p{margin:5px 0 0;color:var(--gs-muted,#586784);font-size:12px;line-height:1.55;overflow-wrap:anywhere}
+.crisisNewsApproval small{display:block;margin-top:5px;color:var(--gs-red,#b62c45);font-size:12px}
+.crisisNewsApproval button{flex:none;min-height:42px;padding:9px 14px;font-size:13px;white-space:normal}
+.crisisNewsPublished{
+ margin:10px 0 0;padding:9px 12px;
+ border:1px solid var(--gs-border,#dce3f0);border-radius:var(--gs-radius-sm,11px);
+ color:var(--gs-green,#287b55);background:var(--gs-surface,#fff);
+ font-size:13px;line-height:1.5;
+}
+@media(max-width:700px){
+ .crisisNewsApproval{align-items:stretch;flex-direction:column}
+ .crisisNewsApproval button{width:100%}
+}
