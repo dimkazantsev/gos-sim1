@@ -374,6 +374,8 @@ jobs:
           cache: npm
           cache-dependency-path: package.json
       - run: npm ci --no-audit --no-fund
+      - name: Все этапы · проверка доступных голосов
+        run: node scripts/gd-vote-allowance-all-stages-check.cjs
       - name: Права совмещённых должностей на всех этапах
         run: node scripts/dual-office-stage-permissions-check.cjs
       - name: Dependency audit — high and critical
@@ -503,7 +505,6 @@ jobs:
       - run: node scripts/party-program-storage-rls-check.cjs
       - run: node scripts/action-error-placement-check.cjs
       - run: node scripts/vote-office-grants-check.cjs
-      - run: node scripts/gd-vote-allowance-all-stages-check.cjs
       - run: node scripts/chat-channel-selection-check.cjs
       - run: node scripts/chat-expanded-layout-browser-check.cjs
       - run: node scripts/chat-realtime-check.cjs
