@@ -4,6 +4,15 @@ const fs=require('node:fs');
 const sql=fs.readFileSync('supabase/migrations/20261119173820_reviewed_crisis_responses_teacher_approved_news_20261120.sql','utf8');
 const view=fs.readFileSync('components/game/CrisisRoom.tsx','utf8');
 const css=fs.readFileSync('components/game/CrisisRoom.module.css','utf8');
+const journalistic=fs.readFileSync('supabase/migrations/20261119174740_crisis_news_journalistic_editorial_and_existing_article_20261120.sql','utf8');
+assert(journalistic.includes('Президент поручил начать переговоры на фоне массовых протестов'),'Existing news gets an editorial headline');
+const article=journalistic.split('-- Repair the one already-published item in place, preserving post identity.')[1]||'';
+for(const forbidden of ['Ответ преподавателя:','Предложения опубликованы после преподавательского разбора','Правовое обоснование участника:','Публичное обращение участника:','Ресурсы и ограничения, указанные участником:']){
+ assert(!article.includes(forbidden),'Classroom wording must not appear in news: '+forbidden);
+}
+assert(journalistic.includes("ON CONFLICT(game_id,source_key)"),'Publisher still prevents duplicates');
+assert(journalistic.includes("id='14d4ef8c-4cad-491f-b391-a6d07fb8405e'::uuid"),'Existing article updated by stable ID');
+assert(view.includes('Материал о мерах реагирования на кризис'), 'Teacher preview must describe news, not classroom fields');
 const editorial=fs.readFileSync('supabase/migrations/20261119174140_crisis_news_editorial_neutral_russian_20261120.sql','utf8');
 assert(editorial.includes('предложения участника — %s'), 'Headline must remain grammatically neutral');
 assert(editorial.includes('Автор предложения: %s'), 'Author must be attributed without inventing enacted actions');

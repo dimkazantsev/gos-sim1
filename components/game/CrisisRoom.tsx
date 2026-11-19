@@ -216,7 +216,7 @@ export default function CrisisRoom({g}:{g:ReturnTypeRepublic}){
      ?<p className={styles.crisisNewsPublished} role="status">Новость опубликована в ленте ГОС.ID. Ответ и решение сохранены.</p>
      :r.status==='reviewed'&&r.teacher_note?.trim()&&<div className={styles.crisisNewsApproval}>
        <div><strong>Новость подготовлена к публикации</strong>
-        <p>«{active.crisis_type}»: предложение {r.role_title||'участника'}, обоснование, ресурсы, публичное сообщение и сохранённый ответ преподавателя. Выполнение предложений не подтверждается автоматически.</p>
+        <p>Материал о мерах реагирования на кризис «{active.crisis_type}» появится в ленте СМИ после подтверждения. В публикацию войдут заявления органов власти и сведения об ограничениях их исполнения.</p>
         {(reviewDraft[r.id]??r.teacher_note).trim()!==r.teacher_note.trim()&&<small>Сначала сохраните изменённый ответ.</small>}
        </div>
        <button type="button" className="primary"
