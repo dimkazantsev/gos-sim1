@@ -150,6 +150,11 @@ function buildStudentPreview(g:ReturnTypeRepublic,student:Member){
   ...g,
   me:student,
   teacher:false,
+  // Teacher-only controls and chat read/write state must never leak into
+  // a student's visual snapshot or mutate the teacher's own chat account.
+  chatOverview:[],
+  chatUnreadCount:0,
+  chatMentionCount:0,
   channels:visibleChannels,
   partyInvitations:visibleInvites,
   partyDocuments:visiblePartyDocs,
@@ -159,6 +164,21 @@ function buildStudentPreview(g:ReturnTypeRepublic,student:Member){
   canVote,
   logout:blockedVoid,
   setTurn:blockedVoid,
+  manageStage:blocked as typeof g.manageStage,
+  updatePoliticalPost:blocked as typeof g.updatePoliticalPost,
+  voteForPartyChair:blocked as typeof g.voteForPartyChair,
+  updatePartyStatistics:blocked as typeof g.updatePartyStatistics,
+  teacherManagePartyMember:blocked as typeof g.teacherManagePartyMember,
+  deleteVote:blocked as typeof g.deleteVote,
+  deletePartyDocument:blocked as typeof g.deletePartyDocument,
+  deleteFormalDocument:blocked as typeof g.deleteFormalDocument,
+  editChatMessage:blocked as typeof g.editChatMessage,
+  setChatPin:blocked as typeof g.setChatPin,
+  markChatRead:blockedVoid as typeof g.markChatRead,
+  setChatChannelPinned:blocked as typeof g.setChatChannelPinned,
+  sendRecordingPreview:blocked as typeof g.sendRecordingPreview,
+  logActivity:blockedVoid as typeof g.logActivity,
+  touchPresence:blockedVoid as typeof g.touchPresence,
   setTurnMinutes:blockedVoid,
   openStage:blockedVoid,
   nextStage:blockedVoid,
@@ -344,6 +364,7 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
  },[viewAsOpen]);
  function selectViewAs(next:string){
   setViewAs(next);
+  setSelectedProfileId('');
   setViewAsOpen(false);
   requestAnimationFrame(()=>viewAsRef.current?.querySelector<HTMLButtonElement>('.viewAsTrigger')?.focus());
  }

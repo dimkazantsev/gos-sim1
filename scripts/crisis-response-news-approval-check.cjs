@@ -41,7 +41,8 @@ assert(sql.includes("Новость уже опубликована; ответ 
 assert(sql.includes("REVOKE ALL ON FUNCTION public.publish_reviewed_crisis_response(uuid) FROM PUBLIC,anon"),'Guest cannot publish');
 assert(view.includes("supabase.rpc('publish_reviewed_crisis_response',{p_response_id:id})"),'One deliberate RPC, no background publication');
 assert(view.includes('Подтвердить публикацию')&&view.includes('Сохранить ответ'),'Two explicit teacher steps');
-assert(view.includes('disabled={busy||plan.trim().length<20||!!myResponse?.published_post_id}'),'No misleading post-publication edit button');
+assert(view.includes('disabled={readOnly||busy||plan.trim().length<20||!!myResponse?.published_post_id}'),
+ 'Read-only student previews and published decisions must both block submission');
 assert(view.includes("active.crisis_type"),'Existing crisis data is reused');
 assert(css.includes('.crisisNewsApproval')&&css.includes('@media(max-width:700px)'),'Responsive publisher controls');
 console.log('PASS: crisis news is teacher-answered, explicitly approved, game-scoped, idempotent and network-sparing');

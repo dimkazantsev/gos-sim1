@@ -99,7 +99,9 @@ export default function GradesView({g,compact=false,previewUserId,onOpenProfile,
  const [gradeAsc,setGradeAsc]=useState(false);
  const [gradeOnlyPending,setGradeOnlyPending]=useState(false);
  const [gradesScrolled,setGradesScrolled]=useState(false);
- const students=members.filter(m=>m.kind==='student');
+ // An individual preview must not mark 16 unseen scores for every OTHER
+ // student as zero. Public class statistics remain in the teacher journal.
+ const students=members.filter(m=>m.kind==='student'&&(!safePreviewUserId||m.user_id===safePreviewUserId));
  const activeStudentCount=students.filter(m=>!m.roster_archived_at).length;
  const gradeByStudent=useMemo(()=>{
   const totals=new Map<string,{sum:number;final:number;graded:number}>();
@@ -366,7 +368,8 @@ export default function GradesView({g,compact=false,previewUserId,onOpenProfile,
  }
 
  return <div className="gradesPage">
-  <section className="gradesHero">
+  {safePreviewUserId&&<p className="stageOperationsNotice" role="status">Показаны личные оценки выбранного студента. В режиме просмотра оценки и итоговый анализ не изменяются; полная статистика группы доступна преподавателю.</p>}
+   <section className="gradesHero">
    <div><small>ВСН · 0–3 БАЛЛА</small><h1>Журнал оценок</h1><p>Все 16 этапов игры. Черновые оценки пересчитываются автоматически каждый час и дополнительно в 03:00; окончательную оценку утверждает только преподаватель.</p></div>
    <div className="gradesHeroLegend"><span className="draft">Черновик</span><span className="final">Итоговая</span><span className="empty">Нет оценки</span></div>
   </section>
