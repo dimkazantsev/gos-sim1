@@ -45,6 +45,10 @@ for(const path of [
  const view=fs.readFileSync(path,'utf8');
  assert(view.includes("stageRoleTitles(g).split(' | ')"),path+' must evaluate each office independently');
 }
+for(const file of ['components/game/StateProgramLab.tsx','components/game/GovernmentProgramSessionLab.tsx']){
+ const view=fs.readFileSync(file,'utf8');
+ assert(view.includes("title.trim()==='президент российской федерации'"),file+' must require the exact presidential office');
+}
 const ghost=fs.readFileSync('components/game/GhostPolicyLab.tsx','utf8');
 assert(ghost.includes("stageRoleTitles(g).split(' | ').some(title=>title.includes('депутат'))"),
  'Stage 5 deputy action must include active secondary offices');

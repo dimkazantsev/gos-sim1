@@ -32,7 +32,8 @@ export default function GovernmentProgramSessionLab({g,onOpenVotes,onOpenDocumen
  const [busy,setBusy]=useState(false);
  const role=stageRoleTitles(g);
  const isPM=role.split(' | ').some(t=>/^председатель\s+правительства(?:\s|$)/u.test(t));
- const canManage=teacher||isPM||role.includes('президент');
+ const isPresident=role.split(' | ').some(title=>title.trim()==='президент российской федерации');
+ const canManage=teacher||isPM||isPresident;
  const canSign=teacher||isPM;
  const canApprove=isPM;
 
