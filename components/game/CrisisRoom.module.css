@@ -152,3 +152,25 @@
  .room :global(.crisisResolution){padding:16px;gap:12px}
  .room :global(.crisisResolution)>button{justify-self:stretch;width:100%}
 }
+
+/* Review status is vertically centred against the participant identity.
+   Keep the badge's own text centred, even with a two-line name. */
+.room :global(.crisisResponseList > article > header){
+ display:grid;grid-template-columns:minmax(0,1fr) auto;
+ align-items:center;column-gap:12px;row-gap:8px;
+}
+.room :global(.crisisResponseList > article > header > div){min-width:0}
+.room :global(.crisisResponseList > article > header > em){
+ display:inline-flex;align-items:center;justify-content:center;
+ justify-self:end;align-self:center;min-height:28px;
+ padding:5px 10px;margin:0;line-height:1.3;
+ text-align:center;white-space:nowrap;font-style:normal;
+}
+@media(max-width:420px){
+ .room :global(.crisisResponseList > article > header){
+  grid-template-columns:minmax(0,1fr);
+ }
+ .room :global(.crisisResponseList > article > header > em){
+  justify-self:start;
+ }
+}
