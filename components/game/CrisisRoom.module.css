@@ -178,13 +178,13 @@
 /* Crisis decision → teacher's response → explicitly approved editorial news.
    All information is already available in the existing crisis-responses fetch. */
 .crisisNewsApproval{
- display:flex;align-items:center;justify-content:space-between;gap:14px;
+ display:flex;flex-direction:column;align-items:stretch;gap:12px;
  min-width:0;margin-top:10px;padding:12px 14px;
  border:1px solid var(--gs-border,#dce3f0);border-radius:var(--gs-radius-sm,11px);
  background:var(--gs-bg-elevated,#f9faff);
 }
-.crisisNewsApproval>div:first-child{flex:1;min-width:0}
-.approvalActions{display:flex;align-items:center;justify-content:flex-end;gap:9px;flex:none}
+.crisisNewsApproval>div:first-child{width:100%;min-width:0}
+.approvalActions{display:flex;align-items:center;justify-content:flex-end;flex-wrap:wrap;gap:9px;width:100%;min-width:0}
 .rejectNewsButton{
  min-height:42px;padding:9px 14px;border:1px solid var(--gs-border-strong,#c7d3e8);
  border-radius:var(--gs-radius-xs,9px);
@@ -211,8 +211,6 @@
  font-size:13px;line-height:1.5;
 }
 @media(max-width:900px){
- .crisisNewsApproval{align-items:stretch;flex-direction:column}
- .approvalActions{justify-content:stretch}
  .approvalActions button{flex:1;min-width:0}
 }
 @media(max-width:700px){
