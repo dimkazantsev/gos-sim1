@@ -5,6 +5,19 @@ const sql=fs.readFileSync('supabase/migrations/20261119173820_reviewed_crisis_re
 const view=fs.readFileSync('components/game/CrisisRoom.tsx','utf8');
 const css=fs.readFileSync('components/game/CrisisRoom.module.css','utf8');
 const journalistic=fs.readFileSync('supabase/migrations/20261119174740_crisis_news_journalistic_editorial_and_existing_article_20261120.sql','utf8');
+const rejected=fs.readFileSync('supabase/migrations/20261119175402_crisis_news_reject_publication_and_resubmit_20261120.sql','utf8');
+assert(rejected.includes('publication_rejected_at timestamptz'),'Rejection must persist');
+assert(rejected.includes('private.is_game_teacher(r.game_id)'),'Only teacher may decline publication');
+assert(rejected.includes('IF r.published_post_id IS NOT NULL THEN'),'Already published articles cannot be declined');
+assert(rejected.includes('IF r.publication_rejected_at IS NOT NULL THEN'),'Duplicate rejection is idempotent');
+assert(rejected.includes("SET publication_rejected_at=clock_timestamp()"),'Rejection must be recorded once');
+assert(rejected.includes('publication_rejected_at=null'),'New review or resubmission clears rejection');
+assert(rejected.includes('Публикация отклонена. Для повторного рассмотрения'),'Declined response cannot be published');
+assert(view.includes("supabase.rpc('reject_reviewed_crisis_news',{p_response_id:id})"),'Client calls exactly one rejection RPC');
+assert(view.includes('Отклонить публикацию')&&view.includes('Подтвердить публикацию'),'Both actions appear together');
+assert(view.includes('publication_rejected_at:new Date().toISOString()'),'Optimistic rejection needs no extra data fetch');
+assert(css.includes('.approvalActions')&&css.includes('.rejectNewsButton'),'Matching project style');
+
 assert(journalistic.includes('Президент поручил начать переговоры на фоне массовых протестов'),'Existing news gets an editorial headline');
 const article=journalistic.split('-- Repair the one already-published item in place, preserving post identity.')[1]||'';
 for(const forbidden of ['Ответ преподавателя:','Предложения опубликованы после преподавательского разбора','Правовое обоснование участника:','Публичное обращение участника:','Ресурсы и ограничения, указанные участником:']){
