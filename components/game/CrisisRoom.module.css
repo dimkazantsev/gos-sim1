@@ -51,3 +51,104 @@
 @media(max-width:1000px){.scenarioGrid{grid-template-columns:repeat(2,minmax(0,1fr))}.intensityGrid{grid-template-columns:repeat(2,minmax(0,1fr))}.launchSummary{flex-direction:column;gap:5px}.launchSummary>span:last-child{flex-shrink:1}}
 @media(max-width:600px){.catalog{padding:16px}.catalogHeading{flex-direction:column;gap:10px}.scenarioGrid,.intensityGrid{grid-template-columns:1fr}.scenario{min-height:0}.previewHeading{flex-direction:column;gap:10px}.launchActions{flex-direction:column}.launchActions button{width:100%}.nextCatalog>summary{padding:16px}.nextCatalog>summary span{display:block;margin:5px 0 0 18px}}
 @media(prefers-reduced-motion:reduce){.scenario{transition:none}}
+
+/* Crisis management inherits the canonical ГОС.ID surfaces and spacing.
+   Pure CSS: no additional assets, queries, subscriptions or animations. */
+.room :global(.crisisRoleConsequences){
+ margin:0;padding:20px 24px 22px;border:0;border-top:1px solid var(--gs-border);
+ border-radius:0;background:var(--gs-surface);
+}
+.room :global(.crisisRoleConsequences .crisisSectionHead){margin-bottom:8px;align-items:center}
+.room :global(.crisisRoleConsequences .crisisSectionHead h3){color:var(--gs-ink);font-size:18px}
+.room :global(.crisisRoleIntro){
+ max-width:900px;margin:0 0 14px;color:var(--gs-muted);font-size:13px;line-height:1.65;
+}
+.room :global(.crisisRoleGrid){
+ display:grid;grid-template-columns:repeat(auto-fit,minmax(235px,1fr));gap:9px;
+}
+.room :global(.crisisRoleGrid) article{
+ display:flex;flex-direction:column;align-items:flex-start;justify-content:space-between;
+ gap:8px;min-width:0;min-height:100px;margin:0;padding:12px 14px;
+ border:1px solid var(--gs-border);border-radius:var(--gs-radius-sm);
+ background:var(--gs-surface);box-shadow:none;
+}
+.room :global(.crisisRoleGrid) article:not(:global(.active)){
+ border-color:var(--gs-border);background:var(--gs-bg-elevated);
+}
+.room :global(.crisisRoleGrid) article>div{min-width:0;width:100%}
+.room :global(.crisisRoleGrid) b{
+ display:block;color:var(--gs-ink);font-size:13px;font-weight:750;line-height:1.45;overflow-wrap:anywhere;
+}
+.room :global(.crisisRoleGrid) small{
+ display:block;margin:3px 0 0;color:var(--gs-muted);font-size:12px;line-height:1.45;overflow-wrap:anywhere;
+}
+.room :global(.crisisRoleGrid) article>span{
+ display:inline-flex;align-items:center;gap:6px;margin:0;padding:0;
+ border:0;border-radius:0;background:transparent;color:var(--gs-green);
+ font-size:12px;font-weight:700;line-height:1.4;
+}
+.room :global(.crisisRoleGrid) article>span::before{
+ content:'';display:block;flex:none;width:6px;height:6px;border-radius:50%;background:currentColor;
+}
+.room :global(.crisisRoleGrid) article:not(:global(.active))>span{
+ background:transparent;color:var(--gs-red);
+}
+.room :global(.crisisRoleGrid) p,.room :global(.crisisRoleGrid) time{
+ margin:4px 0 0;color:var(--gs-muted);font-size:12px;line-height:1.5;overflow-wrap:anywhere;
+}
+.room :global(.crisisRoleComposer){
+ display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1.05fr) minmax(0,1.25fr) minmax(165px,.8fr) auto;
+ gap:10px;align-items:end;margin-top:16px;padding:15px;
+ border:1px solid var(--gs-border);border-radius:var(--gs-radius-sm);
+ background:var(--gs-bg-elevated);
+}
+.roleField{display:grid;gap:6px;min-width:0;color:var(--gs-muted);font-size:12px;font-weight:700}
+.roleField>span{line-height:1.25}
+.room :global(.crisisRoleComposer) .roleField :is(select,input){
+ width:100%;min-width:0;min-height:44px;height:44px;
+ padding:9px 11px;border:1px solid var(--gs-border-strong);
+ border-radius:var(--gs-radius-xs);background:var(--gs-surface);
+ color:var(--gs-ink);font-size:13px;font-weight:550;
+}
+.room :global(.crisisRoleComposer) .roleField :is(select,input):focus-visible,
+.room :global(.crisisResolution) textarea:focus-visible{
+ outline:2px solid var(--gs-accent);outline-offset:2px;
+}
+.room :global(.crisisRoleComposer)>button{
+ min-height:44px;height:44px;margin:0;padding:9px 14px;
+ border-radius:var(--gs-radius-xs);white-space:nowrap;font-size:13px;
+}
+.room :global(.crisisResolution){
+ display:grid;grid-template-columns:minmax(0,.95fr) minmax(0,1.25fr) auto;
+ gap:16px;align-items:center;padding:20px 24px;
+ border-top:1px solid var(--gs-border);background:var(--gs-surface);
+}
+.room :global(.crisisResolution)>div{min-width:0}
+.room :global(.crisisResolution) small{color:var(--gs-muted);font-size:12px;letter-spacing:.055em}
+.room :global(.crisisResolution) p{max-width:480px;margin:5px 0 0;color:var(--gs-muted);font-size:13px;line-height:1.55}
+.room :global(.crisisResolution) textarea{
+ display:block;min-height:94px;padding:10px 12px;
+ border:1px solid var(--gs-border-strong);border-radius:var(--gs-radius-sm);
+ background:var(--gs-surface);color:var(--gs-ink);font-size:13px;
+}
+.room :global(.crisisResolution)>button{
+ justify-self:end;min-height:44px;padding:10px 18px;
+ border-radius:var(--gs-radius-xs);white-space:nowrap;font-size:13px;
+}
+@media(max-width:1100px){
+ .room :global(.crisisRoleGrid){grid-template-columns:repeat(2,minmax(0,1fr))}
+ .room :global(.crisisRoleComposer){grid-template-columns:repeat(2,minmax(0,1fr))}
+ .room :global(.crisisRoleComposer) .roleField:nth-child(3){grid-column:1/-1}
+ .room :global(.crisisRoleComposer)>button{grid-column:auto;width:100%}
+ .room :global(.crisisResolution){grid-template-columns:minmax(0,1fr)}
+ .room :global(.crisisResolution)>button{justify-self:start}
+}
+@media(max-width:640px){
+ .room :global(.crisisRoleConsequences){padding:16px}
+ .room :global(.crisisRoleGrid),.room :global(.crisisRoleComposer){grid-template-columns:minmax(0,1fr)}
+ .room :global(.crisisRoleComposer){padding:12px;gap:11px}
+ .room :global(.crisisRoleComposer) .roleField:nth-child(3),
+ .room :global(.crisisRoleComposer)>button{grid-column:1/-1}
+ .room :global(.crisisResolution){padding:16px;gap:12px}
+ .room :global(.crisisResolution)>button{justify-self:stretch;width:100%}
+}
