@@ -58,8 +58,11 @@ assert.equal(mixed.some(title=>title.includes('председател')&&title.i
 assert.equal(mixed.some(title=>title.includes('председател')&&title.includes('правительств')),true,
  'PM retains its own authority');
 
-const match=a.match(/CREATE OR REPLACE FUNCTION private\.has_effective_role_like[\s\S]*?\$(?:function|f)\$;/);
-assert(match,'Reusable office-role helper definition missing');
+const start=a.indexOf('CREATE OR REPLACE FUNCTION private.has_effective_role_like(');
+const end=a.indexOf('CREATE OR REPLACE FUNCTION public.assign_institution_member(',start);
+assert(start>=0&&end>start,'Reusable office-role helper definition missing');
+const helperDDL=a.slice(start,end).trim();
+assert(helperDDL.endsWith(';'),'Role helper must be a complete SQL statement');
 (async()=>{
  const db=new PGlite();
  try{
@@ -75,7 +78,7 @@ assert(match,'Reusable office-role helper definition missing');
      SELECT lower(coalesce(role_title,'')) FROM game_members WHERE game_id=g AND user_id=u AND kind<>'observer'
      UNION SELECT lower(role_title) FROM game_office_assignments WHERE game_id=g AND user_id=u AND status='active' $$;
   `);
-  await db.exec(match[0]);
+  await db.exec(helperDDL);
   const gid='10000000-0000-4000-8000-000000000001';
   const pm='20000000-0000-4000-8000-000000000001';
   const deputy='20000000-0000-4000-8000-000000000002';
