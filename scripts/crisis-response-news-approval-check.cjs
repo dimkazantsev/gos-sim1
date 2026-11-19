@@ -11,7 +11,7 @@ assert(sql.includes("v_key:='crisis-response:'||r.id::text"),'News must have sta
 assert(sql.includes('ON CONFLICT(game_id,source_key) WHERE source_key IS NOT NULL DO NOTHING'),'Approval must be idempotent');
 assert(sql.includes("c.stage_no,'stage_source','explicit'"),'News must retain crisis stage, not last-opened stage');
 assert(sql.includes("Факт исполнения предложенных мер этой публикацией не подтверждается"),'No invented effects');
-assert(sql.includes("Решение уже опубликовано как новость; изменить его нельзя"),'Published student's decision must be immutable');
+assert(sql.includes("Решение уже опубликовано как новость; изменить его нельзя"),"Published student decision must be immutable");
 assert(sql.includes("Новость уже опубликована; ответ больше не изменяется"),'Published teacher answer must be immutable');
 assert(sql.includes("REVOKE ALL ON FUNCTION public.publish_reviewed_crisis_response(uuid) FROM PUBLIC,anon"),'Guest cannot publish');
 assert(view.includes("supabase.rpc('publish_reviewed_crisis_response',{p_response_id:id})"),'One deliberate RPC, no background publication');
