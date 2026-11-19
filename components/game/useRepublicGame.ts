@@ -6,6 +6,7 @@ import {assetFailureBackoffMs} from './assetFailureBackoff';
 import {boundedChatWrite} from '@/lib/boundedChatWrite';
 import {useBudgetPulse,withBudgetIncome} from './useBudgetPulse';
 import {VOTING_BODIES,bodyQuorum} from './votingBodies';
+import {gdVoteAllowance} from './gdVoteAllowance';
 import {useEffect,useMemo,useRef,useState,type Dispatch,type SetStateAction} from 'react';
 import {useRouter} from 'next/navigation';
 import {supabase} from '@/lib/supabase';
@@ -3044,7 +3045,19 @@ export function useRepublicGame(gameId:string){
  function quorum(v:Vote,registrations:{user_id:string;institution_key:string;stage_no:number;present_mandates?:number|null}[]=[]){
   const eligible=eligibleWeight(v),cast=ballots.filter(b=>b.vote_id===v.id).reduce((n,b)=>n+Number(b.weight),0);
   const attendance=v.electorate_snapshot?.attendance_required||v.procedure_key==='registered_session';
-  const present=v.status==='closed'&&v.result_present!=null?Number(v.result_present):attendance?registrations.filter(r=>r.institution_key===v.institution_key&&r.stage_no===v.stage_no).reduce((n,r)=>n+(v.institution_key==='gd'?Math.min(gdEffectivePresence(r.user_id,r.present_mandates),v.electorate_snapshot?Number(v.electorate_snapshot.weights[r.user_id]||0):gdMandateCapacity(r.user_id)):v.electorate_snapshot?Number(v.electorate_snapshot.weights[r.user_id]||0):v.voting_mode==='mandate'?(partyMandates.find(a=>a.user_id===r.user_id)?.effective_mandates||0):memberMatchesInstitution(r.user_id,v.institution_key)?1:0),0):cast;
+  const present=v.status==='closed'&&v.result_present!=null?Number(v.result_present):attendance?
+   registrations.filter(r=>r.institution_key===v.institution_key&&r.stage_no===v.stage_no)
+    .reduce((n,r)=>{
+     if(v.institution_key==='gd'){
+      if(!v.electorate_snapshot?.weights)return n+gdEffectivePresence(r.user_id,r.present_mandates);
+      const rows=partyMandates.filter(a=>a.user_id===r.user_id);
+      const effective=rows.length?rows.reduce((sum,a)=>sum+Math.max(0,Number(a.effective_mandates)||0),0):null;
+      return n+gdVoteAllowance(Number(v.electorate_snapshot.weights[r.user_id]||0),r.present_mandates,effective);
+     }
+     return n+(v.electorate_snapshot?Number(v.electorate_snapshot.weights[r.user_id]||0):
+      v.voting_mode==='mandate'?(partyMandates.find(a=>a.user_id===r.user_id)?.effective_mandates||0):
+       memberMatchesInstitution(r.user_id,v.institution_key)?1:0);
+    },0):cast;
   const needed=v.quorum_kind==='none'?0:bodyQuorum(v.institution_key,eligible,Number(v.quorum_value));
   return {eligible,cast,present,needed,met:v.quorum_kind==='none'||eligible>0&&present>=needed};
  }

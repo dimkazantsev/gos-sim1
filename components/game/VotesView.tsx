@@ -10,6 +10,7 @@ import FormalDocumentPicker from './FormalDocumentPicker';
 import {formalDocumentTitle} from './formalInstitutions';
 import {votePresetForDocument,institutionLabel,majorityLabel} from './proceduralVoting';
 import VoteBallotControls from './VoteBallotControls';
+import {gdVoteAllowance} from './gdVoteAllowance';
 import {formatKsrfVoteBody,uppercaseFirst} from './ksrfVoteText';
 import {VOTING_BODIES,type VotingUnit} from './votingBodies';
 import {useSavedGameState,savedChoice} from './useSavedGameState';
@@ -45,6 +46,14 @@ export default function VotesView({g,onOpenDocument,onOpenStages,focusId,onClear
  const mandatesByParty=useMemo(()=>{
   const map=new Map<string,typeof partyMandates>();
   for(const row of partyMandates){const rows=map.get(row.party_id);if(rows)rows.push(row);else map.set(row.party_id,[row]);}
+  return map;
+ },[partyMandates]);
+ // Only already-hydrated mandates are used as a current cap. If this view
+ // was opened before the party projection, rely on the immutable vote snapshot.
+ const cachedEffectiveByUser=useMemo(()=>{
+  const map=new Map<string,number>();
+  for(const row of partyMandates)
+   map.set(row.user_id,(map.get(row.user_id)||0)+Math.max(0,Number(row.effective_mandates)||0));
   return map;
  },[partyMandates]);
 
@@ -100,7 +109,15 @@ export default function VotesView({g,onOpenDocument,onOpenStages,focusId,onClear
    checkedIn.some(row=>row.user_id===me?.user_id&&row.institution_key===v.institution_key&&row.stage_no===v.stage_no);
  }
  function canCast(v:Vote){return canVote(v)&&isRegisteredForVote(v)&&(v.institution_key!=='gd'||gdPresentWeight(v)>0)}
- function gdPresentWeight(v:Vote){const mine=checkedIn.find(r=>r.user_id===me?.user_id&&r.institution_key==='gd'&&r.stage_no===v.stage_no);return mine?Math.min(gdEffectivePresence(me?.user_id||'',mine.present_mandates),Number(v.electorate_snapshot?.weights?.[me?.user_id||'']||0)):0;}
+ function gdVotePresentWeight(v:Vote,uid:string,declared:number|null){
+  if(!v.electorate_snapshot?.weights)return gdEffectivePresence(uid,declared);
+  return gdVoteAllowance(Number(v.electorate_snapshot.weights[uid]||0),declared,
+   cachedEffectiveByUser.get(uid)??null);
+ }
+ function gdPresentWeight(v:Vote){
+  const mine=checkedIn.find(r=>r.user_id===me?.user_id&&r.institution_key==='gd'&&r.stage_no===v.stage_no);
+  return mine?gdVotePresentWeight(v,mine.user_id,mine.present_mandates):0;
+ }
  const focusedVote=focusId?votes.find(v=>v.id===focusId):undefined;
  const focusedNeedsRegistration=!!focusedVote&&voteNeedsRegistration(focusedVote)&&!isRegisteredForVote(focusedVote);
  useEffect(()=>{
@@ -259,7 +276,7 @@ export default function VotesView({g,onOpenDocument,onOpenStages,focusId,onClear
     {v.status==='open'&&v.electorate_snapshot?.attendance_required&&!v.procedure_key?.startsWith('budget_')&&v.procedure_key!=='bill_amendments'&&doc?.workflow_key!=='budget'&&<p className="voteAutoClosureHint">Голосование автоматически закроется после последнего голоса зарегистрированного участника при наличии кворума. Председательствующий или преподаватель также может закрыть его вручную.</p>}
     <div className="quorumMeter"><div><span>Присутствует: {q.present} из {q.eligible} · Подано: {q.cast}</span><b className={q.met?'ok':'wait'}>{q.met?'КВОРУМ ЕСТЬ':'НУЖНО '+Math.max(0,q.needed-q.present)}</b></div><i><em style={{width:Math.min(100,pct(q.present,q.eligible))+'%'}}/></i></div>
     {v.voting_mode==='mandate'&&<details className="deputyRegistration" open={v.status==='open'}>
-     <summary><div><small>РЕГИСТРАЦИЯ ДЕПУТАТОВ</small><b>Кто представляет голоса фракций на этом заседании</b></div><span>{(checkinsByInstitutionAndStage.get(v.institution_key+':'+v.stage_no)||[]).reduce((a,x)=>a+gdEffectivePresence(x.user_id,x.present_mandates),0)} / 450 присутствует · Гоствойтинг −{parties.reduce((a,p)=>a+Math.min(p.mandates,p.ghost_loss_current),0)}</span></summary>
+     <summary><div><small>РЕГИСТРАЦИЯ ДЕПУТАТОВ</small><b>Кто представляет голоса фракций на этом заседании</b></div><span>{(checkinsByInstitutionAndStage.get(v.institution_key+':'+v.stage_no)||[]).reduce((a,x)=>a+gdVotePresentWeight(v,x.user_id,x.present_mandates),0)} / 450 присутствует · Гоствойтинг −{parties.reduce((a,p)=>a+Math.min(p.mandates,p.ghost_loss_current),0)}</span></summary>
      <div className="deputyRegistrationBody">
       {parties.filter(p=>p.mandates>0).map(p=>{
        const rows=mandatesByParty.get(p.id)||[];
