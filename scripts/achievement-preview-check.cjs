@@ -17,7 +17,7 @@ assert(!result.some(row=>row.id==='award-99'),'A teacher-earned secret must neve
 assert.equal(catalog[0].earned_at,'2026-10-13T02:00:00Z','Real award records are not modified');
 const game=read('components/GameClient.tsx'),profile=read('components/game/ProfileView.tsx'),shelf=read('components/game/Achievements.tsx');
 assert(game.includes("const GENERIC_STUDENT='__generic_student_preview__'"),'Generic student retains its internal non-UUID sentinel');
-assert(game.includes('previewAchievementsUserId={teacher&&viewAs===GENERIC_STUDENT?me?.user_id:undefined}'),'Only generic teacher preview replaces sentinel with authenticated teacher UUID');
+assert(game.includes('previewAchievementsUserId={teacher&&previewMode&&previewStudent?.kind===\'student\'&&previewStudent.user_id!==GENERIC_STUDENT?previewStudent.user_id:undefined}'),'Teacher preview uses the chosen real student ID, never the teacher account or the sentinel');
 assert(profile.includes('userId={previewAchievementsUserId||target.user_id}')&&profile.includes('previewOnly={!!previewAchievementsUserId}'),'Only generic preview uses proxy catalog, ordinary students use real user IDs');
 assert(profile.includes('!previewAchievementsUserId&&<BlitzArchive'),'Generic preview cannot send fake UUID to blitz RPC');
 assert(profile.includes('if(!game||!target||previewAchievementsUserId||own)return;'),'Generic preview cannot send fake UUID to public stats RPC; own profile skips unused public stats');
