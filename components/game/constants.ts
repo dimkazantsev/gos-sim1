@@ -2,6 +2,8 @@ import type {Metric} from './types';
 
 export const VSN_LABEL=['0','Н','С','В'];
 export const INTENSITY_LABEL={low:'Низкая',medium:'Средняя',high:'Высокая',ultra:'Ультра'} as const;
+export const CRISIS_RESPONSE_HOURS=12;
+export const CRISIS_RESPONSE_MINUTES=CRISIS_RESPONSE_HOURS*60;
 
 export const CRISES=[
  {id:'metro',source:'rules',type:'Террористический акт в московском метро',levels:{low:'Взрыв произошёл, погибших нет.',medium:'Взрыв: 3 погибших, 5 раненых.',high:'Два взрыва на разных станциях: 9 погибших, 19 раненых.',ultra:'Три взрыва на разных станциях и стрельба в метро: 17 погибших, 44 раненых.'}},

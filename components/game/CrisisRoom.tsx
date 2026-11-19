@@ -4,7 +4,7 @@ import {useEffect,useId,useMemo,useRef,useState} from 'react';
 import {BookOpen,Play,Shuffle} from 'lucide-react';
 import {supabase} from '@/lib/supabase';
 import StageModuleHeader from '@/components/ui/StageModuleHeader';
-import {CRISES,INTENSITY_LABEL} from './constants';
+import {CRISES,INTENSITY_LABEL,CRISIS_RESPONSE_HOURS} from './constants';
 import {useGameTableSync} from './useGameTableSync';
 import type {ReturnTypeRepublic} from './viewTypes';
 import styles from './CrisisRoom.module.css';
@@ -18,17 +18,23 @@ type CrisisChoice={type:string;intensity:CrisisIntensity};
 const intensityKeys=['low','medium','high','ultra'] as const;
 
 function CrisisCountdown({deadline}:{deadline:number|null}){
- const [now,setNow]=useState(Date.now());
+ const [now,setNow]=useState(()=>Date.now());
  useEffect(()=>{
   if(deadline===null||!Number.isFinite(deadline))return;
-  let timer:ReturnType<typeof setInterval>|undefined;
-  const tick=()=>{const current=Date.now();setNow(current);if(deadline-current<1000)clearInterval(timer)};
-  tick();if(deadline-Date.now()>=1000)timer=setInterval(tick,1000);
-  return()=>clearInterval(timer);
+  let timer:ReturnType<typeof setTimeout>|undefined;
+  const tick=()=>{
+   const current=Date.now();setNow(current);
+   const remaining=deadline-current;
+   // Update once per minute, not every second; stop while the tab is hidden.
+   if(document.visibilityState==='visible'&&remaining>0)timer=setTimeout(tick,Math.min(60_000,remaining));
+  };
+  const onVisibility=()=>{if(timer)clearTimeout(timer);if(document.visibilityState==='visible')tick()};
+  tick();document.addEventListener('visibilitychange',onVisibility);
+  return()=>{if(timer)clearTimeout(timer);document.removeEventListener('visibilitychange',onVisibility)};
  },[deadline]);
- const left=deadline===null||!Number.isFinite(deadline)?null:Math.max(0,Math.floor((deadline-now)/1000));
+ const left=deadline===null||!Number.isFinite(deadline)?null:Math.max(0,Math.ceil((deadline-now)/60_000));
  const late=left===0;
- const label=left===null?'—':String(Math.floor(left/60)).padStart(2,'0')+':'+String(left%60).padStart(2,'0');
+ const label=left===null?'—':Math.floor(left/60)+' ч '+String(left%60).padStart(2,'0')+' мин';
  return <span className={late?styles.expired:undefined}>{late?'Срок истёк':label}</span>;
 }
 
@@ -54,7 +60,7 @@ function CrisisCatalog({busy,active,onLaunch}:{busy:boolean;active:boolean;onLau
     <span className={styles.intensityTitle}><input type="radio" name={intensityGroup} value={level} checked={intensity===level} onChange={()=>setIntensity(level)}/><b>{INTENSITY_LABEL[level]}</b></span><span>{selected.levels[level]}</span>
    </label>)}</div></fieldset>
    {selected.id==='pandemic'&&<p className={styles.gameNote}>Проценты смертности — условные показатели из авторских правил игры.</p>}
-   <div className={styles.launchSummary} aria-live="polite"><span>Выбрано: <b>{selected.type}</b> · {INTENSITY_LABEL[intensity]} интенсивность</span><span>Первичная реакция участников: <b>20 минут</b></span></div>
+   <div className={styles.launchSummary} aria-live="polite"><span>Выбрано: <b>{selected.type}</b> · {INTENSITY_LABEL[intensity]} интенсивность</span><span>Первичная реакция участников: <b>{CRISIS_RESPONSE_HOURS} часов</b></span></div>
    {active&&<p className={styles.gameNote}>Завершите текущий кризис, чтобы запустить следующий. Каталог доступен для предварительного выбора.</p>}
    <div className={styles.launchActions}><button type="button" className="secondary" disabled={busy||active} onClick={()=>void onLaunch()}><Shuffle size={17} aria-hidden="true"/>Запустить случайный кризис</button><button type="button" className="primary" disabled={busy||active} onClick={()=>void onLaunch({type:selected.type,intensity})}><Play size={17} aria-hidden="true"/>{busy?'Запуск…':'Запустить выбранный сценарий'}</button></div>
    <p className={styles.launchHint}>После запуска участники смогут запросить сведения, отправить план действий, указать полномочия, ресурсы и публичное сообщение. Преподаватель разберёт решения и зафиксирует итог.</p>
@@ -137,7 +143,7 @@ export default function CrisisRoom({g,readOnly=false}:{g:ReturnTypeRepublic;read
  if(!active){
   if(!teacher)return <section className={'crisisCommand '+styles.room}><StageModuleHeader eyebrow={`ТЕКУЩИЙ ЭТАП ${currentStage?.stage_no||game.current_round} · КРИЗИСНОЕ УПРАВЛЕНИЕ`} title="Активного кризиса нет" description="Преподаватель может запустить сценарий на любом этапе. После запуска здесь появятся сведения и формы реагирования."/></section>;
   return <section className={'crisisCommand '+styles.room}>
-   <StageModuleHeader eyebrow={`ТЕКУЩИЙ ЭТАП ${currentStage?.stage_no||game.current_round} · КРИЗИСНОЕ УПРАВЛЕНИЕ`} title="Выберите кризисный сценарий" description="Преподаватель задаёт событие и интенсивность или проводит случайную жеребьёвку. Первичная реакция участников длится 20 минут." icon={<BookOpen size={18} aria-hidden="true"/>} stats={[{label:'Сценарии',value:CRISES.length,detail:'9 из правил · 6 дополнительных'},{label:'Первичная реакция',value:'20 мин',detail:'После запуска сценария'}]}/>
+   <StageModuleHeader eyebrow={`ТЕКУЩИЙ ЭТАП ${currentStage?.stage_no||game.current_round} · КРИЗИСНОЕ УПРАВЛЕНИЕ`} title="Выберите кризисный сценарий" description={`Преподаватель задаёт событие и интенсивность или проводит случайную жеребьёвку. Первичная реакция участников длится ${CRISIS_RESPONSE_HOURS} часов.`} icon={<BookOpen size={18} aria-hidden="true"/>} stats={[{label:'Сценарии',value:CRISES.length,detail:'9 из правил · 6 дополнительных'},{label:'Первичная реакция',value:`${CRISIS_RESPONSE_HOURS} ч`,detail:'После запуска сценария'}]}/>
    <CrisisCatalog busy={busy} active={false} onLaunch={launch}/>
   </section>;
  }
@@ -203,7 +209,7 @@ export default function CrisisRoom({g,readOnly=false}:{g:ReturnTypeRepublic;read
  }
 
  return <section className={'crisisCommand '+styles.room}>
-  <StageModuleHeader eyebrow={`ТЕКУЩИЙ ЭТАП ${currentStage?.stage_no||game.current_round} · АКТИВНЫЙ КРИЗИС`} title={active.crisis_type} description={active.description} stats={[{label:'Окно первичной реакции',value:<CrisisCountdown deadline={deadline}/>,detail:`Запущен на этапе ${active.stage_no}`},{label:'Интенсивность',value:INTENSITY_LABEL[active.intensity]}]}/>
+  <StageModuleHeader eyebrow={`ТЕКУЩИЙ ЭТАП ${currentStage?.stage_no||game.current_round} · АКТИВНЫЙ КРИЗИС`} title={active.crisis_type} description={active.description} variant="government" stats={[{label:'Окно первичной реакции',value:<CrisisCountdown deadline={deadline}/>,detail:`Запущен на этапе ${active.stage_no}`},{label:'Интенсивность',value:INTENSITY_LABEL[active.intensity]}]}/>
 
   <div className="crisisCommandGrid">
    <article className="crisisIntel">

@@ -16,7 +16,7 @@ import {signDocumentAssetBatch} from './signDocumentAssetBatch';
 import {FORMAL_DOCUMENT_SUMMARY_COLUMNS,mergeFormalDocumentSummaries,type FormalDocumentSummary} from './formalDocumentSummary';
 import {PARTY_LIST_COLUMNS,PROFILE_ASSET_COLUMNS,normalizePartyRows,mergeProfileAssetRows,type PartyListRow,type ProfileAssetRow} from './partyProfileSummary';
 import type {Activity,Ballot,Channel,ChatPin,Crisis,Evaluation,EventItem,FormalDocument,FormalHistory,Game,GameDocument,GameProfile,ImpactLedger,ImpactRule,Member,Message,Metric,MetricHistory,Party,PartyAgreement,PartyDocument,PartyInvitation,PartyMandateAllocation,PartySupportHistory,PoliticalPost,PoliticalPostFormalLink,PoliticalPostMedia,Presence,Stage,Vote,View} from './types';
-import {CRISES} from './constants';
+import {CRISES,CRISIS_RESPONSE_MINUTES} from './constants';
 import {CHAT_MAX_FILE_BYTES,preferredRecordingMime,recordingFileName,uploadedChatKind,inferChatMime} from './recordingMedia';
 import type {ChatMediaKind} from './recordingMedia';
 import {sendChatMedia} from './chatMediaTransport';
@@ -3155,7 +3155,7 @@ export function useRepublicGame(gameId:string){
   if(!c||choice&&!keys.includes(choice.intensity)){setError('Выберите сценарий и интенсивность из каталога.');return}
   const intensity=choice?.intensity||keys[Math.floor(Math.random()*keys.length)];
   const description=c.levels[intensity];
-  const r=await supabase.rpc('launch_crisis',{p_game_id:gameId,p_crisis_type:c.type,p_intensity:intensity,p_description:description,p_response_minutes:20});
+  const r=await supabase.rpc('launch_crisis',{p_game_id:gameId,p_crisis_type:c.type,p_intensity:intensity,p_description:description,p_response_minutes:CRISIS_RESPONSE_MINUTES});
   if(r.error)setError(r.error.message);else await refresh();
  }
  async function ghostVoting(){
