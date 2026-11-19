@@ -2,6 +2,11 @@
 const assert=require('node:assert/strict');
 const fs=require('node:fs');
 const migration=fs.readFileSync('supabase/migrations/20261119162951_edit_formal_document_until_first_ballot_20261119.sql','utf8');
+const direct=fs.readFileSync('supabase/migrations/20261119163139_protect_direct_formal_document_text_write_20261119.sql','utf8');
+assert(direct.includes("current_user IN ('authenticated','anon')"),
+ 'Direct authenticated text updates must not bypass revision history or first-ballot checks');
+assert(direct.includes('BEFORE UPDATE OF title, body_text ON public.formal_documents'),
+ 'Direct text UPDATE must be guarded while system status transitions remain untouched');
 const view=fs.readFileSync('components/game/DocumentsView.tsx','utf8');
 assert(migration.includes('join public.game_ballots b on b.vote_id=v.id'),
   'Permission decision must check a cast ballot, not merely an open vote');
