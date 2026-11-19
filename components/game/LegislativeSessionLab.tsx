@@ -37,16 +37,12 @@ export default function LegislativeSessionLab({g,onOpenVotes,onOpenDocument,read
  const [agendaVisible,setAgendaVisible]=useState(false);
  const activeReading=useRef(reading);activeReading.current=reading;
  useEffect(()=>{setAgendaVisible(false);setRegistrationVisible(false)},[reading]);
- const role=stageRoleTitles(g);
+ const roleTitles=stageRoleTitles(g).split(' | ');
+ const dumaChair=roleTitles.some(title=>title.includes('председател')&&title.includes('дум'));
+ const dumaCouncil=roleTitles.some(title=>title.includes('совет')&&title.includes('дум'));
  const stageOpen=isStageWorkOpen(game,g.stages.find(s=>s.stage_no===12));
- const canManage=!readOnly&&(teacher||(stageOpen&&
-  ((role.includes('председател')&&role.includes('дум'))||
-   (role.includes('совет')&&role.includes('дум')))));
- const canChair=!readOnly&&(teacher||(stageOpen&&(
-  (role.includes('председател')&&role.includes('дум'))||
-  g.officeAssignments.some(a=>a.user_id===me?.user_id&&a.status==='active'&&
-   a.role_title.toLowerCase().includes('председател')&&a.role_title.toLowerCase().includes('дум'))
- )));
+ const canManage=!readOnly&&(teacher||(stageOpen&&(dumaChair||dumaCouncil)));
+ const canChair=!readOnly&&(teacher||(stageOpen&&dumaChair));
 
  async function load(){
   if(!game)return;

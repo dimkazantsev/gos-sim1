@@ -28,10 +28,11 @@ export default function InstitutionStaffingLab({g,mode}:{g:ReturnTypeRepublic;mo
  const [edits,setEdits]=useState<Record<string,string>>({});
  const [pick,setPick]=useState<Record<string,string>>({});
  const [busy,setBusy]=useState(false);
- const role=stageRoleTitles(g);
- const isPM=role.includes('председател')&&role.includes('правительств');
+ const roleTitles=stageRoleTitles(g).split(' | ');
+ const isPM=roleTitles.some(title=>title.includes('председател')&&title.includes('правительств'));
  const ledParty=parties.find(p=>p.leader_user_id===me?.user_id);
- const canCreateCommittees=teacher||role.includes('председател')&&role.includes('дум')||role.includes('совет')&&role.includes('дум');
+ const canCreateCommittees=teacher||roleTitles.some(title=>
+  (title.includes('председател')||title.includes('совет'))&&title.includes('дум'));
  const [loaded,setLoaded]=useState(false);
  const [loadError,setLoadError]=useState('');
 

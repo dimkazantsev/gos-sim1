@@ -26,9 +26,10 @@ export default function CommitteeChairElectionPanel({g}:{g:ReturnTypeRepublic}){
  const [voteDraft,setVoteDraft]=useState<Record<string,string>>({});
  const [mode,setMode]=useState<Record<string,'open'|'secret'>>({});
  const [busy,setBusy]=useState(false);
- const role=stageRoleTitles(g);
+ const roleTitles=stageRoleTitles(g).split(' | ');
  const ledParty=parties.find(p=>p.leader_user_id===me?.user_id&&p.registration_status==='registered');
- const canCreate=teacher||(role.includes('председател')&&role.includes('дум'))||(role.includes('совет')&&role.includes('дум'));
+ const canCreate=teacher||roleTitles.some(title=>
+  (title.includes('председател')||title.includes('совет'))&&title.includes('дум'));
 
  async function load(){
   if(!game)return;

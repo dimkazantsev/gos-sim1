@@ -35,6 +35,25 @@ assert(b.includes('private.can_manage_duma_session(p_game,p_user)'),'Duma chair 
 assert(b.includes('private.role_is_available(p_game,p_user)'),'Suspended Duma chair is denied');
 assert(ui.includes("officeAssignments.filter(o=>o.user_id===g.me?.user_id&&o.status==='active')"),
  'Student UI must read active secondary office assignments');
+for(const path of [
+ 'components/game/InstitutionStaffingLab.tsx',
+ 'components/game/LegislativeSessionLab.tsx',
+ 'components/game/CommitteeChairElectionPanel.tsx',
+ 'components/game/GovernmentFormationWorkspace.tsx',
+ 'components/game/BudgetLab.tsx'
+]){
+ const view=fs.readFileSync(path,'utf8');
+ assert(view.includes("stageRoleTitles(g).split(' | ')"),path+' must evaluate each office independently');
+}
+const ghost=fs.readFileSync('components/game/GhostPolicyLab.tsx','utf8');
+assert(ghost.includes("stageRoleTitles(g).split(' | ').some(title=>title.includes('депутат'))"),
+ 'Stage 5 deputy action must include active secondary offices');
+const mixed=['председатель правительства российской федерации','депутат государственной думы'];
+assert.equal(mixed.some(title=>title.includes('председател')&&title.includes('дум')),false,
+ 'Unrelated PM and deputy appointments must not form a false Duma chair');
+assert.equal(mixed.some(title=>title.includes('председател')&&title.includes('правительств')),true,
+ 'PM retains its own authority');
+
 const match=a.match(/CREATE OR REPLACE FUNCTION private\.has_effective_role_like[\s\S]*?\$f\$;/);
 assert(match,'Reusable office-role helper definition missing');
 (async()=>{

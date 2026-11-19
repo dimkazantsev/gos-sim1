@@ -5,6 +5,7 @@ import {supabase} from '@/lib/supabase';
 import {useGameTableSync} from './useGameTableSync';
 import {userError} from '@/lib/userError';
 import type {ReturnTypeRepublic} from './viewTypes';
+import {stageRoleTitles} from './stageRoles';
 
 type Scenario={id:string;game_id:string;title:string;budget_year:number;source_note:string|null;gdp:number;oil_price:number|null;cutoff_price:number|null;key_rate:number|null;fx_change_pct:number|null;fx_intervention:number|null;revenue:number;expenditure:number;debt_start:number;financing:number;balance:number;deficit_pct_gdp:number|null;debt_end:number;debt_pct_gdp:number|null;deficit_limit_pct:number|null;debt_limit_pct:number|null;status:'draft'|'final';formal_document_id:string|null;created_by:string;updated_at:string};
 type ProgramAllocation={id:string;scenario_id:string;program_id:string;amount:number;note:string|null;created_at:string;updated_at:string};
@@ -46,8 +47,10 @@ export default function BudgetLab({g}:{g:ReturnTypeRepublic}){
  const [allocationAmount,setAllocationAmount]=useState('');
  const [allocationNote,setAllocationNote]=useState('');
  const [busy,setBusy]=useState(false);
- const role=(me?.role_title||'').toLowerCase();
- const canFinalize=teacher||(role.includes('председател')&&role.includes('правительств'))||(role.includes('министр')&&role.includes('финанс'));
+ const roleTitles=stageRoleTitles(g).split(' | ');
+ const canFinalize=teacher||roleTitles.some(title=>
+  (title.includes('председател')&&title.includes('правительств'))||
+  (title.includes('министр')&&title.includes('финанс')));
 
  async function load(){
   if(!game)return;

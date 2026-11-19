@@ -3,6 +3,7 @@ import {userError} from '@/lib/userError';
 import {useEffect,useRef,useState} from 'react';
 import {supabase} from '@/lib/supabase';
 import type {ReturnTypeRepublic} from './viewTypes';
+import {stageRoleTitles} from './stageRoles';
 import {notifyGameDataRefresh,useGameTableSync} from './useGameTableSync';
 
 type Policy={id:string;game_id:string;policy_mode:'prohibited'|'justified'|'allowed';rationale:string|null;status:'draft'|'vote_open'|'adopted'|'rejected'|'superseded';vote_id:string|null;proposed_by:string;adopted_at:string|null;created_at:string};
@@ -20,7 +21,8 @@ export default function GhostPolicyLab({g,onOpenVotes}:{g:ReturnTypeRepublic;onO
  const [rationale,setRationale]=useState('');
  const [busy,setBusy]=useState(false);
  const ledParty=parties.find(p=>p.leader_user_id===me?.user_id);
- const canPropose=teacher||me?.kind==='student'&&(!!ledParty||(me.role_title||'').toLowerCase().includes('депутат'));
+ const canPropose=teacher||me?.kind==='student'&&
+  (!!ledParty||stageRoleTitles(g).split(' | ').some(title=>title.includes('депутат')));
  const scope=JSON.stringify([game?.id,me?.user_id,me?.kind,me?.role_title,me?.team,teacher,ledParty?.id]);
  const activeScope=useRef(scope),alive=useRef(true),mutationScope=useRef<string|null>(null);activeScope.current=scope;
  const [dataScope,setDataScope]=useState(scope);

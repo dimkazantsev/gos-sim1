@@ -144,9 +144,9 @@ export default function GovernmentFormationWorkspace({
  const [registrationOpen,setRegistrationOpen]=useState(false);
  const structureDirty=useRef(false);
 
- const role=stageRoleTitles(g);
- const isPresident=role.includes('президент');
- const isPM=role.includes('председател')&&role.includes('правительств');
+ const roleTitles=stageRoleTitles(g).split(' | ');
+ const isPresident=roleTitles.some(title=>title.trim()==='президент российской федерации');
+ const isPM=roleTitles.some(title=>/^председатель\s+правительства(?:\s|$)/u.test(title));
  const canPresident=teacher||isPresident;
  const students=members.filter(m=>m.kind==='student');
 
