@@ -34,7 +34,7 @@ const level=(n:number)=>n>=3?'Высокий':n>=2?'Средний':n>0?'Низ�
 const finalScoreChoice=(a?:Assessment)=>{const score=shownScore(a);return score!==null&&Number.isFinite(score)&&score>=0&&score<=3?formatGradeScore(score):'';};
 const when=(v?:string|null)=>v?new Date(v).toLocaleString('ru-RU',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}):'—';
 
-export default function GradesView({g,compact=false,onOpenProfile,onPublicScores}:{g:ReturnTypeRepublic;compact?:boolean;onOpenProfile?:(id:string)=>void;onPublicScores?:(rows:PublicGradeScore[])=>void}){
+export default function GradesView({g,compact=false,previewUserId,onOpenProfile,onPublicScores}:{g:ReturnTypeRepublic;compact?:boolean;previewUserId?:string;onOpenProfile?:(id:string)=>void;onPublicScores?:(rows:PublicGradeScore[])=>void}){
  const {game,me,members,stages,teacher}=g;
  const [storedRows,setRows]=useState<Assessment[]>([]);
  const [runs,setRuns]=useState<Run[]>([]);
@@ -57,10 +57,11 @@ export default function GradesView({g,compact=false,onOpenProfile,onPublicScores
  // The game hook already checks the active authenticated user's membership
  // through get_my_game_identity. Reuse that verified identity: a second
  // auth.getUser() on every profile/grades mount causes classroom Auth storms.
- // Teacher "view as student" retains the REAL verified user id, not the
- // simulated student's id, so private student scores remain inaccessible.
+ // Preview keeps the teacher's verified identity. The teacher is authorized
+ // to read a selected student's journal, but never to write as that student.
  const authId=g.verifiedUserId;
- const loadScope=[game?.id,me?.user_id,me?.kind,teacher,compact,authId].join(':');
+ const safePreviewUserId=previewUserId&&authId!==previewUserId&&me?.user_id===previewUserId?previewUserId:undefined;
+ const loadScope=[game?.id,me?.user_id,me?.kind,teacher,compact,authId,safePreviewUserId].join(':');
  const activeScope=useRef(loadScope),acceptedRowsScope=useRef(''),acceptedDebriefScope=useRef(''),selectedScope=useRef('');activeScope.current=loadScope;
  const reads=useRef({scope:loadScope,promise:null as Promise<void>|null,queued:false,controller:null as AbortController|null});
  if(reads.current.scope!==loadScope)reads.current={scope:loadScope,promise:null,queued:false,controller:null};
@@ -154,6 +155,24 @@ export default function GradesView({g,compact=false,onOpenProfile,onPublicScores
   let timeout:ReturnType<typeof setTimeout>|undefined;
   try{
    await Promise.race([(async()=>{
+   if(safePreviewUserId){
+    // Preview is deliberately cheaper than the public 100-person journal:
+    // two bounded, index-supported reads for this participant, only when
+    // the teacher opens Grades. No polling or impersonated Auth session.
+    const [own,notes]=await Promise.all([
+     supabase.from('stage_assessments').select(ASSESSMENT_COLUMNS)
+      .eq('game_id',game.id).eq('user_id',safePreviewUserId).order('stage_no').limit(16).abortSignal(signal),
+     supabase.from('stage_debriefs').select('id,game_id,stage_no,user_id,body,updated_at')
+      .eq('game_id',game.id).eq('user_id',safePreviewUserId).order('stage_no').limit(16).abortSignal(signal)
+    ]);
+    if(!current())return;
+    if(own.error||notes.error){g.setError((own.error||notes.error)!.message);return}
+    acceptedRowsScope.current=requestedScope;
+    acceptedDebriefScope.current=requestedScope;
+    setRows((own.data||[]) as Assessment[]);
+    setDebriefRows((notes.data||[]) as Debrief[]);
+    return;
+   }
    if(teacher){
     // PostgREST caps a single result at 1000 rows. 100 players × 16 stages
     // need two ordered pages; never accept a truncated teacher journal.
@@ -216,7 +235,9 @@ export default function GradesView({g,compact=false,onOpenProfile,onPublicScores
   return()=>{loadRequest.current++;evidenceRequest.current++;readState.controller?.abort()};
  },[loadScope]);
  // Assessment tables are not in Realtime publication; retain visible reconciliation.
- useGameTableSync(authId===null?undefined:game?.id,['stage_assessments','stage_debriefs'],load,loadScope,undefined,3000,180000);
+ useGameTableSync(authId===null||safePreviewUserId?undefined:game?.id,['stage_assessments','stage_debriefs'],load,loadScope,undefined,3000,180000);
+ // The read-only preview takes exactly one scoped snapshot when opened.
+ useEffect(()=>{if(safePreviewUserId&&game&&authId)void load()},[loadScope,safePreviewUserId,game?.id,authId]);
 
  const currentStage=stages.find(s=>s.status==='open');
  const eligibleDebriefStages=stages.filter(s=>s.status==='open'||s.status==='completed');
@@ -257,7 +278,7 @@ export default function GradesView({g,compact=false,onOpenProfile,onPublicScores
   setEditScore(finalScoreChoice(a));
   setNote(a?.teacher_note||'');
   setEvidence(null);setRuns([]);setSelectedDebrief(null);
-  if(!game||(!teacher&&(userId!==me?.user_id||authId!==me.user_id)))return;
+  if(!game||(!teacher&&(userId!==me?.user_id||authId!==me.user_id&&safePreviewUserId!==userId)))return;
   setLoadingEvidence(true);
   const requests:any[]=[supabase.rpc('get_stage_assessment_evidence',{p_game_id:game.id,p_user_id:userId,p_stage_no:stageNo})];
   if(a)requests.push(supabase.from('stage_assessment_runs').select('id,assessment_id,run_type,auto_score,criterion_law,criterion_strategy,criterion_debrief,created_at').eq('assessment_id',a.id).order('created_at',{ascending:false}).limit(50));

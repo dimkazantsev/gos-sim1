@@ -78,8 +78,10 @@ function adjacentScreen(entries:ScreenLocation[],index:number,direction:-1|1,ski
  return -1;
 }
 
-function actorsForStudent(m:Member){
- const role=(m.role_title||'').toLowerCase();
+function actorsForStudent(m:Member,offices:ReturnTypeRepublic['officeAssignments']){
+ const titles=[m.role_title,...offices.filter(o=>o.user_id===m.user_id&&o.status==='active').map(o=>o.role_title)]
+  .filter((value):value is string=>!!value).map(value=>value.toLowerCase());
+ const role=titles.join(' | ');
  const x:{key:string;label:string}[]=[{key:'participant',label:m.full_name}];
  if(m.team)x.push({key:'party',label:m.team});
  if(role.includes('президент'))x.push({key:'president',label:'Президент Российской Федерации'});
@@ -92,9 +94,10 @@ function actorsForStudent(m:Member){
  return x;
 }
 
-function memberMatchesInstitution(m:Member|undefined,institution:string){
+function memberMatchesInstitution(m:Member|undefined,institution:string,offices:ReturnTypeRepublic['officeAssignments']){
  if(!m||m.kind==='observer')return false;
- const role=(m.role_title||'').toLowerCase();
+ const role=[m.role_title,...offices.filter(o=>o.user_id===m.user_id&&o.status==='active').map(o=>o.role_title)]
+  .filter(Boolean).join(' | ').toLowerCase();
  if(institution==='all'||institution==='factions')return m.kind==='student'||(m.kind==='teacher'&&!['','руководитель симуляции','преподаватель','администратор'].includes(role.trim()));
  if(institution==='gd')return role.includes('депутат')||(role.includes('государственн')&&role.includes('дум'));
  if(institution==='government')return role.includes('правительств')||role.includes('министр');
@@ -121,7 +124,7 @@ function buildStudentPreview(g:ReturnTypeRepublic,student:Member){
    return Number(v.electorate_snapshot.weights[student.user_id]||0)>0
     &&(v.institution_key!=='gd'||g.gdMandateCapacity(student.user_id)>0);
   }
-  if(v.voting_mode==='member')return memberMatchesInstitution(student,v.institution_key||'all');
+  if(v.voting_mode==='member')return memberMatchesInstitution(student,v.institution_key||'all',g.officeAssignments);
   if(!party)return false;
   if(v.voting_mode==='faction')return party.leader_user_id===student.user_id;
   return (g.partyMandates.find(x=>x.user_id===student.user_id&&x.party_id===party.id)?.effective_mandates||0)>0;
@@ -152,7 +155,7 @@ function buildStudentPreview(g:ReturnTypeRepublic,student:Member){
   partyDocuments:visiblePartyDocs,
   myEvaluations:evaluations,
   averageVsn:average,
-  availableActors:()=>student.kind==='observer'?[]:actorsForStudent(student),
+  availableActors:()=>student.kind==='observer'?[]:actorsForStudent(student,g.officeAssignments),
   canVote,
   logout:blockedVoid,
   setTurn:blockedVoid,
@@ -299,7 +302,7 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
  const counterScopeRef=useRef(counterScope);counterScopeRef.current=counterScope;
  useEffect(()=>{setPendingEvents(0);setPendingBlitz(0)},[counterScope]);
  const sectionUpdates=useSectionUpdates(g.coreLoaded?gameId:undefined,g.me?.user_id,view,!!viewAs);
- const sectionBadge=(key:string)=>Math.min(999,Math.max(sectionUpdates?.[key]||0,key==='events'?pendingEvents:key==='profile'?pendingBlitz:0));
+ const sectionBadge=(key:string)=>viewAs?0:Math.min(999,Math.max(sectionUpdates?.[key]||0,key==='events'?pendingEvents:key==='profile'?pendingBlitz:0));
  const [selectedProfileId,setSelectedProfileId]=useSavedGameState(gameId,g.me?.user_id,'profile-selected','',savedString);
  const [completingProfile,setCompletingProfile]=useState(false);
  const [onboardingNotice,setOnboardingNotice]=useState('');
@@ -417,9 +420,14 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
   game_id:game.id,user_id:GENERIC_GUEST,full_name:'Гость · предпросмотр',group_name:null,
   kind:'observer',role_title:'Гость',team:null,score:0,joined_at:new Date(0).toISOString(),party_joined_at:null
  }:undefined;
+ // A synthetic participant has no votes, party, offices or assignments.
+ // The generic Student choice previews a REAL active participant from the
+ // already-loaded roster, without identity substitution or any extra reads.
+ const defaultPreviewStudent=g.members.find(m=>m.kind==='student'&&!m.roster_archived_at)
+  ||g.members.find(m=>m.kind==='student');
  const previewStudent=teacher&&viewAs
   ? viewAs===GENERIC_STUDENT
-    ? genericStudent
+    ? defaultPreviewStudent||genericStudent
     : viewAs===GENERIC_GUEST
       ? genericGuest
       : g.members.find(m=>m.user_id===viewAs&&m.kind==='student')
@@ -744,33 +752,33 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
     </div>
 
     {teacher&&<div className={'viewAsSwitcher '+(previewMode?'active':'')} ref={viewAsRef}>
-     <button type="button" className="viewAsTrigger" aria-haspopup="menu" aria-expanded={viewAsOpen} aria-controls={viewAsOpen?'game-view-as-menu':undefined} aria-label={'Режим просмотра: '+(!viewAs?'Преподаватель':viewAs===GENERIC_STUDENT?'Студент':viewAs===GENERIC_GUEST?'Гость':previewStudent?.full_name||'Студент')} onClick={()=>setViewAsOpen(open=>!open)}>
+     <button type="button" className="viewAsTrigger" aria-haspopup="menu" aria-expanded={viewAsOpen} aria-controls={viewAsOpen?'game-view-as-menu':undefined} aria-label={'Режим просмотра: '+(!viewAs?'Преподаватель':viewAs===GENERIC_STUDENT?'Студент · '+(previewStudent?.full_name||'без участников'):viewAs===GENERIC_GUEST?'Гость':previewStudent?.full_name||'Студент')} onClick={()=>setViewAsOpen(open=>!open)}>
       <Eye className="viewAsMobileIcon" aria-hidden="true"/><span className="viewAsTriggerText">
        <span className="viewAsLabel">РЕЖИМ ПРОСМОТРА</span>
-       <strong className="viewAsValue">{!viewAs?'Преподаватель':viewAs===GENERIC_STUDENT?'Студент':viewAs===GENERIC_GUEST?'Гость':previewStudent?.full_name||'Студент'}</strong>
+       <strong className="viewAsValue">{!viewAs?'Преподаватель':viewAs===GENERIC_STUDENT?'Студент · '+(previewStudent?.full_name||'без участников'):viewAs===GENERIC_GUEST?'Гость':previewStudent?.full_name||'Студент'}</strong>
       </span>
       <ChevronDown className="viewAsChevron" aria-hidden="true"/>
      </button>
      {viewAsOpen&&<div className="viewAsMenu" id="game-view-as-menu" role="menu" aria-label="Выбрать режим просмотра" onKeyDown={onPreviewMenuKeyDown}>
       <button type="button" role="menuitemradio" aria-checked={!viewAs} className={!viewAs?'selected':''} onClick={()=>selectViewAs('')}>Преподаватель</button>
-      <button type="button" role="menuitemradio" aria-checked={viewAs===GENERIC_STUDENT} className={viewAs===GENERIC_STUDENT?'selected':''} onClick={()=>selectViewAs(GENERIC_STUDENT)}>Студент</button>
+      <button type="button" role="menuitemradio" aria-checked={viewAs===GENERIC_STUDENT} className={viewAs===GENERIC_STUDENT?'selected':''} onClick={()=>selectViewAs(GENERIC_STUDENT)}>Студент · действующий участник</button>
       <button type="button" role="menuitemradio" aria-checked={viewAs===GENERIC_GUEST} className={viewAs===GENERIC_GUEST?'selected':''} onClick={()=>selectViewAs(GENERIC_GUEST)}>Гость</button>
       {g.members.some(m=>m.kind==='student')&&<div role="separator" className="viewAsMenuDivider">Конкретный студент</div>}
       {g.members.filter(m=>m.kind==='student').map(m=><button type="button" key={m.user_id} role="menuitemradio" aria-checked={viewAs===m.user_id} className={viewAs===m.user_id?'selected':''} title={m.full_name+(m.role_title?' · '+m.role_title:'')} onClick={()=>selectViewAs(m.user_id)}>{m.full_name}{m.role_title&&<small>{m.role_title}</small>}</button>)}
      </div>}
     </div>}
 
-     <ChatToggleButton chatOpen={chatOpen} onToggle={toggleTourChat} onExpand={expandTopChat} unreadCount={g.chatUnreadCount} mentionCount={g.chatMentionCount}/>
+     <ChatToggleButton chatOpen={chatOpen} onToggle={toggleTourChat} onExpand={expandTopChat} unreadCount={previewMode?0:g.chatUnreadCount} mentionCount={previewMode?0:g.chatMentionCount}/>
    </header>
    </GameHeader>
 
    {previewMode&&<div className="studentPreviewBanner">
-    <div><Eye aria-hidden="true"/><p><b>{previewGuest?'Режим гостя:':'Режим студента:'}</b> {shownMe.full_name}{shownMe.team?' · '+shownMe.team:''}{shownMe.role_title?' · '+shownMe.role_title:''}. <strong>Действия от его имени заблокированы.</strong></p></div>
+    <div><Eye aria-hidden="true"/><p><b>{previewGuest?'Режим гостя:':'Режим студента:'}</b> {shownMe.full_name}{shownMe.team?' · '+shownMe.team:''}{shownMe.role_title?' · '+shownMe.role_title:''}. <strong>Только просмотр. Личные действия недоступны.</strong>{viewAs===GENERIC_STUDENT&&!previewGuest&&' Выберите конкретного студента в меню для проверки другого набора должностей.'}</p></div>
     <button onClick={()=>setViewAs('')}>Вернуться к преподавателю</button>
    </div>}
 
    <div className="simContentFlow">
-    {!previewMode&&g.crises.some(c=>c.status==='active')&&<section className="crisisNotice"><div><b>В республике активен кризис</b><span>{g.crises.find(c=>c.status==='active')?.crisis_type}</span></div><button className="secondary" aria-expanded={crisisExpanded} onClick={()=>setCrisisExpanded(!crisisExpanded)}>{crisisExpanded?'Свернуть штаб':'Открыть кризисный штаб'}</button>{crisisExpanded&&<div className="crisisNoticeBody"><CrisisRoom g={g}/></div>}</section>}
+    {g.crises.some(c=>c.status==='active')&&<section className="crisisNotice"><div><b>В республике активен кризис</b><span>{g.crises.find(c=>c.status==='active')?.crisis_type}</span></div><button className="secondary" aria-expanded={crisisExpanded} onClick={()=>setCrisisExpanded(!crisisExpanded)}>{crisisExpanded?'Свернуть штаб':'Открыть кризисный штаб'}</button>{crisisExpanded&&<div className="crisisNoticeBody"><CrisisRoom g={vg} readOnly={previewMode||observer}/></div>}</section>}
 
     <main id="game-main" tabIndex={-1} onClickCapture={actionError.onClickCapture} onSubmitCapture={actionError.onSubmitCapture} onChangeCapture={actionError.onChangeCapture} className={`simMain ${chatOpen?'chatOpen':''} ${previewMode?'studentPreviewMain':''}`}>
      {!teacher&&!previewMode&&me.kind==='student'&&g.coreLoaded&&
@@ -816,7 +824,7 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
      {view==='votes'&&(g.coreLoaded||teacher)&&<VotesView g={vg} focusId={currentScreen.voteId} onClearFocus={clearVoteFocus} onOpenDocument={id=>navigate('documents',{documentId:id})} onOpenStages={()=>navigate('stages')}/>}
      {view==='budget'&&(g.coreLoaded||teacher)&&<BudgetView g={vg} readOnly={previewMode||observer} onOpenDocument={id=>navigate('documents',{documentId:id})} onOpenEvents={()=>navigate('events')} onOpenVotes={voteId=>navigate('votes',{voteId})} onOpenStage={stageNo=>navigate('stages',{stageNo})}/>}
      {view==='documents'&&(g.coreLoaded||teacher)&&<DocumentsView g={vg} readOnly={previewMode||observer} focusId={focusFormalId} createTemplate={currentScreen.templateKey} createStageNo={focusStage} onSelectDocument={rememberDocument} onOpenBudget={()=>navigate('budget')} onOpenVotes={voteId=>navigate('votes',{voteId})}/>}
-     {view==='grades'&&(g.coreLoaded||teacher)&&<GradesView g={vg} onOpenProfile={navigateProfile}/>}
+     {view==='grades'&&(g.coreLoaded||teacher)&&<GradesView g={vg} previewUserId={previewMode&&teacher&&previewStudent?.kind==='student'&&previewStudent.user_id!==GENERIC_STUDENT?previewStudent.user_id:undefined} onOpenProfile={navigateProfile}/>}
      {view==='actions'&&(g.coreLoaded||teacher)&&<PoliticalWallView g={vg} readOnly={previewMode||observer} focusPending={true} onOpenVotes={voteId=>navigate('votes',voteId?{voteId}:undefined)} onOpenDocument={id=>navigate('documents',{documentId:id})} onNavigate={navigate}/>}
      {view==='profile'&&(g.coreLoaded||teacher)&&<ProfileView g={vg} targetUserId={selectedProfileId} readOnly={previewMode||observer} onStartTutorial={beginTour} previewAchievementsUserId={teacher&&viewAs===GENERIC_STUDENT?me?.user_id:undefined} onOpenProfile={navigateProfile} onOwnProfile={()=>{setSelectedProfileId('');navigate('profile')}} setupStatus={setupStatus} setupNotice={onboardingNotice} setupFocusVersion={setupFocusVersion} onProfileChanged={()=>void loadProfileSetup()} onFinishSetup={()=>void completeOnboarding()} pendingBlitz={pendingBlitz}/>}
      {view==='events'&&(g.coreLoaded||teacher)&&<EventWorkspace g={vg} readOnly={previewMode||observer}/>}
@@ -825,7 +833,7 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
     </main>
    </div>
 
-   {!CHAT_PAUSED&&chatOpen&&<ChatPanel g={vg} readOnly={observer||!!previewGuest} expandOnOpen={expandChatFromTop} draft={chatDrafts[chatDraftKey]||''} onDraftChange={text=>setChatDrafts(current=>({...current,[chatDraftKey]:text}))} onOpenMember={uid=>{g.setChatOpen(false);navigateProfile(uid)}}/>}
+   {!CHAT_PAUSED&&chatOpen&&<ChatPanel g={vg} readOnly={previewMode||observer||!!previewGuest} expandOnOpen={expandChatFromTop} draft={chatDrafts[chatDraftKey]||''} onDraftChange={text=>setChatDrafts(current=>({...current,[chatDraftKey]:text}))} onOpenMember={uid=>{g.setChatOpen(false);navigateProfile(uid)}}/>}
   </div></TeacherNavigationProvider>
 
   {mobileMenuOpen&&<div className="mobileMoreBackdrop" onClick={()=>setMobileMenuOpen(false)}>
@@ -887,5 +895,5 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
   <AchievementCelebration gameId={gameId} userId={me?.user_id} enabled={g.coreLoaded&&me?.kind==='student'&&!previewMode&&!introOpen&&!stageComicOpen}/>
   <StageComics key={gameId+':'+me?.user_id} gameId={gameId} userId={me?.user_id||''} stages={g.stages} enabled={g.coreLoaded&&!g.loading&&!previewMode&&!introOpen&&!onboardingRequired&&tourMode==='idle'} onOpenChange={setStageComicOpen}/>
   <RepublicComic gameId={gameId} intro open={introOpen} onClose={()=>void finishIntro()}/>
-  <MobileDock items={dockItems} activeView={view} storageKey={'gos-sims-dock:'+shownMe.user_id+(teacher&&!previewMode?':teacher':':student')} editing={mobileDockEditing} setEditing={setMobileDockEditing} tourTarget={tourMode==='tour'?getTourSteps(!!teacher)[tourIndex]?.target:undefined} onNavigate={k=>{if(k==='profile')setSelectedProfileId('');navigate(k,undefined,false,true)}} onChat={()=>{setMobileMenuOpen(false);toggleTourChat()}} chatOpen={chatOpen} chatPaused={CHAT_PAUSED} chatUnreadCount={g.chatUnreadCount} chatMentionCount={g.chatMentionCount} allOpen={mobileMenuOpen} onAll={()=>{setChatOpen(false);setMobileMenuOpen(true)}}/></div>;
+  <MobileDock items={dockItems} activeView={view} storageKey={'gos-sims-dock:'+shownMe.user_id+(teacher&&!previewMode?':teacher':':student')} editing={mobileDockEditing} setEditing={setMobileDockEditing} tourTarget={tourMode==='tour'?getTourSteps(!!teacher)[tourIndex]?.target:undefined} onNavigate={k=>{if(k==='profile')setSelectedProfileId('');navigate(k,undefined,false,true)}} onChat={()=>{setMobileMenuOpen(false);toggleTourChat()}} chatOpen={chatOpen} chatPaused={CHAT_PAUSED} chatUnreadCount={previewMode?0:g.chatUnreadCount} chatMentionCount={previewMode?0:g.chatMentionCount} allOpen={mobileMenuOpen} onAll={()=>{setChatOpen(false);setMobileMenuOpen(true)}}/></div>;
 }

@@ -62,7 +62,7 @@ function CrisisCatalog({busy,active,onLaunch}:{busy:boolean;active:boolean;onLau
  </div>;
 }
 
-export default function CrisisRoom({g}:{g:ReturnTypeRepublic}){
+export default function CrisisRoom({g,readOnly=false}:{g:ReturnTypeRepublic;readOnly?:boolean}){
  const {game,me,teacher,crises,members,currentStage,triggerCrisis,setError}=g;
  const active=useMemo(()=>crises.filter(c=>c.status==='active').sort((a,b)=>new Date(b.created_at).getTime()-new Date(a.created_at).getTime())[0],[crises]);
  const [requests,setRequests]=useState<InfoRequest[]>([]);
@@ -145,7 +145,7 @@ export default function CrisisRoom({g}:{g:ReturnTypeRepublic}){
  const myResponse=responses.find(x=>x.user_id===me.user_id);
 
  async function ask(){
-  if(question.trim().length<5)return;setBusy(true);
+  if(readOnly||question.trim().length<5)return;setBusy(true);
   const r=await supabase.rpc('ask_crisis_information',{p_crisis_id:active.id,p_question:question.trim()});
   if(r.error)setError(userError(r.error));else{setQuestion('');await load()}setBusy(false);
  }
@@ -155,7 +155,7 @@ export default function CrisisRoom({g}:{g:ReturnTypeRepublic}){
   if(r.error)setError(userError(r.error));else{setAnswerDraft(v=>({...v,[id]:''}));await load()}setBusy(false);
  }
  async function submit(){
-  if(plan.trim().length<20)return;setBusy(true);
+  if(readOnly||plan.trim().length<20)return;setBusy(true);
   const r=await supabase.rpc('submit_crisis_response',{p_crisis_id:active.id,p_action_plan:plan.trim(),p_legal_basis:legal.trim()||null,p_resources:resources.trim()||null,p_public_message:message.trim()||null});
   if(r.error)setError(userError(r.error));else{responseDirty.current=false;await load()}setBusy(false);
  }
@@ -209,7 +209,7 @@ export default function CrisisRoom({g}:{g:ReturnTypeRepublic}){
    <article className="crisisIntel">
     <div className="crisisSectionHead"><div><small>ИНФОРМАЦИОННАЯ НЕОПРЕДЕЛЁННОСТЬ</small><h3>Запросы сведений</h3></div><span>{requests.filter(x=>x.status==='pending').length} ждут ответа</span></div>
     <div className="crisisIntelList">{requests.length===0?<div className="crisisEmpty">Дополнительные сведения ещё не запрашивали.</div>:requests.map(q=><div className={'crisisIntelRow '+q.status} key={q.id}><div><b>{members.find(m=>m.user_id===q.requester_id)?.full_name||'Участник'}</b><p>{q.question}</p>{q.answer&&<blockquote>{q.answer}</blockquote>}</div>{teacher&&q.status==='pending'&&<div className="crisisAnswer"><input value={answerDraft[q.id]||''} onChange={e=>setAnswerDraft(v=>({...v,[q.id]:e.target.value}))} placeholder="Дать только ту информацию, которую участники смогли получить…"/><button disabled={busy||!(answerDraft[q.id]||'').trim()} onClick={()=>void answer(q.id)}>Ответить</button></div>}</div>)}</div>
-    {!teacher&&<div className="crisisAsk"><input value={question} onChange={e=>setQuestion(e.target.value)} placeholder="Каких данных не хватает для решения?"/><button disabled={busy||question.trim().length<5} onClick={()=>void ask()}>Запросить сведения</button></div>}
+    {!teacher&&<div className="crisisAsk"><input value={question} disabled={readOnly} onChange={e=>setQuestion(e.target.value)} placeholder="Каких данных не хватает для решения?"/><button disabled={readOnly||busy||question.trim().length<5} onClick={()=>void ask()}>Запросить сведения</button></div>}
    </article>
 
    <article className="crisisResponsePanel">
@@ -241,7 +241,7 @@ export default function CrisisRoom({g}:{g:ReturnTypeRepublic}){
        </div>
       </div>}
    </article>)}</div>
-    :<div className="crisisResponseForm"><label>1 · Управленческое решение<textarea rows={5} value={plan} onChange={e=>{responseDirty.current=true;setPlan(e.target.value)}} placeholder="Что именно вы делаете сейчас, кто исполняет и в какой последовательности?"/></label><label>2 · Полномочия и правовое основание<textarea rows={3} value={legal} onChange={e=>{responseDirty.current=true;setLegal(e.target.value)}} placeholder="На каком полномочии, норме или компетенции основано решение?"/></label><label>3 · Ресурсы и ограничения<textarea rows={3} value={resources} onChange={e=>{responseDirty.current=true;setResources(e.target.value)}} placeholder="Люди, бюджет, информация, время, инфраструктура, риски…"/></label><label>4 · Публичная коммуникация<textarea rows={3} value={message} onChange={e=>{responseDirty.current=true;setMessage(e.target.value)}} placeholder="Что ваш орган сообщает гражданам и другим институтам?"/></label><button className="primary" disabled={busy||plan.trim().length<20||!!myResponse?.published_post_id} onClick={()=>void submit()}>{myResponse?.published_post_id?'Решение опубликовано':myResponse?'Обновить решение':'Отправить решение'}</button>{myResponse?.teacher_note&&<div className="crisisTeacherFeedback"><b>Ответ преподавателя</b><p>{myResponse.teacher_note}</p></div>}</div>}
+    :<div className="crisisResponseForm"><label>1 · Управленческое решение<textarea rows={5} value={readOnly?myResponse?.action_plan||'':plan} disabled={readOnly} onChange={e=>{responseDirty.current=true;setPlan(e.target.value)}} placeholder="Что именно вы делаете сейчас, кто исполняет и в какой последовательности?"/></label><label>2 · Полномочия и правовое основание<textarea rows={3} value={readOnly?myResponse?.legal_basis||'':legal} disabled={readOnly} onChange={e=>{responseDirty.current=true;setLegal(e.target.value)}} placeholder="На каком полномочии, норме или компетенции основано решение?"/></label><label>3 · Ресурсы и ограничения<textarea rows={3} value={readOnly?myResponse?.resources||'':resources} disabled={readOnly} onChange={e=>{responseDirty.current=true;setResources(e.target.value)}} placeholder="Люди, бюджет, информация, время, инфраструктура, риски…"/></label><label>4 · Публичная коммуникация<textarea rows={3} value={readOnly?myResponse?.public_message||'':message} disabled={readOnly} onChange={e=>{responseDirty.current=true;setMessage(e.target.value)}} placeholder="Что ваш орган сообщает гражданам и другим институтам?"/></label><button className="primary" disabled={readOnly||busy||plan.trim().length<20||!!myResponse?.published_post_id} onClick={()=>void submit()}>{myResponse?.published_post_id?'Решение опубликовано':myResponse?'Обновить решение':'Отправить решение'}</button>{myResponse?.teacher_note&&<div className="crisisTeacherFeedback"><b>Ответ преподавателя</b><p>{myResponse.teacher_note}</p></div>}</div>}
    </article>
   </div>
 

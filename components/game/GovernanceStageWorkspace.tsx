@@ -161,7 +161,7 @@ export default function GovernanceStageWorkspace({g,stage,readOnly=false,initial
      {stage.stage_no===12&&<Stage12ReadingWorkspace g={g} readOnly={viewer} stage={stage} subjects={formalSubjects} filingRequest={filingRequest} onOpenVotes={onOpenVotes} onOpenDocument={onOpenDocument}/>}
      {stage.stage_no===13&&<BudgetView g={g} readOnly={viewer} onOpenDocument={id=>onOpenDocument?.(id)} onOpenEvents={()=>onNavigate?.('events')} onOpenVotes={onOpenVotes}/>}
      {stage.stage_no===14&&<><MunicipalGovernancePanel g={g}/><MunicipalProjectLab g={g}/></>}
-     {stage.stage_no===15&&<CrisisRoom g={g}/>}
+     {stage.stage_no===15&&<CrisisRoom g={g} readOnly={viewer}/>}
      {stage.stage_no===16&&<SystemDebriefLab g={g}/>}
     </div>
    </fieldset>
