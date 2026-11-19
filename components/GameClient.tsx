@@ -145,6 +145,10 @@ function buildStudentPreview(g:ReturnTypeRepublic,student:Member){
   g.setError('Это безопасный режим просмотра студента. Действия от его имени заблокированы.');
   return undefined;
  };
+ const blockedDelete=async()=>{
+  g.setError('В режиме просмотра удаление документов запрещено.');
+  return {deleted:false};
+ };
 
  return {
   ...g,
@@ -171,7 +175,7 @@ function buildStudentPreview(g:ReturnTypeRepublic,student:Member){
   teacherManagePartyMember:blocked as typeof g.teacherManagePartyMember,
   deleteVote:blocked as typeof g.deleteVote,
   deletePartyDocument:blocked as typeof g.deletePartyDocument,
-  deleteFormalDocument:blocked as typeof g.deleteFormalDocument,
+  deleteFormalDocument:blockedDelete as typeof g.deleteFormalDocument,
   editChatMessage:blocked as typeof g.editChatMessage,
   setChatPin:blocked as typeof g.setChatPin,
   markChatRead:blockedVoid as typeof g.markChatRead,
