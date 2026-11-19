@@ -376,6 +376,8 @@ jobs:
       - run: npm ci --no-audit --no-fund
       - name: Все этапы · проверка доступных голосов
         run: node scripts/gd-vote-allowance-all-stages-check.cjs
+      - name: Редактирование НПА до первого голоса
+        run: node scripts/formal-edit-first-ballot-check.cjs
       - name: Права совмещённых должностей на всех этапах
         run: node scripts/dual-office-stage-permissions-check.cjs
       - name: Dependency audit — high and critical
