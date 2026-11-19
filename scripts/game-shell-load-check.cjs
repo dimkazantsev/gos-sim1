@@ -62,7 +62,7 @@ assert(source.includes('aria-checked={viewAs===GENERIC_GUEST}')&&source.includes
  'Teacher can select the guest role from the existing menu');
 assert(source.includes("if(student.kind==='observer')return false;"),'Guest preview must never vote');
 assert(source.includes("availableActors:()=>student.kind==='observer'?[]"),'Guest preview must never acquire publication actors');
-assert(source.includes('readOnly={observer||!!previewGuest}'),'Guest preview chat is always read-only');
+assert(source.includes('readOnly={previewMode||observer||!!previewGuest}'),'Every teacher preview, including guest, must keep chat read-only');
 assert(source.includes("previewGuest?'Режим гостя:':'Режим студента:'"),'Guest preview must be clearly labelled');
 assert(source.includes('observer||previewGuest?\' observerShell\''),
  'Guest preview reuses the established guest styles');
