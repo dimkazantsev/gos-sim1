@@ -45,7 +45,7 @@ assert(home.includes("const profile=await supabase.from('teacher_profiles')") &&
  home.includes(".in('kind',['student','observer'])") &&
  home.includes("supabase.rpc('list_my_teacher_games')"),
  'Registered users resume only through protected teacher profile or RLS-scoped student/observer membership');
-assert(home.includes('saveSuccessfulGameCode(loginGameCode);'),'Personal login records game on successful resume');
+assert(home.includes('saveSuccessfulGameCode(available[0].code);'),'Personal login remembers the authorized game returned by the server');
 assert.equal((home.match(/saveSuccessfulGameCode\(code\);router\.push/g)||[]).length,1,'Participant joins remember their game');
 assert(fs.readFileSync('components/game/TeacherGameSessions.tsx','utf8').includes('rememberGameCode(code);'),'Teacher game creation remembers the new nonsecret game identifier');
 assert(home.includes('forgetRememberedGameCode(loginGameCode)'),'Shared devices can forget remembered code');
