@@ -25,4 +25,12 @@ assert.deepEqual(candidates(students,staffed,'internal'),['testov'],'Allow a thi
 const deputy=[...staffed,{unit_id:'defence',user_id:'ivan',assignment_role:'deputy'}];
 assert.deepEqual(candidates(students,deputy,'social'),['ivan'],'A deputy can serve in another ministry');
 assert(src.includes("a.assignment_role==='deputy'?'Заместитель министра'"),'Correctly distinguish deputy office');
+
+assert(src.includes("nomination?.status==='appointed'?nomination:null"),'Approval alone must not grant minister powers');
+assert(src.includes(".in('status',['submitted','vote_open','approved','consultation_pending','consulted','appointed'])"),'Existing nomination read must include pending statuses in the same query');
+assert(src.includes("Кандидатура утверждена Государственной Думой. Ожидается указ Президента."),'Explain why the Duma-approved candidate is not yet a minister');
+assert(src.includes("Консультация с Советом Федерации завершена. Ожидается указ Президента."),'Consultation must not grant minister powers');
+const government=fs.readFileSync('components/game/GovernmentFormationWorkspace.tsx','utf8');
+assert(government.includes("nomination.status==='approved'||nomination.status==='consulted'?' · ожидается указ Президента'"),'Top cards must show the pending presidential decree');
+assert(government.includes("nomination.status==='approved'&&canPresident"),'Appointment is actionable by the President, not the teacher or a candidate');
 console.log('PASS Stage 9 picker: multiple ministries, deputy, minister, no own-unit duplicates and student-only roster');

@@ -14,7 +14,7 @@ type Assignment={id:string;game_id:string;unit_id:string;unit_kind:'committee'|'
 type CommitteeAllocation={id:string;game_id:string;unit_id:string;user_id:string;party_id:string;mandates:number};
 
 type Matrix={unit_id:string;title:string;party_id:string;party_name:string;color:string;quota:number;students:number;assigned_mandates:number;party_mandates:number};
-type Minister={office_key:string;candidate_name:string;candidate_user_id:string|null};
+type Minister={office_key:string;candidate_name:string;status:'submitted'|'vote_open'|'approved'|'consultation_pending'|'consulted'|'appointed'};
 
 export default function InstitutionStaffingLab({g,mode}:{g:ReturnTypeRepublic;mode:'committees'|'ministries'}){
  const {game,me,teacher,members,parties,setError}=g;
@@ -46,7 +46,7 @@ export default function InstitutionStaffingLab({g,mode}:{g:ReturnTypeRepublic;mo
    supabase.from('institution_units').select('*').eq('game_id',game.id).order('unit_kind').order('unit_key'),
    supabase.from('institution_assignments').select('*').eq('game_id',game.id).order('created_at'),
    mode==='committees'?supabase.rpc('get_committee_matrix',{p_game_id:game.id}):Promise.resolve({data:[],error:null}),
-   mode==='ministries'?supabase.from('government_nominations').select('office_key,candidate_name,candidate_user_id').eq('game_id',game.id).eq('stage_no',9).eq('status','appointed').order('created_at'):Promise.resolve({data:[],error:null}),
+   mode==='ministries'?supabase.from('government_nominations').select('office_key,candidate_name,status').eq('game_id',game.id).eq('stage_no',9).in('status',['submitted','vote_open','approved','consultation_pending','consulted','appointed']).order('created_at'):Promise.resolve({data:[],error:null}),
    mode==='committees'?supabase.rpc('get_committee_deputy_capacity',{p_game_id:game.id}):Promise.resolve({data:[],error:null}),
    mode==='committees'?supabase.from('committee_mandate_allocations').select('*').eq('game_id',game.id).order('created_at'):Promise.resolve({data:[],error:null})
   ]);
@@ -156,11 +156,19 @@ export default function InstitutionStaffingLab({g,mode}:{g:ReturnTypeRepublic;mo
   {mode==='ministries'&&ministries.length>0&&<section className="staffingSection ministrySection">
    <div className="staffingSectionHead"><div><small>ПРАВИТЕЛЬСТВО</small><h3>5 министерств · беспартийный кадровый принцип</h3><p>Министры набирают заместителей и участников своих ведомств. Партийная принадлежность здесь не используется как критерий распределения; система показывает дисбаланс численности между ведомствами.</p></div><span className={maxCount-minCount>1?'warn':''}>Разброс {minCount}–{maxCount}</span></div>
    <div className="ministryGrid">{ministries.map(u=>{
-    const minister=ministers.find(n=>n.office_key==='ministry_'+u.unit_key);
+    // A Duma approval does not itself grant the minister's powers.
+    const nomination=[...ministers].reverse().find(n=>n.office_key==='ministry_'+u.unit_key);
+    const minister=nomination?.status==='appointed'?nomination:null;
+    const nextAppointment=nomination?.status==='approved'?'Кандидатура утверждена Государственной Думой. Ожидается указ Президента.':
+     nomination?.status==='consulted'?'Консультация с Советом Федерации завершена. Ожидается указ Президента.':
+     nomination?.status==='vote_open'?'Голосование в Государственной Думе ещё продолжается.':
+     nomination?.status==='consultation_pending'?'Ожидается консультация с Советом Федерации.':
+     nomination?.status==='submitted'?'Кандидатура внесена. Ожидается решение Государственной Думы.':
+     'Кандидатура и назначение находятся выше.';
     const aa=assignedTo(u.id),count=aa.length,balanced=count>=Number(u.capacity_min||3)&&count<=Number(u.capacity_max||5);
     return <article className={'institutionUnit ministryUnit '+(balanced?'balanced':'')} key={u.id}>
      <header><div><small>МИНИСТЕРСТВО</small><h4>{u.title}</h4><p>{u.description}</p></div><span>{count} / {u.capacity_min||3}–{u.capacity_max||5}</span></header>
-     <div className="unitHead"><small>Министр · назначение этапа 9</small><b>{minister?.candidate_name||'Ещё не назначен'}</b>{!minister&&<span>Кандидатура и назначение находятся выше</span>}</div>
+     <div className="unitHead"><small>Министр · назначение этапа 9</small><b>{minister?.candidate_name||'Ещё не назначен'}</b>{!minister&&<span>{nomination?'Кандидатура: '+nomination.candidate_name+'. ':''}{nextAppointment}</span>}</div>
      <div className="unitMembers">{aa.length===0?<div className="emptyState">Ведомство пока не укомплектовано.</div>:aa.map(a=><div key={a.id}><span>{memberName(a.user_id)}</span><small>{a.assignment_role==='head'?'Министр':a.assignment_role==='deputy'?'Заместитель министра':'Член министерства'}</small>{canManageMinistry(u)&&a.assignment_role!=='head'&&<IconAction variant="remove" onClick={()=>void remove(a.id)} label={'Исключить участника '+memberName(a.user_id)}/>}</div>)}</div>
      {canManageMinistry(u)&&minister&&<div className="unitAssign"><select aria-label={'Добавить сотрудника: '+u.title} value={pick[u.id]||''} onChange={e=>setPick(v=>({...v,[u.id]:e.target.value}))}><option value="">Добавить участника…</option>{students.filter(s=>!aa.some(a=>a.user_id===s.user_id)).map(s=><option key={s.user_id} value={s.user_id}>{s.full_name}</option>)}</select><button disabled={busy||!pick[u.id]} onClick={()=>void assign(u.id)}>Добавить</button></div>}
     </article>
