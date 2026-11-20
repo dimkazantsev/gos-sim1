@@ -48,8 +48,9 @@ assert(home.includes("const profile=await supabase.from('teacher_profiles')") &&
 assert(home.includes('saveSuccessfulGameCode(available[0].code);'),'Personal login remembers the authorized game returned by the server');
 assert.equal((home.match(/saveSuccessfulGameCode\(code\);router\.push/g)||[]).length,1,'Participant joins remember their game');
 assert(fs.readFileSync('components/game/TeacherGameSessions.tsx','utf8').includes('rememberGameCode(code);'),'Teacher game creation remembers the new nonsecret game identifier');
-assert(home.includes('forgetRememberedGameCode(loginGameCode)'),'Shared devices can forget remembered code');
-assert(home.includes('savedGameCodes.map(code=>'),'A user with multiple games can choose remembered code');
+// The storage utility's forget behavior is exercised above; this page no longer exposes a forget button.
+assert(home.includes('returningGames.map(game=>'),'A user with multiple authorized games can choose a verified game');
+assert(home.includes('saveSuccessfulGameCode(game.code);'),'Only server-validated available games are remembered from the switcher');
 assert(!source.includes('loginPassword')&&!source.includes('inviteCode')&&!source.includes('refresh_token'),'Never store personal password, invitation code or auth token in utility');
 assert(css.includes('@media(max-width:420px)')&&css.includes('.entryRememberedGameField'),'Mobile input layout styled');
 console.log('PASS: game code persistence, multiple games, restricted storage and no stored secrets');
