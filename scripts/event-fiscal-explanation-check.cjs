@@ -13,4 +13,11 @@ assert(events.includes("outcome.winner!=='tie'"),'No financial event claim on a 
 assert(events.includes('describeEventFiscalEffect(chosenEffect?.fiscal_effect)'),'Only the winning option can disclose its region effect');
 assert(events.includes('прямое изменение экономических параметров для этого варианта не предусмотрено'),'Neutral options have explicit information rather than invented monetary effects');
 assert(events.includes('фактический бюджет рассчитывается по действующей модели'),'Expenses and direct taxes must not be confused');
-console.log('PASS: region event explanations for every outcome, neutral choices, trust separation, units and caps');
+const sql=fs.readFileSync(path.resolve(__dirname,'../supabase/migrations/20261120142327_outcome_winner_economy_visibility_only.sql'),'utf8');
+assert(sql.includes("when won.case_id is not null"),'Ordinary members receive no option effects before outcome');
+assert(sql.includes("('option_'||ordinal::text)=won.winner"),'Regional financial effect visible for the winning option only');
+assert(sql.includes("else '{}'::jsonb end"),'All nonwinning financial effects are withheld');
+assert(sql.includes("private.assigned_game_case"),'A participant may only read assigned cases');
+assert(sql.includes("private.is_game_teacher"),'Teacher retains full visibility');
+assert(sql.includes("on won.case_id=c.id and won.game_id=c.game_id"),'Outcomes remain game-isolated');
+console.log('PASS: region explanations, exact winner-only fiscal disclosure, role boundaries, neutral choices and units');
