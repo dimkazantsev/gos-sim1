@@ -2,6 +2,16 @@ name: Public game on GitHub Pages
 on:
   push:
     branches: [main]
+    # Test-only or documentation commits must not rebuild the entire static site.
+    # Deployment tools, application code, assets and this workflow still trigger.
+    paths-ignore:
+      - 'scripts/*-check.cjs'
+      - 'scripts/design-audit.mjs'
+      - 'scripts/fixtures/**'
+      - 'docs/**'
+      - '.github/workflows/build-check.yml'
+      - '.github/workflows/budget-simulator.yml'
+      - '.github/workflows/stage-desktop.yml'
   pull_request:
     paths:
       - 'app/page.tsx'
