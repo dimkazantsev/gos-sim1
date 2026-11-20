@@ -19,9 +19,11 @@ assert((sql.match(/on conflict\(unit_id,user_id\) do update/g)||[]).length>=3,'M
 assert(ui.includes('readOnly={registeredOnly}'),'Require selection rather than manual text');
 assert(ui.includes('!selected[slot]||candidateName(slot).length<3'),'Stage 9 nomination cannot submit free-text name');
 assert(ui.includes('registeredOnly onSelect={handleNomineeSelect}'),'Stage 9 nominee selector is restricted');
-assert(staff.includes("a.unit_kind==='ministry'&&a.assignment_role!=='head'"),'Only ordinary ministry assignments consume a staff slot');
-assert(staff.includes("!ministryStaff.has(s.user_id)&&!aa.some(a=>a.user_id===s.user_id)"),'Allow heads of other ministries, not existing staff or current-unit members');
-assert(sql.includes('institution_assignments_one_staff_ministry_per_student'),'New partial index protects ordinary staff while permitting multiple heads');
+assert(staff.includes("students.filter(s=>!aa.some(a=>a.user_id===s.user_id))"),'Only same-unit membership restricts a new assignment');
+assert(!staff.includes("ministryStaff.has("),'No global staff restriction across ministries');
+assert(sql.includes('institution_assignments_one_staff_ministry_per_student'),'Historical migration added an earlier staff restriction');
+const approvedStaffRule=fs.readFileSync('supabase/migrations/20261120151810_stage9_allow_parallel_ministry_staff_roles.sql','utf8');
+assert(approvedStaffRule.includes('DROP INDEX IF EXISTS public.institution_assignments_one_staff_ministry_per_student'),'The newest migration removes the obsolete limit');
 
 (async()=>{
 const db=new PGlite();
@@ -49,7 +51,11 @@ try{
  assert.equal((await db.query("SELECT count(*)::int AS n FROM public.institution_assignments WHERE user_id=$1",[student])).rows[0].n,2,'Idempotence per ministry');
  const staffMember='20000000-0000-4000-8000-000000000002';
  await db.query("INSERT INTO public.institution_assignments(game_id,unit_id,user_id,unit_kind,assignment_role) VALUES($1,$2,$3,'ministry','member')",[game,unitOne,staffMember]);
- await assert.rejects(()=>db.query("INSERT INTO public.institution_assignments(game_id,unit_id,user_id,unit_kind,assignment_role) VALUES($1,$2,$3,'ministry','member')",[game,unitTwo,staffMember]),/duplicate key/,'One ordinary staff ministry per student');
- console.log('PASS: repeated nominations for one student; separate minister heads; one ordinary staff ministry; per-unit duplicate protection; registered-only client and server guards; 6 affected RPCs');
+ await assert.rejects(()=>db.query("INSERT INTO public.institution_assignments(game_id,unit_id,user_id,unit_kind,assignment_role) VALUES($1,$2,$3,'ministry','member')",[game,unitTwo,staffMember]),/duplicate key/,'Confirm former limit before migration');
+ await db.exec(approvedStaffRule.replace(/SET LOCAL [^;]+;/g,''));
+ await db.query("INSERT INTO public.institution_assignments(game_id,unit_id,user_id,unit_kind,assignment_role) VALUES($1,$2,$3,'ministry','member')",[game,unitTwo,staffMember]);
+ assert.equal((await db.query('SELECT count(*)::int n FROM public.institution_assignments WHERE game_id=$1 AND user_id=$2',[game,staffMember])).rows[0].n,2,'Staff member is in two distinct ministries');
+ await assert.rejects(()=>db.query("INSERT INTO public.institution_assignments(game_id,unit_id,user_id,unit_kind,assignment_role) VALUES($1,$2,$3,'ministry','member')",[game,unitTwo,staffMember]),/duplicate key/,'Same-unit duplicate still prohibited');
+ console.log('PASS: historical multiple minister heads, new parallel staff across ministries, no same-unit duplicates and original role authorization');
 }finally{await db.close()}
 })().catch(e=>{console.error(e);process.exitCode=1});
