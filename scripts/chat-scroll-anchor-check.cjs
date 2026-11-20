@@ -4,12 +4,12 @@ const assert=require('node:assert/strict');
 const fs=require('node:fs');
 const ts=require('typescript');
 const vm=require('node:vm');
-const module={exports:{}};
+const scrollModule={exports:{}};
 vm.runInNewContext('(function(exports){'+ts.transpileModule(
  fs.readFileSync('components/game/chatScrollPosition.ts','utf8'),
  {compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}}
-).outputText+'})',{})(module.exports);
-const {captureChatScroll,restoreChatScroll}=module.exports;
+).outputText+'})',{})(scrollModule.exports);
+const {captureChatScroll,restoreChatScroll}=scrollModule.exports;
 function container(heights,scrollTop=0,viewport=200){
  const box={scrollTop,scrollHeight:heights.reduce((a,b)=>a+b,0),clientHeight:viewport};
  box.getBoundingClientRect=()=>({top:0,bottom:viewport});
