@@ -1,5 +1,6 @@
 import baseline from '@/data/federal-budget-2026.json';
 import revenueModel from '@/data/budget-revenue-model.json';
+import {fiscalEnvironment} from './fiscalMath';
 import type {FiscalContext,FiscalRate,FiscalRegion} from './fiscalMath';
 
 export const FINANCING_SOURCES = [
@@ -44,7 +45,11 @@ export function calculateFederalBudget(draft:BudgetDraft,state:SimulatorState,co
  const a=state.anchor,p=context?.policy,economy=(context?.metrics.economy??a.economy)-a.economy,trust=(context?.metrics.public_trust??a.trust)-a.trust,key=p?.key_rate??a.key_rate;
  const fx=(p?.fx_rate??a.fx_rate)*clamp(1-economy*.001-trust*.001-(key-a.key_rate)*.0015,.75,1.3);
  const firms=regions.reduce((s,r)=>s+r.enterprises*r.activity_multiplier,0)/Math.max(1,a.enterprises);
- const activity=clamp(firms*(1-(key-a.key_rate)*.007+economy*.002+trust*.001),.2,2);
+ // Preserve the legacy automatic path. The teacher's manual activity
+ // baseline must affect the federal budget just as it affects regions.
+ const autoActivity=1-(key-a.key_rate)*.007+economy*.002+trust*.001;
+ const effectiveActivity=p?.activity_override!=null?fiscalEnvironment(context).activity:autoActivity;
+ const activity=clamp(firms*effectiveActivity,.2,2);
  const cost=clamp(1+((p?.inflation??a.inflation)-a.inflation)*.004+(fx/a.fx_rate-1)*.02,.7,1.6);
  const oil=clamp((p?.oil_price??a.oil_price)/a.oil_price*fx/a.fx_rate,.1,3);
  const vat=rates.find(r=>r.region_code==='00'&&r.tax_key==='vat')?.rate??22,profit=rates.find(r=>r.region_code==='00'&&r.tax_key==='profit')?.rate??25;
@@ -58,9 +63,12 @@ export function calculateFederalBudget(draft:BudgetDraft,state:SimulatorState,co
   const scale=rawGroup>0?income_lines.find(x=>x.key===l.key)!.amount/rawGroup:0;
   const rate=m.key==='vat'?vat:m.key==='profit'?profit:m.reference_rate;
   const divisor=m.rate_unit==='rubles'?m.reference_rate/1e6:m.reference_rate/100;
-  const base=l.amount*m.share/(divisor*m.federal_share)*baseDriver*scale;
-  const amount=base*(m.rate_unit==='rubles'?rate/1e6:rate/100)*m.federal_share;
-  return {...m,rate,base,collection:1,amount,baseline:l.amount*m.share};
+  // Approved neutral 95% calibration. Do not apply experimental response
+  // coefficients yet; non-tax and mixed receipts are not tax collection.
+  const collection=['dividends','asset_interest','other'].includes(m.key)?1:.95;
+  const base=l.amount*m.share/(divisor*m.federal_share)*baseDriver*scale/collection;
+  const amount=base*(m.rate_unit==='rubles'?rate/1e6:rate/100)*collection*m.federal_share;
+  return {...m,rate,base,collection,amount,baseline:l.amount*m.share};
  });
  const selected=requests.filter(r=>draft.transfer_ids.includes(r.id)&&r.status!=='rejected');
  const transfer_expense=budgetMoneySum(...selected.filter(r=>r.kind!=='budget_credit').map(r=>Number(r.amount))),credit_outflow=budgetMoneySum(...selected.filter(r=>r.kind==='budget_credit').map(r=>Number(r.amount)));
