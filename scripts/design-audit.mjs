@@ -83,9 +83,17 @@ check('New director mechanics and scoped editor styles exist',
 const stagesView=read('components/game/StagesView.tsx');
 const stageSheet=read('app/stage-map.css');
 const previewSource=read('scripts/design-preview.cjs');
-check('Last-loaded stage stylesheet is included in offline browser preview',
- previewUsesLayout&&layoutSource.indexOf("import './stage-map.css';")>layoutSource.indexOf("import './mobile-nav-polish.css';")&&
- read('app/layout.tsx').includes("import './stage-map.css'"));
+check('Stage stylesheet is scoped to the game and teacher routes and the offline browser preview',
+ previewUsesLayout&&!layoutSource.includes("import './stage-map.css';")&&
+ read('app/game/[id]/layout.tsx').includes("import '../../stage-map.css';")&&
+ read('app/teacher/page.tsx').includes("import '../stage-map.css';")&&
+ previewSource.includes("'stage-map.css'"));
+check('Stage procedures and canonical stage CSS are excluded from entry and retained on both game routes',
+ ['2026-stage-system.css','stage-operations.css'].every(name=>
+  !layoutSource.includes("import './"+name+"';")&&
+  read('app/game/[id]/layout.tsx').includes("import '../../"+name+"';")&&
+  read('app/teacher/page.tsx').includes("import '../"+name+"';")&&
+  previewSource.includes("'"+name+"'")));
 check('Atlas has search, status filters and selectable game phases',
  stagesView.includes('className="stageAtlasSearch"')&&
  stagesView.includes('className="stageAtlasFilters"')&&

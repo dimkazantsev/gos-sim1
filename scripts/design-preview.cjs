@@ -209,7 +209,7 @@ const scopedLegacy=fs.readFileSync(path.join(root,'app/game/[id]/game-legacy.css
 css+='\n'+scopedLegacy.replace(/@import '\.\.\/\.\.\/([^']+\.css)' layer\(legacy-route\);/g,(_,name)=>
  '@layer legacy-route {\n'+fs.readFileSync(path.join(root,'app',name),'utf8')+'\n}');
 // The stage atlas also belongs to both game and teacher routes, not entry.
-css+='\n'+fs.readFileSync(path.join(root,'app/stage-map.css'),'utf8');
+for(const routeFile of ['stage-map.css','2026-stage-system.css','stage-operations.css'])css+='\n'+fs.readFileSync(path.join(root,'app',routeFile),'utf8');
 for(const subset of ['latin','cyrillic']){const file=path.join(root,'node_modules/@fontsource-variable/manrope/files',`manrope-${subset}-wght-normal.woff2`);css+=`\n@font-face{font-family:'Manrope Variable';font-style:normal;font-weight:200 800;font-display:swap;src:url(data:font/woff2;base64,${fs.readFileSync(file).toString('base64')}) format('woff2');unicode-range:${subset==='cyrillic'?'U+0400-045F,U+0490-0491,U+04B0-04B1,U+2116':'U+0000-00FF,U+0131,U+0152-0153,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215'};}`;}
 css+='\n.previewNotice{position:fixed;z-index:2000;bottom:100px;left:50%;transform:translateX(-50%);max-width:calc(100% - 32px);background:#172447;color:white;border-radius:12px;padding:16px 20px;font:14px/1.5 sans-serif;box-shadow:0 12px 36px #17244733}.previewNotice[hidden]{display:none}';
 function doc(markup){

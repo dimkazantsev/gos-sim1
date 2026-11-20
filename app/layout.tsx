@@ -29,8 +29,6 @@ import './2026-achievements-steam.css';
 import './2026-document-workflow-v2.css';
 import './2026-npa-registry-canonical.css';
 import './2026-npa-workspace-canonical.css';
-import './2026-stage-system.css';
-import './stage-operations.css';
 import './brand-identity.css';
 import './topbar-controls-alignment.css';
 import './profile-first-setup.css';
