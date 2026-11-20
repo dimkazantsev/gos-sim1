@@ -18,8 +18,8 @@ for(const l of base.income_details){
  const hi=up.income_details.find(x=>x.key===l.key),lo=down.income_details.find(x=>x.key===l.key);
  const nonTax=['dividends','asset_interest','other'].includes(l.key);
  assert.equal(l.collection,nonTax?1:.95,l.key+' baseline collection');
- assert.equal(hi.collection,nonTax?1:.9503,l.key+' higher collection');
- assert.equal(lo.collection,nonTax?1:.9497,l.key+' lower collection');
+ assert(Math.abs(hi.collection-(nonTax?1:.9503))<1e-10,l.key+' higher collection');
+ assert(Math.abs(lo.collection-(nonTax?1:.9497))<1e-10,l.key+' lower collection');
  if(nonTax){assert.equal(hi.amount,l.amount,l.key+' never changes from lawfulness')}else{
   assert(hi.amount>l.amount && lo.amount<l.amount,l.key+' paid tax changes');
   assert(Math.abs(hi.base-l.base)<2,l.key+' underlying taxable base must not jump from collection alone');
