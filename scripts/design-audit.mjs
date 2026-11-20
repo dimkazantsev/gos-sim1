@@ -83,17 +83,14 @@ check('New director mechanics and scoped editor styles exist',
 const stagesView=read('components/game/StagesView.tsx');
 const stageSheet=read('app/stage-map.css');
 const previewSource=read('scripts/design-preview.cjs');
-check('Stage stylesheet is scoped to the game and teacher routes and the offline browser preview',
- previewUsesLayout&&!layoutSource.includes("import './stage-map.css';")&&
- read('app/game/[id]/layout.tsx').includes("import '../../stage-map.css';")&&
- read('app/teacher/page.tsx').includes("import '../stage-map.css';")&&
- previewSource.includes("'stage-map.css'"));
-check('Stage procedures and canonical stage CSS are excluded from entry and retained on both game routes',
+check('Stage atlas stylesheet stays in approved global layout and the offline preview',
+ previewUsesLayout&&layoutSource.includes("import './stage-map.css';")&&
+ previewSource.includes("readFileSync(path.join(root,'app',match[1]),'utf8')"));
+check('All canonical stage and procedure styles remain in the global layout',
  ['2026-stage-system.css','stage-operations.css'].every(name=>
-  !layoutSource.includes("import './"+name+"';")&&
-  read('app/game/[id]/layout.tsx').includes("import '../../"+name+"';")&&
-  read('app/teacher/page.tsx').includes("import '../"+name+"';")&&
-  previewSource.includes("'"+name+"'")));
+  layoutSource.includes("import './"+name+"';"))&&
+ !fs.existsSync('app/game/[id]/game-legacy.css')&&
+ !fs.existsSync('app/teacher/teacher-legacy.css'));
 check('Atlas has search, status filters and selectable game phases',
  stagesView.includes('className="stageAtlasSearch"')&&
  stagesView.includes('className="stageAtlasFilters"')&&
@@ -117,14 +114,15 @@ check('Atlas owns last-loaded card styles without old fixed-width buttons',
  stageSheet.includes('.stagesAtlas .stageAtlasCardFooter')&&
  !stageSheet.includes('width:calc(100% - 55px)'));
 const layout=read('app/layout.tsx');
-check('Design sheets preserve their approved ordering across global and route styles',
+check('Design and stage sheets preserve their approved global ordering',
  styles.slice(0,5).every((name,i)=>layout.indexOf(name+'.css')>=0&&(i===0||layout.indexOf(name+'.css')>layout.indexOf(styles[i-1]+'.css')))&&
- ['app/game/[id]/layout.tsx','app/teacher/page.tsx'].every(path=>{
-  const route=read(path);
-  return route.indexOf('stage-map.css')>=0&&
-   route.indexOf('2026-stage-system.css')>route.indexOf('stage-map.css')&&
-   route.indexOf('stage-operations.css')>route.indexOf('2026-stage-system.css');
- }));
+ layout.indexOf("import './stage-map.css';")>=0&&
+ layout.indexOf("import './2026-stage-system.css';")>layout.indexOf("import './stage-map.css';")&&
+ layout.indexOf("import './stage-operations.css';")>layout.indexOf("import './2026-stage-system.css';")&&
+ read('app/globals.css').includes("@import './sim-shell.css' layer(legacy);")&&
+ read('app/globals.css').includes("@import './sim-panels.css' layer(legacy);")&&
+ read('app/globals.css').includes("@import './public-screen.css' layer(legacy);")&&
+ !read('app/globals.css').includes('@layer legacy-route'));
 const font=read('node_modules/@fontsource-variable/manrope/index.css');
 check('Self-hosted Cyrillic font is available',font.includes('cyrillic')&&font.includes('font-display: swap'));
 check('Legacy rules are isolated from the new design',read('app/globals.css').includes('@layer legacy {'));

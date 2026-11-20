@@ -203,13 +203,8 @@ for(const [id,label,initialWorkspace] of [['teacher-stages','Управлени�
 }
 let css=fs.readFileSync(path.join(root,'app/globals.css'),'utf8');css=css.replace(/@import '\.\/([^']+)' layer\(legacy\);/g,(_,file)=>'@layer legacy {\n'+fs.readFileSync(path.join(root,'app',file),'utf8')+'\n}');
 for(const match of fs.readFileSync(path.join(root,'app/layout.tsx'),'utf8').matchAll(/import ['"]\.\/([^'"]+\.css)['"]/g)){if(match[1]!=='globals.css')css+='\n'+fs.readFileSync(path.join(root,'app',match[1]),'utf8')}
-// Mirror the route-scoped legacy CSS used by /game/[id]. Otherwise the
-// offline multi-screen preview omits these styles after entry-CSS splitting.
-const scopedLegacy=fs.readFileSync(path.join(root,'app/game/[id]/game-legacy.css'),'utf8');
-css+='\n'+scopedLegacy.replace(/@import '\.\.\/\.\.\/([^']+\.css)' layer\(legacy-route\);/g,(_,name)=>
- '@layer legacy-route {\n'+fs.readFileSync(path.join(root,'app',name),'utf8')+'\n}');
-// The stage atlas also belongs to both game and teacher routes, not entry.
-for(const routeFile of ['stage-map.css','2026-stage-system.css','stage-operations.css'])css+='\n'+fs.readFileSync(path.join(root,'app',routeFile),'utf8');
+// The global application CSS and its legacy imports are the single source
+// of the approved design, including stage atlas and meeting procedures.
 for(const subset of ['latin','cyrillic']){const file=path.join(root,'node_modules/@fontsource-variable/manrope/files',`manrope-${subset}-wght-normal.woff2`);css+=`\n@font-face{font-family:'Manrope Variable';font-style:normal;font-weight:200 800;font-display:swap;src:url(data:font/woff2;base64,${fs.readFileSync(file).toString('base64')}) format('woff2');unicode-range:${subset==='cyrillic'?'U+0400-045F,U+0490-0491,U+04B0-04B1,U+2116':'U+0000-00FF,U+0131,U+0152-0153,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215'};}`;}
 css+='\n.previewNotice{position:fixed;z-index:2000;bottom:100px;left:50%;transform:translateX(-50%);max-width:calc(100% - 32px);background:#172447;color:white;border-radius:12px;padding:16px 20px;font:14px/1.5 sans-serif;box-shadow:0 12px 36px #17244733}.previewNotice[hidden]{display:none}';
 function doc(markup){
