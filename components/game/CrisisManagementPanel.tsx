@@ -108,7 +108,7 @@ export default function CrisisManagementPanel({crisis,teacher,readOnly=false,onC
    <div><small>ДИНАМИКА КРИЗИСА</small><h3>Развитие и локализация</h3></div>
    <span className={styles.managementPressure}>{crisisPressureLabel(pressure)} · {pressure} из 100</span>
   </div>
-  <p className={styles.managementNote}>Это условные игровые показатели текущей угрозы и выполненных мер. Оценки студентов и показатели Республики не изменяются.</p>
+  <p className={styles.managementNote}>Сила кризиса: 0 — опасности нет, 100 — крайне тяжёлая ситуация. Локализация: 0 — угрозы ещё не устранены, 100 — основные угрозы взяты под контроль. Это игровые оценки преподавателя, а не реальные проценты.</p>
   <div className={styles.managementMeters}>
    <label className={styles.managementMeter}>
     <span><b>Сила кризиса</b><strong>{editable?threat:current.threat} из 100</strong></span>
