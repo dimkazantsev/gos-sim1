@@ -1,7 +1,7 @@
 import catalog from '@/data/taxes-2026.json';
 export type FiscalRegion={game_id:string;region_code:string;name:string;profile:string;disputed:boolean;budget_year:number;enterprises:number;employees_per_firm:number;monthly_wage:number;profit_per_firm:number;consumption_per_firm:number;expenditure:number;transfer_in:number;budget_credit_cash?:number;debt:number;compliance:number;activity_multiplier:number;cost_multiplier:number;observations:Record<string,number|null>;source_url:string;source_year:number};
 export type FiscalRate={region_code:string;tax_key:string;rate:number};
-export type FiscalPolicy={key_rate:number;fx_rate:number;oil_price:number;cutoff_price:number;inflation:number;federal_expenditure:number;municipal_expenditure:number;baseline_economy:number;baseline_trust:number;activity_override?:number|null;activity_reference?:number|null;updated_at:string};
+export type FiscalPolicy={key_rate:number;fx_rate:number;oil_price:number;cutoff_price:number;inflation:number;federal_expenditure:number;municipal_expenditure:number;baseline_economy:number;baseline_trust:number;activity_override?:number|null;activity_reference?:number|null;collection_lawfulness_reference?:number|null;updated_at:string};
 export type FiscalContext={policy:FiscalPolicy;metrics:Record<string,number>;can_change_rate:boolean};
 const clamp=(v:number,min:number,max:number)=>Math.max(min,Math.min(max,v));
 export function fiscalEnvironment(c?:FiscalContext|null){
@@ -21,11 +21,13 @@ export function fiscalForecast(r:FiscalRegion,rates:FiscalRate[],preview?:{tax:s
  const macro=fiscalEnvironment(context),a=r.activity_multiplier*macro.activity,employees=r.enterprises*r.employees_per_firm;
  const oilFactor=context?context.policy.oil_price/75*macro.fx/80:1;
  const bases:Record<string,number>={consumption:r.enterprises*r.consumption_per_firm*a,payroll:employees*r.monthly_wage*12/1e6*macro.activity,profit:r.enterprises*r.profit_per_firm*a,corporate_assets:r.enterprises*18,horsepower:r.enterprises*2*120,land_value:r.enterprises*3,housing_value:employees*2.5,tourism_income:(r.profile==='tourism'?r.enterprises*3:r.enterprises*.2)*macro.activity,oil_income:r.profile==='resources'?r.enterprises*4*oilFactor:0,gambling_income:0};
+ const law=context?.metrics.lawfulness,ref=context?.policy.collection_lawfulness_reference;
+ const effectiveCollection=clamp(r.compliance+(law!=null&&ref!=null?(law-ref)*.0003:0),0,1);
  const lines=catalog.taxes.map(t=>{
   const scope=t.level==='federal'?'00':r.region_code;
   const rate=preview?.tax===t.key?preview.rate:rates.find(x=>x.tax_key===t.key&&x.region_code===scope)?.rate??t.default_rate;
   const base=t.base_key?bases[t.base_key]??0:null;
-  const amount=base===null||rate===null?null:base*rate*(t.key==='transport'?1e-6:.01)*r.compliance;
+  const amount=base===null||rate===null?null:base*rate*(t.key==='transport'?1e-6:.01)*effectiveCollection;
   // Reduced teaching shares. The legal classification and the receiving budget are separate concepts.
   const fed=t.level==='federal'?(t.key==='income'?0:t.key==='profit'?.32:1):0;
   const reg=t.level==='regional'?1:t.key==='income'?.85:t.key==='profit'?.68:0;
