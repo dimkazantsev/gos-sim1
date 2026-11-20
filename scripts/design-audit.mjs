@@ -266,7 +266,7 @@ check('Chat expands from its message icon without hijacking channel selection',
  !chat.includes('<select aria-label="Канал общения"'));
 check('Chat supports real backend pinning and icon-only send',
  chat.includes('chatPinnedWrap')&&chat.includes('setChatPin(m.id,!pinned)')&&
- chat.includes('chatPinAction')&&
+ chat.includes('onClick={()=>void togglePin(m)}')&&
  chat.includes('className="chatSendButton iconOnly"')&&
  !chat.includes('<span>Отправить</span>'));
 check('Pinned media is secured, persistent and available outside recent history',

@@ -45,5 +45,5 @@ assert.ok(game.includes('recalledChatChannel(visibleMe.user_id,available)'),'per
 assert.ok(game.includes('rememberChatChannel(next,visibleMe.user_id)'),'selected chat must be remembered even without sending');
 assert.ok(!game.includes('if(lastSent&&lastSent!==channelRef.current'),'opening chat must not override manual choice');
 assert.ok(panel.includes('value={channelId}'),'dropdown must show active messaging channel');
-assert.ok(panel.includes('placeholder={channelId?'),'composer must use the same active channel');
+assert.ok(panel.includes("channelId?'Сообщение · @фамилия для упоминания':'Выберите чат'")&&panel.includes('disabled={!channelId||chatLoading}'),'composer must use the selected channel and block sending without one');
 console.log('PASS chat selection/header/composer agree; restore, last activity, filtering and manual choice regressions.');
