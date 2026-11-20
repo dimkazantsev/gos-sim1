@@ -55,7 +55,7 @@ const id=n=>'10000000-0000-4000-8000-'+String(n).padStart(12,'0');
   await db.query("INSERT INTO public.event_case_outcomes VALUES ($1,$2,'option_2'),($1,$3,'option_1'),($4,$5,'option_1')",[game,one,two,foreign,foreignCase]);
   await db.exec(helper);
   const auth=async who=>{await db.exec('RESET ROLE');await db.query("SELECT set_config('request.jwt.claim.sub',$1,false)",[who]);await db.exec('SET ROLE authenticated')};
-  const read=async cases=[]> (await db.query('SELECT private.event_winning_outcomes_visible($1,$2::uuid[]) AS result',[game,cases])).rows[0].result;
+  const read=async (cases=[]) => (await db.query('SELECT private.event_winning_outcomes_visible($1,$2::uuid[]) AS result',[game,cases])).rows[0].result;
   await auth(teacher);
   const full=await read();
   assert.equal(Object.keys(full).length,2,'Teacher sees all two completed game cases');
