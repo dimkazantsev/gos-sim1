@@ -13,10 +13,6 @@ import {cropPortrait} from '@/components/game/avatarCrop';
 import {savePermanentTeacherAsset,teacherAssetUrl} from '@/components/game/teacherAccountAssets';
 import {STAGE_OPERATIONS} from '@/components/game/stageOperations';
 import './teacher-portal.css';
-import './teacher-legacy.css';
-import '../stage-map.css';
-import '../2026-stage-system.css';
-import '../stage-operations.css';
 
 type Profile={full_name:string;bio:string|null;gender:'male'|'female'|'unspecified'|null;avatar_path:string|null;signature_path:string|null};
 type Section='dashboard'|'stages'|'actions'|'parties'|'votes'|'documents'|'budget'|'teacher'|'profile';
