@@ -122,3 +122,35 @@ assert(processCss.includes('.simMain.chatOpen > .processScrollTop'),
  'Desktop button moves away from the open chat panel');
 assert(!source.includes("supabase.from('processScrollTop')"),'Scroll control must not use Supabase');
 console.log('PASS Political Process fixed scroll-to-top, mobile dock, chat and reduced motion');
+
+
+/* Run the actual political-wall single-flight wrapper without a database or browser.
+ * Multiple Realtime invalidations must not multiply expensive RLS reads. */
+async function singleFlightRegression(){
+ const source=fs.readFileSync(path.join(root,'components/game/useRepublicGame.ts'),'utf8');
+ const start=source.indexOf(' async function loadPoliticalWall(){');
+ const end=source.indexOf(' async function loadPoliticalWallSnapshot(){',start);
+ assert(start>=0&&end>start,'Real political-wall loader uses a scoped single-flight wrapper');
+ const make=new Function('gameId','authUser','readEpoch','politicalFullMode','politicalWallFlight','alive','activeGameRef','loadPoliticalWallSnapshot',
+  source.slice(start,end)+'\nreturn loadPoliticalWall;');
+ const gameId='sample-game',authUser={current:'student'},readEpoch={current:1},politicalFullMode={current:false},politicalWallFlight={current:null},alive={current:true},activeGameRef={current:gameId};
+ let requests=0;
+ const pending=[];
+ const snapshot=()=>new Promise(resolve=>{requests++;pending.push(resolve)});
+ const refresh=make(gameId,authUser,readEpoch,politicalFullMode,politicalWallFlight,alive,activeGameRef,snapshot);
+ const p1=refresh(),p2=refresh(),p3=refresh();
+ for(let i=0;i<4;i++)await Promise.resolve();
+ assert.equal(requests,1,'Simultaneous callers issue just one first-page RPC');
+ refresh();refresh();pending.shift()();
+ for(let i=0;i<6;i++)await Promise.resolve();
+ assert.equal(requests,2,'Mutation invalidations during a pending read issue one follow-up RPC');
+ pending.shift()();await Promise.all([p1,p2,p3]);
+ assert.equal(politicalWallFlight.current,null,'Single-flight state resets after a completed read');
+ authUser.current='another-student';
+ const switched=refresh();for(let i=0;i<4;i++)await Promise.resolve();
+ assert.equal(requests,3,'New authenticated scope has its own authorized request');
+ pending.shift()();await switched;
+ assert.equal(politicalWallFlight.current,null);
+ console.log('PASS political feed: three simultaneous calls -> one read, dirty burst -> one trailing read, identity isolated');
+}
+singleFlightRegression().catch(error=>{console.error(error);process.exitCode=1});

@@ -98,6 +98,9 @@ export function useRepublicGame(gameId:string){
  const [politicalPostTotal,setPoliticalPostTotal]=useState(0);
  const politicalCursor=useRef<Pick<PoliticalPost,'id'|'created_at'|'pinned'>|null>(null);
  const politicalOlderLoaded=useRef(false),politicalPagePending=useRef(false),politicalFullMode=useRef(false);
+ // Single RLS-scoped political-wall read per game, identity, and feed mode.
+ // Burst invalidations queue one trailing consistency read, never a new socket.
+ const politicalWallFlight=useRef<{scope:string;queued:boolean;promise:Promise<void>}|null>(null);
  const votesRef=useRef(votes);votesRef.current=votes;
  const changedFormalIds=useRef(new Set<string>()),changedVoteIds=useRef(new Set<string>());
  const activeBallotSubmissions=useRef(new Set<string>()); // one in-flight write per user/game/vote
@@ -385,6 +388,7 @@ export function useRepublicGame(gameId:string){
   setPartyDocuments([]);setPartyInvitations([]);setPartyMandateRows([]);setPartyAgreements([]);setFormalDocuments([]);setFormalHistory([]);
   setPoliticalPosts([]);setPoliticalMedia([]);setPostFormalLinks([]);
   politicalCursor.current=null;politicalOlderLoaded.current=false;politicalPagePending.current=false;politicalFullMode.current=false;
+  politicalWallFlight.current=null;
   setPoliticalHasOlder(false);setPoliticalOlderLoading(false);setPoliticalSearchLoading(false);setPoliticalPostTotal(0);setPoliticalActorOptions([]);
   setMetricHistory([]);setPartySupportHistory([]);setImpactRules([]);setImpactLedger([]);
   setProfileGameId('');setIntroAccountSeen(false);
@@ -2148,6 +2152,23 @@ export function useRepublicGame(gameId:string){
  }
 
  async function loadPoliticalWall(){
+  const scope=gameId+':'+(authUser.current||'')+':'+readEpoch.current+':'+(politicalFullMode.current?'full':'page');
+  const existing=politicalWallFlight.current;
+  if(existing?.scope===scope){existing.queued=true;return existing.promise}
+  const flight={scope,queued:false,promise:Promise.resolve()};
+  // Launch in a microtask so concurrent initial calls coalesce without a timer.
+  const work=Promise.resolve().then(async()=>{
+   do{
+    flight.queued=false;
+    await loadPoliticalWallSnapshot();
+   }while(flight.queued&&alive.current&&activeGameRef.current===gameId
+     &&scope===gameId+':'+(authUser.current||'')+':'+readEpoch.current+':'+(politicalFullMode.current?'full':'page'));
+  });
+  flight.promise=work.finally(()=>{if(politicalWallFlight.current===flight)politicalWallFlight.current=null});
+  politicalWallFlight.current=flight;
+  return flight.promise;
+ }
+ async function loadPoliticalWallSnapshot(){
   await readSafely(['political','metrics','parties'],async ticket=>{
    // Six RLS-checked feeds share one consistent PostgreSQL statement;
    // party identity stays in its independent session-scoped cache.
