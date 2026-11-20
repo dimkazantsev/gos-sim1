@@ -20,7 +20,9 @@ const output=ts.transpileModule(handler,{compilerOptions:{target:ts.ScriptTarget
   const repeated='Текст постановления Государственной Думы Российской Федерации. В соответствии с правовыми основаниями документ рассматривается в установленном порядке. ';
   const docText=Array.from({length:26},(_,i)=>'<p>Пункт '+(i+1)+'. '+repeated.repeat(3)+'</p>').join('');
   await page.setContent('<!doctype html><html lang="ru"><body><main class="legalPortal" style="display:grid;grid-template-columns:9000px 100px"><section><h2>Большая боковая панель</h2></section><article class="formalPaper legalDocumentPaper" style="width:100px;min-height:7000px"><header class="legalMasthead"><div class="formalPaperInstitution">Государственная Дума Федерального Собрания Российской Федерации</div><div class="formalPaperType">Постановление</div></header><div class="formalPaperMeta"><time>17.10.2026</time><span>№ 4</span><span>Москва</span></div><h1>Постановление Государственной Думы</h1><div class="formalPaperBody">'+docText+'</div><div class="formalSignature"><div><b>Председатель Государственной Думы</b></div></div><footer class="legalPaperFooterBar"><span>Государственная Дума Федерального Собрания Российской Федерации</span><button>Печать</button></footer></article></main><button id="print" onclick="window.printOfficialDocument()">Распечатать</button></body></html>');
-  await page.addScriptTag({content:'var exports={};'+output+'window.printOfficialDocument=exports.printOfficialDocument;'});
+  // Suppress the browser print dialog in this synthetic test only. PDF is
+  // generated explicitly below; overlapping print jobs fail in headless Chrome.
+  await page.addScriptTag({content:'var exports={};'+output+'window.printOfficialDocument=exports.printOfficialDocument;const realOpen=window.open.bind(window);window.open=(...args)=>{const tab=realOpen(...args);if(tab)tab.print=()=>{};return tab};'});
   const popupPromise=page.waitForEvent('popup');
   await page.locator('#print').click();
   const printPage=await popupPromise;

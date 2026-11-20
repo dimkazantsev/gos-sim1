@@ -257,7 +257,7 @@ const chatCss=read('app/design-readability.css');
 check('Chat expands from its message icon without hijacking channel selection',
  chat.includes('<ChatChannelDropdown')&&
  chat.includes('className="chatHeadIcon chatExpandTrigger"')&&
- chat.includes('onClick={()=>setExpanded(value=>!value)}')&&
+ chat.includes('onClick={()=>changeExpanded(!expanded)}')&&
  chat.includes('createPortal(chatView,document.body)')&&
  !chat.includes('onExpand={()=>setExpanded(true)}')&&
  read('components/game/ChatChannelDropdown.tsx').includes('role="menuitemradio"')&&
