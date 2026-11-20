@@ -289,7 +289,14 @@ async function main(){
    await page.getByRole('button',{name:'Вернуться к бюджету',exact:true}).click();await sim.locator('[data-budget-kpi=income]').waitFor();
    await page.getByRole('button',{name:'Только просмотр',exact:true}).click();await openTab(page,'Доходы');assert(await sim.getByLabel('Название расчета').isDisabled(),'Readonly mode protects the shared title');
    await openTab(page,'Проект ФЗ');const save=sim.getByRole('button',{name:'Сохранить расчёт',exact:true}),create=sim.getByRole('button',{name:/(Создать проект ФЗ о бюджете|Открыть проект в реестре)/});assert(await save.isDisabled(),'Readonly cannot save a shared plan');assert(await create.isDisabled(),'Readonly cannot create a federal law');
-   await nav.getByRole('tab').filter({hasText:'Регионы'}).focus();await page.keyboard.press('Enter');assert.equal(await nav.getByRole('tab').filter({hasText:'Регионы'}).getAttribute('aria-selected'),'true','The flow can be followed with the keyboard');await page.keyboard.press('ArrowRight');assert.equal(await nav.getByRole('tab').filter({hasText:'Расходы'}).getAttribute('aria-selected'),'true','Arrow-key navigation follows the sequential flow');await page.keyboard.press('Home');assert.equal(await nav.getByRole('tab').filter({hasText:'Доходы'}).getAttribute('aria-selected'),'true');await page.keyboard.press('End');assert.equal(await nav.getByRole('tab').filter({hasText:'Проект ФЗ'}).getAttribute('aria-selected'),'true');
+   // React tab selection may commit after the keyboard event promise resolves.
+   // Wait for accessible state without weakening the keyboard navigation checks.
+   const keyboardSelected=async label=>page.waitForFunction(name=>[...document.querySelectorAll('[role="tablist"][aria-label="Разделы бюджетного расчёта"] [role="tab"]')].some(el=>el.textContent?.includes(name)&&el.getAttribute('aria-selected')==='true'),label,{timeout:4000});
+   await nav.getByRole('tab').filter({hasText:'Регионы'}).focus();
+   await page.keyboard.press('Enter');await keyboardSelected('Регионы');
+   await page.keyboard.press('ArrowRight');await keyboardSelected('Расходы');
+   await page.keyboard.press('Home');await keyboardSelected('Доходы');
+   await page.keyboard.press('End');await keyboardSelected('Проект ФЗ');
    const permissions=sim.locator('[data-budget-plan-permissions]');
    assert.match(await permissions.innerText(),/Кто может создавать и сохранять варианты/,'Roles that may create plans must be explained');
    assert.match(await permissions.innerText(),/Председатель Правительства/,'Government roles must be named');

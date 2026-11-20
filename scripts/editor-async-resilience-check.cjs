@@ -15,7 +15,7 @@ function harness(component){
  const code=ts.transpileModule(fs.readFileSync(file,'utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022,jsx:ts.JsxEmit.ReactJSX}}).outputText;
  const slots=[],pendingEffects=[],channels=[],counts=new Map(),holds=new Map(),errors=[],fetches=[],failures=new Set(),profileNotes=new Map(),committeeLegal=new Map(),budgetConclusions=new Map();
  let cursor=0,dirty=false,tree,latestTableLoad,revision=1,serverVenue='Saved venue',serverPollApproved=false,serverHymn=null,serverMusic=null,serverPhoto=null,serverPhotos=null,serverCeremonyAt='2026-10-08T12:00:00Z',serverSettingsStatus='round1',ceremonySaveCount=0,ceremonyConfirmCount=0,clock=0,sessionUser='teacher-a',props;
- const g={game:{id:'game-a'},me:{game_id:'game-a',user_id:'teacher-a',kind:'teacher',full_name:'Teacher A'},teacher:true,currentStage:{stage_no:7},formalDocuments:[],formalHistory:[],votes:[],members:[],parties:[],setError:error=>errors.push(String(error?.message||error))};
+ const g={game:{id:'game-a'},me:{game_id:'game-a',user_id:'teacher-a',kind:'teacher',full_name:'Teacher A'},teacher:true,currentStage:{stage_no:7},formalDocuments:[],formalHistory:[],votes:[],ballots:[],members:[],parties:[],setError:error=>errors.push(String(error?.message||error))};
  for(const name of ['createFormalDocument','deleteFormalDocument','advanceFormalDocument','updateFormalDraft','vetoFormalDocument','resolveBudgetConciliation','startBudgetRejectionBranch','createVote'])g[name]=async()=>null;
  g.refresh=async()=>{};
  g.refreshDocuments=async id=>{assert(g.formalDocuments.some(doc=>doc.id===id),'Document refresh must target an existing selected document');};

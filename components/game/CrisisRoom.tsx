@@ -105,11 +105,14 @@ export default function CrisisRoom({g,readOnly=false}:{g:ReturnTypeRepublic;read
   const [q,r,cs]=await Promise.all([
    supabase.from('crisis_information_requests').select('*').eq('game_id',game.id).eq('crisis_id',active.id).order('created_at',{ascending:true}),
    supabase.from('crisis_responses').select('*').eq('game_id',game.id).eq('crisis_id',active.id).order('created_at',{ascending:true}),
-   supabase.from('game_role_consequences').select('*').eq('game_id',game.id).order('set_at',{ascending:false})
+   // Only the teacher renders and uses the role-sanction ledger.
+   // Avoid one REST request on each student refresh (including fallback polls).
+   teacher?supabase.from('game_role_consequences').select('*').eq('game_id',game.id).order('set_at',{ascending:false})
+    :Promise.resolve({data:[] as RoleConsequence[],error:null})
   ]);
   const failure=[q,r,cs].find(x=>x.error);if(failure?.error){setError(userError(failure.error));return;}
   if(!q.error)setRequests((q.data||[]) as InfoRequest[]);
-  if(!cs.error)setConsequences((cs.data||[]) as RoleConsequence[]);
+  if(!teacher)setConsequences([]);else if(!cs.error)setConsequences((cs.data||[]) as RoleConsequence[]);
   if(!r.error){
    const rows=(r.data||[]) as CrisisResponse[];
    setResponses(rows);
