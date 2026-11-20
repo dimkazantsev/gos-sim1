@@ -40,7 +40,18 @@ function accounting(c,label,eventRevenue=0){
 accounting(first,'Unchanged baseline');
 assert.equal(article(first,'profit').federal_share,.32,'The federal income is only its assigned share of total profit tax');
 assert.equal(article(first,'recycling').rate_unit,'rubles');assert.equal(article(first,'recycling').base_unit,'units');
-near(article(first,'recycling').base*article(first,'recycling').rate/1e6,article(first,'recycling').amount,'Unit levy converted from rubles to millions');
+near(article(first,'recycling').base*article(first,'recycling').rate/1e6*article(first,'recycling').collection,article(first,'recycling').amount,'Unit levy converted from rubles to millions after collection');
+const anchoredContext={...context,policy:{...context.policy,collection_lawfulness_reference:24},metrics:{...context.metrics,lawfulness:24}};
+const anchored=run(draft,state,anchoredContext);
+assert.equal(anchored.revenue,first.revenue,'Capturing current lawfulness must preserve an existing budget');
+const legalUp=run(draft,state,{...anchoredContext,metrics:{...anchoredContext.metrics,lawfulness:25}});
+const legalDown=run(draft,state,{...anchoredContext,metrics:{...anchoredContext.metrics,lawfulness:23}});
+assert(legalUp.revenue>anchored.revenue && legalDown.revenue<anchored.revenue,'Lawfulness changes actual national tax receipts');
+near(article(legalUp,'vat').collection,.9503,'Higher lawfulness changes tax collection');
+near(article(legalDown,'vat').collection,.9497,'Lower lawfulness changes tax collection');
+near(article(legalUp,'dividends').amount,article(anchored,'dividends').amount,'Non-tax receipts unaffected by collection');
+near(article(legalUp,'vat').base,article(anchored,'vat').base,'A collection change alone does not change the underlying tax base',2);
+accounting(legalUp,'Dynamic collection increase');accounting(legalDown,'Dynamic collection decrease');
 
 const expanded=run(draft,state,context,[{...regions[0],enterprises:1100}]);
 near(article(expanded,'vat').base/article(first,'vat').base,1.1,'An accepted enterprise-growth outcome changes VAT base');
