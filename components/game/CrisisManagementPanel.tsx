@@ -20,6 +20,15 @@ function suggestedChange(kind:'escalate'|'stabilize',current:{threat:number;cont
  }
  return null;
 }
+// Each action accepts only its own direction of change. An unrelated slider
+// adjustment must never disable both buttons or be silently written as an
+// opposite action. Fall back to the existing 10-point step when needed.
+function actionTarget(kind:'escalate'|'stabilize',current:{threat:number;containment:number},draft:{threat:number;containment:number}){
+ const target=kind==='escalate'
+  ?{threat:Math.max(current.threat,draft.threat),containment:Math.min(current.containment,draft.containment)}
+  :{threat:Math.min(current.threat,draft.threat),containment:Math.max(current.containment,draft.containment)};
+ return target.threat!==current.threat||target.containment!==current.containment?target:suggestedChange(kind,current);
+}
 export default function CrisisManagementPanel({crisis,teacher,readOnly=false,onChanged,setError}:{
  crisis:Crisis;teacher:boolean;readOnly?:boolean;onChanged:()=>Promise<void>;setError:(value:unknown)=>void;
 }){
@@ -43,12 +52,10 @@ export default function CrisisManagementPanel({crisis,teacher,readOnly=false,onC
  ] as const;
  const editable=teacher&&!readOnly&&current.status==='active';
  const changed=threat!==current.threat||containment!==current.containment;
- const increasing=changed&&threat>=current.threat&&containment<=current.containment;
- const decreasing=changed&&threat<=current.threat&&containment>=current.containment;
- const suggestedEscalation=suggestedChange('escalate',current);
- const suggestedStabilization=suggestedChange('stabilize',current);
- const canEscalate=increasing||(!changed&&suggestedEscalation!==null);
- const canStabilize=decreasing||(!changed&&suggestedStabilization!==null);
+ const escalation=actionTarget('escalate',current,{threat,containment});
+ const stabilization=actionTarget('stabilize',current,{threat,containment});
+ const canEscalate=escalation!==null;
+ const canStabilize=stabilization!==null;
  const validReason=reason.trim().length>=10&&reason.trim().length<=1200;
  const closeReady=crisisReadyToClose(current.threat,current.containment);
  const mayClose=editable&&closeReady&&!changed&&checks.every(Boolean)&&reason.trim().length>=20&&reason.trim().length<=1200;
@@ -74,9 +81,9 @@ export default function CrisisManagementPanel({crisis,teacher,readOnly=false,onC
   if(!editable||busy||!validReason)return;
   if(kind==='escalate'&&!canEscalate||kind==='stabilize'&&!canStabilize||kind==='finish'&&!mayClose)return;
   const note=reason.trim();
-  const suggestion=kind==='escalate'?suggestedEscalation:suggestedStabilization;
-  const nextThreat=kind==='finish'?current.threat:changed?threat:suggestion?.threat??current.threat;
-  const nextContainment=kind==='finish'?current.containment:changed?containment:suggestion?.containment??current.containment;
+  const target=kind==='escalate'?escalation:kind==='stabilize'?stabilization:current;
+  const nextThreat=target?.threat??current.threat;
+  const nextContainment=target?.containment??current.containment;
   const confirmations=kind==='finish'?checks:[false,false,false];
   const fingerprint=JSON.stringify([crisis.id,current.revision,kind,nextThreat,nextContainment,note,confirmations]);
   if(pending.current?.fingerprint!==fingerprint)pending.current={fingerprint,id:crypto.randomUUID()};
@@ -125,8 +132,8 @@ export default function CrisisManagementPanel({crisis,teacher,readOnly=false,onC
     <button type="button" className="secondary" disabled={busy||!validReason||!canEscalate} onClick={()=>void apply('escalate')}>Обострить</button>
     <button type="button" className="primary" disabled={busy||!validReason||!canStabilize} onClick={()=>void apply('stabilize')}>Стабилизировать</button>
    </div>
-   <p className={styles.managementNote}>После ввода основания можно сразу нажать кнопку: «Обострить» увеличит силу кризиса на 10 пунктов, «Стабилизировать» — локализацию на 10. Если ползунки изменены вручную, сохранятся выбранные значения. При достижении 100 пунктов изменяется второй показатель.</p>
-   {!changed&&suggestedEscalation===null&&<p className={styles.managementNote} role="status">Сила кризиса уже 100, локализация — 0. Дальнейшее числовое обострение невозможно.</p>}
+   <p className={styles.managementNote}>После ввода основания выберите действие. «Обострить» учитывает усиление угрозы, «Стабилизировать» — увеличение локализации или снижение угрозы. Противоположные изменения ползунков не применяются; если нужный показатель не менялся, используется шаг 10 пунктов.</p>
+   {!canEscalate&&<p className={styles.managementNote} role="status">Сила кризиса уже 100, локализация — 0. Дальнейшее числовое обострение невозможно.</p>}
    <fieldset className={styles.managementChecks}>
     <legend>Условия завершения острой фазы</legend>
     {requirements.map((text,index)=><label key={index}>
