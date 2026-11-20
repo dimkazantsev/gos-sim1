@@ -191,6 +191,9 @@ async function main(){
     await sim.getByRole('alert').waitFor({state:'hidden'});
    }
    await outcome.fill('');
+   // Await the controlled React value: a concurrent rendering pass can briefly
+   // restore the seeded text after Playwright dispatches an input event.
+   await page.waitForFunction(()=>document.querySelector('[aria-label="Заявка по региональному событию"] textarea[rows="2"]')?.value==='',null,{timeout:4000});
    assert.equal(await outcome.inputValue(),'','The invalid result must reach the controlled textarea at '+width+'px');
    await submitRequest.click();
    try{
