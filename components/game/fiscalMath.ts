@@ -19,10 +19,15 @@ export function fiscalEnvironment(c?:FiscalContext|null){
 }
 export function fiscalForecast(r:FiscalRegion,rates:FiscalRate[],preview?:{tax:string;rate:number},context?:FiscalContext|null){
  const macro=fiscalEnvironment(context),a=r.activity_multiplier*macro.activity,employees=r.enterprises*r.employees_per_firm;
- const oilFactor=context?context.policy.oil_price/75*macro.fx/80:1;
- const bases:Record<string,number>={consumption:r.enterprises*r.consumption_per_firm*a,payroll:employees*r.monthly_wage*12/1e6*macro.activity,profit:r.enterprises*r.profit_per_firm*a,corporate_assets:r.enterprises*18,horsepower:r.enterprises*2*120,land_value:r.enterprises*3,housing_value:employees*2.5,tourism_income:(r.profile==='tourism'?r.enterprises*3:r.enterprises*.2)*macro.activity,oil_income:r.profile==='resources'?r.enterprises*4*oilFactor:0,gambling_income:0};
+ const economyShift=context?(context.metrics.economy??context.policy.baseline_economy)-context.policy.baseline_economy:0;
+ const fixedBaseFactor=clamp(1+economyShift*.002,.7,1.3);
+ const oilFactor=context?context.policy.oil_price/75*macro.fx/80*fixedBaseFactor:1;
+ const bases:Record<string,number>={consumption:r.enterprises*r.consumption_per_firm*a,payroll:employees*r.monthly_wage*12/1e6*macro.activity,profit:r.enterprises*r.profit_per_firm*a,corporate_assets:r.enterprises*18*fixedBaseFactor,horsepower:r.enterprises*2*120*fixedBaseFactor,land_value:r.enterprises*3*fixedBaseFactor,housing_value:employees*2.5*fixedBaseFactor,tourism_income:(r.profile==='tourism'?r.enterprises*3:r.enterprises*.2)*macro.activity,oil_income:r.profile==='resources'?r.enterprises*4*oilFactor:0,gambling_income:0};
  const law=context?.metrics.lawfulness,ref=context?.policy.collection_lawfulness_reference;
- const effectiveCollection=clamp(r.compliance+(law!=null&&ref!=null?(law-ref)*.0003:0),0,1);
+ const trust=context?.metrics.public_trust,trustRef=context?.policy.baseline_trust;
+ // Limit the total regional collection adjustment to +/-1 percentage point.
+ const adjustment=clamp((law!=null&&ref!=null?(law-ref)*.0003:0)+(trust!=null&&trustRef!=null?(trust-trustRef)*.0005:0),-.01,.01);
+ const effectiveCollection=clamp(r.compliance+adjustment,0,1);
  const lines=catalog.taxes.map(t=>{
   const scope=t.level==='federal'?'00':r.region_code;
   const rate=preview?.tax===t.key?preview.rate:rates.find(x=>x.tax_key===t.key&&x.region_code===scope)?.rate??t.default_rate;

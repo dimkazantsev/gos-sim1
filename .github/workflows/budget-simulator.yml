@@ -32,6 +32,7 @@ jobs:
       - run: node scripts/budget-simulator-math-check.cjs
       - run: node scripts/budget-workflow-math-check.cjs
       - run: node scripts/economy-b-budget-driver-sync-check.cjs
+      - run: node scripts/economy-b-approved-coefficients-check.cjs
       - run: node scripts/economy-b-event-ledger-contract-check.cjs
       - run: node scripts/event-fiscal-explanation-check.cjs
       - run: node scripts/budget-amendments-visibility-check.cjs

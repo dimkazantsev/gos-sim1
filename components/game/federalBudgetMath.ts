@@ -46,12 +46,12 @@ export function calculateFederalBudget(draft:BudgetDraft,state:SimulatorState,co
  const firms=regions.reduce((s,r)=>s+r.enterprises*r.activity_multiplier,0)/Math.max(1,a.enterprises);
  const activity=clamp(firms*(1-(key-a.key_rate)*.007+economy*.002+trust*.001),.2,2);
  const cost=clamp(1+((p?.inflation??a.inflation)-a.inflation)*.004+(fx/a.fx_rate-1)*.02,.7,1.6);
- const oil=clamp((p?.oil_price??a.oil_price)/a.oil_price*fx/a.fx_rate,.1,3);
+ const oil=clamp((p?.oil_price??a.oil_price)/a.oil_price*fx/a.fx_rate,.1,3)*clamp(1+economy*.002,.7,1.3);
  const vat=rates.find(r=>r.region_code==='00'&&r.tax_key==='vat')?.rate??22,profit=rates.find(r=>r.region_code==='00'&&r.tax_key==='profit')?.rate??25;
- // Only legal stability changes collection. Trust already affects activity,
- // so it must not produce a second automatic revenue adjustment.
+ // Approved independent channels: legal stability +0.03 pp and trust +0.05 pp per point.
+ // The existing macro-economic activity factor is not multiplied a second time.
  const law=context?.metrics.lawfulness,ref=p?.collection_lawfulness_reference;
- const collectionRate=law!=null&&ref!=null?clamp(.95+(law-ref)*.0003,.85,.995):.95;
+ const collectionRate=clamp(.95+(law!=null&&ref!=null?(law-ref)*.0003:0)+trust*.0005,.85,.995);
  const collectionFactor=collectionRate/.95;
  const taxableGroups=new Set(['oil_gas','turnover','income','rent','recycling']);
  const income_lines=baseline.income_lines.map(l=>{const driver=l.driver==='oil'?oil:l.driver==='activity'?activity:1;const tax=l.key==='turnover'?1+.72*(vat/22-1):l.key==='income'?1+.8*(profit/25-1):1;return {key:l.key,label:l.label,baseline:l.amount,amount:round(Math.max(0,l.amount*driver*tax*(1+(draft.income_changes[l.key]??0)/100)*(taxableGroups.has(l.key)?collectionFactor:1)+(draft.revenue_adjustments[l.key]??0)))};});
