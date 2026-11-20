@@ -56,7 +56,7 @@ const DEFAULT_TITLES:Record<PortfolioKey,string>={
 const PORTFOLIOS:Array<{key:PortfolioKey;label:string;route:'duma'|'sf';scope:string}>= [
  {key:'social',label:'Социальная политика',route:'duma',scope:'Труд, демография, культура, образование, здравоохранение'},
  {key:'economic',label:'Экономическая политика',route:'duma',scope:'Финансы, налоги, транспорт, энергетика и развитие'},
- {key:'foreign',label:'Внешняя политика',route:'duma',scope:'Международные отношения и внешнеполитическая координация'},
+ {key:'foreign',label:'Внешняя политика',route:'sf',scope:'Международные отношения и внешнеполитическая координация'},
  {key:'defence',label:'Оборона и безопасность',route:'sf',scope:'Оборона, безопасность государства и силовой блок'},
  {key:'internal',label:'Внутренняя политика и государство',route:'sf',scope:'ОГВ, ОМС, МВД, МЧС, национальности, гражданское общество'}
 ];
@@ -147,7 +147,7 @@ export default function GovernmentFormationWorkspace({
  const roleTitles=stageRoleTitles(g).split(' | ');
  const isPresident=roleTitles.some(title=>title.trim()==='президент российской федерации');
  const isPM=roleTitles.some(title=>/^председатель\s+правительства(?:\s|$)/u.test(title));
- const canPresident=teacher||isPresident;
+ const canPresident=isPresident&&!teacher;
  const students=members.filter(m=>m.kind==='student');
 
  async function load(){
@@ -432,7 +432,7 @@ export default function GovernmentFormationWorkspace({
 
   <section className={'gov8Ministries '+(stageNo===8?'isStructureStage ':'')+(!pmAppointed?'isLocked':'')}>
    <header className="gov8SectionHead">
-    <div><span className="gov8SectionIcon"><Building2 size={20}/></span><div><small>{stageNo===8?'Структура Правительства':'Кандидатуры министров'}</small><h3>{stageNo===8?'Названия пяти министерств':'Выдвижение и назначение по портфелям'}</h3><p>{stageNo===8?'Функции закреплены правилами игры. Председатель Правительства предлагает названия; Президент одобряет структуру или возвращает её на переименование.':'Для каждого портфеля выберите участника или укажите кандидатуру вручную. Три кандидатуры вносит Председатель Правительства, две — Президент. Система сохраняет согласование и указ о назначении.'}</p></div></div>
+    <div><span className="gov8SectionIcon"><Building2 size={20}/></span><div><small>{stageNo===8?'Структура Правительства':'Кандидатуры министров'}</small><h3>{stageNo===8?'Названия пяти министерств':'Выдвижение и назначение по портфелям'}</h3><p>{stageNo===8?'Функции закреплены правилами игры. Председатель Правительства предлагает названия; Президент одобряет структуру или возвращает её на переименование.':'Для каждого портфеля выберите участника или укажите кандидатуру вручную. Две кандидатуры вносит Председатель Правительства, три — Президент. Система сохраняет согласование и указ о назначении.'}</p></div></div>
     <span className={'gov8StatusPill is-'+(structure?.status||'preview')}>{!pmAppointed?'Предпросмотр':structure?.status==='approved'?(stageNo===9?'Структура одобрена':'Одобрено'):structure?.status==='submitted'?'На рассмотрении':structure?.status==='revision'?'На доработке':'Черновик'}</span>
    </header>
 
@@ -458,7 +458,7 @@ export default function GovernmentFormationWorkspace({
 
        {stageNo===9&&(nomination&&!['rejected','withdrawn'].includes(nomination.status)?<div className="gov8MinistryNominee"><small>КАНДИДАТУРА</small><b>{nomination.candidate_name}</b><span>{STATUS[nomination.status]} · попытка {nomination.attempt_no}/3</span>
         <div className="gov8MinistryLinks">
-         {nomination.formal_document_id&&<button onClick={()=>onOpenDocument?.(nomination.formal_document_id!)}>Постановление ГД</button>}
+         {nomination.formal_document_id&&<button onClick={()=>onOpenDocument?.(nomination.formal_document_id!)}>{p.route==='sf'?'Документ консультации СФ':'Постановление ГД'}</button>}
          {nomination.appointment_document_id&&<button onClick={()=>onOpenDocument?.(nomination.appointment_document_id!)}>Указ Президента</button>}
           {nomination.status==='appointed'&&!nomination.candidate_user_id&&<p className="gov8FormGate" role="status">Руководитель пока не связан с зарегистрированным студентом. Полномочия ведомства будут доступны после подтверждения личности назначенного министра.</p>}
          {nomination.vote_id&&<button onClick={()=>openVoting(nomination.vote_id)}>Голосование</button>}
@@ -480,8 +480,8 @@ export default function GovernmentFormationWorkspace({
 
   {stageNo===9&&<section className="gov8RulesStrip">
    <div><small>ЛОГИКА ПРАВИЛ</small><b>1 заместитель + 4 министра = 5 руководителей министерств</b></div>
-   <span>3 портфеля: Председатель Правительства → ГД → Президент</span>
-   <span>2 специальных портфеля: Президент → консультация СФ → назначение</span>
+   <span>2 портфеля: Председатель Правительства → ГД → Президент</span>
+   <span>3 специальных портфеля: Президент → консультация СФ → назначение</span>
    <span>СФ в игровой модели консультирует преподаватель</span>
   </section>}
   {stageNo===8&&pmAppointed&&structureApproved&&<div className="stageOperationsActionBar"><p>Председатель Правительства назначен, структура одобрена. На этапе 9 внесите кандидатуры министров и сформируйте команды ведомств.</p><button type="button" className="primary" disabled={!onOpenStage} onClick={()=>onOpenStage?.(9)}>Перейти к назначению министров</button></div>}
