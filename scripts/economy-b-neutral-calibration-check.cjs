@@ -25,12 +25,12 @@ for(const group of base.income_lines){
 }
 const manualContext={...context,policy:{...p,activity_override:55.7,activity_reference:1}};
 const manual=run(manualContext);
-assert(Math.abs(manual.activity-.557)<1e-10,'Manual activity affects federal forecasts');
+assert(Math.abs(manual.activity-1)<1e-10,'Federal activity must not scale previously accepted budget a second time');
 assert.equal(fiscalEnvironment(manualContext).activity,.557);
-assert(manual.revenue<base.revenue);
+assert.equal(manual.revenue,base.revenue,'Existing teacher activity must not retroactively cut federal income');
 assert(fiscalForecast(r,[],undefined,manualContext).revenue<fiscalForecast(r,[],undefined,context).revenue);
 assert(run({...context,policy:{...p,key_rate:18}}).revenue<base.revenue,'Automatic rate path still works');
 assert(run(context,[{...r,activity_multiplier:.98}]).revenue<base.revenue,'Event activity changes federal base');
 assert(run({...context,metrics:{economy:50,public_trust:52}}).revenue>base.revenue,'Trust retains prior effect, no new double accounting');
 assert(run({...context,policy:{...p,oil_price:65}}).revenue<base.revenue,'Oil effects remain');
-console.log('PASS Economy B: 12 articles, 7 groups, neutral 95% calibration, 55.7% override, federal and regional consistency');
+console.log('PASS Economy B: 12 articles, 7 groups, neutral 95% calibration, 55.7% regional override, stable federal historical baseline');
