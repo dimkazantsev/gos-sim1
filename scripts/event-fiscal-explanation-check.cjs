@@ -1,0 +1,16 @@
+const assert=require('node:assert/strict');
+const fs=require('node:fs'),path=require('node:path'),Module=require('node:module'),ts=require('typescript');
+require.extensions['.ts']=(m,f)=>m._compile(ts.transpileModule(fs.readFileSync(f,'utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}}).outputText,f);
+const {describeEventFiscalEffect}=require('../components/game/eventFiscalEffect.ts');
+assert.deepEqual(describeEventFiscalEffect(),[]);
+assert.deepEqual(describeEventFiscalEffect({activity:0,expenditure:0}),[]);
+assert.deepEqual(describeEventFiscalEffect({activity:0.004,expenditure:15}),['коэффициент деловой активности +0,004','расходы региона +15 млн ₽']);
+assert.deepEqual(describeEventFiscalEffect({enterprises:-30,cost:-0.004}),['условные предприятия -30','коэффициент расходов -0,004']);
+assert.deepEqual(describeEventFiscalEffect({transfer_in:18}),['трансферты региону +18 млн ₽']);
+assert.deepEqual(describeEventFiscalEffect({expenditure:NaN,activity:Infinity}),[]);
+const events=fs.readFileSync(path.resolve(__dirname,'../components/game/EventWorkspace.tsx'),'utf8');
+assert(events.includes("outcome.winner!=='tie'"),'No financial event claim on a tied vote');
+assert(events.includes('describeEventFiscalEffect(chosenEffect?.fiscal_effect)'),'Only the winning option can disclose its region effect');
+assert(events.includes('прямое изменение экономических параметров для этого варианта не предусмотрено'),'Neutral options have explicit information rather than invented monetary effects');
+assert(events.includes('фактический бюджет рассчитывается по действующей модели'),'Expenses and direct taxes must not be confused');
+console.log('PASS: region event explanations for every outcome, neutral choices, trust separation, units and caps');

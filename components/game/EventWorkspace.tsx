@@ -13,11 +13,12 @@ import {eventButtonSound} from './eventButtonSound';
 import EventAutopilotPanel from './EventAutopilotPanel';
 import EventComic from './EventComic';
 import EventChoicePanel from './EventChoicePanel';
+import {describeEventFiscalEffect,type EventFiscalEffect} from './eventFiscalEffect';
 
 import EventCaseTile from './EventCaseTile';
 import EventCaseModal from './EventCaseModal';
 import type {EventComicScene} from './types';
-type CaseRow={id:string;game_id:string;case_key:string;title:string;situation:string;category:string;seriousness:'serious'|'light';audience:'single'|'group'|'all';allowed_roles:string[];status:string;source_url:string|null;decision_options?:string[];effect_plan?:{best_option_key?:string;options?:{key:string;trust:number;description?:string;legal_basis?:string}[]};comic_scene?:EventComicScene};
+type CaseRow={id:string;game_id:string;case_key:string;title:string;situation:string;category:string;seriousness:'serious'|'light';audience:'single'|'group'|'all';allowed_roles:string[];status:string;source_url:string|null;decision_options?:string[];effect_plan?:{best_option_key?:string;options?:{key:string;trust:number;description?:string;legal_basis?:string;fiscal_effect?:EventFiscalEffect}[]};comic_scene?:EventComicScene};
 type Assignment={id:string;case_id:string;game_id:string;recipient_id:string;status:string;created_at:string};
 type Decision={id:string;case_id:string;actor_id:string;choice:string;role_snapshot?:string};
 type Authority={decision_id:string;case_id:string;actor_id:string;authority_ok:boolean;lawful:boolean;strategy_point:boolean;role_snapshot:string;legal_basis:string};
@@ -377,6 +378,7 @@ export default function EventWorkspace({g,readOnly=false,mode='feed'}:{g:ReturnT
        {chosenEffect?.description&&<p>{chosenEffect.description}</p>}
        <span>Фактическое изменение доверия: {outcome.trust_delta>0?'+':''}{outcome.trust_delta} п.п. · Голосов: {outcome.votes_count}/{outcome.assignments_count}</span>
        {outcome.requested_trust_delta!==undefined&&outcome.requested_trust_delta!==outcome.trust_delta&&<span>Расчётный эффект: {outcome.requested_trust_delta>0?'+':''}{outcome.requested_trust_delta} п.п. · Достигнута граница показателя.</span>}
+       {outcome.winner!=='tie'&&<span>Региональные последствия: {describeEventFiscalEffect(chosenEffect?.fiscal_effect).join('; ')||'прямое изменение экономических параметров для этого варианта не предусмотрено'}. Изменение доверия учитывается отдельно; фактический бюджет рассчитывается по действующей модели.</span>}
       </div>}
       {teacher&&responded.length>0&&!outcome&&<button type="button" disabled={!!busyId||readOnly} className="eventFinalize" onClick={()=>void finalize(c.id)}>Подвести итог по полученным голосам</button>}
       {teacher&&authority.some(a=>a.case_id===c.id)&&<div className="eventAuthorityTable"><h4>Полномочия и баллы</h4>{authority.filter(a=>a.case_id===c.id).map(a=><article key={a.decision_id}><b>{g.names[a.actor_id]||'Участник'}</b><span>{a.role_snapshot||'Без должности'}</span><strong>{a.authority_ok&&a.lawful?'Правовой критерий: 1 балл':'Правовой критерий: 0 баллов'}</strong><small>{a.legal_basis}</small>{a.strategy_point&&<span>Защита интересов своей роли: учитывается в стратегии</span>}</article>)}</div>}
