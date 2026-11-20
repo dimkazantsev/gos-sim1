@@ -190,11 +190,13 @@ async function main(){
     await event.getByRole('button',{name:'Подготовить заявку',exact:true}).click();
     await sim.getByRole('alert').waitFor({state:'hidden'});
    }
-   await outcome.fill('');
-   // Validate the value of the *actual labelled field* immediately before
-   // submission. A global document.querySelector can read a different form
-   // when multiple scoped panels are mounted in the test fixture.
-   assert.equal(await outcome.inputValue(),'','The invalid result must remain visible before submitting at '+width+'px');
+   // Real keyboard deletion exercises the React-controlled field, not a
+   // synthetic element.value mutation. Verify the field AFTER React commits.
+   await outcome.focus();
+   await outcome.press('ControlOrMeta+A');
+   await outcome.press('Backspace');
+   await page.evaluate(()=>new Promise(requestAnimationFrame));
+   assert.equal(await outcome.inputValue(),'','Clearing the visible result must persist at '+width+'px');
    await submitRequest.click();
    try{
     await sim.getByRole('alert').waitFor();

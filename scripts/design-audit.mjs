@@ -117,7 +117,14 @@ check('Atlas owns last-loaded card styles without old fixed-width buttons',
  stageSheet.includes('.stagesAtlas .stageAtlasCardFooter')&&
  !stageSheet.includes('width:calc(100% - 55px)'));
 const layout=read('app/layout.tsx');
-check('Single ordered entry point for all design sheets',styles.every((name,i)=>layout.indexOf(name+'.css')>=0&&(i===0||layout.indexOf(name+'.css')>layout.indexOf(styles[i-1]+'.css'))));
+check('Design sheets preserve their approved ordering across global and route styles',
+ styles.slice(0,5).every((name,i)=>layout.indexOf(name+'.css')>=0&&(i===0||layout.indexOf(name+'.css')>layout.indexOf(styles[i-1]+'.css')))&&
+ ['app/game/[id]/layout.tsx','app/teacher/page.tsx'].every(path=>{
+  const route=read(path);
+  return route.indexOf('stage-map.css')>=0&&
+   route.indexOf('2026-stage-system.css')>route.indexOf('stage-map.css')&&
+   route.indexOf('stage-operations.css')>route.indexOf('2026-stage-system.css');
+ }));
 const font=read('node_modules/@fontsource-variable/manrope/index.css');
 check('Self-hosted Cyrillic font is available',font.includes('cyrillic')&&font.includes('font-display: swap'));
 check('Legacy rules are isolated from the new design',read('app/globals.css').includes('@layer legacy {'));
