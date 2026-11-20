@@ -10,7 +10,7 @@ assert.deepEqual(describeEventFiscalEffect({transfer_in:18}),['трансфер�
 assert.deepEqual(describeEventFiscalEffect({expenditure:NaN,activity:Infinity}),[]);
 const events=fs.readFileSync(path.resolve(__dirname,'../components/game/EventWorkspace.tsx'),'utf8');
 assert(events.includes("outcome.winner!=='tie'"),'No financial event claim on a tied vote');
-assert(events.includes('describeEventFiscalEffect(chosenEffect?.fiscal_effect)'),'Only the winning option can disclose its region effect');
+assert(events.includes('describeEventFiscalEffect(chosenEffect?.fiscal_effect??outcome.winning_fiscal_effect)'),'Use the winning outcome in existing realtime projection when the case was opened before voting');
 assert(events.includes('прямое изменение экономических параметров для этого варианта не предусмотрено'),'Neutral options have explicit information rather than invented monetary effects');
 assert(events.includes('фактический бюджет рассчитывается по действующей модели'),'Expenses and direct taxes must not be confused');
 const sql=fs.readFileSync(path.resolve(__dirname,'../supabase/migrations/20261120142327_outcome_winner_economy_visibility_only.sql'),'utf8');
@@ -20,4 +20,9 @@ assert(sql.includes("else '{}'::jsonb end"),'All nonwinning financial effects ar
 assert(sql.includes("private.assigned_game_case"),'A participant may only read assigned cases');
 assert(sql.includes("private.is_game_teacher"),'Teacher retains full visibility');
 assert(sql.includes("on won.case_id=c.id and won.game_id=c.game_id"),'Outcomes remain game-isolated');
+const projection=fs.readFileSync(path.resolve(__dirname,'../supabase/migrations/20261120142502_winning_fiscal_effect_in_event_projection.sql'),'utf8');
+assert(projection.includes('AS winning_fiscal_effect'),'Existing projection carries the finished outcome without additional fetch');
+assert(projection.includes('AS winning_description'),'Winning consequence is visible after result');
+assert(projection.includes('v_full_view OR o.case_id=ANY(v_cases)'),'Keep per-user event membership checks');
+assert(events.includes('winning_fiscal_effect?:EventFiscalEffect|null'),'An old opened case can display the final effect after projection reconciliation');
 console.log('PASS: region explanations, exact winner-only fiscal disclosure, role boundaries, neutral choices and units');
