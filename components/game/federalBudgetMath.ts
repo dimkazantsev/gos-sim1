@@ -48,7 +48,13 @@ export function calculateFederalBudget(draft:BudgetDraft,state:SimulatorState,co
  const cost=clamp(1+((p?.inflation??a.inflation)-a.inflation)*.004+(fx/a.fx_rate-1)*.02,.7,1.6);
  const oil=clamp((p?.oil_price??a.oil_price)/a.oil_price*fx/a.fx_rate,.1,3);
  const vat=rates.find(r=>r.region_code==='00'&&r.tax_key==='vat')?.rate??22,profit=rates.find(r=>r.region_code==='00'&&r.tax_key==='profit')?.rate??25;
- const income_lines=baseline.income_lines.map(l=>{const driver=l.driver==='oil'?oil:l.driver==='activity'?activity:1;const tax=l.key==='turnover'?1+.72*(vat/22-1):l.key==='income'?1+.8*(profit/25-1):1;return {key:l.key,label:l.label,baseline:l.amount,amount:round(Math.max(0,l.amount*driver*tax*(1+(draft.income_changes[l.key]??0)/100)+(draft.revenue_adjustments[l.key]??0)))};});
+ // Only legal stability changes collection. Trust already affects activity,
+ // so it must not produce a second automatic revenue adjustment.
+ const law=context?.metrics.lawfulness,ref=p?.collection_lawfulness_reference;
+ const collectionRate=law!=null&&ref!=null?clamp(.95+(law-ref)*.0003,.85,.995):.95;
+ const collectionFactor=collectionRate/.95;
+ const taxableGroups=new Set(['oil_gas','turnover','income','rent','recycling']);
+ const income_lines=baseline.income_lines.map(l=>{const driver=l.driver==='oil'?oil:l.driver==='activity'?activity:1;const tax=l.key==='turnover'?1+.72*(vat/22-1):l.key==='income'?1+.8*(profit/25-1):1;return {key:l.key,label:l.label,baseline:l.amount,amount:round(Math.max(0,l.amount*driver*tax*(1+(draft.income_changes[l.key]??0)/100)*(taxableGroups.has(l.key)?collectionFactor:1)+(draft.revenue_adjustments[l.key]??0)))};});
  const income_details:BudgetIncomeDetail[]=revenueModel.map(m=>{
   const l=baseline.income_lines.find(x=>x.key===m.group_key)!;
   const driver=l.driver==='oil'?oil:l.driver==='activity'?activity:1;
@@ -58,9 +64,9 @@ export function calculateFederalBudget(draft:BudgetDraft,state:SimulatorState,co
   const scale=rawGroup>0?income_lines.find(x=>x.key===l.key)!.amount/rawGroup:0;
   const rate=m.key==='vat'?vat:m.key==='profit'?profit:m.reference_rate;
   const divisor=m.rate_unit==='rubles'?m.reference_rate/1e6:m.reference_rate/100;
-  // Approved neutral 95% calibration. Do not apply experimental response
-  // coefficients yet; non-tax and mixed receipts are not tax collection.
-  const collection=['dividends','asset_interest','other'].includes(m.key)?1:.95;
+  // The initial 95% is calibrated to preserve the active game's accepted budget.
+  // Changes in lawfulness adjust actual receipts and never modify non-tax income.
+  const collection=['dividends','asset_interest','other'].includes(m.key)?1:collectionRate;
   const base=l.amount*m.share/(divisor*m.federal_share)*baseDriver*scale/collection;
   const amount=base*(m.rate_unit==='rubles'?rate/1e6:rate/100)*collection*m.federal_share;
   return {...m,rate,base,collection,amount,baseline:l.amount*m.share};
