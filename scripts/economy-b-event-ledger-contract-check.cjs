@@ -2,11 +2,14 @@ const assert=require('node:assert/strict');
 const fs=require('node:fs');
 const read=path=>fs.readFileSync(path,'utf8');
 const migration=read('supabase/migrations/20261120140645_economy_b_no_double_fiscal_event_effects.sql');
+const rateFix=read('supabase/migrations/20261120140915_economy_b_prevent_federal_tax_act_double_credit.sql');
 const matrix=read('supabase/migrations/20261011180500_event_case_330_matrix.sql');
 const routing=read('supabase/migrations/20261011181000_event_stage_party_dispatch.sql');
 const revenue=read('supabase/migrations/20261120135619_economy_b_dynamic_collection.sql');
 const codes=(matrix.match(/declare codes text:='([0-9a-f]+)'/)||[])[1];
 assert.equal(codes?.length,330,'The 330 situation matrix is unchanged');
+assert(rateFix.includes("p.tax_key in ('vat','profit')")&&rateFix.includes("l.region_code='00'"),
+  'Federal VAT/profit changes cannot be added on top of the rate-aware model');
 assert(migration.includes("if key='budget' and l.source_type='event' then continue;end if;"),
   'An event changes the regional base and economy, not federal revenue twice');
 assert(migration.includes("key in array array['budget','economy']"),
