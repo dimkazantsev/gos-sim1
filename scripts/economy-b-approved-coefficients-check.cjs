@@ -11,7 +11,9 @@ const calc=c=>calculateFederalBudget(draft,state,c,[region],[],[]);
 const baseline=calc(ctx);
 assert.equal(baseline.revenue,40283300,'Approved coefficients retain baseline');
 const trustPlus={...ctx,metrics:{...ctx.metrics,public_trust:13}};
-const trustPlusWithoutCollection={...trustPlus,policy:{...ctx.policy,baseline_trust:13}};
+// Hold activity and exchange-rate effects constant; neutralize only the collection
+// increment by offsetting lawfulness in the synthetic calculation (0.0005 / 0.0003).
+const trustPlusWithoutCollection={...trustPlus,metrics:{...trustPlus.metrics,lawfulness:24-5/3}};
 const withCollection=calc(trustPlus),withoutCollection=calc(trustPlusWithoutCollection);
 assert(withCollection.revenue>withoutCollection.revenue,'Trust collection adds a separate positive channel');
 for(const key of ['assets','other'])assert.equal(withCollection.income_lines.find(x=>x.key===key).amount,withoutCollection.income_lines.find(x=>x.key===key).amount,'Non-tax budget line is not collected twice');
