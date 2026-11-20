@@ -8,7 +8,7 @@ const panel=fs.readFileSync('components/game/ChatPanel.tsx','utf8');
 const picker=fs.readFileSync('components/game/ChatChannelDropdown.tsx','utf8');
 const css=fs.readFileSync('app/profile-chat-responsive.css','utf8');
 const responsiveSiteCss=fs.readFileSync('app/design-readability.css','utf8')+fs.readFileSync('app/mobile-nav-polish.css','utf8')+fs.readFileSync('app/teacher-ui-polish.css','utf8');
-assert(panel.includes('className="chatHeadIcon chatExpandTrigger"')&&panel.includes('onClick={()=>setExpanded(value=>!value)}'),'The message icon must expand chat');
+assert(panel.includes('className="chatHeadIcon chatExpandTrigger"')&&panel.includes('onClick={()=>changeExpanded(!expanded)}'),'The message icon must expand chat');
 assert(panel.includes('createPortal(chatView,document.body)'),'Expanded chat must escape the page stacking context');
 assert(panel.includes('expanded={expanded}'));
 assert(panel.includes('useDialog(overlay||expanded'));
