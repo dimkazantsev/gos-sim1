@@ -10,7 +10,7 @@ const compiled=ts.transpileModule(loader.getText(parsed)+'\nexports.load=loadPas
 }).outputText;
 function make(deps){
  const out={},env={supabase:deps.supabase,game:{id:'test-game'},teacher:deps.teacher,me:deps.me,authId:deps.authId,
-  compact:false,loadScope:'scope',activeScope:deps.activeScope||{current:'scope'},loadRequest:deps.loadRequest,
+  compact:false,safePreviewUserId:undefined,loadScope:'scope',activeScope:deps.activeScope||{current:'scope'},loadRequest:deps.loadRequest,
   acceptedRowsScope:{current:''},acceptedDebriefScope:{current:''},publicScoresCallback:{current:deps.onPublicScores},
   ASSESSMENT_COLUMNS:'id,game_id,stage_no,user_id,auto_score,final_score,status,criterion_law,criterion_strategy,criterion_debrief,public_rationale,last_run_type,last_auto_at,revision_count,teacher_note,finalized_at',
   readState:{controller:null},g:{setError:error=>{throw Error('Unexpected loader error: '+error);}},setRows:deps.setRows,setDebriefRows:deps.setDebriefRows,AbortSignal,AbortController,setTimeout,clearTimeout,exports:out};
@@ -46,7 +46,7 @@ function pendingQuery(pending){return{select(){return this;},eq(){return this;},
   const request=load();await tick();activeScope.current='another-game-or-role';pending[0]({error:null,data:[{teacher_note:'private old scope'}]});await request;
   assert.equal(seen.length,0,'An old game or role cannot publish private data into the new scope');
  }
- assert(source.includes("useGameTableSync(authId===null?undefined:game?.id,['stage_assessments','stage_debriefs'],load,loadScope"),'Shared refresh must follow current account, game and role');
+ assert(source.includes("useGameTableSync(authId===null||safePreviewUserId?undefined:game?.id,['stage_assessments','stage_debriefs'],load,loadScope"),'Shared refresh must follow current account, game and role');
  const gameShell=fs.readFileSync('components/game/useRepublicGame.ts','utf8');
  const gameClient=fs.readFileSync('components/GameClient.tsx','utf8');
  assert(gameShell.includes('me:visibleMe,verifiedUserId:visibleMe?.user_id??null,'),
@@ -57,7 +57,7 @@ function pendingQuery(pending){return{select(){return this;},eq(){return this;},
   'Teacher student preview must carry the REAL auth identity, not impersonate the student');
  assert(source.includes("me?.kind==='student'&&authId===me.user_id"),
   'Only the signed-in student can fetch private assessments and debriefs');
- assert(source.includes('authId===null?undefined:game?.id'),
+ assert(source.includes('authId===null||safePreviewUserId?undefined:game?.id'),
   'No verified identity must mean no grade refresh');
  assert(!source.includes("channel('grades-view:"),'Unpublished assessments must not create a useless channel');
  assert(source.includes("useState<'surname'|'name'|'sum'|'average'|'final'|'graded'>('sum')"),

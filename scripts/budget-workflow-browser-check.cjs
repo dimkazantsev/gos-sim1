@@ -191,10 +191,10 @@ async function main(){
     await sim.getByRole('alert').waitFor({state:'hidden'});
    }
    await outcome.fill('');
-   // Await the controlled React value: a concurrent rendering pass can briefly
-   // restore the seeded text after Playwright dispatches an input event.
-   await page.waitForFunction(()=>document.querySelector('[aria-label="Заявка по региональному событию"] textarea[rows="2"]')?.value==='',null,{timeout:4000});
-   assert.equal(await outcome.inputValue(),'','The invalid result must reach the controlled textarea at '+width+'px');
+   // Validate the value of the *actual labelled field* immediately before
+   // submission. A global document.querySelector can read a different form
+   // when multiple scoped panels are mounted in the test fixture.
+   assert.equal(await outcome.inputValue(),'','The invalid result must remain visible before submitting at '+width+'px');
    await submitRequest.click();
    try{
     await sim.getByRole('alert').waitFor();
