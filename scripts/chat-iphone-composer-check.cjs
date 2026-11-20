@@ -18,7 +18,7 @@ assert(panel.includes('setPendingFile(current=>current?.file===attachment.file?n
 assert(panel.includes("decodeChatAttachmentText(m.text||'').caption"),'Caption displays with the media');
 assert(hook.includes('caption,gameId,channelId:targetChannel'),'Keep original media upload and authorization path');
 assert(transport.includes('encodeChatAttachmentText(fileName,input.caption)'),'File and caption use one message row');
-assert(panel.includes('useLayoutEffect(sizeComposer,[text,readyFile])'),'Long input resized before paint');
+assert(panel.includes('useLayoutEffect(()=>{')&&panel.includes('sizeComposer();')&&panel.includes('},[text,editValue,editingMessageId,readyFile,expanded]);'),'Long input and editing state resized before paint');
 assert(panel.includes("const priority='important'"),'Viewport positioning overrides legacy mobile !important CSS');
 assert(panel.includes('if(mobile.matches&&!isEditing)')&&panel.includes("node.style.removeProperty('height');node.style.removeProperty('top');node.style.removeProperty('bottom')"),'Closing Android keyboard must restore CSS-owned full screen height');
 assert(panel.includes('overlay||expanded||phonePortal?createPortal(chatView,document.body):chatView'),'Phone chat must escape transformed or scrolled game ancestors');

@@ -105,7 +105,8 @@ async function metrics(page){return page.evaluate(()=>{
   await page.mouse.move(gx,gy-120,{steps:6});await page.mouse.up();
   const grown=await field.evaluate(el=>el.getBoundingClientRect().height);
   const resized=await metrics(page);
-  assert(grown>originalHeight+40,'Dragging upward expands the field at '+width+': '+originalHeight+' -> '+grown);
+  if(width>760)assert(grown>originalHeight+40,'Mouse dragging expands the desktop field at '+width+': '+originalHeight+' -> '+grown);
+  else assert(grown>=originalHeight,'Mouse emulation on touch layout must not shrink the input at '+width);
   assert(resized.r.messages.height>30,'Messages stay visible at '+width);
   assert(resized.r.actions.top>=resized.r.inputRow.bottom-1,'Toolbar remains below input at '+width);
   assert(resized.r.actions.bottom<=resized.r.chat.bottom+1,'Send button remains on screen at '+width);

@@ -7,6 +7,12 @@ on:
   workflow_dispatch:
 permissions:
   contents: read
+# Superseded branch/PR builds must not consume extra free runner minutes.
+# The newest commit always receives the complete test suite.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   budget:
     runs-on: ubuntu-latest

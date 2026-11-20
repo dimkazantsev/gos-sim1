@@ -71,6 +71,12 @@ on:
 permissions:
   contents: read
 
+# Superseded branch/PR builds must not consume extra free runner minutes.
+# The newest commit always receives the complete test suite.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   teacher-ui:
     runs-on: ubuntu-24.04

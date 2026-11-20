@@ -359,6 +359,12 @@ on:
     branches: [main, "feature/blitz-questions-*", "codex/civic-*", "codex/budget-amendments-*", "codex/project-audit-*", "fix/fast-login-*", "fix/stabilize-runtime-*", "fix/realtime-capacity-*", "fix/situation-icons-only-*", "fix/realtime-capacity-sync-indicator-*", "fix/bootstrap-no-realtime-*", "fix/password-login-bypass-refresh-*", "fix/profile-refresh-navigation-*", "fix/restore-current-screen-on-refresh-*", "fix/events-targeted-stability-*", "fix/event-header-button-style-*", "fix/event-refresh-next-to-status-*", "fix/lazy-event-bank-bulk-manage-*", "fix/lazy-event-bank-bulk-manage-reorder-*", "feat/pau-regional-event-routing-*"]
   workflow_dispatch:
 
+# Superseded branch/PR builds must not consume extra free runner minutes.
+# The newest commit always receives the complete test suite.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   verify:
     runs-on: ubuntu-latest

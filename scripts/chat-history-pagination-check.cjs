@@ -47,7 +47,7 @@ assert(loader.includes(".order('id',{ascending:false})"),'Tied timestamps must h
 assert(loader.includes('loadingOlderChatRef.current'),'Repeated taps must not overlap');
 assert(loader.includes('chatChannelVersion.current!==version'),'Old channel responses must be discarded');
 assert(hook.includes("if(!latest)return; // The first fetch is strictly ten messages."));
-assert(hook.includes('if(channelId&&chatOpen)'),'Closed chat must not fetch message bodies');
+assert(hook.includes('if(!chatOpen||!channelId)return;')&&hook.includes('void loadMessages(channelId,true);'),'Closed chat must not fetch message bodies');
 assert(hook.includes('hasOlderChatMessages,olderChatLoading,loadOlderChatMessages'),'Expose paging through existing hook');
 assert(panel.includes('Загрузить предыдущие сообщения')&&panel.includes('onClick={()=>void loadEarlierHistory()}'));
 assert(panel.includes('useLayoutEffect')&&panel.includes('restoreHistoryScroll.current'),'Preserve scrolling');
