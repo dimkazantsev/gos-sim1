@@ -5,6 +5,24 @@
 SET LOCAL lock_timeout = '1500ms';
 SET LOCAL statement_timeout = '12s';
 
+-- Abort if production routines changed after the reviewed 2026-11-20 snapshot.
+DO $economy_b_guard$
+BEGIN
+ IF md5(pg_get_functiondef('private.budget_income_details(uuid,jsonb,jsonb,numeric,numeric)'::regprocedure)) <> '3ace56695e45a298bd667dbac2e0ac6e' THEN
+  RAISE EXCEPTION 'economy B: income detail definition drifted, migration aborted';
+ END IF;
+ IF md5(pg_get_functiondef('private.calculate_budget_simulator(uuid,jsonb)'::regprocedure)) <> '0c5aa97934384cbfdeb4fc19076229f5' THEN
+  RAISE EXCEPTION 'economy B: simulator definition drifted, migration aborted';
+ END IF;
+ IF md5(pg_get_functiondef('private.budget_forecast_signature(uuid,jsonb)'::regprocedure)) <> '15b5ed64ff8f456e7c4194cd84398f86' THEN
+  RAISE EXCEPTION 'economy B: forecast signature definition drifted, migration aborted';
+ END IF;
+ IF to_regprocedure('private.fiscal_activity_reference(numeric,numeric,numeric,numeric)') IS NULL THEN
+  RAISE EXCEPTION 'economy B: missing relative activity helper';
+ END IF;
+END;
+$economy_b_guard$;
+
 CREATE OR REPLACE FUNCTION private.budget_income_details(p_game uuid, d jsonb, groups jsonb, p_activity numeric, p_oil numeric)
  RETURNS jsonb
  LANGUAGE plpgsql
