@@ -4,6 +4,7 @@ import {useEffect,useId,useMemo,useRef,useState} from 'react';
 import {BookOpen,Play,Shuffle} from 'lucide-react';
 import {supabase} from '@/lib/supabase';
 import StageModuleHeader from '@/components/ui/StageModuleHeader';
+import CrisisManagementPanel from './CrisisManagementPanel';
 import {CRISES,INTENSITY_LABEL,CRISIS_RESPONSE_HOURS} from './constants';
 import {useGameTableSync} from './useGameTableSync';
 import type {ReturnTypeRepublic} from './viewTypes';
@@ -69,7 +70,7 @@ function CrisisCatalog({busy,active,onLaunch}:{busy:boolean;active:boolean;onLau
 }
 
 export default function CrisisRoom({g,readOnly=false}:{g:ReturnTypeRepublic;readOnly?:boolean}){
- const {game,me,teacher,crises,members,currentStage,triggerCrisis,setError}=g;
+ const {game,me,teacher,crises,members,currentStage,triggerCrisis,refreshCrisisState,setError}=g;
  const active=useMemo(()=>crises.filter(c=>c.status==='active').sort((a,b)=>new Date(b.created_at).getTime()-new Date(a.created_at).getTime())[0],[crises]);
  const [requests,setRequests]=useState<InfoRequest[]>([]);
  const [responses,setResponses]=useState<CrisisResponse[]>([]);
@@ -89,7 +90,7 @@ export default function CrisisRoom({g,readOnly=false}:{g:ReturnTypeRepublic;read
  const [resources,setResources]=useState('');
  const [message,setMessage]=useState('');
  const [reviewDraft,setReviewDraft]=useState<Record<string,string>>({});
- const [resolution,setResolution]=useState('');
+
  const [consequenceUser,setConsequenceUser]=useState('');
  const [consequenceStatus,setConsequenceStatus]=useState<RoleConsequence['status']>('suspended');
  const [consequenceReason,setConsequenceReason]=useState('');
@@ -141,10 +142,13 @@ export default function CrisisRoom({g,readOnly=false}:{g:ReturnTypeRepublic;read
 
  if(!game||!me)return null;
  if(!active){
-  if(!teacher)return <section className={'crisisCommand '+styles.room}><StageModuleHeader eyebrow={`ТЕКУЩИЙ ЭТАП ${currentStage?.stage_no||game.current_round} · КРИЗИСНОЕ УПРАВЛЕНИЕ`} title="Активного кризиса нет" description="Преподаватель может запустить сценарий на любом этапе. После запуска здесь появятся сведения и формы реагирования."/></section>;
+  if(!teacher)return <section className={'crisisCommand '+styles.room}><StageModuleHeader eyebrow={`ТЕКУЩИЙ ЭТАП ${currentStage?.stage_no||game.current_round} · КРИЗИСНОЕ УПРАВЛЕНИЕ`} title="Активного кризиса нет" description="Преподаватель может запустить сценарий на любом этапе. После запуска здесь появятся сведения и формы реагирования."/>
+    {crises.filter(c=>c.status==='resolved').slice(0,1).map(c=><CrisisManagementPanel key={c.id} crisis={c} teacher={false} readOnly onChanged={refreshCrisisState} setError={setError}/>)}
+   </section>;
   return <section className={'crisisCommand '+styles.room}>
    <StageModuleHeader eyebrow={`ТЕКУЩИЙ ЭТАП ${currentStage?.stage_no||game.current_round} · КРИЗИСНОЕ УПРАВЛЕНИЕ`} title="Выберите кризисный сценарий" description={`Преподаватель задаёт событие и интенсивность или проводит случайную жеребьёвку. Первичная реакция участников длится ${CRISIS_RESPONSE_HOURS} часов.`} icon={<BookOpen size={18} aria-hidden="true"/>} stats={[{label:'Сценарии',value:CRISES.length,detail:'9 из правил · 6 дополнительных'},{label:'Первичная реакция',value:`${CRISIS_RESPONSE_HOURS} ч`,detail:'После запуска сценария'}]}/>
    <CrisisCatalog busy={busy} active={false} onLaunch={launch}/>
+    {crises.filter(c=>c.status==='resolved').slice(0,1).map(c=><CrisisManagementPanel key={c.id} crisis={c} teacher={false} readOnly onChanged={refreshCrisisState} setError={setError}/>)}
   </section>;
  }
  const deadline=active.response_deadline?new Date(active.response_deadline).getTime():null;
@@ -194,10 +198,6 @@ export default function CrisisRoom({g,readOnly=false}:{g:ReturnTypeRepublic;read
     ?{...item,publication_rejected_at:new Date().toISOString()}:item));
   }finally{setBusy(false)}
  }
- async function resolve(){
-  setBusy(true);const r=await supabase.rpc('resolve_crisis',{p_crisis_id:active.id,p_resolution_note:resolution.trim()||null});
-  if(r.error)setError(userError(r.error));setBusy(false);
- }
  async function applyRoleConsequence(){
   if(!consequenceUser)return;setBusy(true);
   const r=await supabase.rpc('set_crisis_role_consequence',{
@@ -211,6 +211,7 @@ export default function CrisisRoom({g,readOnly=false}:{g:ReturnTypeRepublic;read
  return <section className={'crisisCommand '+styles.room}>
   <StageModuleHeader eyebrow={`ТЕКУЩИЙ ЭТАП ${currentStage?.stage_no||game.current_round} · АКТИВНЫЙ КРИЗИС`} title={active.crisis_type} description={active.description} variant="government" stats={[{label:'Окно первичной реакции',value:<CrisisCountdown deadline={deadline}/>,detail:`Запущен на этапе ${active.stage_no}`},{label:'Интенсивность',value:INTENSITY_LABEL[active.intensity]}]}/>
 
+  <CrisisManagementPanel key={active.id} crisis={active} teacher={teacher} readOnly={readOnly} onChanged={refreshCrisisState} setError={setError}/>
   <div className="crisisCommandGrid">
    <article className="crisisIntel">
     <div className="crisisSectionHead"><div><small>ИНФОРМАЦИОННАЯ НЕОПРЕДЕЛЁННОСТЬ</small><h3>Запросы сведений</h3></div><span>{requests.filter(x=>x.status==='pending').length} ждут ответа</span></div>
@@ -264,7 +265,7 @@ export default function CrisisRoom({g,readOnly=false}:{g:ReturnTypeRepublic;read
    </div>
   </section>}
 
-  {teacher&&<footer className="crisisResolution"><div><small>ЗАВЕРШЕНИЕ СЦЕНАРИЯ</small><p>Фиксируйте результат только после разбора решений: что сработало, какие полномочия были использованы корректно и какие последствия возникли.</p></div><textarea rows={3} aria-label="Итог кризиса и ключевые последствия" value={resolution} onChange={e=>setResolution(e.target.value)} placeholder="Итог кризиса и ключевые последствия"/><button className="primary" disabled={busy} onClick={()=>void resolve()}>Завершить кризис</button></footer>}
+  
   {teacher&&<details className={styles.nextCatalog}><summary>Каталог сценариев для следующего запуска <span>{CRISES.length} сценариев · 4 уровня</span></summary><CrisisCatalog busy={busy} active onLaunch={launch}/></details>}
  </section>;
 }
