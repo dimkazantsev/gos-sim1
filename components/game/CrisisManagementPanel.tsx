@@ -43,10 +43,10 @@ export default function CrisisManagementPanel({crisis,teacher,readOnly=false,onC
   if(!historyOpen)return;
   let cancelled=false;
   setHistoryBusy(true);setHistoryError('');
-  void supabase.from('crisis_management_history')
+  void Promise.resolve(supabase.from('crisis_management_history')
    .select('id,kind,old_threat,new_threat,old_containment,new_containment,reason,created_at')
    .eq('game_id',crisis.game_id).eq('crisis_id',crisis.id)
-   .order('id',{ascending:false}).limit(20)
+   .order('id',{ascending:false}).limit(20))
    .then(result=>{
     if(cancelled)return;
     if(result.error)setHistoryError(userError(result.error));
