@@ -535,6 +535,7 @@ jobs:
       - run: node scripts/telegram-reception-journal-check.cjs
       - run: node scripts/telegram-bot-avatar-check.cjs
       - run: node scripts/event-option-legality-check.cjs
+      - run: node scripts/event-teacher-feed-privilege-check.cjs
       - run: node scripts/regional-party-case-competence-check.cjs
       - run: node scripts/event-single-correct-explanation-check.cjs
       - run: npm run design:check
