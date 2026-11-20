@@ -1,0 +1,3 @@
+@import '../../sim-shell.css' layer(legacy-route);
+@import '../../sim-panels.css' layer(legacy-route);
+@import '../../public-screen.css' layer(legacy-route);

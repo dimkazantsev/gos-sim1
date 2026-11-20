@@ -1,8 +1,5 @@
-@layer legacy;
+@layer legacy-route, legacy;
 @import './landing.css' layer(legacy);
-@import './sim-shell.css' layer(legacy);
-@import './sim-panels.css' layer(legacy);
-@import './public-screen.css' layer(legacy);
 @import './stage7-election.css' layer(legacy);
 
 @layer legacy {
