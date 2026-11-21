@@ -253,7 +253,8 @@ export default function StateMetricsDock({g,initialSelectedMetricId='',initialCo
  const series=activeMetrics.map(metric=>({
   metric,
   color:metric.id===chosen?.id?METRIC_COLORS[0]:METRIC_COLORS[(1+comparisonOptions.findIndex(option=>option.id===metric.id))%METRIC_COLORS.length],
-  points:pointsForMetric(metric,mergedHistory,bucket,game?.created_at,snapshotAt,metric.metric_key!=='budget'&&historyMore[metric.metric_key]!==false)
+  points:pointsForMetric(metric,mergedHistory,bucket,game?.created_at,snapshotAt,
+   historyMore[metric.metric_key]!==false&&(metric.metric_key!=='budget'||!g.budgetPulse?.history?.length))
  }));
  const moneyChart=series.length===1&&chosen?.metric_key==='budget';
  const geometry=drawMetricChart(series,series.length>1,Math.max(240,plotWidth),plotWidth<460?222:250,moneyChart?72:52);

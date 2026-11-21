@@ -18,6 +18,7 @@ assert(source.includes("metricHistory.filter(row=>row.metric_key!=='budget')"),'
 assert(source.includes("source_type:'budget_forecast'"),'Real budget forecast records only');
 assert(!source.includes("chosen.metric_key!=='budget'&&historyMore[chosen.metric_key]"),'Older income history is paginated on demand');
 assert(source.includes('Загрузка истории бюджетных расчётов…'),'Loading state distinguishes a missing history from an in-flight page');
+assert(source.includes("historyMore[metric.metric_key]!==false&&(metric.metric_key!=='budget'||!g.budgetPulse?.history?.length)"),'A partial 50-row budget page cannot claim it starts at the game's first budget record');
 const budgets=Array.from({length:77},(_,n)=>({id:n+31,recorded_at:new Date(Date.UTC(2026,10,20,0,0,n)).toISOString(),value:35000000+n*100}));
 const orderedBudgets=[...budgets].reverse();
 const first=orderedBudgets.slice(0,pageSize),last=first.at(-1);
