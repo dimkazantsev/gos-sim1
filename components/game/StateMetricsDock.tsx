@@ -94,10 +94,18 @@ export default function StateMetricsDock({g,initialSelectedMetricId='',initialCo
  const visibleMetrics=[...primary,...secondary];
  const chosen=allowed.find(m=>m.id===selected);
  const mergedHistory=useMemo(()=>{
-  const unique=new Map(metricHistory.map(row=>[row.id,row]));
-  Object.values(historyPages).forEach(rows=>rows.forEach(row=>unique.set(row.id,row)));
+  // Income calculations belong to the budget history, not the metric log.
+  // Prefer the budget view's already loaded pulse to avoid a second request.
+  const budgetRows=g.budgetPulse?.history?.length?g.budgetPulse.history:
+   historyPages.budget?.length?historyPages.budget:
+   metricHistory.filter(row=>row.metric_key==='budget');
+  const unique=new Map([...metricHistory.filter(row=>row.metric_key!=='budget'),...budgetRows]
+   .map(row=>[row.metric_key+':'+row.id,row]));
+  Object.entries(historyPages).forEach(([key,rows])=>{
+   if(key!=='budget')rows.forEach(row=>unique.set(row.metric_key+':'+row.id,row));
+  });
   return [...unique.values()].sort((a,b)=>a.recorded_at.localeCompare(b.recorded_at)||a.id-b.id);
- },[metricHistory,historyPages]);
+ },[metricHistory,historyPages,g.budgetPulse?.history]);
  useEffect(()=>{
   if(!chosen||!plotRef.current)return;
   const node=plotRef.current;
@@ -174,7 +182,7 @@ export default function StateMetricsDock({g,initialSelectedMetricId='',initialCo
  const comparisonOptions=visibleMetrics.filter(m=>m.id!==chosen?.id);
  const activeMetrics=chosen?[chosen,...comparisonOptions.filter(m=>compare.includes(m.id))]:[];
  const comparisonLimitReached=activeMetrics.length>=MAX_CHART_SERIES;
- const activeHistoryKeys=activeMetrics.filter(metric=>metric.metric_key!=='budget').map(metric=>metric.metric_key).join('|');
+ const activeHistoryKeys=activeMetrics.filter(metric=>metric.metric_key!=='budget'||!g.budgetPulse?.history?.length).map(metric=>metric.metric_key).join('|');
  const loadHistoryPage=async(metricKey:string)=>{
   const gid=game?.id,scope=historyScope.current;
   if(!gid||historyPending.current.has(metricKey)||
@@ -187,8 +195,10 @@ export default function StateMetricsDock({g,initialSelectedMetricId='',initialCo
   setHistoryError('');
   try{
    const cursor=historyCursor.current.get(metricKey);
-   let query=supabase.from('state_metric_history').select('*')
-    .eq('game_id',gid).eq('metric_key',metricKey)
+   // A bounded, on-demand RLS read. No new poll or subscription.
+   let query=(metricKey==='budget'
+    ?supabase.from('budget_income_history').select('id,game_id,value,previous_value,note,recorded_at').eq('game_id',gid)
+    :supabase.from('state_metric_history').select('*').eq('game_id',gid).eq('metric_key',metricKey))
     .order('recorded_at',{ascending:false}).order('id',{ascending:false})
     .limit(HISTORY_PAGE_SIZE);
    if(cursor){
@@ -198,9 +208,14 @@ export default function StateMetricsDock({g,initialSelectedMetricId='',initialCo
    const result=await query;
    if(historyScope.current!==scope)return;
    if(result.error){setHistoryError('Не удалось загрузить предыдущие записи.');return}
-   const rows=(result.data||[]) as MetricHistory[];
+   const raw=result.data||[];
+   const rows=(metricKey==='budget'?raw.map(row=>({
+    ...row,metric_key:'budget',metric_id:chosen?.id??null,
+    source_type:'budget_forecast',source_id:null,actor_id:null,
+    delta:Number(row.value)-Number(row.previous_value??row.value)
+   })):raw) as MetricHistory[];
    historyLoaded.current.add(metricKey);
-   setHistoryMore(previous=>({...previous,[metricKey]:rows.length===HISTORY_PAGE_SIZE}));
+   setHistoryMore(previous=>({...previous,[metricKey]:raw.length===HISTORY_PAGE_SIZE}));
    if(rows.length){
     const last=rows[rows.length-1];
     historyCursor.current.set(metricKey,{recorded_at:last.recorded_at,id:last.id});
@@ -329,7 +344,8 @@ export default function StateMetricsDock({g,initialSelectedMetricId='',initialCo
       <span className="metricPointDot" style={{background:activePoint.color}} aria-hidden="true"/>
       <span className="metricPointText"><b>{activePoint.metric.label} · {formatValue(activePoint.value,activePoint.metric.unit)}</b><small>{formatTime(activePoint.at)} · {activePoint.note}</small></span>
      </div>}
-     {singlePoint&&<p className="metricChartNotice">{chosenPoints[0].kind==='snapshot'?'Показано текущее значение. Записи об изменениях пока отсутствуют.':'Показана исходная точка. Линия динамики появится после первого изменения.'}</p>}
+     {chosen.metric_key==='budget'&&historyLoading.budget&&<p className="metricChartNotice" role="status">Загрузка истории бюджетных расчётов…</p>}
+     {singlePoint&&!historyLoading[chosen.metric_key]&&<p className="metricChartNotice">{chosenPoints[0].kind==='snapshot'?'Показано текущее значение. Записи об изменениях пока отсутствуют.':'Показана исходная точка. Линия динамики появится после первого изменения.'}</p>}
      {geometry.comparing&&<p className="metricChartNotice">Линии приведены к собственным шкалам. Точные значения показаны при выборе точки.</p>}
      <div className="metricSeriesControls">
       <div className="metricSeriesControlsHead">
@@ -351,7 +367,7 @@ export default function StateMetricsDock({g,initialSelectedMetricId='',initialCo
      </div>
     </section>
     <div className="metricHistoryList">
-     <div className="metricHistoryHead"><b>Журнал показателя</b><span>{hist.length} загружено</span></div>
+     <div className="metricHistoryHead"><b>{chosen.metric_key==='budget'?'Журнал расчётов доходов':'Журнал показателя'}</b><span>{hist.length} загружено</span></div>
      {[...hist].reverse().slice(0,showFullHistory?hist.length:HISTORY_PREVIEW_COUNT).map(h=>{const p=h.source_id?politicalPosts.find(x=>x.id===h.source_id):undefined;return <article key={h.id}>
       <time>{new Date(h.recorded_at).toLocaleString('ru-RU')}</time>
       <div><b>{Number(h.previous_value??h.value).toLocaleString('ru-RU')} → {Number(h.value).toLocaleString('ru-RU')} {chosen.unit||''}</b><p>{h.note||p?.title||linkedPostTitles[String(h.source_id||'')]||gameValueLabel(h.source_type,'Изменение показателя')}</p>{h.actor_id&&<small>{names[h.actor_id]||'Участник'}</small>}
@@ -366,7 +382,7 @@ export default function StateMetricsDock({g,initialSelectedMetricId='',initialCo
       <strong className={Number(h.delta)>=0?'up':'down'}>{Number(h.delta)>0?'+':''}{Number(h.delta||0).toFixed(1)}</strong>
      </article>})}
      {hist.length>HISTORY_PREVIEW_COUNT&&<button type="button" className="metricHistoryMore" onClick={()=>setShowFullHistory(v=>!v)}>{showFullHistory?'Свернуть журнал':`Показать ещё ${Math.min(hist.length,30)-HISTORY_PREVIEW_COUNT} записей`}</button>}
-     {chosen.metric_key!=='budget'&&historyMore[chosen.metric_key]&&
+     {historyMore[chosen.metric_key]&&
       <button type="button" className="metricHistoryMore"
        disabled={!!historyLoading[chosen.metric_key]} aria-busy={!!historyLoading[chosen.metric_key]}
        onClick={()=>{setShowFullHistory(true);void loadHistoryPage(chosen.metric_key)}}>
