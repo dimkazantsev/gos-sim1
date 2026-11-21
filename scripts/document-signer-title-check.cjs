@@ -27,7 +27,28 @@ assert.equal(role('government_resolution','government','Преподавател
 assert.equal(role('sf_resolution','sf','Преподаватель-администратор',{acting_office_title:'Администратор игры'}),'Председатель Совета Федерации');
 assert.equal(role('justice_response','minjust','Преподаватель',{signatory_title:'Заместитель министра юстиции',acting_office_title:'Сотрудник Минюста'}),minjust);
 
+
 assert.equal(role('sf_resolution','sf','Председатель Совета Федерации'),'Председатель Совета Федерации');
+const responsible=(docType,subjectKey,metadata={},subjectLabel='',required=[])=>signatures.documentSigningAuthority({
+ doc_type:docType,subject_key:subjectKey,subject_label:subjectLabel,metadata
+},required);
+assert.equal(responsible('fz_bill','gd_deputy'), 'Президент Российской Федерации (после прохождения установленной процедуры)', 'A bill is signed by President, not deputy-author');
+assert.equal(responsible('fkz_bill','sf_member'),'Президент Российской Федерации (после прохождения установленной процедуры)');
+assert.equal(responsible('federal_budget','government'),'Президент Российской Федерации (после прохождения установленной процедуры)');
+assert.equal(responsible('president_decree','president',{},'Президент Российской Федерации'),'Президент Российской Федерации — Президент Российской Федерации');
+assert.equal(responsible('gd_resolution','gd',{},'Государственная Дума Федерального Собрания РФ'),'Государственная Дума Федерального Собрания РФ — Председатель Государственной Думы');
+assert.equal(responsible('sf_resolution','sf',{},'Совет Федерации Федерального Собрания РФ'),'Совет Федерации Федерального Собрания РФ — Председатель Совета Федерации');
+assert.equal(responsible('government_resolution','government',{},'Правительство Российской Федерации'),'Правительство Российской Федерации — Председатель Правительства Российской Федерации');
+assert.equal(responsible('ministry_order','ministry',{issuer_name:'Министерство по экономической политике'},'Федеральное министерство'),'Министерство по экономической политике — Федеральный министр');
+assert.equal(responsible('justice_response','minjust'),'Министерство юстиции Российской Федерации — '+minjust);
+assert.equal(responsible('meeting_agenda','gd',{},'Государственная Дума',[
+ {office:'Председатель Государственной Думы'},{office:'Заместитель Председателя Государственной Думы'}
+]),'Государственная Дума — Председатель Государственной Думы; Заместитель Председателя Государственной Думы');
+assert.match(responsible('meeting_agenda','ksrf',{},'КСРФ'),/состав уполномоченных подписантов пока не подтверждён/,'Missing signer list cannot claim a person has signed');
+const view=fs.readFileSync('components/game/DocumentsView.tsx','utf8');
+assert(view.includes('Документ подписывает: <b>{documentSigningAuthority(selected,institutionSigners?.required||[])}</b>'),'Current signing institution is shown in document procedure, reusing existing data');
+assert(!view.includes("rpc('get_document_signing_authority'"),'No new signature lookups');
+
 const paper=fs.readFileSync('components/game/DocumentPaper.tsx','utf8');
 assert(paper.includes('role=documentSignerTitle(d,metadataSigned?m.signed_role:null)'),'Signed paper must resolve a contextual game office');
 assert(paper.includes('<b>{name}</b>')&&paper.includes("role||'Уполномоченное лицо'"),'Existing signer name/date display is preserved');
