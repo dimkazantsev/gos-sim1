@@ -2,7 +2,7 @@ const assert=require('node:assert/strict');
 const fs=require('node:fs');
 const path=require('node:path');
 const root=path.resolve(__dirname,'..');
-const sql=fs.readFileSync(path.join(root,'supabase/migrations/20261123012500_metric_legitimacy_macro_links.sql'),'utf8');
+const sql=fs.readFileSync(path.join(root,'supabase/migrations/20261122182656_metric_legitimacy_macro_links_20261123.sql'),'utf8');
 for(const required of [
   "private.write_weighted_legitimacy","private.apply_societal_metric_deltas",
   "private.apply_macro_political_effect","private.derive_legitimacy_from_metric_history",
