@@ -28,6 +28,7 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run typecheck
+      - run: node scripts/ui-terminology-brand-check.cjs
       - run: node scripts/fiscal-macro-save-check.cjs
       - run: node scripts/inflation-spending-contract-check.cjs
       - run: node scripts/budget-simulator-math-check.cjs

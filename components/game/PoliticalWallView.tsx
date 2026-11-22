@@ -311,7 +311,7 @@ export default function PoliticalWallView({g,onOpenVotes,onOpenDocument,onNaviga
  }
  const voteSettings=<div className="processVoteSettings">
   <StyledSelect label="Кто голосует" value={voteBody} onChange={key=>{setVoteBody(key);setVoteGroup('')}} options={[{value:'all',label:'Все участники'},...(teacher?VOTING_BODIES.map(b=>({value:b.key,label:b.title})):[])]}/>
-  {isGroupBody&&<StyledSelect label="Учебная группа" value={voteGroup} onChange={setVoteGroup} options={[{value:'',label:groups.length>1?'Выберите группу':'Вся игровая группа'},...groups.map(x=>({value:x,label:x}))]}/>}
+  {isGroupBody&&<StyledSelect label="Игровая группа" value={voteGroup} onChange={setVoteGroup} options={[{value:'',label:groups.length>1?'Выберите группу':'Вся игровая группа'},...groups.map(x=>({value:x,label:x}))]}/>}
   <p>{selectedBody?.basis||'Голосует каждый студент текущей игры. Кворум — две трети состава; решение — большинство присутствующих.'}</p>
  </div>;
  if(!game||!me)return null;

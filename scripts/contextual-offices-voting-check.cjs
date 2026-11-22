@@ -9,7 +9,7 @@ const form=read('components/game/StageDocumentForm.tsx');
 const migration=read('supabase/migrations/20261015010000_contextual_document_office_validation.sql');
 assert(!profile.includes('select_game_office')&&!profile.includes('officeCurrentRole'),'Student cannot switch the representative role in profile');
 assert(profile.includes('Полномочия действуют')&&profile.includes('active.length'),'Role portfolio is visible in profile');
-assert(!votes.includes('label="Учебная группа"')&&!attendance.includes('label="Учебная группа"'),'No classroom group filter is displayed');
+assert(!votes.includes('label="Игровая группа"')&&!attendance.includes('label="Игровая группа"'),'No classroom group filter is displayed');
 assert(!votes.includes('groupName:group||null')&&!attendance.includes('m.group_name===group'),'Groups cannot restrict a new voting procedure');
 assert(votes.includes("groupName:null"),'Votes are opened without a group boundary');
 assert(attendance.includes("eligible(m.user_id)"),'Attendance is based on actual institutional membership');

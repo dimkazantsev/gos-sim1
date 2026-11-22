@@ -131,6 +131,16 @@
 .stateMetricFormula p{margin:7px 0;font-size:13px;line-height:1.65;overflow-wrap:anywhere}
 .stateMetricFormula small{display:block;color:#5b7191;font-size:12px;line-height:1.5}
 .stateMetricFormula .stateMetricFormulaNotice{color:#536781}
+/* International finance: native typography and spacing within the established metric dialog. */
+.stateMetricFinance{border-top:1px solid var(--gs-border);margin-top:14px;padding-top:14px;min-width:0}
+.stateMetricFinance h4{margin:0 0 6px;color:var(--gs-ink);font-size:14px;font-weight:800;line-height:1.4}
+.stateMetricFinanceFacts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:12px 0}
+.stateMetricFinanceFacts>div{min-width:0;border:1px solid var(--gs-border);border-radius:12px;padding:11px 13px;background:#fff}
+.stateMetricFinanceFacts dt{color:var(--gs-muted);font-size:12px;font-weight:500;line-height:1.4}
+.stateMetricFinanceFacts dd{margin:6px 0 0;color:var(--gs-ink);font-size:18px;font-weight:800;line-height:1.25;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+.stateMetricFormula .stateMetricFinanceDetails{color:var(--gs-muted);font-size:12px;line-height:1.6}
+.stateMetricFormula .stateMetricFinanceRoute{color:var(--gs-ink);font-size:12px;font-weight:600;line-height:1.5}
+@media(max-width:520px){.stateMetricFinanceFacts{grid-template-columns:1fr;gap:8px}.stateMetricFinanceFacts>div{padding:10px 12px}}
 .stateMetricFormulaRules{margin:14px 0 10px}
 .stateMetricFormulaRules>b{font-size:13px}
 .stateMetricFormulaRules ul{margin:8px 0;padding-left:19px}

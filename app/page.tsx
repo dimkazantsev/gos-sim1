@@ -387,15 +387,15 @@ export default function Home(){
   <header className="entryHeader"><a className="wordmark" href="/" aria-label={BRAND_NAME+" — главная"}><BrandIdentity tagline/></a><span className="entryEdition">Лаборатория государственного управления <i>2026</i></span></header>
   <div className="entryGrid">
    <section className="entryStory" aria-labelledby="entry-title">
-    <div className="entryEyebrow"><span/>Учебная игра · ГМУ</div>
+    <div className="entryEyebrow"><span/>Деловая игра · ГМУ</div>
     <h1 id="entry-title">Государство<br/>начинается<br/><em>с вашего решения.</em></h1>
     <p className="entryLead">Создавайте партии. Принимайте законы. Договаривайтесь о будущем. Пройдите путь от первого политического союза до управления целой республикой.</p>
     <div className="entryVisual"><CivicArtwork/><div className="entryVisualCaption"><span>{BRAND_NAME} // {BRAND_TAGLINE}</span><ArrowUpRight aria-hidden="true"/></div></div>
-    <div className="entryFacts"><div><b>16</b><span>этапов игры</span></div><div><Landmark aria-hidden="true"/><span>Реальные институты.<br/>Учебные решения.</span></div><div><GraduationCap aria-hidden="true"/><span>Практика государственного<br/>и муниципального управления</span></div></div>
+    <div className="entryFacts"><div><b>16</b><span>этапов игры</span></div><div><Landmark aria-hidden="true"/><span>Государственные институты.<br/>Решения участников.</span></div><div><GraduationCap aria-hidden="true"/><span>Практика государственного<br/>и муниципального управления</span></div></div>
    </section>
    <section className="entryAccess" aria-labelledby="entry-heading">
     {!personalLogin&&<form id="entry-form" className="entryForm" onSubmit={submit} aria-busy={busy}>
-     <div className="entryFormIntro"><span className="overline">{mode==='teacher'&&createMode?'СОЗДАТЬ УЧЕБНУЮ ИГРУ':'ПРИСОЕДИНИТЬСЯ К ИГРЕ'}</span><h2 id="entry-heading">{heading}</h2><p>{mode==='teacher'?(createMode?'Задайте название и коды доступа для вашей группы.':'Откройте занятие с помощью кода игры и кода преподавателя.'):'Введите код игры и приглашение, полученные от преподавателя. Для повторного входа используйте личный пароль.'}</p></div>
+     <div className="entryFormIntro"><span className="overline">{mode==='teacher'&&createMode?'СОЗДАТЬ ИГРУ':'ПРИСОЕДИНИТЬСЯ К ИГРЕ'}</span><h2 id="entry-heading">{heading}</h2><p>{mode==='teacher'?(createMode?'Задайте название и коды доступа для вашей группы.':'Откройте занятие с помощью кода игры и кода преподавателя.'):'Введите код игры и приглашение, полученные от преподавателя. Для повторного входа используйте личный пароль.'}</p></div>
      <fieldset disabled={busy}>
       <legend className="srOnly">Роль и данные для входа</legend>
       <div className="entryRoles" aria-label="Ваша роль"><button type="button" aria-pressed={mode==='student'} className={mode==='student'?'active':''} onClick={()=>{setMode('student');setCreateMode(false);setError('')}}><GraduationCap aria-hidden="true"/>Участник</button><button type="button" aria-pressed={mode==='teacher'} className={mode==='teacher'?'active':''} onClick={()=>{setMode('teacher');setError('')}}><Landmark aria-hidden="true"/>Преподаватель</button><button type="button" aria-pressed={mode==='guest'} className={mode==='guest'?'active':''} onClick={()=>{setMode('guest');setCreateMode(false);setError('')}}><Eye aria-hidden="true"/>Гость</button><button type="button" onClick={()=>{setTeacherLogin(mode==='teacher');setPersonalLogin(true);setError('')}}><LockKeyhole aria-hidden="true"/>Войти с личным паролем</button></div>
@@ -441,6 +441,6 @@ export default function Home(){
     <div className="entryAccessNote"><span>01 — 16</span><p>Здесь каждое решение<br/>меняет ход игры.</p><ArrowUpRight aria-hidden="true"/></div>
    </section>
   </div>
-  <footer className="entryFooter"><span>{BRAND_NAME} · {BRAND_TAGLINE}</span><span>Деловая игра по ПАУ / ГПУ</span><span>Учебная модель государственных институтов</span></footer>
+  <footer className="entryFooter"><span>{BRAND_NAME} · {BRAND_TAGLINE}</span><span>Деловая игра по ПАУ / ГПУ</span><span>Модель государственных институтов</span></footer>
  </main>;
 }

@@ -48,7 +48,7 @@ function CrisisCatalog({busy,active,onLaunch}:{busy:boolean;active:boolean;onLau
 
  return <div className={styles.catalog} data-crisis-catalog>
   <div className={styles.catalogHeading}><div><h3>Каталог кризисов</h3><p>Выберите событие, сравните четыре степени интенсивности и запустите нужный вариант.</p></div><span className={styles.catalogCount}>{CRISES.length} сценариев · 4 уровня</span></div>
-  <p className={styles.gameNote}>Все события — условные учебные сценарии. Девять сценариев сохранены из авторских правил, шесть административных случаев добавлены для игры.</p>
+  <p className={styles.gameNote}>Все события — сценарии игры. Девять сценариев сохранены из авторских правил, шесть административных случаев добавлены для игры.</p>
   {(['rules','additional'] as const).map(source=><section className={styles.catalogGroup} key={source} aria-label={source==='rules'?'Сценарии из правил':'Дополнительные административные сценарии'}>
    <div className={styles.groupHeading}><h4>{source==='rules'?'Сценарии из правил':'Административные случаи'}</h4><span>{CRISES.filter(c=>c.source===source).length}</span></div>
    <div className={styles.scenarioGrid}>{CRISES.filter(c=>c.source===source).map(c=><button type="button" className={styles.scenario} key={c.id} aria-pressed={selected.id===c.id} onClick={()=>setSelectedId(c.id)}>

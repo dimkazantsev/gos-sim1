@@ -58,7 +58,7 @@ export default function Home(){
       <label>ФИО<input value={fio} onChange={e=>setFio(e.target.value)} required /></label>
       {mode==='teacher'&&createMode&&<label>Название игры<input value={gameTitle} onChange={e=>setGameTitle(e.target.value)} required /></label>}
       <label>Код игры<input value={gameCode} onChange={e=>setGameCode(e.target.value)} placeholder="GOS-2026" required /></label>
-      {mode==='student'&&<label>Учебная группа<input value={group} onChange={e=>setGroup(e.target.value)} /></label>}
+      {mode==='student'&&<label>Игровая группа<input value={group} onChange={e=>setGroup(e.target.value)} /></label>}
       <label>{mode==='teacher'?'Код преподавателя':'Код участника'}<input type="password" value={invite} onChange={e=>setInvite(e.target.value)} required /></label>{mode==='teacher'&&createMode&&<label>Код для студентов<input type="password" value={studentCode} onChange={e=>setStudentCode(e.target.value)} required /></label>}
       {error&&<div className="errorBox">{error}</div>}
       <button className="primary" disabled={busy}>{busy?'Подключение…':'Войти в государство'}</button>

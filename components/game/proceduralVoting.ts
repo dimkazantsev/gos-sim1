@@ -158,7 +158,7 @@ export function votePresetForDocument(doc:FormalDocument):VotePreset|null{
    allowAbstain:true,tieBreakerChair:false,
    passTransition:'advance',failTransition:'reject',
    badge:'МСУ',rule:'Простое большинство присутствующих',
-   legalMode:'game',legalBasis:'Учебное правило этапа 14: проекты на заседании Администрации города принимаются или отклоняются простым большинством.'
+   legalMode:'game',legalBasis:'Правило игры для этапа 14: проекты на заседании Администрации города принимаются или отклоняются простым большинством.'
   };
  }
 

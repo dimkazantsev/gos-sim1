@@ -3,7 +3,7 @@ import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
   title: 'ГОС.ID',
-  description: 'Учебная многопользовательская симуляция государственного управления'
+  description: 'Многопользовательская симуляция государственного управления'
 };
 
 export default function RootLayout({children}:{children:React.ReactNode}){
