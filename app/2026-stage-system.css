@@ -1304,3 +1304,11 @@ button.presSystemAdopted.isReady:hover{box-shadow:0 7px 18px rgba(38,117,87,.09)
 /* Procedural vote: unobtrusive notice about automatic closing at full registered turnout. */
 .voteAutoClosureHint{margin:11px 0;padding:10px 12px;border:1px solid #d2e2f5;border-radius:10px;background:#f6faff;color:#426085;font-size:13px;line-height:1.5}
 @media(max-width:600px){.voteAutoClosureHint{font-size:12px;padding:9px 11px}}
+
+/* Stages 10–11: accurate, compact presentation of simultaneous office mandates. */
+.stageOperationsRoleContext{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;min-width:0;margin:0 0 14px;padding:13px 16px;border:1px solid var(--line,#dce4ef);border-radius:12px;background:var(--surface-2,#f8fafc)}
+.stageOperationsRoleContext>div{display:grid;gap:5px;flex:1 1 300px;min-width:0}
+.stageOperationsRoleContext strong{color:var(--text,#10213c);font-size:13px;line-height:1.4}
+.stageOperationsRoleContext span{color:var(--body,#354a67);font-size:12px;line-height:1.55;overflow-wrap:anywhere}
+.stageOperationsRoleContext button{flex:none;min-height:44px;white-space:normal}
+@media(max-width:560px){.stageOperationsRoleContext{padding:12px}.stageOperationsRoleContext button{width:100%}}

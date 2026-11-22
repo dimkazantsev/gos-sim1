@@ -5,7 +5,7 @@ import {useRef,useState} from 'react';
 import {CheckCircle2,FileText,RefreshCcw,Vote,Mic2,MessageCircleQuestion,ClipboardCheck} from 'lucide-react';
 import {supabase} from '@/lib/supabase';
 import {useGameTableSync} from './useGameTableSync';
-import {stageRoleTitles} from './stageRoles';
+import {hasActiveGameRole} from './stageRoles';
 import type {ReturnTypeRepublic} from './viewTypes';
 
 type Session={id:string;game_id:string;session_no:number;title:string;time_limit_minutes:number;agenda_document_id:string|null;status:'draft'|'open'|'closed';chair_user_id:string|null;created_at:string;opened_at:string|null;closed_at:string|null;agenda_approved_at:string|null;agenda_approved_by:string|null};
@@ -31,9 +31,8 @@ export default function GovernmentProgramSessionLab({g,onOpenVotes,onOpenDocumen
  const [selectedId,setSelectedId]=useState('');
  const [timeLimit,setTimeLimit]=useState(60);
  const [busy,setBusy]=useState(false);
- const role=stageRoleTitles(g);
- const isPM=role.split(' | ').some(t=>/^председатель\s+правительства(?:\s|$)/u.test(t));
- const isPresident=role.split(' | ').some(title=>title.trim()==='президент российской федерации');
+ const isPM=hasActiveGameRole(g,/^председатель\s+правительства(?:\s|$)/u);
+ const isPresident=hasActiveGameRole(g,/^президент российской федерации$/u);
  const canManage=teacher||isPM||isPresident;
  const canSign=teacher||isPM;
  const canApprove=isPM;
@@ -185,6 +184,7 @@ export default function GovernmentProgramSessionLab({g,onOpenVotes,onOpenDocumen
      <header><div><strong>{p.title}</strong><small>{p.responsible_ministry}</small></div><span>На согласовании</span></header>
      <label>Причина возврата на доработку
       <textarea rows={3} maxLength={1500} disabled={busy} value={pmReasons[p.id]||''} onChange={e=>setPmReasons(old=>({...old,[p.id]:e.target.value}))} placeholder="Укажите, что исправить в целях, показателях, мероприятиях или финансировании"/>
+      <small>Для возврата напишите причину длиной не менее 10 символов.</small>
      </label>
      <div className="govPmReviewActions">
       <button type="button" disabled={busy||(pmReasons[p.id]||'').trim().length<10} onClick={()=>void decidePmProgram(p.id,'revision')}>Вернуть на доработку</button>

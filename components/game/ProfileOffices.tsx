@@ -5,6 +5,7 @@ import {Landmark,ShieldCheck,Clock3} from 'lucide-react';
 import {supabase} from '@/lib/supabase';
 import type {ReturnTypeRepublic} from './viewTypes';
 import type {RoleGroup} from './gameOfficeCatalog';
+import {hasActiveGameRole} from './stageRoles';
 type Office={id:string;user_id:string;role_title:string;status:string;legal_basis:string;educational_exception:boolean;created_at:string};
 export default function ProfileOffices({g,userId,readOnly=false,roleGroups,catalogReady,catalogError}:{g:ReturnTypeRepublic;userId:string;readOnly?:boolean;roleGroups:RoleGroup[];catalogReady:boolean;catalogError:string}){
  const students=g.members.filter(m=>m.kind==='student');
@@ -14,7 +15,7 @@ export default function ProfileOffices({g,userId,readOnly=false,roleGroups,catal
  const role=roleChoice.trim();
  const roleAllowed=roleGroups.some(group=>group.roles.includes(role));
  const target=g.members.find(m=>m.user_id===targetId),active=offices.filter(o=>o.status==='active');
- const canInitiate=!readOnly&&(g.teacher||/президент|председатель.*правительств|глава/i.test(g.me?.role_title||''));
+ const canInitiate=!readOnly&&(g.teacher||hasActiveGameRole(g,/президент|председатель.*правительств|глава/i));
  async function load(){
   const token=++request.current;
   if(!g.game||!targetId){setOffices([]);return}

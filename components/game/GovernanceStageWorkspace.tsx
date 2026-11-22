@@ -3,6 +3,7 @@
 import {useCallback,useEffect,useState,type CSSProperties} from 'react';
 import {ArrowLeft,BookOpenText,CalendarClock,CheckCircle2,ChevronLeft,ChevronRight,ClipboardCheck,FileText,Landmark,Link2,MessageCircle,Route,Settings2,Vote} from 'lucide-react';
 import {isStageWorkOpen,stageWorkLabel} from './stageWorkStatus';
+import {activeGameRoleTitles} from './stageRoles';
 import type {Stage,View} from './types';
 import type {ReturnTypeRepublic} from './viewTypes';
 import {formatDeadline} from './constants';
@@ -105,6 +106,9 @@ export default function GovernanceStageWorkspace({g,stage,readOnly=false,initial
  const openVotes=votes.filter(v=>v.status==='open');
  const publicChannel=g.channels.find(c=>c.kind==='public'&&c.name!=='Вне игры');
  const bodies=BODIES[stage.stage_no];
+ const stageOffices=(stage.stage_no===10||stage.stage_no===11)&&g.me?.kind==='student'
+  ?activeGameRoleTitles(g):[];
+ const primeOffice=stageOffices.find(title=>/^председатель\s+правительства(?:\s|$)/iu.test(title));
  const teacher=g.teacher&&!readOnly;
  const stageLocked=!isStageWorkOpen(g.game,stage);
  const scoringClosed=stage.status==='open'&&Boolean(stage.score_closed_at);
@@ -137,6 +141,10 @@ export default function GovernanceStageWorkspace({g,stage,readOnly=false,initial
   </nav>
 
   <section id={sectionId+'-work'} className="stageOperationsPane" hidden={tab!=='work'} aria-label="Рабочие процедуры">
+   {stageOffices.length>0&&<div className="stageOperationsRoleContext" aria-label="Действующие государственные должности участника">
+    <div><strong>{primeOffice?'Полномочия на этапе: '+primeOffice:'Ваши действующие должности'}</strong><span>{stageOffices.join(' · ')}</span></div>
+    {!primeOffice&&<button type="button" onClick={()=>void g.refreshOfficeAssignments()}>Обновить должности</button>}
+   </div>}
    <div className="stageOperationsHandoff"><div><small>Основание</small><span>{operation.input}</span></div><ChevronRight size={18} aria-hidden="true"/><div><small>Результат этапа</small><span>{operation.output}</span></div></div>
    <StageMeetingProcedureFlow stage={stage} votesCount={votes.length} onOpenVotes={()=>onOpenVotes()}/>
    {scoringClosed&&<section className="stageFinalWorkPrompt" role="alert" aria-label="Оценочный срок завершён">

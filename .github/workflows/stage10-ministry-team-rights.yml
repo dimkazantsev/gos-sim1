@@ -3,6 +3,14 @@ on:
   pull_request:
     paths:
       - 'components/game/StateProgramLab.tsx'
+      - 'components/game/stageRoles.ts'
+      - 'components/game/GovernmentProgramSessionLab.tsx'
+      - 'components/game/ProfileView.tsx'
+      - 'components/game/ProfileOffices.tsx'
+      - 'components/game/GovernanceStageWorkspace.tsx'
+      - 'components/game/useRepublicGame.ts'
+      - 'scripts/stage-active-roles-check.cjs'
+      - 'app/2026-stage-system.css'
       - 'components/game/StateProgramEditor.tsx'
       - 'scripts/stage10-ministry-team-rights-check.cjs'
       - 'scripts/pm-program-revision-check.cjs'
@@ -13,6 +21,14 @@ on:
     branches: [main]
     paths:
       - 'components/game/StateProgramLab.tsx'
+      - 'components/game/stageRoles.ts'
+      - 'components/game/GovernmentProgramSessionLab.tsx'
+      - 'components/game/ProfileView.tsx'
+      - 'components/game/ProfileOffices.tsx'
+      - 'components/game/GovernanceStageWorkspace.tsx'
+      - 'components/game/useRepublicGame.ts'
+      - 'scripts/stage-active-roles-check.cjs'
+      - 'app/2026-stage-system.css'
       - 'components/game/StateProgramEditor.tsx'
       - 'scripts/stage10-ministry-team-rights-check.cjs'
       - 'scripts/pm-program-revision-check.cjs'
@@ -32,4 +48,5 @@ jobs:
       - run: npm ci
       - run: node scripts/stage10-ministry-team-rights-check.cjs
       - run: node scripts/pm-program-revision-check.cjs
+      - run: node scripts/stage-active-roles-check.cjs
       - run: npm run typecheck

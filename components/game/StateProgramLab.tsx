@@ -3,7 +3,7 @@ import {useEffect,useRef,useState} from 'react';
 import {supabase} from '@/lib/supabase';
 import StageModuleHeader from '../ui/StageModuleHeader';
 import {useGameTableSync} from './useGameTableSync';
-import {stageRoleTitles} from './stageRoles';
+import {hasActiveGameRole} from './stageRoles';
 import type {ReturnTypeRepublic} from './viewTypes';
 import StateProgramEditor from './StateProgramEditor';
 import {programMoney,programStatusLabel,type StateProgram,type ProgramGoal,type ProgramComponent,type ProgramExpense,type ProgramPriority} from './stateProgramModel';
@@ -29,7 +29,7 @@ export default function StateProgramLab({g}:{g:ReturnTypeRepublic}){
  useEffect(()=>{alive.current=true;return()=>{alive.current=false;request.current++}},[]);
  useEffect(()=>{setPmRevisionReason('')},[selectedId,viewScope]);
  useEffect(()=>{manualProgramChoice.current=false;request.current++;readinessRequest.current++;addressDirty.current=false;addressVersion.current=0;setGoalsDirty(false);setSelectedGoals(['','','','','']);busyRef.current=false;setPrograms([]);setAddresses([]);setPriorities([]);setReadiness({});setGoals([]);setComponents([]);setExpenses([]);setYears([]);setMinistryAssignments([]);setMinistryUnits([]);setSelectedId('');setCreating(false);creatingRef.current=false;selectedRef.current='';setBusy(false);setAddressTitle('Послание Президента Российской Федерации Федеральному Собранию');setAddressBody('');setAddressVideo('');},[viewScope]);
- const role=stageRoleTitles(g),isPM=role.split(' | ').some(title=>/^председатель\s+правительства(?:\s|$)/u.test(title)),isMinister=me?.kind==='student'&&!me?.roster_archived_at&&ministryUnits.some(u=>u.head_user_id===me?.user_id),isPresident=role.split(' | ').some(title=>title.trim()==='президент российской федерации');
+ const isPM=hasActiveGameRole(g,/^председатель\s+правительства(?:\s|$)/u),isMinister=me?.kind==='student'&&!me?.roster_archived_at&&ministryUnits.some(u=>u.head_user_id===me?.user_id),isPresident=hasActiveGameRole(g,/^президент российской федерации$/u);
  // Once the office role arrives, open the programme actually waiting for this chair.
  // Never override a programme the user explicitly selected.
  useEffect(()=>{
@@ -187,6 +187,7 @@ export default function StateProgramLab({g}:{g:ReturnTypeRepublic}){
      {(teacher||isPM)&&selected.status==='pm_review'&&<div className={styles.programRevisionForm}>
       <label className={styles.field}>Причина возврата на доработку
        <textarea rows={3} maxLength={1500} value={pmRevisionReason} disabled={busy} onChange={e=>setPmRevisionReason(e.target.value)} placeholder="Что необходимо исправить в целях, мероприятиях, показателях или финансировании"/>
+       <small>Для возврата укажите причину не короче 10 символов. После этого кнопка станет доступна.</small>
       </label>
       <div className={styles.programApprovalActions}>
        <button type="button" disabled={busy||pmRevisionReason.trim().length<10} onClick={()=>void returnForRevision(selected.id)}>Вернуть на доработку</button>

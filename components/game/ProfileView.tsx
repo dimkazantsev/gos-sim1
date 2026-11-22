@@ -28,6 +28,7 @@ import {ListTodo} from 'lucide-react';
 import type {ProfileSetupStatus,ProfileSetupField} from './profileSetup';
 import {PROFILE_SETUP_LABELS} from './profileSetup';
 import {currentGameMembers,currentGameProfiles} from './gameRoster';
+import {activeGameRoleTitles,hasActiveGameRole} from './stageRoles';
 
 type PublicAssessment={stage_no:number;auto_score:number;final_score:number|null;status:string};
 type PublicStats={accepted_actions:number;posts:number;votes_cast:number;documents_created:number;activity_entries:number;events_decided:number};
@@ -41,9 +42,10 @@ export default function ProfileView({g,targetUserId,onOpenProfile,onOwnProfile,o
  const party=parties.find(p=>p.name===target?.team);
  const chairedParty=parties.find(p=>p.leader_user_id===target?.user_id&&p.name===target?.team);
  const partyChairTitle=chairedParty?'Председатель партии «'+chairedParty.name+'»':'';
+ const targetRoles=activeGameRoleTitles(g,target?.user_id);
  const allocation=party?partyMandates.find(x=>x.party_id===party.id&&x.user_id===target?.user_id):undefined;
  const pendingInvites=partyInvitations.filter(i=>i.invited_user_id===me?.user_id&&i.status==='pending');
- const canEditOffices=!readOnly&&(teacher||/президент|председатель.*правительств|глава/i.test(me?.role_title||''));
+ const canEditOffices=!readOnly&&(teacher||hasActiveGameRole(g,/президент|председатель.*правительств|глава/i));
  const officeCatalog=useGameOfficeCatalog(game?.id,canEditOffices);
  const officeRoleNames=gameOfficeRoleList(officeCatalog.groups);
  const [tasksOpen,setTasksOpen]=useState(false);
@@ -174,7 +176,7 @@ export default function ProfileView({g,targetUserId,onOpenProfile,onOwnProfile,o
    <div className="profileIntro">
     <small>{own?'ЛИЧНЫЙ КАБИНЕТ':'ПУБЛИЧНЫЙ ПРОФИЛЬ ИГРОКА'}</small>
     <h1>{target.full_name}</h1>
-    <p>{partyChairTitle||target.role_title||'Участник'}{party?' · '+party.name:''}</p>
+    <p>{[partyChairTitle,...targetRoles].filter(Boolean).join(' · ')||'Участник'}{party?' · '+party.name:''}</p>
     <div className="profileChips">
      <span>{target.kind==='teacher'?'Преподаватель':target.kind==='observer'?'Гость':'Участник'}</span>
      {target.kind==='student'&&target.group_name&&<span>Группа: {target.group_name}</span>}
@@ -209,7 +211,7 @@ export default function ProfileView({g,targetUserId,onOpenProfile,onOwnProfile,o
   <div className="profilePublicStrip">
    <div><UsersRound size={19}/><div><b>Профили участников</b><span>Должности, фракции, публичные оценки и участие в игре.</span></div></div>
    <StyledSelect label="Открыть профиль игрока" value={target.user_id} onChange={v=>v===me.user_id?onOwnProfile?.():onOpenProfile?.(v)}
-    options={members.map(m=>({value:m.user_id,label:m.full_name+(parties.some(p=>p.leader_user_id===m.user_id&&p.name===m.team)?' · Председатель партии':m.role_title?' · '+m.role_title:'')}))}/>
+    options={members.map(m=>{const titles=activeGameRoleTitles(g,m.user_id);const pm=titles.find(title=>/^председатель\s+правительства(?:\s|$)/iu.test(title));const shown=[titles[0],pm].filter((title,i,all):title is string=>!!title&&all.indexOf(title)===i);const extra=titles.length-shown.length;return {value:m.user_id,label:m.full_name+(parties.some(p=>p.leader_user_id===m.user_id&&p.name===m.team)?' · Председатель партии':'')+(shown.length?' · '+shown.join(' · '):'')+(extra?' · ещё '+extra+' должн.':'')}})}/>
   </div>
 
   {!own&&<>
@@ -256,7 +258,7 @@ export default function ProfileView({g,targetUserId,onOpenProfile,onOwnProfile,o
      </div>:own&&pendingInvites.length?<div className="profileInviteNote"><b>У вас {pendingInvites.length} приглашение(я) в партию.</b><span>Откройте раздел «Партии», чтобы принять или отклонить.</span></div>:<div className="emptyState">Партия пока не указана.</div>}
     <div className="profilePositionDivider"/>
     <div className="surfaceHead"><div><small>ИГРОВАЯ ПОЗИЦИЯ</small><h2>Роль в Республике</h2></div></div>
-    <dl><div><dt>Партия</dt><dd>{target.team||'Не назначена'}</dd></div>{partyChairTitle&&<div><dt>Партийная должность</dt><dd>{partyChairTitle}</dd></div>}<div><dt>Должность</dt><dd>{target.role_title||'Не назначена'}</dd></div>{target.kind==='student'&&<div><dt>Сумма баллов</dt><dd>{scoreTotalLabel}</dd></div>}</dl>
+    <dl><div><dt>Партия</dt><dd>{target.team||'Не назначена'}</dd></div>{partyChairTitle&&<div><dt>Партийная должность</dt><dd>{partyChairTitle}</dd></div>}<div><dt>Действующие должности</dt><dd>{targetRoles.join(' · ')||'Не назначены'}</dd></div>{target.kind==='student'&&<div><dt>Сумма баллов</dt><dd>{scoreTotalLabel}</dd></div>}</dl>
     {targetProfile?.bio&&<div className="profileBioPreview"><small>Описание</small><p>{targetProfile.bio}</p></div>}
    </aside>
   </section>
