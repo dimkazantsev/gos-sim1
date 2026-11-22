@@ -15,6 +15,7 @@ import {TurnCountdownPill} from './game/TurnClock';
 import type {Member,View,Vote} from './game/types';
 import type {ReturnTypeRepublic} from './game/viewTypes';
 import {initials} from './game/constants';
+import {activeGameRoleTitles} from './game/stageRoles';
 import DashboardView from './game/DashboardView';
 import {useDialog} from './ui/useDialog';
 
@@ -650,6 +651,14 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
  }
  const vg=previewStudent?buildStudentPreview(g,previewStudent):observer&&me?{...buildStudentPreview(g,me),logout:g.logout} as ReturnTypeRepublic:g;
  const shownMe=vg.me||me;
+ const activeTitles=shownMe?.kind==='student'?activeGameRoleTitles(g,shownMe.user_id):[];
+ const pmTitle=activeTitles.find(title=>/^председатель\s+правительства(?:\s|$)/iu.test(title));
+ const orderedTitles=pmTitle?[pmTitle,...activeTitles.filter(title=>title!==pmTitle)]:activeTitles;
+ const completeRoleTitle=activeTitles.join(' · ')||shownMe?.role_title|| (teacher?'Преподаватель':'Участник');
+ const compactRoleTitle=orderedTitles.length?orderedTitles.map(title=>title
+  .replace('Российской Федерации','РФ')
+  .replace('Депутат Государственной Думы','Депутат ГД')
+  .replace('Заместитель Председателя Государственной Думы','Зампред ГД')).join(' · '):completeRoleTitle;
  const chatDraftKey=(shownMe?.user_id||'')+':'+g.channelId;
  useEffect(()=>{
   // Never interpret a temporarily missing profile row during initial loading
@@ -752,7 +761,7 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
    <div className="sidebarFooter">
     <div className={'sidebarUser'+(teacher&&!previewMode?' sidebarUserTeacher':'')}>
      <div className="simAvatar">{initials(shownMe.full_name)}</div>
-     <div className="simUserText"><b title={shownMe.full_name}>{shownMe.full_name}</b><span>{previewMode?'Просмотр · '+(shownMe.role_title||'Участник'):shownMe.role_title||(teacher?'Преподаватель':'Участник')}</span></div>
+     <div className="simUserText"><b title={shownMe.full_name}>{shownMe.full_name}</b><span title={completeRoleTitle} aria-label={completeRoleTitle}>{previewMode?'Просмотр · '+compactRoleTitle:compactRoleTitle}</span></div>
      {teacher&&!previewMode&&<button type="button" aria-label="Открыть постоянную нулевую игру" title="Нулевая игра · Постоянный кабинет" className="sidebarIconButton" onClick={openTeacherGameChooser}><Landmark aria-hidden="true"/></button>}
      {previewMode?<button aria-label="Вернуться к преподавателю" className="sidebarIconButton" onClick={()=>setViewAs('')}><ChevronLeft/></button>:<button aria-label="Выйти" className="sidebarIconButton" onClick={logout}><LogOut/></button>}
     </div>
@@ -798,7 +807,7 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
    </GameHeader>
 
    {previewMode&&<div className="studentPreviewBanner">
-    <div><Eye aria-hidden="true"/><p><b>{previewGuest?'Режим гостя:':'Режим студента:'}</b> {shownMe.full_name}{shownMe.team?' · '+shownMe.team:''}{shownMe.role_title?' · '+shownMe.role_title:''}. <strong>Только просмотр. Личные действия недоступны.</strong>{viewAs===GENERIC_STUDENT&&!previewGuest&&' Выберите конкретного студента в меню для проверки другого набора должностей.'}</p></div>
+    <div><Eye aria-hidden="true"/><p><b>{previewGuest?'Режим гостя:':'Режим студента:'}</b> {shownMe.full_name}{shownMe.team?' · '+shownMe.team:''}{completeRoleTitle?' · '+completeRoleTitle:''}. <strong>Только просмотр. Личные действия недоступны.</strong>{viewAs===GENERIC_STUDENT&&!previewGuest&&' Выберите конкретного студента в меню для проверки другого набора должностей.'}</p></div>
     <button onClick={()=>setViewAs('')}>Вернуться к преподавателю</button>
    </div>}
 
@@ -865,7 +874,7 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
    <section ref={mobileDialogRef} tabIndex={-1} className="mobileMoreSheet" role="dialog" aria-modal="true" onClick={e=>e.stopPropagation()} aria-label="Все разделы">
     <header><div><small>НАВИГАЦИЯ</small><b>Все разделы игры</b></div><IconAction onClick={()=>setMobileMenuOpen(false)} label="Закрыть меню"/></header>
     <div className="mobileAllGrid">{teacher&&!previewMode&&<button type="button" onClick={openTeacherGameChooser}><Landmark aria-hidden="true"/><span>Мои игры</span></button>}{nav.map(([k,label])=><button key={k} type="button" aria-current={view===k?'page':undefined} className={view===k?'active':''} data-tour-view={k} onClick={()=>navigate(k,undefined,false,true)}>{navIcon(k)}<span>{label}</span></button>)}<button type="button" data-tour-view="chat" className={chatOpen?'active':''} disabled={CHAT_PAUSED} title={CHAT_PAUSED?'Чат временно приостановлен':'Открыть чат'} aria-haspopup="dialog" onClick={()=>{setMobileMenuOpen(false);toggleTourChat()}}><span className="mobileMenuChatIcon"><MessageCircle aria-hidden="true"/>{g.chatUnreadCount>0&&<i className={g.chatMentionCount>0?'hasMention':''}>{g.chatUnreadCount>99?'99+':g.chatUnreadCount}</i>}</span><span>Чат</span></button></div>
-    <footer className="mobileAccount"><div><b>{shownMe.full_name}</b><span>{shownMe.role_title||(teacher?'Преподаватель':'Участник')}</span></div>{previewMode?<button className="secondary" onClick={()=>{setViewAs('');setMobileMenuOpen(false)}}>К преподавателю</button>:<button className="secondary" onClick={logout}><LogOut aria-hidden="true"/>Выйти</button>}</footer>
+    <footer className="mobileAccount"><div><b>{shownMe.full_name}</b><span title={completeRoleTitle}>{completeRoleTitle}</span></div>{previewMode?<button className="secondary" onClick={()=>{setViewAs('');setMobileMenuOpen(false)}}>К преподавателю</button>:<button className="secondary" onClick={logout}><LogOut aria-hidden="true"/>Выйти</button>}</footer>
    </section>
   </div>}
   {shareUrl&&<div className="eventCaseBackdrop" onMouseDown={e=>{if(e.target===e.currentTarget)setShareUrl('')}}>

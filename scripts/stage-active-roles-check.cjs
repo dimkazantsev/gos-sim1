@@ -38,6 +38,8 @@ assert.equal(activeGameRoleTitles({...g,me:{...member,roster_archived_at:'2026-1
 assert.equal(activeGameRoleTitles({...g,members:[],me:{...member,roster_archived_at:'2026-11-20'}}).length,0,'Archived actor cannot inherit active office titles');
 assert.equal(activeGameRoleTitles({...g,me:{...member,kind:'observer'},members:[{...member,kind:'observer'}]}).length,0,'Observer has no office rights');
 const profile=fs.readFileSync('components/game/ProfileView.tsx','utf8');
+const shell=fs.readFileSync('components/GameClient.tsx','utf8');
+const overview=fs.readFileSync('components/game/DashboardView.tsx','utf8');
 const stage=fs.readFileSync('components/game/GovernanceStageWorkspace.tsx','utf8');
 const government=fs.readFileSync('components/game/GovernmentProgramSessionLab.tsx','utf8');
 const lab=fs.readFileSync('components/game/StateProgramLab.tsx','utf8');
@@ -45,6 +47,8 @@ const offices=fs.readFileSync('components/game/ProfileOffices.tsx','utf8');
 const hook=fs.readFileSync('components/game/useRepublicGame.ts','utf8');
 const style=fs.readFileSync('app/2026-stage-system.css','utf8');
 assert(profile.includes("targetRoles.join(' · ')")&&profile.includes('Действующие должности'),'Profile cannot hide secondary office roles');
+assert(shell.includes('completeRoleTitle')&&shell.includes('compactRoleTitle')&&shell.includes('simUserText')&&shell.includes('mobileAccount'),'All primary account chrome displays the secondary PM appointment');
+assert(overview.includes('activeGameRoleTitles(g,me.user_id)')&&overview.includes('primeOffice'),'The game dashboard must show PM duties, not only the primary deputy role');
 assert(stage.includes('stageOperationsRoleContext')&&stage.includes('primeOffice'),'Stages 10–11 must show current executive authority');
 assert(lab.includes('hasActiveGameRole(g,')&&government.includes('hasActiveGameRole(g,'),'Program actions must share the office resolver');
 assert(offices.includes('hasActiveGameRole(g,'),'Office nomination UI must respect multiple active roles');

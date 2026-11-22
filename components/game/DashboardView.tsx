@@ -4,6 +4,7 @@ import {GAME_DATA_REFRESH_EVENT} from './useGameTableSync';
 import {supabase} from '@/lib/supabase';
 import {ArrowRight,ArrowUpRight,BookOpen,Check,Clock3,FileText,Landmark,MessageCircle,Vote,Users} from 'lucide-react';
 import type {ReturnTypeRepublic} from './viewTypes';
+import {activeGameRoleTitles} from './stageRoles';
 import type {PoliticalPost,View} from './types';
 import {STAGE_ACTIONS} from './stageActions';
 import StateMetricsDock from './StateMetricsDock';
@@ -84,6 +85,8 @@ export default function DashboardView({g,onNavigate,onOpenProfile}:{g:ReturnType
  const totalMandates=parties.reduce((n,p)=>n+Number(p.mandates||0),0);
  const participants=members.filter(m=>m.kind==='student').length;
  const myParty=parties.find(p=>p.name===me.team);
+ const activeTitles=activeGameRoleTitles(g,me.user_id);
+ const primeOffice=activeTitles.find(title=>/^председатель\s+правительства(?:\s|$)/iu.test(title));
  return <div className="overviewPage">
   <header className="overviewHeading"><div><span className="overline">{game.title}</span><h1>{teacher?'Игра под вашим управлением.':'Республика в действии. Ваш ход.'}</h1></div><button aria-label="Открыть карту игры" className="quietButton" onClick={()=>onNavigate('stages')}>Карта игры<ArrowUpRight aria-hidden="true"/></button></header>
   <div className="overviewLead">
@@ -110,7 +113,7 @@ export default function DashboardView({g,onNavigate,onOpenProfile}:{g:ReturnType
     :recentPosts.length?<ol className="eventTimeline">{recentPosts.map(post=><li key={post.id}><span className="eventDot notice"/><div><time dateTime={post.created_at}>{new Date(post.created_at).toLocaleString('ru-RU',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})}</time><h3>{post.title}</h3><p>{post.body.replace(/\s+/g,' ').slice(0,210)}{post.body.length>210?'…':''}</p></div></li>)}</ol>
     :<div className="overviewEmpty"><span><FileText aria-hidden="true"/></span><h3>Публикаций пока нет</h3><p>Здесь появятся действующие публикации политического процесса.</p><button className="textButton" onClick={()=>onNavigate('actions')}>Открыть политический процесс<ArrowRight aria-hidden="true"/></button></div>}
    </section>
-   <section className="republicCard"><div className="sectionTop"><span className="overline">СОСТАВ РЕСПУБЛИКИ</span><Landmark aria-hidden="true"/></div><h2>{teacher?'Парламент Республики':me.role_title||'Участник республики'}</h2><p>{teacher?'Участники, партии и руководство республики.':myParty?myParty.name:'Ваша роль и партия появятся здесь после назначения.'}</p>
+   <section className="republicCard"><div className="sectionTop"><span className="overline">СОСТАВ РЕСПУБЛИКИ</span><Landmark aria-hidden="true"/></div><h2>{teacher?'Парламент Республики':primeOffice||activeTitles[0]||'Участник республики'}</h2><p>{teacher?'Участники, партии и руководство республики.':activeTitles.length>1?activeTitles.join(' · ')+(myParty?' · '+myParty.name:''):myParty?myParty.name:'Ваша роль и партия появятся здесь после назначения.'}</p>
     <div className="republicStats"><div><Users aria-hidden="true"/><strong>{participants}</strong><span>участников</span></div><div><Landmark aria-hidden="true"/><strong>{parties.length}</strong><span>партий</span></div><div><FileText aria-hidden="true"/><strong>{formalDocuments.length}</strong><span>НПА в реестре</span></div></div>
     <RepublicLeadership g={g} onOpenProfile={onOpenProfile}/>
     {totalMandates>0?<div className="mandateSummary"><div className="mandateLabel"><b>Распределение мандатов</b><span>{totalMandates}</span></div><div className="mandateBar" role="img" aria-label={parties.filter(p=>p.mandates>0).map(p=>`${p.name}: ${p.mandates}`).join('; ')}>{parties.filter(p=>p.mandates>0).map((p,i)=><span key={p.id} style={{width:p.mandates/totalMandates*100+'%',background:p.color||['#2453E6','#EFA5CB','#172E74'][i%3]}}/>)}</div><ul className="mandateLegend">{parties.filter(p=>p.mandates>0).map((p,i)=><li key={p.id}><i style={{background:p.color||['#2453E6','#EFA5CB','#172E74'][i%3]}}/><span>{p.name}</span><b>{p.mandates}</b></li>)}</ul></div>:<div className="republicPending"><Check aria-hidden="true"/><p>Мандаты появятся после проведения выборов.</p></div>}
