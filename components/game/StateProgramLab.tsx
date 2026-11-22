@@ -19,7 +19,7 @@ export default function StateProgramLab({g}:{g:ReturnTypeRepublic}){
  const [programs,setPrograms]=useState<StateProgram[]>([]),[addresses,setAddresses]=useState<Address[]>([]),[priorities,setPriorities]=useState<ProgramPriority[]>([]),[readiness,setReadiness]=useState<Record<string,Readiness>>({});
  const [goals,setGoals]=useState<ProgramGoal[]>([]),[components,setComponents]=useState<ProgramComponent[]>([]),[expenses,setExpenses]=useState<ProgramExpense[]>([]),[years,setYears]=useState<BudgetYear[]>([]);
  const [ministryAssignments,setMinistryAssignments]=useState<MinistryAssignment[]>([]),[ministryUnits,setMinistryUnits]=useState<MinistryUnit[]>([]);
- const [selectedId,setSelectedId]=useState(''),[creating,setCreating]=useState(false),[busy,setBusy]=useState(false);
+ const [selectedId,setSelectedId]=useState(''),[creating,setCreating]=useState(false),[busy,setBusy]=useState(false),[pmRevisionReason,setPmRevisionReason]=useState('');
  const [addressTitle,setAddressTitle]=useState('Послание Президента Российской Федерации Федеральному Собранию'),[addressBody,setAddressBody]=useState(''),[addressVideo,setAddressVideo]=useState('');
  const [selectedGoals,setSelectedGoals]=useState<string[]>(['','','','','']),[goalsDirty,setGoalsDirty]=useState(false);
  const addressDirty=useRef(false),addressVersion=useRef(0),busyRef=useRef(false),request=useRef(0),readinessRequest=useRef(0),alive=useRef(true),creatingRef=useRef(creating),selectedRef=useRef(selectedId);
@@ -27,6 +27,7 @@ export default function StateProgramLab({g}:{g:ReturnTypeRepublic}){
  const viewScope=[game?.id,me?.user_id,teacher].join('|'),scope=useRef(viewScope);scope.current=viewScope;
  const active=()=>alive.current&&scope.current===viewScope;
  useEffect(()=>{alive.current=true;return()=>{alive.current=false;request.current++}},[]);
+ useEffect(()=>{setPmRevisionReason('')},[selectedId,viewScope]);
  useEffect(()=>{request.current++;readinessRequest.current++;addressDirty.current=false;addressVersion.current=0;setGoalsDirty(false);setSelectedGoals(['','','','','']);busyRef.current=false;setPrograms([]);setAddresses([]);setPriorities([]);setReadiness({});setGoals([]);setComponents([]);setExpenses([]);setYears([]);setMinistryAssignments([]);setMinistryUnits([]);setSelectedId('');setCreating(false);creatingRef.current=false;selectedRef.current='';setBusy(false);setAddressTitle('Послание Президента Российской Федерации Федеральному Собранию');setAddressBody('');setAddressVideo('');},[viewScope]);
  const role=stageRoleTitles(g),isPM=role.split(' | ').some(title=>/^председатель\s+правительства(?:\s|$)/u.test(title)),isMinister=me?.kind==='student'&&!me?.roster_archived_at&&ministryUnits.some(u=>u.head_user_id===me?.user_id),isPresident=role.split(' | ').some(title=>title.trim()==='президент российской федерации');
  async function refreshReadiness(programId:string){
@@ -88,6 +89,13 @@ export default function StateProgramLab({g}:{g:ReturnTypeRepublic}){
   if(!active()||busyRef.current)return false;busyRef.current=true;setBusy(true);
   try{const r=await supabase.rpc(name,args);if(!active())return false;if(r.error){setError(r.error);return false;}await load();if(!active())return false;await g.refresh();return active()}
   catch(error){if(active())setError(error);return false}finally{if(active()){busyRef.current=false;setBusy(false)}}
+ }
+ async function returnForRevision(programId:string){
+  if(!active()||!selected||selected.id!==programId||selected.status!=='pm_review'||!(teacher||isPM))return;
+  const reason=pmRevisionReason.trim();
+  if(reason.length<10||reason.length>1500)return;
+  const ok=await run('request_state_program_revision',{p_program_id:programId,p_reason:reason});
+  if(ok&&active())setPmRevisionReason('');
  }
  async function saveAddress(){
   if(!active()||busyRef.current)return;const version=addressVersion.current;busyRef.current=true;setBusy(true);
@@ -157,13 +165,22 @@ export default function StateProgramLab({g}:{g:ReturnTypeRepublic}){
     <ol className={styles.programApprovalSteps} aria-label="Порядок принятия программы">
      <li>Подготовка и проверка</li><li>Представление и голосование</li><li>Подпись и публикация</li>
     </ol>
+    {selected.pm_revision_reason&&['revision','pm_review'].includes(selected.status)&&<div className={styles.programRevisionNotice} role="status"><strong>Замечания Председателя Правительства</strong><p>{selected.pm_revision_reason}</p>{selected.status==='revision'&&<small>Исправьте программу и повторно направьте её Председателю Правительства.</small>}</div>}
     {vote&&<p className={styles.programApprovalNotice} role="status">Голосование Правительства: {vote.status==='open'?'Идёт · голосуют зарегистрированные участники':vote.result_label||'Завершено'}.</p>}
     {selected.status==='ready'&&<p className={styles.programApprovalNotice}>Программа подготовлена. Включите её в повестку Этапа 11. Голосование открывается только после доклада.</p>}
     {selected.status==='adopted'&&<p className={styles.programApprovalNotice}>Правительство поддержало программу. Ожидается оформление подписи и публикация постановления по результатам голосования.</p>}
     {selected.status==='rejected'&&<p className={styles.programApprovalNotice}>Программа отклонена. Подписание и публикация по данному голосованию недоступны.</p>}
     <div className={styles.programApprovalActions}>
      {(teacher||selected.responsible_minister_id===me.user_id)&&selected.status==='minister_review'&&<><button type="button" disabled={busy} onClick={()=>void run('advance_state_program',{p_program_id:selected.id,p_action:'minister_revision'})}>Вернуть автору на доработку</button><button type="button" disabled={busy} className="primary" onClick={()=>void run('advance_state_program',{p_program_id:selected.id,p_action:'minister_approve'})}>Одобрить и передать Председателю Правительства</button></>}
-     {(teacher||isPM)&&selected.status==='pm_review'&&<><button type="button" disabled={busy} onClick={()=>void run('advance_state_program',{p_program_id:selected.id,p_action:'pm_revision'})}>Вернуть на доработку</button><button type="button" disabled={busy} className="primary" onClick={()=>void run('advance_state_program',{p_program_id:selected.id,p_action:'pm_ready'})}>Согласовать для включения в повестку</button></>}
+     {(teacher||isPM)&&selected.status==='pm_review'&&<div className={styles.programRevisionForm}>
+      <label className={styles.field}>Причина возврата на доработку
+       <textarea rows={3} maxLength={1500} value={pmRevisionReason} disabled={busy} onChange={e=>setPmRevisionReason(e.target.value)} placeholder="Что необходимо исправить в целях, мероприятиях, показателях или финансировании"/>
+      </label>
+      <div className={styles.programApprovalActions}>
+       <button type="button" disabled={busy||pmRevisionReason.trim().length<10} onClick={()=>void returnForRevision(selected.id)}>Вернуть на доработку</button>
+       <button type="button" disabled={busy} className="primary" onClick={()=>void run('advance_state_program',{p_program_id:selected.id,p_action:'pm_ready'})}>Согласовать для включения в проект повестки</button>
+      </div>
+     </div>
      {(teacher||isPM)&&selected.status==='adopted'&&!g.formalDocuments.some(d=>d.game_id===game!.id&&d.stage_no===11&&d.doc_type==='government_resolution'&&d.metadata?.state_program_id===selected.id&&d.status_code==='published')&&<button type="button" disabled={busy} className="primary" onClick={()=>void run('sign_adopted_state_program',{p_program_id:selected.id})}>Подписать и опубликовать принятую программу</button>}
     </div>
    </section>

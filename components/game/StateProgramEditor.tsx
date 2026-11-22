@@ -89,7 +89,7 @@ export default function StateProgramEditor({g,program,goals,components,expenses,
    if(!active())return;
    if(r.error){if(r.error.code==='40001')setNotice('Другой участник уже сохранил новую версию. Ваш текст остался в этой форме, но не перезаписал чужие изменения. Скопируйте нужные фрагменты и откройте актуальную программу перед повторным сохранением.');g.setError(r.error);return;}
    if(editVersion.current===savedVersion)dirty.current=false;
-   setNotice(confirm?'Программа подтверждена и направлена министру.':dirty.current?'Форма сохранена. Более поздние изменения ещё не сохранены.':'Вся форма и таблица расходов сохранены.');
+   setNotice(confirm?(program?.status==='revision'&&program.pm_revision_reason?'Исправленная программа повторно направлена Председателю Правительства.':'Программа подтверждена и направлена министру.'):dirty.current?'Форма сохранена. Более поздние изменения ещё не сохранены.':'Вся форма и таблица расходов сохранены.');
    await onSaved(String(r.data));
   }catch(error){if(active())g.setError(error)}
   finally{if(active()){busyRef.current=false;setBusy(false)}}
@@ -140,6 +140,6 @@ export default function StateProgramEditor({g,program,goals,components,expenses,
      <div className={styles.total}><span>Общий бюджет программы</span><strong aria-live="polite">{!editable&&program&&program.form_version!==2&&!expenses.length?programMoney(program.total_budget):kopecksMoney(total)}</strong></div>
     </section>
    </fieldset>
-  {editable&&<div className={styles.actions}><button type="button" disabled={busy||passport.title.trim().length<5||passport.responsible_ministry.trim().length<3} onClick={()=>void save(false)}>Сохранить всю форму</button>{(!program||['draft','revision'].includes(program.status))&&<button type="button" className="primary" disabled={busy||passport.title.trim().length<5||passport.responsible_ministry.trim().length<3} onClick={()=>void save(true)}>Подтвердить программу и направить министру</button>}</div>}
+  {editable&&<div className={styles.actions}><button type="button" disabled={busy||passport.title.trim().length<5||passport.responsible_ministry.trim().length<3} onClick={()=>void save(false)}>Сохранить всю форму</button>{(!program||['draft','revision'].includes(program.status))&&<button type="button" className="primary" disabled={busy||passport.title.trim().length<5||passport.responsible_ministry.trim().length<3} onClick={()=>void save(true)}{program?.status==='revision'&&program.pm_revision_reason?'Повторно направить Председателю Правительства':'Подтвердить программу и направить министру'}</button>}</div>}
  </section>;
 }

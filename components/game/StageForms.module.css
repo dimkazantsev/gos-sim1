@@ -321,3 +321,13 @@
  .programWorkspace .programApprovalActions{display:grid;grid-template-columns:minmax(0,1fr)}
  .programWorkspace .programApprovalActions button{width:100%}
 }
+
+/* Возврат ГП Председателем: прежние компоненты и токены Этапа 10. */
+.programWorkspace .programRevisionForm{display:grid;gap:12px;width:100%;min-width:0;border:1px solid var(--line,#dce4ef);border-radius:13px;background:var(--surface-2,#f8fafc);padding:14px}
+.programWorkspace .programRevisionForm .field textarea{min-height:100px}
+.programWorkspace .programRevisionForm .programApprovalActions{justify-content:flex-end}
+.programWorkspace .programRevisionNotice{display:grid;gap:6px;border-left:3px solid var(--blue,#315efb);border-radius:0 10px 10px 0;background:var(--blue-soft,#edf2ff);padding:12px 14px;min-width:0;color:var(--text,#10213c)}
+.programWorkspace .programRevisionNotice strong{font-size:13px}
+.programWorkspace .programRevisionNotice p{margin:0;white-space:pre-wrap;overflow-wrap:anywhere;font-size:13px;line-height:1.55}
+.programWorkspace .programRevisionNotice small{font-size:12px;color:var(--body,#354a67)}
+@media(max-width:700px){.programWorkspace .programRevisionForm{padding:12px}}
