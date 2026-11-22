@@ -6,7 +6,7 @@ import {isStageWorkOpen} from './stageWorkStatus';
 import {useEffect,useMemo,useRef,useState,type ComponentType} from 'react';
 import {partyDocumentVersionLabel,partyDocumentVerdict} from './partyDocumentVersions';
 import {IconAction} from '../ui/IconAction';
-import {BookOpen,ChevronDown,CircleAlert,ExternalLink,FileText,PencilLine,Plus,Trash2,Upload,UserPlus,UsersRound} from 'lucide-react';
+import {BookOpen,ChevronDown,CircleAlert,ExternalLink,FileText,MapPin,PencilLine,Plus,Trash2,Upload,UserPlus,UsersRound} from 'lucide-react';
 import StyledSelect from '../ui/StyledSelect';
 import ProfileAvatar from './ProfileAvatar';
 import PartyLogoEditor from './PartyLogoEditor';
@@ -64,6 +64,13 @@ export default function PartiesView({g}:{g:ReturnTypeRepublic}){
  certificateIssued=!!selected&&g.formalDocuments.some(d=>d.doc_type==='party_certificate'&&d.metadata?.party_id===selected.id),
  publicDocs=selected?.registration_status==='registered'&&certificateIssued?
   latestDocs.filter(d=>['charter','program','symbol','congress_minutes'].includes(d.doc_kind)&&d.status==='accepted'):[],free=members.filter(m=>m.kind==='student'&&!m.roster_archived_at&&!m.team),pending=partyInvitations.filter(i=>i.party_id===selected?.id&&i.status==='pending'),inbox=partyInvitations.filter(i=>i.invited_user_id===me?.user_id&&i.status==='pending');
+ const regionModel=useMemo(()=>{
+  const allocated=(Array.isArray(g.regionalControl)?g.regionalControl:[]).filter(row=>row.party_id===selected?.id).sort((a,b)=>a.code.localeCompare(b.code));
+  const stability=Number(g.metrics.find(metric=>metric.metric_key==='lawfulness')?.value??40);
+  const penalty=Number.isFinite(stability)?Math.max(0,Math.floor(40-stability)):0;
+  const limit=Math.max(0,allocated.length-penalty);
+  return {controlled:allocated.slice(0,limit),suspended:allocated.slice(limit),total:allocated.length};
+ },[g.regionalControl,g.metrics,selected?.id]);
  const reviewedCount=DOCS.filter(kind=>latestDocs.some(d=>d.doc_kind===kind.kind&&d.status==='accepted')).length;
  const canInvite=partyFormationOpen&&!!selected&&!!me&&!me.roster_archived_at&&(teacher||me.kind==='student'&&me.team===selected.name);
  const membershipCandidates=teacher&&partyStageCompleted&&selected?members.filter(m=>m.kind==='student'&&!m.roster_archived_at&&m.team!==selected.name):[];
@@ -220,6 +227,15 @@ export default function PartiesView({g}:{g:ReturnTypeRepublic}){
        role={membershipFeedback.kind==='error'?'alert':'status'}>{membershipFeedback.message}</p>}
      </div>}
     </details>
+   <details className="civicPartyRoster" data-party-regions>
+    <PartyDisclosureSummary icon={MapPin} title="Регионы под контролем партии" meta={regionModel.controlled.length+' из '+regionModel.total+(regionModel.suspended.length?' · временно утрачено '+regionModel.suspended.length:'')}/>
+    {regionModel.total?
+     <ul>
+      {regionModel.controlled.map(region=><li key={region.code}><div><b>{region.name}</b><small>Контроль партии действует</small></div></li>)}
+      {regionModel.suspended.map(region=><li key={region.code}><div><b>{region.name}</b><small>Контроль временно утрачен из-за низкой правовой устойчивости</small></div></li>)}
+     </ul>
+     :<p className="civicPartyRosterEmpty">Регионы пока не закреплены за партией.</p>}
+   </details>
    {(canEditDescription||canUploadLogo)&&<details className="civicPartyEditor"><PartyDisclosureSummary icon={PencilLine} title="Оформление партии" meta="Эмблема и публичное описание"/>{canEditDescription&&<><label>Описание<textarea rows={4} value={description||selected.description||''} onChange={e=>setDescription(e.target.value)}/></label><button className="secondary" disabled={busy} onClick={()=>void saveDescription()}>Сохранить описание</button></>}{canUploadLogo&&<PartyLogoEditor key={selected.id} partyName={selected.name} disabled={busy} onSave={saveLogo}/>}</details>}
    {(own||(selected.registration_status==='registered'&&certificateIssued))&&
     <div className="gosPartyStageFieldset"><JusticeDocuments g={g} partyId={selected.id}/></div>}

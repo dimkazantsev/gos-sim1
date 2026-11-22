@@ -33,6 +33,23 @@ function billThreshold(doc:FormalDocument){
 export function votePresetForDocument(doc:FormalDocument):VotePreset|null{
  const threshold=billThreshold(doc);
 
+ if(doc.status_code==='sf_veto'&&['fz_bill','federal_budget'].includes(doc.doc_type)){
+  return {
+   title:'Преодоление отклонения Совета Федерации: '+doc.title,
+   body:'Государственная Дума повторно рассматривает федеральный закон в ранее принятой редакции после автоматического отклонения Советом Федерации при правовой устойчивости ниже 30%.',
+   mode:'mandate',institutionKey:'gd',procedureKey:'sf_veto_override',
+   quorumKind:'fraction',quorumValue:0.5,
+   majorityKind:'eligible_fraction',majorityValue:2/3,
+   allowAbstain:true,tieBreakerChair:false,
+   passTransition:'advance',failTransition:'reject',
+   badge:'ОТКЛОНЕНИЕ СФ · ПРЕОДОЛЕНИЕ',
+   rule:'Не менее 2/3 от общего числа депутатов Государственной Думы',
+   legalMode:'reduction',legalBasis:'Часть 5 статьи 105 Конституции РФ: после отклонения федерального закона Советом Федерации Государственная Дума может принять его в ранее принятой редакции не менее чем 2/3 голосов от общего числа депутатов. Автоматическое отклонение при показателе ниже 30% — условное правило ГОС.ID.'
+  };
+ }
+
+ if(doc.status_code==='sf_fkz_blocked')return null;
+
  if(doc.status_code==='president_veto'){
   return {
    title:'Преодоление вето Президента: '+doc.title,
