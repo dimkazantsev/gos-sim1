@@ -28,7 +28,7 @@ export default function StateProgramLab({g}:{g:ReturnTypeRepublic}){
  const active=()=>alive.current&&scope.current===viewScope;
  useEffect(()=>{alive.current=true;return()=>{alive.current=false;request.current++}},[]);
  useEffect(()=>{request.current++;readinessRequest.current++;addressDirty.current=false;addressVersion.current=0;setGoalsDirty(false);setSelectedGoals(['','','','','']);busyRef.current=false;setPrograms([]);setAddresses([]);setPriorities([]);setReadiness({});setGoals([]);setComponents([]);setExpenses([]);setYears([]);setMinistryAssignments([]);setMinistryUnits([]);setSelectedId('');setCreating(false);creatingRef.current=false;selectedRef.current='';setBusy(false);setAddressTitle('Послание Президента Российской Федерации Федеральному Собранию');setAddressBody('');setAddressVideo('');},[viewScope]);
- const role=stageRoleTitles(g),isPM=role.split(' | ').some(title=>/^председатель\s+правительства(?:\s|$)/u.test(title)),isMinister=role.includes('министр'),isPresident=role.split(' | ').some(title=>title.trim()==='президент российской федерации');
+ const role=stageRoleTitles(g),isPM=role.split(' | ').some(title=>/^председатель\s+правительства(?:\s|$)/u.test(title)),isMinister=me?.kind==='student'&&!me?.roster_archived_at&&ministryUnits.some(u=>u.head_user_id===me?.user_id),isPresident=role.split(' | ').some(title=>title.trim()==='президент российской федерации');
  async function refreshReadiness(programId:string){
   if(!active()||!game||!programId)return;
   const version=++readinessRequest.current;
