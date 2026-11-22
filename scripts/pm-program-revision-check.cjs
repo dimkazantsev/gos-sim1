@@ -62,7 +62,7 @@ assert(meeting.includes('create_government_session_from_programmes')&&meeting.in
   await db.query("INSERT INTO public.state_programs(id,game_id,status,signed_at,created_by,responsible_minister_id) VALUES($1,$2,'minister_review',NULL,$3,$3)",[program,game,minister]);
   await db.query("INSERT INTO public.state_programs(id,game_id,status,signed_at,created_by,responsible_minister_id) VALUES($1,$2,'revision',NULL,$3,$3)",[second,game,minister]);
   const as=async uid=>{await db.query("SELECT set_config('request.jwt.claim.sub',$1,false)",[uid]);};
-  const status=async p=program=>(await db.query('SELECT status,pm_revision_reason FROM public.state_programs WHERE id=$1',[p])).rows[0];
+  const status=async (p=program)=>(await db.query('SELECT status,pm_revision_reason FROM public.state_programs WHERE id=$1',[p])).rows[0];
   await as(minister);
   await db.query("SELECT public.advance_state_program($1,'minister_approve')",[program]);
   assert.equal((await status()).status,'pm_review');

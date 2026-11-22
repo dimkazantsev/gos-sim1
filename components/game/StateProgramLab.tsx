@@ -178,9 +178,9 @@ export default function StateProgramLab({g}:{g:ReturnTypeRepublic}){
       </label>
       <div className={styles.programApprovalActions}>
        <button type="button" disabled={busy||pmRevisionReason.trim().length<10} onClick={()=>void returnForRevision(selected.id)}>Вернуть на доработку</button>
-       <button type="button" disabled={busy} className="primary" onClick={()=>void run('advance_state_program',{p_program_id:selected.id,p_action:'pm_ready'})}>Согласовать для включения в проект повестки</button>
+       <button type="button" disabled={busy} className="primary" onClick={()=>void run('advance_state_program',{p_program_id:selected.id,p_action:'pm_ready'})}>Согласовать для включения в повестку</button>
       </div>
-     </div>
+     </div>}
      {(teacher||isPM)&&selected.status==='adopted'&&!g.formalDocuments.some(d=>d.game_id===game!.id&&d.stage_no===11&&d.doc_type==='government_resolution'&&d.metadata?.state_program_id===selected.id&&d.status_code==='published')&&<button type="button" disabled={busy} className="primary" onClick={()=>void run('sign_adopted_state_program',{p_program_id:selected.id})}>Подписать и опубликовать принятую программу</button>}
     </div>
    </section>
