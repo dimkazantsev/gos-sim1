@@ -65,7 +65,7 @@ export default function PartiesView({g}:{g:ReturnTypeRepublic}){
  publicDocs=selected?.registration_status==='registered'&&certificateIssued?
   latestDocs.filter(d=>['charter','program','symbol','congress_minutes'].includes(d.doc_kind)&&d.status==='accepted'):[],free=members.filter(m=>m.kind==='student'&&!m.roster_archived_at&&!m.team),pending=partyInvitations.filter(i=>i.party_id===selected?.id&&i.status==='pending'),inbox=partyInvitations.filter(i=>i.invited_user_id===me?.user_id&&i.status==='pending');
  const regionModel=useMemo(()=>{
-  const allocated=(g.regionalControl||[]).filter(row=>row.party_id===selected?.id).sort((a,b)=>a.code.localeCompare(b.code));
+  const allocated=(Array.isArray(g.regionalControl)?g.regionalControl:[]).filter(row=>row.party_id===selected?.id).sort((a,b)=>a.code.localeCompare(b.code));
   const stability=Number(g.metrics.find(metric=>metric.metric_key==='lawfulness')?.value??40);
   const penalty=Number.isFinite(stability)?Math.max(0,Math.floor(40-stability)):0;
   const limit=Math.max(0,allocated.length-penalty);
