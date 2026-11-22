@@ -1,16 +1,31 @@
 import catalog from '@/data/taxes-2026.json';
 export type FiscalRegion={game_id:string;region_code:string;name:string;profile:string;disputed:boolean;budget_year:number;enterprises:number;employees_per_firm:number;monthly_wage:number;profit_per_firm:number;consumption_per_firm:number;expenditure:number;transfer_in:number;budget_credit_cash?:number;debt:number;compliance:number;activity_multiplier:number;cost_multiplier:number;observations:Record<string,number|null>;source_url:string;source_year:number};
 export type FiscalRate={region_code:string;tax_key:string;rate:number};
-export type FiscalPolicy={key_rate:number;fx_rate:number;oil_price:number;cutoff_price:number;inflation:number;federal_expenditure:number;municipal_expenditure:number;baseline_economy:number;baseline_trust:number;activity_override?:number|null;activity_reference?:number|null;collection_lawfulness_reference?:number|null;updated_at:string};
+export type FiscalPolicy={budget_aux_anchor?:Record<string,number>;key_rate:number;fx_rate:number;oil_price:number;cutoff_price:number;inflation:number;federal_expenditure:number;municipal_expenditure:number;baseline_economy:number;baseline_trust:number;activity_override?:number|null;activity_reference?:number|null;collection_lawfulness_reference?:number|null;updated_at:string};
 export type FiscalContext={policy:FiscalPolicy;metrics:Record<string,number>;can_change_rate:boolean};
+/** Model B additional channels: the existing 0.002 activity and 0.0005
+ * collection sensitivities, distributed over seven supplementary indicators.
+ * Zero effect at the per-game anchor; no historical budget revaluation.
+ */
+export const MODEL_B_AUX_KEYS=['social_stability','security','elite_support','international_standing','social_tension','legitimacy','media_climate'] as const;
+export function modelBAdditionalChannels(metrics:Record<string,number>,anchors?:Record<string,number>|null){
+ const delta=(key:typeof MODEL_B_AUX_KEYS[number])=>{
+  const current=metrics[key],reference=anchors?.[key];
+  return Number.isFinite(current)&&Number.isFinite(reference)?current-reference:0;
+ };
+ const activityPoints=(delta('social_stability')+delta('security')+delta('elite_support')+delta('international_standing')-delta('social_tension'))/5;
+ const collectionPoints=(delta('legitimacy')+delta('media_climate'))/2;
+ return {activity_adjustment:Math.max(-.03,Math.min(.03,activityPoints*.002)),collection_adjustment:Math.max(-.01,Math.min(.01,collectionPoints*.0005))};
+}
 const clamp=(v:number,min:number,max:number)=>Math.max(min,Math.min(max,v));
 export function fiscalEnvironment(c?:FiscalContext|null){
  if(!c)return {activity:1,cost:1,fx:80,uncertainty:.04};
+ const aux=modelBAdditionalChannels(c.metrics,c.policy.budget_aux_anchor);
  const p=c.policy,economy=(c.metrics.economy??p.baseline_economy)-p.baseline_economy,trust=(c.metrics.public_trust??p.baseline_trust)-p.baseline_trust;
  const fx=p.fx_rate*clamp(1-economy*.001-trust*.001-(p.key_rate-16)*.0015,.75,1.3);
  // A manual value is a new starting level, not a permanent freeze.
  // The reference factor is captured when the teacher sets that level.
- const automatic=clamp(1-(p.key_rate-16)*.007+economy*.002+trust*.001-(fx/80-1)*.06,.65,1.4);
+ const automatic=clamp(1-(p.key_rate-16)*.007+economy*.002+trust*.001-(fx/80-1)*.06+aux.activity_adjustment,.65,1.4);
  const reference=p.activity_reference!=null&&p.activity_reference>0?p.activity_reference:automatic;
  const activity=p.activity_override!=null?clamp(p.activity_override/100*automatic/reference,0,10):automatic;
  const cost=clamp(1+(p.inflation-6)*.004+(fx/80-1)*.02,.7,1.6);
@@ -26,7 +41,7 @@ export function fiscalForecast(r:FiscalRegion,rates:FiscalRate[],preview?:{tax:s
  const law=context?.metrics.lawfulness,ref=context?.policy.collection_lawfulness_reference;
  const trust=context?.metrics.public_trust,trustRef=context?.policy.baseline_trust;
  // Limit the total regional collection adjustment to +/-1 percentage point.
- const adjustment=clamp((law!=null&&ref!=null?(law-ref)*.0003:0)+(trust!=null&&trustRef!=null?(trust-trustRef)*.0005:0),-.01,.01);
+ const adjustment=clamp((law!=null&&ref!=null?(law-ref)*.0003:0)+(trust!=null&&trustRef!=null?(trust-trustRef)*.0005:0)+(context?modelBAdditionalChannels(context.metrics,context.policy.budget_aux_anchor).collection_adjustment:0),-.01,.01);
  const effectiveCollection=clamp(r.compliance+adjustment,0,1);
  const lines=catalog.taxes.map(t=>{
   const scope=t.level==='federal'?'00':r.region_code;
