@@ -9,6 +9,34 @@
 -- Macro contribution bounded to +/-0.5 pp for each indicator per ledger action.
 -- Relative change only: previously published outcomes and initial metrics are immutable.
 
+CREATE OR REPLACE FUNCTION private.write_weighted_legitimacy(
+ p_game uuid,p_delta numeric,p_source_id text,p_actor uuid,p_note text
+) RETURNS void
+LANGUAGE plpgsql SECURITY DEFINER SET search_path TO 'public','private','pg_temp'
+AS $func$
+DECLARE v_id uuid;v_old numeric;v_new numeric;v_effect numeric;
+BEGIN
+ v_effect:=greatest(-1,least(1,coalesce(p_delta,0)));
+ IF v_effect=0 THEN RETURN;END IF;
+ UPDATE public.state_metrics m
+ SET previous_value=m.value,
+     value=greatest(coalesce(m.min_value,0),
+       least(coalesce(m.max_value,100),m.value+v_effect)),
+     updated_at=now()
+ WHERE m.game_id=p_game AND m.metric_key='legitimacy'
+   AND greatest(coalesce(m.min_value,0),
+     least(coalesce(m.max_value,100),m.value+v_effect)) IS DISTINCT FROM m.value
+ RETURNING m.id,m.previous_value,m.value INTO v_id,v_old,v_new;
+ IF FOUND THEN
+  INSERT INTO public.state_metric_history(game_id,metric_id,metric_key,value,previous_value,delta,
+   source_type,source_id,actor_id,note)
+  VALUES(p_game,v_id,'legitimacy',v_new,v_old,v_new-v_old,
+   'derived:legitimacy',p_source_id,p_actor,p_note);
+ END IF;
+END $func$;
+REVOKE ALL ON FUNCTION private.write_weighted_legitimacy(uuid,numeric,text,uuid,text)
+ FROM PUBLIC,anon,authenticated;
+
 CREATE OR REPLACE FUNCTION private.apply_societal_metric_deltas(
  p_game uuid,p_trust numeric,p_elite numeric,p_source_type text,p_source_id text,
  p_actor uuid,p_note text
@@ -16,6 +44,7 @@ CREATE OR REPLACE FUNCTION private.apply_societal_metric_deltas(
 LANGUAGE plpgsql SECURITY DEFINER SET search_path TO 'public','private','pg_temp'
 AS $func$
 DECLARE v record;v_id uuid;v_old numeric;v_new numeric;
+ v_trust_actual numeric:=0;v_elite_actual numeric:=0;
 BEGIN
  IF coalesce(p_trust,0)=0 AND coalesce(p_elite,0)=0 THEN RETURN;END IF;
  -- One indexed UPDATE per changed metric, not SELECT + UPDATE + another SELECT.
@@ -37,8 +66,15 @@ BEGIN
    INSERT INTO public.state_metric_history(game_id,metric_id,metric_key,value,previous_value,delta,
     source_type,source_id,actor_id,note)
    VALUES(p_game,v_id,v.metric_key,v_new,v_old,v_new-v_old,p_source_type,p_source_id,p_actor,p_note);
+   IF v.metric_key='public_trust' THEN v_trust_actual:=v_new-v_old;
+   ELSIF v.metric_key='elite_support' THEN v_elite_actual:=v_new-v_old; END IF;
   END IF;
  END LOOP;
+ -- Exactly one legitimacy write and one history row for both macro drivers.
+ PERFORM private.write_weighted_legitimacy(p_game,
+   0.18*v_trust_actual+0.12*v_elite_actual,
+   p_source_type||':'||p_source_id,p_actor,
+   'Автоматическая формула легитимности: 0,18 × доверие + 0,12 × поддержка элит');
 END;
 $func$;
 REVOKE ALL ON FUNCTION private.apply_societal_metric_deltas(uuid,numeric,numeric,text,text,uuid,text)
@@ -85,7 +121,7 @@ CREATE OR REPLACE FUNCTION private.derive_legitimacy_from_metric_history()
 RETURNS trigger LANGUAGE plpgsql SECURITY DEFINER SET search_path TO 'public','private','pg_temp'
 AS $func$
 DECLARE v_action text;v_prev_raw numeric:=0;v_raw numeric;v_delta numeric;
- v_id uuid;v_before numeric;v_after numeric;v_part numeric;
+ v_part numeric;
 BEGIN
  IF NEW.delta=0 THEN RETURN NEW;END IF;
  IF NEW.metric_key='economy' THEN
@@ -101,7 +137,10 @@ BEGIN
     'Деловая активность: изменение индекса экономики (без обратной связи от доверия/элит)');
   RETURN NEW;
  END IF;
- IF NEW.metric_key NOT IN ('public_trust','elite_support') THEN RETURN NEW;END IF;
+ IF NEW.metric_key NOT IN ('public_trust','elite_support')
+  OR NEW.source_type IN ('macro_political','business_activity')
+  OR NEW.source_type LIKE 'rule:%'
+ THEN RETURN NEW;END IF;
  v_part:=NEW.delta*CASE WHEN NEW.metric_key='public_trust' THEN 0.18 ELSE 0.12 END;
  IF v_part=0 THEN RETURN NEW;END IF;
  -- Cap the combined contribution by logical source within a DB transaction,
@@ -115,22 +154,8 @@ BEGIN
  PERFORM set_config('app.gos_legitimacy_action',v_action,true);
  PERFORM set_config('app.gos_legitimacy_raw',v_raw::text,true);
  IF v_delta=0 THEN RETURN NEW;END IF;
- UPDATE public.state_metrics m SET
-   previous_value=m.value,
-   value=greatest(coalesce(m.min_value,0),
-     least(coalesce(m.max_value,100),m.value+v_delta)),
-   updated_at=now()
- WHERE m.game_id=NEW.game_id AND m.metric_key='legitimacy'
-   AND greatest(coalesce(m.min_value,0),least(coalesce(m.max_value,100),m.value+v_delta))
-       IS DISTINCT FROM m.value
- RETURNING m.id,m.previous_value,m.value INTO v_id,v_before,v_after;
- IF FOUND THEN
-  INSERT INTO public.state_metric_history(game_id,metric_id,metric_key,
-   value,previous_value,delta,source_type,source_id,actor_id,note)
-  VALUES(NEW.game_id,v_id,'legitimacy',v_after,v_before,v_after-v_before,
-   'derived:legitimacy',NEW.id::text,NEW.actor_id,
-   'Формула легитимности: 0,18 × Δ доверия + 0,12 × Δ поддержки элит; предел ±1 п.п. на исходное действие');
- END IF;
+ PERFORM private.write_weighted_legitimacy(NEW.game_id,v_delta,NEW.id::text,NEW.actor_id,
+  'Формула легитимности: 0,18 × Δ доверия + 0,12 × Δ поддержки элит; предел ±1 п.п. на исходное действие');
  RETURN NEW;
 END;
 $func$;
@@ -168,3 +193,79 @@ UPDATE public.impact_rules
  SET effects=jsonb_set(effects,'{metrics,legitimacy}','0.35'::jsonb,true),
      updated_at=now()
 WHERE rule_key='vote_passed' AND (effects->'metrics'->>'legitimacy')::numeric=0.5;
+
+-- Bundle linked formula in the existing once-per-rule write path.
+CREATE OR REPLACE FUNCTION private.apply_rule_effects(p_game uuid, p_rule impact_rules, p_source_type text, p_source_id text, p_actor uuid, p_context jsonb, p_note text)
+ RETURNS boolean
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+ SET search_path TO 'public', 'private', 'pg_temp'
+AS $function$
+declare
+ kv record;
+ m public.state_metrics%rowtype;
+ party public.game_parties%rowtype;
+ delta numeric;
+ v_old numeric;
+ v_new numeric;
+ v_actual numeric;
+ v_actual_metrics jsonb:='{}'::jsonb;
+ v_actual_effects jsonb:='{}'::jsonb;
+begin
+ if not p_rule.enabled or not p_rule.auto_apply then return false;end if;
+ if not private.impact_condition_matches(p_rule.conditions,p_context) then return false;end if;
+ if exists(select 1 from public.impact_ledger where game_id=p_game and rule_key=p_rule.rule_key and source_type=p_source_type and source_id=p_source_id) then return false;end if;
+
+ for kv in select key,value from jsonb_each_text(coalesce(p_rule.effects->'metrics','{}'::jsonb))
+ order by case when key='legitimacy' then 1 else 0 end,key
+ loop
+   delta:=kv.value::numeric;
+   select * into m from public.state_metrics where game_id=p_game and metric_key=kv.key for update;
+   if m.id is not null and delta<>0 then
+     v_old:=m.value;
+     v_new:=v_old+delta;
+     if m.min_value is not null then v_new:=greatest(m.min_value,v_new);end if;
+     if m.max_value is not null then v_new:=least(m.max_value,v_new);end if;
+     v_actual:=v_new-v_old;
+     if v_actual<>0 then
+       perform private.record_metric_change(p_game,kv.key,v_new,'rule:'||p_rule.rule_key,p_source_id,p_actor,coalesce(p_note,p_rule.label));
+       v_actual_metrics:=v_actual_metrics||jsonb_build_object(kv.key,v_actual);
+     end if;
+   end if;
+ end loop;
+
+ -- One aggregate legitimacy update for all dimensions of one accepted rule.
+ -- The metric-history trigger explicitly skips source_type 'rule:*' to
+ -- avoid intermediate writes and duplicated Realtime notifications.
+ IF (v_actual_metrics ? 'public_trust') OR (v_actual_metrics ? 'elite_support') THEN
+  PERFORM private.write_weighted_legitimacy(p_game,
+   0.18*coalesce((v_actual_metrics->>'public_trust')::numeric,0)
+   +0.12*coalesce((v_actual_metrics->>'elite_support')::numeric,0),
+   p_source_id,p_actor,'Зависимость легитимности от доверия граждан и поддержки элит · '||
+    coalesce(p_note,p_rule.label));
+ END IF;
+ v_actual_effects:=jsonb_build_object('metrics',v_actual_metrics);
+
+ if (p_rule.effects ? 'actor_party_support') and p_actor is not null then
+   select gp.* into party
+   from public.game_members gm join public.game_parties gp on gp.game_id=gm.game_id and gp.name=gm.team
+   where gm.game_id=p_game and gm.user_id=p_actor limit 1 for update of gp;
+   if party.id is not null then
+     delta:=(p_rule.effects->>'actor_party_support')::numeric;
+     v_old:=party.support;
+     v_new:=least(100,greatest(0,v_old+delta));
+     v_actual:=v_new-v_old;
+     if v_actual<>0 then
+       update public.game_parties set support=v_new where id=party.id;
+       insert into public.party_support_history(game_id,party_id,value,previous_value,delta,source_type,source_id)
+       values(p_game,party.id,v_new,v_old,v_actual,'rule:'||p_rule.rule_key,p_source_id);
+       v_actual_effects:=v_actual_effects||jsonb_build_object('actor_party_support',v_actual);
+     end if;
+   end if;
+ end if;
+
+ insert into public.impact_ledger(game_id,rule_id,rule_key,source_type,source_id,actor_id,effects,note)
+ values(p_game,p_rule.id,p_rule.rule_key,p_source_type,p_source_id,p_actor,v_actual_effects,coalesce(p_note,p_rule.label));
+ return true;
+end;
+$function$;
