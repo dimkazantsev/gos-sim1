@@ -21,13 +21,19 @@ export default function FiscalMacroPanel({g,context,readOnly,onSaved,onOpenDocum
  // Budget already loads current office assignments. Reuse them if a fiscal
  // context snapshot was computed before the active appointment reached the UI.
  // The adoption RPC independently rechecks the appointment and auth.uid().
- const canBankAct=!readOnly&&g.me?.kind==='student'&&g.me.roster_archived_at==null&&(
-  context.can_issue_bank_rate_decision===true||
+ const isBankChairInRoster=g.me?.kind==='student'&&g.me.roster_archived_at==null&&
   g.officeAssignments.some(office=>office.game_id===g.game?.id&&office.user_id===g.me?.user_id&&
-   office.status==='active'&&office.role_title==='Председатель Центрального банка Российской Федерации')
+   office.status==='active'&&office.role_title==='Председатель Центрального банка Российской Федерации');
+ const canBankAct=!readOnly&&g.me?.kind==='student'&&g.me.roster_archived_at==null&&(
+  context.can_issue_bank_rate_decision===true||isBankChairInRoster
  );
+ // Teacher preview uses the student's loaded office assignments, not the
+ // teacher's auth-bound fiscal-context permission. Preview can open and
+ // explore the editor but never submit a Bank of Russia decision.
+ const canPreviewBankRate=readOnly&&isBankChairInRoster;
+ const showBankRateControls=canBankAct||canPreviewBankRate;
  function toggleBankRate(){
-  if(!canBankAct||bankBusy)return;
+  if(!showBankRateControls||bankBusy)return;
   if(bankOpen){setBankOpen(false);return;}
   bankRequest.current=crypto.randomUUID();
   setBankDraft(String(p.key_rate));setBankReason('');setBankError('');setBankOpen(true);
@@ -130,9 +136,10 @@ export default function FiscalMacroPanel({g,context,readOnly,onSaved,onOpenDocum
  }
  return <section className="surface fiscalMacroPanel" aria-label="Экономические условия"><header className="fiscalMacroHeading"><span className="fiscalMacroHeadingIcon" aria-hidden="true"><Gauge size={23}/></span><div className="fiscalMacroHeadingText"><h2>Экономические условия</h2><p>Ключевые показатели игрового бюджета: ставки, цены и деловая активность. Изменения учитываются при расчёте доходов, расходов и долговой нагрузки.</p></div></header>
  <div className="fiscalMacroStats">{[['Ключевая ставка',quantity(p.key_rate,'% годовых')],['Расчётный курс',quantity(environment.fx,'₽ за 1 доллар')],['Нефть',quantity(p.oil_price,'долларов за баррель')],['Цена отсечения',quantity(p.cutoff_price,'долларов за баррель')],['Инфляция',new Intl.NumberFormat('ru-RU',{maximumFractionDigits:6}).format(p.inflation)+' % в год'],['Деловая активность',quantity(environment.activity*100,'% от исходного уровня')],
-['ФНБ',shownFnb(p.fnb_total??10000000)],['Доступно из ФНБ',shownFnb(p.fnb_liquid??4490900)]].map(([label,value])=><article key={label}><span>{label}</span>{label==='Ключевая ставка'&&canBankAct?<button type="button" className="fiscalMacroBankRateValue" aria-expanded={bankOpen} aria-controls="fiscal-bank-rate-controls" aria-label={'Изменить ключевую ставку. Текущая ставка: '+value} onClick={toggleBankRate}><b>{value}</b><small>Изменить ставку</small></button>:<b>{value}</b>}</article>)}</div>
- {bankOpen&&canBankAct&&<div id="fiscal-bank-rate-controls" className="fiscalMacroBankDecision" role="group" aria-label="Решение Председателя Банка России об изменении ключевой ставки">
+['ФНБ',shownFnb(p.fnb_total??10000000)],['Доступно из ФНБ',shownFnb(p.fnb_liquid??4490900)]].map(([label,value])=><article key={label}><span>{label}</span>{label==='Ключевая ставка'&&showBankRateControls?<button type="button" className="fiscalMacroBankRateValue" aria-expanded={bankOpen} aria-controls="fiscal-bank-rate-controls" aria-label={'Изменить ключевую ставку. Текущая ставка: '+value} onClick={toggleBankRate}><b>{value}</b><small>Изменить ставку</small></button>:<b>{value}</b>}</article>)}</div>
+ {bankOpen&&showBankRateControls&&<div id="fiscal-bank-rate-controls" className="fiscalMacroBankDecision" role="group" aria-label="Решение Председателя Банка России об изменении ключевой ставки">
   <div className="fiscalMacroBankDecisionHeading"><FileText size={21} aria-hidden="true"/><div><strong>Решение Банка России</strong><p>Новая ставка применяется сразу. Решение регистрируется в реестре НПА как принятое; затем Председатель Банка России подписывает его в карточке документа.</p></div></div>
+  {canPreviewBankRate&&<p className="budgetNotice" role="status">Просмотр полномочий студента: можно проверить изменение значения, но принять решение или подписать НПА от его имени нельзя. Председатель Банка России выполняет эти действия после входа под своей учётной записью.</p>}
   <label className="fiscalMacroBankRateLabel">Новая ключевая ставка, % годовых
    <span className="fiscalMacroBankRateControl">
     <button type="button" className="secondary" aria-label="Понизить ставку на 0,5 процентного пункта" disabled={bankBusy||Number(bankDraft)<=0} onClick={()=>changeBankRate(-0.5)}><Minus size={17}/></button>
@@ -143,7 +150,7 @@ export default function FiscalMacroPanel({g,context,readOnly,onSaved,onOpenDocum
   <label className="fiscalMacroBankReason">Основание решения
    <textarea rows={3} maxLength={1500} value={bankReason} disabled={bankBusy} onChange={e=>setBankReason(e.target.value)} placeholder="Причины изменения ключевой ставки, ситуация с инфляцией и кредитованием"/>
   </label>
-  <div className="fiscalMacroBankActions"><button type="button" className="secondary" disabled={bankBusy} onClick={()=>setBankOpen(false)}>Отмена</button><button type="button" className="primary" disabled={bankBusy} onClick={()=>void submitBankRate()}><FileText size={17} aria-hidden="true"/>{bankBusy?'Принимается…':'Принять решение и открыть НПА'}</button></div>
+  <div className="fiscalMacroBankActions"><button type="button" className="secondary" disabled={bankBusy} onClick={()=>setBankOpen(false)}>Отмена</button><button type="button" className="primary" disabled={bankBusy||canPreviewBankRate} onClick={()=>void submitBankRate()}><FileText size={17} aria-hidden="true"/>{canPreviewBankRate?'Подтверждение недоступно при просмотре':bankBusy?'Принимается…':'Принять решение и открыть НПА'}</button></div>
   {bankError&&<p className="error" role="alert">{bankError}</p>}
  </div>}
  <details className="fiscalMacroDetails"><summary><span className="fiscalMacroSummaryTitle"><BookOpenText size={19} aria-hidden="true"/> Пояснения к показателям</span><ChevronDown className="fiscalMacroChevron" size={19} aria-hidden="true"/></summary><p>Ручное значение деловой активности становится новой исходной точкой: в момент сохранения отображается заданный процент, а дальнейшие изменения ставки, курса, экономического индекса и доверия продолжают изменять его относительно этой точки. При автоматическом расчёте чем дороже кредит, тем слабее активность бизнеса и выше обслуживание долга. Доверие и экономический индекс влияют на активность и курс; инфляция — на стоимость обязательств. Для добывающих регионов учитываются нефть и курс.</p><p data-inflation-explanation><strong>Инфляция и расходы.</strong> Когда подтверждённое решение увеличивает фактические государственные расходы, расчётная инфляция растёт; сокращение расходов снижает её. На каждые дополнительные 1% расходов относительно базового федерального бюджета 2026 года приходится 0,2 процентного пункта инфляции, но не более ±0,5 пункта за решение. Учитываются исполненные финансовые последствия событий, расходные решения и опубликованные бюджетные обязательства, включая государственные программы. Простая регистрация проекта, отказ без изменения утверждённых расходов или изменение налоговой ставки сами по себе инфляцию не меняют. Преподаватель может вручную установить любое значение инфляции, после чего дальнейшие последствия рассчитываются от него.</p><p data-fnb-explanation><strong>ФНБ и нефтегазовые доходы.</strong> Общий объём фонда и доступная для финансирования часть учитываются раздельно. При принятии федерального бюджета нефтегазовые средства сверх цены отсечения направляются в ФНБ и одновременно включаются в потребность финансирования — повторное использование этих денег исключено. Если нефть дешевле цены отсечения, нефтегазовые поступления сокращаются, а доступные средства ФНБ можно направить на покрытие дефицита или погашение долгов по установленным процедурам. Ослабление рубля повышает рублёвую стоимость валютной части ФНБ, укрепление снижает её; это переоценка активов, а не дополнительный доход.</p>
