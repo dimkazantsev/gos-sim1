@@ -96,7 +96,7 @@ export function calculateFederalBudget(draft:BudgetDraft,state:SimulatorState,co
  const revenue=round(budgetMoneySum(...income_lines.map(r=>r.amount),baseline.income_rounding,state.revenue_adjustment)),expenditure=budgetMoneySum(...expense_lines.map(r=>r.amount),baseline.expense_rounding);
  const oldExternal=state.last_plan_id?Number(state.last_financing.external??0):0;
  const externalNew=Math.max(0,Number(draft.financing.external??0)-oldExternal);
- const externalOver=Math.max(0,externalNew-access.available);
+ const externalOver=budgetMoney(Math.max(0,externalNew-access.available));
  const refinance=Number(draft.external_refinance??0);
  const due=contracts.filter(c=>c.status==='due'&&c.maturity_month<=state.month&&c.principal>0)
   .slice().sort((a,b)=>a.maturity_month-b.maturity_month||String(a.id||'').localeCompare(String(b.id||'')));
