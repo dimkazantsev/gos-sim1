@@ -1,0 +1,11 @@
+const assert=require('node:assert/strict');
+const fs=require('node:fs');
+const path=require('node:path');
+const sql=fs.readFileSync(path.join(__dirname,'..','supabase/migrations/20261122194657_security_macro_social_crisis_events_low_load_20261123.sql'),'utf8');
+const rules=["private.apply_security_delta","private.security_from_macro_ledger","private.security_from_metric_history","private.security_from_crisis_management","private.security_from_event_outcome","d:=-0.10*(NEW.new_threat-NEW.old_threat)","0.05*(NEW.new_containment-NEW.old_containment)","d:=-0.8*di-0.5*dr+0.6*da","THEN k:=0.7","THEN k:=-0.4","THEN k:=0.3","THEN k:=0.2","NEW.source_type IN ('teacher','decision','fiscal')","NEW.source_type IN ('teacher','decision','event_authority')","c.category='Безопасность'","e.best_option AND e.authority_ok AND e.lawful","NEW.source_type IS DISTINCT FROM 'derived:security'"];
+for(const rule of rules)assert(sql.includes(rule),'Missing safety contract: '+rule);
+assert(!/create\s+table|create\s+index|pg_cron|pg_net/i.test(sql),'Disallowed resource');
+assert(!/state_programs|government_program/i.test(sql),'Programs must not influence safety');
+const fiscal=fs.readFileSync(path.join(__dirname,'..','components/game/fiscalMath.ts'),'utf8');
+assert(fiscal.includes("'security'")&&fiscal.includes('modelBAdditionalChannels'),'Model B connection missing');
+console.log('PASS safety coefficients, isolated drivers, crises, legal outcomes, budget integration');
