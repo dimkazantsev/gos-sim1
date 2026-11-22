@@ -17,4 +17,17 @@ assert(!/create\s+table/i.test(sql),'No new tables permitted');
 assert(!/pg_cron|create\s+(?:publication|subscription)|\bhttp\b|pg_net/i.test(sql),'No polling, new subscriptions, or network calls');
 const game=fs.readFileSync(path.join(root,'components/game/StateMetricsDock.tsx'),'utf8');
 assert(game.includes("'public_trust'")&&game.includes("'elite_support'")&&game.includes("'legitimacy'"),'Existing UI metrics remain available');
+
+const linked=fs.readFileSync(path.join(root,'supabase/migrations/20261122182954_metric_legitimacy_historical_revert_and_post_batch_20261123.sql'),'utf8');
+for(const required of [
+ "private.write_weighted_legitimacy_delta",
+ "v_actual_effects:=v_actual_effects||jsonb_build_object('legitimacy_derivative',v_legit_derived)",
+ "l.effects ? 'legitimacy_derivative'",
+ "NEW.source_type LIKE 'rule_revert:%'",
+ "NEW.source_type IN ('macro_political','business_activity','decision')",
+ "private.apply_post_effects",
+ "order by case when key='legitimacy' then 1 else 0 end,key"
+])assert(linked.includes(required),'Missing historical vote/post protection: '+required);
+assert(!/create\s+table/i.test(linked),'No additional tables permitted');
+
 console.log('PASS: existing server trigger reused; activity and price drivers linked; no client calls or new tables');
