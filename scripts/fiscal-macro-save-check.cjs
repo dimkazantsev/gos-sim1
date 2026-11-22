@@ -26,8 +26,8 @@ assert(parent.includes("sequence.current++;")&&parent.includes('setContext(previ
 assert(parent.includes('void g.refreshBudgetPulse?.()')&&!parent.includes('await g.refreshBudgetPulse?.()'),
  'Forecast is synchronized without locking the form');
 assert(form.includes("g.teacher||key==='key_rate'"),'Preserve Bank of Russia-only rate permissions');
-assert(form.includes("!draft[key]?.trim()||Number(draft[key])!==Number(context.policy[key])"),
- 'Cleared numeric inputs must not be silently skipped');
+assert(form.includes("!draft[key]?.trim()||Number(draft[key])!==Number(context.policy[key]??fnbDefaults"),
+ 'Cleared numeric inputs must not be silently skipped, including the FNB inputs');
 const changed=(draft,previous)=>draft!==undefined&&(!draft.trim()||Number(draft)!==Number(previous));
 assert(!changed('60','60'));
 assert(!changed('60.0','60'));
