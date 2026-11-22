@@ -34,7 +34,7 @@ function accounting(c,label,eventRevenue=0){
  near(c.revenue-c.expenditure,c.balance,label+': balance');
  near(Math.max(0,c.expenditure-c.revenue),c.deficit,label+': deficit');
  near(Math.max(0,c.revenue-c.expenditure),c.surplus,label+': surplus');
- near(c.deficit+c.credit_outflow,c.funding_need,label+': loan principal below the expenditure line');
+ near(c.deficit+c.credit_outflow+(c.fnb_oil_change??0),c.funding_need,label+': loan principal and FNB oil savings remain below the expenditure line');
  near(Math.max(0,c.funding_need-c.financing),c.funding_gap,label+': uncovered financing');
 }
 accounting(first,'Unchanged baseline');
