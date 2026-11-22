@@ -7,7 +7,7 @@ const compile=s=>ts.transpileModule(s,{compilerOptions:{module:ts.ModuleKind.Com
 // Load the real lightweight grade-format helper into the isolated VM fixture.
 const gradeHelper={};
 new Function('exports',compile(fs.readFileSync(path.join(root,'lib/gradeScore.ts'),'utf8')))(gradeHelper);
-const compiled=new Map();function code(name,old=false){const file='components/game/'+name+'.'+(name==='useGameTableSync'||name==='assessmentPresentation'?'ts':'tsx'),key=old+file;if(!compiled.has(key))compiled.set(key,compile(old?execFileSync('git',['show',baseline+':'+file],{cwd:root,encoding:'utf8'}):fs.readFileSync(path.join(root,file),'utf8')));return compiled.get(key);}
+const compiled=new Map();function code(name,old=false){const file='components/game/'+name+'.'+(['useGameTableSync','assessmentPresentation','stageRoles'].includes(name)?'ts':'tsx'),key=old+file;if(!compiled.has(key))compiled.set(key,compile(old?execFileSync('git',['show',baseline+':'+file],{cwd:root,encoding:'utf8'}):fs.readFileSync(path.join(root,file),'utf8')));return compiled.get(key);}
 const tick=async()=>{for(let i=0;i<36;i++)await Promise.resolve()};
 const players=Array.from({length:40},(_,i)=>({game_id:'game-A',user_id:'student-'+i,full_name:'Участник '+String(i).padStart(2,'0'),kind:'student',team:'Партия',role_title:'Депутат'}));
 function assessmentRows(game){return players.flatMap((p,i)=>Array.from({length:16},(_,j)=>({id:game+':'+p.user_id+':'+(j+1),game_id:game,user_id:p.user_id,stage_no:j+1,auto_score:(i+j)%3+.5,final_score:j%2===0?(i+j)%4:null,status:j%2===0?'final':'draft',criterion_law:true,criterion_strategy:true,criterion_debrief:true,teacher_note:'private:'+p.user_id,public_rationale:'Обоснование '+(j+1),last_run_type:'automatic',last_auto_at:null,revision_count:1,finalized_at:null})));}
@@ -52,6 +52,7 @@ function realm(kind='profile',{old=false,hidden=false,user='student-0',teacher=f
  function requireFor(name){
   if(name==='react')return react;if(name==='react/jsx-runtime')return{jsx,jsxs:jsx,Fragment:'fragment'};if(name==='@/lib/gradeScore')return gradeHelper;if(name==='@/lib/supabase')return{supabase};if(name==='./useGameTableSync')return modules.sync;if(name==='./GradesView')return modules.grades;
   if(name==='lucide-react')return new Proxy({},{get:(_,key)=>String(key)});if(name==='@/lib/userError')return{userError:e=>e?.message||String(e)};
+  if(name==='./stageRoles')return modules.roles;
   if(name==='./gameRoster')return{currentGameMembers:(members,id)=>members.filter(m=>m.game_id===id),currentGameProfiles:p=>p};
   if(name==='./avatarCrop')return{preparePortraitDetector:async()=>{},decodePortrait:async()=>{}};if(name==='./useGameOfficeCatalog')return{useGameOfficeCatalog:()=>({groups:[],ready:true,error:''})};if(name==='./gameOfficeCatalog')return{gameOfficeRoleList:()=>[]};
   if(name==='./Achievements')return{AwardShelf:'AwardShelf'};if(name==='./Blitz')return{BlitzArchive:'BlitzArchive'};if(name==='./profileSetup')return{PROFILE_SETUP_LABELS:{}};
@@ -60,7 +61,7 @@ function realm(kind='profile',{old=false,hidden=false,user='student-0',teacher=f
   if(name==='./stageAnalysisWindow')return{stageAnalysisPhase:()=> 'unavailable'};
   return{__esModule:true,default:name};
  }
- vm.createContext(context);modules.sync=load('sync',code('useGameTableSync'));modules.presentation=load('presentation',code('assessmentPresentation'));modules.grades=load('grades',code('GradesView',old)+'\nexports.fixtureModal=AssessmentModal;');const rootModule=kind==='grades'?modules.grades:load(kind,code(kind==='analytics'?'ParticipantsAnalytics':'ProfileView',old));
+ vm.createContext(context);modules.sync=load('sync',code('useGameTableSync'));modules.presentation=load('presentation',code('assessmentPresentation'));modules.roles=load('roles',code('stageRoles'));modules.grades=load('grades',code('GradesView',old)+'\nexports.fixtureModal=AssessmentModal;');const rootModule=kind==='grades'?modules.grades:load(kind,code(kind==='analytics'?'ParticipantsAnalytics':'ProfileView',old));
  function renderComponent(key,fn,p,visited){let f=frames.get(key);if(!f){f={hooks:[],cursor:0};frames.set(key,f);}visited.add(key);const previous=frame;frame=f;f.cursor=0;const node=fn(p);frame=previous;
   function visit(n){if(Array.isArray(n)){n.forEach(visit);return;}if(!n||typeof n!=='object')return;if(n.type===modules.grades.default)n.rendered=renderComponent(key+'/grades',n.type,n.props,visited);else visit(n.props?.children);}
   visit(node);return node;
@@ -69,7 +70,7 @@ function realm(kind='profile',{old=false,hidden=false,user='student-0',teacher=f
   props(game='game-A',uid=user,memberKind=teacher?'teacher':'student'){
    const me={...players.find(p=>p.user_id===uid),game_id:game,user_id:uid,full_name:uid,kind:memberKind};const members=players.map(p=>({...p,game_id:game}));if(!members.some(p=>p.user_id===uid))members.push(me);
    // Mirror the game's server-verified identity; never substitute a displayed role or an unverified Auth user.
-   const g={game:{id:game},me,verifiedUserId:authNever?null:(currentAuth??me.user_id),members,teacher:memberKind==='teacher',profiles:[],parties:[],partyInvitations:[],partyMandates:[],averageVsn:[],myEvaluations:[],politicalPosts:[],ballots:[],formalDocuments:[],activities:[],stages:Array.from({length:16},(_,i)=>({stage_no:i+1,title:'Этап '+(i+1),status:i===1?'open':'completed'})),setError:e=>errors.push(e),saveProfile:async()=>true};
+   const g={game:{id:game},me,officeAssignments:[],verifiedUserId:authNever?null:(currentAuth??me.user_id),members,teacher:memberKind==='teacher',profiles:[],parties:[],partyInvitations:[],partyMandates:[],averageVsn:[],myEvaluations:[],politicalPosts:[],ballots:[],formalDocuments:[],activities:[],stages:Array.from({length:16},(_,i)=>({stage_no:i+1,title:'Этап '+(i+1),status:i===1?'open':'completed'})),setError:e=>errors.push(e),saveProfile:async()=>true};
    return{g,readOnly,targetUserId:target,previewAchievementsUserId};
   },render(p=props){props=p;const visited=new Set();tree=renderComponent('root',rootModule.default,props,visited);for(const [key,f]of frames)if(!visited.has(key)){for(const h of f.hooks)h?.cleanup?.();frames.delete(key);}while(effects.length)effects.shift()();return tree;},
   async settle(){for(let i=0;i<6;i++){await tick();api.render();}await tick();},
