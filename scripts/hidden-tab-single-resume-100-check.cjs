@@ -32,8 +32,10 @@ assert(widgets.includes('function pausePolling()')&&widgets.includes('function s
  'Visible stage widget polls should not wake hidden tabs');
 assert(widgets.includes("if(document.visibilityState!=='visible'){\n    if(!hiddenAt)hiddenAt=Date.now();"),
  'Unmounted or inactive stage widgets retain their queued work');
-assert(budget.includes('function stopPolling()')&&budget.includes('dirtyWhileHidden'),
- 'Expensive budget refreshes must not poll when hidden');
+assert(budget.includes('dirtyWhileHidden')&&!budget.includes('setInterval(')
+ &&budget.includes("if(document.visibilityState!=='visible'){dirtyWhileHidden=true;return}")
+ &&budget.includes('if(dirtyWhileHidden||Date.now()-lastAutomaticAt>=180000)automatic(dirtyWhileHidden)'),
+ 'Budget uses no periodic polling; hidden changes reconcile on resume');
 assert(core.includes('},300000);'),
  'Brief background switches must never disconnect the game socket');
 

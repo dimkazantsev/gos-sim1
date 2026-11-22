@@ -185,6 +185,8 @@ export default function ImpactRulesPanel({g,initialTab='rules',initialExpandedRu
   const matchQuery=(r.label+' '+r.event_type+' '+(r.description||'')).toLocaleLowerCase('ru-RU').includes(query.trim().toLocaleLowerCase('ru-RU'));
   return matchQuery&&(ruleFilter==='all'||(ruleFilter==='automatic'&&r.enabled&&r.auto_apply)||(ruleFilter==='off'&&!r.enabled));
  });
+ const visibleRuleIds=new Set(filtered.map(rule=>rule.id));
+ const rulesByKey=useMemo(()=>new Map(impactRules.map(rule=>[rule.rule_key,rule])),[impactRules]);
  const history=useMemo(()=>[...impactLedger].sort((a,b)=>Date.parse(b.created_at)-Date.parse(a.created_at)),[impactLedger]);
  const filteredHistory=history.filter(l=>ledgerFilter==='all'||(ledgerFilter==='reverted'?l.status==='reverted':l.status!=='reverted'));
  return <section className="surface impactEngine impactWorkbench" aria-label="Модель последствий">
@@ -221,7 +223,7 @@ export default function ImpactRulesPanel({g,initialTab='rules',initialExpandedRu
    </div>
    <p className="impactListCount">Показано {filtered.length} из {impactRules.length} правил. Нажмите «Настроить», чтобы изменить конкретное правило.</p>
    <div className="impactRulesGrid">
-    {impactRules.map(rule=><div className="impactRuleItem" key={rule.id} hidden={!filtered.some(item=>item.id===rule.id)}>
+    {impactRules.map(rule=><div className="impactRuleItem" key={rule.id} hidden={!visibleRuleIds.has(rule.id)}>
      <RuleCard g={g} rule={rule} expanded={expandedId===rule.id} onToggle={()=>setExpandedId(current=>current===rule.id?null:rule.id)}/>
     </div>)}
     {filtered.length===0&&<div className="impactEmpty">Правила по выбранным условиям не найдены. Измените поиск или фильтр.</div>}
@@ -235,7 +237,7 @@ export default function ImpactRulesPanel({g,initialTab='rules',initialExpandedRu
     </div></div>
    <div className="impactLedger">
     {filteredHistory.length===0?<div className="impactEmpty">Записей по выбранному фильтру пока нет.</div>:
-     filteredHistory.slice(0,10).map(entry=><LedgerRow key={entry.id} g={g} entry={entry} rule={impactRules.find(r=>r.rule_key===entry.rule_key)}/>)}
+     filteredHistory.slice(0,10).map(entry=><LedgerRow key={entry.id} g={g} entry={entry} rule={rulesByKey.get(entry.rule_key)}/>)}
    </div>
    {filteredHistory.length>10&&<p className="impactListCount">Показаны последние 10 из {filteredHistory.length} записей.</p>}
   </div>

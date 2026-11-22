@@ -8,6 +8,8 @@ on:
       - 'supabase/migrations/20261029144000_impact_engine_projection_invoker.sql'
       - 'supabase/migrations/20261031165000_impact_ledger_ten_projection.sql'
       - 'scripts/impact-engine-projection-rls-check.cjs'
+      - 'scripts/impact-model-low-load-check.cjs'
+      - 'supabase/migrations/20261123060000_impact_metric_trigger_when_scope.sql'
       - 'components/game/ImpactRulesPanel.tsx'
       - 'components/game/useRepublicGame.ts'
 permissions:
@@ -30,6 +32,7 @@ jobs:
       - run: npm ci --no-audit --no-fund
       - run: node --check supabase/tests/impact_projection_100_local.cjs
       - run: node scripts/impact-engine-projection-rls-check.cjs
+      - run: node scripts/impact-model-low-load-check.cjs
       - uses: supabase/setup-cli@v3
         with:
           version: latest
