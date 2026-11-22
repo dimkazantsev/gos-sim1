@@ -1098,3 +1098,18 @@
  .govMeetingSpeakerFinish{align-items:stretch;flex-direction:column}
  .govMeetingSpeakerFinish button{width:100%;white-space:normal}
 }
+
+/* ГП на предварительном рассмотрении: используем действующие токены Правительства. */
+.govSessionLab .govPmReview{margin:0 0 18px}
+.govSessionLab .govPmReviewItems{display:grid;gap:12px;min-width:0}
+.govSessionLab .govPmReviewItem{display:grid;gap:13px;min-width:0;padding:16px;border:1px solid var(--gs-border,#dce3f0);border-radius:12px;background:var(--gs-bg-elevated,#f9faff)}
+.govSessionLab .govPmReviewItem>header{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+.govSessionLab .govPmReviewItem>header>div{display:grid;gap:5px;min-width:0}
+.govSessionLab .govPmReviewItem>header strong{font-size:15px;color:var(--gs-ink,#172447);overflow-wrap:anywhere}
+.govSessionLab .govPmReviewItem small{color:var(--gs-muted,#586784);font-size:12px}
+.govSessionLab .govPmReviewItem>header>span{font-size:12px;color:var(--gs-accent,#2453e6);font-weight:750;white-space:normal}
+.govSessionLab .govPmReviewItem>label{display:grid;gap:7px;color:var(--gs-muted,#586784);font-size:13px;font-weight:700}
+.govSessionLab .govPmReviewItem textarea{box-sizing:border-box;width:100%;min-height:88px;padding:12px;border:1px solid var(--gs-border-strong,#b8c5dc);border-radius:11px;background:var(--gs-surface,#fff);color:var(--gs-ink,#172447);font:inherit;font-size:14px;resize:vertical}
+.govSessionLab .govPmReviewActions{display:flex;justify-content:flex-end;flex-wrap:wrap;gap:10px}
+.govSessionLab .govPmReviewActions button{min-height:46px;white-space:normal}
+@media(max-width:600px){.govSessionLab .govPmReviewItem{padding:12px}.govSessionLab .govPmReviewItem>header{flex-direction:column}.govSessionLab .govPmReviewActions{display:grid;grid-template-columns:minmax(0,1fr)}.govSessionLab .govPmReviewActions button{width:100%}}

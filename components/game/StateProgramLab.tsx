@@ -22,14 +22,21 @@ export default function StateProgramLab({g}:{g:ReturnTypeRepublic}){
  const [selectedId,setSelectedId]=useState(''),[creating,setCreating]=useState(false),[busy,setBusy]=useState(false),[pmRevisionReason,setPmRevisionReason]=useState('');
  const [addressTitle,setAddressTitle]=useState('Послание Президента Российской Федерации Федеральному Собранию'),[addressBody,setAddressBody]=useState(''),[addressVideo,setAddressVideo]=useState('');
  const [selectedGoals,setSelectedGoals]=useState<string[]>(['','','','','']),[goalsDirty,setGoalsDirty]=useState(false);
- const addressDirty=useRef(false),addressVersion=useRef(0),busyRef=useRef(false),request=useRef(0),readinessRequest=useRef(0),alive=useRef(true),creatingRef=useRef(creating),selectedRef=useRef(selectedId);
+ const addressDirty=useRef(false),addressVersion=useRef(0),busyRef=useRef(false),request=useRef(0),readinessRequest=useRef(0),alive=useRef(true),creatingRef=useRef(creating),selectedRef=useRef(selectedId),manualProgramChoice=useRef(false);
  creatingRef.current=creating;selectedRef.current=selectedId;
  const viewScope=[game?.id,me?.user_id,teacher].join('|'),scope=useRef(viewScope);scope.current=viewScope;
  const active=()=>alive.current&&scope.current===viewScope;
  useEffect(()=>{alive.current=true;return()=>{alive.current=false;request.current++}},[]);
  useEffect(()=>{setPmRevisionReason('')},[selectedId,viewScope]);
- useEffect(()=>{request.current++;readinessRequest.current++;addressDirty.current=false;addressVersion.current=0;setGoalsDirty(false);setSelectedGoals(['','','','','']);busyRef.current=false;setPrograms([]);setAddresses([]);setPriorities([]);setReadiness({});setGoals([]);setComponents([]);setExpenses([]);setYears([]);setMinistryAssignments([]);setMinistryUnits([]);setSelectedId('');setCreating(false);creatingRef.current=false;selectedRef.current='';setBusy(false);setAddressTitle('Послание Президента Российской Федерации Федеральному Собранию');setAddressBody('');setAddressVideo('');},[viewScope]);
+ useEffect(()=>{manualProgramChoice.current=false;request.current++;readinessRequest.current++;addressDirty.current=false;addressVersion.current=0;setGoalsDirty(false);setSelectedGoals(['','','','','']);busyRef.current=false;setPrograms([]);setAddresses([]);setPriorities([]);setReadiness({});setGoals([]);setComponents([]);setExpenses([]);setYears([]);setMinistryAssignments([]);setMinistryUnits([]);setSelectedId('');setCreating(false);creatingRef.current=false;selectedRef.current='';setBusy(false);setAddressTitle('Послание Президента Российской Федерации Федеральному Собранию');setAddressBody('');setAddressVideo('');},[viewScope]);
  const role=stageRoleTitles(g),isPM=role.split(' | ').some(title=>/^председатель\s+правительства(?:\s|$)/u.test(title)),isMinister=me?.kind==='student'&&!me?.roster_archived_at&&ministryUnits.some(u=>u.head_user_id===me?.user_id),isPresident=role.split(' | ').some(title=>title.trim()==='президент российской федерации');
+ // Once the office role arrives, open the programme actually waiting for this chair.
+ // Never override a programme the user explicitly selected.
+ useEffect(()=>{
+  if(!isPM||manualProgramChoice.current||creatingRef.current)return;
+  const waiting=programs.find(p=>p.status==='pm_review'&&!p.signed_at);
+  if(waiting&&selectedId!==waiting.id)setSelectedId(waiting.id);
+ },[isPM,programs,selectedId,viewScope]);
  async function refreshReadiness(programId:string){
   if(!active()||!game||!programId)return;
   const version=++readinessRequest.current;
@@ -80,6 +87,7 @@ export default function StateProgramLab({g}:{g:ReturnTypeRepublic}){
  useEffect(()=>{if(selectedId&&game&&programs.some(p=>p.id===selectedId&&p.game_id===game.id))void refreshReadiness(selectedId)},[selectedId,viewScope]);
  useGameTableSync(game?.id,['state_programs','state_program_goals','state_program_components','state_program_expenses','state_program_budget_commitments','presidential_addresses','presidential_priorities','state_program_budget_years','institution_assignments','institution_units'],load,viewScope);
  if(!game||!me)return null;
+ const pendingPmPrograms=programs.filter(p=>p.status==='pm_review'&&!p.signed_at);
  const selected=creating?undefined:programs.find(p=>p.id===selectedId),publishedAddress=addresses.find(x=>x.status==='published'),activeAddress=addresses.find(x=>x.status==='draft')||publishedAddress;
  const publishedPriorities=publishedAddress?priorities.filter(x=>x.address_id===publishedAddress.id):[],check=selected?readiness[selected.id]:undefined;
  const appointedColleague=!!selected?.responsible_minister_id&&!me.roster_archived_at&&ministryAssignments.some(a=>a.user_id===me.user_id&&ministryUnits.some(u=>u.id===a.unit_id&&u.head_user_id===selected.responsible_minister_id));
@@ -151,13 +159,17 @@ export default function StateProgramLab({g}:{g:ReturnTypeRepublic}){
     {activeAddress?.status==='draft'&&!(teacher||isPresident)&&<p className={styles.notice}>Президент ещё не утвердил цели. Можно просматривать раздел, но использовать президентские цели в программах до публикации послания нельзя.</p>}
    </section>
   </section>
-  {(programs.length>0||teacher||isMinister||isPM)&&<div className="programPicker" aria-label="Выбор государственной программы"><div className="programTabs">{programs.map(p=><button type="button" key={p.id} aria-pressed={!creating&&p.id===selectedId} className={!creating&&p.id===selectedId?'active':''} onClick={()=>{creatingRef.current=false;setCreating(false);setSelectedId(p.id)}}><b>{p.title}</b><span>{programStatusLabel[p.status]}</span></button>)}</div>{(teacher||isMinister||isPM)&&<button type="button" className="programNew" onClick={()=>{creatingRef.current=true;setCreating(true);setSelectedId('')}}>Новая программа</button>}</div>}
+  {(teacher||isPM)&&pendingPmPrograms.length>0&&<section className={styles.programApproval} aria-label="Государственные программы на согласовании Председателя Правительства">
+   <div className={styles.programApprovalHeading}><div><h3>На согласовании Председателя Правительства</h3><p>Выберите поступившую ГП. Ниже можно согласовать её либо вернуть на доработку с замечаниями.</p></div><span className={styles.programApprovalState}>{pendingPmPrograms.length} ГП</span></div>
+   <div className={styles.pmReviewQueue}>{pendingPmPrograms.map(p=><button type="button" key={p.id} aria-pressed={!creating&&selectedId===p.id} onClick={()=>{manualProgramChoice.current=true;creatingRef.current=false;setCreating(false);setSelectedId(p.id);document.getElementById('state-program-approval')?.scrollIntoView({block:'start',behavior:'auto'})}}><strong>{p.title}</strong><small>{p.responsible_ministry}</small><span>{!creating&&selectedId===p.id?'Выбрана':'Открыть решение Председателя'}</span></button>)}</div>
+  </section>}
+  {(programs.length>0||teacher||isMinister||isPM)&&<div className="programPicker" aria-label="Выбор государственной программы"><div className="programTabs">{programs.map(p=><button type="button" key={p.id} aria-pressed={!creating&&p.id===selectedId} className={!creating&&p.id===selectedId?'active':''} onClick={()=>{manualProgramChoice.current=true;creatingRef.current=false;setCreating(false);setSelectedId(p.id)}}><b>{p.title}</b><span>{programStatusLabel[p.status]}</span></button>)}</div>{(teacher||isMinister||isPM)&&<button type="button" className="programNew" onClick={()=>{manualProgramChoice.current=true;creatingRef.current=true;setCreating(true);setSelectedId('')}}>Новая программа</button>}</div>}
   {(selected||editable)&&<StateProgramEditor key={viewScope+'|'+(selected?.id||'new')} g={g} program={selected||null} goals={goals.filter(x=>x.program_id===selected?.id)} components={components.filter(x=>x.program_id===selected?.id)} expenses={expenses.filter(x=>x.program_id===selected?.id)} priorities={publishedPriorities} editable={editable} onSaved={async id=>{if(!active())return;creatingRef.current=false;setCreating(false);setSelectedId(id);await load()}}/>}
   {selected&&<>
    {selected.signed_at&&<p className={styles.notice}>Подписал Председатель Правительства: {members.find(m=>m.user_id===selected.signed_by)?.full_name||'Уполномоченный участник'} · {new Date(selected.signed_at).toLocaleString('ru-RU')}. {selected.status==='adopted'?'Программа принята Правительством.':'Для этой программы подпись была зарегистрирована до завершения голосования.'}</p>}
    {selected.form_version!==2&&years.some(x=>x.program_id===selected.id)&&<section className={styles.panel}><h3>Финансирование сохранённой программы</h3><div className={styles.statList}>{years.filter(x=>x.program_id===selected.id).map(x=><div key={x.id}><span>{x.budget_year}</span><strong>{programMoney(x.amount)}</strong></div>)}</div><p>Бюджет паспорта: <b>{programMoney(selected.total_budget)}</b></p></section>}
    <section className={styles.panel} aria-label="Проверка готовности программы"><h3>{check?.ready?'Программа готова к согласованию':'Проверка заполнения программы'}</h3>{check&&!check.ready&&<ul>{check.issues.map(x=><li key={x}>{x}</li>)}</ul>}<div className={styles.statList}><div><span>Цели</span><strong>{check?.goals??0}</strong></div><div><span>Направления</span><strong>{check?.directions??0} / 3</strong></div><div><span>Структурные элементы</span><strong>{check?.components??0} / 25</strong></div><div><span>Финансирование по годам</span><strong>{check?.budget_years??0} / {check?.expected_budget_years??0}</strong></div></div></section>
-   <section className={styles.programApproval} aria-label="Согласование и подписание государственной программы">
+   <section id="state-program-approval" className={styles.programApproval} aria-label="Согласование и подписание государственной программы">
     <div className={styles.programApprovalHeading}>
      <div><h3>Согласование государственной программы</h3><p>После доклада на заседании члены Правительства голосуют. Принятую программу подписывает и публикует Председатель Правительства.</p></div>
      <span className={styles.programApprovalState}>{selected.status==='adopted'&&selected.signed_at?'Подписана и опубликована':programStatusLabel[selected.status]}</span>

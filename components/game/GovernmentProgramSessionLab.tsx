@@ -1,7 +1,7 @@
 'use client';
 import {userError} from '@/lib/userError';
 import StageModuleHeader from '../ui/StageModuleHeader';
-import {useState} from 'react';
+import {useRef,useState} from 'react';
 import {CheckCircle2,FileText,RefreshCcw,Vote,Mic2,MessageCircleQuestion,ClipboardCheck} from 'lucide-react';
 import {supabase} from '@/lib/supabase';
 import {useGameTableSync} from './useGameTableSync';
@@ -26,6 +26,7 @@ export default function GovernmentProgramSessionLab({g,onOpenVotes,onOpenDocumen
  const [questionDrafts,setQuestionDrafts]=useState<Record<string,string>>({});
  const [answerDrafts,setAnswerDrafts]=useState<Record<string,string>>({});
  const [reviewProgram,setReviewProgram]=useState(''),[reviewSection,setReviewSection]=useState('structure'),[reviewOriginal,setReviewOriginal]=useState(''),[reviewProposed,setReviewProposed]=useState(''),[reviewReason,setReviewReason]=useState('');
+ const [pmReasons,setPmReasons]=useState<Record<string,string>>({}),pmRequestBusy=useRef(false);
  const [notice,setNotice]=useState('');
  const [selectedId,setSelectedId]=useState('');
  const [timeLimit,setTimeLimit]=useState(60);
@@ -71,6 +72,7 @@ export default function GovernmentProgramSessionLab({g,onOpenVotes,onOpenDocumen
  const activeGame=game;
  const selected=sessions.find(x=>x.id===selectedId)||sessions[0];
  const agenda=selected?items.filter(x=>x.session_id===selected.id).sort((a,b)=>a.agenda_no-b.agenda_no):[];
+ const pendingPmPrograms=programs.filter(p=>p.status==='pm_review'&&!p.signed_at);
  const readyPrograms=programs.filter(p=>p.status==='ready'||(
   p.status==='government_vote'&&!!p.signed_at&&!!p.government_vote_id
   &&votes.some(v=>v.id===p.government_vote_id&&v.status==='open'&&v.procedure_key==='state_program')
@@ -86,6 +88,22 @@ export default function GovernmentProgramSessionLab({g,onOpenVotes,onOpenDocumen
  const program=(id:string)=>programs.find(p=>p.id===id);
  const vote=(id:string|null)=>id?votes.find(v=>v.id===id):undefined;
 
+ async function decidePmProgram(programId:string,action:'revision'|'ready'){
+  if(!canApprove||busy||pmRequestBusy.current||!pendingPmPrograms.some(p=>p.id===programId))return;
+  const reason=(pmReasons[programId]||'').trim();
+  if(action==='revision'&&(reason.length<10||reason.length>1500))return;
+  pmRequestBusy.current=true;setBusy(true);
+  try{
+   const r=action==='revision'
+    ?await supabase.rpc('request_state_program_revision',{p_program_id:programId,p_reason:reason})
+    :await supabase.rpc('advance_state_program',{p_program_id:programId,p_action:'pm_ready'});
+   if(r.error)throw r.error;
+   setPmReasons(previous=>{const next={...previous};delete next[programId];return next});
+   await load();
+   setNotice(action==='revision'?'Государственная программа возвращена разработчикам с замечаниями.':'Государственная программа согласована и доступна для включения в проект повестки.');
+  }catch(e){setError(userError(e))}
+  finally{pmRequestBusy.current=false;setBusy(false)}
+ }
  async function submitReview(){
   if(!selected||!reviewablePrograms.some(p=>p.id===reviewProgram)||reviewProposed.trim().length<5||busy||selected.status==='closed')return;
   setBusy(true);
@@ -160,6 +178,20 @@ export default function GovernmentProgramSessionLab({g,onOpenVotes,onOpenDocumen
    <div><span>03</span><strong>Доклад и вопросы</strong><small>На заседании</small></div>
    <div><span>04</span><strong>Решение</strong><small>Голосование и публикация</small></div>
   </div>
+  {canApprove&&<section className="govMeetingAuto govPmReview" aria-label="Предварительное согласование государственных программ">
+   <div><span className="govEyebrow">Предварительное согласование</span><h3>ГП, поступившие Председателю Правительства</h3><p>Рассмотрите программу до включения в проект повестки. Возврат требует письменных замечаний; после исправлений программа снова поступит непосредственно Председателю.</p></div>
+   {pendingPmPrograms.length===0?<p>Государственных программ, ожидающих решения Председателя, сейчас нет.</p>:
+    <div className="govPmReviewItems">{pendingPmPrograms.map(p=><article className="govPmReviewItem" key={p.id}>
+     <header><div><strong>{p.title}</strong><small>{p.responsible_ministry}</small></div><span>На согласовании</span></header>
+     <label>Причина возврата на доработку
+      <textarea rows={3} maxLength={1500} disabled={busy} value={pmReasons[p.id]||''} onChange={e=>setPmReasons(old=>({...old,[p.id]:e.target.value}))} placeholder="Укажите, что исправить в целях, показателях, мероприятиях или финансировании"/>
+     </label>
+     <div className="govPmReviewActions">
+      <button type="button" disabled={busy||(pmReasons[p.id]||'').trim().length<10} onClick={()=>void decidePmProgram(p.id,'revision')}>Вернуть на доработку</button>
+      <button type="button" className="primary" disabled={busy} onClick={()=>void decidePmProgram(p.id,'ready')}>Согласовать для включения в повестку</button>
+     </div>
+    </article>)}</div>}
+  </section>}
   {sessions.length>0&&<div className="govSessionTabs govSessionTabsFull" aria-label="Заседания Правительства"><div>{sessions.map(session=><button type="button" key={session.id} className={session.id===selected?.id?'active':''} onClick={()=>setSelectedId(session.id)}><b>№ {session.session_no}</b><span>{session.title}</span><em>{session.status==='closed'?'Завершено':session.status==='open'?'Идёт':session.agenda_approved_at?'Повестка утверждена':'Проект повестки'}</em></button>)}</div></div>}
   {canApprove&&!selected&&<section className="govMeetingAuto" aria-label="Автоматическая повестка">
     <div><span className="govEyebrow">Подготовка заседания</span><h3>Государственные программы из Этапа 10</h3><p>Система самостоятельно сформирует проект официальной повестки из согласованных ГП. Ни одну программу не нужно переносить вручную.</p></div>

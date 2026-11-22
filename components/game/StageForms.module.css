@@ -331,3 +331,13 @@
 .programWorkspace .programRevisionNotice p{margin:0;white-space:pre-wrap;overflow-wrap:anywhere;font-size:13px;line-height:1.55}
 .programWorkspace .programRevisionNotice small{font-size:12px;color:var(--body,#354a67)}
 @media(max-width:700px){.programWorkspace .programRevisionForm{padding:12px}}
+
+/* Очередь Председателя: тот же стиль карточек и адаптивная сетка ГОС.ID. */
+.programWorkspace .pmReviewQueue{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,270px),1fr));gap:10px}
+.programWorkspace .pmReviewQueue button{display:grid;gap:5px;min-width:0;text-align:left;padding:13px;border:1px solid var(--line,#dce4ef);border-radius:12px;background:var(--surface-2,#f8fafc);color:var(--text,#10213c);font-family:inherit;cursor:pointer}
+.programWorkspace .pmReviewQueue button[aria-pressed=true]{border-color:var(--blue,#315efb);background:var(--blue-soft,#edf2ff)}
+.programWorkspace .pmReviewQueue strong{font-size:14px;overflow-wrap:anywhere}
+.programWorkspace .pmReviewQueue small{font-size:12px;color:var(--body,#354a67);overflow-wrap:anywhere}
+.programWorkspace .pmReviewQueue button>span{font-size:12px;font-weight:750;color:var(--blue,#315efb)}
+.programWorkspace .pmReviewQueue button:focus-visible{outline:3px solid var(--blue,#315efb);outline-offset:2px}
+.programWorkspace #state-program-approval{scroll-margin-top:100px}

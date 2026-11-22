@@ -14,6 +14,9 @@ const html=`<!doctype html><html lang="ru"><head><meta name="viewport" content="
 <div><span>02</span><strong>Утверждение</strong><small>Председателем Правительства</small></div>
 <div><span>03</span><strong>Доклад и вопросы</strong><small>На заседании</small></div>
 <div><span>04</span><strong>Решение</strong><small>Голосование и публикация</small></div></div>
+<section class="govMeetingAuto govPmReview" aria-label="Предварительное согласование"><div><span class="govEyebrow">Предварительное согласование</span><h3>ГП, поступившие Председателю Правительства</h3><p>Рассматриваются до повестки.</p></div>
+<div class="govPmReviewItems"><article class="govPmReviewItem"><header><div><strong>Комплексное развитие регионов и инфраструктуры</strong><small>Министерство по внутренней политике и государству</small></div><span>На согласовании</span></header>
+<label>Причина возврата на доработку<textarea rows="3" placeholder="Уточните параметры программы"></textarea></label><div class="govPmReviewActions"><button>Вернуть на доработку</button><button class="primary">Согласовать для включения в повестку</button></div></article></div></section>
 <section class="govMeetingAgendaCard"><div class="govMeetingAgendaHead"><div><span class="govEyebrow">Официальный документ · Заседание № 1</span><h3>Повестка заседания Правительства</h3>
 <p>2 государственные программы · 60 минут. Утверждена Председателем Правительства.</p></div><div class="govMeetingAgendaHeadActions"><button class="secondary">Открыть документ</button><button class="secondary">Обновить</button></div></div>
 <div class="govMeetingAgendaActions"><div><strong>Повестка ожидает утверждения</strong><small>Председательствующий</small></div><button class="govMeetingRefreshPrograms secondary" aria-label="Обновить список государственных программ"><svg viewBox="0 0 24 24" width="17" height="17" aria-hidden="true"><path d="M20 6v6h-6M4 18v-6h6" fill="none" stroke="currentColor" stroke-width="2"/></svg><span>Обновить список ГП</span></button><button class="primary">Утвердить повестку</button></div></section>
@@ -27,7 +30,7 @@ for(const width of [320,375,430,768,1024,1440]){
  const page=await browser.newPage({viewport:{width,height:900},deviceScaleFactor:1});await page.setContent(html,{waitUntil:'load'});
  const m=await page.evaluate(()=>({
  scroll:document.documentElement.scrollWidth,viewport:innerWidth,
- box:[...document.querySelectorAll('.govMeetingFlow,.govMeetingAgendaCard,.govMeetingProgramme,.govMeetingSpeakerQuestions')].map(el=>({left:el.getBoundingClientRect().left,right:el.getBoundingClientRect().right})),
+ box:[...document.querySelectorAll('.govMeetingFlow,.govPmReview,.govPmReviewItem,.govMeetingAgendaCard,.govMeetingProgramme,.govMeetingSpeakerQuestions')].map(el=>({left:el.getBoundingClientRect().left,right:el.getBoundingClientRect().right})),
  buttons:[...document.querySelectorAll('.govSessionLab button')].map(el=>({height:el.getBoundingClientRect().height,right:el.getBoundingClientRect().right,left:el.getBoundingClientRect().left})),
  metrics:[...document.querySelectorAll('[data-stage-module-head] .stats>div')].map(card=>{
    const label=card.querySelector('dt'),value=card.querySelector('dd'),detail=card.querySelector('span');

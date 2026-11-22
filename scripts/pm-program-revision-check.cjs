@@ -11,9 +11,15 @@ const styles=fs.readFileSync('components/game/StageForms.module.css','utf8');
 const meeting=fs.readFileSync('components/game/GovernmentProgramSessionLab.tsx','utf8');
 assert(lab.includes("run('request_state_program_revision'"),'Only an explicit PM request may return a programme');
 assert(lab.includes('Причина возврата на доработку')&&lab.includes('pmRevisionReason.trim().length<10'),'A reason is mandatory in the existing UI');
+assert(lab.includes('pendingPmPrograms')&&lab.includes("status==='pm_review'")&&lab.includes('manualProgramChoice.current'),'PM pending programmes must be discoverable without changing an explicit user selection');
+assert(lab.includes('На согласовании Председателя Правительства')&&lab.includes('state-program-approval'),'Chair queue must navigate to the approval controls');
+assert(meeting.includes('ГП, поступившие Председателю Правительства')&&meeting.includes("supabase.rpc('request_state_program_revision'")&&meeting.includes("p_action:'pm_ready'"),'Government stage 11 must expose reasoned return and approval');
+assert(meeting.includes('pmRequestBusy.current'),'Concurrent return clicks must issue one RPC');
 assert(lab.includes('Замечания Председателя Правительства'),'Return notes must be visible to authors');
 assert(editor.includes('Повторно направить Председателю Правительства'),'PM-returned document must have a distinct send action');
 assert(styles.includes('.programWorkspace .programRevisionForm'),'Reuses the approved Stage 10 visual system');
+assert(styles.includes('.programWorkspace .pmReviewQueue'),'Chair queue must use the approved Stage 10 styles');
+assert(fs.readFileSync('app/2026-october-refinement.css','utf8').includes('.govSessionLab .govPmReviewActions'),'Government PM form must reuse stage 11 style tokens');
 assert(meeting.includes('create_government_session_from_programmes')&&meeting.includes('sync_government_session_programmes')&&meeting.includes('open_program_vote_from_agenda'),'Government agenda and vote remain the existing procedures');
 
 
