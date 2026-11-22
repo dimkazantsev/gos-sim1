@@ -33,8 +33,8 @@ for(const name of routes){
 }
 assert(b.includes('private.can_manage_duma_session(p_game,p_user)'),'Duma chair authority in the presidential-system decision');
 assert(b.includes('private.role_is_available(p_game,p_user)'),'Suspended Duma chair is denied');
-assert(ui.includes("officeAssignments.filter(o=>o.user_id===g.me?.user_id&&o.status==='active')"),
- 'Student UI must read active secondary office assignments');
+assert(ui.includes('export function activeGameRoleTitles')&&ui.includes("o.user_id===userId&&o.status==='active'"),
+ 'Student UI must read active secondary office assignments in the same game and for the authorized actor');
 for(const path of [
  'components/game/InstitutionStaffingLab.tsx',
  'components/game/LegislativeSessionLab.tsx',
@@ -47,7 +47,7 @@ for(const path of [
 }
 for(const file of ['components/game/StateProgramLab.tsx','components/game/GovernmentProgramSessionLab.tsx']){
  const view=fs.readFileSync(file,'utf8');
- assert(view.includes("title.trim()==='президент российской федерации'"),file+' must require the exact presidential office');
+ assert(view.includes("hasActiveGameRole(g,/^президент российской федерации$/u)"),file+' must require the exact presidential office');
 }
 const ghost=fs.readFileSync('components/game/GhostPolicyLab.tsx','utf8');
 assert(ghost.includes("stageRoleTitles(g).split(' | ').some(title=>title.includes('депутат'))"),
