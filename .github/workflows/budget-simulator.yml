@@ -40,6 +40,7 @@ jobs:
       - run: node scripts/economy-b-budget-driver-sync-check.cjs
       - run: node scripts/economy-b-approved-coefficients-check.cjs
       - run: node scripts/economy-b-all-metrics-check.cjs
+      - run: node scripts/legitimacy-socioeconomic-contract-check.cjs
       - run: node scripts/model-b-fnb-debt-integration-check.cjs
       - run: node scripts/economy-b-event-ledger-contract-check.cjs
       - run: node scripts/event-fiscal-explanation-check.cjs
