@@ -1,6 +1,7 @@
 import baseline from '@/data/federal-budget-2026.json';
 import revenueModel from '@/data/budget-revenue-model.json';
 import {modelBAdditionalChannels,MODEL_B_AUX_KEYS,type FiscalContext,type FiscalRate,type FiscalRegion} from './fiscalMath';
+import {externalFinancingTerms,type ExternalFinanceContract} from './externalFinancePolicy';
 
 export const FINANCING_SOURCES = [
  {key:'ofz_fixed',label:'ОФЗ с постоянным купоном',lender:'Банки, фонды и граждане через рынок ценных бумаг',debt:'internal',spread:0,risk:'Стоимость фиксируется при размещении. Остаются риск слабого спроса и необходимость погашения.'},
@@ -14,12 +15,12 @@ export const FINANCING_SOURCES = [
 export type FundingKey=typeof FINANCING_SOURCES[number]['key'];
 export type BudgetTransfer={id:string;region_code:string;region_name:string;kind:'grant'|'subsidy'|'subvention'|'budget_credit';amount:number;cofinancing:number;purpose:string;section_key:string;status:'requested'|'included'|'granted'|'rejected';document_id?:string|null;repaid_at?:string|null;event_case_id?:string|null;event_title?:string|null;expected_result?:string|null};
 export type BudgetExpenseItem={id:string;section_key:string;title:string;indicator:string;justification:string;amount:number;program_id?:string|null;budget_year?:number};
-export type BudgetDraft={title:string;income_changes:Record<string,number>;spending_changes:Record<string,number>;base_reallocations?:Record<string,number>;revenue_adjustments:Record<string,number>;financing:Record<FundingKey,number>;terms:Record<string,number>;transfer_ids:string[];expense_items?:BudgetExpenseItem[];note:string};
+export type BudgetDraft={external_refinance?:number;title:string;income_changes:Record<string,number>;spending_changes:Record<string,number>;base_reallocations?:Record<string,number>;revenue_adjustments:Record<string,number>;financing:Record<FundingKey,number>;terms:Record<string,number>;transfer_ids:string[];expense_items?:BudgetExpenseItem[];note:string};
 export type BudgetIncomeDetail={key:string;group_key:string;label:string;rate:number;rate_unit:string;base:number;base_unit:string;collection:number;federal_share:number;amount:number;baseline:number;base_label:string;driver_note:string;model_rate:boolean};
 export type SimulatorAnchor={aux_metrics?:Record<string,number>;enterprises:number;key_rate:number;fx_rate:number;oil_price:number;inflation:number;economy:number;trust:number};
 export type SimulatorState={anchor:SimulatorAnchor;internal_debt:number;external_debt:number;reserve_remaining:number;service_adjustment:number;revenue_adjustment:number;last_financing:Record<FundingKey,number>;financing_rates?:Record<string,number>;month:number;last_document_id:string|null;last_plan_id:string|null;version:number};
-export type BudgetCalculation={model_b_additional_channels?:{activity_adjustment:number;collection_adjustment:number};income_lines:{key:string;label:string;amount:number;baseline:number}[];income_details?:BudgetIncomeDetail[];expense_lines:{key:string;label:string;amount:number;baseline:number;base_amount?:number;base_reallocation_amount?:number;items_amount?:number;transfer_amount?:number;interest_amount?:number}[];expense_items?:BudgetExpenseItem[];transfer_requests?:BudgetTransfer[];program_expenses?:{program_id:string;title:string;indicators:string;expense_breakdown:{indicator_name:string;justification:string;amount:string;budget_year:number;component_title:string}[]}[];income_rounding?:number;revenue_adjustment?:number;revenue:number;expenditure:number;balance:number;deficit:number;surplus:number;deficit_pct_gdp:number;financing:number;funding_need:number;funding_gap:number;cash_excess:number;internal_debt:number;external_debt:number;debt_total:number;debt_pct_gdp:number;annual_interest:number;interest_delta:number;transfer_expense:number;credit_outflow:number;reserve_remaining:number;activity:number;cost:number;fx:number;uncertainty:number;revenue_low:number;revenue_high:number;expenditure_low:number;expenditure_high:number};
-export function newBudgetDraft():BudgetDraft {return {title:'Проект федерального бюджета на 2026 год',income_changes:{},spending_changes:{},revenue_adjustments:{},financing:{...baseline.financing},terms:{ofz_fixed:60,ofz_float:60,bank_credit:12,external:60},transfer_ids:[],expense_items:[],note:''};}
+export type BudgetCalculation={external_borrowing_limit?:number;external_borrowing_available?:number;external_borrowing_used?:number;external_borrowing_rate?:number;external_borrowing_new?:number;external_borrowing_over_limit?:number;external_refinance?:number;external_refinance_eligible?:number;external_refinance_allocated?:number;external_refinance_over_limit?:number;model_b_additional_channels?:{activity_adjustment:number;collection_adjustment:number};income_lines:{key:string;label:string;amount:number;baseline:number}[];income_details?:BudgetIncomeDetail[];expense_lines:{key:string;label:string;amount:number;baseline:number;base_amount?:number;base_reallocation_amount?:number;items_amount?:number;transfer_amount?:number;interest_amount?:number}[];expense_items?:BudgetExpenseItem[];transfer_requests?:BudgetTransfer[];program_expenses?:{program_id:string;title:string;indicators:string;expense_breakdown:{indicator_name:string;justification:string;amount:string;budget_year:number;component_title:string}[]}[];income_rounding?:number;revenue_adjustment?:number;revenue:number;expenditure:number;balance:number;deficit:number;surplus:number;deficit_pct_gdp:number;financing:number;funding_need:number;funding_gap:number;cash_excess:number;internal_debt:number;external_debt:number;debt_total:number;debt_pct_gdp:number;annual_interest:number;interest_delta:number;transfer_expense:number;credit_outflow:number;reserve_remaining:number;activity:number;cost:number;fx:number;uncertainty:number;revenue_low:number;revenue_high:number;expenditure_low:number;expenditure_high:number};
+export function newBudgetDraft():BudgetDraft {return {title:'Проект федерального бюджета на 2026 год',external_refinance:0,income_changes:{},spending_changes:{},revenue_adjustments:{},financing:{...baseline.financing},terms:{ofz_fixed:60,ofz_float:60,bank_credit:12,external:60},transfer_ids:[],expense_items:[],note:''};}
 export function defaultSimulatorState(context:FiscalContext|null,regions:FiscalRegion[]):SimulatorState {
  const p=context?.policy;return {anchor:{enterprises:regions.reduce((s,r)=>s+r.enterprises*r.activity_multiplier,0)||1,key_rate:p?.key_rate??16,fx_rate:p?.fx_rate??80,oil_price:Math.max(.01,p?.oil_price??75),inflation:p?.inflation??6,economy:context?.metrics.economy??50,trust:context?.metrics.public_trust??50,aux_metrics:Object.fromEntries(MODEL_B_AUX_KEYS.filter(key=>context?.metrics[key]!==undefined).map(key=>[key,context!.metrics[key]]))},internal_debt:baseline.internal_debt_end,external_debt:baseline.external_debt_end,reserve_remaining:baseline.reserve_available_model,service_adjustment:0,revenue_adjustment:0,last_financing:{...baseline.financing},month:0,last_document_id:null,last_plan_id:null,version:0};
 }
@@ -33,16 +34,18 @@ export function budgetMoneySum(...values:number[]):number {
  const digits=(units<0n?-units:units).toString().padStart(9,'0');
  return Number((units<0n?'-':'')+digits.slice(0,-8)+'.'+digits.slice(-8));
 }
-export function financingRate(key:string,keyRate:number){return key==='external'?7.5:key==='bank_credit'?keyRate+3:key==='ofz_float'?keyRate+.5:key==='ofz_fixed'?keyRate:0;}
-export function fundingAnnualInterest(key:FundingKey,draft:BudgetDraft,state:SimulatorState,keyRate:number){
+export function financingRate(key:string,keyRate:number,externalRate=7.5){return key==='external'?externalRate:key==='bank_credit'?keyRate+3:key==='ofz_float'?keyRate+.5:key==='ofz_fixed'?keyRate:0;}
+export function fundingAnnualInterest(key:FundingKey,draft:BudgetDraft,state:SimulatorState,keyRate:number,externalRate=7.5){
  const amount=draft.financing[key],issued=state.last_plan_id?Math.min(amount,state.last_financing[key]):0;
- const quote=financingRate(key,keyRate),locked=state.financing_rates?.[key]??financingRate(key,state.anchor.key_rate);
+ const quote=financingRate(key,keyRate,externalRate),locked=state.financing_rates?.[key]??financingRate(key,state.anchor.key_rate);
  return key==='ofz_float'?amount*quote/100:(issued*locked+(amount-issued)*quote)/100;
 }
 /** All monetary calculations use millions of roubles, including cross-budget transfers. */
-export function calculateFederalBudget(draft:BudgetDraft,state:SimulatorState,context:FiscalContext|null,regions:FiscalRegion[],rates:FiscalRate[],requests:BudgetTransfer[]):BudgetCalculation {
+export function calculateFederalBudget(draft:BudgetDraft,state:SimulatorState,context:FiscalContext|null,regions:FiscalRegion[],rates:FiscalRate[],requests:BudgetTransfer[],contracts:ExternalFinanceContract[]=[]):BudgetCalculation {
  const a=state.anchor,p=context?.policy,economy=(context?.metrics.economy??a.economy)-a.economy,trust=(context?.metrics.public_trust??a.trust)-a.trust,key=p?.key_rate??a.key_rate;
  const aux=modelBAdditionalChannels(context?.metrics??{},a.aux_metrics);
+ const standing=context?.metrics.international_standing??a.aux_metrics?.international_standing??0;
+ const access=externalFinancingTerms(standing,state.month,contracts);
  const fx=(p?.fx_rate??a.fx_rate)*clamp(1-economy*.001-trust*.001-(key-a.key_rate)*.0015,.75,1.3);
  const firms=regions.reduce((s,r)=>s+r.enterprises*r.activity_multiplier,0)/Math.max(1,a.enterprises);
  const activity=clamp(firms*(1-(key-a.key_rate)*.007+economy*.002+trust*.001+aux.activity_adjustment),.2,2);
@@ -74,7 +77,7 @@ export function calculateFederalBudget(draft:BudgetDraft,state:SimulatorState,co
  });
  const selected=requests.filter(r=>draft.transfer_ids.includes(r.id)&&r.status!=='rejected');
  const transfer_expense=budgetMoneySum(...selected.filter(r=>r.kind!=='budget_credit').map(r=>Number(r.amount))),credit_outflow=budgetMoneySum(...selected.filter(r=>r.kind==='budget_credit').map(r=>Number(r.amount)));
- const annual_interest=FINANCING_SOURCES.filter(s=>s.debt!=='none').reduce((sum,s)=>sum+fundingAnnualInterest(s.key,draft,state,key),0);
+ const annual_interest=FINANCING_SOURCES.filter(s=>s.debt!=='none').reduce((sum,s)=>sum+fundingAnnualInterest(s.key,draft,state,key,access.rate),0);
  // Half-year convention for new net borrowings; this is an explicit teaching assumption.
  const interest_delta=(annual_interest-baseline.financing.ofz_fixed*a.key_rate/100)*.5+state.service_adjustment;
  const expense_items=draft.expense_items??[];
@@ -91,17 +94,39 @@ export function calculateFederalBudget(draft:BudgetDraft,state:SimulatorState,co
   return {key:l.key,label:l.label,baseline:l.amount,base_amount,base_reallocation_amount,transfer_amount,items_amount,interest_amount,amount:budgetMoneySum(rounded_base_and_interest,base_reallocation_amount,transfer_amount,items_amount)};
  });
  const revenue=round(budgetMoneySum(...income_lines.map(r=>r.amount),baseline.income_rounding,state.revenue_adjustment)),expenditure=budgetMoneySum(...expense_lines.map(r=>r.amount),baseline.expense_rounding);
- const balance=budgetMoneySum(revenue,-expenditure),deficit=Math.max(0,-balance),surplus=Math.max(0,balance),financing=budgetMoneySum(...FINANCING_SOURCES.map(f=>draft.financing[f.key]));
+ const oldExternal=state.last_plan_id?Number(state.last_financing.external??0):0;
+ const externalNew=Math.max(0,Number(draft.financing.external??0)-oldExternal);
+ const externalOver=Math.max(0,externalNew-access.available);
+ const refinance=Number(draft.external_refinance??0);
+ const due=contracts.filter(c=>c.status==='due'&&c.maturity_month<=state.month&&c.principal>0)
+  .slice().sort((a,b)=>a.maturity_month-b.maturity_month||String(a.id||'').localeCompare(String(b.id||'')));
+ const eligible=due.reduce((sum,c)=>sum+c.principal*(c.source_key==='external'?fx/a.fx_rate:1),0);
+ const refinanceAllocated=Math.min(refinance,eligible,externalNew);
+ const refinanceOver=Math.max(0,refinance-refinanceAllocated);
+ let refinanceRemaining=refinanceAllocated,paidInternal=0,paidExternal=0;
+ for(const c of due){if(refinanceRemaining<=0)break;
+  const paid=Math.min(refinanceRemaining,c.principal*(c.source_key==='external'?fx/a.fx_rate:1));
+  if(c.source_key==='external')paidExternal+=paid;else paidInternal+=paid;
+  refinanceRemaining=Math.max(0,refinanceRemaining-paid);
+ }
+ const balance=budgetMoneySum(revenue,-expenditure),deficit=Math.max(0,-balance),surplus=Math.max(0,balance),financing=budgetMoneySum(...FINANCING_SOURCES.map(f=>draft.financing[f.key]),-refinance);
  const internal=budgetMoneySum(...FINANCING_SOURCES.filter(s=>s.debt==='internal').flatMap(f=>[draft.financing[f.key],-state.last_financing[f.key]]));
- const internal_debt=Math.max(0,budgetMoneySum(state.internal_debt,internal)),external_debt=Math.max(0,budgetMoneySum(state.external_debt*fx/a.fx_rate,draft.financing.external,-state.last_financing.external));
+ const internal_debt=Math.max(0,budgetMoneySum(state.internal_debt,internal,-paidInternal)),external_debt=Math.max(0,budgetMoneySum(state.external_debt*fx/a.fx_rate,draft.financing.external,-state.last_financing.external,-paidExternal));
  const funding_need=budgetMoneySum(deficit,credit_outflow),funding_gap=Math.max(0,budgetMoneySum(funding_need,-financing)),cash_excess=budgetMoneySum(Math.max(0,budgetMoneySum(financing,-funding_need)),surplus);
  const uncertainty=clamp(.04+Math.abs(economy)*.001+Math.abs(trust)*.001+Math.abs((p?.inflation??a.inflation)-a.inflation)*.003,.025,.2);
  const debt_total=budgetMoneySum(internal_debt,external_debt);
- return {model_b_additional_channels:aux,income_lines,income_details,expense_lines,expense_items,transfer_requests:selected,revenue,expenditure,balance,deficit,surplus,deficit_pct_gdp:deficit/baseline.gdp*100,financing,funding_need,funding_gap,cash_excess,internal_debt,external_debt,debt_total,debt_pct_gdp:debt_total/baseline.gdp*100,annual_interest,interest_delta,transfer_expense,credit_outflow,reserve_remaining:budgetMoneySum(state.reserve_remaining,-draft.financing.reserves,state.last_plan_id?state.last_financing.reserves:0),activity,cost,fx,uncertainty,revenue_low:revenue*(1-uncertainty),revenue_high:revenue*(1+uncertainty),expenditure_low:expenditure*(1-uncertainty),expenditure_high:expenditure*(1+uncertainty)};
+ return {external_borrowing_limit:access.annualLimit,external_borrowing_available:access.available,external_borrowing_used:access.used,external_borrowing_rate:access.rate,external_borrowing_new:externalNew,external_borrowing_over_limit:externalOver,external_refinance:refinance,external_refinance_eligible:eligible,external_refinance_allocated:refinanceAllocated,external_refinance_over_limit:refinanceOver,model_b_additional_channels:aux,income_lines,income_details,expense_lines,expense_items,transfer_requests:selected,revenue,expenditure,balance,deficit,surplus,deficit_pct_gdp:deficit/baseline.gdp*100,financing,funding_need,funding_gap,cash_excess,internal_debt,external_debt,debt_total,debt_pct_gdp:debt_total/baseline.gdp*100,annual_interest,interest_delta,transfer_expense,credit_outflow,reserve_remaining:budgetMoneySum(state.reserve_remaining,-draft.financing.reserves,state.last_plan_id?state.last_financing.reserves:0),activity,cost,fx,uncertainty,revenue_low:revenue*(1-uncertainty),revenue_high:revenue*(1+uncertainty),expenditure_low:expenditure*(1-uncertainty),expenditure_high:expenditure*(1+uncertainty)};
 }
-export function coverFundingGap(draft:BudgetDraft,key:FundingKey,state:SimulatorState,context:FiscalContext|null,regions:FiscalRegion[],rates:FiscalRate[],requests:BudgetTransfer[]){
+export function coverFundingGap(draft:BudgetDraft,key:FundingKey,state:SimulatorState,context:FiscalContext|null,regions:FiscalRegion[],rates:FiscalRate[],requests:BudgetTransfer[],contracts:ExternalFinanceContract[]=[]){
  const next={...draft,financing:{...draft.financing}};
- for(let i=0;i<30;i++){const c=calculateFederalBudget(next,state,context,regions,rates,requests);if(c.funding_gap<=0)break;next.financing[key]=budgetMoneySum(next.financing[key],Math.max(.00000001,c.funding_gap));}
+ for(let i=0;i<30;i++){const c=calculateFederalBudget(next,state,context,regions,rates,requests,contracts);if(c.funding_gap<=0)break;
+ const increase=Math.max(.00000001,c.funding_gap);
+ if(key==='external'){
+  const old=state.last_plan_id?Number(state.last_financing.external??0):0;
+  const allowed=old+(c.external_borrowing_available??0);
+  if(next.financing.external>=allowed)break;
+  next.financing.external=budgetMoney(Math.min(allowed,next.financing.external+increase));
+ }else next.financing[key]=budgetMoneySum(next.financing[key],increase);}
  return next;
 }
 /** Human-readable amounts. All internal calculations remain in million roubles. */

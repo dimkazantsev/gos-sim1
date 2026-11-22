@@ -2,6 +2,7 @@
 import {gameValueLabel,impactConditionText} from '../../lib/gameLabels';
 import {supabase} from '@/lib/supabase';
 import {metricQuantity} from '@/lib/formatQuantity';
+import {externalFinancingTerms} from './externalFinancePolicy';
 import {IconAction} from '../ui/IconAction';
 import {useEffect,useMemo,useRef,useState} from 'react';
 import {Activity,BadgeCheck,Globe2,Handshake,HeartHandshake,MessageSquare,Scale,ShieldCheck,TrendingUp,UsersRound,Wallet} from 'lucide-react';
@@ -311,6 +312,13 @@ export default function StateMetricsDock({g,initialSelectedMetricId='',initialCo
       <small>Единица расчёта: млн ₽. Источник — общий бюджетный расчёт ГОС.ID.</small>
      </>:<>
       <p>Каждое игровое событие изменяет предыдущее значение на установленное число процентных пунктов. {percentBound?'Результат ограничивается диапазоном от 0 до 100%.':'Применяются минимальное и максимальное значения, установленные для этого показателя.'} Изменения начисляются в процентных пунктах, а не как процент от текущего значения.</p>
+      {chosen.metric_key==='international_standing'&&<div className="stateMetricFormulaNotice" data-international-financing-explanation>
+       <strong>Влияние на бюджет и государственный долг</strong>
+       <p>Международное положение определяет доступность новых иностранных кредитов для покрытия дефицита и погашения долгов с наступившим сроком. Годовой предел = 3% расчётного ВВП × значение показателя / 100.</p>
+       <p>При значении <strong>{Number(chosen.value).toLocaleString('ru-RU',{maximumFractionDigits:1})}/100</strong> теоретический годовой предел — <strong>{(externalFinancingTerms(Number(chosen.value)).annualLimit/1000).toLocaleString('ru-RU',{maximumFractionDigits:2})} млрд ₽</strong> до вычета уже привлечённых кредитов. Новые займы имеют учебную ставку <strong>{externalFinancingTerms(Number(chosen.value)).rate.toLocaleString('ru-RU',{maximumFractionDigits:2})}% годовых</strong>.</p>
+       <p>При снижении показателя доступный объём кредитов сокращается. Один иностранный кредит нельзя одновременно использовать для покрытия дефицита и для погашения прежнего долга. Уже заключённые договоры и их ставки сохраняются. Остаток лимита и долговой календарь находятся в разделе «Бюджет» → «Баланс».</p>
+       <small>Учебная модель, не реальные кредитные предложения.</small>
+      </div>}
       <p>Записей об изменении после исходной точки: <strong>{metricEvents}</strong>. Каждое начисление и причина отображаются в журнале ниже.</p>
       {ruleError?<p role="alert">{ruleError}</p>:ruleRows===null?<p>Загружаем утверждённые правила…</p>:activeEffects.length===0?
        <p className="stateMetricFormulaNotice">Для этого индикатора сейчас не настроено активных автоматических начислений. Пока преподаватель не изменит значение или не утвердит соответствующее игровое последствие, показатель останется неизменным.</p>:

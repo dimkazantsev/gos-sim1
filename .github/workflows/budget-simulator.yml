@@ -30,6 +30,7 @@ jobs:
       - run: npm run typecheck
       - run: node scripts/fiscal-macro-save-check.cjs
       - run: node scripts/budget-simulator-math-check.cjs
+      - run: node scripts/external-finance-policy-check.cjs
       - run: node scripts/budget-workflow-math-check.cjs
       - run: node scripts/economy-b-budget-driver-sync-check.cjs
       - run: node scripts/economy-b-approved-coefficients-check.cjs
