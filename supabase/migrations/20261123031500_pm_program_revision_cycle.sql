@@ -49,8 +49,7 @@ begin
   -- Preliminary PM approval transfers the unsigned programme to the Government agenda.
   -- The PM signs and publishes only after a passed vote.
  else raise exception 'Unsupported program action'; end if;
-end;$function$
-
+end;$function$;
 
 CREATE OR REPLACE FUNCTION public.request_state_program_revision(p_program_id uuid,p_reason text)
 RETURNS void LANGUAGE plpgsql SECURITY DEFINER
