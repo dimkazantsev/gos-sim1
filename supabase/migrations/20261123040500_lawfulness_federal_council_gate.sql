@@ -15,7 +15,7 @@ AS $function$
  or (p_document.workflow_key='municipal_act' and p_document.status_code='meeting')
  or (p_document.doc_type='federal_budget' and p_document.workflow_key='budget'
   and (p_document.status_code='government' or p_document.status_code='revision' and p_document.current_owner_key='government' and p_document.current_step=1));
-$function$
+$function$;
 
 -- The gate is enforced inside PostgreSQL, not by hiding a client button.
 -- Extra index-free lookups run only on legal-status changes, not on reads.
@@ -26,7 +26,8 @@ declare v_law numeric;
 begin
  if new.workflow_key not in ('bill','budget')
     or new.doc_type not in ('fz_bill','fkz_bill','federal_budget')
-    or new.status_code is not distinct from old.status_code then
+    or new.status_code is not distinct from old.status_code
+    or old.status_code not in ('reading3','sf','sf_veto','sf_fkz_blocked') then
   return new;
  end if;
  select value into v_law from public.state_metrics
@@ -225,4 +226,4 @@ begin
         'Голосование '||p_vote::text||coalesce(' · '||nullif(p_note,''),'')
  from public.formal_documents fd where fd.id=d.id;
 end;
-$function$
+$function$;
