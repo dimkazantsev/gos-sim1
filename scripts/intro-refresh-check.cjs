@@ -42,7 +42,7 @@ function harness(g,storage=new Map(),rpc=async()=>({error:null})){
   if(request==='@/lib/supabase')return{supabase};
   if(request==='./ui/useDialog')return{useDialog:()=>({current:null})};
   if(request==='./game/constants')return{initials:()=> 'ТУ'};
-  if(request==='./game/introProgress'||request==='./game/useSavedGameState'){
+  if(request==='./game/introProgress'||request==='./game/useSavedGameState'||request==='./game/stageRoles'){
    if(!loaded.has(request)){const file=path.join(root,'components',request.slice(2)+'.ts');const m={exports:{}};const js=ts.transpileModule(fs.readFileSync(file,'utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}}).outputText;vm.runInContext('(function(require,module,exports){'+js+'\n})',context)(requireFor,m,m.exports);loaded.set(request,m.exports);}
    return loaded.get(request);
   }
