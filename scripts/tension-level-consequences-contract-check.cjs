@@ -18,7 +18,7 @@ for(const marker of [
   "'derived:tension_stability'",
   "NEW.metric_key='social_tension' AND NEW.source_type IN ('teacher','decision')"
 ])assert(sql.includes(marker),'Missing tension contract: '+marker);
-for(const forbidden of [/create\\s+table/i,/create\\s+index/i,/pg_cron|pg_net|net\\.http/i,/CREATE\\s+TRIGGER\\s+trg_tension/i])
+for(const forbidden of [/create\s+table/i,/create\s+index/i,/pg_cron|pg_net|net\.http/i,/CREATE\s+TRIGGER\s+trg_tension/i])
  assert(!forbidden.test(sql),'Unapproved additional server workload');
 const anchor={social_tension:92,social_stability:10,security:13,elite_support:8,international_standing:3,legitimacy:7,media_climate:29};
 const close=(a,b,msg)=>assert(Math.abs(a-b)<1e-10,msg+': '+a+' vs '+b);
