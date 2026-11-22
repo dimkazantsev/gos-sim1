@@ -47,6 +47,29 @@ export function votePresetForDocument(doc:FormalDocument):VotePreset|null{
   };
  }
 
+ if(doc.workflow_key==='bill'&&doc.doc_type==='fz_bill'&&doc.metadata?.cutoff_price_proposal===true){
+  if(doc.status_code==='government')return {
+   title:'Решение Правительства о внесении изменения в бюджетное правило: '+doc.title,
+   body:'Правительство рассматривает законопроект Министерства по экономической политике и голосует по его внесению в Государственную Думу.',
+   mode:'member',institutionKey:'government',procedureKey:'cutoff_government_submission',
+   quorumKind:'fraction',quorumValue:0.5,majorityKind:'present_majority',majorityValue:0.5,
+   allowAbstain:true,tieBreakerChair:true,passTransition:'advance',failTransition:'return_author',
+   badge:'БЮДЖЕТНОЕ ПРАВИЛО · ПРАВИТЕЛЬСТВО',
+   rule:'Кворум — не менее половины состава; решение большинством присутствующих',
+   legalMode:'game',legalBasis:'Правила ГОС.ID: одобрение проекта ФЗ Правительством до внесения в Государственную Думу. Министерство подготавливает законопроект, но не заменяет решение Правительства.'
+  };
+  if(doc.status_code==='sf')return {
+   title:'Рассмотрение Советом Федерации: '+doc.title,
+   body:'Совет Федерации рассматривает принятый Государственной Думой законопроект об изменении базовой цены нефти.',
+   mode:'member',institutionKey:'sf',procedureKey:'cutoff_sf_review',
+   quorumKind:'fraction',quorumValue:0.5,majorityKind:'eligible_majority',majorityValue:0.5,
+   allowAbstain:true,tieBreakerChair:false,passTransition:'advance',failTransition:'reject',
+   badge:'БЮДЖЕТНОЕ ПРАВИЛО · СОВЕТ ФЕДЕРАЦИИ',
+   rule:'Одобрение большинством от общего состава; если сенаторы не назначены, решение подтверждает преподаватель',
+   legalMode:'reduction',legalBasis:'Статьи 105 и 106 Конституции РФ: принятие федерального закона и рассмотрение финансового регулирования Советом Федерации. Утверждённое игровое упрощение: в отсутствие назначенных сенаторов решение фиксирует преподаватель.'
+  };
+ }
+
  if(doc.workflow_key==='budget'){
   if(doc.doc_type==='federal_budget'&&(doc.status_code==='government'||doc.status_code==='revision'&&doc.current_owner_key==='government'&&doc.current_step===1)){
    return {
@@ -99,7 +122,7 @@ export function votePresetForDocument(doc:FormalDocument):VotePreset|null{
     allowAbstain:true,tieBreakerChair:false,
     passTransition:'advance',failTransition:'reject',
     badge:label.toUpperCase(),rule:threshold.rule,
-    legalMode:'law',legalBasis:doc.doc_type==='fkz_bill'?'Ст. 108 Конституции РФ: ФКЗ требует не менее 2/3 голосов от общего числа депутатов ГД; последующее одобрение СФ в игре редуцировано по авторским правилам.':'Ст. 105 Конституции РФ: федеральный закон принимается большинством от общего числа депутатов ГД; последующее одобрение СФ в игре редуцировано по авторским правилам.'
+    legalMode:'law',legalBasis:doc.metadata?.cutoff_price_proposal===true?'Статьи 105 и 106 Конституции РФ: голосование Государственной Думы, затем обязательное рассмотрение финансового регулирования Советом Федерации.':doc.doc_type==='fkz_bill'?'Ст. 108 Конституции РФ: ФКЗ требует не менее 2/3 голосов от общего числа депутатов ГД; последующее одобрение СФ в игре редуцировано по авторским правилам.':'Ст. 105 Конституции РФ: федеральный закон принимается большинством от общего числа депутатов ГД; последующее одобрение СФ в игре редуцировано по авторским правилам.'
    };
   }
   return null;

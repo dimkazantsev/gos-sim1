@@ -107,6 +107,7 @@ export default function DocumentsView({g,focusId,createTemplate,createStageNo,on
  const [budgetReview,setBudgetReview]=useState<BudgetPreliminaryReview|null>(null),[budgetDocsOk,setBudgetDocsOk]=useState(false),[budgetDistributed,setBudgetDistributed]=useState(false),[budgetAccounts,setBudgetAccounts]=useState(false),[budgetConclusion,setBudgetConclusion]=useState(''),[budgetDecision,setBudgetDecision]=useState<'draft'|'accept'|'return'>('draft'),[budgetReviewNote,setBudgetReviewNote]=useState('');
  const [localRefresh,setLocalRefresh]=useState(0);
  const [vetoSfNote,setVetoSfNote]=useState('');
+ const [cutoffSfNote,setCutoffSfNote]=useState('');
  const [billAmendmentGate,setBillAmendmentGate]=useState<BillAmendmentGate|null>(null);
  const [institutionSigners,setInstitutionSigners]=useState<{required:{user_id:string;office:string;signed:boolean;facsimile_url?:string|null}[];can_sign:boolean}|null>(null);
  const [documentSignatures,setDocumentSignatures]=useState<{id:string;signer_id:string;signed_at:string;history_id:number;url:string|null}[]>([]);
@@ -288,7 +289,7 @@ export default function DocumentsView({g,focusId,createTemplate,createStageNo,on
  const signatureHolder=selected?(attributedUser||(personalSigner?author:(members.find(m=>subject?.roleHints.some(h=>(m.role_title||'').toLowerCase().includes(h)))||author))):undefined;
  const signature=selected?formalSignature(selected.subject_key,signatureHolder?.full_name||author?.full_name||'________________'):null;
 
- function canDeleteDocument(doc:FormalDocument){return doc.doc_type!=='bank_rate_decision'&&!readOnly&&!!me&&(teacher||doc.author_id===me.user_id)}
+ function canDeleteDocument(doc:FormalDocument){return doc.doc_type!=='bank_rate_decision'&&doc.metadata?.cutoff_price_proposal!==true&&!readOnly&&!!me&&(teacher||doc.author_id===me.user_id)}
  function canManage(doc:FormalDocument){
   if(doc.id===selected?.id&&documentAccess)return !readOnly&&documentAccess.can_manage;
   if(readOnly||!me)return false;if(doc.current_owner_key==='author')return doc.author_id===me.user_id;if(teacher)return false;
@@ -391,7 +392,7 @@ export default function DocumentsView({g,focusId,createTemplate,createStageNo,on
  // button immediately if another participant casts while this screen is open.
  const castVoteIds=useMemo(()=>new Set(g.ballots.map(b=>b.vote_id)),[g.ballots]);
  const hasCastVoteForSelected=!!selected&&votes.some(v=>v.formal_document_id===selected.id&&castVoteIds.has(v.id));
- const canEditSelected=!readOnly&&!!selected&&documentAccess?.can_edit===true&&!hasCastVoteForSelected;
+ const canEditSelected=!readOnly&&!!selected&&selected.metadata?.cutoff_price_proposal!==true&&documentAccess?.can_edit===true&&!hasCastVoteForSelected;
 
  const isTerminalDocument=!!selected&&['rejected','superseded','withdrawn'].includes(selected.status_code);
  const terminalDocumentText=selected?.status_code==='rejected'?'Документ отклонён. Дальнейшее рассмотрение, голосование и подписание прекращены.':selected?.status_code==='superseded'?'Проект утратил актуальность после принятия альтернативного решения. Дальнейшее рассмотрение прекращено.':'Документ отозван. Дальнейшее рассмотрение прекращено.';
@@ -447,6 +448,22 @@ export default function DocumentsView({g,focusId,createTemplate,createStageNo,on
    if(error)throw error;
    setVetoSfNote('');
    await g.refresh();setLocalRefresh(n=>n+1);
+  }catch(error){g.setError(userError(error))}
+  finally{setBusy(false)}
+ }
+ async function confirmCutoffSf(approved:boolean){
+  if(!selected||selected.metadata?.cutoff_price_proposal!==true||
+   selected.status_code!=='sf'||readOnly||!teacher||busy)return;
+  const note=cutoffSfNote.trim();
+  if(note.length<8||note.length>1500){g.setError('Укажите основание решения Совета Федерации (8–1500 символов).');return;}
+  setBusy(true);
+  try{
+   const {error}=await supabase.rpc('confirm_cutoff_sf_review',{
+    p_document_id:selected.id,p_approved:approved,p_note:note
+   });
+   if(error)throw error;
+   await g.refreshDocuments(selected.id);
+   setLocalRefresh(n=>n+1);setCutoffSfNote('');
   }catch(error){g.setError(userError(error))}
   finally{setBusy(false)}
  }
@@ -647,6 +664,22 @@ export default function DocumentsView({g,focusId,createTemplate,createStageNo,on
       <article className="surface formalActions"><div className="surfaceHead"><div><small>Текущая стадия</small><h2>Что нужно сделать сейчас</h2></div></div>
        <div className="documentNextStep"><span>{isTerminalDocument?'Рассмотрение завершено':`${selected.current_step+1} из ${selected.workflow_steps.length}`}</span><h3>{isTerminalDocument?selected.status_label:selected.workflow_steps[selected.current_step]?.label||selected.status_label}</h3><p>Ответственный: <b>{ownerLabel(selected.current_owner_key)}</b>.</p>{!isTerminalDocument&&<p>Документ подписывает: <b>{documentSigningAuthority(selected,institutionSigners?.required||[])}</b>.</p>}<p>{isTerminalDocument?terminalDocumentText:isMandatorySignature?'Вето преодолено обеими палатами. Президент обязан подписать закон без повторного вето.':isSfVetoConfirmation?'Ожидается решение Совета Федерации, подтверждаемое преподавателем. Закон ещё не опубликован.':isBillForPresidentialSignature?'Закон ожидает подписи Президента Российской Федерации. До назначения Президента подписание невозможно, документ сохраняет текущую стадию.':linkedOpenVote?"Завершите открытое голосование — его результат автоматически изменит стадию.":votePreset?"Для перехода дальше требуется решение голосованием.":procedureBlocked?"Сначала подготовьте обязательный комплект законопроекта.":meetingProcedureHint|| (currentAction?"Доступное действие: "+currentAction+".":"Процедура завершена.")}</p>{!canManage(selected)&&currentAction&&!linkedOpenVote&&<small>Действие выполняет ответственный орган. Для ознакомления документ можно отправить из блока под его текстом.</small>}</div>
        {selected.metadata?.source_type==='ghost_voting_policies'&&Boolean(selected.metadata?.source_vote_id)&&<div className="formalVoteLink active" role="status"><small>● Решение этапа 05 принято</small><b>Постановление связано с итогами Goust Voting</b><span>Повторное голосование не требуется. Уполномоченное лицо оформляет и публикует постановление.</span><button type="button" className="secondary" onClick={()=>onOpenVotes(String(selected.metadata?.source_vote_id))}>Посмотреть принятое решение →</button></div>}
+       {selected.metadata?.cutoff_price_proposal===true&&selected.status_code==='sf'&&teacher&&!readOnly&&<div className="formalBranchPanel" aria-label="Подтверждение решения Совета Федерации">
+        <small>Совет Федерации · финансовое регулирование</small>
+        <b>Подтверждение рассмотрения преподавателем</b>
+        <p>Если сенаторы не назначены, преподаватель фиксирует результат рассмотрения по игровым правилам. Это не подпись за сенатора или студента. При назначенном составе палаты можно провести отдельное голосование.</p>
+        <label className="documentEditNote">Основание решения Совета Федерации
+         <textarea rows={3} maxLength={1500} value={cutoffSfNote} disabled={busy}
+          onChange={e=>setCutoffSfNote(e.target.value)}
+          placeholder="Укажите решение и основание его подтверждения"/>
+        </label>
+        <div>
+         <button type="button" className="primary" disabled={busy||!!linkedOpenVote||cutoffSfNote.trim().length<8}
+          onClick={()=>void confirmCutoffSf(true)}>Подтвердить одобрение Советом Федерации</button>
+         <button type="button" className="secondary" disabled={busy||!!linkedOpenVote||cutoffSfNote.trim().length<8}
+          onClick={()=>void confirmCutoffSf(false)}>Подтвердить отклонение</button>
+        </div>
+       </div>}
        {linkedOpenVote?<div className="formalVoteLink active"><small>● Идёт голосование</small><b>{linkedOpenVote.title}</b><span>Результат автоматически изменит стадию документа.</span><button className="primary" onClick={()=>onOpenVotes(linkedOpenVote.id)}>Перейти к голосованию →</button></div>
        :selected.status_code==='budget_conciliation'?<div className="formalBranchPanel"><small>Согласительная комиссия</small><b>Президент отклонил закон о федеральном бюджете</b><p>В соответствии с правилами игры необходимо выработать согласованный вариант либо вернуть проект Правительству на доработку.</p>{canManage(selected)||teacher?<div><button className="primary" disabled={busy} onClick={async()=>{setBusy(true);await resolveBudgetConciliation(selected.id,'agreed','Согласованный вариант выработан');setBusy(false)}}>✓ Согласованный вариант готов</button><button className="secondary" disabled={busy} onClick={async()=>{setBusy(true);await resolveBudgetConciliation(selected.id,'government_revision','Возвращено Правительству');setBusy(false)}}>↺ Вернуть Правительству</button></div>:<span>Ожидается решение согласительной комиссии.</span>}</div>
        :isSfVetoConfirmation?<div className="formalBranchPanel" aria-label="Решение Совета Федерации о преодолении вето">
