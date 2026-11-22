@@ -23,6 +23,7 @@ const g={
  ]
 };
 const titles=activeGameRoleTitles(g);
+assert.deepEqual(activeGameRoleTitles({...g,members:undefined,officeAssignments:undefined}),['Депутат Государственной Думы'],'Account view must not crash before roster or office hydration');
 const stageFixture={...g,stages:[{stage_no:10,status:'open',deadline:'2026-11-22T10:00:00Z'},{stage_no:11,status:'open',deadline:'2026-11-23T10:00:00Z'}],currentStage:{stage_no:10,status:'open'},game:{id:game,current_round:10}};
 assert.equal(currentGameStageNumber(stageFixture),10,'Current stage is the one shown in the teacher clock');
 assert.equal(currentStageRoleTitle(stageFixture,uid),'Председатель Правительства Российской Федерации','PM title must replace primary deputy title at stage 10');
