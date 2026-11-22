@@ -55,14 +55,22 @@ const voiceRms=Array.from({length:36},(_,i)=>{
 });
 const peak=Math.max(...voiceRms,1e-6);
 const voiceWave=voiceRms.map(v=>Math.round(Math.max(18,Math.min(100,18+82*(v/peak)**.65))));
-// Fresh media fixtures must stay inside the one-hour retention window.
-// Historical text/document fixtures intentionally keep their old timestamps.
+// Keep preview voice/video within the media retention window. Historic
+// text and document examples are shifted below into a rolling 48-hour window
+// so real chat retention rules do not hide the offline demo after 30 days.
 const chatMediaFixtureTime = new Date(Date.now()-2*60*1000).toISOString();
 fixture.messages.push(
  {id:'c8',game_id:'design-preview',channel_id:'public-demo',author_id:'teacher-demo',kind:'audio',text:'voice-preview.wav',storage_path:'preview/mock.wav',mime_type:'audio/wav',url:voicePreviewUrl,voice_meta:{duration:1,waveform:voiceWave},created_at:chatMediaFixtureTime},
  {id:'c9',game_id:'design-preview',channel_id:'public-demo',author_id:'student-0',kind:'video',text:null,storage_path:'preview/video.webm',mime_type:'video/webm',created_at:chatMediaFixtureTime},
  {id:'c8-expired',game_id:'design-preview',channel_id:'public-demo',author_id:'teacher-demo',kind:'audio',text:'expired-voice.wav',storage_path:'preview/expired.wav',mime_type:'audio/wav',url:voicePreviewUrl,voice_meta:{duration:1,waveform:voiceWave},created_at:'2026-09-28T11:00:00Z'}
 );
+// Preserve their relative order and two calendar days; deliberately expired
+// audio (c8-expired) is left untouched to exercise the retention behavior.
+const chatFixtureOffset=Date.now()-48*60*60*1000-Date.parse('2026-09-27T09:15:00Z');
+for(const item of fixture.messages){
+ if(item.kind==='text'||item.kind==='file')
+  item.created_at=new Date(Date.parse(item.created_at)+chatFixtureOffset).toISOString();
+}
 fixture.chatPins=[{id:'pin-audio',game_id:'design-preview',channel_id:'public-demo',message_id:'c8',pinned_by:'teacher-demo',pinned_at:'2026-09-28T14:01:00Z'},{id:'pin-video',game_id:'design-preview',channel_id:'public-demo',message_id:'c9',pinned_by:'teacher-demo',pinned_at:'2026-09-28T14:02:00Z'},{id:'pin-file',game_id:'design-preview',channel_id:'public-demo',message_id:'c5',pinned_by:'teacher-demo',pinned_at:'2026-09-28T14:00:00Z'}];
 fixture.pinnedMessages=fixture.messages.filter(m=>fixture.chatPins.some(pin=>pin.message_id===m.id));
 fixture.votes=[{id:'vote-demo',stage_no:4,title:'Об утверждении повестки заседания',body:'Предлагается утвердить порядок рассмотрения вопросов первого заседания Государственной Думы.',voting_mode:'mandate',status:'open',opened_at:now,closed_at:null,institution_key:'gd',procedure_key:'gd_resolution',quorum_kind:'fraction',quorum_value:.5,majority_kind:'eligible_majority',majority_value:.5,allow_abstain:true,result_code:null}];
