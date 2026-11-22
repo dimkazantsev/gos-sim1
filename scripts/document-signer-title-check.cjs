@@ -50,6 +50,7 @@ assert(view.includes('Документ подписывает: <b>{documentSigni
 assert(!view.includes("rpc('get_document_signing_authority'"),'No new signature lookups');
 
 const paper=fs.readFileSync('components/game/DocumentPaper.tsx','utf8');
-assert(paper.includes('role=documentSignerTitle(d,metadataSigned?m.signed_role:null)'),'Signed paper must resolve a contextual game office');
+assert(paper.includes('role=documentSignerTitle(d,isRoleSigner?m.acting_office_title:metadataSigned?m.signed_role:null)'),'Signed paper must use the verified acting office when a role-specific name is present');
+assert(paper.includes('name=isRoleSigner?roleName:'),'Role-specific personal name must match the signed office');
 assert(paper.includes('<b>{name}</b>')&&paper.includes("role||'Уполномоченное лицо'"),'Existing signer name/date display is preserved');
 console.log('PASS: approved Minjust institutional signer overrides unrelated roles, other offices use signed authority');
