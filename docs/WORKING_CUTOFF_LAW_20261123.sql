@@ -111,7 +111,7 @@ BEGIN
   'fz_bill','government','Правительство Российской Федерации',v_uid,
   v_body,'bill',v_steps,0,'draft','Подготовка Министерством по экономической политике',
   'author',jsonb_build_object('registry_independent',true,'cutoff_price_proposal',true,
-    'document_kind','cutoff_price_bill','proposal_old_price',v_old,'proposal_new_price',p_new_price,
+    'proposal_old_price',v_old,'proposal_new_price',p_new_price,
     'issuer_name','Правительство Российской Федерации','acting_user_id',v_uid,
     'acting_office_title','Министерство по экономической политике',
     'legal_basis','Пункт 4 статьи 96.6 БК РФ; статьи 104–107 Конституции РФ'));
