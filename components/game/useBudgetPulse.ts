@@ -50,10 +50,9 @@ export function useBudgetPulse(gameId:string,enabled:boolean){
   const relevant=new Set(['formal_documents','state_metrics','game_fiscal_policy','game_fiscal_regions','game_fiscal_rates','budget_simulator_plans','budget_simulator_state','budget_transfer_requests']);
   let pending:ReturnType<typeof setTimeout>|undefined,lastAutomaticAt=Date.now();
   let dirtyWhileHidden=document.visibilityState!=='visible';
-  let timer:ReturnType<typeof setInterval>|null=null;
-  // Event-driven updates stay immediate. A passive budget check is needed
-  // less often because the current RPC recalculates and can write state.
-  const intervalMs=180000+Math.floor(Math.random()*30000);
+  // No periodic budget polling: the existing shared Realtime invalidation,
+  // focus/visibility recovery and online event already cover refreshes.
+  // Each idle visible client no longer calls get_budget_pulse every ~3 min.
   if(!dirtyWhileHidden)void refresh();
   function automatic(force=false){
    if(document.visibilityState!=='visible'){dirtyWhileHidden=true;return}
@@ -67,24 +66,26 @@ export function useBudgetPulse(gameId:string,enabled:boolean){
    if(pending!==undefined)return;
    pending=setTimeout(()=>{pending=undefined;automatic()},1200);
   }
-  function stopPolling(){
-   if(timer!==null){clearInterval(timer);timer=null}
+  function cancelPending(){
    if(pending!==undefined){clearTimeout(pending);pending=undefined;dirtyWhileHidden=true}
   }
-  function startPolling(){
-   if(timer===null&&document.visibilityState==='visible')
-    timer=setInterval(()=>automatic(),intervalMs);
-  }
   const resume=()=>{
-   if(document.visibilityState!=='visible'){stopPolling();return}
-   startPolling();
-   // A dirty hidden tab still refreshes on return; otherwise wait 3 min.
+   if(document.visibilityState!=='visible'){cancelPending();return}
+   // Do not refetch on a short tab switch without changes.
    if(dirtyWhileHidden||Date.now()-lastAutomaticAt>=180000)automatic(dirtyWhileHidden);
   };
-  startPolling();
+  const online=()=>{dirtyWhileHidden=true;automatic(true)};
   document.addEventListener('visibilitychange',resume);
+  window.addEventListener('focus',resume);
+  window.addEventListener('online',online);
   window.addEventListener(GAME_DATA_REFRESH_EVENT,changed);
-  return()=>{alive.current=false;request.current++;stopPolling();document.removeEventListener('visibilitychange',resume);window.removeEventListener(GAME_DATA_REFRESH_EVENT,changed)};
+  return()=>{
+   alive.current=false;request.current++;cancelPending();
+   document.removeEventListener('visibilitychange',resume);
+   window.removeEventListener('focus',resume);
+   window.removeEventListener('online',online);
+   window.removeEventListener(GAME_DATA_REFRESH_EVENT,changed);
+  };
  },[gameId,enabled,refresh]);
  return {budgetPulse:enabled&&pulse?.game_id===gameId?pulse:null,budgetPulseError:enabled?error:'',refreshBudgetPulse:refresh};
 }

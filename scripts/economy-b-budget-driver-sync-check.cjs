@@ -20,6 +20,8 @@ assert(migration.includes("REVOKE ALL ON FUNCTION private.reconcile_budget_drive
 assert(recovery.includes('EXCEPTION WHEN OTHERS'),'Budget errors cannot revoke a completed game action');
 assert(recovery.includes("RAISE WARNING 'ГОС.ID: budget sync failed"),'Failures remain observable and do not trigger retry loops');
 assert(budget.includes("supabase.rpc('get_budget_pulse'"),'Original authorized budget read path remains');
-assert(budget.includes("const intervalMs=180000"),'No new passive polling was added');
+assert(!budget.includes('setInterval('),'No passive budget RPCs under 100 visible participants');
+assert(budget.includes("window.addEventListener('online',online)")&&budget.includes("window.addEventListener('focus',resume)"),'Reconnect and focus recovery preserved');
+assert(budget.includes('GAME_DATA_REFRESH_EVENT')&&budget.includes("supabase.rpc('get_budget_pulse'"),'Event-driven budget read preserved');
 assert(!/create\s+table|create\s+policy|grant\s+execute/i.test(migration+recovery),'No extra tables or access rights');
 console.log('PASS: 16 stages, event-driven budget sync, one cache, game-isolated permission contract and no extra polling');

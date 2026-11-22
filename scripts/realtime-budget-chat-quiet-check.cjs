@@ -17,7 +17,8 @@ assert(game.includes("if(!liveConnected)void loadChatOverview();"),'Healthy chat
 assert(game.includes('!gameRealtimeConnected(gameId))scheduleRealtimeChatOverview()'),'Receipt relies on authorised chat_channel_state changes while live; disconnected fallback survives');
 assert(game.includes("dirtyOverview=true;"),'Three-minute overview reconciliation preserved');
 assert(game.includes("chatRecovery=setInterval(recoverVisibleChatAndBallots,6000)"),'Offline chat recovery retained');
-assert(budget.includes('180000+Math.floor(Math.random()*30000)'), 'Budget check moves to 3–3.5 min');
+assert(!budget.includes('setInterval('),'Idle budget views must not issue periodic RPCs');
+assert(budget.includes("window.addEventListener('online',online)")&&budget.includes("window.addEventListener('focus',resume)"),'Budget recovery stays connected to online and focus');
 assert(budget.includes("window.addEventListener(GAME_DATA_REFRESH_EVENT,changed)"),'Event-driven budget refresh stays immediate');
 assert(budget.includes('if(running?.gameId===gameId)'),'Overlapping budget reads share one in-flight operation');
 assert(budget.includes('running.rerun=true'),'Updates received during a slow read require a trailing reconciliation');
