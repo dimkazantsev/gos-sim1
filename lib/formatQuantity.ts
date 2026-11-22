@@ -17,3 +17,12 @@ export function scenarioUnit(note:string|null|undefined){
  return /трлн|триллион/.test(s)?'трлн ₽':/млрд|миллиард/.test(s)?'млрд ₽':/млн|миллион/.test(s)?'млн ₽':/тыс\.?|тысяч/.test(s)?'тыс. ₽':/рубл|₽/.test(s)?'₽':'млн ₽';
 }
 export function scenarioMoney(value:number|null|undefined,note?:string|null){return quantity(value,scenarioUnit(note));}
+
+/** A signed program's annual commitment is stored in roubles; scenario inputs
+ * use the scale already shown by the Budget Lab, without changing saved data. */
+export function scenarioAmountFromRubles(amountRubles:number,note:string|null|undefined){
+ if(!Number.isFinite(amountRubles)||amountRubles<0)return null;
+ const unit=scenarioUnit(note);
+ const divisor=unit==='трлн ₽'?1e12:unit==='млрд ₽'?1e9:unit==='млн ₽'?1e6:unit==='тыс. ₽'?1e3:1;
+ return amountRubles/divisor;
+}

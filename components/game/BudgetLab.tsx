@@ -1,5 +1,5 @@
 'use client';
-import {scenarioUnit,scenarioMoney} from '@/lib/formatQuantity';
+import {scenarioUnit,scenarioMoney,scenarioAmountFromRubles} from '@/lib/formatQuantity';
 import {useEffect,useMemo,useState} from 'react';
 import {supabase} from '@/lib/supabase';
 import {useGameTableSync} from './useGameTableSync';
@@ -9,7 +9,14 @@ import {stageRoleTitles} from './stageRoles';
 
 type Scenario={id:string;game_id:string;title:string;budget_year:number;source_note:string|null;gdp:number;oil_price:number|null;cutoff_price:number|null;key_rate:number|null;fx_change_pct:number|null;fx_intervention:number|null;revenue:number;expenditure:number;debt_start:number;financing:number;balance:number;deficit_pct_gdp:number|null;debt_end:number;debt_pct_gdp:number|null;deficit_limit_pct:number|null;debt_limit_pct:number|null;status:'draft'|'final';formal_document_id:string|null;created_by:string;updated_at:string};
 type ProgramAllocation={id:string;scenario_id:string;program_id:string;amount:number;note:string|null;created_at:string;updated_at:string};
-type AdoptedProgram={id:string;title:string;responsible_ministry:string;total_budget:number;status:string};
+type AnnualCommitment={budget_year:number;amount:number;status:string;signed_by:string};
+type AdoptedProgram={id:string;title:string;responsible_ministry:string;signed_by:string|null;signed_at:string|null;state_program_budget_commitments:AnnualCommitment[]};
+const approvedAnnualCommitment=(p:AdoptedProgram,year:number)=>{
+ if(!p.signed_at||!p.signed_by)return undefined;
+ return p.state_program_budget_commitments?.find(c=>
+  c.budget_year===year&&c.status==='approved'&&c.signed_by===p.signed_by&&
+  Number.isFinite(Number(c.amount))&&Number(c.amount)>0);
+};
 type Stream={id:string;scenario_id:string;workstream:'central_bank'|'macro'|'revenue'|'expenditure'|'financing_debt';summary:string;submitted_by:string;updated_at:string};
 
 const streams=[
@@ -58,7 +65,7 @@ export default function BudgetLab({g}:{g:ReturnTypeRepublic}){
    supabase.from('budget_scenarios').select('*').eq('game_id',game.id).order('created_at',{ascending:true}),
    supabase.from('budget_workstreams').select('*').eq('game_id',game.id),
    supabase.from('budget_program_allocations').select('*').eq('game_id',game.id),
-   supabase.from('state_programs').select('id,title,responsible_ministry,total_budget,status').eq('game_id',game.id).eq('status','adopted').order('title')
+   supabase.from('state_programs').select('id,title,responsible_ministry,signed_by,signed_at,state_program_budget_commitments(budget_year,amount,status,signed_by)').eq('game_id',game.id).eq('status','adopted').order('title')
   ]);
   if(!s.error){const rows=(s.data||[]) as Scenario[];setScenarios(rows);if(!selectedId&&rows[0])setSelectedId(rows[0].id)}
   if(!w.error){const rows=(w.data||[]) as Stream[];setWork(rows);setStreamDraft(v=>({...v,...Object.fromEntries(rows.map(x=>[x.scenario_id+'-'+x.workstream,x.summary]))}))}
@@ -74,6 +81,8 @@ export default function BudgetLab({g}:{g:ReturnTypeRepublic}){
   if(!selected)return;
   setTitle(selected.title);setYear(selected.budget_year);setSource(selected.source_note||'');setGdp(String(selected.gdp));setOil(String(selected.oil_price??''));setCutoff(String(selected.cutoff_price??''));setRate(String(selected.key_rate??''));setFx(String(selected.fx_change_pct??''));setIntervention(String(selected.fx_intervention??''));setRevenue(String(selected.revenue));setExpenditure(String(selected.expenditure));setDebt(String(selected.debt_start));setFinancing(String(selected.financing));setDeficitLimit(String(selected.deficit_limit_pct??''));setDebtLimit(String(selected.debt_limit_pct??''));
  },[selected?.id,selected?.updated_at]);
+ // Clear unsaved input if the chosen scenario, year or display unit changes.
+ useEffect(()=>{setAllocationProgram('');setAllocationAmount('');},[selected?.id,selected?.budget_year,scenarioUnit(source)]);
 
  if(!game||!me)return null;
  const activeGame=game;
@@ -85,6 +94,11 @@ export default function BudgetLab({g}:{g:ReturnTypeRepublic}){
  const previewDebtPct=n(gdp)>0?previewDebt/n(gdp)*100:null;
  const myWork=selected?work.filter(x=>x.scenario_id===selected.id):[];
  const myAllocations=selected?allocations.filter(x=>x.scenario_id===selected.id):[];
+ const allocatedProgramIds=new Set(myAllocations.map(a=>a.program_id));
+ const availablePrograms=selected?adoptedPrograms.filter(p=>
+  !allocatedProgramIds.has(p.id)&&!!approvedAnnualCommitment(p,selected.budget_year)):[];
+ const allocationScenarioReady=!!selected&&year===selected.budget_year&&
+  scenarioUnit(source)===scenarioUnit(selected.source_note);
  const allocatedTotal=myAllocations.reduce((sum,x)=>sum+Number(x.amount||0),0);
  const allocationCoverage=n(expenditure)>0?allocatedTotal/n(expenditure)*100:0;
  const budgetDocument=selected?.formal_document_id?formalDocuments.find(d=>d.id===selected.formal_document_id):undefined;
@@ -107,7 +121,7 @@ export default function BudgetLab({g}:{g:ReturnTypeRepublic}){
  }
  async function finalize(){if(!selected)return;setBusy(true);const r=await supabase.rpc('finalize_budget_scenario',{p_scenario_id:selected.id});if(r.error)setError(userError(r.error));else await load();setBusy(false)}
  async function setAllocation(){
-  if(!selected||!allocationProgram||Number(allocationAmount)<0)return;
+  if(!selected||!allocationScenarioReady||!allocationProgram||!Number.isFinite(Number(allocationAmount))||Number(allocationAmount)<=0)return;
   setBusy(true);const r=await supabase.rpc('set_budget_program_allocation',{p_scenario_id:selected.id,p_program_id:allocationProgram,p_amount:Number(allocationAmount)||0,p_note:allocationNote.trim()||null});
   if(r.error)setError(userError(r.error));else{setAllocationProgram('');setAllocationAmount('');setAllocationNote('');await load()}setBusy(false);
  }
@@ -149,8 +163,9 @@ export default function BudgetLab({g}:{g:ReturnTypeRepublic}){
 
   {selected&&<section className="budgetPrograms">
    <div className="budgetProgramsHead"><div><small>ПРОГРАММНЫЕ РАСХОДЫ</small><h3>Принятые ГП → федеральный бюджет</h3><p>Здесь бюджетный сценарий получает содержательную структуру: принятые Правительством государственные программы превращаются в конкретные расходные обязательства.</p></div><div><strong>{scenarioMoney(allocatedTotal,source)}</strong><span>{allocationCoverage.toFixed(1)}% расходов распределено по ГП</span></div></div>
-   <div className="budgetAllocationList">{myAllocations.length===0?<div className="emptyState">Принятые государственные программы пока не связаны с этим бюджетом.</div>:myAllocations.map(a=>{const p=adoptedPrograms.find(x=>x.id===a.program_id);return <article key={a.id}><div><b>{p?.title||'Государственная программа'}</b><small>{p?.responsible_ministry||'Ответственный исполнитель'}</small>{a.note&&<p>{a.note}</p>}</div><strong>{scenarioMoney(Number(a.amount),source)}</strong>{selected.status==='draft'&&canFinalize&&<button onClick={()=>void deleteAllocation(a.id)}>×</button>}</article>})}</div>
-   {selected.status==='draft'&&canFinalize&&adoptedPrograms.length>0&&<div className="budgetAllocationForm"><select value={allocationProgram} onChange={e=>{setAllocationProgram(e.target.value);const p=adoptedPrograms.find(x=>x.id===e.target.value);if(p)setAllocationAmount(String(p.total_budget||0))}}><option value="">Выберите принятую ГП…</option>{adoptedPrograms.filter(p=>!myAllocations.some(a=>a.program_id===p.id)).map(p=><option key={p.id} value={p.id}>{p.title} · {p.responsible_ministry}</option>)}</select><input type="number" min="0" value={allocationAmount} onChange={e=>setAllocationAmount(e.target.value)} aria-label={"Сумма финансирования, "+scenarioUnit(source)} placeholder={"Сумма, "+scenarioUnit(source)}/><input value={allocationNote} onChange={e=>setAllocationNote(e.target.value)} placeholder="Комментарий / приоритет / корректировка"/><button disabled={busy||!allocationProgram} onClick={()=>void setAllocation()}>Добавить финансирование</button></div>}
+   <div className="budgetAllocationList">{myAllocations.length===0?<div className="emptyState">Программы пока не добавлены. Требуется подписанная ГП с утверждённым финансированием на {selected.budget_year} год.</div>:myAllocations.map(a=>{const p=adoptedPrograms.find(x=>x.id===a.program_id);return <article key={a.id}><div><b>{p?.title||'Государственная программа'}</b><small>{p?.responsible_ministry||'Ответственный исполнитель'}</small>{a.note&&<p>{a.note}</p>}</div><strong>{scenarioMoney(Number(a.amount),source)}</strong>{selected.status==='draft'&&canFinalize&&<button onClick={()=>void deleteAllocation(a.id)}>×</button>}</article>})}</div>
+   {selected.status==='draft'&&canFinalize&&!allocationScenarioReady&&<div className="emptyState">Сначала сохраните изменения года или единиц измерения сценария.</div>}
+   {selected.status==='draft'&&canFinalize&&allocationScenarioReady&&availablePrograms.length>0&&<div className="budgetAllocationForm"><select value={allocationProgram} onChange={e=>{setAllocationProgram(e.target.value);const p=availablePrograms.find(x=>x.id===e.target.value);const annual=p?approvedAnnualCommitment(p,selected.budget_year):undefined;const value=annual?scenarioAmountFromRubles(Number(annual.amount),source):null;setAllocationAmount(value===null?'':String(value))}}><option value="">Выберите подписанную ГП…</option>{availablePrograms.map(p=><option key={p.id} value={p.id}>{p.title} · {p.responsible_ministry}</option>)}</select><input type="number" min="0" value={allocationAmount} onChange={e=>setAllocationAmount(e.target.value)} aria-label={"Сумма финансирования, "+scenarioUnit(source)} placeholder={"Сумма, "+scenarioUnit(source)}/><input value={allocationNote} onChange={e=>setAllocationNote(e.target.value)} placeholder="Комментарий / приоритет / корректировка"/><button disabled={busy||!allocationProgram||!Number.isFinite(Number(allocationAmount))||Number(allocationAmount)<=0} onClick={()=>void setAllocation()}>Добавить финансирование</button></div>}
   </section>}
 
   {selected&&<div className="budgetStreams">{streams.map(([key,label,hint])=>{
