@@ -11,7 +11,7 @@ export const MODEL_B_AUX_KEYS=['social_stability','security','elite_support','in
 export function modelBAdditionalChannels(metrics:Record<string,number>,anchors?:Record<string,number>|null){
  const delta=(key:typeof MODEL_B_AUX_KEYS[number])=>{
   const current=metrics[key],reference=anchors?.[key];
-  return Number.isFinite(current)&&Number.isFinite(reference)?current-reference:0;
+  return Number.isFinite(current)&&typeof reference==='number'&&Number.isFinite(reference)?current-reference:0;
  };
  const activityPoints=(delta('social_stability')+delta('security')+delta('elite_support')+delta('international_standing')-delta('social_tension'))/5;
  const collectionPoints=(delta('legitimacy')+delta('media_climate'))/2;
