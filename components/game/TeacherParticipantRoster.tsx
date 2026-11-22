@@ -122,7 +122,7 @@ export default function TeacherParticipantRoster({g}:{g:ReturnTypeRepublic}){
     <label>Фамилия, имя и отчество участника
      <input autoComplete="off" maxLength={200} value={reentryName} disabled={busy||!!reentryUrl} onChange={e=>setReentryName(e.target.value)} placeholder="Иванова Анна Сергеевна"/>
     </label>
-    <label>Учебная группа
+    <label>Игровая группа
      <input autoComplete="off" maxLength={120} value={reentryGroup} disabled={busy||!!reentryUrl} onChange={e=>setReentryGroup(e.target.value)} placeholder="8.414"/>
     </label>
    </div>}

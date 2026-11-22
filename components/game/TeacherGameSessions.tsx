@@ -71,9 +71,9 @@ export default function TeacherGameSessions({displayName='Преподавате
   if(auth.data.session?.user)await supabase.from('teacher_profiles').update({last_game_id:id}).eq('user_id',auth.data.session.user.id);
   openGame(id);
  }
- return <section id="teacher-game-sessions" className="gosTeacherSessions surface" aria-label="Игры и учебные сеансы">
+ return <section id="teacher-game-sessions" className="gosTeacherSessions surface" aria-label="Игры и сессии">
   <header className="gosTeacherSessionsHeader">
-   <div><small>ЛИЧНЫЙ КАБИНЕТ</small><h2>Игры и учебные сеансы</h2><p>Игры создаются и переключаются здесь. Постоянный профиль преподавателя не удаляется вместе с ними.</p></div>
+   <div><small>ЛИЧНЫЙ КАБИНЕТ</small><h2>Игры и сессии</h2><p>Игры создаются и переключаются здесь. Постоянный профиль преподавателя не удаляется вместе с ними.</p></div>
    <div className="gosTeacherSessionsActions">
     <button type="button" className="secondary" disabled={busy} onClick={()=>void refresh()} aria-label="Обновить список игр"><RefreshCcw size={17}/>Обновить</button>
     <button type="button" className="primary" aria-expanded={formOpen} disabled={busy} onClick={()=>setFormOpen(v=>!v)}><Plus size={17}/>{formOpen?'Свернуть':'Создать игру'}</button>

@@ -3,7 +3,7 @@
 const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path');
 const root=path.resolve(__dirname,'..');
 const sources=['app','components','production-app/app'];
-const exceptions=new Set(['components/game/cecOfficialWording.ts']); // This regex explicitly filters such wording from official forms.
+const exceptions=new Set(['components/game/cecOfficialWording.ts','components/game/EventChoicePanel.tsx']); // These two modules reject or replace banned generated text rather than display it.
 const failures=[];
 function walk(relative){
  const absolute=path.join(root,relative);

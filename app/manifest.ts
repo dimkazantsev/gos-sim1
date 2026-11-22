@@ -4,7 +4,7 @@ export const dynamic='force-static';
 export default function manifest():MetadataRoute.Manifest{
  return {
   id:'/',name:'ГОС.ID — Цифровая платформа России',short_name:'ГОС.ID',
-  description:'Учебная политико-административная игра',
+  description:'Республиканская цифровая платформа ГОС.ID',
   start_url:'/',scope:'/',display:'standalone',
   background_color:'#f7f9fd',theme_color:'#2453e6',
   lang:'ru',orientation:'any',
