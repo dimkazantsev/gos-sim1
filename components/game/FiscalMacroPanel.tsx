@@ -17,8 +17,15 @@ export default function FiscalMacroPanel({g,context,readOnly,onSaved,onOpenDocum
  const [bankOpen,setBankOpen]=useState(false),[bankDraft,setBankDraft]=useState(''),[bankReason,setBankReason]=useState(''),[bankBusy,setBankBusy]=useState(false),[bankError,setBankError]=useState('');
  useEffect(()=>{if(context)setDraft(Object.fromEntries(fields.map(([key])=>[key,key==='activity_override'?(context.policy.activity_override==null?'':String(context.policy.activity_override)):String(context.policy[key]??fnbDefaults[key as keyof typeof fnbDefaults]??'')])));},[context?.policy.updated_at]);
  if(!context)return <p role="status">Загружаются общие параметры бюджетного сценария…</p>;
- const p=context.policy,environment=fiscalEnvironment(context),canEdit=!readOnly&&g.teacher,
-  canBankAct=!readOnly&&context.can_issue_bank_rate_decision===true;
+ const p=context.policy,environment=fiscalEnvironment(context),canEdit=!readOnly&&g.teacher;
+ // Budget already loads current office assignments. Reuse them if a fiscal
+ // context snapshot was computed before the active appointment reached the UI.
+ // The adoption RPC independently rechecks the appointment and auth.uid().
+ const canBankAct=!readOnly&&g.me?.kind==='student'&&g.me.roster_archived_at==null&&(
+  context.can_issue_bank_rate_decision===true||
+  g.officeAssignments.some(office=>office.game_id===g.game?.id&&office.user_id===g.me?.user_id&&
+   office.status==='active'&&office.role_title==='Председатель Центрального банка Российской Федерации')
+ );
  function toggleBankRate(){
   if(!canBankAct||bankBusy)return;
   if(bankOpen){setBankOpen(false);return;}
