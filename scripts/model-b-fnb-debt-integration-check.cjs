@@ -1,0 +1,51 @@
+const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path'),Module=require('node:module'),ts=require('typescript');
+const root=path.resolve(__dirname,'..'),resolve=Module._resolveFilename;
+Module._resolveFilename=function(request,...args){return resolve.call(this,request.startsWith('@/')?path.join(root,request.slice(2)):request,...args)};
+require.extensions['.ts']=(m,f)=>m._compile(ts.transpileModule(fs.readFileSync(f,'utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,esModuleInterop:true,target:ts.ScriptTarget.ES2022}}).outputText,f);
+const {fiscalEnvironment,fiscalForecast}=require('../components/game/fiscalMath');
+const {calculateFederalBudget,defaultSimulatorState,newBudgetDraft,financingRate,coverFundingGap}=require('../components/game/federalBudgetMath');
+const metrics={economy:16,public_trust:12,lawfulness:24,international_standing:3,security:13,
+social_stability:10,elite_support:8,media_climate:29,social_tension:92,legitimacy:7};
+const policy={key_rate:16,fx_rate:65,oil_price:45,cutoff_price:40,inflation:19,
+baseline_economy:16,baseline_trust:12,collection_lawfulness_reference:24};
+const region={game_id:'fixture',region_code:'54',profile:'industrial',enterprises:5000,activity_multiplier:1,
+employees_per_firm:14,monthly_wage:50000,profit_per_firm:2,consumption_per_firm:4,expenditure:14000,
+transfer_in:0,debt:0,compliance:.95,cost_multiplier:1};
+const context={policy,metrics},state=defaultSimulatorState(context,[region]),draft=newBudgetDraft();
+const calculate=(d=draft,p=policy,s=state,regions=[region])=>calculateFederalBudget(d,s,{policy:p,metrics},regions,[],[],[]);
+const base=calculate();
+assert.equal(state.fnb_total,10000000,'Full FNB starts at 10T');
+assert.equal(base.fnb_total,10000000+base.fnb_oil_change-draft.financing.reserves,'Full FNB reflects allocated savings and used reserve');
+assert(base.fnb_oil_allocation>0,'Above-cutoff oil saved to FNB');
+assert(Math.abs(base.fnb_oil_change-(base.funding_need-base.deficit-base.credit_outflow))<1e-6,'Oil allocation cannot finance deficit twice');
+assert.equal(calculate(draft,{...policy,oil_price:35}).fnb_oil_allocation,0,'Oil below cutoff generates no new FNB saving');
+const weaker={...region,enterprises:region.enterprises*.9};
+const weakerContext={...policy,tax_activity_reference:1};
+const anchorState={...state,anchor:{...state.anchor,tax_activity_reference:1}};
+const original=calculate(draft,weakerContext,anchorState,[region]),down=calculate(draft,weakerContext,anchorState,[weaker]);
+assert(down.revenue<original.revenue,'Fewer enterprises lower tax revenues');
+const regionalBase=fiscalForecast(region,[],undefined,{metrics,policy:weakerContext}).lines;
+const regionalDown=fiscalForecast(weaker,[],undefined,{metrics,policy:weakerContext}).lines;
+const vat=(lines)=>lines.find(v=>v.key==='vat');
+if(vat(regionalBase)&&vat(regionalDown))assert(vat(regionalDown).amount<vat(regionalBase).amount,'Regional VAT falls with enterprises');
+assert.equal(base.internal_borrowing_new,0,'Initial federal borrowing plan is not reborrowed');
+assert.equal(base.internal_borrowing_over_limit,0,'Initial existing debt is grandfathered');
+assert(base.internal_borrowing_limit<.045*235067000,'Inflation restricts new domestic issuance');
+assert(financingRate('ofz_fixed',16,7.5,19)>financingRate('ofz_fixed',16,7.5,16),'Inflation premium for new OFZ');
+assert.equal(financingRate('ofz_fixed',16,7.5,19)-financingRate('ofz_fixed',16,7.5,16),.75);
+const high={...draft,financing:{...draft.financing,bank_credit:7000000}};
+assert(calculate(high).internal_borrowing_over_limit>0,'Large new domestic bank loan is restricted');
+const filled=coverFundingGap(draft,'bank_credit',state,context,[region],[],[],[]);
+assert(filled.financing.bank_credit<=base.internal_borrowing_available+1e-6,'Automatic financing respects domestic limit');
+const currentRate=state.financing_rates?.ofz_fixed;
+const retained={...state,last_plan_id:'existing',financing_rates:{ofz_fixed:16}};
+assert.equal(calculate(draft,policy,retained).annual_interest>0,true);
+assert(calculate(draft,policy,retained).internal_borrowing_new===0,'Existing fixed-coupon bonds do not count as a new borrowing');
+const metricSource=fs.readFileSync(path.join(root,'components/game/StateMetricsDock.tsx'),'utf8');
+const panel=fs.readFileSync(path.join(root,'components/game/FiscalMacroPanel.tsx'),'utf8');
+assert.match(metricSource,/data-budget-debt-explanation/);
+assert.match(metricSource,/data-economy-tax-explanation/);
+assert.match(panel,/data-fnb-explanation/);
+assert.match(panel,/\['fnb_total','ФНБ — общий объём'/);
+assert(!/учебн/iu.test(panel),'User-facing copy is in project language');
+console.log('PASS: FNB, oil allocation, inflation-sensitive internal credit, anchored taxation and explanatory UI');
