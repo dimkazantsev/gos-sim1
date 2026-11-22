@@ -10,7 +10,6 @@ on:
       - 'scripts/impact-engine-projection-rls-check.cjs'
       - 'scripts/impact-model-low-load-check.cjs'
       - 'supabase/migrations/20261123060000_impact_metric_trigger_when_scope.sql'
-      - 'components/game/StateMetricsDock.tsx'
       - 'components/game/ImpactRulesPanel.tsx'
       - 'components/game/useRepublicGame.ts'
 permissions:
