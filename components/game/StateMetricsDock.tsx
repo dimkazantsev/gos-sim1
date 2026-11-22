@@ -73,7 +73,7 @@ export default function StateMetricsDock({g,initialSelectedMetricId='',initialCo
  const plotRef=useRef<HTMLDivElement>(null);
  const [plotWidth,setPlotWidth]=useState(700);
  const [focusedPoint,setFocusedPoint]=useState<{id:string;at:number}|null>(null);
- const [ruleRows,setRuleRows]=useState<ImpactRule[]|null>(null);
+ const [ruleRows,setRuleRows]=useState<Pick<ImpactRule,'id'|'label'|'conditions'|'effects'|'enabled'|'auto_apply'>[]|null>(null);
  const [ruleError,setRuleError]=useState('');
  // Load the live configured formula only when someone opens a metric.
  // The dashboard itself makes no extra requests for a classroom of 40.
@@ -81,11 +81,11 @@ export default function StateMetricsDock({g,initialSelectedMetricId='',initialCo
   if(!selected||!game?.id){setRuleRows(null);setRuleError('');return}
   let valid=true;setRuleRows(null);setRuleError('');
   void (async()=>{
-   const r=await supabase.from('impact_rules').select('*')
+   const r=await supabase.from('impact_rules').select('id,label,conditions,effects,enabled,auto_apply')
     .eq('game_id',game.id).order('priority').limit(60);
    if(!valid)return;
    if(r.error)setRuleError('Не удалось получить действующие правила расчёта.');
-   else setRuleRows((r.data||[]) as ImpactRule[]);
+   else setRuleRows((r.data||[]) as Pick<ImpactRule,'id'|'label'|'conditions'|'effects'|'enabled'|'auto_apply'>[]);
   })();
   return()=>{valid=false};
  },[game?.id,!!selected]);
@@ -119,8 +119,16 @@ export default function StateMetricsDock({g,initialSelectedMetricId='',initialCo
   return()=>{observer?.disconnect();window.removeEventListener('resize',update)};
  },[chosen?.id]);
 
- function rowsFor(metricKey:string){return mergedHistory.filter(h=>h.metric_key===metricKey)}
- const hist=chosen?rowsFor(chosen.metric_key).sort((a,b)=>Date.parse(a.recorded_at)-Date.parse(b.recorded_at)):[];
+ const historyByMetric=useMemo(()=>{
+  const grouped=new Map<string,MetricHistory[]>();
+  for(const entry of mergedHistory){
+   const rows=grouped.get(entry.metric_key);
+   if(rows)rows.push(entry);else grouped.set(entry.metric_key,[entry]);
+  }
+  return grouped;
+ },[mergedHistory]);
+ function rowsFor(metricKey:string){return historyByMetric.get(metricKey)||[]}
+ const hist=chosen?[...rowsFor(chosen.metric_key)].sort((a,b)=>Date.parse(a.recorded_at)-Date.parse(b.recorded_at)):[];
  // A closed dashboard never needs the full political feed just to display
  // six small metric cards. When history is opened, resolve only the exact
  // linked publication titles that can appear in that dialog (RLS scoped).
