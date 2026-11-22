@@ -5,6 +5,7 @@ import {Download,Search} from 'lucide-react';
 import {supabase} from '@/lib/supabase';
 import StyledSelect from '../ui/StyledSelect';
 import type {ReturnTypeRepublic} from './viewTypes';
+import {currentStageRoleTitle} from './stageRoles';
 import {useGameTableSync} from './useGameTableSync';
 import {formatGradeScore} from '@/lib/gradeScore';
 type Assessment={user_id:string;stage_no:number;auto_score:number;final_score:number|null;status:'draft'|'final'};
@@ -62,7 +63,7 @@ export default function ParticipantsAnalytics({g}:{g:ReturnTypeRepublic}){
   });
  },[members,assessments,stage,politicalPosts,formalDocuments,ballots,activities,activityTotals]);
  const filtered=rows.filter(r=>(!team||(r.m.team||r.m.group_name||'')===team)&&(!onlyAssessed||r.assessed>0)&&
-  (!search||[r.m.full_name,r.m.team||'',r.m.group_name||'',r.m.role_title||''].some(s=>s.toLocaleLowerCase('ru').includes(search.toLocaleLowerCase('ru'))))).sort((a,b)=>{
+  (!search||[r.m.full_name,r.m.team||'',r.m.group_name||'',r.m.role_title||'',currentStageRoleTitle(g,r.m.user_id)].some(s=>s.toLocaleLowerCase('ru').includes(search.toLocaleLowerCase('ru'))))).sort((a,b)=>{
    const part=(n:string,index:number)=>n.trim().split(/\s+/)[index]||'';
    let n=sort==='surname'?part(a.m.full_name,0).localeCompare(part(b.m.full_name,0),'ru'):
     sort==='name'?part(a.m.full_name,1).localeCompare(part(b.m.full_name,1),'ru'):
@@ -106,7 +107,7 @@ export default function ParticipantsAnalytics({g}:{g:ReturnTypeRepublic}){
   {error&&<p role="alert">{error}</p>}
   <div className="participantsTableScroll" role="region" aria-label="Таблица аналитики участников" tabIndex={0}>
    <table className="participantsTable"><thead><tr><th>Участник</th><th>Сумма</th><th>Среднее</th><th>Этапы</th><th>Итоговых</th><th>Посты</th><th>НПА</th><th>Голоса</th><th>Активность</th></tr></thead>
-    <tbody>{filtered.map(r=><tr key={r.m.user_id}><th scope="row"><strong>{r.m.full_name}</strong><small>{r.m.team||r.m.group_name||'Без группы'} · {r.m.role_title||'Роль не назначена'}</small></th>
+    <tbody>{filtered.map(r=><tr key={r.m.user_id}><th scope="row"><strong>{r.m.full_name}</strong><small>{r.m.team||r.m.group_name||'Без группы'} · {currentStageRoleTitle(g,r.m.user_id)||'Роль не назначена'}</small></th>
      <td><b>{r.assessed?formatGradeScore(r.sum):'—'}</b></td><td>{formatGradeScore(r.average)}</td><td>{r.assessed}/16</td><td>{r.approved}</td><td>{r.posts}</td><td>{r.documents}</td><td>{r.votes}</td><td>{r.activity}</td></tr>)}</tbody>
    </table>
    {!filtered.length&&<div className="journalEmpty">Нет участников по выбранным условиям.</div>}

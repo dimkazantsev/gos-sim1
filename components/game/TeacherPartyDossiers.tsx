@@ -8,6 +8,7 @@ import TeacherPartyStatistics from './TeacherPartyStatistics';
 import {FileText,Trash2,UsersRound,Landmark,ShieldAlert,X,ExternalLink,MessageCircle} from 'lucide-react';
 import {useDialog} from '../ui/useDialog';
 import type {ReturnTypeRepublic} from './viewTypes';
+import {activeGameRoleTitles,currentGameStageNumber,relevantStageRoleTitle} from './stageRoles';
 const docLabels:Record<string,string>={application:'Заявление о регистрации',charter:'Устав',program:'Программа',fee:'Госпошлина',symbol:'Символика',congress_minutes:'Протокол учредительного съезда',other:'Дополнительный документ'};
 function uploadTime(value:string){const date=new Date(value);return Number.isNaN(date.getTime())?'Время не указано':date.toLocaleString('ru-RU',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'});}
 export default function TeacherPartyDossiers({g,onOpenChat}:{g:ReturnTypeRepublic;onOpenChat?:(channelId:string)=>void}){
@@ -50,6 +51,7 @@ export default function TeacherPartyDossiers({g,onOpenChat}:{g:ReturnTypeRepubli
  const [notice,setNotice]=useState('');
  const [error,setError]=useState('');
  const target=parties.find(p=>p.id===selected);
+ const activeStageNo=currentGameStageNumber(g);
  const close=()=>{if(!busy){setSelected(null);setConfirm('');setError('')}};
  const dialogRef=useDialog(selected!==null,close);
  async function remove(){
@@ -79,7 +81,7 @@ export default function TeacherPartyDossiers({g,onOpenChat}:{g:ReturnTypeRepubli
     <TeacherPartyStatistics g={g} party={p} invitations={invites.length}/>
     <div className="teacherPartySection"><h4><Landmark size={15} aria-hidden="true"/> Руководство и состав</h4>
      <p><b>Председатель:</b> {leader?.full_name||'Не назначен'}</p>
-     {staff.length?<ul>{staff.map(m=><li key={m.user_id}><span>{m.full_name}<small>{m.user_id===p.leader_user_id?'Председатель партии «'+p.name+'»':m.role_title||'Участник'}</small></span></li>)}</ul>:<p className="teacherPartyMuted"><UsersRound size={15} aria-hidden="true"/> Участники пока не вступили в партию</p>}
+     {staff.length?<ul>{staff.map(m=>{const titles=activeGameRoleTitles(g,m.user_id);const current=relevantStageRoleTitle(titles,activeStageNo);const shown=activeStageNo===1&&m.user_id===p.leader_user_id?'Председатель партии «'+p.name+'»':current||'Участник';return <li key={m.user_id}><span>{m.full_name}<small title={titles.join(' · ')||shown}>{shown}</small></span></li>})}</ul>:<p className="teacherPartyMuted"><UsersRound size={15} aria-hidden="true"/> Участники пока не вступили в партию</p>}
      <PartyChairFallback g={g} party={p}/>
     </div>
     <div className="teacherPartySection"><h4><FileText size={15} aria-hidden="true"/> Документы ({docs.length})</h4><p className="partyDossierDocHint">Принимайте документы по одному. При возврате укажите замечания; официальный ответ по регистрационному пакету оформляется ниже.</p>

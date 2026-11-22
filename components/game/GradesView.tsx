@@ -5,6 +5,7 @@ import {useEffect,useMemo,useRef,useState} from 'react';
 import {useDialog} from '../ui/useDialog';
 import {supabase} from '@/lib/supabase';
 import type {ReturnTypeRepublic} from './viewTypes';
+import {currentStageRoleTitle} from './stageRoles';
 import StyledSelect from '../ui/StyledSelect';
 import ScoreFormula from './ScoreFormula';
 import BlitzKnowledgeScore from './BlitzKnowledgeScore';
@@ -403,7 +404,7 @@ export default function GradesView({g,compact=false,previewUserId,onOpenProfile,
     onScroll={event=>{const scrollLeft=event.currentTarget.scrollLeft;setGradesScrolled(previous=>scrollLeft>24?true:scrollLeft<8?false:previous);}}>
     <div className="gradesMatrixHead" role="row"><b>Студент</b><span className="gradeTotalHead">Σ</span><span className="gradeTotalHead">Ср.</span>{STAGES.map(n=><span key={n} title={stages.find(s=>s.stage_no===n)?.title||''}>{n}</span>)}</div>
     {sortedStudents.length===0?<div className="emptyState">Нет студентов по выбранным фильтрам.</div>:sortedStudents.map(s=><div className="gradesMatrixRow" role="row" key={s.user_id}>
-     <div className="gradesStudentCell">{onOpenProfile?<button type="button" className="gradesProfileLink" onClick={()=>onOpenProfile(s.user_id)} aria-label={s.full_name} title={s.full_name}><span className="gradesNameFull">{s.full_name}</span><span className="gradesNameShort" aria-hidden="true">{s.full_name.trim().split(/\s+/)[0]||s.full_name}</span></button>:<b className="gradesStudentName" title={s.full_name}><span className="gradesNameFull">{s.full_name}</span><span className="gradesNameShort" aria-hidden="true">{s.full_name.trim().split(/\s+/)[0]||s.full_name}</span></b>}<small>{s.team||'Без партии'} · {s.role_title||'Роль не назначена'}</small></div>
+     <div className="gradesStudentCell">{onOpenProfile?<button type="button" className="gradesProfileLink" onClick={()=>onOpenProfile(s.user_id)} aria-label={s.full_name} title={s.full_name}><span className="gradesNameFull">{s.full_name}</span><span className="gradesNameShort" aria-hidden="true">{s.full_name.trim().split(/\s+/)[0]||s.full_name}</span></button>:<b className="gradesStudentName" title={s.full_name}><span className="gradesNameFull">{s.full_name}</span><span className="gradesNameShort" aria-hidden="true">{s.full_name.trim().split(/\s+/)[0]||s.full_name}</span></b>}<small>{s.team||'Без партии'} · {currentStageRoleTitle(g,s.user_id)||'Роль не назначена'}</small></div>
      <span className="gradeTotal">{gradeByStudent.get(s.user_id)?.graded?formatGradeScore(gradeByStudent.get(s.user_id)?.sum):'—'}</span>
      <span className="gradeTotal">{formatGradeScore(gradeByStudent.get(s.user_id)?.average)}</span>
      {STAGES.map(n=>{const a=assessmentLookup.get(s.user_id+':'+n),v=shownScore(a);return <button key={n} className={a?.status||'empty'} onClick={()=>void open(s.user_id,n)} aria-label={s.full_name+', этап '+n+', '+(v===null?'нет оценки':formatGradeScore(v))}><b>{formatGradeScore(v)}</b><small>{a?.status==='final'?'итог':a?'авто':''}</small></button>})}

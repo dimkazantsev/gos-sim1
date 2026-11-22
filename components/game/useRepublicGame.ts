@@ -1689,7 +1689,7 @@ export function useRepublicGame(gameId:string){
    if(['stages','event','tools'].includes(workspace))cold('events');
    if(workspace==='stages')cold('evaluations');
    if(workspace==='stages')cold('documents');
-   if(['stages','event','tools','parties','impact'].includes(workspace))offices();
+   if(['stages','event','tools','parties','impact','participants','analytics','grades'].includes(workspace))offices();
    if(['journal','analytics','tools'].includes(workspace))jobs.push(loadClassroomTelemetry());
    if(workspace==='impact')jobs.push(loadImpactEngine());
    if(['parties','tools'].includes(workspace))jobs.push(loadPartyRepresentation(false));
