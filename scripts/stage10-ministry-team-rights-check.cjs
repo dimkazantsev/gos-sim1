@@ -11,7 +11,7 @@ assert(lab.includes('teacher?Promise.resolve({data:[] as MinistryUnit[],error:nu
 assert(lab.includes("supabase.from('institution_assignments')")&&lab.includes("supabase.from('institution_units')"),'Participant ministry eligibility reads remain available');
 assert(lab.includes("appointedColleague"));
 assert(lab.includes("selected.responsible_minister_id"));
-assert(editor.includes("expected_updated_at:program.updated_at"));
+assert(editor.includes('expected_updated_at:sourceRevision.current'),'Dirty program form must preserve its loaded version for conflict detection');
 assert(migration.includes("p_payload ? ''expected_updated_at''"));
 assert(migration.includes("FOR UPDATE"));
 const id=n=>'10000000-0000-0000-0000-'+String(n).padStart(12,'0');
