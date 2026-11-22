@@ -46,14 +46,14 @@ async function main(){
   await db.exec("update public.state_metrics set value=value where metric_key='budget'");
   assert.deepEqual(await counts(),{budget:1,clamp:4},'Identical budget values skip bridge work');
   await db.exec("update public.state_metrics set value=500 where metric_key='lawfulness'");
-  assert.equal((await db.query("select value from public.state_metrics where metric_key='lawfulness'")).rows[0].value,100,
+  assert.equal(Number((await db.query("select value from public.state_metrics where metric_key='lawfulness'")).rows[0].value),100,
    'Percentage bounds still enforce 0–100');
   assert.deepEqual(await counts(),{budget:1,clamp:5},'Percentage update still clamps');
   await db.exec("update public.state_metrics set unit='%' where metric_key='budget'");
   assert.deepEqual(await counts(),{budget:1,clamp:6},'Switching a unit to percentage still clamps');
   await db.exec("update public.state_metrics set value=106 where metric_key='budget'");
   assert.deepEqual(await counts(),{budget:2,clamp:7},'Budget updates still invoke bridge and new percentage bounds');
-  assert.equal((await db.query("select value from public.state_metrics where metric_key='budget'")).rows[0].value,100);
+  assert.equal(Number((await db.query("select value from public.state_metrics where metric_key='budget'")).rows[0].value),100);
   // Compare the new indexed grouping to the former per-metric filter, without touching data.
   const source=[
    {id:3,metric_key:'lawfulness',recorded_at:'2026-01-03'},
