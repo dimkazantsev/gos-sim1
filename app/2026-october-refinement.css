@@ -1113,3 +1113,24 @@
 .govSessionLab .govPmReviewActions{display:flex;justify-content:flex-end;flex-wrap:wrap;gap:10px}
 .govSessionLab .govPmReviewActions button{min-height:46px;white-space:normal}
 @media(max-width:600px){.govSessionLab .govPmReviewItem{padding:12px}.govSessionLab .govPmReviewItem>header{flex-direction:column}.govSessionLab .govPmReviewActions{display:grid;grid-template-columns:minmax(0,1fr)}.govSessionLab .govPmReviewActions button{width:100%}}
+
+
+/* Bank of Russia: rate decision extends existing economic cards and design tokens. */
+.fiscalMacroStats .fiscalMacroBankRateValue{display:grid;justify-items:start;align-content:start;gap:2px;width:100%;min-width:0;padding:0;background:transparent;color:var(--gs-ink,#172447);border:0;border-radius:8px;text-align:left;cursor:pointer}
+.fiscalMacroStats .fiscalMacroBankRateValue b{color:inherit}
+.fiscalMacroStats .fiscalMacroBankRateValue small{font-size:12px;font-weight:700;color:var(--gs-accent,#2453e6)}
+.fiscalMacroStats .fiscalMacroBankRateValue:hover b{text-decoration:underline;text-underline-offset:3px}
+.fiscalMacroStats .fiscalMacroBankRateValue:focus-visible{outline:3px solid var(--gs-accent,#2453e6);outline-offset:5px}
+.fiscalMacroBankDecision{margin-top:14px;padding:18px;border:1px solid var(--gs-border,#dce3f0);border-radius:var(--gs-radius-sm,12px);background:var(--gs-surface-soft,#f4f6fc);display:grid;gap:15px}
+.fiscalMacroBankDecisionHeading{display:flex;align-items:flex-start;gap:12px;color:var(--gs-accent,#2453e6)}
+.fiscalMacroBankDecisionHeading>div{flex:1;min-width:0}
+.fiscalMacroBankDecisionHeading strong{color:var(--gs-ink,#172447);font-size:16px}
+.fiscalMacroBankDecisionHeading p{font-size:13px;margin:5px 0 0;line-height:1.6}
+.fiscalMacroBankRateLabel,.fiscalMacroBankReason{display:grid;gap:8px;font-size:13px;font-weight:700;color:var(--gs-ink-2,#344467)}
+.fiscalMacroBankRateControl{display:grid;grid-template-columns:48px minmax(0,160px) 48px;gap:8px;align-items:center}
+.fiscalMacroBankRateControl>button{display:grid;place-items:center;min-height:46px;padding:0}
+.fiscalMacroBankRateControl>input{box-sizing:border-box;width:100%;min-width:0;min-height:46px;border:1px solid var(--gs-border-strong,#b8c5dc);border-radius:var(--gs-radius-xs,8px);background:var(--gs-surface,#fff);color:var(--gs-ink,#172447);text-align:center;font-size:18px;font-weight:750}
+.fiscalMacroBankReason textarea{box-sizing:border-box;resize:vertical;min-height:88px;width:100%;border:1px solid var(--gs-border-strong,#b8c5dc);border-radius:var(--gs-radius-xs,8px);padding:12px;background:var(--gs-surface,#fff);color:var(--gs-ink,#172447);font:inherit;font-size:14px;font-weight:400}
+.fiscalMacroBankActions{display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap}
+.fiscalMacroBankActions button{min-height:44px;display:inline-flex;align-items:center;justify-content:center;gap:8px}
+@media(max-width:550px){.fiscalMacroBankDecision{padding:12px}.fiscalMacroBankActions{display:grid;grid-template-columns:minmax(0,1fr)}.fiscalMacroBankActions button{width:100%}.fiscalMacroBankRateControl{grid-template-columns:48px minmax(0,1fr) 48px}}

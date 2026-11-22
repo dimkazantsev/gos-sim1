@@ -38,7 +38,8 @@ export const FORMAL_TYPES:FormalDocType[]=[
 // Keep persistent doc_type codes unchanged; only their public captions are localized.
 const FORMAL_SYSTEM_TYPE_LABELS:Record<string,string>={
  party_certificate:'Свидетельство о государственной регистрации политической партии',
- justice_response:'Официальный ответ Министерства юстиции Российской Федерации'
+ justice_response:'Официальный ответ Министерства юстиции Российской Федерации',
+ bank_rate_decision:'Решение Совета директоров Банка России'
 };
 
 export function formalDocumentTypeLabel(key:string){
@@ -50,6 +51,7 @@ export function formalDocumentTypeLabel(key:string){
 export function formalSubjectDisplayLabel(key:string,label?:string|null){
  const raw=String(label||'').trim();
  if(key==='ksrf')return 'КСРФ';
+ if(key==='central_bank')return 'Банк России';
  if(raw&&raw.toLowerCase()!==key.toLowerCase())return raw;
  return FORMAL_SUBJECTS.find(subject=>subject.key===key)?.label||(/[А-Яа-яЁё]/.test(raw)?raw:'Государственный орган');
 }
@@ -134,6 +136,6 @@ export function ownerLabel(key:string){
   gd_council:'Совет Государственной Думы',gd:'Государственная Дума',sf:'Совет Федерации',
   president:'Президент РФ',government:'Правительство РФ',ministry:'Министерство',municipality:'Муниципальный орган',conciliation:'Согласительная комиссия',
   ksrf:'Член КСРФ',ks:'Представитель Конституционного Суда РФ',vs:'Представитель Верховного Суда РФ',region:'Уполномоченное лицо субъекта РФ',
-  teacher:'Преподаватель (только контроль)',system:'Завершено'
+  central_bank:'Председатель Банка России',teacher:'Преподаватель (только контроль)',system:'Завершено'
  }[key]||'Ответственный орган';
 }

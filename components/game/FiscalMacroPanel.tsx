@@ -1,6 +1,6 @@
 'use client';
 import {useEffect,useRef,useState} from 'react';
-import {Gauge,Save,ChevronDown,BookOpenText,SlidersHorizontal} from 'lucide-react';
+import {Gauge,Save,ChevronDown,BookOpenText,SlidersHorizontal,Minus,Plus,FileText} from 'lucide-react';
 import {supabase} from '@/lib/supabase';
 import {userError} from '@/lib/userError';
 import {quantity,moneyMillions} from '@/lib/formatQuantity';
@@ -11,12 +11,54 @@ const fnbDefaults={fnb_total:10000000,fnb_liquid:4490900,fnb_fx_share:25};
 const shownFnb=(v:number)=>new Intl.NumberFormat('ru-RU',{maximumFractionDigits:2}).format(v/1000000)+' трлн ₽';
 const points=(value:number)=>new Intl.NumberFormat('ru-RU',{maximumFractionDigits:5}).format(value)+' п. п.';
 const monetaryDate=(value:string)=>new Date(value+'T12:00:00+07:00').toLocaleDateString('ru-RU',{day:'numeric',month:'long',year:'numeric',timeZone:'Asia/Barnaul'});
-export default function FiscalMacroPanel({g,context,readOnly,onSaved}:{g:ReturnTypeRepublic;context:FiscalContext|null;readOnly:boolean;onSaved:(values:Partial<FiscalPolicy>)=>void}){
+export default function FiscalMacroPanel({g,context,readOnly,onSaved,onOpenDocument}:{g:ReturnTypeRepublic;context:FiscalContext|null;readOnly:boolean;onSaved:(values:Partial<FiscalPolicy>)=>void;onOpenDocument:(id:string)=>void}){
  const [draft,setDraft]=useState<Record<string,string>>({}),[reason,setReason]=useState(''),[busy,setBusy]=useState(false),[error,setError]=useState(''),[notice,setNotice]=useState('');
- const saving=useRef(false);
+ const saving=useRef(false),bankSaving=useRef(false),bankRequest=useRef('');
+ const [bankOpen,setBankOpen]=useState(false),[bankDraft,setBankDraft]=useState(''),[bankReason,setBankReason]=useState(''),[bankBusy,setBankBusy]=useState(false),[bankError,setBankError]=useState('');
  useEffect(()=>{if(context)setDraft(Object.fromEntries(fields.map(([key])=>[key,key==='activity_override'?(context.policy.activity_override==null?'':String(context.policy.activity_override)):String(context.policy[key]??fnbDefaults[key as keyof typeof fnbDefaults]??'')])));},[context?.policy.updated_at]);
  if(!context)return <p role="status">Загружаются общие параметры бюджетного сценария…</p>;
- const p=context.policy,environment=fiscalEnvironment(context),canEdit=!readOnly&&(g.teacher||context.can_change_rate);
+ const p=context.policy,environment=fiscalEnvironment(context),canEdit=!readOnly&&g.teacher,
+  canBankAct=!readOnly&&context.can_issue_bank_rate_decision===true;
+ function toggleBankRate(){
+  if(!canBankAct||bankBusy)return;
+  if(bankOpen){setBankOpen(false);return;}
+  bankRequest.current=crypto.randomUUID();
+  setBankDraft(String(p.key_rate));setBankReason('');setBankError('');setBankOpen(true);
+ }
+ function changeBankRate(delta:number){
+  setBankError('');
+  setBankDraft(value=>String(Math.max(0,Math.min(100,Math.round((Number(value||p.key_rate)+delta)*100)/100))));
+ }
+ async function submitBankRate(){
+  if(!g.game||!canBankAct||bankSaving.current)return;
+  const next=Number(bankDraft),reasonText=bankReason.trim();
+  if(!bankDraft.trim()||!Number.isFinite(next)||next<0||next>100||Math.round(next*100)!==next*100){
+   setBankError('Укажите ключевую ставку от 0 до 100% с точностью до сотых.');return;
+  }
+  if(next===p.key_rate){setBankError('Выберите ставку, отличающуюся от действующей.');return;}
+  if(reasonText.length<8||reasonText.length>1500){setBankError('Основание решения должно содержать от 8 до 1500 символов.');return;}
+  const requestId=bankRequest.current||crypto.randomUUID();bankRequest.current=requestId;
+  const abort=new AbortController(),timer=window.setTimeout(()=>abort.abort(),18000);
+  bankSaving.current=true;setBankBusy(true);setBankError('');
+  try{
+   const result=await supabase.rpc('adopt_bank_rate_decision',{
+    p_game_id:g.game.id,p_new_rate:next,p_expected_rate:p.key_rate,
+    p_reason:reasonText,p_request_id:requestId
+   }).abortSignal(abort.signal);
+   if(abort.signal.aborted){setBankError('Подтверждение не получено. Перед повторным решением обновите данные и проверьте реестр НПА.');return;}
+   if(result.error){setBankError(userError(result.error));return;}
+   const documentId=String((result.data as {document_id?:string}|null)?.document_id||'');
+   onSaved({key_rate:next});
+   setBankOpen(false);bankRequest.current='';
+   setNotice(documentId?'Решение Банка России принято. Подписание доступно в реестре НПА.':'Ключевая ставка обновлена. Проверьте реестр НПА.');
+   if(documentId){
+    try{await g.refreshDocuments(documentId);}catch{/* Document remains persisted; opening it is still allowed. */}
+    onOpenDocument(documentId);
+   }
+  }catch(e){
+   setBankError(abort.signal.aborted?'Результат сохранения неизвестен. Обновите данные и проверьте реестр НПА.':userError(e));
+  }finally{window.clearTimeout(timer);bankSaving.current=false;setBankBusy(false);}
+ }
  async function save(){
   if(!g.game||!context||saving.current)return;
   const changedFields=fields.filter(([key])=>
@@ -81,7 +123,22 @@ export default function FiscalMacroPanel({g,context,readOnly,onSaved}:{g:ReturnT
  }
  return <section className="surface fiscalMacroPanel" aria-label="Экономические условия"><header className="fiscalMacroHeading"><span className="fiscalMacroHeadingIcon" aria-hidden="true"><Gauge size={23}/></span><div className="fiscalMacroHeadingText"><h2>Экономические условия</h2><p>Ключевые показатели игрового бюджета: ставки, цены и деловая активность. Изменения учитываются при расчёте доходов, расходов и долговой нагрузки.</p></div></header>
  <div className="fiscalMacroStats">{[['Ключевая ставка',quantity(p.key_rate,'% годовых')],['Расчётный курс',quantity(environment.fx,'₽ за 1 доллар')],['Нефть',quantity(p.oil_price,'долларов за баррель')],['Цена отсечения',quantity(p.cutoff_price,'долларов за баррель')],['Инфляция',new Intl.NumberFormat('ru-RU',{maximumFractionDigits:6}).format(p.inflation)+' % в год'],['Деловая активность',quantity(environment.activity*100,'% от исходного уровня')],
-['ФНБ',shownFnb(p.fnb_total??10000000)],['Доступно из ФНБ',shownFnb(p.fnb_liquid??4490900)]].map(([label,value])=><article key={label}><span>{label}</span><b>{value}</b></article>)}</div>
+['ФНБ',shownFnb(p.fnb_total??10000000)],['Доступно из ФНБ',shownFnb(p.fnb_liquid??4490900)]].map(([label,value])=><article key={label}><span>{label}</span>{label==='Ключевая ставка'&&canBankAct?<button type="button" className="fiscalMacroBankRateValue" aria-expanded={bankOpen} aria-controls="fiscal-bank-rate-controls" aria-label={'Изменить ключевую ставку. Текущая ставка: '+value} onClick={toggleBankRate}><b>{value}</b><small>Изменить ставку</small></button>:<b>{value}</b>}</article>)}</div>
+ {bankOpen&&canBankAct&&<div id="fiscal-bank-rate-controls" className="fiscalMacroBankDecision" role="group" aria-label="Решение Председателя Банка России об изменении ключевой ставки">
+  <div className="fiscalMacroBankDecisionHeading"><FileText size={21} aria-hidden="true"/><div><strong>Решение Банка России</strong><p>Новая ставка применяется сразу. Решение регистрируется в реестре НПА как принятое; затем Председатель Банка России подписывает его в карточке документа.</p></div></div>
+  <label className="fiscalMacroBankRateLabel">Новая ключевая ставка, % годовых
+   <span className="fiscalMacroBankRateControl">
+    <button type="button" className="secondary" aria-label="Понизить ставку на 0,5 процентного пункта" disabled={bankBusy||Number(bankDraft)<=0} onClick={()=>changeBankRate(-0.5)}><Minus size={17}/></button>
+    <input type="number" aria-label="Новая ключевая ставка" min={0} max={100} step="0.25" value={bankDraft} disabled={bankBusy} onChange={e=>{setBankDraft(e.target.value);setBankError('');}}/>
+    <button type="button" className="secondary" aria-label="Повысить ставку на 0,5 процентного пункта" disabled={bankBusy||Number(bankDraft)>=100} onClick={()=>changeBankRate(0.5)}><Plus size={17}/></button>
+   </span>
+  </label>
+  <label className="fiscalMacroBankReason">Основание решения
+   <textarea rows={3} maxLength={1500} value={bankReason} disabled={bankBusy} onChange={e=>setBankReason(e.target.value)} placeholder="Причины изменения ключевой ставки, ситуация с инфляцией и кредитованием"/>
+  </label>
+  <div className="fiscalMacroBankActions"><button type="button" className="secondary" disabled={bankBusy} onClick={()=>setBankOpen(false)}>Отмена</button><button type="button" className="primary" disabled={bankBusy} onClick={()=>void submitBankRate()}><FileText size={17} aria-hidden="true"/>{bankBusy?'Принимается…':'Принять решение и открыть НПА'}</button></div>
+  {bankError&&<p className="error" role="alert">{bankError}</p>}
+ </div>
  <details className="fiscalMacroDetails"><summary><span className="fiscalMacroSummaryTitle"><BookOpenText size={19} aria-hidden="true"/> Пояснения к показателям</span><ChevronDown className="fiscalMacroChevron" size={19} aria-hidden="true"/></summary><p>Ручное значение деловой активности становится новой исходной точкой: в момент сохранения отображается заданный процент, а дальнейшие изменения ставки, курса, экономического индекса и доверия продолжают изменять его относительно этой точки. При автоматическом расчёте чем дороже кредит, тем слабее активность бизнеса и выше обслуживание долга. Доверие и экономический индекс влияют на активность и курс; инфляция — на стоимость обязательств. Для добывающих регионов учитываются нефть и курс.</p><p data-inflation-explanation><strong>Инфляция и расходы.</strong> Когда подтверждённое решение увеличивает фактические государственные расходы, расчётная инфляция растёт; сокращение расходов снижает её. На каждые дополнительные 1% расходов относительно базового федерального бюджета 2026 года приходится 0,2 процентного пункта инфляции, но не более ±0,5 пункта за решение. Учитываются исполненные финансовые последствия событий, расходные решения и опубликованные бюджетные обязательства, включая государственные программы. Простая регистрация проекта, отказ без изменения утверждённых расходов или изменение налоговой ставки сами по себе инфляцию не меняют. Преподаватель может вручную установить любое значение инфляции, после чего дальнейшие последствия рассчитываются от него.</p><p data-fnb-explanation><strong>ФНБ и нефтегазовые доходы.</strong> Общий объём фонда и доступная для финансирования часть учитываются раздельно. При принятии федерального бюджета нефтегазовые средства сверх цены отсечения направляются в ФНБ и одновременно включаются в потребность финансирования — повторное использование этих денег исключено. Если нефть дешевле цены отсечения, нефтегазовые поступления сокращаются, а доступные средства ФНБ можно направить на покрытие дефицита или погашение долгов по установленным процедурам. Ослабление рубля повышает рублёвую стоимость валютной части ФНБ, укрепление снижает её; это переоценка активов, а не дополнительный доход.</p>
  <p data-monetary-calendar-explanation><strong>Ключевая ставка и инфляция.</strong> Один реальный календарный день равен одному месяцу экономического времени. После подтверждённого изменения ставки её влияние на инфляцию распределяется на следующие 10 календарных дней: 70% за первые пять дней, 100% за десять. Повышение ставки на 1 п. п. сдерживает инфляцию суммарно на 1,5 п. п.; снижение действует в обратную сторону. Дневной суммарный эффект решений Банка России ограничен ±1 п. п. инфляции. Пропущенные дни учитываются при следующем обращении к игре без фонового опроса. День определяется по времени Алтайского края. Это коэффициенты игровой модели.</p>
  {p.monetary_last_effect_date&&<p data-monetary-actual-effect role="status"><strong>Последнее начисление:</strong> {monetaryDate(p.monetary_last_effect_date)} — {points(p.monetary_last_daily_effect??0)}. <strong>Накопленное воздействие ставки:</strong> {points(p.monetary_cumulative_effect??0)}. Ручная корректировка инфляции преподавателем сохраняется; предстоящие последствия продолжают действовать от нового значения.</p>}

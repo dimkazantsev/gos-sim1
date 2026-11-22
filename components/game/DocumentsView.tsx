@@ -219,7 +219,7 @@ export default function DocumentsView({g,focusId,createTemplate,createStageNo,on
   return()=>{active=false};
  },[selected?.id,selected?.updated_at,localRefresh]);
  useEffect(()=>{
-  if(!selected?.id||!['gd','ksrf'].includes(selected.subject_key)&&!['meeting_agenda','minutes'].includes(selected.doc_type)){setInstitutionSigners(null);return}
+  if(!selected?.id||!['gd','ksrf','central_bank'].includes(selected.subject_key)&&!['meeting_agenda','minutes'].includes(selected.doc_type)){setInstitutionSigners(null);return}
   let alive=true;
   void (async()=>{
    try{
@@ -288,7 +288,7 @@ export default function DocumentsView({g,focusId,createTemplate,createStageNo,on
  const signatureHolder=selected?(attributedUser||(personalSigner?author:(members.find(m=>subject?.roleHints.some(h=>(m.role_title||'').toLowerCase().includes(h)))||author))):undefined;
  const signature=selected?formalSignature(selected.subject_key,signatureHolder?.full_name||author?.full_name||'________________'):null;
 
- function canDeleteDocument(doc:FormalDocument){return !readOnly&&!!me&&(teacher||doc.author_id===me.user_id)}
+ function canDeleteDocument(doc:FormalDocument){return doc.doc_type!=='bank_rate_decision'&&!readOnly&&!!me&&(teacher||doc.author_id===me.user_id)}
  function canManage(doc:FormalDocument){
   if(doc.id===selected?.id&&documentAccess)return !readOnly&&documentAccess.can_manage;
   if(readOnly||!me)return false;if(doc.current_owner_key==='author')return doc.author_id===me.user_id;if(teacher)return false;

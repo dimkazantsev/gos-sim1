@@ -2,7 +2,7 @@ import catalog from '@/data/taxes-2026.json';
 export type FiscalRegion={game_id:string;region_code:string;name:string;profile:string;disputed:boolean;budget_year:number;enterprises:number;employees_per_firm:number;monthly_wage:number;profit_per_firm:number;consumption_per_firm:number;expenditure:number;transfer_in:number;budget_credit_cash?:number;debt:number;compliance:number;activity_multiplier:number;cost_multiplier:number;observations:Record<string,number|null>;source_url:string;source_year:number};
 export type FiscalRate={region_code:string;tax_key:string;rate:number};
 export type FiscalPolicy={budget_aux_anchor?:Record<string,number>;fnb_total?:number;fnb_liquid?:number;fnb_fx_share?:number;monetary_last_settled_on?:string;monetary_last_effect_date?:string|null;monetary_last_daily_effect?:number;monetary_cumulative_effect?:number;monetary_last_day_details?:Array<{date:string;change:number}>;tax_activity_reference?:number;key_rate:number;fx_rate:number;oil_price:number;cutoff_price:number;inflation:number;federal_expenditure:number;municipal_expenditure:number;baseline_economy:number;baseline_trust:number;activity_override?:number|null;activity_reference?:number|null;collection_lawfulness_reference?:number|null;updated_at:string};
-export type FiscalContext={policy:FiscalPolicy;metrics:Record<string,number>;can_change_rate:boolean};
+export type FiscalContext={policy:FiscalPolicy;metrics:Record<string,number>;can_change_rate:boolean;can_issue_bank_rate_decision?:boolean};
 /** Model B additional channels: the existing 0.002 activity and 0.0005
  * collection sensitivities, distributed over seven supplementary indicators.
  * Zero effect at the per-game anchor; no historical budget revaluation.
