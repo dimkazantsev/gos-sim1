@@ -10,7 +10,7 @@ const near=(actual,expected,label,tolerance=.000001)=>assert(Math.abs(actual-exp
 const sum=(rows,key='amount')=>rows.reduce((n,row)=>n+Number(row[key]||0),0);
 const kopecks=value=>{const fixed=Math.abs(value).toFixed(8),[whole,fraction]=fixed.split('.');return (BigInt(whole)*100000000n+BigInt(fraction))*(value<0?-1n:1n);};
 const regions=[{game_id:'qa-game',region_code:'54',name:'Учебный регион',profile:'industrial',disputed:false,budget_year:2026,enterprises:1000,activity_multiplier:1,employees_per_firm:10,monthly_wage:50000,profit_per_firm:3,consumption_per_firm:4,expenditure:20000,transfer_in:3000,debt:4000,compliance:1,cost_multiplier:1,observations:{},source_url:'',source_year:2025}];
-const context={policy:{key_rate:16,fx_rate:80,oil_price:75,cutoff_price:60,inflation:6,federal_expenditure:0,municipal_expenditure:0,baseline_economy:50,baseline_trust:50,updated_at:''},metrics:{economy:50,public_trust:50},can_change_rate:true};
+const context={policy:{key_rate:16,fx_rate:80,oil_price:75,cutoff_price:75,inflation:6,federal_expenditure:0,municipal_expenditure:0,baseline_economy:50,baseline_trust:50,updated_at:''},metrics:{economy:50,public_trust:50},can_change_rate:true};
 const state=defaultSimulatorState(context,regions),draft=newBudgetDraft();
 const run=(d=draft,s=state,c=context,r=regions,rates=[],requests=[])=>calculate(d,s,c,r,rates,requests);
 const first=run(),article=(calculation,key)=>calculation.income_details.find(l=>l.key===key),section=(calculation,key)=>calculation.expense_lines.find(l=>l.key===key);

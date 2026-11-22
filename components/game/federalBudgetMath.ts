@@ -124,7 +124,7 @@ export function calculateFederalBudget(draft:BudgetDraft,state:SimulatorState,co
  const internalAvailable=Math.max(0,budgetMoneySum(internalLimit,-internalUsed));
  const internalOver=budgetMoney(Math.max(0,internalNew-internalAvailable));
  const interestOver=budgetMoney(Math.max(0,annual_interest-revenue*.10));
- const oilCurrent=p?.oil_price??a.oil_price,cutoff=p?.cutoff_price??40;
+ const oilCurrent=p?.oil_price??a.oil_price,cutoff=p?.cutoff_price??oilCurrent;
  const oilGasIncome=income_lines.find(x=>x.key==='oil_gas')?.amount??0;
  const oilSaving=budgetMoney(oilGasIncome*Math.max(0,oilCurrent-cutoff)/Math.max(.01,oilCurrent));
  const oilChange=budgetMoneySum(oilSaving,-(state.fnb_last_oil_allocation??0));
