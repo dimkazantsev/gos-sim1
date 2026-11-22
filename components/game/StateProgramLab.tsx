@@ -82,7 +82,7 @@ export default function StateProgramLab({g}:{g:ReturnTypeRepublic}){
  const selected=creating?undefined:programs.find(p=>p.id===selectedId),publishedAddress=addresses.find(x=>x.status==='published'),activeAddress=addresses.find(x=>x.status==='draft')||publishedAddress;
  const publishedPriorities=publishedAddress?priorities.filter(x=>x.address_id===publishedAddress.id):[],check=selected?readiness[selected.id]:undefined;
  const appointedColleague=!!selected?.responsible_minister_id&&!me.roster_archived_at&&ministryAssignments.some(a=>a.user_id===me.user_id&&ministryUnits.some(u=>u.id===a.unit_id&&u.head_user_id===selected.responsible_minister_id));
- const editable=selected?(teacher||selected.created_by===me.user_id||selected.responsible_minister_id===me.user_id||appointedColleague)&&['draft','revision'].includes(selected.status)&&!selected.signed_at:teacher||isMinister||isPM;
+ const editable=selected?(teacher||selected.created_by===me.user_id||selected.responsible_minister_id===me.user_id||appointedColleague)&&['draft','revision','minister_review'].includes(selected.status)&&!selected.signed_at:teacher||isMinister||isPM;
  const vote=votes.find(v=>v.id===selected?.government_vote_id);
  async function run(name:string,args:Record<string,unknown>){
   if(!active()||busyRef.current)return false;busyRef.current=true;setBusy(true);

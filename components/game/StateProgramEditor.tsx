@@ -20,13 +20,15 @@ const blankPassport:Passport={title:'',responsible_ministry:'',responsible_minis
 export default function StateProgramEditor({g,program,goals,components,expenses,priorities,editable,onSaved}:{g:ReturnTypeRepublic;program:StateProgram|null;goals:ProgramGoal[];components:ProgramComponent[];expenses:ProgramExpense[];priorities:ProgramPriority[];editable:boolean;onSaved:(id:string)=>Promise<void>}){
  const formId=useId();
  const [passport,setPassport]=useState<Passport>(blankPassport),[goalRows,setGoalRows]=useState<GoalDraft[]>([]),[componentRows,setComponentRows]=useState<ComponentDraft[]>([]),[expenseRows,setExpenseRows]=useState<ExpenseDraft[]>([]),[busy,setBusy]=useState(false),[notice,setNotice]=useState('');
- const dirty=useRef(false),alive=useRef(true),busyRef=useRef(false),editVersion=useRef(0);
+ const dirty=useRef(false),sourceRevision=useRef(program?.updated_at||''),alive=useRef(true),busyRef=useRef(false),editVersion=useRef(0);
  const scope=[g.game?.id,g.me?.user_id,g.me?.kind,g.me?.roster_archived_at,g.teacher,program?.id||'new',program?.status,program?.signed_at,editable].join('|'),currentScope=useRef(scope);currentScope.current=scope;
  const active=()=>alive.current&&scope===currentScope.current;
  useEffect(()=>{alive.current=true;return()=>{alive.current=false;busyRef.current=false;editVersion.current++}},[]);
- useEffect(()=>{dirty.current=false;editVersion.current++;busyRef.current=false;setBusy(false);setNotice('')},[scope]);
+ useEffect(()=>{dirty.current=false;sourceRevision.current=program?.updated_at||'';editVersion.current++;busyRef.current=false;setBusy(false);setNotice('')},[scope]);
  useEffect(()=>{
   if(dirty.current)return;
+  // Remote updates cannot advance the source version of unsaved local changes.
+  sourceRevision.current=program?.updated_at||'';
   setPassport(program?{title:program.title,responsible_ministry:program.responsible_ministry,responsible_minister_id:program.responsible_minister_id||'',curator_id:program.curator_id||'',national_goal:program.national_goal||'',presidential_priority_id:program.presidential_priority_id||'',participants:program.participants||'',start_date:program.start_date||'',end_date:program.end_date||'',expected_results:program.expected_results||''}:blankPassport);
   setGoalRows(goals.length?goals.map(x=>({...x,key:x.id,unit:x.unit||'',baseline_value:String(x.baseline_value??''),target_value:String(x.target_value??''),target_year:String(x.target_year??'')})):editable?[blankGoal()]:[]);
   const savedComponents=components.map(x=>({...x,key:x.id,start_date:x.start_date||'',end_date:x.end_date||'',goal_key:x.target_goal_id||''}));
@@ -83,9 +85,9 @@ export default function StateProgramEditor({g,program,goals,components,expenses,
    }
   busyRef.current=true;setBusy(true);setNotice('');
   try{
-   const r=await supabase.rpc('save_state_program_draft',{p_game_id:g.game.id,p_program_id:program?.id||null,p_payload:{...passport,...(program?.updated_at?{expected_updated_at:program.updated_at}:{}),goals:activeGoals.map(({key,...x})=>x),components:activeComponents.map(({key,goal_key,...x})=>({...x,goal_no:goal_key?activeGoals.findIndex(goal=>goal.key===goal_key)+1:null})),expenses:activeExpenses.map(({key,component_key,...x})=>({...x,component_no:activeComponents.findIndex(c=>c.key===component_key)+1,amount:x.amount.trim().replace(',','.')}))},p_confirm:confirm});
+   const r=await supabase.rpc('save_state_program_draft',{p_game_id:g.game.id,p_program_id:program?.id||null,p_payload:{...passport,...(sourceRevision.current?{expected_updated_at:sourceRevision.current}:{}),goals:activeGoals.map(({key,...x})=>x),components:activeComponents.map(({key,goal_key,...x})=>({...x,goal_no:goal_key?activeGoals.findIndex(goal=>goal.key===goal_key)+1:null})),expenses:activeExpenses.map(({key,component_key,...x})=>({...x,component_no:activeComponents.findIndex(c=>c.key===component_key)+1,amount:x.amount.trim().replace(',','.')}))},p_confirm:confirm});
    if(!active())return;
-   if(r.error){g.setError(r.error);return;}
+   if(r.error){if(r.error.code==='40001')setNotice('Другой участник уже сохранил новую версию. Ваш текст остался в этой форме, но не перезаписал чужие изменения. Скопируйте нужные фрагменты и откройте актуальную программу перед повторным сохранением.');g.setError(r.error);return;}
    if(editVersion.current===savedVersion)dirty.current=false;
    setNotice(confirm?'Программа подтверждена и направлена министру.':dirty.current?'Форма сохранена. Более поздние изменения ещё не сохранены.':'Вся форма и таблица расходов сохранены.');
    await onSaved(String(r.data));
@@ -93,7 +95,7 @@ export default function StateProgramEditor({g,program,goals,components,expenses,
   finally{if(active()){busyRef.current=false;setBusy(false)}}
  }
  return <section className={`${styles.panel} ${styles.programEditorPanel}`} aria-label="Форма государственной программы">
-  <div className={`${styles.sectionHead} ${styles.programIntro}`}><div><h3>{program?'Государственная программа · Полная форма':'Новая государственная программа'}</h3><p>Паспорт, цели, мероприятия и расходы заполняются вместе. Суммы указаны в рублях.</p></div></div>
+  <div className={`${styles.sectionHead} ${styles.programIntro}`}><div><h3>{program?'Государственная программа · Полная форма':'Новая государственная программа'}</h3><p>Паспорт, цели, мероприятия и расходы заполняются вместе. Сотрудники одного министерства могут сохранять правки до передачи программы Председателю Правительства. Суммы указаны в рублях.</p></div></div>
   {notice&&<p className={styles.notice} role="status">{notice}</p>}
   {program?.form_version!==2&&program&&editable&&<p className={styles.notice}>В прежнем паспорте: {programMoney(program.total_budget)}. Для сохранения полной формы разнесите эту сумму по строкам расходов и обоснуйте каждую строку.</p>}
   <fieldset className={styles.form} disabled={!editable||busy}>

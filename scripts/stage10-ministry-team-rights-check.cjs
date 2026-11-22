@@ -2,6 +2,7 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const {PGlite} = require('@electric-sql/pglite');
 const migration = fs.readFileSync('supabase/migrations/20261020001000_stage10_ministry_collaboration_and_version_guard.sql','utf8');
+const coedit = fs.readFileSync('supabase/migrations/20261123020000_state_program_coedit_until_government.sql','utf8');
 const lab = fs.readFileSync('components/game/StateProgramLab.tsx','utf8');
 const editor = fs.readFileSync('components/game/StateProgramEditor.tsx','utf8');
 assert(lab.includes("institution_assignments").valueOf());
@@ -36,6 +37,7 @@ try{
  `);
  const fn=migration.slice(0,migration.indexOf('-- Defensive concurrency guard'));
  await db.exec(fn);
+ await db.exec(coedit);
  const game=id(1), outsider=id(99), teacher=id(90);
  const heads=[id(20),id(21),id(22),id(23),id(24)];
  for(let i=0;i<5;i++){
@@ -62,7 +64,10 @@ try{
  await authorize(heads[0]);assert.equal(await can(id(50),heads[0]),true);
  await authorize(teacher);assert.equal(await can(id(50),teacher),true);
  await db.query("UPDATE state_programs SET status='minister_review' WHERE id=$1",[id(50)]);
- await authorize(id(100));assert.equal(await can(id(50),id(100)),false,'staff cannot approve or change minister review');
+ await authorize(id(100));assert.equal(await can(id(50),id(100)),true,'appointed staff may jointly edit during minister review');
+ await db.query("UPDATE state_programs SET status='pm_review' WHERE id=$1",[id(50)]);
+ assert.equal(await can(id(50),id(100)),false,'staff cannot edit after transfer to Prime Minister');
+ await db.query("UPDATE state_programs SET status='minister_review' WHERE id=$1",[id(50)]);
  await authorize(heads[0]);assert.equal(await can(id(50),heads[0]),true,'minister can review');
  await db.query("UPDATE state_programs SET status='draft', signed_at=now() WHERE id=$1",[id(50)]);
  assert.equal(await can(id(50),heads[0]),false,'signed text is immutable');
@@ -71,6 +76,6 @@ try{
  await authorize(id(100));assert.equal(await can(id(50),id(100)),false,'archived user cannot edit');
  await db.query("UPDATE institution_assignments SET game_id=$1 WHERE user_id=$2",[id(2),id(105)]);
  await authorize(id(105));assert.equal(await can(id(50),id(105)),false);
- console.log('PASS: 40 appointed staff, 5 ministries, foreign/archived exclusion, minister and teacher rights, signed and review locks.');
+ console.log('PASS: 40 appointed staff, 5 ministries, foreign/archived exclusion, minister and teacher rights, signed and Government-transfer locks.');
 }finally{await db.close();}
 })().catch(error=>{console.error(error);process.exitCode=1});

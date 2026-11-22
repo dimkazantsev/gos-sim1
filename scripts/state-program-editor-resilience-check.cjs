@@ -34,7 +34,7 @@ function harness(component='StateProgramEditor',initialProps={}){
   const amountText=cents=>(cents/100n).toString()+'.'+(cents%100n).toString().padStart(2,'0');
   for(const row of rows)row.budget=amountText(expenses.filter(x=>x.component_id===row.id).reduce((sum,x)=>sum+model.expenseKopecks(x.amount),0n));
   const total=amountText(expenses.reduce((sum,x)=>sum+model.expenseKopecks(x.amount),0n));
-  tables.set(game+':state_programs',[{...existing,...payload,id,total_budget:total,status:args.p_confirm?'minister_review':'draft',form_version:2,updated_at:'revision-'+serial}]);
+  tables.set(game+':state_programs',[{...existing,...payload,id,total_budget:total,status:args.p_confirm?'minister_review':existing.status==='minister_review'?'minister_review':'draft',form_version:2,updated_at:'revision-'+serial}]);
   tables.set(game+':state_program_goals',payload.goals.map((row,index)=>({...row,id:game+'-saved-goal-'+serial+'-'+index,game_id:game,program_id:id})));
   tables.set(game+':state_program_components',rows);tables.set(game+':state_program_expenses',expenses);
  }
@@ -65,7 +65,7 @@ function harness(component='StateProgramEditor',initialProps={}){
  function button(label){const found=all('button').find(node=>text(node)===label);assert.ok(found,'Missing button: '+label);return found;}
  function select(label,index=0){const found=nodes(tree,node=>node.type?.displayName==='StyledSelect'&&node.props.label===label)[index];assert.ok(found,'Missing select: '+label);return found;}
  function change(label,value,index){field(label,index).props.onChange({target:{value}});render();}
- function hydrate(){if(component==='StateProgramEditor'){const next=data(props.g.game.id);props={...props,...next,editable:['draft','revision'].includes(next.program.status)&&!next.program.signed_at};}}
+ function hydrate(){if(component==='StateProgramEditor'){const next=data(props.g.game.id);props={...props,...next,editable:['draft','revision','minister_review'].includes(next.program.status)&&!next.program.signed_at};}}
  return{calls,errors,saved,refreshes,render,settle,all,field,button,select,change,model:loadModule('stateProgramModel'),text:()=>text(tree),refresh:()=>latestLoad(),hydrate,
   get props(){return props;},editor:()=>nodes(tree,node=>node.type?.displayName==='StateProgramEditor')[0],
   setProps(value){props={...props,...value};},
@@ -94,6 +94,26 @@ async function runChecks(check){
  });
  await check('Actual editor newer edits during a pending save remain drafts after its reload',async()=>{
   const h=harness();await h.settle();h.change('Название программы','Сохраняемая версия');const pending=h.hold('save_state_program_draft');h.button('Сохранить всю форму').props.onClick();await tick();h.change('Название программы','Новый несохранённый текст');h.change('Сумма расхода 1, рубли','29.13');h.button('Добавить показатель').props.onClick();h.render();pending.resolve();await h.settle();assert.equal(h.field('Название программы').props.value,'Новый несохранённый текст');assert.equal(h.field('Сумма расхода 1, рубли').props.value,'29.13');assert.equal(h.all('textarea').filter(x=>x.props.value==='').length,1,'New blank goal must remain');h.patch('state_programs',{title:'Внешняя версия'});h.hydrate();await h.settle();assert.equal(h.field('Название программы').props.value,'Новый несохранённый текст');h.dispose();
+ });
+ await check('Concurrent edits retain their loaded version despite teammate refresh',async()=>{
+  const h=harness();await h.settle();const original=h.props.program.updated_at;
+  h.change('Название программы','Незавершённая правка сотрудника');
+  h.patch('state_programs',{title:'Изменение коллеги',updated_at:'2026-11-22T20:00:00Z'});
+  h.hydrate();await h.settle();
+  assert.equal(h.field('Название программы').props.value,'Незавершённая правка сотрудника');
+  h.button('Сохранить всю форму').props.onClick();await h.settle();
+  const saved=h.calls.find(x=>x.name==='save_state_program_draft');
+  assert.equal(saved.args.p_payload.expected_updated_at,original,'Stale unsaved fields cannot bypass the conflict guard');
+  h.dispose();
+ });
+ await check('Minister review permits team saves without repeating submission',async()=>{
+  const h=harness();h.setProps({program:{...h.props.program,status:'minister_review'},editable:true});await h.settle();
+  assert.equal(h.all('fieldset')[0].props.disabled,false);
+  assert.equal(h.all('button').some(node=>text(node)==='Подтвердить программу и направить министру'),false);
+  h.button('Сохранить всю форму').props.onClick();await h.settle();
+  assert.equal(h.calls.find(x=>x.name==='save_state_program_draft').args.p_confirm,false);
+  assert.equal(h.props.program.status,'minister_review');
+  h.dispose();
  });
  await check('Actual editor duplicate retained clicks issue one pending RPC',async()=>{
   const h=harness();await h.settle();const pending=h.hold('save_state_program_draft'),action=h.button('Сохранить всю форму').props.onClick;action();action();await tick();assert.equal(h.calls.filter(x=>x.name==='save_state_program_draft').length,1);pending.resolve();await h.settle();assert.equal(h.button('Сохранить всю форму').props.disabled,false);h.dispose();
