@@ -44,6 +44,7 @@ jobs:
       - run: node scripts/legitimacy-strong-links-contract-check.cjs
       - run: node scripts/security-driver-links-contract-check.cjs
       - run: node scripts/economy-macro-derived-contract-check.cjs
+      - run: node scripts/tension-level-consequences-contract-check.cjs
       - run: node scripts/model-b-fnb-debt-integration-check.cjs
       - run: node scripts/economy-b-event-ledger-contract-check.cjs
       - run: node scripts/event-fiscal-explanation-check.cjs

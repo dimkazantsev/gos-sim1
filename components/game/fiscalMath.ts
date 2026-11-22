@@ -3,9 +3,9 @@ export type FiscalRegion={game_id:string;region_code:string;name:string;profile:
 export type FiscalRate={region_code:string;tax_key:string;rate:number};
 export type FiscalPolicy={budget_aux_anchor?:Record<string,number>;fnb_total?:number;fnb_liquid?:number;fnb_fx_share?:number;monetary_last_settled_on?:string;monetary_last_effect_date?:string|null;monetary_last_daily_effect?:number;monetary_cumulative_effect?:number;monetary_last_day_details?:Array<{date:string;change:number}>;tax_activity_reference?:number;key_rate:number;fx_rate:number;oil_price:number;cutoff_price:number;inflation:number;federal_expenditure:number;municipal_expenditure:number;baseline_economy:number;baseline_trust:number;activity_override?:number|null;activity_reference?:number|null;collection_lawfulness_reference?:number|null;updated_at:string};
 export type FiscalContext={policy:FiscalPolicy;metrics:Record<string,number>;can_change_rate:boolean;can_issue_bank_rate_decision?:boolean};
-/** Model B additional channels: the existing 0.002 activity and 0.0005
- * collection sensitivities, distributed over seven supplementary indicators.
- * Zero effect at the per-game anchor; no historical budget revaluation.
+/** Model B additional channels: four anchor-relative activity drivers,
+ * two tax-collection drivers, plus the approved PERMANENT level-based
+ * social-tension penalty above 60. No separate historical revaluation.
  */
 export const MODEL_B_AUX_KEYS=['social_stability','security','elite_support','international_standing','social_tension','legitimacy','media_climate'] as const;
 export function modelBAdditionalChannels(metrics:Record<string,number>,anchors?:Record<string,number>|null){
@@ -13,9 +13,11 @@ export function modelBAdditionalChannels(metrics:Record<string,number>,anchors?:
   const current=metrics[key],reference=anchors?.[key];
   return Number.isFinite(current)&&typeof reference==='number'&&Number.isFinite(reference)?current-reference:0;
  };
- const activityPoints=(delta('social_stability')+delta('security')+delta('elite_support')+delta('international_standing')-delta('social_tension'))/5;
+ const activityPoints=(delta('social_stability')+delta('security')+delta('elite_support')+delta('international_standing'))/5;
  const collectionPoints=(delta('legitimacy')+delta('media_climate'))/2;
- return {activity_adjustment:Math.max(-.03,Math.min(.03,activityPoints*.002)),collection_adjustment:Math.max(-.01,Math.min(.01,collectionPoints*.0005))};
+ const tensionLevel=metrics.social_tension;
+ const tensionPenalty=Number.isFinite(tensionLevel)?Math.min(.04,Math.max(0,tensionLevel-60)*.001):0;
+ return {activity_adjustment:Math.max(-.03,Math.min(.03,activityPoints*.002))-tensionPenalty,collection_adjustment:Math.max(-.01,Math.min(.01,collectionPoints*.0005))};
 }
 const clamp=(v:number,min:number,max:number)=>Math.max(min,Math.min(max,v));
 export function fiscalEnvironment(c?:FiscalContext|null){
