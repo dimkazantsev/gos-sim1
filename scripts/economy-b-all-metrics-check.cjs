@@ -10,7 +10,7 @@ const region={game_id:'offline',region_code:'54',profile:'industrial',enterprise
 const context={policy,metrics},state=defaultSimulatorState(context,[region]),draft=newBudgetDraft();
 const run=m=>calculateFederalBudget(draft,state,{policy,metrics:m},[region],[],[]);
 const base=run(metrics);
-assert.deepEqual(base.model_b_additional_channels,{activity_adjustment:0,collection_adjustment:0});
+assert.deepEqual(base.model_b_additional_channels,{activity_adjustment:-.032,collection_adjustment:0});
 const polarity={social_stability:1,security:1,elite_support:1,international_standing:1,social_tension:-1,legitimacy:1,media_climate:1};
 for(const [k,sign] of Object.entries(polarity)){
  const changed={...metrics,[k]:metrics[k]+1};
@@ -26,4 +26,4 @@ assert(run({...metrics,lawfulness:25}).revenue>base.revenue,'Legal channel prese
 const high=Object.fromEntries(MODEL_B_AUX_KEYS.map(k=>[k,100]));
 const low=Object.fromEntries(MODEL_B_AUX_KEYS.map(k=>[k,0]));
 assert.equal(modelBAdditionalChannels({...high,social_tension:-100},low).activity_adjustment,.03);
-console.log('PASS: all ten indicators affect federal revenues; additional seven affect regional forecasts; anchor and caps preserved');
+console.log('PASS: all ten indicators affect federal revenues; high tension carries a permanent level penalty, other anchors and caps preserved');
