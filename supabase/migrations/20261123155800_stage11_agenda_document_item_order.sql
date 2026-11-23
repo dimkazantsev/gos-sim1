@@ -61,8 +61,7 @@ begin
  end if;
  perform set_config('app.gos_government_agenda_session','',true);
  return v_doc;
-end;$function$
-
+end;$function$;
 
 -- Refresh only unpublished drafts. Never rewrite approved or signed agendas.
 DO $repair$
