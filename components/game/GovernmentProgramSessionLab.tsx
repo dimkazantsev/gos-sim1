@@ -2,7 +2,7 @@
 import {userError} from '@/lib/userError';
 import StageModuleHeader from '../ui/StageModuleHeader';
 import {useRef,useState} from 'react';
-import {CheckCircle2,FileText,RefreshCcw,Vote,Mic2,MessageCircleQuestion,ClipboardCheck} from 'lucide-react';
+import {CheckCircle2,FileText,RefreshCcw,Vote,Mic2,MessageCircleQuestion,ClipboardCheck,PencilLine} from 'lucide-react';
 import {supabase} from '@/lib/supabase';
 import {useGameTableSync} from './useGameTableSync';
 import {hasActiveGameRole} from './stageRoles';
@@ -15,7 +15,7 @@ type Question={id:string;session_id:string;title:string;description:string;durat
 type SpeakerQuestion={id:string;game_id:string;session_id:string;agenda_item_id:string;asked_by:string;question_text:string;answer_text:string|null;answered_by:string|null;created_at:string;answered_at:string|null};
 type Proposal={id:string;session_id:string|null;program_id:string;section_key:string;original_text:string;proposed_text:string;justification:string;status:'submitted'|'accepted'|'rejected';review_note:string|null;created_by:string;created_at:string};
 
-export default function GovernmentProgramSessionLab({g,onOpenVotes,onOpenDocument}:{g:ReturnTypeRepublic;onOpenVotes:(id?:string)=>void;onOpenDocument?:(id:string)=>void}){
+export default function GovernmentProgramSessionLab({g,onOpenVotes,onOpenDocument,onEditProgram,readOnly=false}:{g:ReturnTypeRepublic;onOpenVotes:(id?:string)=>void;onOpenDocument?:(id:string)=>void;onEditProgram?:(id:string)=>void;readOnly?:boolean}){
  const {game,me,teacher,members,votes,setError}=g;
  const [sessions,setSessions]=useState<Session[]>([]);
  const [items,setItems]=useState<Item[]>([]);
@@ -136,6 +136,16 @@ export default function GovernmentProgramSessionLab({g,onOpenVotes,onOpenDocumen
   try{const r=await supabase.rpc('open_government_session',{p_session_id:selected.id});if(r.error)throw r.error;await load();setNotice('Заседание открыто. Зарегистрируйтесь на заседание, затем начните представление программ.');}
   catch(e){setError(userError(e))}finally{setBusy(false)}
  }
+ async function editProgramme(id:string){
+  if(readOnly||busy||!onEditProgram)return;
+  setBusy(true);setNotice('');
+  try{
+   const r=await supabase.rpc('begin_stage11_program_revision',{p_program_id:id});
+   if(r.error)throw r.error;
+   onEditProgram(id);
+  }catch(e){setError(userError(e))}
+  finally{setBusy(false)}
+ }
  async function start(id:string){if(!canApprove||busy)return;setBusy(true);
   try{const r=await supabase.rpc('start_government_program_report',{p_item_id:id});if(r.error)throw r.error;await load();}
   catch(e){setError(userError(e))}finally{setBusy(false)}
@@ -220,6 +230,9 @@ export default function GovernmentProgramSessionLab({g,onOpenVotes,onOpenDocumen
       const qa=speakerQuestions.filter(q=>q.agenda_item_id===item.id);
       const awaiting=qa.filter(q=>!q.answer_text);
       const speaker=canApprove||p?.responsible_minister_id===me.user_id;
+      const mayEdit=!readOnly&&!!onEditProgram&&p?.signed_at==null&&!p?.government_vote_id&&!item.vote_id&&
+        !!p&&['draft','revision','minister_review','pm_review','ready'].includes(p.status)&&
+        (teacher||p.responsible_minister_id===me.user_id)&&g.stages.some(s=>s.stage_no===11&&s.status==='open');
       return <article className={'govMeetingProgramme govMeetingProgramme-'+item.status} key={item.id}>
        <header><span className="govMeetingProgrammeNo">{String(item.agenda_no).padStart(2,'0')}</span><div><span className="govEyebrow">{p?.responsible_ministry||'Ответственное министерство'}</span><h4>{p?.title||'Государственная программа'}</h4><p>Докладчик: {name(p?.responsible_minister_id||null)} · Регламент: {item.report_minutes} минут</p></div><strong className="govMeetingProgrammeStatus">{item.status==='pending'?'Ожидает доклада':item.status==='presenting'?'Доклад и вопросы':item.status==='decision'?'Голосование':item.status==='completed'?'Рассмотрена':'Снята с рассмотрения'}</strong></header>
        {item.result_note&&<p className="govMeetingDecisionNote">{item.result_note}</p>}
@@ -230,6 +243,7 @@ export default function GovernmentProgramSessionLab({g,onOpenVotes,onOpenDocumen
         {canApprove&&<div className="govMeetingSpeakerFinish"><small>{awaiting.length?('Ожидают ответа: '+awaiting.length):'Ответы на вопросы завершены.'}</small><button type="button" className="primary" disabled={busy||awaiting.length>0} onClick={()=>void decision(item.id)}><Vote size={17}/>Завершить вопросы и открыть голосование</button></div>}
        </div>}
        <div className="govMeetingProgrammeActions">
+        {mayEdit&&<button type="button" className="secondary" disabled={busy} onClick={()=>void editProgramme(p.id)}><PencilLine size={16}/>Редактировать</button>}
         {canApprove&&selected.status==='open'&&item.status==='pending'&&<button type="button" className="primary" disabled={busy||!!current} onClick={()=>void start(item.id)}><Mic2 size={16}/>Начать представление</button>}
         {item.vote_id&&<button type="button" className={item.status==='decision'?'primary':'secondary'} onClick={()=>onOpenVotes(item.vote_id!)}><Vote size={17}/>{item.status==='decision'?'Перейти к голосованию':'Открыть результаты голосования'}</button>}
         {p?.status==='adopted'&&canSign&&!g.formalDocuments.some(d=>d.game_id===game!.id&&d.stage_no===11&&d.doc_type==='government_resolution'&&d.metadata?.state_program_id===p.id&&d.status_code==='published')&&<button type="button" className="primary" disabled={busy} onClick={()=>void sign(p.id)}>{p.signed_at?'Опубликовать постановление':'Подписать и опубликовать принятую ГП'}</button>}
