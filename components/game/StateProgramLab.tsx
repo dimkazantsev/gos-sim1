@@ -186,7 +186,7 @@ export default function StateProgramLab({g,focusProgramId,revisionOnly=false}:{g
     </ol>
     {selected.pm_revision_reason&&['revision','pm_review'].includes(selected.status)&&<div className={styles.programRevisionNotice} role="status"><strong>Замечания Председателя Правительства</strong><p>{selected.pm_revision_reason}</p>{selected.status==='revision'&&<small>Исправьте программу и повторно направьте её Председателю Правительства.</small>}</div>}
     {vote&&<p className={styles.programApprovalNotice} role="status">Голосование Правительства: {vote.status==='open'?'Идёт · голосуют зарегистрированные участники':vote.result_label||'Завершено'}.</p>}
-    {selected.status==='ready'&&<p className={styles.programApprovalNotice}>Программа подготовлена. Включите её в повестку Этапа 11. Голосование открывается только после доклада.</p>}
+    {selected.status==='ready'&&<p className={styles.programApprovalNotice}>Программа согласована и автоматически включается в повестку Этапа 11. До открытия голосования ответственный министр может вернуть её на доработку.</p>}
     {selected.status==='adopted'&&<p className={styles.programApprovalNotice}>Правительство поддержало программу. Ожидается оформление подписи и публикация постановления по результатам голосования.</p>}
     {selected.status==='rejected'&&<p className={styles.programApprovalNotice}>Программа отклонена. Подписание и публикация по данному голосованию недоступны.</p>}
     <div className={styles.programApprovalActions}>
