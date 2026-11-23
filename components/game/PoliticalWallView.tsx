@@ -1,7 +1,7 @@
 'use client';
 import {userError} from '@/lib/userError';
 import {useEffect,useMemo,useRef,useState} from 'react';
-import {ArrowUp,BookOpenText,ChevronDown,FilePlus2,Link2,Newspaper,Pencil,Plus,SlidersHorizontal,Trash2,Vote,X} from 'lucide-react';
+import {ArrowUp,BookOpenText,ChevronDown,FilePlus2,Link2,Newspaper,Pencil,Pin,PinOff,Plus,SlidersHorizontal,Trash2,Vote,X} from 'lucide-react';
 import {supabase} from '@/lib/supabase';
 import {BRAND_NAME} from '@/components/ui/BrandIdentity';
 import type {ReturnTypeRepublic} from './viewTypes';
@@ -82,6 +82,7 @@ export default function PoliticalWallView({g,onOpenVotes,onOpenDocument,onNaviga
  const [title,setTitle]=useState(''),[body,setBody]=useState(''),[selectedTags,setSelectedTags]=useState<string[]>([]);
  const [externalUrl,setExternalUrl]=useState(''),[internalView,setInternalView]=useState(''),[formalIds,setFormalIds]=useState<string[]>([]);
  const [files,setFiles]=useState<File[]>([]),[busy,setBusy]=useState(false),[notice,setNotice]=useState('');
+ const [pinBusy,setPinBusy]=useState<string|null>(null);
  const [search,setSearch]=useState(''),[filterActor,setFilterActor]=useState(''),[filterType,setFilterType]=useState(''),[filterStage,setFilterStage]=useState('');
  const [visiblePostCount,setVisiblePostCount]=useState(POLITICAL_POST_BATCH_SIZE);
  const postFeedRef=useRef<HTMLElement>(null);
@@ -261,6 +262,18 @@ export default function PoliticalWallView({g,onOpenVotes,onOpenDocument,onNaviga
  function editPost(p:PoliticalPost){
   setEditing(p);setNotice('');
  }
+ async function togglePostPinned(post:PoliticalPost){
+  if(!teacher||readOnly||busy||pinBusy!==null||!game||!me||post.game_id!==game.id)return;
+  setPinBusy(post.id);setNotice('');
+  try{
+   const r=await supabase.rpc('set_political_post_pin',{p_post_id:post.id,p_pin:!post.pinned});
+   if(r.error)throw r.error;
+   // Only refresh the visible feed, not all game tables or other sections.
+   await g.refreshPoliticalWall();
+  }catch(error){
+   setNotice(userError(error)||'Не удалось изменить закрепление публикации.');
+  }finally{setPinBusy(null)}
+ }
  async function publish(){
   if(!actor||!title.trim()||!body.trim()||busy)return;
   setBusy(true);setNotice('');
@@ -384,10 +397,16 @@ export default function PoliticalWallView({g,onOpenVotes,onOpenDocument,onNaviga
     const cecComplaintReply=p.actor_key==='cec'&&p.context?.cec_complaint_reply===true&&!!p.source_key?.startsWith('cec-complaint-response:');
     const own=p.author_id===me.user_id,editable=!storyPost&&!readOnly&&(teacher||own&&!auto);
     const canRequestVote=!storyPost&&!readOnly&&(teacher||own&&!auto);
+    const pinButton=teacher&&!readOnly?<button type="button" aria-pressed={!!p.pinned} disabled={busy||pinBusy!==null}
+     onClick={()=>void togglePostPinned(p)} title={p.pinned?'Снять закрепление':'Закрепить сообщение сверху'}
+     aria-label={(p.pinned?'Открепить: ':'Закрепить: ')+p.title}>
+     {p.pinned?<PinOff size={17}/>:<Pin size={17}/>}
+     {pinBusy===p.id?'Сохраняется…':p.pinned?'Открепить':'Закрепить'}
+    </button>:null;
     return <article className={'wallPost '+p.status+(bulkMode&&bulkAllowed?' bulkSelecting':'')+(selectedPostIds.has(p.id)&&bulkMode&&bulkAllowed?' bulkSelected':'')+(!stageLifecycleNotice&&auto&&(p.context?.editorial_verified||editorialFallback)?' editorialStory':'')+(stageLifecycleNotice?' systemNotice':'')} key={p.id} id={'process-'+p.id} data-political-post-id={p.id}>
      <header>{bulkMode&&bulkAllowed&&!storyPost&&<label className="wallBulkPostSelect" title={'Выбрать публикацию: '+p.title}><input type="checkbox" aria-label={'Выбрать публикацию: '+p.title} checked={selectedPostIds.has(p.id)} disabled={busy} onChange={()=>toggleSelectedPost(p.id)}/></label>}<div className="wallPostAvatar"><PublisherAvatar actorKey={stageLifecycleNotice?'system':p.actor_key} label={label} partyLogo={stageLifecycleNotice?undefined:party?.logo_url} avatar={stageLifecycleNotice?undefined:pf?.avatar_url} gender={stageLifecycleNotice?undefined:pf?.gender} name={stageLifecycleNotice?undefined:names[p.author_id]}/></div><div className="wallPostWho"><b>{label}</b><small>{stageLifecycleNotice?'Официальное уведомление платформы':modeledExpert?'Экспертная реконструкция':auto?'Автоматическая публикация':p.actor_key==='participant'?names[p.author_id]||'Участник':'Официальное сообщение'} · <time dateTime={p.created_at}>{new Date(p.created_at).toLocaleString('ru-RU')}</time></small></div><span className={'postStatus '+p.status}>{p.status==='accepted'?'Принято':p.status==='rejected'?'Отклонено':'Опубликовано'}</span></header>
      {editing?.id===p.id&&<PostInlineEditor key={p.id} post={p} g={g} onClose={()=>setEditing(null)} onSaved={()=>{setEditing(null);setNotice('Изменения сохранены.')}}/>}
-     <div className="wallPostBody"><div className="processPostMeta"><span>{kind}</span>{p.context?.stage_no&&<span>Этап {String(p.context.stage_no)}</span>}</div><h2>{displayPost.title}</h2>
+     <div className="wallPostBody"><div className="processPostMeta"><span>{kind}</span>{p.pinned&&<span><Pin size={14} aria-hidden="true"/>Закреплено</span>}{p.context?.stage_no&&<span>Этап {String(p.context.stage_no)}</span>}</div><h2>{displayPost.title}</h2>
       {!!p.comic_scene&&<div className="wallPostComic"><EventComic silent title={p.comic_scene.title||p.title} category={p.comic_scene.category||'Событие'} caseKey={p.comic_scene.case_key||p.internal_ref_id||p.id} scene={p.comic_scene}/></div>}
       {modeledExpert&&<div className="processSourceVisual"><div><Newspaper size={18}/></div><span><small>Моделируемый эксперт ГОС.ID · реконструкция, не подлинное высказывание</small><b>Наталья Васильевна Зубаревич</b><small>Доктор географических наук, профессор кафедры экономической и социальной географии России МГУ имени М. В. Ломоносова</small></span></div>}
       {!cecComplaintReply&&(storyPost?<StoryNewsIllustration episodeNo={Number(p.context?.story_episode)||0}/>:p.actor_key==='media'&&Array.isArray(p.context?.rating_changes)?<RatingNewsVisual g={g} post={p}/>:!modeledExpert&&!media.some(m=>m.media_kind==='image')&&!p.comic_scene&&<div className="processSourceVisual"><div><PublisherAvatar actorKey={stageLifecycleNotice?'system':party?'party':p.actor_key} label={stageLifecycleNotice?BRAND_NAME:party?.name||label} partyLogo={stageLifecycleNotice?undefined:party?.logo_url} avatar={stageLifecycleNotice?undefined:pf?.avatar_url} gender={stageLifecycleNotice?undefined:pf?.gender}/></div><span><small>{links.length?'Связанные документы':kind}</small><b>{party?.name||label}</b>{!!p.context?.stage_title&&<small>{g.stages.find(stage=>stage.stage_no===Number(p.context?.stage_no))?.title||String(p.context.stage_title)}</small>}</span></div>)}
@@ -403,6 +422,7 @@ export default function PoliticalWallView({g,onOpenVotes,onOpenDocument,onNaviga
      {(p.external_url||p.internal_view)&&<div className="wallLinks">{p.external_url&&<a href={p.external_url} target="_blank" rel="noreferrer"><Link2 size={16}/>Внешний ресурс</a>}{p.internal_view&&RESOURCE_VIEWS.some(v=>v.value===p.internal_view)&&<button onClick={()=>p.internal_view==='documents'&&p.internal_ref_id?onOpenDocument(p.internal_ref_id):onNavigate(p.internal_view as View)}><Link2 size={16}/>{RESOURCE_VIEWS.find(v=>v.value===p.internal_view)?.label}</button>}</div>}
      {vote&&<button className={'processLinkedVote '+vote.status} onClick={()=>onOpenVotes(vote.id)}><span className="processLinkedVoteIcon" aria-hidden="true"><Vote size={21}/></span><span className="processLinkedVoteCopy"><small className="processLinkedVoteStatus">{vote.status==='open'?'Идёт голосование':'Голосование завершено'}</small><b className="processLinkedVoteTitle">{vote.title}</b></span><strong className="processLinkedVoteResult">{vote.status==='closed'?vote.result_label:'Открыть'}</strong></button>}
      {!readOnly&&!storyPost&&<div className="wallPostActions">
+      {pinButton}
       {!vote&&p.status==='published'&&canRequestVote&&<button onClick={()=>{setVoteFor(voteFor===p.id?'':p.id);setVoteBody('all');setVoteGroup('')}}><Vote size={17}/>Голосование</button>}
       <button onClick={()=>setNpaFor(npaFor===p.id?'':p.id)}><FilePlus2 size={17}/>Создать НПА</button>
       {editable&&<button onClick={()=>editPost(p)}><Pencil size={17}/>Редактировать</button>}
@@ -410,6 +430,7 @@ export default function PoliticalWallView({g,onOpenVotes,onOpenDocument,onNaviga
       {(teacher||own&&!auto)&&<button className="deletePost" disabled={busy} onClick={()=>void deletePost(p)}><Trash2 size={17}/>Удалить публикацию</button>}
       {teacher&&<button onClick={()=>setMetricPost(p)}><SlidersHorizontal size={17}/>Изменить показатели</button>}
      </div>}
+     {storyPost&&pinButton&&<div className="wallPostActions">{pinButton}</div>}
      {!storyPost&&<CivicDiscussion kind="post" targetId={p.id} g={g} readOnly={readOnly}/>}
      {voteFor===p.id&&<section className="processVoteComposer"><h3>Голосование по публикации</h3>{voteSettings}<button className="primary" disabled={busy||isGroupBody&&groups.length>1&&!voteGroup} onClick={()=>void startVote(p.id)}><Vote size={18}/>{busy?'Открывается…':'Открыть голосование'}</button></section>}
      {npaFor===p.id&&<div className="quickNpa"><StyledSelect label="Вид НПА" value={npaType} onChange={setNpaType} options={[{value:'fz_bill',label:'Проект ФЗ'},{value:'fkz_bill',label:'Проект ФКЗ'},{value:'federal_budget',label:'Федеральный бюджет'},{value:'president_decree',label:'Указ Президента'},{value:'government_resolution',label:'Постановление Правительства'},{value:'gd_resolution',label:'Постановление ГД'},{value:'sf_resolution',label:'Постановление СФ'},{value:'municipal_act',label:'Муниципальный акт'}]}/><button className="primary" disabled={busy} onClick={()=>void quickNpa(p)}>Создать проект из публикации</button></div>}
