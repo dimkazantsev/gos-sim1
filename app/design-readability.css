@@ -2752,3 +2752,30 @@
  .chatPeopleResults>button{grid-template-columns:32px minmax(0,1fr)}
  .chatPeopleResults em{display:none}
 }
+
+/* ГОС.ID: descriptions inherit the approved metric-dialog tokens. No new assets. */
+.metricRelations{
+ min-width:0;margin:0 0 16px;padding:16px 18px;
+ border:1px solid var(--gs-border,#dfe6ef);border-radius:14px;
+ background:var(--gs-surface-soft,#f8faff);color:var(--gs-ink,#203452);
+}
+.metricRelations h4,.metricRelations summary{
+ margin:0;font-size:14px;line-height:1.45;font-weight:750;color:var(--gs-ink,#203452);
+}
+.metricRelations summary{cursor:pointer;min-height:26px}
+.metricRelations summary:focus-visible{outline:3px solid var(--gs-accent,#487de7);outline-offset:3px;border-radius:4px}
+.metricRelationsBody{display:grid;gap:12px;margin-top:10px;min-width:0}
+.metricRelationsMeaning{margin:0;font-size:13px;line-height:1.65;color:var(--gs-ink,#203452)}
+.metricRelationsGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:0}
+.metricRelationsGrid>div{min-width:0;padding:12px 13px;border:1px solid var(--gs-border,#dfe6ef);border-radius:11px;background:#fff}
+.metricRelationsGrid dt{margin:0 0 7px;color:var(--gs-accent,#375fa9);font-size:12px;font-weight:750;line-height:1.4}
+.metricRelationsGrid dd{margin:0;color:var(--gs-ink,#203452);font-size:13px;line-height:1.65;overflow-wrap:anywhere}
+.metricRelationsNote{margin:0;padding-top:10px;border-top:1px solid var(--gs-border,#dfe6ef);font-size:12px;line-height:1.6;color:var(--gs-muted,#63748b)}
+.metricModal.redesigned .metricRelations{margin-bottom:16px}
+.metricDirectorStudio .metricRelations{margin:12px 0 16px}
+.metricRelationsCompact .metricRelationsBody{margin-top:13px}
+@media(max-width:650px){
+ .metricRelations{padding:13px 12px;margin-bottom:13px}
+ .metricRelationsGrid{grid-template-columns:minmax(0,1fr);gap:8px}
+ .metricRelationsGrid>div{padding:10px 11px}
+}

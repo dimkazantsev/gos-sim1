@@ -4,6 +4,7 @@ import {useState} from 'react';
 import {metricQuantity} from '@/lib/formatQuantity';
 import {Activity,CheckCircle2,Newspaper,SlidersHorizontal} from 'lucide-react';
 import StyledSelect from '../ui/StyledSelect';
+import MetricRelationships from './MetricRelationships';
 import {supabase} from '@/lib/supabase';
 import type {ReturnTypeRepublic} from './viewTypes';
 export default function TeacherMetricStudio({g,postId}:{g:ReturnTypeRepublic;postId?:string}){
@@ -42,6 +43,7 @@ export default function TeacherMetricStudio({g,postId}:{g:ReturnTypeRepublic;pos
    <label className="metricValueField">Новое значение<span className="metricValueControl"><input aria-label="Новое значение" type="number" step="any" value={value} onChange={e=>setValue(e.target.value)} min={metric?.min_value??undefined} max={metric?.max_value??undefined} placeholder="Введите число"/><span>{metric?.unit}</span></span></label>
   </div>
   {metric?.metric_key==='budget'&&<p className="metricDirectorNotice">Доходы федерального бюджета — общий прогноз во вкладке «Бюджет». Введите сумму в миллионах рублей. Корректировка меняет доходы на ту же величину и записывается в финансовый журнал.</p>}
+  <MetricRelationships metricKey={metric?.metric_key||""} compact/>
   <label className="metricDirectorReason">Обоснование<textarea rows={2} value={reason} onChange={e=>setReason(e.target.value)} placeholder="Что произошло и почему изменился показатель?"/></label>
   {!postId&&<label className="metricDirectorCheck"><input type="checkbox" checked={broadcast} onChange={e=>setBroadcast(e.target.checked)}/><Newspaper size={17}/> Опубликовать политическое событие одновременно с корректировкой</label>}
   {!postId&&broadcast&&<label className="metricDirectorReason">Заголовок публикации<input value={title} onChange={e=>setTitle(e.target.value)} placeholder={'Изменение показателя: '+(metric?.label||'')}/></label>}
