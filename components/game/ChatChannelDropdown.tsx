@@ -78,7 +78,7 @@ export default function ChatChannelDropdown({
      <button type="button" role="menuitemradio" aria-checked={value===c.id}
       className={'chatChannelOption '+(value===c.id?'selected':'')} onClick={()=>choose(c.id)}>
       <span className="chatChannelOptionIcon" aria-hidden="true"><UsersRound size={16}/></span>
-      <span className="chatChannelOptionText"><b>{displayName(c.name)}</b><small>{shortPreview(info?.last_message_text)|| (c.name==='Вне игры'?'Неформальное общение':c.kind==='public'?'Все участники':c.kind==='team'?'Фракция':c.kind==='teacher'?'Преподаватели':'Личная беседа')}</small></span>
+      <span className="chatChannelOptionText"><b>{displayName(c.name)}</b><small>{shortPreview(info?.last_message_text)|| (c.name==='Вне игры'?'Неформальное общение':c.kind==='public'?'Все участники':c.name==='Правительство РФ'?'Закрытый чат Правительства':c.kind==='team'?'Фракция':c.kind==='teacher'?'Преподаватели':'Личная беседа')}</small></span>
       <span className="chatChannelCounters">{mentions>0&&<i className="chatMentionBadge" aria-label={'Упоминаний: '+mentions}>@{mentions}</i>}{unread>0&&<i className="chatUnreadBadge" aria-label={'Непрочитанных: '+unread}>{unread>99?'99+':unread}</i>}</span>
       {value===c.id&&<Check size={17} className="chatChannelSelectedCheck" aria-hidden="true"/>}
      </button>
