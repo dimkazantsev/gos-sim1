@@ -30,7 +30,7 @@ export async function telegramVisibleChatChannels(db:Db,gameId:string,userId:str
  }
  return channels.filter(c=>
   !isHiddenChatChannel(c)&&
-  (c.kind!=='private'||counts.get(c.id)===2)&&
+  (c.kind!=='private'||(c.name==='Правительство РФ'||c.name==='Совет ГД')||counts.get(c.id)===2)&&
   (c.kind==='public'||actorKind==='teacher'||mine.has(c.id))
  );
 }
