@@ -157,6 +157,8 @@ on:
       - 'scripts/regional-party-case-competence-check.cjs'
       - 'supabase/migrations/20261110153512_regional_party_competent_fair_dispatch.sql'
       - 'components/game/EventCollaboration.tsx'
+      - 'scripts/event-invite-best-choice-check.cjs'
+      - 'supabase/migrations/20261123204000_authority_violations_reduce_lawfulness_not_trust.sql'
       - 'components/game/EventWorkspace.tsx'
       - 'components/game/ClassroomJournal.tsx'
       - 'components/game/InstitutionRegistrationPanel.tsx'
@@ -543,6 +545,7 @@ jobs:
       - run: node scripts/event-teacher-feed-privilege-check.cjs
       - run: node scripts/regional-party-case-competence-check.cjs
       - run: node scripts/event-single-correct-explanation-check.cjs
+      - run: node scripts/event-invite-best-choice-check.cjs
       - run: npm run design:check
       - run: node scripts/interface-contract-check.cjs
       - run: node scripts/political-wall-feed-check.cjs
