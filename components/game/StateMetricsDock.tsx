@@ -3,6 +3,7 @@ import {gameValueLabel,impactConditionText} from '../../lib/gameLabels';
 import {supabase} from '@/lib/supabase';
 import {metricQuantity} from '@/lib/formatQuantity';
 import {externalFinancingTerms} from './externalFinancePolicy';
+import MetricRelationships from './MetricRelationships';
 import {IconAction} from '../ui/IconAction';
 import {useEffect,useMemo,useRef,useState} from 'react';
 import {Activity,BadgeCheck,Globe2,Handshake,HeartHandshake,MessageSquare,Scale,ShieldCheck,TrendingUp,UsersRound,Wallet} from 'lucide-react';
@@ -344,6 +345,7 @@ export default function StateMetricsDock({g,initialSelectedMetricId='',initialCo
       <small>Используются настройки конкретной игры. Преподаватель может изменить последствия в разделе управления игровыми эффектами.</small>
      </>}
     </section>
+    <MetricRelationships metricKey={chosen.metric_key}/>
     <div className="metricBucketTabs"><button className={bucket==='changes'?'active':''} aria-pressed={bucket==='changes'} onClick={()=>{setFocusedPoint(null);setBucket('changes')}}>Все изменения</button><button className={bucket==='day'?'active':''} aria-pressed={bucket==='day'} onClick={()=>{setFocusedPoint(null);setBucket('day')}}>По дням</button><button className={bucket==='week'?'active':''} aria-pressed={bucket==='week'} onClick={()=>{setFocusedPoint(null);setBucket('week')}}>По неделям</button></div>
     <section className="metricChart redesignedChart" aria-label="График динамики показателей">
      <div className="metricChartCaption"><b>{geometry.comparing?'Динамика показателей':'История показателя'}{axisUnit&&<small data-budget-chart-unit> · {axisUnit}</small>}</b><span>{bucket==='changes'?'По игровым событиям':bucket==='day'?'По дням':'По неделям'} · {activeMetrics.length} из {MAX_CHART_SERIES} линий</span></div>
