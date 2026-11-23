@@ -10,6 +10,8 @@ export default function StageWorkspace(props:{
  readOnly?:boolean;
  initialTab?:'materials'|'work';
  onBack:()=>void;
+ focusProgramId?:string;
+ onEditStateProgram?:(programId:string)=>void;
  onOpenStage?:(stageNo:number)=>void;
  onOpenVotes:(voteId?:string)=>void;
  onOpenDocument?:(id:string)=>void;
