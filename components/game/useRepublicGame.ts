@@ -2248,7 +2248,11 @@ export function useRepublicGame(gameId:string){
       setPoliticalPosts(posts);
      }else{
       setPoliticalPosts(previous=>{
-       const all=new Map(previous.filter(p=>p.game_id===gameId).map(p=>[p.id,p]));
+       // The first server page contains the only current pin. Clear any
+       // previously loaded stale pin when older pages are already mounted.
+       const currentPin=posts.find(p=>p.pinned)?.id;
+       const all=new Map(previous.filter(p=>p.game_id===gameId).map(p=>
+        [p.id,p.pinned&&p.id!==currentPin?{...p,pinned:false}:p] as const));
        posts.forEach(p=>all.set(p.id,p));
        return [...all.values()].sort((a,b)=>Number(!!b.pinned)-Number(!!a.pinned)||
         b.created_at.localeCompare(a.created_at)||b.id.localeCompare(a.id));
