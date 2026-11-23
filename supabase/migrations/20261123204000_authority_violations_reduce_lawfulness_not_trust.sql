@@ -25,3 +25,34 @@ BEGIN
   RAISE EXCEPTION 'ГОС.ID: authority patch not installed';
  END IF;
 END $patch$;
+
+-- Preserve existing collaboration limits while preventing more invitations
+-- than the event's configured audience can actually accept. Case row is
+-- already locked FOR UPDATE, so simultaneous inviters cannot overbook.
+DO $invitations$
+DECLARE
+ v_def text;
+ v_old_cap constant text := 'if (select count(*) from public.event_collaboration_invites where case_id=p_case and status in (''pending'',''accepted''))>=30 then raise exception ''Достигнут предел приглашений'';end if;';
+ v_cap_guard constant text := 'if c.audience in (''single'',''group'') and ((select count(*) from public.event_assignments where case_id=p_case) + (select count(*) from public.event_collaboration_invites where case_id=p_case and status=''pending''))>=3 then raise exception ''Все места совместного решения заняты'';end if;';
+ v_accept_new constant text := 'if p_accept then' || E'\n' ||
+   '  if not exists (select 1 from public.game_members where game_id=i.game_id and user_id=auth.uid() and kind=''student'' and roster_archived_at is null) then raise exception ''Приглашение доступно только действующему участнику''; end if;';
+BEGIN
+ v_def:=pg_get_functiondef('public.invite_event_collaborator(uuid,uuid)'::regprocedure);
+ IF position(v_cap_guard in v_def)=0 THEN
+  IF position(v_old_cap in v_def)=0 THEN
+   RAISE EXCEPTION 'ГОС.ID: invitation capacity source changed';
+  END IF;
+  EXECUTE replace(v_def,v_old_cap,v_cap_guard||E'\n '||v_old_cap);
+ END IF;
+ v_def:=pg_get_functiondef('public.respond_event_invitation(uuid,boolean)'::regprocedure);
+ IF position('Приглашение доступно только действующему участнику' in v_def)=0 THEN
+  IF position('if p_accept then' in v_def)=0 THEN
+   RAISE EXCEPTION 'ГОС.ID: invitation acceptance source changed';
+  END IF;
+  EXECUTE replace(v_def,'if p_accept then',v_accept_new);
+ END IF;
+ IF position(v_cap_guard in pg_get_functiondef('public.invite_event_collaborator(uuid,uuid)'::regprocedure))=0
+ OR position('Приглашение доступно только действующему участнику' in pg_get_functiondef('public.respond_event_invitation(uuid,boolean)'::regprocedure))=0 THEN
+  RAISE EXCEPTION 'ГОС.ID: invitation guards not installed';
+ END IF;
+END $invitations$;

@@ -47,9 +47,14 @@ assert(collab.includes('Проверьте полномочия до голос�
 assert(collab.includes('приглашение само по себе не подтверждает полномочия'),'Never claim invitations automatically validate authority');
 assert(!collab.includes('if(canInvite)void loadRoster()'),'Use in-memory game members; roster refresh only on request');
 assert(collab.includes('onClick={()=>void loadRoster()}'),'Keep explicit refresh for newly joined students');
+assert(collab.includes("const availableSeats=audience==='all'?30-pendingSeats-acceptedInvites:3-assignedIds.length-pendingSeats"),'Only display available invitation seats');
+assert(workspace.includes('audience={c.audience}'),'Pass source case capacity into invitation controls');
+assert(collab.includes('Лимит участников совместного решения достигнут'),'Explain capacity exhaustion');
 assert(authorityMigration.includes("v_authority_delta:=case when violations>0 then 0 else 1 end;"),'Authority breach must not subtract trust');
 assert(authorityMigration.includes('if v_authority_delta<>0 then'),'Do not create zero trust ledger entries');
 assert(authorityMigration.includes("legal_delta:=case when violations>0 then -least(9,violations*3) else 2 end;"),'Preserve existing lawfulness impact');
 assert(authorityMigration.includes('pg_get_functiondef'),'Patch existing function, no new trigger or reads');
+assert(authorityMigration.includes('Все места совместного решения заняты'),'Server must reject over-invites before acceptance');
+assert(authorityMigration.includes('Приглашение доступно только действующему участнику'),'Reject archived recipients on acceptance');
 
 console.log('PASS: valid TSX, correct-result gating, no spoilers, 40-person eligibility, existing-assignment and archived filtering, empty-state explanation, refresh, SQL rights and responsive CSS.');

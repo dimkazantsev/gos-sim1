@@ -7,13 +7,18 @@ import type {ReturnTypeRepublic} from './viewTypes';
 export type EventInvitation={id:string;case_id:string;recipient_id:string;inviter_id:string;status:string};
 type Entry={id:number;author_id:string;body:string;created_at:string};
 type InviteMember={user_id:string;full_name:string;role_title:string|null;kind:string;roster_archived_at?:string|null};
-export default function EventCollaboration({g,caseId,invitations,assignedIds,closed,votingStarted,onChanged,readOnly=false}:{g:ReturnTypeRepublic;caseId:string;invitations:EventInvitation[];assignedIds:string[];closed:boolean;votingStarted:boolean;onChanged:()=>Promise<void>;readOnly?:boolean}){
+export default function EventCollaboration({g,caseId,audience,invitations,assignedIds,closed,votingStarted,onChanged,readOnly=false}:{g:ReturnTypeRepublic;caseId:string;audience:'single'|'group'|'all';invitations:EventInvitation[];assignedIds:string[];closed:boolean;votingStarted:boolean;onChanged:()=>Promise<void>;readOnly?:boolean}){
  const [entries,setEntries]=useState<Entry[]>([]),[text,setText]=useState(''),[recipient,setRecipient]=useState(''),[busy,setBusy]=useState(false),[notice,setNotice]=useState('');
  const [roster,setRoster]=useState<InviteMember[]|null>(null),[rosterLoading,setRosterLoading]=useState(false);
  const myInvite=invitations.find(i=>i.recipient_id===g.me?.user_id&&i.status==='pending');
  const assigned=assignedIds.includes(g.me?.user_id||'');
  const canChat=(assigned||g.teacher)&&!readOnly&&g.me?.kind!=='observer';
- const canInvite=assigned&&!closed&&!votingStarted&&!readOnly&&g.me?.kind==='student';
+ // Single/group cases allow up to 3 people. Accepted invitations already
+ // count as assignments; pending ones reserve the remaining seats.
+ const pendingSeats=invitations.filter(i=>i.status==='pending').length;
+ const acceptedInvites=invitations.filter(i=>i.status==='accepted').length;
+ const availableSeats=audience==='all'?30-pendingSeats-acceptedInvites:3-assignedIds.length-pendingSeats;
+ const canInvite=assigned&&!closed&&!votingStarted&&!readOnly&&g.me?.kind==='student'&&availableSeats>0;
  const eligible=(roster??g.members).filter(m=>m.kind==='student'&&!m.roster_archived_at
   &&m.user_id!==g.me?.user_id&&!assignedIds.includes(m.user_id)
   &&!invitations.some(i=>i.recipient_id===m.user_id&&(i.status==='pending'||i.status==='accepted')));
@@ -52,6 +57,7 @@ export default function EventCollaboration({g,caseId,invitations,assignedIds,clo
   <button type="button" className="eventInviteRefresh" disabled={busy||rosterLoading} onClick={()=>void loadRoster()}>Обновить список</button>
   {!rosterLoading&&eligible.length===0&&<p className="eventInviteEmpty" role="status">Пригласить пока некого: все зарегистрированные действующие студенты уже участвуют в этом событии или ожидают ответа на приглашение. Когда в игру войдут другие участники, нажмите «Обновить список».</p>}
  </div>}
+ {assigned&&!closed&&!votingStarted&&availableSeats<=0&&<p className="eventInviteExplanation" role="status">Лимит участников совместного решения достигнут. Новые приглашения недоступны.</p>}
  {invitations.length>0&&<div className="eventInviteStatuses">{invitations.map(i=><span key={i.id}>{g.names[i.recipient_id]||'Участник'}: {i.status==='accepted'?'Принял':i.status==='declined'?'Отклонил':i.status==='cancelled'?'Отменено':'Ожидает ответа'}{i.status==='pending'&&(i.inviter_id===g.me?.user_id||g.teacher)&&!readOnly&&<button disabled={busy} onClick={()=>void act('cancel_event_invitation',{p_id:i.id})}>Отменить приглашение</button>}</span>)}</div>}
  {(assigned||g.teacher)&&<div className="eventTextDiscussion"><h4>Обсуждение ситуации</h4><div className="eventDiscussionLog" role="log" aria-live="polite">{entries.length?entries.map(e=><p key={e.id}><b>{g.names[e.author_id]||'Участник'}</b><span>{e.body}</span></p>):<p>Сообщений пока нет.</p>}</div>{canChat&&!closed&&<form onSubmit={e=>{e.preventDefault();if(text.trim())void act('send_event_discussion',{p_case:caseId,p_body:text})}}><input value={text} onChange={e=>setText(e.target.value)} maxLength={2000} placeholder="Короткое текстовое сообщение" aria-label="Сообщение по ситуации"/><button disabled={busy||!text.trim()}>Отправить</button></form>}</div>}
  {notice&&<p role="status">{notice}</p>}</section>;
