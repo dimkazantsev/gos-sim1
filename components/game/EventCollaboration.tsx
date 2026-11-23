@@ -27,7 +27,7 @@ export default function EventCollaboration({g,caseId,invitations,assignedIds,clo
   else setRoster((r.data||[]) as InviteMember[]);
   setRosterLoading(false);
  }
- useEffect(()=>{setRoster(null);setRecipient('');if(canInvite)void loadRoster();},[caseId,g.game?.id,canInvite]);
+ useEffect(()=>{setRoster(null);setRecipient('');},[caseId,g.game?.id]);
  const discussionScope=(g.game?.id||'')+':'+caseId+':'+(g.me?.user_id||'')+':'+assigned+':'+g.teacher;
  const activeDiscussionScope=useRef(discussionScope);activeDiscussionScope.current=discussionScope;
  useEffect(()=>setEntries([]),[discussionScope]);
@@ -39,10 +39,10 @@ export default function EventCollaboration({g,caseId,invitations,assignedIds,clo
  useGameTableSync(assigned||g.teacher?g.game?.id:undefined,['event_discussion_messages'],load,discussionScope,undefined,750,60000,0,caseId);
  async function act(name:string,params:Record<string,unknown>){if(busy)return;setBusy(true);const r=await supabase.rpc(name,params);setNotice(r.error?userError(r.error):'');if(!r.error){setText('');if(name==='invite_event_collaborator')setRecipient('');await Promise.all([onChanged(),load()])}setBusy(false)}
  return <section className="eventCollaboration">
- {assigned&&!closed&&!votingStarted&&<p className="eventInviteExplanation">Кнопка «Пригласить» позволяет привлечь участника с необходимыми полномочиями — например, руководителя профильного ведомства. Приглашённый должен принять приглашение; только после этого он участвует в совместном решении. Это особенно важно, если ваша должность не даёт права самостоятельно принять решение.</p>}
+ {assigned&&!closed&&!votingStarted&&<p className="eventInviteExplanation"><strong>Проверьте полномочия до голосования.</strong> Если вашей должности недостаточно, пригласите компетентного участника до первого голоса. В списке доступны все остальные действующие студенты игры, кроме уже назначенных и ожидающих ответа: приглашение само по себе не подтверждает полномочия. Проверяйте должность выбранного участника. Он должен принять приглашение до общего решения.</p>}
  {myInvite&&!readOnly&&<div className="eventInvitation"><strong>{g.names[myInvite.inviter_id]||'Участник'} приглашает вас к совместному решению</strong><div><button disabled={busy} onClick={()=>void act('respond_event_invitation',{p_id:myInvite.id,p_accept:true})}>Принять приглашение</button><button disabled={busy} onClick={()=>void act('respond_event_invitation',{p_id:myInvite.id,p_accept:false})}>Отклонить</button></div></div>}
  {canInvite&&<div className="eventInviteControls">
-  <label>Пригласить участника
+  <label>Пригласить участника с нужными полномочиями
    <select aria-label="Кого пригласить к рассмотрению ситуации" value={eligible.some(m=>m.user_id===recipient)?recipient:''} disabled={busy||rosterLoading||eligible.length===0} onChange={e=>setRecipient(e.target.value)}>
     <option value="">{rosterLoading?'Обновляем список участников…':eligible.length?'Выберите участника':'Нет доступных участников'}</option>
     {eligible.map(m=><option key={m.user_id} value={m.user_id}>{m.full_name} · {m.role_title||'Без должности'}</option>)}

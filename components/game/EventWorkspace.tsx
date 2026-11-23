@@ -371,6 +371,7 @@ export default function EventWorkspace({g,readOnly=false,mode='feed'}:{g:ReturnT
       <div className="eventStoryRecipients">{assigned.map(a=><span key={a.id}>{members.find(m=>m.user_id===a.recipient_id)?.full_name||'Участник'} · {members.find(m=>m.user_id===a.recipient_id)?.role_title||'Без должности'}</span>)}</div>
       <div className="eventCaseFooter"><span><UsersRound size={15} aria-hidden="true"/>{assigned.length} назначено</span><span><CheckCircle2 size={15} aria-hidden="true"/>{responded.length} ответили · {pct(responded.length,assigned.length)}%</span>
       </div>
+      {expandedCase&&<EventCollaboration g={g} caseId={c.id} invitations={invites} assignedIds={assigned.map(a=>a.recipient_id)} closed={!!outcome} votingStarted={responded.length>0} onChanged={()=>reload(false)} readOnly={readOnly}/>}
       <EventChoicePanel labels={labels} decisions={responded} members={members} profiles={g.profiles} currentChoice={mineAnswer?.choice} canAnswer={!!my&&my.status==='pending'&&me.kind==='student'&&!outcome&&!busyId&&!readOnly&&!pendingInvites} onAnswer={choice=>{if(my)void answer(my,choice)}} revealResults={teacher||!!outcome||!!mineAnswer} showCorrectExplanation={!!mineAnswer&&!!outcome&&me.kind==='student'} correctIndex={bestIndex} bestDescription={bestOption?.description} bestLegalBasis={bestOption?.legal_basis} shuffleSeed={c.id+':'+me.user_id} notice={pendingInvites?'Ожидаем ответа на приглашения.':undefined}/>
 
       {mineAnswer&&!teacher&&<div className="eventOutcomeNote">Ваш голос: {labels[mineAnswer.choice==='accept'?0:mineAnswer.choice==='reject'?1:Math.max(0,Number(mineAnswer.choice.replace('option_',''))-1)]||'Учтён'}</div>}
@@ -385,7 +386,6 @@ export default function EventWorkspace({g,readOnly=false,mode='feed'}:{g:ReturnT
       </>}
      </div>
     </article>
-    {expandedCase&&<EventCollaboration g={g} caseId={c.id} invitations={invites} assignedIds={assigned.map(a=>a.recipient_id)} closed={!!outcome} votingStarted={responded.length>0} onChanged={()=>reload(false)} readOnly={readOnly}/>}
     </div></EventCaseModal>;
    })}
   {notice&&<p className="eventNotice" role="status">{notice}</p>}
