@@ -224,7 +224,7 @@ export default function GovernmentProgramSessionLab({g,onOpenVotes,onOpenDocumen
     </div>
    </section>
    <section className="govMeetingProgrammeList" aria-label="Представление государственных программ">
-    <div className="govMeetingListHeader"><h3>Государственные программы в повестке</h3><p>Для каждой программы: доклад → вопросы выступающему → голосование Правительства → оформление решения.</p></div>
+    <div className="govMeetingListHeader"><h3>Государственные программы в повестке</h3><p>Для каждой программы: доклад → вопросы → голосование → оформление решения. До открытия голосования ответственный министр может доработать ГП на Этапе 10 с повторным согласованием.</p></div>
     {agenda.length===0?<p className="govMeetingHint">В повестке ещё нет государственных программ.</p>:agenda.map((item)=>{
       const p=program(item.program_id),v=vote(item.vote_id);
       const qa=speakerQuestions.filter(q=>q.agenda_item_id===item.id);
