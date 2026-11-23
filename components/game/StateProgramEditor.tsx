@@ -95,7 +95,7 @@ export default function StateProgramEditor({g,program,goals,components,expenses,
   finally{if(active()){busyRef.current=false;setBusy(false)}}
  }
  return <section className={`${styles.panel} ${styles.programEditorPanel}`} aria-label="Форма государственной программы">
-  <div className={`${styles.sectionHead} ${styles.programIntro}`}><div><h3>{program?'Государственная программа · Полная форма':'Новая государственная программа'}</h3><p>Паспорт, цели, мероприятия и расходы заполняются вместе. Сотрудники одного министерства могут сохранять правки до передачи программы Председателю Правительства. Суммы указаны в рублях.</p></div></div>
+  <div className={`${styles.sectionHead} ${styles.programIntro}`}><div><h3>{program?'Государственная программа · Полная форма':'Новая государственная программа'}</h3><p>Паспорт, цели, мероприятия и расходы заполняются вместе. После Этапа 10 ответственный министр может доработать программу на Этапе 11 до открытия голосования. После открытия голосования текст и расходы защищены от изменений. Суммы указаны в рублях.</p></div></div>
   {notice&&<p className={styles.notice} role="status">{notice}</p>}
   {program?.form_version!==2&&program&&editable&&<p className={styles.notice}>В прежнем паспорте: {programMoney(program.total_budget)}. Для сохранения полной формы разнесите эту сумму по строкам расходов и обоснуйте каждую строку.</p>}
   <fieldset className={styles.form} disabled={!editable||busy}>

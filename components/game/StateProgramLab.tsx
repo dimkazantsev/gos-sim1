@@ -14,7 +14,7 @@ type Readiness={ready:boolean;issues:string[];goals:number;directions:number;com
 type BudgetYear={id:string;program_id:string;budget_year:number;amount:number|string};
 type MinistryAssignment={unit_id:string;user_id:string};
 type MinistryUnit={id:string;head_user_id:string|null};
-export default function StateProgramLab({g}:{g:ReturnTypeRepublic}){
+export default function StateProgramLab({g,focusProgramId,revisionOnly=false}:{g:ReturnTypeRepublic;focusProgramId?:string;revisionOnly?:boolean}){
  const {game,me,teacher,members,votes,setError}=g;
  const [programs,setPrograms]=useState<StateProgram[]>([]),[addresses,setAddresses]=useState<Address[]>([]),[priorities,setPriorities]=useState<ProgramPriority[]>([]),[readiness,setReadiness]=useState<Record<string,Readiness>>({});
  const [goals,setGoals]=useState<ProgramGoal[]>([]),[components,setComponents]=useState<ProgramComponent[]>([]),[expenses,setExpenses]=useState<ProgramExpense[]>([]),[years,setYears]=useState<BudgetYear[]>([]);
@@ -24,6 +24,7 @@ export default function StateProgramLab({g}:{g:ReturnTypeRepublic}){
  const [selectedGoals,setSelectedGoals]=useState<string[]>(['','','','','']),[goalsDirty,setGoalsDirty]=useState(false);
  const addressDirty=useRef(false),addressVersion=useRef(0),busyRef=useRef(false),request=useRef(0),readinessRequest=useRef(0),alive=useRef(true),creatingRef=useRef(creating),selectedRef=useRef(selectedId),manualProgramChoice=useRef(false);
  creatingRef.current=creating;selectedRef.current=selectedId;
+ const focusedProgramHandled=useRef('');
  const viewScope=[game?.id,me?.user_id,teacher].join('|'),scope=useRef(viewScope);scope.current=viewScope;
  const active=()=>alive.current&&scope.current===viewScope;
  useEffect(()=>{alive.current=true;return()=>{alive.current=false;request.current++}},[]);
@@ -84,6 +85,12 @@ export default function StateProgramLab({g}:{g:ReturnTypeRepublic}){
    setSelectedGoals(saved.length>=5?saved:[...saved,...Array(5-saved.length).fill('')]);
   }
  }
+ useEffect(()=>{
+  if(!focusProgramId||focusedProgramHandled.current===focusProgramId||!programs.some(p=>p.id===focusProgramId))return;
+  focusedProgramHandled.current=focusProgramId;
+  manualProgramChoice.current=true;
+  setCreating(false);setSelectedId(focusProgramId);
+ },[focusProgramId,programs]);
  useEffect(()=>{if(selectedId&&game&&programs.some(p=>p.id===selectedId&&p.game_id===game.id))void refreshReadiness(selectedId)},[selectedId,viewScope]);
  useGameTableSync(game?.id,['state_programs','state_program_goals','state_program_components','state_program_expenses','state_program_budget_commitments','presidential_addresses','presidential_priorities','state_program_budget_years','institution_assignments','institution_units'],load,viewScope);
  if(!game||!me)return null;
@@ -163,7 +170,7 @@ export default function StateProgramLab({g}:{g:ReturnTypeRepublic}){
    <div className={styles.programApprovalHeading}><div><h3>На согласовании Председателя Правительства</h3><p>Выберите поступившую ГП. Ниже можно согласовать её либо вернуть на доработку с замечаниями.</p></div><span className={styles.programApprovalState}>{pendingPmPrograms.length} ГП</span></div>
    <div className={styles.pmReviewQueue}>{pendingPmPrograms.map(p=><button type="button" key={p.id} aria-pressed={!creating&&selectedId===p.id} onClick={()=>{manualProgramChoice.current=true;creatingRef.current=false;setCreating(false);setSelectedId(p.id);document.getElementById('state-program-approval')?.scrollIntoView({block:'start',behavior:'auto'})}}><strong>{p.title}</strong><small>{p.responsible_ministry}</small><span>{!creating&&selectedId===p.id?'Выбрана':'Открыть решение Председателя'}</span></button>)}</div>
   </section>}
-  {(programs.length>0||teacher||isMinister||isPM)&&<div className="programPicker" aria-label="Выбор государственной программы"><div className="programTabs">{programs.map(p=><button type="button" key={p.id} aria-pressed={!creating&&p.id===selectedId} className={!creating&&p.id===selectedId?'active':''} onClick={()=>{manualProgramChoice.current=true;creatingRef.current=false;setCreating(false);setSelectedId(p.id)}}><b>{p.title}</b><span>{programStatusLabel[p.status]}</span></button>)}</div>{(teacher||isMinister||isPM)&&<button type="button" className="programNew" onClick={()=>{manualProgramChoice.current=true;creatingRef.current=true;setCreating(true);setSelectedId('')}}>Новая программа</button>}</div>}
+  {(programs.length>0||teacher||isMinister||isPM)&&<div className="programPicker" aria-label="Выбор государственной программы"><div className="programTabs">{programs.map(p=><button type="button" key={p.id} aria-pressed={!creating&&p.id===selectedId} className={!creating&&p.id===selectedId?'active':''} onClick={()=>{manualProgramChoice.current=true;creatingRef.current=false;setCreating(false);setSelectedId(p.id)}}><b>{p.title}</b><span>{programStatusLabel[p.status]}</span></button>)}</div>{!revisionOnly&&(teacher||isMinister||isPM)&&<button type="button" className="programNew" onClick={()=>{manualProgramChoice.current=true;creatingRef.current=true;setCreating(true);setSelectedId('')}}>Новая программа</button>}</div>}
   {(selected||editable)&&<StateProgramEditor key={viewScope+'|'+(selected?.id||'new')} g={g} program={selected||null} goals={goals.filter(x=>x.program_id===selected?.id)} components={components.filter(x=>x.program_id===selected?.id)} expenses={expenses.filter(x=>x.program_id===selected?.id)} priorities={publishedPriorities} editable={editable} onSaved={async id=>{if(!active())return;creatingRef.current=false;setCreating(false);setSelectedId(id);await load()}}/>}
   {selected&&<>
    {selected.signed_at&&<p className={styles.notice}>Подписал Председатель Правительства: {members.find(m=>m.user_id===selected.signed_by)?.full_name||'Уполномоченный участник'} · {new Date(selected.signed_at).toLocaleString('ru-RU')}. {selected.status==='adopted'?'Программа принята Правительством.':'Для этой программы подпись была зарегистрирована до завершения голосования.'}</p>}
@@ -179,7 +186,7 @@ export default function StateProgramLab({g}:{g:ReturnTypeRepublic}){
     </ol>
     {selected.pm_revision_reason&&['revision','pm_review'].includes(selected.status)&&<div className={styles.programRevisionNotice} role="status"><strong>Замечания Председателя Правительства</strong><p>{selected.pm_revision_reason}</p>{selected.status==='revision'&&<small>Исправьте программу и повторно направьте её Председателю Правительства.</small>}</div>}
     {vote&&<p className={styles.programApprovalNotice} role="status">Голосование Правительства: {vote.status==='open'?'Идёт · голосуют зарегистрированные участники':vote.result_label||'Завершено'}.</p>}
-    {selected.status==='ready'&&<p className={styles.programApprovalNotice}>Программа подготовлена. Включите её в повестку Этапа 11. Голосование открывается только после доклада.</p>}
+    {selected.status==='ready'&&<p className={styles.programApprovalNotice}>Программа согласована и автоматически включается в повестку Этапа 11. До открытия голосования ответственный министр может вернуть её на доработку.</p>}
     {selected.status==='adopted'&&<p className={styles.programApprovalNotice}>Правительство поддержало программу. Ожидается оформление подписи и публикация постановления по результатам голосования.</p>}
     {selected.status==='rejected'&&<p className={styles.programApprovalNotice}>Программа отклонена. Подписание и публикация по данному голосованию недоступны.</p>}
     <div className={styles.programApprovalActions}>

@@ -51,11 +51,11 @@ function formatStageConsequence(type:string,magnitude:number|null):string{
 }
 
 type Tab='work'|'rules'|'materials'|'check'|'settings';
-type Props={g:ReturnTypeRepublic;stage:Stage;readOnly?:boolean;initialTab?:'materials'|'work';onBack:()=>void;onOpenStage?:(no:number)=>void;onOpenVotes:(id?:string)=>void;onOpenDocument?:(id:string)=>void;onCreateDocument?:(key:string,no:number)=>void;onNavigate?:(view:View)=>void};
+type Props={g:ReturnTypeRepublic;stage:Stage;readOnly?:boolean;initialTab?:'materials'|'work';onBack:()=>void;focusProgramId?:string;onEditStateProgram?:(programId:string)=>void;onOpenStage?:(no:number)=>void;onOpenVotes:(id?:string)=>void;onOpenDocument?:(id:string)=>void;onCreateDocument?:(key:string,no:number)=>void;onNavigate?:(view:View)=>void};
 const VIEW_NAMES:Partial<Record<View,string>>={parties:'Партии и фракции',votes:'Голосования',documents:'Реестр НПА',budget:'Бюджет',events:'События',grades:'Журнал оценок',actions:'Политический процесс',profile:'Профиль'};
 const BODIES:Partial<Record<number,string[]>>={2:['ksrf'],3:['ksrf'],4:['gd'],5:['gd'],11:['government'],12:['gd','committee'],13:['gd','committee','sf'],14:['municipality']};
 
-export default function GovernanceStageWorkspace({g,stage,readOnly=false,initialTab='work',onBack,onOpenStage,onOpenVotes,onOpenDocument,onCreateDocument,onNavigate}:Props){
+export default function GovernanceStageWorkspace({g,stage,readOnly=false,initialTab='work',onBack,focusProgramId,onEditStateProgram,onOpenStage,onOpenVotes,onOpenDocument,onCreateDocument,onNavigate}:Props){
  const [tab,setTab]=useState<Tab>(initialTab);
  const [filingRequest,setFilingRequest]=useState(0);
  const openStage12Filing=()=>{setFilingRequest(n=>n+1);setTab('work')};
@@ -112,7 +112,8 @@ export default function GovernanceStageWorkspace({g,stage,readOnly=false,initial
  const teacher=g.teacher&&!readOnly;
  const stageLocked=!isStageWorkOpen(g.game,stage);
  const scoringClosed=stage.status==='open'&&Boolean(stage.score_closed_at);
- const viewer=readOnly||g.me?.kind==='observer'||(stageLocked&&!teacher);
+ const canRevisitStage10=stage.stage_no===10&&stage.status==='completed'&&g.stages.some(s=>s.stage_no===11&&s.status==='open');
+ const viewer=readOnly||g.me?.kind==='observer'||(stageLocked&&!teacher&&!canRevisitStage10);
  const canRemediateCompleted=stage.status==='completed'&&!readOnly&&g.me?.kind!=='observer'&&awaitingFinalDocuments.length>0&&actionableFinalDocuments.length>0;
  const ksrfSessionBlocked=(stage.stage_no===2||stage.stage_no===3)&&!teacher&&
   !(sessionGate?.stage===stage.stage_no&&sessionGate.ready);
@@ -164,8 +165,8 @@ export default function GovernanceStageWorkspace({g,stage,readOnly=false,initial
      {stage.stage_no===7&&<PresidentialElectionStage7 g={g}/>}
      {stage.stage_no===8&&<GovernmentFormationWorkspace g={g} stageNo={8} onOpenVotes={onOpenVotes} onOpenStage={onOpenStage} onOpenDocument={onOpenDocument} onNavigate={onNavigate}/>}
      {stage.stage_no===9&&<><GovernmentFormationWorkspace g={g} stageNo={9} onOpenVotes={onOpenVotes} onOpenStage={onOpenStage} onOpenDocument={onOpenDocument} onNavigate={onNavigate}/><section id="ministry-teams" className="stageOperationsMinistryTeams"><InstitutionStaffingLab g={g} mode="ministries"/></section></>}
-     {stage.stage_no===10&&<StateProgramLab g={g}/>}
-     {stage.stage_no===11&&<GovernmentProgramSessionLab g={g} onOpenVotes={onOpenVotes} onOpenDocument={onOpenDocument}/>}
+     {stage.stage_no===10&&<StateProgramLab g={g} focusProgramId={focusProgramId} revisionOnly={stage.status==='completed'}/> }
+     {stage.stage_no===11&&<GovernmentProgramSessionLab g={g} readOnly={viewer} onEditProgram={onEditStateProgram} onOpenVotes={onOpenVotes} onOpenDocument={onOpenDocument}/>}
      {stage.stage_no===12&&<Stage12ReadingWorkspace g={g} readOnly={viewer} stage={stage} subjects={formalSubjects} filingRequest={filingRequest} onOpenVotes={onOpenVotes} onOpenDocument={onOpenDocument}/>}
      {stage.stage_no===13&&<BudgetView g={g} readOnly={viewer} onOpenDocument={id=>onOpenDocument?.(id)} onOpenEvents={()=>onNavigate?.('events')} onOpenVotes={onOpenVotes}/>}
      {stage.stage_no===14&&<><MunicipalGovernancePanel g={g}/><MunicipalProjectLab g={g}/></>}
