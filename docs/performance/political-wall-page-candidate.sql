@@ -1,9 +1,12 @@
--- REVIEW ONLY: not an automatic migration. Do not execute on production until full RPC regression and permission verification.
+-- Historical candidate. Installed via migration 20261124185203_optimize_political_wall_page_pool.sql.
+-- Full JSON response matched old query 12/12 before and 12/12 after installation across three roles.
+-- ACL unchanged (anon denied, authenticated allowed), SECURITY INVOKER, STABLE, empty search_path.
+-- Nonmember and malformed cursor rejected before installation; guard unchanged. No active presence at installation.
 -- 2026-11-25: SELECT-only candidate pool tested under authenticated student, teacher, observer RLS;
 -- four cursors each, 12/12 equivalent ordered IDs. Single warm-cache student first-page executions:
 -- original 28.230 ms / 2714 shared buffer hits; candidate 2.446 ms / 182 hits.
 -- Uses existing indexes; does not alter RLS, ACLs, response shape, or other CTEs.
--- This is not a whole-RPC benchmark. Recheck definition against deployment target before generating migration.
+-- This is not a whole-RPC benchmark. No manual execution of this historical copy is needed.
 CREATE OR REPLACE FUNCTION public.get_political_wall_page(p_game_id uuid, p_cursor_pinned boolean DEFAULT NULL::boolean, p_cursor_created_at timestamp with time zone DEFAULT NULL::timestamp with time zone, p_cursor_id uuid DEFAULT NULL::uuid)
  RETURNS jsonb
  LANGUAGE plpgsql

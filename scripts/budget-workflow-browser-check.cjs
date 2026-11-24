@@ -8,7 +8,7 @@ const output=path.join(root,'.design-review','budget-workflow'),baseline=require
 const Module=require('node:module'),ts=require('typescript'),resolve=Module._resolveFilename;
 Module._resolveFilename=function(request,...args){return resolve.call(this,request.startsWith('@/')?path.join(root,request.slice(2)):request,...args)};
 require.extensions['.ts']=(m,f)=>m._compile(ts.transpileModule(fs.readFileSync(f,'utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,esModuleInterop:true,target:ts.ScriptTarget.ES2022}}).outputText,f);
-const {calculateFederalBudget,newBudgetDraft}=require('../components/game/federalBudgetMath');
+const {calculateFederalBudget,newBudgetDraft,budgetMoney}=require('../components/game/federalBudgetMath');
 
 const pageSource=`'use client';
 import {useState} from 'react';
@@ -48,7 +48,7 @@ async function mockTransport(context,page,f){
    case 'list_regional_cases':response=f.regional_events.map(e=>({...e,comic_scene:{region_code:e.region_code}}));break;
    case 'delete_budget_simulator_draft':{const idx=f.plans.findIndex(x=>x.id===p.p_plan_id&&x.status==='draft'&&!x.document_id);assert(idx>=0,'Only a draft may be deleted');assert.equal(f.plans[idx].revision,p.p_revision);f.plans.splice(idx,1);response=true;break;}
    case 'get_budget_simulator':response={state:f.state,plans:f.plans,requests:f.requests,contracts:f.contracts,ledger:[],can_prepare:f.canPrepare,can_request:true,event_count:f.regional_events.length,regional_events:f.regional_events};break;
-   case 'get_signed_state_program_budget':response=f.programmes.map(x=>({...x.program,ministry:x.program.responsible_ministry,program_status:x.program.status,indicators:x.indicators,expense_breakdown:x.expense_breakdown,budget_expense_item:x.commitment.budget_year===2027&&x.commitment.status==='approved'&&x.program.status==='adopted'&&x.program.signed_at&&Number(x.commitment.amount)>0?{id:'program-'+x.program.id,program_id:x.program.id,budget_year:2027,section_key:'01',title:x.program.title,indicator:x.indicators,justification:'Финансирование принятой государственной программы',amount:Number(x.commitment.amount)/1e6}:null,years:[{year:x.commitment.budget_year,amount:x.commitment.amount,status:x.commitment.status}]}));break;
+   case 'get_signed_state_program_budget':response=f.programmes.map(x=>({...x.program,ministry:x.program.responsible_ministry,program_status:x.program.status,indicators:x.indicators,expense_breakdown:x.expense_breakdown,budget_expense_item:x.commitment.budget_year===2027&&x.commitment.status==='approved'&&x.program.status==='adopted'&&x.program.signed_at&&Number(x.commitment.amount)>0?{id:'program-'+x.program.id,program_id:x.program.id,budget_year:2027,section_key:'01',title:x.program.title,indicator:x.indicators,justification:'Финансирование принятой государственной программы',amount:budgetMoney(Number(x.commitment.amount)/1e6)}:null,years:[{year:x.commitment.budget_year,amount:x.commitment.amount,status:x.commitment.status}]}));break;
    case 'get_budget_change_registry_page':{
     const samples=Array.from({length:12},(_,i)=>({entry_key:'income:'+(i+1),category:'Доходы',title:'Изменение доходов '+(i+1),status:'Сохранено',changed_at:'2026-10-12T12:00:00Z',actor_id:null,document_id:null,details:'Доходы федерального бюджета',amount:i+1}));
     const ordered=p.p_focus?[...samples].sort((a,b)=>Number(b.entry_key===p.p_focus)-Number(a.entry_key===p.p_focus)):samples;
