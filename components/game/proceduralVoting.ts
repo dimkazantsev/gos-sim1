@@ -82,16 +82,7 @@ export function votePresetForDocument(doc:FormalDocument):VotePreset|null{
    rule:'Кворум — не менее половины состава; решение большинством присутствующих',
    legalMode:'game',legalBasis:'Правила ГОС.ID: одобрение проекта ФЗ Правительством до внесения в Государственную Думу. Министерство подготавливает законопроект, но не заменяет решение Правительства.'
   };
-  if(doc.status_code==='sf')return {
-   title:'Рассмотрение Советом Федерации: '+doc.title,
-   body:'Совет Федерации рассматривает принятый Государственной Думой законопроект об изменении базовой цены нефти.',
-   mode:'member',institutionKey:'sf',procedureKey:'cutoff_sf_review',
-   quorumKind:'fraction',quorumValue:0.5,majorityKind:'eligible_majority',majorityValue:0.5,
-   allowAbstain:true,tieBreakerChair:false,passTransition:'advance',failTransition:'reject',
-   badge:'БЮДЖЕТНОЕ ПРАВИЛО · СОВЕТ ФЕДЕРАЦИИ',
-   rule:'Одобрение большинством от общего состава; если сенаторы не назначены, решение подтверждает преподаватель',
-   legalMode:'reduction',legalBasis:'Статьи 105 и 106 Конституции РФ: принятие федерального закона и рассмотрение финансового регулирования Советом Федерации. Утверждённое игровое упрощение: в отсутствие назначенных сенаторов решение фиксирует преподаватель.'
-  };
+  if(doc.status_code==='sf')return null;
  }
 
  if(doc.workflow_key==='budget'){
