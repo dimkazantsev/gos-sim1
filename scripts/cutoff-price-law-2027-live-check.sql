@@ -149,17 +149,34 @@ BEGIN
  IF (SELECT cutoff_price FROM public.game_fiscal_policy WHERE game_id=g)<>40 THEN RAISE EXCEPTION 'Cutoff applied before publication';END IF;
 END;$reading3$;
 RESET ROLE;
+DO $legacy_sf$
+DECLARE g uuid:=current_setting('qa.cutoff.game')::uuid;u uuid:=gen_random_uuid();
+BEGIN
+ INSERT INTO auth.users(id,aud,role) VALUES(u,'authenticated','authenticated');
+ INSERT INTO public.game_members(game_id,user_id,full_name,kind,role_title) VALUES(g,u,'QA legacy senator','student','Сенатор Российской Федерации');
+ IF NOT private.vote_member_has_office(g,u,'sf') THEN RAISE EXCEPTION 'FAIL legacy senator fixture';END IF;
+ PERFORM set_config('qa.cutoff.legacy_sf',u::text,true);
+END;$legacy_sf$;
 SET LOCAL ROLE authenticated;
 DO $decision$
-DECLARE g uuid:=current_setting('qa.cutoff.game')::uuid;ids jsonb:=current_setting('qa.cutoff.users')::jsonb;d uuid:=current_setting('qa.cutoff.doc')::uuid;
+DECLARE g uuid:=current_setting('qa.cutoff.game')::uuid;ids jsonb:=current_setting('qa.cutoff.users')::jsonb;d uuid:=current_setting('qa.cutoff.doc')::uuid;denied boolean;
 BEGIN
+ PERFORM set_config('request.jwt.claim.sub',current_setting('qa.cutoff.legacy_sf'),true);
+ denied:=false;BEGIN PERFORM public.confirm_cutoff_sf_review(d,true,'QA unauthorized confirmation');EXCEPTION WHEN insufficient_privilege THEN denied:=true;END;
+ IF NOT denied THEN RAISE EXCEPTION 'FAIL senator confirmed cutoff';END IF;
+ denied:=false;BEGIN PERFORM public.advance_formal_document(d,'advance','QA senator bypass');EXCEPTION WHEN insufficient_privilege THEN denied:=true;END;
+ IF NOT denied THEN RAISE EXCEPTION 'FAIL senator bypassed teacher';END IF;
+ denied:=false;BEGIN PERFORM public.create_procedural_vote(g,'QA prohibited ballot',null,'member','sf','cutoff_sf_review','fraction',.5,'eligible_majority',.5,true,false,d,'advance','reject');EXCEPTION WHEN insufficient_privilege THEN denied:=true;END;
+ IF NOT denied THEN RAISE EXCEPTION 'FAIL senator opened ballot';END IF;
  PERFORM set_config('request.jwt.claim.sub',ids->>'teacher',true);
+ denied:=false;BEGIN PERFORM public.create_procedural_vote(g,'QA prohibited ballot',null,'member','sf','cutoff_sf_review','fraction',.5,'eligible_majority',.5,true,false,d,'advance','reject');EXCEPTION WHEN insufficient_privilege THEN denied:=true;END;
+ IF NOT denied THEN RAISE EXCEPTION 'FAIL separate ballot';END IF;
  BEGIN
  PERFORM public.confirm_cutoff_sf_review(d,false,'QA SF rejects cutoff law');
  IF (SELECT status_code FROM public.formal_documents WHERE id=d)<>'rejected' OR (SELECT cutoff_price FROM public.game_fiscal_policy WHERE game_id=g)<>40 THEN RAISE EXCEPTION 'Rejected cutoff law changed price';END IF;
  RAISE EXCEPTION USING ERRCODE='ZX001',MESSAGE='rollback rejected branch';
  EXCEPTION WHEN SQLSTATE 'ZX001' THEN NULL;END;
- PERFORM public.confirm_cutoff_sf_review(d,true,'QA confirms SF decision in absence of senators');
+ PERFORM public.confirm_cutoff_sf_review(d,true,'QA teacher confirms SF despite legacy senator role');
  IF (SELECT status_code FROM public.formal_documents WHERE id=d)<>'president' OR (SELECT cutoff_price FROM public.game_fiscal_policy WHERE game_id=g)<>40 THEN RAISE EXCEPTION 'SF approval changed price';END IF;
  PERFORM set_config('request.jwt.claim.sub',ids->>'president',true);
  PERFORM public.advance_formal_document(d,'advance','QA President signs cutoff law');

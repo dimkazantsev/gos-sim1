@@ -166,6 +166,14 @@ begin
 end;$failure_branches$;
 reset role;
 update state_metrics set value=70 where game_id=current_setting('qa.budget.game')::uuid and metric_key='lawfulness';
+do $legacy_sf$
+declare g uuid:=current_setting('qa.budget.game')::uuid;u uuid:=gen_random_uuid();
+begin
+ insert into auth.users(id,aud,role) values(u,'authenticated','authenticated');
+ insert into game_members(game_id,user_id,full_name,kind,role_title,group_name) values(g,u,'QA legacy senator','student','Сенатор Российской Федерации','QA');
+ if not private.vote_member_has_office(g,u,'sf') then raise exception 'FAIL legacy senator fixture';end if;
+ perform set_config('qa.budget.legacy_sf',u::text,true);
+end;$legacy_sf$;
 set local role authenticated;
 do $publish$
 declare g uuid:=current_setting('qa.budget.game')::uuid;ids jsonb:=current_setting('qa.budget.users')::jsonb;doc uuid:=current_setting('qa.budget.doc')::uuid;pl uuid:=current_setting('qa.budget.plan')::uuid;v uuid;r jsonb;reading integer;scenario integer;denied boolean;
@@ -179,7 +187,9 @@ begin
  end loop;
  if (select status_code from formal_documents where id=doc)<>'sf' then raise exception 'FAIL budget SF route: % lawfulness %',(select status_code from formal_documents where id=doc),(select value from state_metrics where game_id=g and metric_key='lawfulness');end if;
  if (select last_plan_id from budget_simulator_state where game_id=g) is not null then raise exception 'FAIL prematurely executed';end if;
- perform set_config('request.jwt.claim.sub',ids->>'duma_a',true);
+ perform set_config('request.jwt.claim.sub',current_setting('qa.budget.legacy_sf'),true);
+ denied:=false;begin perform advance_formal_document(doc,'advance','QA prohibited senator approval');exception when insufficient_privilege then denied:=true;end;
+ if not denied then raise exception 'FAIL senator bypassed teacher';end if;
  denied:=false;begin perform confirm_budget_sf_review(doc,true,'QA unauthorized approval');exception when insufficient_privilege then denied:=true;end;
  if not denied then raise exception 'FAIL participant confirmed SF';end if;
  perform set_config('request.jwt.claim.sub',ids->>'teacher',true);
@@ -196,7 +206,7 @@ begin
  raise exception using errcode='ZX001',message='rollback SF branch';
  exception when sqlstate 'ZX001' then null;end;
  end loop;
- perform confirm_budget_sf_review(doc,true,'QA approved SF review without assigned senators');
+ perform confirm_budget_sf_review(doc,true,'QA teacher confirms SF review despite legacy senator role');
  if (select status_code from formal_documents where id=doc)<>'president' then raise exception 'FAIL confirmed SF approval';end if;
  denied:=false;begin perform advance_formal_document(doc,'advance','QA unauthorized teacher signature');exception when others then if sqlerrm not like '%Current stage belongs%' then raise;end if;denied:=true;end;
  if not denied then raise exception 'FAIL teacher signed as President';end if;
