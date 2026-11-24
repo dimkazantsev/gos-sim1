@@ -34,8 +34,11 @@ function accounting(c,label,eventRevenue=0){
  near(c.revenue-c.expenditure,c.balance,label+': balance');
  near(Math.max(0,c.expenditure-c.revenue),c.deficit,label+': deficit');
  near(Math.max(0,c.revenue-c.expenditure),c.surplus,label+': surplus');
- near(c.deficit+c.credit_outflow+(c.fnb_oil_change??0),c.funding_need,label+': loan principal and FNB oil savings remain below the expenditure line');
- near(Math.max(0,c.funding_need-c.financing),c.funding_gap,label+': uncovered financing');
+ // Signed balance matters: a surplus pays financial outflows before borrowing.
+ const netNeed=c.expenditure-c.revenue+c.credit_outflow+(c.fnb_oil_change??0);
+ near(Math.max(0,netNeed),c.funding_need,label+': loan principal and FNB oil savings remain below the expenditure line, including surplus');
+ near(Math.max(0,netNeed-c.financing),c.funding_gap,label+': uncovered financing');
+ near(Math.max(0,c.financing-netNeed),c.cash_excess,label+': free cash after all financial outflows');
 }
 accounting(first,'Unchanged baseline');
 assert.equal(article(first,'profit').federal_share,.32,'The federal income is only its assigned share of total profit tax');

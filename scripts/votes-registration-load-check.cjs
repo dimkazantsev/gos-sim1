@@ -162,7 +162,28 @@ async function staleMeetingActions(){
   await make(ctx)[name](name==='saveStage12Editor'?false:'agenda');assert.equal(busy,false,name+' releases busy on network failure');assert.equal(saving,false,name+' releases saving on network failure');assert.deepEqual(errors,['network failure'],name+' reports a network error');
  }
 }
+
+// Validate actual memoized queue expressions against the previous direct
+// predicates, including closed and unrelated votes. No network or React DOM.
+function indexedDocumentQueues(){
+ const ts=require('typescript'),source=fs.readFileSync(path.join(__dirname,'../components/game/VotesView.tsx'),'utf8');
+ const ast=ts.createSourceFile('VotesView.tsx',source,ts.ScriptTarget.Latest,true,ts.ScriptKind.TSX),nodes={};
+ function visit(n){if(ts.isVariableDeclaration(n)&&['openDocumentSteps','scheduledBills','pendingNpas'].includes(n.name.getText(ast)))nodes[n.name.getText(ast)]=n.getText(ast);ts.forEachChild(n,visit)}visit(ast);
+ assert.equal(Object.keys(nodes).length,3);
+ const code=ts.transpileModule('const '+nodes.openDocumentSteps+';const '+nodes.scheduledBills+';const '+nodes.pendingNpas+';return [scheduledBills,pendingNpas]',{compilerOptions:{target:ts.ScriptTarget.ES2022}}).outputText;
+ const evaluate=new Function('formalDocuments','votes','votePresetForDocument','useMemo',code);
+ const preset=d=>d.status_code==='agenda'?{}:null;
+ for(let shift=0;shift<30;shift++){
+  const documents=Array.from({length:300},(_,i)=>({id:'d'+i,workflow_key:i%3===0?'bill':'government_act',doc_type:i%11===0?'minutes':'government_order',status_code:(i+shift)%7===0?'published':i%3===0?'reading1':'agenda'}));
+  const votes=Array.from({length:200},(_,i)=>({formal_document_id:'d'+(i*7%300),formal_step_code:i%3===0?'reading1':'agenda',status:(i+shift)%5===0?'closed':'open'}));
+  const indexed=evaluate(documents,votes,preset,fn=>fn());
+  const has=d=>votes.some(v=>v.formal_document_id===d.id&&v.formal_step_code===d.status_code&&v.status==='open');
+  assert.deepEqual(indexed,[documents.filter(d=>d.workflow_key==='bill'&&!['published','rejected'].includes(d.status_code)&&!has(d)),documents.filter(d=>d.workflow_key!=='bill'&&!['state_program','meeting_agenda','minutes'].includes(d.doc_type)&&preset(d)&&!has(d))]);
+ }
+}
+
 async function main(){
+ indexedDocumentQueues();
  async function model(old){const sessions=Array.from({length:40},()=>realm('votes',old));await tick();for(const r of sessions)await r.settle();for(let second=0;second<12;second++){for(const r of sessions)for(let i=0;i<8;i++)r.local('institution_session_registrations');for(const r of sessions)await r.advance(1000)}const reads=sessions.reduce((n,r)=>n+r.metrics().reads,0);for(const r of sessions)r.close();return reads}
  async function idle(old){const sessions=Array.from({length:40},()=>realm('votes',old));await tick();for(const r of sessions)await r.settle();for(const r of sessions)await r.advance(20*60000);const reads=sessions.reduce((n,r)=>n+r.metrics().reads,0);for(const r of sessions)r.close();return reads}
  const before=process.env.PERFORMANCE_BASELINE_REF?await model(true):null,reads=await model(false);
