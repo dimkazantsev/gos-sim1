@@ -71,7 +71,7 @@ async function sqlTest(){
   await db.exec(rulesMigration);
   for(const table of ruleTables){
    await db.query('insert into public.'+table+' values (1,$1,\'secret\'),(2,$1,\'secret\'),(3,$2,\'secret\')',[game,another]);
-   await db.query('update public.'+table+' set game_id=$2 where id=1',[game,another]);
+   await db.query('update public.'+table+' set game_id=$2 where id=1 and game_id=$1',[game,another]);
    await db.query('delete from public.'+table+' where id in (1,3)');
   }
   const ruleSignals=(await db.query("select topic,event,payload,is_private from realtime.messages where event='game_rules_changed' order by id")).rows;
