@@ -322,7 +322,7 @@ CREATE OR REPLACE FUNCTION public.propose_cutoff_price_bill(p_game_id uuid, p_ne
  SET search_path TO ''
 AS $function$
 DECLARE v_uid uuid:=auth.uid();v_old numeric;v_doc uuid;v_existing uuid;
- v_steps jsonb;v_stage integer;v_no text;v_body text;
+ v_steps jsonb;v_stage integer;v_no text;v_body text;v_office_id uuid;
 BEGIN
  IF NOT private.can_propose_cutoff_price(p_game_id,v_uid) THEN
   RAISE EXCEPTION 'Инициативу вправе подготовить только действующий руководитель Министерства по экономической политике.' USING errcode='42501';
@@ -344,6 +344,11 @@ BEGIN
  WHERE st.game_id=p_game_id AND st.stage_no=12 AND st.status='open'
   AND (st.deadline IS NULL OR st.deadline>clock_timestamp());
  IF v_stage IS NULL THEN RAISE EXCEPTION 'Для рассмотрения изменения бюджетного правила необходимо открыть Этап 12 (законодательная процедура).' USING errcode='42501';END IF;
+ SELECT a.id INTO v_office_id FROM public.game_office_assignments a
+ WHERE a.game_id=p_game_id AND a.user_id=v_uid AND a.status='active'
+  AND a.role_title='Министерство по экономической политике'
+ ORDER BY a.created_at DESC,a.id LIMIT 1;
+ IF v_office_id IS NULL THEN RAISE EXCEPTION 'Действующее назначение министра не найдено.' USING errcode='42501';END IF;
  v_doc:=gen_random_uuid();
  v_no:='ГОС.ID-ЗП-ФЗ-'||lpad(nextval('public.formal_registry_seq')::text,4,'0');
  v_steps:=jsonb_insert(private.formal_workflow('bill'),'{1}',jsonb_build_object(
@@ -369,7 +374,7 @@ BEGIN
   'author',jsonb_build_object('registry_independent',true,'cutoff_price_proposal',true,
     'proposal_old_price',v_old,'proposal_new_price',p_new_price,
     'issuer_name','Правительство Российской Федерации','acting_user_id',v_uid,
-    'acting_office_title','Министерство по экономической политике',
+    'acting_office_title','Министерство по экономической политике','acting_office_id',v_office_id,
     'legal_basis','Пункт 4 статьи 96.6 БК РФ; статьи 104–107 Конституции РФ'));
  INSERT INTO private.cutoff_price_law_proposals(
   document_id,game_id,author_id,request_id,old_price,new_price,reason)
