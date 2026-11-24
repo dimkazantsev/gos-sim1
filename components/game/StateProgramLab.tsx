@@ -35,10 +35,10 @@ export default function StateProgramLab({g,focusProgramId,revisionOnly=false}:{g
  // Once the office role arrives, open the programme actually waiting for this chair.
  // Never override a programme the user explicitly selected.
  useEffect(()=>{
-  if(!canSubmitProgramme||manualProgramChoice.current||creatingRef.current)return;
+  if(!(teacher||canSubmitProgramme)||manualProgramChoice.current||creatingRef.current)return;
   const waiting=programs.find(p=>p.status==='pm_review'&&!p.signed_at);
   if(waiting&&selectedId!==waiting.id)setSelectedId(waiting.id);
- },[canSubmitProgramme,programs,selectedId,viewScope]);
+ },[teacher,canSubmitProgramme,programs,selectedId,viewScope]);
  async function refreshReadiness(programId:string){
   if(!active()||!game||!programId)return;
   const version=++readinessRequest.current;
@@ -174,7 +174,7 @@ export default function StateProgramLab({g,focusProgramId,revisionOnly=false}:{g
   {(programs.length>0||teacher||isMinister||isPM)&&<div className="programPicker" aria-label="Выбор государственной программы"><div className="programTabs">{programs.map(p=><button type="button" key={p.id} aria-pressed={!creating&&p.id===selectedId} className={!creating&&p.id===selectedId?'active':''} onClick={()=>{manualProgramChoice.current=true;creatingRef.current=false;setCreating(false);setSelectedId(p.id)}}><b>{p.title}</b><span>{programStatusLabel[p.status]}</span></button>)}</div>{!revisionOnly&&(teacher||isMinister||isPM)&&<button type="button" className="programNew" onClick={()=>{manualProgramChoice.current=true;creatingRef.current=true;setCreating(true);setSelectedId('')}}>Новая программа</button>}</div>}
   {(selected||editable)&&<StateProgramEditor key={viewScope+'|'+(selected?.id||'new')} g={g} program={selected||null} goals={goals.filter(x=>x.program_id===selected?.id)} components={components.filter(x=>x.program_id===selected?.id)} expenses={expenses.filter(x=>x.program_id===selected?.id)} priorities={publishedPriorities} editable={editable} onSaved={async id=>{if(!active())return;creatingRef.current=false;setCreating(false);setSelectedId(id);await load()}}/>}
   {selected&&<>
-   {selected.signed_at&&<p className={styles.notice}>Подписал Председатель Правительства: {members.find(m=>m.user_id===selected.signed_by)?.full_name||'Уполномоченный участник'} · {new Date(selected.signed_at).toLocaleString('ru-RU')}. {selected.status==='adopted'?'Программа принята Правительством.':'Для этой программы подпись была зарегистрирована до завершения голосования.'}</p>}
+   {selected.signed_at&&<p className={styles.notice}>{members.find(m=>m.user_id===selected.signed_by)?.kind==='teacher'?'Удостоверил преподаватель: ':'Подписал Председатель Правительства: '}{members.find(m=>m.user_id===selected.signed_by)?.full_name||'Уполномоченный участник'} · {new Date(selected.signed_at).toLocaleString('ru-RU')}. {selected.status==='adopted'?'Программа принята Правительством.':'Для этой программы подпись была зарегистрирована до завершения голосования.'}</p>}
    {selected.form_version!==2&&years.some(x=>x.program_id===selected.id)&&<section className={styles.panel}><h3>Финансирование сохранённой программы</h3><div className={styles.statList}>{years.filter(x=>x.program_id===selected.id).map(x=><div key={x.id}><span>{x.budget_year}</span><strong>{programMoney(x.amount)}</strong></div>)}</div><p>Бюджет паспорта: <b>{programMoney(selected.total_budget)}</b></p></section>}
    <section className={styles.panel} aria-label="Проверка готовности программы"><h3>{check?.ready?'Программа готова к согласованию':'Проверка заполнения программы'}</h3>{check&&!check.ready&&<ul>{check.issues.map(x=><li key={x}>{x}</li>)}</ul>}<div className={styles.statList}><div><span>Цели</span><strong>{check?.goals??0}</strong></div><div><span>Направления</span><strong>{check?.directions??0} / 3</strong></div><div><span>Структурные элементы</span><strong>{check?.components??0} / 25</strong></div><div><span>Финансирование по годам</span><strong>{check?.budget_years??0} / {check?.expected_budget_years??0}</strong></div></div></section>
    <section id="state-program-approval" className={styles.programApproval} aria-label="Согласование и подписание государственной программы">
@@ -202,7 +202,7 @@ export default function StateProgramLab({g,focusProgramId,revisionOnly=false}:{g
        <button type="button" disabled={busy} className="primary" onClick={()=>void run('advance_state_program',{p_program_id:selected.id,p_action:'pm_ready'})}>Внести в повестку</button>
       </div>
      </div>}
-     {(teacher||isPM)&&selected.status==='adopted'&&!g.formalDocuments.some(d=>d.game_id===game!.id&&d.stage_no===11&&d.doc_type==='government_resolution'&&d.metadata?.state_program_id===selected.id&&d.status_code==='published')&&<button type="button" disabled={busy} className="primary" onClick={()=>void run('sign_adopted_state_program',{p_program_id:selected.id})}>Подписать и опубликовать принятую программу</button>}
+     {(teacher||isPM)&&selected.status==='adopted'&&!g.formalDocuments.some(d=>d.game_id===game!.id&&d.stage_no===11&&d.doc_type==='government_resolution'&&d.metadata?.state_program_id===selected.id&&d.status_code==='published')&&<button type="button" disabled={busy} className="primary" onClick={()=>void run('sign_adopted_state_program',{p_program_id:selected.id})}>{teacher?'Удостоверить и опубликовать принятую программу':'Подписать и опубликовать принятую программу'}</button>}
     </div>
    </section>
   </>}
