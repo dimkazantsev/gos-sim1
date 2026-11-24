@@ -1,0 +1,10 @@
+# P1: 100-player nightly capacity and index/cron evidence
+
+Measured from production statistics, without writes or test traffic, 25 November 2026 (session date).
+
+- 7 scheduled jobs: 1857/1857 successful in the preceding 24h; recorded summed job durations 55.11 s (not CPU or wall-clock utilisation).
+- Achievement worker: 392 invocations over seven days; p95 117.0 ms, maximum 192.1 ms, no failed job runs. Job success is not proof of individual award success (worker handles errors).
+- Current schedule 56 slots/night, one member/slot: at most 56 processed. Original worker retained. Candidate adaptive wrapper processes at most two sequential members only when ready backlog exceeds future slots, never starts a second if the first took >=1 s. Same schedule, lock, timeout, original worker, retry policy and role restrictions. No additional timers/jobs.
+- Schedule model (no SQL or real traffic): [{"n":40,"completed":40,"calls":40,"max":1},{"n":56,"completed":56,"calls":56,"max":1},{"n":57,"completed":57,"calls":57,"max":2},{"n":100,"completed":100,"calls":100,"max":2},{"n":112,"completed":112,"calls":112,"max":2},{"n":113,"completed":112,"calls":112,"max":2}]. Full PGlite fixture SQL test added to existing test file; must pass before migration. 112 is theoretical maximum, not a guaranteed capacity under failures or slow workers.
+- Index inspection: most scanned relations include game_members (28 estimated live tuples, 84,578,784 seq tuples read since stats reset), chat_messages (1,335 estimated live, 13,210,166 seq tuples read), event_assignments (121, 6,738,223 seq tuples read). Existing indexes on membership PK/user, channel activity, event badge, political feed and activity journal used. Exact nonunique duplicates (same keys, opclass, collation, order, predicate, access method, included columns): zero. Reverse-order chat indexes may be useful for mixed order and NULL ordering, so do not drop based solely on scan counters. Small-table sequential scans may be planner-optimal; no blanket index additions.
+- Cron sum is measured across jobs; optimize further only with call-specific evidence. Production not modified by this candidate.
