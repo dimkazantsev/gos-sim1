@@ -1,7 +1,10 @@
-/* The meeting registration panel previews the canonical Stage 12 Duma agenda. */
-.institutionRegistrationPanel .civicAgendaSyncedPreview{min-width:0;margin:12px 0;padding:15px 16px;border:1px solid var(--gs-border);border-radius:var(--gs-radius-sm);background:var(--gs-surface-soft)}
-.institutionRegistrationPanel .civicAgendaSyncedPreview>strong{display:block;margin-bottom:9px;font-size:13px;line-height:1.4;font-weight:750;color:var(--gs-ink)}
-.institutionRegistrationPanel .civicAgendaSyncedPreview>pre{margin:0;max-height:340px;overflow:auto;white-space:pre-wrap;overflow-wrap:anywhere;font-family:inherit;font-size:13px;line-height:1.6;color:var(--gs-ink-2)}
+/* Canonical meeting-document previews for the Duma and Government. */
+.institutionRegistrationPanel .civicAgendaSyncedPreview,
+.govMeetingAgendaCard>.civicAgendaSyncedPreview{min-width:0;margin:12px 0;padding:15px 16px;border:1px solid var(--gs-border);border-radius:var(--gs-radius-sm);background:var(--gs-surface-soft)}
+.institutionRegistrationPanel .civicAgendaSyncedPreview>strong,
+.govMeetingAgendaCard>.civicAgendaSyncedPreview>strong{display:block;margin-bottom:9px;font-size:13px;line-height:1.4;font-weight:750;color:var(--gs-ink)}
+.institutionRegistrationPanel .civicAgendaSyncedPreview>pre,
+.govMeetingAgendaCard .govMeetingAgendaText{margin:0;max-height:340px;overflow:auto;white-space:pre-wrap;overflow-wrap:anywhere;font-family:inherit;font-size:13px;line-height:1.6;color:var(--gs-ink-2)}
 @media(max-width:640px){.institutionRegistrationPanel .civicAgendaSyncedPreview{padding:12px}.institutionRegistrationPanel .civicAgendaSyncedPreview>pre{max-height:260px}}
 
 /* Shared column edges, consistent with the rest of the meeting form. */
@@ -30,3 +33,22 @@
 
 .civicRegistration .civicAgendaEditBody .civicAgendaTextEditor{width:100%;min-width:0;min-height:280px;resize:vertical;white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.6;font-size:13px}
 @media(max-width:600px){.civicRegistration .civicAgendaEditBody .civicAgendaTextEditor{min-height:240px}}
+
+/* Government agenda: match the existing 22px card gutters, use normal project
+   typography, and allow long programme names to wrap on narrow screens. */
+.govSessionLab .govMeetingAgendaCard>.civicAgendaSyncedPreview{box-sizing:border-box;margin:0 22px 16px;max-width:100%;min-width:0}
+.govSessionLab .govMeetingAgendaCard .govMeetingAgendaText{box-sizing:border-box;min-width:0;max-width:100%;max-height:none;overflow:visible;white-space:pre-wrap;overflow-wrap:anywhere;word-break:normal;font-family:inherit;font-weight:500;line-height:1.65}
+.govSessionLab .govMeetingAgendaCard>.govReviewForm{box-sizing:border-box;margin:16px 22px;min-width:0}
+.govSessionLab .govMeetingAgendaCard>.govReviewForm textarea{box-sizing:border-box;width:100%;max-width:100%;min-width:0;white-space:pre-wrap;overflow-wrap:anywhere;font-family:inherit}
+.govSessionLab .govMeetingAgendaCard>.govMeetingAgendaStageHint{margin:12px 22px 16px}
+.govSessionLab .govMeetingAgendaActions>div:first-child{flex:1 1 210px;min-width:0;overflow-wrap:anywhere}
+.govSessionLab .govMeetingAgendaActions>button{max-width:100%;min-width:0;white-space:normal;overflow-wrap:anywhere}
+.govSessionLab .govMeetingAgendaActions .govMeetingRefreshPrograms span{white-space:normal;min-width:0}
+@media(max-width:600px){
+ .govSessionLab .govMeetingAgendaCard>.civicAgendaSyncedPreview,
+ .govSessionLab .govMeetingAgendaCard>.govReviewForm,
+ .govSessionLab .govMeetingAgendaCard>.govMeetingAgendaStageHint{margin-left:16px;margin-right:16px}
+ .govSessionLab .govMeetingAgendaCard>.civicAgendaSyncedPreview{padding:12px}
+ .govSessionLab .govMeetingAgendaActions>div:first-child{flex:0 0 auto}
+ .govSessionLab .govMeetingAgendaActions>button{width:100%;box-sizing:border-box}
+}
