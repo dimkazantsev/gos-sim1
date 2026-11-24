@@ -109,7 +109,7 @@ export default function DocumentsView({g,focusId,createTemplate,createStageNo,on
  const [vetoSfNote,setVetoSfNote]=useState('');
  const [cutoffSfNote,setCutoffSfNote]=useState('');
  const [billAmendmentGate,setBillAmendmentGate]=useState<BillAmendmentGate|null>(null);
- const [institutionSigners,setInstitutionSigners]=useState<{required:{user_id:string;office:string;signed:boolean;facsimile_url?:string|null}[];can_sign:boolean}|null>(null);
+ const [institutionSigners,setInstitutionSigners]=useState<{required:{user_id:string;office:string;display_name?:string|null;signed:boolean;facsimile_url?:string|null}[];can_sign:boolean}|null>(null);
  const [documentSignatures,setDocumentSignatures]=useState<{id:string;signer_id:string;signed_at:string;history_id:number;url:string|null}[]>([]);
  const [supportDocuments,setSupportDocuments]=useState<SupportDocument[]>([]),[supportCategory,setSupportCategory]=useState('opinion'),[supportTitle,setSupportTitle]=useState(''),[supportNote,setSupportNote]=useState(''),[supportFile,setSupportFile]=useState<File|null>(null),[supportFormOpen,setSupportFormOpen]=useState(false);
 
@@ -226,9 +226,9 @@ export default function DocumentsView({g,focusId,createTemplate,createStageNo,on
    try{
     const {data,error}=await supabase.rpc('get_institution_document_signers',{p_document_id:selected.id});
     if(error||!data||!Array.isArray(data.required)){if(alive)setInstitutionSigners(null);return}
-    const raw=data.required as {user_id:string;office:string;signed:boolean;facsimile_path?:string|null}[];
+    const raw=data.required as {user_id:string;office:string;display_name?:string|null;signed:boolean;facsimile_path?:string|null}[];
     const required=await Promise.all(raw.map(async item=>({
-     user_id:item.user_id,office:item.office,signed:item.signed,
+     user_id:item.user_id,office:item.office,display_name:item.display_name,signed:item.signed,
      facsimile_url:item.facsimile_path?await signedAsset(item.facsimile_path):null
     })));
     if(alive)setInstitutionSigners({required,can_sign:!!data.can_sign});
