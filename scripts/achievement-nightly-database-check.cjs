@@ -160,7 +160,10 @@ async function main(){
    for(const minute of slots)await tick(stamp(minute));
    assert.equal(await checked(),56,'Baseline: original worker can complete only 56 of 100');
   }finally{await db.exec('ROLLBACK')}
-  await db.exec(fs.readFileSync(path.join(work,'docs/performance/achievement-nightly-capacity-candidate.sql'),'utf8'));
+  const candidateSql=fs.readFileSync(path.join(work,'docs/performance/achievement-nightly-capacity-candidate.sql'),'utf8');
+  const deployedSql=fs.readFileSync(path.join(work,'supabase/migrations/20261124200138_achievement_nightly_capacity_100.sql'),'utf8');
+  assert(deployedSql.endsWith(candidateSql.replace('-- Candidate only. Not applied.','-- Bounded adaptive nightly worker; tested in disposable PostgreSQL.')),'Deployed worker body matches verified candidate');
+  await db.exec(candidateSql);
   async function batchTick(iso){return(await db.query('SELECT private.run_nightly_achievements_batch($1::timestamptz) n',[iso])).rows[0].n}
   assert.equal(await batchTick(date+'T19:59:00Z'),0);
   const callsBefore=(await db.query('SELECT count(*)::int n FROM private.fixture_calls')).rows[0].n;
