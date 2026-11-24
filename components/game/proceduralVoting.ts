@@ -52,7 +52,7 @@ export function canReferenceVoteDocument(doc:FormalDocument,stageNo:number){
 }
 
 export function votePresetForDocument(doc:FormalDocument):VotePreset|null{
- if(['meeting_agenda','minutes'].includes(doc.doc_type))return null;
+ if(['meeting_agenda','minutes','state_program'].includes(doc.doc_type)||doc.doc_type==='government_resolution'&&doc.stage_no===11&&doc.metadata?.state_program_id)return null;
  const threshold=billThreshold(doc);
 
  if(doc.status_code==='sf_veto'&&['fz_bill','federal_budget'].includes(doc.doc_type)){
