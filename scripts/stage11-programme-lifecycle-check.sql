@@ -104,5 +104,14 @@ begin
  if (select count(*) from public.formal_documents where game_id=g and doc_type='government_resolution' and metadata->>'state_program_id'=b::text)<>2 then raise exception 'FAIL second resolution';end if;
 end;$again$;
 reset role;
+do $late$
+declare g uuid:=current_setting('qa.budget.game')::uuid;ids jsonb:=current_setting('qa.budget.users')::jsonb;t uuid:=(ids->>'teacher')::uuid;m uuid:=(ids->>'minister')::uuid;c uuid:=gen_random_uuid();s uuid:=current_setting('qa.gp.s')::uuid;
+begin
+ perform set_config('request.jwt.claim.sub',t::text,true);
+ insert into public.state_programs(id,game_id,title,responsible_ministry,responsible_minister_id,created_by,status)
+ values(c,g,'QA late programme','Министерство по экономической политике',m,m,'ready');
+ if not exists(select 1 from public.government_program_agenda a join public.government_sessions gs on gs.id=a.session_id where a.program_id=c and gs.id<>s and gs.status='draft' and gs.agenda_approved_at is null) then raise exception 'FAIL late programme';end if;
+ if not exists(select 1 from public.government_sessions gs join public.formal_documents d on d.id=gs.agenda_document_id where gs.id=s and gs.status='open' and d.status_code='published') then raise exception 'FAIL signed agenda changed';end if;
+end;$late$;
 rollback;
 select 'PASS: auto agenda, registry, releasing revised active report, accepted vote, return after acceptance, old vote retained, edit, new vote, signature' result;

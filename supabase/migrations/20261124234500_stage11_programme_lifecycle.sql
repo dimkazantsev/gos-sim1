@@ -10,6 +10,7 @@ BEGIN
  WHERE a.program_id=p.id AND a.status<>'withdrawn' ORDER BY s.session_no DESC,a.created_at DESC LIMIT 1;
  IF item_status IS NULL AND p.status NOT IN ('adopted','government_vote','rejected') THEN RETURN;END IF;
  IF p.status='revision' THEN code:='revision';label:='На доработке';owner:='ministry';step:=0;
+ ELSIF p.status IN ('draft','minister_review','pm_review') AND item_status IS NOT NULL THEN code:='revision';label:=CASE WHEN p.status='draft' THEN 'На доработке' ELSE 'На повторном согласовании' END;owner:=CASE WHEN p.status='pm_review' THEN 'government' ELSE 'ministry' END;step:=0;
  ELSIF p.status='adopted' AND p.signed_at IS NOT NULL THEN code:='published';label:='Подписана и опубликована';owner:='system';step:=3;
  ELSIF p.status='adopted' THEN code:='adopted';label:='Принята — ожидает подписи';owner:='government';step:=2;
  ELSIF p.status='rejected' THEN code:='rejected';label:='Отклонена голосованием';owner:='system';step:=1;
@@ -27,7 +28,10 @@ BEGIN
   UPDATE public.formal_documents SET status_code=code,status_label=label,current_owner_key=owner,current_step=step,updated_at=now() WHERE id=d.id;
   PERFORM set_config('app.gos_stage11_registry_status_id','',true);
   INSERT INTO public.formal_document_history(document_id,game_id,actor_id,action,from_status,to_status,from_owner,to_owner,note)
-  VALUES(d.id,p.game_id,actor,label,d.status_code,code,d.current_owner_key,owner,CASE WHEN p.government_vote_id IS NOT NULL THEN 'Голосование '||p.government_vote_id::text ELSE p.pm_revision_reason END);
+  VALUES(d.id,p.game_id,actor,
+   CASE WHEN code='published' AND p.signed_by=auth.uid() AND EXISTS(SELECT 1 FROM public.game_profiles gp WHERE gp.game_id=p.game_id AND gp.user_id=actor AND nullif(gp.signature_path,'') IS NOT NULL) THEN 'Подписан документ уполномоченным лицом'
+        WHEN code='published' THEN 'ГП опубликована по итогам подписания' ELSE label END,
+   d.status_code,code,d.current_owner_key,owner,CASE WHEN p.government_vote_id IS NOT NULL THEN 'Голосование '||p.government_vote_id::text ELSE p.pm_revision_reason END);
  END LOOP;
 END;$f$;
 REVOKE ALL ON FUNCTION private.sync_stage11_program_registry_status(uuid) FROM PUBLIC,anon,authenticated;
@@ -590,6 +594,7 @@ begin
       null,null,null,'government_act',
       jsonb_build_object('state_program_id',p.id,'government_vote_id',new.id,'auto_generated',true)
     );
+    UPDATE public.formal_documents SET status_label='Принята — ожидает подписи',updated_at=now() WHERE id=v_doc;
     -- A favourable vote creates only the draft resolution.
     -- The published programme and resolution are released together by the PM signature RPC.
   end if;
@@ -781,7 +786,6 @@ begin
  if s.id is null then raise exception 'Заседание не найдено'; end if;
  if not private.can_manage_government_session(s.game_id,v_uid) then raise exception 'Недостаточно прав на открытие заседания'; end if;
  if s.status<>'draft' then raise exception 'Заседание уже открыто или завершено'; end if;
- perform pg_advisory_xact_lock(hashtextextended('gos-stage11-auto-agenda:'||s.game_id::text,0));
  if exists(select 1 from public.government_sessions x where x.game_id=s.game_id and x.stage_no=11 and x.status='open' and x.id<>s.id) then raise exception 'Сначала завершите текущее заседание Правительства';end if;
  if s.agenda_approved_at is null then raise exception 'Сначала Председатель Правительства должен утвердить сформированную повестку';end if;
  if not private.can_approve_government_agenda(s.game_id,v_uid) then raise exception 'Начать заседание может только Председатель Правительства';end if;
@@ -1076,3 +1080,5 @@ WHERE a.game_id='068dac89-00ea-447a-96bf-0cb11d85014a' AND p.id=a.program_id AND
  AND s.status='open' AND a.status='presenting' AND a.vote_id IS NULL AND p.status='revision' AND p.government_vote_id IS NULL AND p.signed_at IS NULL;
 SELECT private.ensure_stage11_government_agenda('068dac89-00ea-447a-96bf-0cb11d85014a');
 SELECT private.sync_stage11_program_registry_status(id) FROM public.state_programs WHERE game_id='068dac89-00ea-447a-96bf-0cb11d85014a';
+
+UPDATE public.formal_documents d SET status_label='Принята — ожидает подписи',updated_at=now() FROM public.state_programs p WHERE d.game_id='068dac89-00ea-447a-96bf-0cb11d85014a' AND d.game_id=p.game_id AND d.stage_no=11 AND d.doc_type='government_resolution' AND d.status_code='draft' AND d.metadata->>'state_program_id'=p.id::text AND d.metadata->>'government_vote_id'=p.government_vote_id::text AND p.status='adopted' AND p.signed_at IS NULL AND d.status_label IS DISTINCT FROM 'Принята — ожидает подписи';
