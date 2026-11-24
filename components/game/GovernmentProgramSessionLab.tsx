@@ -234,7 +234,7 @@ export default function GovernmentProgramSessionLab({g,onOpenVotes,onOpenDocumen
         !!p&&['draft','revision','minister_review','pm_review','ready'].includes(p.status)&&
         (teacher||p.responsible_minister_id===me.user_id)&&g.stages.some(s=>s.stage_no===11&&s.status==='open');
       return <article className={'govMeetingProgramme govMeetingProgramme-'+item.status} key={item.id}>
-       <header><span className="govMeetingProgrammeNo">{String(item.agenda_no).padStart(2,'0')}</span><div><span className="govEyebrow">{p?.responsible_ministry||'Ответственное министерство'}</span><h4>{p?.title||'Государственная программа'}</h4><p>Докладчик: {name(p?.responsible_minister_id||null)} · Регламент: {item.report_minutes} минут</p></div><strong className="govMeetingProgrammeStatus">{item.status==='pending'?'Ожидает доклада':item.status==='presenting'?'Доклад и вопросы':item.status==='decision'?'Голосование':item.status==='completed'?'Рассмотрена':'Снята с рассмотрения'}</strong></header>
+       <header><span className="govMeetingProgrammeNo">{String(item.agenda_no).padStart(2,'0')}</span><div><span className="govEyebrow">{p?.responsible_ministry||'Ответственное министерство'}</span><h4>{p?.title||'Государственная программа'}</h4><p>Докладчик: {name(p?.responsible_minister_id||null)} · Регламент: {item.report_minutes} минут</p></div><strong className="govMeetingProgrammeStatus">{item.status==='pending'?(p?.status==='revision'?'На доработке':'Ожидает доклада'):item.status==='presenting'?'Доклад и вопросы':item.status==='decision'?'Голосование':item.status==='completed'?'Рассмотрена':'Снята с рассмотрения'}</strong></header>
        {item.result_note&&<p className="govMeetingDecisionNote">{item.result_note}</p>}
        {item.status==='presenting'&&<div className="govMeetingSpeakerQuestions" aria-label="Вопросы выступающему">
         <div className="govMeetingSpeakerHead"><div><h5><MessageCircleQuestion size={18}/>Вопросы к докладчику</h5><p>После выступления участники задают вопросы. На каждый вопрос нужно ответить до открытия голосования.</p></div><span>{qa.length} вопросов</span></div>
@@ -244,7 +244,7 @@ export default function GovernmentProgramSessionLab({g,onOpenVotes,onOpenDocumen
        </div>}
        <div className="govMeetingProgrammeActions">
         {mayEdit&&<button type="button" className="secondary" disabled={busy} onClick={()=>void editProgramme(p.id)}><PencilLine size={16}/>Редактировать</button>}
-        {canApprove&&selected.status==='open'&&item.status==='pending'&&<button type="button" className="primary" disabled={busy||!!current} onClick={()=>void start(item.id)}><Mic2 size={16}/>Начать представление</button>}
+        {canApprove&&selected.status==='open'&&item.status==='pending'&&p?.status!=='revision'&&<button type="button" className="primary" disabled={busy||!!current} onClick={()=>void start(item.id)}><Mic2 size={16}/>Начать представление</button>}
         {item.vote_id&&<button type="button" className={item.status==='decision'?'primary':'secondary'} onClick={()=>onOpenVotes(item.vote_id!)}><Vote size={17}/>{item.status==='decision'?'Перейти к голосованию':'Открыть результаты голосования'}</button>}
         {p?.status==='adopted'&&canSign&&!g.formalDocuments.some(d=>d.game_id===game!.id&&d.stage_no===11&&d.doc_type==='government_resolution'&&d.metadata?.state_program_id===p.id&&d.status_code==='published')&&<button type="button" className="primary" disabled={busy} onClick={()=>void sign(p.id)}>{p.signed_at?'Опубликовать постановление':'Подписать и опубликовать принятую ГП'}</button>}
        </div>
@@ -256,7 +256,7 @@ export default function GovernmentProgramSessionLab({g,onOpenVotes,onOpenDocumen
    <div className="govProgramReviewHeader"><div><h3>Государственные программы на рассмотрении</h3><p>Программы Этапа 10 рассматриваются после включения в повестку. Ранее открытое голосование без поданных голосов можно связать с докладом, не создавая дубликата.</p></div><span>{reviewablePrograms.length} программ</span></div>
    <div className="govProgramReviewGrid">{reviewablePrograms.length?reviewablePrograms.map(p=><article key={p.id}>
     <small>{p.responsible_ministry}</small><h4>{p.title}</h4>
-    <span>{p.status==='ready'?'Готова к заседанию':p.status==='adopted'?(p.signed_at?'Подписана и опубликована':'Ожидает подписи Председателя Правительства'):p.status==='rejected'?'Отклонена':p.status==='government_vote'?'На голосовании':'В подготовке и согласовании'}</span>
+    <span>{p.status==='ready'?'Готова к заседанию':p.status==='adopted'?(p.signed_at?'Подписана и опубликована':'Ожидает подписи Председателя Правительства'):p.status==='revision'?'На доработке':p.status==='rejected'?'Отклонена':p.status==='government_vote'?'На голосовании':'В подготовке и согласовании'}</span>
     <p>{meetingProposals.filter(q=>q.program_id===p.id).length} предложений по изменению</p>
     <button type="button" onClick={()=>{setReviewProgram(p.id);document.getElementById('gov-review-form')?.scrollIntoView({block:'nearest',behavior:'smooth'})}}>Рассмотреть и предложить правку</button>
    </article>):<p>Сначала включите программу из этапа 10 в повестку заседания.</p>}</div>
