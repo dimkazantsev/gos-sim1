@@ -23,7 +23,8 @@ assert(!migration.includes('UPDATE public.state_metrics')&&!migration.includes('
 assert(source.includes("'post_media'")&&source.includes("'vote_passed'")&&source.includes("'crisis_ultra'"),'Document only source-backed rules');
 assert(engine.includes('v_new:=v_old+delta')&&engine.includes('m.min_value')&&engine.includes('m.max_value'),'Current formula is bounded addition');
 assert(dock.includes('Расчёт и правила изменения показателя'),'Show formula when selected');
-assert(dock.includes(".from('impact_rules').select('*')")&&dock.includes(".eq('game_id',game.id).order('priority').limit(60)"),'Fetch only game-scoped approved coefficients on demand');
+assert(dock.includes(".from('impact_rules').select('id,label,conditions,effects,enabled,auto_apply')")&&!dock.includes(".from('impact_rules').select('*')")&&dock.includes(".eq('game_id',game.id).order('priority').limit(60)"),'Fetch only needed game-scoped approved coefficient fields');
+assert(dock.includes("if(!selected||!game?.id){setRuleRows(null);setRuleError('');return}")&&dock.includes('},[game?.id,!!selected]);'),'No initial rule fetch; switching metric reuses same game rule set');
 assert(dock.includes('activeEffects.length===0'),'Explain when an indicator cannot change automatically');
 assert(dock.includes('Записей об изменении после исходной точки'),'Tell player whether any effects actually occurred');
 assert(dock.includes("const chosen=allowed.find(m=>m.id===selected);")&&dock.includes('Последний сохранённый прогноз; актуализируется'),'Do not hide saved budget on dashboard');

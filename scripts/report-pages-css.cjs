@@ -46,3 +46,16 @@ const scriptPaths=[...new Set([...html.matchAll(/<script\b[^>]*\bsrc="([^"]+)"[^
 }).filter(Boolean))];
 for(const path of scriptPaths)if(!existsSync(path))throw Error('Missing initial JavaScript asset '+path);
 console.log('GOS_ID_INITIAL_JS_ASSETS '+JSON.stringify(report(scriptPaths)));
+
+// Measure fonts emitted by the existing build and fonts actually preloaded by
+// the entry HTML. Unicode-range remains browser-selected; emitted != fetched.
+const fontAssets=files(join(out,'_next/static')).filter(file=>/\.(?:woff2?|ttf|otf)$/i.test(file));
+const fontPreloads=[...new Set([...html.matchAll(/<link\b[^>]*>/g)].map(m=>m[0]).filter(tag=>/\brel="preload"/.test(tag)&&/\bas="font"/.test(tag)).map(tag=>{
+ const href=/\bhref="([^"]+)"/.exec(tag)?.[1];if(!href)throw Error('Font preload missing href');
+ const pathname=new URL(href,'https://static.invalid').pathname;
+ if(!pathname.startsWith('/gos-sim1/'))throw Error('External or unscoped font preload '+pathname);
+ const file=join(out,pathname.slice('/gos-sim1/'.length));
+ if(!existsSync(file))throw Error('Missing preloaded font '+pathname);
+ return file;
+}))];
+console.log('GOS_ID_FONT_ASSETS '+JSON.stringify({entryPreloads:report(fontPreloads),emittedFonts:report(fontAssets),scope:'preloaded and emitted assets, not measured browser transfers'}));

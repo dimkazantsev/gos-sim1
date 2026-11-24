@@ -1,7 +1,7 @@
 'use strict';
 // #491 Browser smoke for real current Next.js entry, not a full 16-stage E2E.
 // All Supabase routes are intercepted and return deterministic mock data.
-// 100 independent browser contexts in groups of 10; NOT 100 simultaneous users.
+// 100 independent browser contexts in groups of 2; NOT 100 simultaneous users.
 const assert=require('node:assert/strict');
 const fs=require('node:fs');
 const {performance}=require('node:perf_hooks');
@@ -78,7 +78,7 @@ async function main(){
     page=await ctx.newPage();
     const start=performance.now();
     await page.goto(ORIGIN+'/',{waitUntil:'domcontentloaded',timeout:30000});
-    // DOM can be visible while Next.js dev is still compiling/hydrating;
+    // DOM can be visible before the production Next.js entry has hydrated;
     // controlled inputs get a value tracker only after React mounts.
     await page.waitForFunction(()=>!!document.querySelector('input[name="fullName"]')?._valueTracker,null,{timeout:30000});
     if(teacher){
@@ -115,8 +115,7 @@ async function main(){
      assert.deepEqual(calls,['signup','join'],'A rejected invite must not navigate');
      assert.equal(new URL(page.url()).pathname,'/');
     }else{
-     // Next.js dev may not finish loading the game module while other
-     // contexts compile it. Entry acceptance checks the route transition,
+     // Entry acceptance checks the route transition,
      // not the subsequent game bootstrap (which is a separate E2E case).
      await page.waitForURL(url=>url.pathname.includes('/game/'),{
       waitUntil:'commit',timeout:15000
@@ -130,8 +129,12 @@ async function main(){
   }
   // Bounded fan-out avoids conflating a 100-browser memory stress test
   // with server concurrency. Each request uses an independent context.
-  for(let first=0;first<TOTAL;first+=PARALLEL)
+  for(let first=0;first<TOTAL;first+=PARALLEL){
    await Promise.all(Array.from({length:PARALLEL},(_,i)=>visit(first+i)));
+   // A broken shared login contract must not repeat its 30s timeout 100 times.
+   assert.equal(errors.length,0,'Browser wave failed: '+JSON.stringify(errors.slice(0,2)));
+   if((first+PARALLEL)%10===0)console.log('QA_ENTRY_PROGRESS '+(first+PARALLEL)+'/'+TOTAL);
+  }
   await visit(100,{kind:'guest'});
   await visit(101,{teacher:true});
   await visit(102,{denyJoin:true});

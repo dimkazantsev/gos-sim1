@@ -34,10 +34,12 @@ jobs:
           test "$GOS_BROWSER_ENTRY_QA" = MOCK-ONLY
           test "$NEXT_PUBLIC_SUPABASE_URL" = "http://127.0.0.1:54321"
           node -e "const x=process.env.NEXT_PUBLIC_SUPABASE_URL; if(new URL(x).hostname!=='127.0.0.1')process.exit(1)"
-      - name: Serve the real Next.js entry with localhost-only configuration
+      - name: Build once with isolated localhost-only configuration
+        run: npm run build
+      - name: Serve the production-mode Next.js entry with localhost-only configuration
         run: |
           set -euo pipefail
-          npm run dev -- --hostname 127.0.0.1 --port 4180 >/tmp/gos-browser-entry-next.log 2>&1 &
+          npm run start -- --hostname 127.0.0.1 --port 4180 >/tmp/gos-browser-entry-next.log 2>&1 &
           echo $! > /tmp/gos-browser-entry-next.pid
           for i in $(seq 1 75); do
             if curl --silent --fail --max-time 2 http://127.0.0.1:4180/ >/dev/null; then exit 0; fi
@@ -45,7 +47,7 @@ jobs:
           done
           tail -80 /tmp/gos-browser-entry-next.log || true
           exit 1
-      - name: Browser QA (100 contexts in 10 waves, no production calls)
+      - name: Browser QA (100 contexts in 50 waves, fail-fast, no production calls)
         run: node scripts/qa-browser-entry-100-check.cjs
       - uses: actions/upload-artifact@v4
         if: always()
