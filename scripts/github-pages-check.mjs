@@ -142,3 +142,11 @@ for(const [file,owner] of [["stage6-cec-workspace-polish.css","components/game/P
  assert.ok(!rootLayout.includes("import './"+file+"'"),'Game-specific CSS not in global entry: '+file);
  assert.ok(readFileSync(join(built,owner),'utf8').includes("import '../../app/"+file+"'"),'Component owns exact approved CSS: '+file);
 }
+
+for(const name of ["interior-user","finance","economy","education","health","foreign","russia"]){
+ const original=join(built,'public/emblems',name+'.png'),variant=join(out,'emblems/optimized',name+'-256.webp');
+ assert.ok(existsSync(variant),'Generated responsive emblem '+name);
+ const webp=readFileSync(variant),source=readFileSync(original);
+ assert.ok(webp.subarray(0,4).toString()==='RIFF'&&webp.subarray(8,12).toString()==='WEBP','Valid WebP '+name);
+ assert.ok(webp.byteLength<source.byteLength,'Smaller emblem '+name);
+}

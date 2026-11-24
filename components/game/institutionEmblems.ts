@@ -49,6 +49,25 @@ const EMBLEM={
 
 export const gosSimsEmblem=EMBLEM.flag;
 
+// Original assets remain the authoritative source, including for print and large displays.
+const smallEmblemVariants=new Map<string,{file:string;width:number}>([
+ [assetSrc(interiorUser),{file:'interior-user',width:interiorUser.width}],
+ [assetSrc(finance),{file:'finance',width:finance.width}],
+ [assetSrc(economy),{file:'economy',width:economy.width}],
+ [assetSrc(education),{file:'education',width:education.width}],
+ [assetSrc(health),{file:'health',width:health.width}],
+ [assetSrc(foreign),{file:'foreign',width:foreign.width}],
+ [assetSrc(russia),{file:'russia',width:russia.width}]
+]);
+export function smallEmblemSrcSet(src:string,width?:number,height?:number){
+ // Only fixed, small icons; full-size documents and large illustrations retain original resolution.
+ if(process.env.NODE_ENV!=='production'||!width||width>64||(height&&height>64))return undefined;
+ const variant=smallEmblemVariants.get(src);if(!variant)return undefined;
+ const base=process.env.NEXT_PUBLIC_ASSET_BASE_PATH||'';
+ const version=encodeURIComponent(src.split('/').pop()||'');
+ return {srcSet:base+'/emblems/optimized/'+variant.file+'-256.webp?v='+version+' 256w, '+src+' '+variant.width+'w',sizes:width+'px'};
+}
+
 export function institutionEmblem(subject:string,issuer=''){
  let key=subject.toLocaleLowerCase('ru-RU');
  const hay=(key+' '+issuer).toLocaleLowerCase('ru-RU');

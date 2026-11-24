@@ -11,3 +11,6 @@ npm-debug.log*
 *.tsbuildinfo
 .impeccable/review/
 supabase/.temp/
+
+# Generated on build from authoritative emblem images; not versioned twice.
+public/emblems/optimized/
