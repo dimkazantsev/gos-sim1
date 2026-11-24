@@ -66,8 +66,8 @@ assert(source.includes('readOnly={previewMode||observer||!!previewGuest}'),'Ever
 assert(source.includes("previewGuest?'Режим гостя:':'Режим студента:'"),'Guest preview must be clearly labelled');
 assert(source.includes('observer||previewGuest?\' observerShell\''),
  'Guest preview reuses the established guest styles');
-function compile(node,env){
- const script=ts.transpileModule('module.exports='+node.getText(ast),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}}).outputText;
+function compile(node,env,syntax=ast){
+ const script=ts.transpileModule('module.exports='+node.getText(syntax),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}}).outputText;
  const context={module:{exports:{}},...env};vm.runInNewContext(script,context);return {fn:context.module.exports,context};
 }
 function fixture(){
@@ -104,31 +104,40 @@ async function main(){
  const pending=compile(blitzCall.arguments[2],late.env).fn();
  late.env.counterScopeRef.current='new-game-or-user-or-role';resolve({data:{pending:99},error:null});await pending;
  assert.equal(late.blitz.length,0,'A response from the previous scope cannot populate the new badge');
- const presence=effects.find(n=>n.arguments[0].getText(ast).includes('const labels:Record<View,string>'));
- assert(presence,'The real presence effect is available');
+ const hookFile='components/game/usePresenceHeartbeat.ts';
+ const hookSource=fs.readFileSync(hookFile,'utf8');
+ const hookAst=ts.createSourceFile(hookFile,hookSource,ts.ScriptTarget.Latest,true,ts.ScriptKind.TS);
+ assert.equal(hookAst.parseDiagnostics.length,0);
+ assert(source.includes('usePresenceHeartbeat({gameId,userId:me?.user_id,view,enabled:g.coreLoaded&&!previewMode,touchPresence})'),'The game shell wires the real presence hook');
+ let presence;
+ function walkPresence(node){if(ts.isCallExpression(node)&&node.expression.getText(hookAst)==='useEffect')presence=node;ts.forEachChild(node,walkPresence)}
+ walkPresence(hookAst);
+ assert(presence,'The real extracted presence effect is available');
+ const schedulerModule={exports:{}};
+ vm.runInNewContext(ts.transpileModule(fs.readFileSync('components/game/presenceHeartbeat.ts','utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}}).outputText,{module:schedulerModule,exports:schedulerModule.exports});
+ const schedulePresenceHeartbeat=schedulerModule.exports.schedulePresenceHeartbeat;
  for(let n=0;n<40;n++){
-  let tick,first,delay,initialDelay,now=1000,cleared=false,firstCleared=false;
-  const calls=[],listeners=new Map();
+  let now=1000,nextId=0,callbacks=0;
+  const calls=[],listeners=new Map(),timers=new Map();
   const document={visibilityState:'visible',addEventListener:(name,fn)=>listeners.set(name,fn),removeEventListener:name=>listeners.delete(name)};
-  const {fn}=compile(presence.arguments[0],{
-   me:{kind:'student',user_id:'student-'+n},g:{coreLoaded:true},gameId:'classroom',previewMode:false,view:'documents',
-   document,Date:{now:()=>now},Math,firstPresenceWriteDelay:()=>2000,
-   initialSqlPresence:{current:{scope:'',readyAt:0}},
-   touchPresence:(...args)=>{calls.push(args);return Promise.resolve()},
-   setTimeout:(fn,ms)=>{first=fn;initialDelay=ms;return 2},
-   clearTimeout:()=>{firstCleared=true},
-   setInterval:(fn,ms)=>{tick=fn;delay=ms;return 1},
-   clearInterval:()=>{cleared=true}
-  });
-  const cleanup=fn();
-  assert.equal(initialDelay,2000,'Optional SQL presence is delayed after entry');
-  assert.equal(calls.length,0,'No immediate database write during a 100-client login burst');
-  assert(delay>=68000&&delay<74000,'Presence remains below the existing 90-second online threshold');
-  now+=initialDelay;first();assert.equal(calls.length,1,'First SQL write is preserved once admitted');
-  tick();assert.equal(calls.length,2);document.visibilityState='hidden';
-  for(let minute=0;minute<20;minute++)tick();assert.equal(calls.length,2,'Hidden sessions send zero twenty-minute presence writes');
-  document.visibilityState='visible';listeners.get('visibilitychange')();assert.equal(calls.length,3,'Returning starts a new presence interval');
-  cleanup();assert(cleared&&firstCleared);assert.equal(listeners.size,0);
+  const userId='student-'+n,gameId='classroom',view='documents',enabled=true;
+  const admission={current:{scope:'',readyAt:0}};
+  const writer={current:{gameId,userId,view,enabled,touchPresence:(...args)=>{calls.push(args);return Promise.resolve()}}};
+  const env={userId,gameId,view,enabled,document,admission,writer,labels:{documents:'НПА / Формальные институты'},Date:{now:()=>now},
+   firstPresenceWriteDelay:()=>2000,schedulePresenceHeartbeat,
+   setTimeout:(fn,ms)=>{const id=++nextId;timers.set(id,{at:now+ms,fn});return id},clearTimeout:id=>timers.delete(id)};
+  function advance(ms){const target=now+ms;while(timers.size){const [id,t]=[...timers].sort((a,b)=>a[1].at-b[1].at)[0];if(t.at>target)break;now=t.at;timers.delete(id);callbacks++;t.fn()}now=target}
+  const cleanup=compile(presence.arguments[0],env,hookAst).fn();
+  assert.equal(timers.size,1);assert.equal([...timers.values()][0].at-now,2000);
+  assert.equal(calls.length,0,'No immediate write on login');
+  advance(2000);assert.equal(calls.length,1);assert.deepEqual(calls[0],[view,'Открыл раздел «НПА / Формальные институты»']);
+  const delay=[...timers.values()][0].at-now;assert(delay>=68000&&delay<74000);
+  advance(delay);assert.equal(calls.length,2);assert.equal(calls[1][1],undefined);
+  document.visibilityState='hidden';listeners.get('visibilitychange')();
+  const before=callbacks;advance(1200000);
+  assert.equal(callbacks,before,'No background timer wakeups');assert.equal(calls.length,2);assert.equal(timers.size,0);
+  document.visibilityState='visible';listeners.get('visibilitychange')();assert.equal(calls.length,3);
+  cleanup();assert.equal(timers.size,0);assert.equal(listeners.size,0);
  }
  console.log('PASS: 40 game shells share counter delivery, preserve pending-case deduplication and role scope, suppress stale responses and hidden-tab presence writes');
 }
