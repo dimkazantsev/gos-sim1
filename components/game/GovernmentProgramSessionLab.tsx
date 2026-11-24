@@ -85,6 +85,14 @@ export default function GovernmentProgramSessionLab({g,onOpenVotes,onOpenDocumen
  useGameTableSync(game?.id,['government_sessions','government_program_agenda','government_session_questions','state_program_review_proposals','state_programs','government_program_speaker_questions'],load,(me?.user_id||'')+':'+selectedId);
 
  const visibleSession=sessions.find(x=>x.id===selectedId)||sessions.find(x=>x.status==='open')||sessions[0];
+ const activeAmendmentItem=items.find(x=>x.session_id===visibleSession?.id&&x.status==='presenting'&&!!x.qa_closed_at);
+ const amendmentProgram=activeAmendmentItem?.program_id||null;
+ useEffect(()=>{
+  if(!amendmentProgram||!activeAmendmentItem?.id)return;
+  setReviewProgram(amendmentProgram);
+  setReviewSection('structure');setReviewOriginal('');setReviewProposed('');setReviewReason('');
+  setExpandedAmendments(activeAmendmentItem.id);
+ },[amendmentProgram,activeAmendmentItem?.id]);
  const agendaSummary=g.formalDocuments.find(d=>d.id===visibleSession?.agenda_document_id);
  useEffect(()=>{if(agendaSummary&&agendaSummary.body_text==null)void g.ensureFormalDocument(agendaSummary.id,agendaSummary.updated_at);},[game?.id,me?.user_id,agendaSummary?.id,agendaSummary?.updated_at,agendaSummary?.body_text]);
  if(!game||!me)return null;
@@ -108,7 +116,6 @@ export default function GovernmentProgramSessionLab({g,onOpenVotes,onOpenDocumen
  const agendaAccepted=deletedAcceptedAgenda||agendaSigned&&agendaVote?.status==='closed'&&agendaVote.result_code==='passed'&&agendaVote.result_quorum_met&&agendaVote.body===agendaDoc?.body_text;
  const registeredUsers=attendance.session===selected?.id?attendance.users:[];
  const mayCorrect=canApprove&&stageOpen&&!!selected&&selected.status!=='closed'&&!current&&!!agendaDoc?.body_text&&agendaVote?.status!=='open'&&agendaVote?.result_code!=='passed';
- const amendmentProgram=current?.status==='presenting'&&!!current.qa_closed_at?current.program_id:null;
  const autoMinutes=selected?g.formalDocuments.find(x=>x.doc_type==='minutes'&&x.metadata?.automatic_session_id===selected.id):undefined;
  const name=(id:string|null,office?:string)=>{const key=(office||'').trim().toLocaleLowerCase('ru-RU');const matches=appointed.filter(a=>a.candidate_user_id===id);const role=key==='prime_minister'?matches.find(a=>a.office_key==='prime_minister'):key?matches.find(a=>{const title=a.office_title.trim().toLocaleLowerCase('ru-RU');return title===key||title.endsWith(' — '+key)}):undefined;return role?.candidate_name||members.find(m=>m.user_id===id)?.full_name||'—';};
  const program=(id:string)=>programs.find(p=>p.id===id);
@@ -211,7 +218,7 @@ export default function GovernmentProgramSessionLab({g,onOpenVotes,onOpenDocumen
  }
  async function closeDiscussion(item:Item){
   if(!canApprove||busy)return;setBusy(true);
-  try{const r=await supabase.rpc('close_government_program_questions',{p_item_id:item.id});if(r.error)throw r.error;if(reviewProgram!==item.program_id){setReviewSection('structure');setReviewOriginal('');setReviewProposed('');setReviewReason('');}setReviewProgram(item.program_id);setExpandedAmendments(item.id);await load();setNotice('Обсуждение завершено. Рассмотрите поправки либо переходите к итоговому голосованию, если их нет.');}catch(e){setError(userError(e))}finally{setBusy(false)}
+  try{const r=await supabase.rpc('close_government_program_questions',{p_item_id:item.id});if(r.error)throw r.error;await load();setNotice('Обсуждение завершено. Рассмотрите поправки либо переходите к итоговому голосованию, если их нет.');}catch(e){setError(userError(e))}finally{setBusy(false)}
  }
  async function decision(id:string){
   if(!canApprove||busy)return;setBusy(true);
@@ -325,7 +332,7 @@ export default function GovernmentProgramSessionLab({g,onOpenVotes,onOpenDocumen
         {canApprove&&<div className="govMeetingSpeakerFinish"><small>{awaiting.length?('Ожидают ответа: '+awaiting.length):'Ответы на вопросы завершены.'}</small><button type="button" className="primary" disabled={busy||awaiting.length>0} onClick={()=>void closeDiscussion(item)}><ClipboardCheck size={17}/>Завершить обсуждение и перейти к поправкам</button></div>}
        </div>}
        <div className="govMeetingProgrammeActions">
-        <button type="button" className="secondary" aria-expanded={amendmentsOpen} aria-controls={"gov-amendments-"+item.id} onClick={()=>{if(amendmentsOpen){setExpandedAmendments(null);return}setExpandedAmendments(item.id);if(maySubmitAmendment&&reviewProgram!==item.program_id){setReviewProgram(item.program_id);setReviewSection('structure');setReviewOriginal('');setReviewProposed('');setReviewReason('');}}}><PencilLine size={16}/>Поправки{itemProposals.length>0?' ('+itemProposals.length+')':''}</button>
+        <button type="button" className="secondary" aria-expanded={amendmentsOpen} aria-controls={"gov-amendments-"+item.id} onClick={()=>{if(amendmentsOpen){setExpandedAmendments(null);return}setExpandedAmendments(item.id);}}><PencilLine size={16}/>Поправки{itemProposals.length>0?' ('+itemProposals.length+')':''}</button>
         {mayEdit&&<button type="button" className="secondary" disabled={busy} onClick={()=>void editProgramme(p.id)}><PencilLine size={16}/>Редактировать</button>}
         {canApprove&&agendaAccepted&&selected.status==='open'&&item.status==='pending'&&(p?.status==='ready'||p?.status==='government_vote')&&<button type="button" className="primary" disabled={busy||!!current} onClick={()=>void start(item.id)}><Mic2 size={16}/>Начать представление</button>}
         {canApprove&&agendaAccepted&&p?.status==='ready'&&acceptedAmendments.length>0&&<button type="button" className="secondary" disabled={busy} onClick={()=>void confirmAmendments(item.program_id)}>Подтвердить внесение поправок в паспорт ГП</button>}
@@ -348,7 +355,7 @@ export default function GovernmentProgramSessionLab({g,onOpenVotes,onOpenDocumen
    </article>)}</div>}
         {itemProposals.length===0&&<p className="govMeetingDecisionNote">Поправок пока нет.</p>}
        </section>}
-       {item.status==='presenting'&&!!item.qa_closed_at&&<div className="govMeetingSpeakerQuestions"><h5>Поправки к государственной программе</h5><p>{pendingAmendments?'Сначала рассмотрите поступившие поправки.':unincorporated?'Одобренные поправки должны быть внесены в паспорт ГП.':'Все поправки рассмотрены или не поступали.'}</p>{canApprove&&unincorporated&&!pendingAmendments&&<button type="button" className="secondary" disabled={busy} onClick={()=>void returnForAmendments(item.program_id)}>Передать на внесение одобренных поправок</button>}{canApprove&&<button type="button" className="primary" disabled={busy||pendingAmendments||unincorporated} onClick={()=>void decision(item.id)}><Vote size={17}/>Открыть итоговое голосование по ГП</button>}</div>}
+       {item.status==='presenting'&&!!item.qa_closed_at&&<div className="govMeetingSpeakerQuestions"><h5>Переход к итоговому голосованию</h5><p>{pendingAmendments?'Сначала рассмотрите поступившие поправки.':unincorporated?'Одобренные поправки должны быть внесены в паспорт ГП.':'Все поправки рассмотрены или не поступали.'}</p>{canApprove&&unincorporated&&!pendingAmendments&&<button type="button" className="secondary" disabled={busy} onClick={()=>void returnForAmendments(item.program_id)}>Передать на внесение одобренных поправок</button>}{canApprove&&<button type="button" className="primary" disabled={busy||pendingAmendments||unincorporated} onClick={()=>void decision(item.id)}><Vote size={17}/>Открыть итоговое голосование по ГП</button>}</div>}
        {v&&ballotPanel(v,true)}
       </article>;
      })}
