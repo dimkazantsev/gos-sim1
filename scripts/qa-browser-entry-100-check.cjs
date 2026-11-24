@@ -36,7 +36,7 @@ async function main(){
   async function visit(n,{kind='student',denyJoin=false,teacher=false}={}){
    const width=WIDTHS[n%WIDTHS.length],ctx=await browser.newContext({
     viewport:{width,height:900},deviceScaleFactor:1,reducedMotion:'reduce'});
-   const calls=[];let page;
+   const calls=[],pageErrors=[],failedRequests=[];let page;
    try{
     await ctx.route('**/*',async route=>{
      const req=route.request(),url=new URL(req.url());
@@ -76,16 +76,24 @@ async function main(){
      throw Error('Unexpected Auth request in isolated entry QA: '+path);
     });
     page=await ctx.newPage();
+    page.on('pageerror',e=>{if(pageErrors.length<5)pageErrors.push(String(e.message).slice(0,300))});
+    page.on('requestfailed',r=>{if(failedRequests.length<5)failedRequests.push({url:r.url().split('?')[0],error:r.failure()?.errorText})});
     const start=performance.now();
     await page.goto(ORIGIN+'/',{waitUntil:'domcontentloaded',timeout:30000});
-    // DOM can be visible before the production Next.js entry has hydrated;
-    // controlled inputs get a value tracker only after React mounts.
-    await page.waitForFunction(()=>!!document.querySelector('input[name="fullName"]')?._valueTracker,null,{timeout:30000});
-    if(teacher){
-     await page.getByRole('button',{name:'Преподаватель',exact:true}).click();
-    }else if(kind==='guest'){
-     await page.getByRole('button',{name:'Гость',exact:true}).click();
+    // Verify observable interaction, not React's private input bookkeeping.
+    // A role button can appear in SSR markup before its handlers are mounted.
+    async function chooseRole(name){
+     const button=page.getByRole('button',{name,exact:true});
+     const deadline=performance.now()+15000;
+     do{
+      await button.click({timeout:5000});
+      if(await button.getAttribute('aria-pressed')==='true')return;
+      await page.waitForTimeout(100);
+     }while(performance.now()<deadline);
+     throw Error('Role control never became interactive: '+name);
     }
+    await chooseRole(teacher?'Преподаватель':'Гость');
+    if(!teacher&&kind==='student')await chooseRole('Участник');
     await page.locator('input[name="fullName"]').fill('Тестовый Участник '+n);
     await page.locator('input[name="gameCode"]').fill('QA100');
     if(kind==='student'&&!teacher)await page.locator('input[name="group"]').fill('ГМУ-100');
@@ -124,7 +132,7 @@ async function main(){
      entries.push({n,width,role:kind});
     }
     timings.push(performance.now()-start);
-   }catch(e){errors.push({n,width,kind,teacher,denyJoin,error:String(e?.stack||e).slice(0,600),calls,url:page?.url()||''});}
+   }catch(e){errors.push({n,width,kind,teacher,denyJoin,error:String(e?.stack||e).slice(0,600),calls,pageErrors,failedRequests,url:page?.url()||''});}
    finally{await ctx.close();}
   }
   // Bounded fan-out avoids conflating a 100-browser memory stress test
