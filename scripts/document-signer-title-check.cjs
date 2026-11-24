@@ -46,7 +46,23 @@ assert.equal(responsible('meeting_agenda','gd',{},'Государственна�
 ]),'Государственная Дума — Председатель Государственной Думы; Заместитель Председателя Государственной Думы');
 assert.match(responsible('meeting_agenda','ksrf',{},'КСРФ'),/состав уполномоченных подписантов пока не подтверждён/,'Missing signer list cannot claim a person has signed');
 const view=fs.readFileSync('components/game/DocumentsView.tsx','utf8');
-assert(view.includes('Документ подписывает: <b>{documentSigningAuthority(selected,institutionSigners?.required||[])}</b>'),'Current signing institution is shown in document procedure, reusing existing data');
+// Evaluate the actual signer expression from the rendered procedure, including
+// the approved teacher decision for SF legislative/budget review.
+const signerExpression=view.match(/Документ подписывает: <b>\{([^{}]+)\}<\/b>/);
+assert(signerExpression,'Signing institution remains visible in the procedure');
+const renderSigner=new Function('selected','institutionSigners','documentSigningAuthority','return ('+signerExpression[1]+')');
+for(const workflow_key of ['bill','budget','other']){
+ for(const status_code of ['sf','president','draft']){
+  const selected={workflow_key,status_code};
+  const required=[{office:'Existing authority'}];
+  let reads=0;
+  const actual=renderSigner(selected,{required},(doc,signers)=>{reads++;assert.equal(doc,selected);assert.equal(signers,required);return 'Existing authority';});
+  const teacherReview=status_code==='sf'&&['bill','budget'].includes(workflow_key);
+  assert.equal(actual,teacherReview?'Преподаватель (решение Совета Федерации)':'Existing authority');
+  assert.equal(reads,teacherReview?0:1);
+ }
+}
+assert(view.includes('!isTerminalDocument&&<p>Документ подписывает:'),'Terminal document does not display a future signer');
 assert(!view.includes("rpc('get_document_signing_authority'"),'No new signature lookups');
 
 const paper=fs.readFileSync('components/game/DocumentPaper.tsx','utf8');
