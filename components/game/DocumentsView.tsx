@@ -1,4 +1,5 @@
 'use client';
+import '../../app/2026-bill-dossier-design.css';
 import {userError} from '@/lib/userError';
 import {useEffect,useMemo,useRef,useState} from 'react';
 import {supabase} from '@/lib/supabase';

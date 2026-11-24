@@ -35,3 +35,14 @@ function report(paths){
  return{files:sizes.length,rawBytes:sizes.reduce((s,x)=>s+x.bytes,0),gzipBytes:sizes.reduce((s,x)=>s+x.gzipBytes,0),largest:sizes.slice(0,5)};
 }
 console.log('GOS_ID_CSS_ASSETS '+JSON.stringify({initialLinkReferences:styles.length,initialDocument:report(initial),allBuildCss:report(css)}));
+
+const scriptPaths=[...new Set([...html.matchAll(/<script\b[^>]*\bsrc="([^"]+)"[^>]*>/g),...html.matchAll(/<link\b[^>]*>/g)].map(m=>{
+ const tag=m[0];
+ if(tag.startsWith('<link')&&!(/\brel="(?:preload|modulepreload)"/.test(tag)&&(/\bas="script"/.test(tag)||/\brel="modulepreload"/.test(tag))))return null;
+ const url=tag.startsWith('<script')?m[1]:/\bhref="([^"]+)"/.exec(tag)?.[1];
+ if(!url)return null;
+ const pathname=new URL(url,'https://static.invalid').pathname;
+ return pathname.startsWith('/gos-sim1/')&&pathname.endsWith('.js')?join(out,pathname.slice('/gos-sim1/'.length)):null;
+}).filter(Boolean))];
+for(const path of scriptPaths)if(!existsSync(path))throw Error('Missing initial JavaScript asset '+path);
+console.log('GOS_ID_INITIAL_JS_ASSETS '+JSON.stringify(report(scriptPaths)));

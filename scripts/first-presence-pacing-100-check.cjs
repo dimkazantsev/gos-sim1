@@ -27,6 +27,7 @@ assert(hook.includes('if(admission.current.scope!==scope)'),'View changes retain
 assert(hook.includes('68000+firstPresenceWriteDelay(userId)%6000'));
 assert(hook.includes("document.visibilityState==='visible'"));
 assert(hook.includes("navigation?'Открыл раздел «'+labels[view]+'»':undefined"));
+assert(hook.includes('latest.gameId!==gameId||latest.userId!==userId||latest.view!==view||!latest.enabled'),'Old lifecycle cannot write to a new game or account');
 const schedulerSource=fs.readFileSync('components/game/presenceHeartbeat.ts','utf8');
 const schedulerJS=ts.transpileModule(schedulerSource,{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}}).outputText;
 const schedulerModule={exports:{}};

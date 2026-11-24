@@ -10,7 +10,7 @@ type PresenceWriter=(view:string,label?:string)=>Promise<void>;
 /** One independent, visibility-aware SQL presence lifecycle per game/account. */
 export function usePresenceHeartbeat({gameId,userId,view,enabled,touchPresence}:{gameId:string;userId?:string;view:PresenceView;enabled:boolean;touchPresence:PresenceWriter}){
  const admission=useRef({scope:'',readyAt:0});
- const writer=useRef(touchPresence);writer.current=touchPresence;
+ const writer=useRef({gameId,userId,view,enabled,touchPresence});writer.current={gameId,userId,view,enabled,touchPresence};
  useEffect(()=>{
   if(!userId||!enabled)return;
   const scope=gameId+':'+userId;
@@ -18,7 +18,7 @@ export function usePresenceHeartbeat({gameId,userId,view,enabled,touchPresence}:
   const heartbeatMs=68000+firstPresenceWriteDelay(userId)%6000;
   const lifecycle=schedulePresenceHeartbeat({
    readyAt:admission.current.readyAt,heartbeatMs,
-   write:navigation=>{void writer.current(view,navigation?'Открыл раздел «'+labels[view]+'»':undefined)},
+   write:navigation=>{const latest=writer.current;if(latest.gameId!==gameId||latest.userId!==userId||latest.view!==view||!latest.enabled)return;void latest.touchPresence(view,navigation?'Открыл раздел «'+labels[view]+'»':undefined)},
    isVisible:()=>document.visibilityState==='visible',now:Date.now,
    schedule:(fn,delay)=>setTimeout(fn,delay),cancel:timer=>clearTimeout(timer)
   });

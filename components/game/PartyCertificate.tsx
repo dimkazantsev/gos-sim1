@@ -1,4 +1,5 @@
 'use client';
+import '../../app/party-certificate.css';
 import type {FormalDocument} from './types';
 import InstitutionEmblemImage from './InstitutionEmblemImage';
 import {institutionEmblem} from './institutionEmblems';

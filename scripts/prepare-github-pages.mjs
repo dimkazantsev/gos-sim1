@@ -61,8 +61,9 @@ home=home.replaceAll('href="/"','href='+JSON.stringify(base+'/'));
 writeFileSync(resolve(target,'components/StaticLanding.tsx'),home);
 writeFileSync(resolve(target,'components/StaticGame.tsx'),`'use client';
 import {useSearchParams} from 'next/navigation';
-import GameClient from './GameClient';
+import dynamic from 'next/dynamic';
 import Home from './StaticLanding';
+const GameClient=dynamic(()=>import('./GameClient'),{ssr:false,loading:()=> <p>Загрузка игры…</p>});
 export default function StaticGame(){const game=useSearchParams().get('game');return game?<GameClient key={game} gameId={game}/>:<Home/>}
 `);
 writeFileSync(resolve(target,'app/page.tsx'),`import {Suspense} from 'react';import StaticGame from '@/components/StaticGame';export default function Page(){return <Suspense fallback={<p>Загрузка игры…</p>}><StaticGame/></Suspense>};\n`);

@@ -133,3 +133,12 @@ assert.ok(!telegram.includes("fetch('/api/telegram/"),'Telegram must not POST to
 assert.ok(existsSync(join(built,'data/region-paths.json')),'Shared region data');
 assert.ok(!readFileSync(join(built,'components/game/portableSession.ts'),'utf8').includes("asset('/portable/"),'Portable assets need the repository prefix.');
 console.log(`PASS ${refs.size} HTML asset links, ${scenes.length} scenes, dynamic game entry, recovery route, document attachments and portable files.`);
+
+const staticGame=readFileSync(join(built,'components/StaticGame.tsx'),'utf8');
+assert.ok(staticGame.includes("dynamic(()=>import('./GameClient'),{ssr:false"),'Static login must not eagerly load the whole game');
+assert.ok(!staticGame.includes("import GameClient from"),'No static game dependency on login');
+const rootLayout=readFileSync(join(built,'app/layout.tsx'),'utf8');
+for(const [file,owner] of [["stage6-cec-workspace-polish.css","components/game/PresidentialElectionLab.tsx"],["party-certificate.css","components/game/PartyCertificate.tsx"],["2026-bill-dossier-design.css","components/game/DocumentsView.tsx"]]){
+ assert.ok(!rootLayout.includes("import './"+file+"'"),'Game-specific CSS not in global entry: '+file);
+ assert.ok(readFileSync(join(built,owner),'utf8').includes("import '../../app/"+file+"'"),'Component owns exact approved CSS: '+file);
+}

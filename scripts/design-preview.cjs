@@ -215,6 +215,10 @@ for(const [id,label,initialWorkspace] of [['teacher-stages','Управлени�
 }
 let css=fs.readFileSync(path.join(root,'app/globals.css'),'utf8');css=css.replace(/@import '\.\/([^']+)' layer\(legacy\);/g,(_,file)=>'@layer legacy {\n'+fs.readFileSync(path.join(root,'app',file),'utf8')+'\n}');
 for(const match of fs.readFileSync(path.join(root,'app/layout.tsx'),'utf8').matchAll(/import ['"]\.\/([^'"]+\.css)['"]/g)){if(match[1]!=='globals.css')css+='\n'+fs.readFileSync(path.join(root,'app',match[1]),'utf8')}
+for(const component of ['PartyCertificate','PresidentialElectionLab','DocumentsView']){
+ const source=fs.readFileSync(path.join(root,'components/game',component+'.tsx'),'utf8');
+ for(const match of source.matchAll(/import ['"]\.\.\/\.\.\/app\/([^'"]+\.css)['"]/g))css+='\n'+fs.readFileSync(path.join(root,'app',match[1]),'utf8');
+}
 // The global application CSS and its legacy imports are the single source
 // of the approved design, including stage atlas and meeting procedures.
 for(const subset of ['latin','cyrillic']){const file=path.join(root,'node_modules/@fontsource-variable/manrope/files',`manrope-${subset}-wght-normal.woff2`);css+=`\n@font-face{font-family:'Manrope Variable';font-style:normal;font-weight:200 800;font-display:swap;src:url(data:font/woff2;base64,${fs.readFileSync(file).toString('base64')}) format('woff2');unicode-range:${subset==='cyrillic'?'U+0400-045F,U+0490-0491,U+04B0-04B1,U+2116':'U+0000-00FF,U+0131,U+0152-0153,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215'};}`;}
