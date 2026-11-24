@@ -1,3 +1,4 @@
+require('./read-transport-protection-check.cjs');
 /* Deterministic, offline protection against classroom request storms.
  * 40 synthetic user-scoped caches; no production requests or database writes.
  */
