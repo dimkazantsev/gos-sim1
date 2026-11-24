@@ -79,6 +79,8 @@ export default function GovernmentProgramSessionLab({g,onOpenVotes,onOpenDocumen
  if(!game||!me)return null;
  const activeGame=game;
  const selected=sessions.find(x=>x.id===selectedId)||sessions[0];
+ const selectedAgenda=g.formalDocuments.find(d=>d.id===selected?.agenda_document_id);
+ const needsAgendaSignature=!!selected?.agenda_approved_at&&!!selectedAgenda&&selectedAgenda.status_code!=='published';
  const agenda=selected?items.filter(x=>x.session_id===selected.id).sort((a,b)=>a.agenda_no-b.agenda_no):[];
  const pendingPmPrograms=programs.filter(p=>p.status==='pm_review'&&!p.signed_at);
  const readyPrograms=programs.filter(p=>p.status==='ready'||(
@@ -227,7 +229,9 @@ export default function GovernmentProgramSessionLab({g,onOpenVotes,onOpenDocumen
     <div className="govMeetingAgendaActions">
      <div><strong>{selected.status==='closed'?'Заседание завершено':selected.status==='open'?'Заседание открыто':selected.agenda_approved_at?'Повестка утверждена':'Ожидает утверждения'}</strong><small>Председательствующий: {name(selected.chair_user_id)}.</small></div>
      {canApprove&&selected.status==='draft'&&!selected.agenda_approved_at&&<><button type="button" className="govMeetingRefreshPrograms secondary" aria-label="Обновить список государственных программ" disabled={busy} onClick={()=>void sync()}><RefreshCcw size={17} aria-hidden="true"/><span>Обновить список ГП</span></button><button type="button" className="primary" disabled={busy||agenda.length===0} onClick={()=>void approve()}><ClipboardCheck size={17}/>Сохранить и подписать</button></>}
-     {canApprove&&selected.status==='draft'&&!!selected.agenda_approved_at&&<button type="button" className="primary" disabled={busy} onClick={()=>void open()}><Mic2 size={17}/>Открыть заседание</button>}
+     {canApprove&&selected.status!=='closed'&&needsAgendaSignature&&<button type="button" className="primary" disabled={busy} onClick={()=>void approve()}><ClipboardCheck size={17}/>Подписать текущую редакцию повестки</button>}
+     {needsAgendaSignature&&<p className="govMeetingHint">Предыдущая версия повестки была изменена системой. Для регистрации новых участников требуется личная подпись текущей редакции.</p>}
+     {canApprove&&selected.status==='draft'&&!!selected.agenda_approved_at&&!needsAgendaSignature&&<button type="button" className="primary" disabled={busy} onClick={()=>void open()}><Mic2 size={17}/>Открыть заседание</button>}
      {canApprove&&selected.status==='open'&&<button type="button" disabled={busy||!!current} onClick={()=>void close()}>Закрыть заседание</button>}
      {selected.status==='closed'&&autoMinutes&&onOpenDocument&&<button type="button" className="secondary" onClick={()=>onOpenDocument(autoMinutes.id)}><FileText size={17}/>Опубликованный протокол</button>}
     </div>

@@ -64,6 +64,15 @@ begin
  if (select count(*) from public.formal_documents where game_id=g and doc_type='state_program' and status_code='agenda')<>2 then raise exception 'FAIL registry agenda';end if;
  perform public.sign_institution_meeting_agenda((select agenda_document_id from public.government_sessions where id=s));
  perform public.open_government_session(s);
+ IF NOT EXISTS(SELECT 1 FROM public.government_sessions gs JOIN public.formal_documents d ON d.id=gs.agenda_document_id WHERE gs.id=s AND d.status_code='published') THEN RAISE EXCEPTION 'FAIL opening invalidated signature';END IF;
+ -- The pre-existing production defect is represented only by a test revision timestamp.
+ execute 'reset role';
+ perform set_config('app.gos_government_agenda_session',s::text,true);
+ update public.formal_documents set metadata=metadata||jsonb_build_object('revision_changed_at',clock_timestamp()) where id=(select agenda_document_id from public.government_sessions where id=s);
+ perform set_config('app.gos_government_agenda_session','',true);
+ execute 'set local role authenticated';
+ perform public.sign_institution_meeting_agenda((select agenda_document_id from public.government_sessions where id=s));
+ IF NOT EXISTS(SELECT 1 FROM public.government_sessions gs JOIN public.formal_documents d ON d.id=gs.agenda_document_id WHERE gs.id=s AND d.status_code='published') THEN RAISE EXCEPTION 'FAIL re-sign';END IF;
  perform public.start_government_program_report(ia);
  perform public.request_state_program_revision(a,'QA return before vote with reason');
  if (select status from public.government_program_agenda where id=ia)<>'pending' then raise exception 'FAIL stuck presentation';end if;
