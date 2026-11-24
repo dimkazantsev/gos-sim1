@@ -2,6 +2,17 @@
  * This suite does not start a browser or contact a database or document API. */
 const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path'),vm=require('node:vm'),ts=require('typescript');
 const root=path.resolve(__dirname,'..');
+// Run the real pure voting contracts instead of incomplete UI test doubles.
+function loadVotingModule(name,requireModule){
+ const source=fs.readFileSync(path.join(root,'components/game',name+'.ts'),'utf8');
+ const code=ts.transpileModule(source,{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}}).outputText;
+ const module={exports:{}};
+ vm.runInNewContext('(function(require,module,exports){'+code+'\n})',{})(requireModule,module,module.exports);
+ return module.exports;
+}
+const votingBodies=loadVotingModule('votingBodies',name=>{throw Error('Unexpected votingBodies import: '+name)});
+const proceduralVoting=loadVotingModule('proceduralVoting',name=>{if(name==='./votingBodies')return votingBodies;throw Error('Unexpected proceduralVoting import: '+name)});
+assert.equal(typeof proceduralVoting.canReferenceVoteDocument,'function');
 const tick=()=>new Promise(resolve=>setImmediate(resolve));
 function deferred(){let resolve;const promise=new Promise(done=>resolve=done);return{promise,resolve};}
 function text(node){if(node==null||typeof node==='boolean')return'';if(typeof node!=='object')return String(node);return[node.props?.children].flat(Infinity).map(text).join('');}
@@ -67,7 +78,7 @@ function harness(component){
   if(name==='./useSavedGameState')return{useSavedGameState:(id,user,section,initial)=>react.useState(initial),savedChoice:()=>()=>true,savedString:()=>true,savedBoolean:()=>true};
   if(name==='./formalInstitutions')return{FORMAL_SUBJECTS:[subject],FORMAL_TYPES:types,inferFormal:()=>({subject,type:types[0]}),formalSignature:()=>null,ownerLabel:x=>x,formalDocumentTypeLabel:key=>types.find(t=>t.key===key)?.label||'Документ',formalDocumentTitle:title=>title,formalSubjectDisplayLabel:(key,label)=>label||key};
   if(name==='./contextualOffices')return{actingOfficeOptions:()=>[{value:'legacy',id:null,role:'Депутат Государственной Думы',userId:null,label:'Депутат Государственной Думы'}]};
-  if(name==='./proceduralVoting')return{votePresetForDocument:()=>null};
+  if(name==='./proceduralVoting')return proceduralVoting;
   if(name==='./documentTemplates')return{DOCUMENT_TEMPLATES:[{key:'fz_bill',title:'Template title',body:'Template body with enough text',docType:'fz_bill',subject:'gd_deputy'}]};
   if(name==='./institutionEmblems')return{institutionEmblem:()=>''};
   return new Proxy({__esModule:true,default:tag(path.basename(name))},{get:(object,key)=>key in object?object[key]:tag(String(key))});
