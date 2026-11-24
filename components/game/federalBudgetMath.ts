@@ -132,7 +132,7 @@ export function calculateFederalBudget(draft:BudgetDraft,state:SimulatorState,co
  const balance=budgetMoneySum(revenue,-expenditure),deficit=Math.max(0,-balance),surplus=Math.max(0,balance),financing=budgetMoneySum(...FINANCING_SOURCES.map(f=>draft.financing[f.key]),-refinance);
  const internal=budgetMoneySum(...FINANCING_SOURCES.filter(s=>s.debt==='internal').flatMap(f=>[draft.financing[f.key],-state.last_financing[f.key]]));
  const internal_debt=Math.max(0,budgetMoneySum(state.internal_debt,internal,-paidInternal)),external_debt=Math.max(0,budgetMoneySum(state.external_debt*fx/a.fx_rate,draft.financing.external,-state.last_financing.external,-paidExternal));
- const funding_need=budgetMoneySum(deficit,credit_outflow,oilChange),funding_gap=Math.max(0,budgetMoneySum(funding_need,-financing)),cash_excess=budgetMoneySum(Math.max(0,budgetMoneySum(financing,-funding_need)),surplus);
+ const netFundingNeed=budgetMoneySum(-balance,credit_outflow,oilChange),funding_need=Math.max(0,netFundingNeed),funding_gap=Math.max(0,budgetMoneySum(netFundingNeed,-financing)),cash_excess=Math.max(0,budgetMoneySum(financing,-netFundingNeed));
  const uncertainty=clamp(.04+Math.abs(economy)*.001+Math.abs(trust)*.001+Math.abs((p?.inflation??a.inflation)-a.inflation)*.003,.025,.2);
  const debt_total=budgetMoneySum(internal_debt,external_debt);
  const reserveRemaining=budgetMoneySum(state.reserve_remaining,oilChange,-draft.financing.reserves,state.last_plan_id?(state.last_financing.reserves??0):0);
