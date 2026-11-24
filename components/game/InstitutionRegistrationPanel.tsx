@@ -219,12 +219,24 @@ export default function InstitutionRegistrationPanel({g,readOnly=false,freshAtte
  const config=VOTING_BODIES.find(b=>b.key===body),unit=units.find(u=>'unit:'+u.id===body);
  function eligible(uid:string){const m=g.members.find(x=>x.user_id===uid);if(!m||m.kind==='observer')return false;if(unit)return assignments.some(a=>a.unit_id===unit.id&&a.user_id===uid);if(body==='ksrf')return m.kind==='student'||g.parties.some(p=>p.leader_user_id===uid);if(body==='gd'&&m.kind==='student')return !m.roster_archived_at;return !!config&&(config.role.test(m.role_title||'')||(m.kind==='student'&&offices.some(o=>o.user_id===uid&&config.role.test(o.role_title))))}
  const participants=g.members.filter(m=>eligible(m.user_id));
+ const governmentWeights=new Map<string,number>();
+ if(body==='government'){
+  const officeKeys=new Map<string,Set<string>>();
+  for(const o of offices){
+   if(!/правительств|министр|^министерство по /i.test(o.role_title))continue;
+   const keys=officeKeys.get(o.user_id)||new Set<string>();
+   const role=o.role_title.toLowerCase().trim();
+   keys.add(role.match(/министерство по .+$/)?.[0]||role);
+   officeKeys.set(o.user_id,keys);
+  }
+  for(const m of participants)if(!m.roster_archived_at)governmentWeights.set(m.user_id,Math.max(1,officeKeys.get(m.user_id)?.size||0));
+ }
  const freshRegistration=(r:Entry)=>!freshAttendance||body!=='gd'||stage!==12||!!r.presence_updated_at&&r.presence_updated_at>=(meetingRows.find(m=>m.institution_key===body)?.agenda_approved_at||'~');
  const registered=rows.filter(r=>r.institution_key===body&&freshRegistration(r)&&participants.some(m=>m.user_id===r.user_id));
  const mine=registered.some(r=>r.user_id===g.me?.user_id);
  const factionCount=body==='ksrf'?g.parties.length:0;
- const total=body==='ksrf'?factionCount:body==='gd'?450:body==='government'?participants.length:body==='municipality'?participants.length:unit?.mandate_capacity??participants.length;
- const present=body==='ksrf'?new Set(registered.map(r=>g.parties.find(p=>p.leader_user_id===r.user_id)?.id).filter(Boolean)).size:body==='gd'?registered.reduce((n,r)=>n+(gdPresence?.registered.find(x=>x.user_id===r.user_id)?.present||0),0):registered.length;
+ const total=body==='ksrf'?factionCount:body==='gd'?450:body==='government'?[...governmentWeights.values()].reduce((n,w)=>n+w,0):body==='municipality'?participants.length:unit?.mandate_capacity??participants.length;
+ const present=body==='ksrf'?new Set(registered.map(r=>g.parties.find(p=>p.leader_user_id===r.user_id)?.id).filter(Boolean)).size:body==='gd'?registered.reduce((n,r)=>n+(gdPresence?.registered.find(x=>x.user_id===r.user_id)?.present||0),0):body==='government'?registered.reduce((n,r)=>n+(governmentWeights.get(r.user_id)||0),0):registered.length;
  const needed=bodyQuorum(body,total);
  const meetingRecord=meetingRows.find(m=>m.institution_key===body);
  const gdStage12CanonicalAgenda=body==='gd'&&stage===12;

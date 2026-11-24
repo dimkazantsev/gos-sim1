@@ -5,7 +5,8 @@ export default function VoteBallotControls({vote,maxWeight,canCast,ballot,onSubm
  const [partial,setPartial]=useState(false),[split,setSplit]=useState(false),[quantity,setQuantity]=useState(maxWeight),[yes,setYes]=useState(0),[no,setNo]=useState(0),[abstain,setAbstain]=useState(0),[busy,setBusy]=useState(false);
  const submitting=useRef(false); // synchronous guard before React re-renders
  useEffect(()=>setQuantity(maxWeight),[maxWeight]);
- const integer=(v:number)=>Number.isInteger(v)&&v>=0,amount=partial?quantity:maxWeight,total=yes+no+abstain,valid=split?[yes,no,abstain].every(integer)&&total>0&&total<=maxWeight&&(!abstain||vote.allow_abstain):integer(amount)&&amount>0&&amount<=maxWeight;
+ const government=vote.institution_key==='government',multiOffice=government&&maxWeight>1;
+ const integer=(v:number)=>Number.isInteger(v)&&v>=0,amount=partial?quantity:maxWeight,total=yes+no+abstain,valid=split?[yes,no,abstain].every(integer)&&total>0&&total<=maxWeight&&(!government||total===maxWeight)&&(!abstain||vote.allow_abstain):integer(amount)&&amount>0&&amount<=maxWeight;
  async function send(y:number,n:number,a:number){if(!valid||!canCast||submitting.current)return;submitting.current=true;setBusy(true);try{await onSubmit(y,n,a)}finally{submitting.current=false;setBusy(false)}}
  const submitted=ballot?{yes:ballot.yes_weight??(ballot.choice==='yes'?ballot.weight:0),no:ballot.no_weight??(ballot.choice==='no'?ballot.weight:0),abstain:ballot.abstain_weight??(ballot.choice==='abstain'?ballot.weight:0)}:null;
  return <section className="civicBallot civicBallotModern" aria-label="Подать голоса">
@@ -18,14 +19,14 @@ export default function VoteBallotControls({vote,maxWeight,canCast,ballot,onSubm
     <b>{maxWeight}</b><span>голосов</span>
    </div>
   </div>
-  {vote.voting_mode==='mandate'&&<div className="civicBallotModes">
-   <label className={'civicBallotMode '+(partial?'isActive':'')}>
+  {(vote.voting_mode==='mandate'||multiOffice)&&<div className="civicBallotModes">
+   {!government&&<label className={'civicBallotMode '+(partial?'isActive':'')}>
     <input type="checkbox" checked={partial} onChange={e=>{setPartial(e.target.checked);setSplit(false)}}/>
     <span><strong>Указать количество голосов</strong><small>Использовать часть доступных мандатов</small></span>
-   </label>
+   </label>}
    <label className={'civicBallotMode '+(split?'isActive':'')}>
     <input type="checkbox" checked={split} onChange={e=>{setSplit(e.target.checked);if(e.target.checked)setPartial(false)}}/>
-    <span><strong>Распределить голоса между вариантами</strong><small>Разделить голоса между решениями</small></span>
+    <span><strong>Распределить голоса между вариантами</strong><small>{government?'По одному голосу за каждую занимаемую должность':'Разделить голоса между решениями'}</small></span>
    </label>
   </div>}
   {partial&&<label className="civicBallotAmount">
@@ -46,7 +47,7 @@ export default function VoteBallotControls({vote,maxWeight,canCast,ballot,onSubm
    <button type="button" className="civicBallotChoice is-no" disabled={!canCast||!valid||busy} onClick={()=>void send(0,amount,0)}><span>Против</span><b>{Number.isFinite(amount)?amount:0}</b></button>
    {vote.allow_abstain&&<button type="button" className="civicBallotChoice is-abstain" disabled={!canCast||!valid||busy} onClick={()=>void send(0,0,amount)}><span>Воздержаться</span><b>{Number.isFinite(amount)?amount:0}</b></button>}
   </div>}
-  {!valid&&maxWeight>0&&<p className="civicBallotError" role="alert">Укажите целые числа. Сумма должна быть от 1 до {maxWeight}.</p>}
+  {!valid&&maxWeight>0&&<p className="civicBallotError" role="alert">{government?`Распределите все ${maxWeight} доступных голосов.`:`Укажите целые числа. Сумма должна быть от 1 до ${maxWeight}.`}</p>}
   {submitted&&<p className="civicMyBallot">Ваши голоса: за {submitted.yes}, против {submitted.no}, воздержались {submitted.abstain}. Всего {ballot?.weight}.</p>}
  </section>;
 }
