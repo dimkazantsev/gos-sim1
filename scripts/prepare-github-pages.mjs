@@ -49,7 +49,7 @@ let home=readFileSync(resolve(target,'app/page.tsx'),'utf8');
 // Preserve validated Telegram section/deep-link parameters on every transition.
 for(const [method,target] of [
  ['push','r.data'],
- ['replace','rows.data[0].game_id'],['replace','String(resume.data)']
+ ['replace','rows.data[0].game_id']
 ]){
  const original="router."+method+"('/game/'+"+target+"+incomingSectionSuffix())";
  if(!home.includes(original))throw Error('Static game entry adapter is missing: '+original);

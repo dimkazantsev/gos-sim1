@@ -8,7 +8,10 @@ const entry=read('app/page.tsx'),sessions=read('components/game/TeacherGameSessi
  names=read('supabase/migrations/20261025115000_protect_owner_name_and_teacher_profiles.sql');
 assert(!entry.includes('newParticipantIdentity')&&!entry.includes('entryNewParticipant'),'Never ask participant to check extra role switch');
 assert(entry.includes("rpc('join_game_as_role'")&&entry.includes("p_expected_kind:mode==='guest'?'observer':mode"),'Game join binds selected role to invitation');
-assert(entry.includes("rpc('resume_member_game_as_role'"),'Password resume cannot elevate to owner');
+assert(!entry.includes("rpc('resume_member_game'"),'Never invoke revoked legacy resume RPC');
+const password=entry.slice(entry.indexOf("phase='game';"),entry.indexOf("async function recover()"));
+assert(password.includes("from('teacher_profiles')")&&password.includes(".select('last_game_id').eq('user_id',userId).maybeSingle()")&&password.includes("if(profile.data)")&&password.includes("rpc('list_my_teacher_games')")&&password.includes("rpc('ensure_my_game_access',{p_game:target.id})")&&password.includes("if(access.error)throw access.error"),'Teacher entry requires own protected profile, server-listed game and verified access');
+assert(password.includes("from('game_members')")&&password.includes(".eq('user_id',userId)")&&password.includes(".in('kind',['student','observer']).is('roster_archived_at',null)")&&password.includes("openAuthorizedGame(selected.game_id)"),'Participant/guest entry uses own active server-side membership, never a selected teacher role');
 assert(entry.includes("signOut({scope:'local'})")&&entry.includes("signInAnonymously"),'Test identity cannot reuse teacher uid');
 assert(!entry.includes("rpc('join_game_with_code'"),'Disallow legacy role inference');
 assert(m.includes("AND ic.kind=p_expected_kind")&&m.includes("IF k<>p_expected_kind"),'Server checks expected role before insertion');

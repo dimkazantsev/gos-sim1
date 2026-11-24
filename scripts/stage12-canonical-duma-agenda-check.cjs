@@ -16,7 +16,7 @@ assert(sync.includes("s.status='draft'")&&sync.includes("agenda_approved_at=case
 assert(save.includes("p_kind='agenda' and p_institution='gd' and p_stage_no=12"),'No second editable agenda can be written');
 assert(open.includes('m.agenda_approved_at is not null'),'Meeting cannot begin without approved synced agenda');
 assert(panel.includes('gdStage12CanonicalAgenda')&&panel.includes('civicAgendaSyncedPreview'),'Registration panel previews the same agenda');
-assert(panel.includes('!gdStage12CanonicalAgenda&&(!agendaHasDocument||!hasSessionRegistrations)'),'Independent editor hidden for Stage 12 only');
+assert(panel.includes('!gdStage12CanonicalAgenda&&!canonicalGovernmentAgenda&&(!agendaHasDocument||!hasSessionRegistrations)'),'Independent editor hidden for canonical Duma and Government agendas');
 assert(layout.includes("import './2026-stage12-synced-agenda.css';"),'Brand styling loaded');
 const game='10000000-0000-0000-0000-000000000001';
 const chair='30000000-0000-0000-0000-000000000001';
