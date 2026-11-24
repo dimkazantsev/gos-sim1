@@ -44,8 +44,10 @@ BEGIN
  PERFORM public.save_institution_meeting_document(g,12,'government','agenda','Рассмотрение законодательной инициативы по бюджетному правилу.',null);
  PERFORM public.approve_institution_meeting_agenda(g,12,'government');
  v:=public.create_procedural_vote(g,'QA Government cutoff','QA','member','government','cutoff_government_submission','fraction',.5,'present_majority',.5,true,true,d,'advance','return_author');
- PERFORM public.register_institution_session_at_stage(g,'government',12);PERFORM public.cast_procedural_vote(v,'yes');
- PERFORM set_config('request.jwt.claim.sub',ids->>'minister',true);PERFORM public.register_institution_session_at_stage(g,'government',12);PERFORM public.cast_procedural_vote(v,'yes');
+ PERFORM public.register_institution_session_at_stage(g,'government',12);
+ PERFORM set_config('request.jwt.claim.sub',ids->>'minister',true);PERFORM public.register_institution_session_at_stage(g,'government',12);
+ PERFORM set_config('request.jwt.claim.sub',ids->>'pm',true);PERFORM public.cast_procedural_vote(v,'yes');
+ PERFORM set_config('request.jwt.claim.sub',ids->>'minister',true);PERFORM public.cast_procedural_vote(v,'yes');
  PERFORM set_config('request.jwt.claim.sub',ids->>'teacher',true);r:=public.close_procedural_vote(v,'QA Government approval');
  IF r->>'result'<>'passed' OR (SELECT status_code FROM public.formal_documents WHERE id=d)<>'registered' THEN RAISE EXCEPTION 'Government cutoff vote failed: %',r;END IF;
  PERFORM set_config('request.jwt.claim.sub',ids->>'chair',true);
