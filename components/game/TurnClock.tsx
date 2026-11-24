@@ -1,6 +1,6 @@
 'use client';
 import {useEffect,useState} from 'react';
-import {turnCountdown} from './turnCountdown';
+import {turnCountdown,turnMinuteSnapshot} from './turnCountdown';
 
 function useTurnSeconds(endAt:string){
  const [seconds,setSeconds]=useState(0);
@@ -11,8 +11,28 @@ function useTurnSeconds(endAt:string){
  return seconds;
 }
 
+function useTurnMinutes(endAt:string){
+ const [seconds,setSeconds]=useState(0);
+ useEffect(()=>{
+  const deadline=new Date(endAt).getTime();
+  let timer:ReturnType<typeof setTimeout>|undefined;
+  function tick(){
+   clearTimeout(timer);timer=undefined;
+   if(document.visibilityState!=='visible')return;
+   const next=turnMinuteSnapshot(deadline-Date.now());
+   setSeconds(next.seconds);
+   if(next.delay>0)timer=setTimeout(tick,next.delay);
+  }
+  tick();
+  document.addEventListener('visibilitychange',tick);
+  window.addEventListener('focus',tick);
+  return()=>{clearTimeout(timer);document.removeEventListener('visibilitychange',tick);window.removeEventListener('focus',tick)};
+ },[endAt]);
+ return seconds;
+}
+
 export function TurnCountdownPill({endAt}:{endAt:string}){
- const remaining=turnCountdown(useTurnSeconds(endAt));
+ const remaining=turnCountdown(useTurnMinutes(endAt));
  return <span className="timerPill timerPillDuration" aria-label={remaining.ariaLabel} title={remaining.ariaLabel}>
   <span className="timerPillUnit" aria-hidden="true"><strong>{remaining.days}</strong><span className="timerPillUnitFull">ДНИ</span><span className="timerPillUnitCompact">д</span></span>
   <span className="timerPillUnit" aria-hidden="true"><strong>{remaining.hours}</strong><span className="timerPillUnitFull">ЧАСЫ</span><span className="timerPillUnitCompact">ч</span></span>

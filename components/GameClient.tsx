@@ -436,6 +436,10 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
   setScreenHistory(previous=>({entries:previous.entries.map((screen,index)=>index===previous.index&&screen.view==='votes'?{...screen,voteId:''}:screen),index:previous.index}));
  }
  const {game,me,currentStage,teacher,chatOpen,setChatOpen,loading,error,setError,logout,touchPresence,logActivity}=g;
+ // The global turn deadline is the earliest of all open stages, not the stage in the header.
+ const headerStage=(view==='stages'&&focusStage?g.stages.find(stage=>stage.stage_no===focusStage):undefined)||currentStage;
+ const headerStageOpen=headerStage?.status==='open';
+ const headerStageState=headerStageOpen?'Ход открыт':headerStage?.status==='completed'?'Этап завершён':'Этап не открыт';
  const actionError=useActionErrorPlacement(error,view,()=>setError(''));
 
  const genericStudent:Member|undefined=teacher&&game?{
@@ -777,11 +781,11 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
      <button type="button" className="screenHistoryButton" onClick={()=>moveHistory(forwardIndex)} disabled={forwardIndex<0} aria-label="Перейти к следующему экрану" title="Вперёд"><ChevronRight aria-hidden="true"/></button>
     </nav>
     <div className="simTopCenter">
-     <div className="topStageCopy"><small>ЭТАП {String(currentStage?.stage_no||game.current_round||1).padStart(2,'0')}</small><strong>{nav.find(([key])=>key===view)?.[1]||game.title}</strong></div>
+     <div className="topStageCopy"><small>ЭТАП {String(headerStage?.stage_no||game.current_round||1).padStart(2,'0')}</small><strong>{nav.find(([key])=>key===view)?.[1]||game.title}</strong></div>
      <div className="topIndicators">
-      <span className={`livePill ${game.turn_open?'on':'off'}`} aria-label={game.turn_open?'Ход открыт':currentStage?.status==='completed'?'Этап завершён':'Этап не открыт'} title={game.turn_open?'Ход открыт':currentStage?.status==='completed'?'Этап завершён':'Этап не открыт'}><Radio aria-hidden="true"/><span className="livePillText">{game.turn_open?'Ход открыт':currentStage?.status==='completed'?'Этап завершён':'Этап не открыт'}</span></span>
+      <span className={`livePill ${headerStageOpen?'on':'off'}`} aria-label={headerStageState} title={headerStageState}><Radio aria-hidden="true"/><span className="livePillText">{headerStageState}</span></span>
       <button type="button" className="gameShareScreen" onClick={()=>void shareCurrentScreen()} title="Поделиться текущим разделом или документом" aria-label="Поделиться текущим разделом"><Share2 size={17} aria-hidden="true"/><span>Поделиться</span></button>
-      {game.turn_open&&game.turn_ends_at&&<TurnCountdownPill endAt={game.turn_ends_at}/>}
+      {headerStageOpen&&headerStage?.deadline&&<TurnCountdownPill endAt={headerStage.deadline}/>}
      </div>
     </div>
 
