@@ -70,6 +70,12 @@ begin
  perform public.start_government_program_report(ib);
  perform public.close_government_program_questions(ib);
  v:=public.open_program_vote_from_agenda(ib);
+ perform set_config('request.jwt.claim.sub',ids->>'teacher',true);
+ perform public.close_procedural_vote(v,'QA no quorum');
+ IF NOT EXISTS(SELECT 1 FROM public.game_votes WHERE id=v AND result_code='no_quorum' AND status='closed') OR NOT EXISTS(SELECT 1 FROM public.state_programs WHERE id=b AND status='ready' AND government_vote_id IS NULL) OR NOT EXISTS(SELECT 1 FROM public.government_program_agenda WHERE id=ib AND status='pending' AND vote_id IS NULL) THEN RAISE EXCEPTION 'FAIL no quorum retry';END IF;
+ perform set_config('request.jwt.claim.sub',pm::text,true);
+ perform public.start_government_program_report(ib);perform public.close_government_program_questions(ib);
+ v:=public.open_program_vote_from_agenda(ib);
  perform public.register_institution_session_at_stage(g,'government',11);
  perform set_config('request.jwt.claim.sub',m::text,true);perform public.register_institution_session_at_stage(g,'government',11);perform public.cast_procedural_vote(v,'yes');
  perform set_config('request.jwt.claim.sub',pm::text,true);perform public.cast_procedural_vote(v,'yes');
@@ -90,7 +96,7 @@ reset role;
 update public.state_programs set status='ready' where id=current_setting('qa.gp.b')::uuid;
 set local role authenticated;
 do $again$
-declare g uuid:=current_setting('qa.budget.game')::uuid;ids jsonb:=current_setting('qa.budget.users')::jsonb;pm uuid:=(ids->>'pm')::uuid;m uuid:=(ids->>'minister')::uuid;b uuid:=current_setting('qa.gp.b')::uuid;s uuid:=current_setting('qa.gp.s')::uuid;ib uuid;v uuid;
+declare g uuid:=current_setting('qa.budget.game')::uuid;ids jsonb:=current_setting('qa.budget.users')::jsonb;pm uuid:=(ids->>'pm')::uuid;m uuid:=(ids->>'minister')::uuid;b uuid:=current_setting('qa.gp.b')::uuid;s uuid:=current_setting('qa.gp.s')::uuid;ib uuid;v uuid;denied boolean;
 begin
  perform set_config('request.jwt.claim.sub',pm::text,true);
  select id into ib from public.government_program_agenda where session_id=s and program_id=b;
@@ -102,6 +108,8 @@ begin
  if not exists(select 1 from public.state_programs where id=b and signed_at is not null and status='adopted' and government_vote_id=v) then raise exception 'FAIL signed revision';end if;
  if not exists(select 1 from public.formal_documents where game_id=g and doc_type='state_program' and metadata->>'state_program_id'=b::text and status_code='published') then raise exception 'FAIL signed registry';end if;
  if (select count(*) from public.formal_documents where game_id=g and doc_type='government_resolution' and metadata->>'state_program_id'=b::text)<>2 then raise exception 'FAIL second resolution';end if;
+ denied:=false;begin perform public.request_state_program_revision(b,'QA prohibited return after signature');exception when others then if sqlerrm not like 'Возврат доступен%' then raise;end if;denied:=true;end;
+ if not denied then raise exception 'FAIL returned signed programme';end if;
 end;$again$;
 reset role;
 do $late$

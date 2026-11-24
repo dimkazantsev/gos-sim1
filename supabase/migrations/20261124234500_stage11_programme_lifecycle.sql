@@ -594,7 +594,7 @@ begin
       null,null,null,'government_act',
       jsonb_build_object('state_program_id',p.id,'government_vote_id',new.id,'auto_generated',true)
     );
-    UPDATE public.formal_documents SET status_label='Принята — ожидает подписи',updated_at=now() WHERE id=v_doc;
+    UPDATE public.formal_documents SET current_step=2,status_code='adopted',status_label='Принята — ожидает подписи',current_owner_key='government',updated_at=now() WHERE id=v_doc;
     -- A favourable vote creates only the draft resolution.
     -- The published programme and resolution are released together by the PM signature RPC.
   end if;
@@ -1073,6 +1073,55 @@ begin
 end;
 $function$;
 
+CREATE OR REPLACE FUNCTION public.sign_adopted_state_program(p_program_id uuid)
+ RETURNS void
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+ SET search_path TO 'public', 'private', 'pg_temp'
+AS $function$
+declare p public.state_programs%rowtype;
+ v_uid uuid:=(select auth.uid());
+ v_doc public.formal_documents%rowtype;
+begin
+ select * into p from public.state_programs where id=p_program_id for update;
+ if p.id is null then raise exception 'Государственная программа не найдена'; end if;
+ if v_uid is null or not private.is_game_member(p.game_id) or private.is_game_observer(p.game_id) then
+  raise exception 'Требуются полномочия действующего участника';end if;
+ if not private.is_game_teacher(p.game_id)
+   and (not private.role_is_available(p.game_id,v_uid)
+     or not exists(select 1 from private.formal_user_roles(p.game_id,v_uid) r
+      where r ~* '^председатель[[:space:]]+правительства([[:space:]]|$)')) then
+   raise exception 'Подписать программу может только Председатель Правительства';end if;
+ if p.status<>'adopted' or p.government_vote_id is null
+  or not exists(select 1 from public.game_votes v
+    where v.id=p.government_vote_id and v.game_id=p.game_id and v.status='closed'
+      and v.procedure_key='state_program' and v.result_code='passed'
+      and v.result_quorum_met) then
+  raise exception 'Подпись доступна только после положительного голосования Правительства с кворумом';end if;
+ select * into v_doc from public.formal_documents d
+ where d.game_id=p.game_id and d.stage_no=11
+   and d.doc_type='government_resolution'
+   and d.metadata->>'state_program_id'=p.id::text
+   and d.metadata->>'government_vote_id'=p.government_vote_id::text
+ order by d.created_at limit 1 for update;
+ if v_doc.id is null then raise exception 'Не найдено постановление по итогам голосования';end if;
+ if p.signed_at is null then
+  perform private.publish_signed_state_program(p.id,v_uid);
+ end if;
+ if v_doc.status_code='published' then return;end if;
+ if v_doc.status_code NOT IN ('draft','adopted') then raise exception 'Непредусмотренный статус постановления';end if;
+ update public.formal_documents
+ set current_step=3,status_code='published',status_label='Подписан и опубликован',
+     current_owner_key='system',updated_at=now()
+ where id=v_doc.id;
+ insert into public.formal_document_history(document_id,game_id,actor_id,action,
+  from_status,to_status,from_owner,to_owner,note)
+ values(v_doc.id,p.game_id,v_uid,'Подписано Председателем Правительства после голосования',
+  v_doc.status_code,'published',coalesce(v_doc.current_owner_key,'author'),'system',
+  'Положительное решение Правительства зафиксировано в голосовании; программа подписана и опубликована.');
+end
+$function$;
+
 -- Reconcile the live game's stale presentation and register its actual current statuses without inventing votes.
 UPDATE public.government_program_agenda a SET status='pending',started_at=NULL,qa_closed_at=NULL,result_note='Программа на доработке'
 FROM public.state_programs p,public.government_sessions s
@@ -1081,4 +1130,4 @@ WHERE a.game_id='068dac89-00ea-447a-96bf-0cb11d85014a' AND p.id=a.program_id AND
 SELECT private.ensure_stage11_government_agenda('068dac89-00ea-447a-96bf-0cb11d85014a');
 SELECT private.sync_stage11_program_registry_status(id) FROM public.state_programs WHERE game_id='068dac89-00ea-447a-96bf-0cb11d85014a';
 
-UPDATE public.formal_documents d SET status_label='Принята — ожидает подписи',updated_at=now() FROM public.state_programs p WHERE d.game_id='068dac89-00ea-447a-96bf-0cb11d85014a' AND d.game_id=p.game_id AND d.stage_no=11 AND d.doc_type='government_resolution' AND d.status_code='draft' AND d.metadata->>'state_program_id'=p.id::text AND d.metadata->>'government_vote_id'=p.government_vote_id::text AND p.status='adopted' AND p.signed_at IS NULL AND d.status_label IS DISTINCT FROM 'Принята — ожидает подписи';
+UPDATE public.formal_documents d SET current_step=2,status_code='adopted',status_label='Принята — ожидает подписи',current_owner_key='government',updated_at=now() FROM public.state_programs p WHERE d.game_id='068dac89-00ea-447a-96bf-0cb11d85014a' AND d.game_id=p.game_id AND d.stage_no=11 AND d.doc_type='government_resolution' AND d.status_code='draft' AND d.metadata->>'state_program_id'=p.id::text AND d.metadata->>'government_vote_id'=p.government_vote_id::text AND p.status='adopted' AND p.signed_at IS NULL ;

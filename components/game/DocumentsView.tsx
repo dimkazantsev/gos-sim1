@@ -413,7 +413,7 @@ export default function DocumentsView({g,focusId,createTemplate,createStageNo,on
  const progress=selected?Math.round((selected.current_step/Math.max(1,selected.workflow_steps.length-1))*100):0;
  const showBudgetPreliminary=!!selected&&selected.workflow_key==='budget'&&['budget_registered','budget_committee','budget_council','revision'].includes(selected.status_code);
  const votePreset=selected&&!isTerminalDocument?votePresetForDocument(selected):null;
- const isStage11Programme=!!selected&&(selected.doc_type==='state_program'&&!!selected.metadata?.state_program_id||selected.doc_type==='government_resolution'&&selected.stage_no===11&&!!selected.metadata?.state_program_id);
+ const isStage11Programme=!!selected&&(selected.doc_type==='state_program'&&!!selected.metadata?.state_program_id&&g.stages.some(s=>s.stage_no===11&&s.status==='open')||selected.doc_type==='government_resolution'&&selected.stage_no===11&&!!selected.metadata?.state_program_id);
  const chairBodies=me?.kind==='student'&&!me.roster_archived_at?chairVotingBodies([me.role_title||'',...activeRoles]):[];
  const referenceBody=selected&&!votePreset&&canReferenceVoteDocument(selected,g.game?.current_round||0)?chairBodies.find(b=>referenceDocumentMatchesBody(selected,b)):undefined;
  const canOpenSelectedVote=!!votePreset&&!!selected&&(canManage(selected)||chairBodies.includes(votePreset.institutionKey)||(teacher&&selected.status_code==='sf_veto'));
