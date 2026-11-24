@@ -453,13 +453,13 @@ export default function DocumentsView({g,focusId,createTemplate,createStageNo,on
   finally{setBusy(false)}
  }
  async function confirmCutoffSf(approved:boolean){
-  if(!selected||selected.metadata?.cutoff_price_proposal!==true||
+  if(!selected||!(selected.metadata?.cutoff_price_proposal===true||selected.workflow_key==='budget'&&selected.doc_type==='federal_budget')||
    selected.status_code!=='sf'||readOnly||!teacher||busy)return;
   const note=cutoffSfNote.trim();
   if(note.length<8||note.length>1500){g.setError('Укажите основание решения Совета Федерации (8–1500 символов).');return;}
   setBusy(true);
   try{
-   const {error}=await supabase.rpc('confirm_cutoff_sf_review',{
+   const {error}=await supabase.rpc(selected.workflow_key==='budget'?'confirm_budget_sf_review':'confirm_cutoff_sf_review',{
     p_document_id:selected.id,p_approved:approved,p_note:note
    });
    if(error)throw error;
@@ -665,7 +665,7 @@ export default function DocumentsView({g,focusId,createTemplate,createStageNo,on
       <article className="surface formalActions"><div className="surfaceHead"><div><small>Текущая стадия</small><h2>Что нужно сделать сейчас</h2></div></div>
        <div className="documentNextStep"><span>{isTerminalDocument?'Рассмотрение завершено':`${selected.current_step+1} из ${selected.workflow_steps.length}`}</span><h3>{isTerminalDocument?selected.status_label:selected.workflow_steps[selected.current_step]?.label||selected.status_label}</h3><p>Ответственный: <b>{ownerLabel(selected.current_owner_key)}</b>.</p>{!isTerminalDocument&&<p>Документ подписывает: <b>{documentSigningAuthority(selected,institutionSigners?.required||[])}</b>.</p>}<p>{isTerminalDocument?terminalDocumentText:isMandatorySignature?'Вето преодолено обеими палатами. Президент обязан подписать закон без повторного вето.':isSfVetoConfirmation?'Ожидается решение Совета Федерации, подтверждаемое преподавателем. Закон ещё не опубликован.':isBillForPresidentialSignature?'Закон ожидает подписи Президента Российской Федерации. До назначения Президента подписание невозможно, документ сохраняет текущую стадию.':linkedOpenVote?(linkedOpenVote.formal_step_code==='reference'?"Завершите ознакомительное голосование. Его результат не изменит стадию документа.":"Завершите открытое голосование — его результат будет учтён по установленной процедуре."):votePreset?"Для перехода дальше требуется решение голосованием.":procedureBlocked?"Сначала подготовьте обязательный комплект законопроекта.":meetingProcedureHint|| (currentAction?"Доступное действие: "+currentAction+".":"Процедура завершена.")}</p>{!canManage(selected)&&currentAction&&!linkedOpenVote&&<small>Действие выполняет ответственный орган. Для ознакомления документ можно отправить из блока под его текстом.</small>}</div>
        {selected.metadata?.source_type==='ghost_voting_policies'&&Boolean(selected.metadata?.source_vote_id)&&<div className="formalVoteLink active" role="status"><small>● Решение этапа 05 принято</small><b>Постановление связано с итогами Goust Voting</b><span>Повторное голосование не требуется. Уполномоченное лицо оформляет и публикует постановление.</span><button type="button" className="secondary" onClick={()=>onOpenVotes(String(selected.metadata?.source_vote_id))}>Посмотреть принятое решение →</button></div>}
-       {selected.metadata?.cutoff_price_proposal===true&&selected.status_code==='sf'&&teacher&&!readOnly&&<div className="formalBranchPanel" aria-label="Подтверждение решения Совета Федерации">
+       {(selected.metadata?.cutoff_price_proposal===true||selected.workflow_key==='budget'&&selected.doc_type==='federal_budget')&&selected.status_code==='sf'&&teacher&&!readOnly&&<div className="formalBranchPanel" aria-label="Подтверждение решения Совета Федерации">
         <small>Совет Федерации · финансовое регулирование</small>
         <b>Подтверждение рассмотрения преподавателем</b>
         <p>Если сенаторы не назначены, преподаватель фиксирует результат рассмотрения по игровым правилам. Это не подпись за сенатора или студента. При назначенном составе палаты можно провести отдельное голосование.</p>
