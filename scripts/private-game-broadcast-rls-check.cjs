@@ -7,7 +7,7 @@ const {harness}=require('./republic-game-resilience-check.cjs');
 const repo=path.join(__dirname,'..');
 const migration=fs.readFileSync(path.join(repo,'supabase/migrations/20261029180000_private_game_broadcast_documents.sql'),'utf8');
 const hook=fs.readFileSync(path.join(repo,'components/game/useRepublicGame.ts'),'utf8');
-const rulesMigration=fs.readFileSync(path.join(repo,'supabase/migrations/20261124191600_game_rules_private_broadcast.sql'),'utf8');
+const rulesMigration=fs.readFileSync(path.join(repo,'supabase/migrations/20261124194908_game_rules_private_broadcast.sql'),'utf8');
 const ruleTables=['stage_deadline_rules','parliamentary_election_rules','regional_election_rules'];
 const uuid=n=>'00000000-0000-4000-8000-'+String(n).padStart(12,'0');
 const game=uuid(900),another=uuid(901),topic='gos-id-live:'+game;
