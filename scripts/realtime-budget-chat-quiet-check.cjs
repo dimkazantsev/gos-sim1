@@ -1,4 +1,5 @@
 'use strict';
+require('./budget-pulse-trailing-refresh-check.cjs');
 // Minimal SQL trigger + offline regression. Does not touch production state.
 const assert=require('node:assert/strict');
 const fs=require('node:fs');

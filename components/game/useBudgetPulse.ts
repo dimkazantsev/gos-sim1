@@ -54,17 +54,23 @@ export function useBudgetPulse(gameId:string,enabled:boolean){
   // focus/visibility recovery and online event already cover refreshes.
   // Each idle visible client no longer calls get_budget_pulse every ~3 min.
   if(!dirtyWhileHidden)void refresh();
+  function scheduleAutomatic(delay=1200){
+   if(pending!==undefined)return;
+   // Keep the last invalidation even during the cooldown; one trailing read
+   // covers the entire burst without polling or adding a second timer.
+   pending=setTimeout(()=>{pending=undefined;automatic()},Math.max(delay,8000-(Date.now()-lastAutomaticAt)));
+  }
   function automatic(force=false){
    if(document.visibilityState!=='visible'){dirtyWhileHidden=true;return}
-   if(!force&&Date.now()-lastAutomaticAt<8000)return;
+   if(!force&&Date.now()-lastAutomaticAt<8000){scheduleAutomatic(0);return}
+   if(pending!==undefined){clearTimeout(pending);pending=undefined}
    lastAutomaticAt=Date.now();dirtyWhileHidden=false;void refresh();
   }
   function changed(event:Event){
    const detail=(event as CustomEvent<{gameId?:string;table?:string}>).detail;
    if(detail?.gameId!==gameId||detail.table&&!relevant.has(detail.table))return;
    if(document.visibilityState!=='visible'){dirtyWhileHidden=true;return}
-   if(pending!==undefined)return;
-   pending=setTimeout(()=>{pending=undefined;automatic()},1200);
+   scheduleAutomatic();
   }
   function cancelPending(){
    if(pending!==undefined){clearTimeout(pending);pending=undefined;dirtyWhileHidden=true}
