@@ -98,7 +98,7 @@ begin
     'registry_no', d.registry_no
   );
 end;
-$function$
+$function$;
 
 CREATE OR REPLACE FUNCTION public.sync_government_session_programmes(p_session_id uuid)
  RETURNS integer
@@ -135,4 +135,4 @@ BEGIN
   PERFORM private.refresh_government_agenda_document(s.id);
  END IF;
  RETURN n;
-END $function$
+END $function$;
