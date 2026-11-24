@@ -29,7 +29,7 @@ assert(!/supabase|fetch\(|setInterval\(|setTimeout\(|\.rpc\(/.test(component),'E
 assert(dock.includes('<MetricRelationships metricKey={chosen.metric_key}/>'),'Metric detail missing explanations');
 assert(teacher.includes('<MetricRelationships metricKey={metric?.metric_key||""} compact/>'),'Teacher editor missing explanations');
 assert(css.includes('.metricRelationsGrid')&&css.includes('@media(max-width:650px)'), 'Missing branded, narrow-screen layout');
-assert(actual.lawfulness.outgoing.includes('40%')&&actual.lawfulness.outgoing.includes('30%')&&actual.lawfulness.outgoing.includes('ФКЗ'),'Legal thresholds must be explained');
+assert(actual.lawfulness.outgoing.includes('ниже 40%')&&actual.lawfulness.outgoing.includes('ниже 30%')&&actual.lawfulness.outgoing.includes('2/3 голосов от общего числа депутатов')&&/Федеральный конституционный закон одной Думой преодолеть нельзя/.test(actual.lawfulness.outgoing),'Legal thresholds must be explained');
 assert(actual.social_tension.meaning.includes('снижение'),'Inverse social-tension direction missing');
 assert(actual.budget.meaning.includes('не процентный индекс'),'Budget units must not be confused with percentages');
 console.log('PASS: 11/11 indices covered; two surfaces; no requests; 40/30 legal thresholds; responsive branded layout.');

@@ -736,7 +736,7 @@ export function useRepublicGame(gameId:string){
   // Invalidation-only subscriptions need no row bodies. The three direct
   // delta handlers retain complete payloads so votes, stages and document
   // changes still update immediately without additional PostgREST reads.
-  for(const table of ['game_stages','party_invitations','party_chair_ballots','formal_documents','game_votes','blitz_assignments','stage_deadline_rules']){
+  for(const table of ['game_stages','party_invitations','party_chair_ballots','formal_documents','game_votes','blitz_assignments']){
    const fullDelta=table==='game_stages'||table==='formal_documents'||table==='game_votes';
    channel.on('postgres_changes',{event:'*',schema:'public',table,filter:'game_id=eq.'+gameId,
     ...(fullDelta?{}:{select:['game_id']})},payload=>{
@@ -807,12 +807,18 @@ export function useRepublicGame(gameId:string){
      scheduleRealtimeReload(0,['vote_ballots']);
    },5000);
   });
-  // KSRF proposals use this existing authorised game socket, not five widget channels.
-  // Only interested stage views refresh their proposal lists.
-  for(const table of ['parliamentary_election_rules','regional_election_rules']){
-   channel.on('postgres_changes',{event:'*',schema:'public',table,filter:'game_id=eq.'+gameId,
-    select:['game_id']},()=>notifyGameDataRefresh(gameId,table));
-  }
+  // These three tables are readable by every member of the same game.
+  // A private table-name pulse replaces three per-client WAL bindings.
+  // Preserve the deadline scheduler and the existing targeted election reads.
+  channel.on('broadcast',{event:'game_rules_changed'},payload=>{
+   if(!currentConnection())return;
+   const table=payload.payload?.table;
+   if(table==='stage_deadline_rules'){
+    dirtyTables.add(table);reconcileTables.add(table);schedule();
+   }else if(table==='parliamentary_election_rules'||table==='regional_election_rules'){
+    notifyGameDataRefresh(gameId,table);
+   }
+  });
   // Five low-frequency Duma procedure tables share one authorised Broadcast
   // invalidation instead of five per-client Postgres Changes bindings. Only
   // table names travel over this private channel; rows still load under RLS.

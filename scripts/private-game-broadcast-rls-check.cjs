@@ -7,6 +7,8 @@ const {harness}=require('./republic-game-resilience-check.cjs');
 const repo=path.join(__dirname,'..');
 const migration=fs.readFileSync(path.join(repo,'supabase/migrations/20261029180000_private_game_broadcast_documents.sql'),'utf8');
 const hook=fs.readFileSync(path.join(repo,'components/game/useRepublicGame.ts'),'utf8');
+const rulesMigration=fs.readFileSync(path.join(repo,'supabase/migrations/20261124191600_game_rules_private_broadcast.sql'),'utf8');
+const ruleTables=['stage_deadline_rules','parliamentary_election_rules','regional_election_rules'];
 const uuid=n=>'00000000-0000-4000-8000-'+String(n).padStart(12,'0');
 const game=uuid(900),another=uuid(901),topic='gos-id-live:'+game;
 assert(migration.includes('on realtime.messages')&&migration.includes('private.is_game_member'),'Room membership required in Realtime RLS');
@@ -64,6 +66,29 @@ async function sqlTest(){
   assert.equal(await role(1,'gos-id-live:not-a-uuid'),0,'Malformed topic denied without cast error');
   await assert.rejects(role(1,topic,'anon'),e=>e.code==='42501','Anonymous Postgres role lacks SELECT');
   console.log('PASS: SQL: 40 students, teacher, guest, other game, anon, malformed topic; 4 private metadata-only triggers');
+  await db.exec('reset role');
+  for(const table of ruleTables)await db.exec('create table public.'+table+'(id integer primary key,game_id uuid not null,secret text)');
+  await db.exec(rulesMigration);
+  for(const table of ruleTables){
+   await db.query('insert into public.'+table+' values (1,$1,\'secret\'),(2,$1,\'secret\'),(3,$2,\'secret\')',[game,another]);
+   await db.query('update public.'+table+' set game_id=$2 where id=1',[game,another]);
+   await db.query('delete from public.'+table+' where id in (1,3)');
+  }
+  const ruleSignals=(await db.query("select topic,event,payload,is_private from realtime.messages where event='game_rules_changed' order by id")).rows;
+  assert.equal(ruleSignals.length,15,'Each table emits two insert, two cross-game update and one delete signal');
+  assert(ruleSignals.every(x=>x.is_private&&ruleTables.includes(x.payload.table)&&Object.keys(x.payload).length===1),'Only table names, no rule content or IDs');
+  assert.equal(ruleSignals.filter(x=>x.topic===topic).length,6);
+  assert.equal(ruleSignals.filter(x=>x.topic==='gos-id-live:'+another).length,9);
+  for(const n of [1,41,42])assert.equal(await role(n),9,'Student, teacher and guest see own game only');
+  assert.equal(await role(1,'gos-id-live:'+another),0);
+  assert.equal(await role(43,topic),0);
+  assert.equal(await role(43,'gos-id-live:'+another),10);
+  assert.equal(await role(null),0);
+  await db.exec('reset role');
+  const access=(await db.query("select has_function_privilege('authenticated','private.broadcast_game_rules_invalidation()','EXECUTE') as allowed,has_function_privilege('anon','private.broadcast_game_rules_invalidation()','EXECUTE') as anonymous")).rows[0];
+  assert.equal(access.allowed,false);assert.equal(access.anonymous,false);
+  console.log('PASS: rule changes: three tables, bulk statements, old/new games, no payload secrets, trigger ACL and room RLS');
+
  }finally{await db.close()}
 }
 
@@ -82,7 +107,19 @@ async function hookTest(){
    assert.equal(rooms[0].private,true,'Room channel must be private');
    assert.equal(rooms[0].handlers.filter(x=>x.kind==='broadcast'&&x.event==='party_documents_changed').length,1);
    assert.equal(rooms[0].handlers.filter(x=>x.kind==='postgres_changes'&&x.table==='party_documents').length,0);
+   assert.equal(rooms[0].handlers.filter(x=>x.kind==='postgres_changes'&&ruleTables.includes(x.table)).length,0);
+   assert.equal(rooms[0].handlers.filter(x=>x.kind==='broadcast'&&x.event==='game_rules_changed').length,1);
   }
+  const noticeCount=(h,table)=>h.stats().notices.filter(n=>n.gameId==='game-a'&&n.table===table).length;
+  const beforeRules=clients.map(h=>ruleTables.map(table=>noticeCount(h,table)));
+  clients.forEach(h=>h.broadcast('gos-id-live:game-b','game_rules_changed',{table:'regional_election_rules'}));
+  clients.forEach(h=>h.broadcast('gos-id-live:game-a','game_rules_changed',{table:'unknown'}));
+  await Promise.all(clients.map(h=>h.settle()));
+  assert(clients.every((h,i)=>ruleTables.every((table,j)=>noticeCount(h,table)===beforeRules[i][j])));
+  for(const table of ruleTables)clients.forEach(h=>h.broadcast('gos-id-live:game-a','game_rules_changed',{table}));
+  await Promise.all(clients.map(h=>h.advance(12000)));
+  assert(clients.every((h,i)=>ruleTables.every((table,j)=>noticeCount(h,table)===beforeRules[i][j]+1)),'All three rule invalidations use existing refresh path exactly once');
+  console.log('PASS: 100 synthetic tabs, 300 direct rule bindings removed, one shared private event per tab');
   const before=clients.map(h=>h.readCount('party_documents'));
   clients.forEach(h=>h.broadcast('gos-id-live:game-b','party_documents_changed',{table:'party_documents'}));
   await Promise.all(clients.map(h=>h.settle()));
