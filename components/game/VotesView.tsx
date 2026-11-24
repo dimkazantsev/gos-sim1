@@ -8,7 +8,7 @@ import StyledSelect from '../ui/StyledSelect';
 import InstitutionRegistrationPanel from './InstitutionRegistrationPanel';
 import FormalDocumentPicker from './FormalDocumentPicker';
 import {formalDocumentTitle} from './formalInstitutions';
-import {votePresetForDocument,institutionLabel,majorityLabel} from './proceduralVoting';
+import {canReferenceVoteDocument,votePresetForDocument,institutionLabel,majorityLabel} from './proceduralVoting';
 import VoteBallotControls from './VoteBallotControls';
 import {gdVoteAllowance} from './gdVoteAllowance';
 import {formatKsrfVoteBody,uppercaseFirst} from './ksrfVoteText';
@@ -17,6 +17,7 @@ import {useSavedGameState,savedChoice} from './useSavedGameState';
 import {Trash2,Vote as VoteIcon} from 'lucide-react';
 import DisclosureSummary from '../ui/DisclosureSummary';
 
+function transitionLabel(value:string){return ({advance:'переход к следующей стадии',reject:'отклонение документа',return_author:'возврат автору',return_previous:'возврат на предыдущую стадию',none:'без автоматического перехода'} as Record<string,string>)[value]||'по установленной процедуре'}
 function pct(n:number,d:number){return d>0?Math.round(n/d*100):0}
 function time(v:string){return new Date(v).toLocaleTimeString('ru-RU',{hour:'2-digit',minute:'2-digit'})}
 
@@ -27,11 +28,16 @@ export default function VotesView({g,onOpenDocument,onOpenStages,focusId,onClear
  const [tab,setTab]=useSavedGameState<'open'|'closed'|'all'>(g.game?.id,g.me?.user_id,'votes-tab','open',savedChoice('open','closed','all')),[busy,setBusy]=useState('');
  const [query,setQuery]=useState(''),[units,setUnits]=useState<VotingUnit[]>([]);
  const [formalId,setFormalId]=useState('');
+ const [referenceTarget,setReferenceTarget]=useState('');
  const selectedNpa=formalDocuments.find(d=>d.id===formalId);
  // Index immutable projections once per update rather than scanning every
  // ballot, document and participant again for each displayed vote.
  const openDocumentSteps=useMemo(()=>new Set(votes.filter(v=>v.status==='open'&&v.formal_document_id).map(v=>v.formal_document_id+':'+v.formal_step_code)),[votes]);
  const documentById=useMemo(()=>new Map(formalDocuments.map(d=>[d.id,d])),[formalDocuments]);
+ const documentsWithOpenVotes=useMemo(()=>new Set(votes.filter(v=>v.status==='open'&&v.formal_document_id).map(v=>v.formal_document_id)),[votes]);
+ const selectableNpas=useMemo(()=>formalDocuments.filter(d=>!documentsWithOpenVotes.has(d.id)&&
+   (!!votePresetForDocument(d)||canReferenceVoteDocument(d,g.game?.current_round||0))),[formalDocuments,documentsWithOpenVotes,g.game?.current_round]);
+ const referenceNpas=useMemo(()=>formalDocuments.filter(d=>!documentsWithOpenVotes.has(d.id)&&canReferenceVoteDocument(d,votes.find(v=>v.id===referenceTarget)?.stage_no||0)),[formalDocuments,documentsWithOpenVotes,referenceTarget,votes]);
  const memberById=useMemo(()=>new Map(members.map(m=>[m.user_id,m])),[members]);
  const ballotByVoteAndVoter=useMemo(()=>{
   const map=new Map<string,typeof ballots>();
@@ -149,6 +155,18 @@ export default function VotesView({g,onOpenDocument,onOpenStages,focusId,onClear
   if(ok){setTitle('');setBody('');setFormalId('')}
  }
 
+ async function attachReference(voteId:string,ids:string[]){
+  if(!teacher||!ids[0]||busy)return;
+  setBusy('reference:'+voteId);
+  try{
+   const r=await supabase.rpc('attach_vote_reference_document',{p_vote_id:voteId,p_document_id:ids[0]});
+   if(r.error){g.setError(r.error.message);return}
+   setReferenceTarget('');
+   await g.refresh();
+  }catch(e){g.setError(e instanceof Error?e.message:String(e))}
+  finally{setBusy('')}
+ }
+
  function canDelete(v:Vote){return v.result_code!=='superseded'&&!!me&&(teacher||v.created_by===me.user_id)}
  function canClose(v:Vote){
   if(teacher)return true;
@@ -219,7 +237,7 @@ export default function VotesView({g,onOpenDocument,onOpenStages,focusId,onClear
    <div className="teacherDetailsBody">
     <div className="voteBuilder modern">
      <input aria-label="Вопрос голосования" value={title} onChange={e=>setTitle(e.target.value)} placeholder="Вопрос голосования"/>
-     <FormalDocumentPicker documents={formalDocuments} value={formalId?[formalId]:[]} onChange={chooseNpa} multiple={false}/>
+     <FormalDocumentPicker documents={selectableNpas} value={formalId?[formalId]:[]} onChange={chooseNpa} multiple={false}/>{selectedNpa&&<p className="civicVoteBase">{votePresetForDocument(selectedNpa)?'Процедурное голосование: орган, кворум и последствия определены стадией НПА. Для чтений требуется заседание ГД.':'Ознакомительное голосование: документ доступен участникам, но результат не меняет его правовой статус.'}</p>}
      <textarea aria-label="Проект решения" value={body} onChange={e=>setBody(e.target.value)} placeholder="Проект решения / пояснение"/>
      <div className="voteBuilderGrid">
       <StyledSelect label="Кто голосует" value={institution} onChange={key=>{setInstitution(key);setMode(key==='gd'?'mandate':'member');setQuorumValue(VOTING_BODIES.find(b=>b.key===key)?.quorum||.5);setMajorityKind(key==='gd'?'eligible_majority':'present_majority')}} options={[{value:'all',label:'Все участники'},{value:'factions',label:'Фракции'},...VOTING_BODIES.map(b=>({value:b.key,label:b.title})),...units.map(u=>({value:'unit:'+u.id,label:u.title}))]}/>
@@ -260,11 +278,13 @@ export default function VotesView({g,onOpenDocument,onOpenStages,focusId,onClear
       </div>
      </header>
 
+    {teacher&&v.status==='open'&&!v.formal_document_id&&!v.formal_step_code&&!v.source_post_id&&['manual','registered_session'].includes(v.procedure_key)&&v.pass_transition==='none'&&v.fail_transition==='none'&&!(ballotByVoteAndVoter.get(v.id)||[]).length&&<div className="voteRelations">{referenceTarget===v.id?<div><FormalDocumentPicker documents={referenceNpas} value={[]} multiple={false} label="Выбрать НПА из реестра" onChange={ids=>void attachReference(v.id,ids)}/><p className="civicVoteBase">Ознакомительная связь, без изменения стадии НПА. После первого голоса недоступна.</p><button type="button" className="secondary" disabled={!!busy} onClick={()=>setReferenceTarget('')}>Отмена</button></div>:<button type="button" className="secondary" disabled={!!busy} onClick={()=>setReferenceTarget(v.id)}>Прикрепить НПА</button>}</div>}
     {(doc||stage)&&<div className="voteRelations">
-     {doc&&<button onClick={()=>onOpenDocument(doc.id)}><small>СВЯЗАННЫЙ НПА</small><b>{doc.registry_no}</b><span>{formalDocumentTitle(doc.title,doc.doc_type)}</span></button>}
-     {stage&&<button onClick={onOpenStages}><small>ЭТАП ИГРЫ</small><b>{stage.stage_no}. {stage.title}</b><span>{v.formal_step_code?'Стадия НПА: '+(doc?.workflow_steps.find(step=>step.code===v.formal_step_code)?.label||'Стадия процедуры'):'Открыть описание этапа'}</span></button>}
+     {doc&&<button onClick={()=>onOpenDocument(doc.id)}><small>{v.formal_step_code==='reference'?'НПА ДЛЯ ОЗНАКОМЛЕНИЯ':'СВЯЗАННЫЙ НПА'}</small><b>{doc.registry_no}</b><span>{formalDocumentTitle(doc.title,doc.doc_type)}</span><span>Текущая редакция {String(doc.metadata?.revision||1)}</span></button>}
+     {stage&&<button onClick={onOpenStages}><small>ЭТАП ИГРЫ</small><b>{stage.stage_no}. {stage.title}</b><span>{v.formal_step_code==='reference'?'Ознакомительное голосование':v.formal_step_code?'Стадия НПА: '+(doc?.workflow_steps.find(step=>step.code===v.formal_step_code)?.label||'Стадия процедуры'):'Открыть описание этапа'}</span></button>}
     </div>}
 
+    {doc&&v.formal_step_code!=='reference'&&(v.pass_transition!=='none'||v.fail_transition!=='none')&&<p className="civicVoteBase">При принятии: {transitionLabel(v.pass_transition)}. При отклонении: {transitionLabel(v.fail_transition)}. При отсутствии кворума стадия не меняется.</p>}
     {v.body&&<p className="voteBody">{formatKsrfVoteBody(v.procedure_key,v.body)}</p>}
 
     <div className="voteRuleStrip">
@@ -308,7 +328,7 @@ export default function VotesView({g,onOpenDocument,onOpenStages,focusId,onClear
      <div><span>За <b>{v.result_yes??t.yes}</b></span><span>Против <b>{v.result_no??t.no}</b></span><span>Воздержались <b>{v.result_abstain??t.abstain}</b></span></div>
     </div>}
 
-    <footer><span>Открыто {time(v.opened_at)}</span>{v.closed_at&&<span>Завершено {time(v.closed_at)}</span>}{doc&&<span>Результат связан с движением НПА</span>}</footer>
+    <footer><span>Открыто {time(v.opened_at)}</span>{v.closed_at&&<span>Завершено {time(v.closed_at)}</span>}{doc&&<span>{v.formal_step_code==='reference'||v.pass_transition==='none'&&v.fail_transition==='none'?'Результат сам по себе не меняет стадию НПА':'Результат связан с движением НПА'}</span>}</footer>
    </article>
   })}</div>
  </div>;
