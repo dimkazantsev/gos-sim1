@@ -8,12 +8,12 @@ import {useGameTableSync} from './useGameTableSync';
 import {hasActiveGameRole} from './stageRoles';
 import type {ReturnTypeRepublic} from './viewTypes';
 
-type Session={id:string;game_id:string;session_no:number;title:string;time_limit_minutes:number;agenda_document_id:string|null;status:'draft'|'open'|'closed';chair_user_id:string|null;created_at:string;opened_at:string|null;closed_at:string|null;agenda_approved_at:string|null;agenda_approved_by:string|null};
+type Session={id:string;game_id:string;session_no:number;title:string;time_limit_minutes:number;agenda_document_id:string|null;status:'draft'|'open'|'closed';chair_user_id:string|null;created_at:string;opened_at:string|null;closed_at:string|null;agenda_approved_at:string|null;agenda_approved_by:string|null;agenda_vote_id:string|null};
 type Item={id:string;session_id:string;program_id:string;agenda_no:number;report_minutes:number;status:'pending'|'presenting'|'decision'|'completed'|'withdrawn';vote_id:string|null;result_note:string|null;started_at:string|null;completed_at:string|null;qa_closed_at:string|null};
 type Program={id:string;title:string;responsible_ministry:string;status:string;responsible_minister_id:string|null;signed_at:string|null;government_vote_id:string|null};
 type Question={id:string;session_id:string;title:string;description:string;duration_minutes:number;program_agenda_id:string|null;status:'pending'|'discussed';created_at:string};
 type SpeakerQuestion={id:string;game_id:string;session_id:string;agenda_item_id:string;asked_by:string;question_text:string;answer_text:string|null;answered_by:string|null;created_at:string;answered_at:string|null};
-type Proposal={id:string;session_id:string|null;program_id:string;section_key:string;original_text:string;proposed_text:string;justification:string;status:'submitted'|'accepted'|'rejected';review_note:string|null;created_by:string;created_at:string};
+type Proposal={id:string;session_id:string|null;program_id:string;section_key:string;original_text:string;proposed_text:string;justification:string;status:'submitted'|'accepted'|'rejected';review_note:string|null;created_by:string;created_at:string;incorporated_at:string|null};
 
 export default function GovernmentProgramSessionLab({g,onOpenVotes,onOpenDocument,onEditProgram,readOnly=false}:{g:ReturnTypeRepublic;onOpenVotes:(id?:string)=>void;onOpenDocument?:(id:string)=>void;onEditProgram?:(id:string)=>void;readOnly?:boolean}){
  const {game,me,teacher,members,votes,setError}=g;
@@ -28,14 +28,16 @@ export default function GovernmentProgramSessionLab({g,onOpenVotes,onOpenDocumen
  const [reviewProgram,setReviewProgram]=useState(''),[reviewSection,setReviewSection]=useState('structure'),[reviewOriginal,setReviewOriginal]=useState(''),[reviewProposed,setReviewProposed]=useState(''),[reviewReason,setReviewReason]=useState('');
  const [pmReasons,setPmReasons]=useState<Record<string,string>>({}),pmRequestBusy=useRef(false);
  const [notice,setNotice]=useState('');
+ const [agendaEdit,setAgendaEdit]=useState<{session:string;original:string;body:string}|null>(null);
  const [selectedId,setSelectedId]=useState('');
  const [timeLimit,setTimeLimit]=useState(60);
  const [busy,setBusy]=useState(false);
  const isPM=hasActiveGameRole(g,/^председатель\s+правительства(?:\s|$)/u);
  const isPresident=hasActiveGameRole(g,/^президент российской федерации$/u);
  const canManage=teacher||isPM||isPresident;
- const canSign=teacher||isPM;
- const canApprove=isPM;
+ const canSign=(teacher||isPM)&&!readOnly;
+ const canApprove=isPM&&!readOnly;
+ const canSubmit=(teacher||hasActiveGameRole(g,/^(?:заместитель\s+)?председатель\s+правительства(?:\s|$)/u))&&!readOnly;
 
  async function load(){
   if(!game)return;
@@ -48,24 +50,24 @@ export default function GovernmentProgramSessionLab({g,onOpenVotes,onOpenDocumen
   ]);
   const failure=[s,i,p,q,r].find(x=>x.error);if(failure?.error){setError(userError(failure.error));return;}
   const sessionRows=(s.data||[]) as Session[];
-  const activeSession=sessionRows.find(x=>x.id===selectedId)||sessionRows[0];
+  const activeSession=sessionRows.find(x=>x.id===selectedId)||sessionRows.find(x=>x.status==='open')||sessionRows[0];
   const activeItem=((i.data||[]) as Item[]).find(x=>x.session_id===activeSession?.id&&x.status==='presenting');
   // At most one programme presentation is active. Fetch its questions only.
-  // Each user can ask two questions; 40 attendees means at most 80 rows per report.
+  // Each user can ask two questions; load only this report, up to 100 attendees.
   if(activeItem){
    const speaker=await supabase.from('government_program_speaker_questions').select('*')
      .eq('game_id',game.id).eq('agenda_item_id',activeItem.id)
-     .order('created_at',{ascending:true}).limit(80);
+     .order('created_at',{ascending:true}).limit(200);
    if(speaker.error){setError(userError(speaker.error));return;}
    setSpeakerQuestions((speaker.data||[]) as SpeakerQuestion[]);
   }else setSpeakerQuestions([]);
-  if(!s.error){setSessions(sessionRows);if(!sessionRows.some(row=>row.id===selectedId)&&sessionRows[0])setSelectedId(sessionRows[0].id)}
+  if(!s.error){setSessions(sessionRows);if(!sessionRows.some(row=>row.id===selectedId)&&sessionRows[0])setSelectedId(activeSession?.id||sessionRows[0].id)}
   if(!i.error)setItems((i.data||[]) as Item[]);
   if(!p.error)setPrograms((p.data||[]) as Program[]);
   if(!q.error)setQuestions((q.data||[]) as Question[]);
   if(!r.error)setProposals((r.data||[]) as Proposal[]);
  }
- useGameTableSync(game?.id,['government_sessions','government_program_agenda','government_session_questions','formal_documents','state_program_review_proposals','state_programs','game_votes','game_ballots','institution_session_registrations','government_program_speaker_questions'],load,(me?.user_id||'')+':'+selectedId);
+ useGameTableSync(game?.id,['government_sessions','government_program_agenda','government_session_questions','state_program_review_proposals','state_programs','government_program_speaker_questions'],load,(me?.user_id||'')+':'+selectedId);
 
  if(!game||!me)return null;
  const activeGame=game;
@@ -82,13 +84,19 @@ export default function GovernmentProgramSessionLab({g,onOpenVotes,onOpenDocumen
  const reviewablePrograms=selected?programs.filter(p=>agenda.some(a=>a.program_id===p.id)):[];
  const meetingProposals=selected?proposals.filter(p=>p.session_id===selected.id):[];
  const current=agenda.find(x=>x.status==='presenting'||x.status==='decision');
+ const agendaDoc=selected?g.formalDocuments.find(d=>d.id===selected.agenda_document_id):undefined;
+ const agendaVote=selected?.agenda_vote_id?votes.find(v=>v.id===selected.agenda_vote_id):undefined;
+ const agendaSigned=!!selected?.agenda_approved_at&&agendaDoc?.status_code==='published';
+ const agendaAccepted=agendaSigned&&agendaVote?.status==='closed'&&agendaVote.result_code==='passed'&&agendaVote.result_quorum_met&&agendaVote.body===agendaDoc?.body_text;
+ const mayCorrect=canApprove&&!!selected&&selected.status!=='closed'&&!current&&!!agendaDoc?.body_text&&agendaVote?.status!=='open'&&agendaVote?.result_code!=='passed';
+ const amendmentProgram=current?.status==='presenting'&&!!current.qa_closed_at?current.program_id:null;
  const autoMinutes=selected?g.formalDocuments.find(x=>x.doc_type==='minutes'&&x.metadata?.automatic_session_id===selected.id):undefined;
  const name=(id:string|null)=>members.find(m=>m.user_id===id)?.full_name||'—';
  const program=(id:string)=>programs.find(p=>p.id===id);
  const vote=(id:string|null)=>id?votes.find(v=>v.id===id):undefined;
 
  async function decidePmProgram(programId:string,action:'revision'|'ready'){
-  if(!canApprove||busy||pmRequestBusy.current||!pendingPmPrograms.some(p=>p.id===programId))return;
+  if(!canSubmit||busy||pmRequestBusy.current||!pendingPmPrograms.some(p=>p.id===programId))return;
   const reason=(pmReasons[programId]||'').trim();
   if(action==='revision'&&(reason.length<10||reason.length>1500))return;
   pmRequestBusy.current=true;setBusy(true);
@@ -99,12 +107,12 @@ export default function GovernmentProgramSessionLab({g,onOpenVotes,onOpenDocumen
    if(r.error)throw r.error;
    setPmReasons(previous=>{const next={...previous};delete next[programId];return next});
    await load();
-   setNotice(action==='revision'?'Государственная программа возвращена разработчикам с замечаниями.':'Государственная программа согласована и доступна для включения в проект повестки.');
+   setNotice(action==='revision'?'Государственная программа возвращена разработчикам с замечаниями.':'Государственная программа внесена в проект повестки Этапа 11.');
   }catch(e){setError(userError(e))}
   finally{pmRequestBusy.current=false;setBusy(false)}
  }
  async function submitReview(){
-  if(!selected||!reviewablePrograms.some(p=>p.id===reviewProgram)||reviewProposed.trim().length<5||busy||selected.status==='closed')return;
+  if(!selected||reviewProgram!==amendmentProgram||!agendaAccepted||reviewProposed.trim().length<5||busy||selected.status!=='open')return;
   setBusy(true);
   try{const r=await supabase.rpc('submit_government_agenda_program_proposal',{p_session_id:selected.id,p_program_id:reviewProgram,p_section_key:reviewSection,p_original_text:reviewOriginal,p_proposed_text:reviewProposed,p_justification:reviewReason});if(r.error)throw r.error;setReviewProposed('');setReviewOriginal('');setReviewReason('');await load();setNotice('Предложение к государственной программе зарегистрировано.')}catch(e){setError(e)}finally{setBusy(false)}
  }
@@ -129,12 +137,30 @@ export default function GovernmentProgramSessionLab({g,onOpenVotes,onOpenDocumen
  }
  async function approve(){
   if(!selected||!canApprove||busy)return;setBusy(true);
-  try{if(!selected.agenda_document_id)throw new Error('Повестка ещё не сформирована');const r=await supabase.rpc('sign_institution_meeting_agenda',{p_document_id:selected.agenda_document_id});if(r.error)throw r.error;await load();setNotice('Председатель Правительства лично подписал повестку. Документ утверждён после всех обязательных подписей.');}
+  try{if(!selected.agenda_document_id)throw new Error('Повестка ещё не сформирована');const r=await supabase.rpc('sign_institution_meeting_agenda',{p_document_id:selected.agenda_document_id});if(r.error)throw r.error;await load();setNotice('Повестка подписана Председателем Правительства. Зарегистрируйтесь; затем все члены Правительства голосуют за документ.');}
   catch(e){setError(userError(e))}finally{setBusy(false)}
  }
  async function open(){if(!selected||!canApprove||busy)return;setBusy(true);
-  try{const r=await supabase.rpc('open_government_session',{p_session_id:selected.id});if(r.error)throw r.error;await load();setNotice('Заседание открыто. Зарегистрируйтесь на заседание, затем начните представление программ.');}
+  try{const r=await supabase.rpc('open_government_session',{p_session_id:selected.id});if(r.error)throw r.error;await load();setNotice('Регистрация открыта. После регистрации всех членов Правительства начнётся голосование по повестке.');}
   catch(e){setError(userError(e))}finally{setBusy(false)}
+ }
+ async function openAgendaVote(){
+  if(!selected||!canApprove||busy)return;setBusy(true);
+  try{const r=await supabase.rpc('open_government_agenda_vote',{p_session_id:selected.id});if(r.error)throw r.error;await load();onOpenVotes(String(r.data));}catch(e){setError(userError(e))}finally{setBusy(false)}
+ }
+ async function saveAgendaText(){
+  if(!selected||!mayCorrect||agendaEdit?.session!==selected.id||busy)return;setBusy(true);
+  try{const r=await supabase.rpc('correct_government_agenda_text',{p_session_id:selected.id,p_body:agendaEdit.body,p_expected_body:agendaEdit.original});if(r.error)throw r.error;setAgendaEdit(null);await load();setNotice('Текст исправлен. Подпишите новую редакцию и вынесите её на повторное голосование.');}catch(e){setError(userError(e))}finally{setBusy(false)}
+ }
+ async function returnForAmendments(programId:string){
+  if(!canApprove||busy)return;setBusy(true);
+  const accepted=meetingProposals.filter(p=>p.program_id===programId&&p.status==='accepted'&&!p.incorporated_at);
+  const reason=('Внесите одобренные поправки в паспорт программы и повторно направьте его на согласование. '+accepted.map(p=>p.proposed_text).join('; ')).slice(0,1500);
+  try{const r=await supabase.rpc('request_state_program_revision',{p_program_id:programId,p_reason:reason});if(r.error)throw r.error;await load();setNotice('Ответственному министерству возвращена ГП для внесения одобренных поправок.');}catch(e){setError(userError(e))}finally{setBusy(false)}
+ }
+ async function confirmAmendments(programId:string){
+  if(!selected||!canApprove||busy)return;setBusy(true);
+  try{const r=await supabase.rpc('confirm_government_program_amendments',{p_session_id:selected.id,p_program_id:programId});if(r.error)throw r.error;await load();setNotice('Председатель подтвердил внесение одобренных поправок в актуальную редакцию ГП.');}catch(e){setError(userError(e))}finally{setBusy(false)}
  }
  async function editProgramme(id:string){
   if(readOnly||busy||!onEditProgram)return;
@@ -164,13 +190,13 @@ export default function GovernmentProgramSessionLab({g,onOpenVotes,onOpenDocumen
    setAnswerDrafts(old=>({...old,[id]:''}));await load();
   }catch(e){setError(userError(e))}finally{setBusy(false)}
  }
+ async function closeDiscussion(item:Item){
+  if(!canApprove||busy)return;setBusy(true);
+  try{const r=await supabase.rpc('close_government_program_questions',{p_item_id:item.id});if(r.error)throw r.error;setReviewProgram(item.program_id);await load();setNotice('Обсуждение завершено. Рассмотрите поправки либо переходите к итоговому голосованию, если их нет.');}catch(e){setError(userError(e))}finally{setBusy(false)}
+ }
  async function decision(id:string){
   if(!canApprove||busy)return;setBusy(true);
-  try{
-   const qa=await supabase.rpc('close_government_program_questions',{p_item_id:id});if(qa.error)throw qa.error;
-   const r=await supabase.rpc('open_program_vote_from_agenda',{p_item_id:id});if(r.error)throw r.error;
-   await load();setNotice('Вопросы рассмотрены. Голосование по представленной государственной программе открыто.');
-  }catch(e){setError(userError(e))}finally{setBusy(false)}
+  try{const r=await supabase.rpc('open_program_vote_from_agenda',{p_item_id:id});if(r.error)throw r.error;await load();onOpenVotes(String(r.data));}catch(e){setError(userError(e))}finally{setBusy(false)}
  }
  async function sign(programId:string){
   if(!canSign||busy)return;setBusy(true);
@@ -180,14 +206,15 @@ export default function GovernmentProgramSessionLab({g,onOpenVotes,onOpenDocumen
  async function close(){if(!selected)return;setBusy(true);const r=await supabase.rpc('close_government_session',{p_session_id:selected.id});if(r.error)setError(userError(r.error));else await load();setBusy(false)}
 
  return <section className="govSessionLab">
-  <StageModuleHeader variant="government" eyebrow="Этап 11 · Правительство Российской Федерации" title="Рассмотрение государственных программ" description="Проекты Этапа 10 автоматически включаются в повестку. После утверждения Председателем Правительства проводятся доклады, вопросы и голосование; принятые программы подписываются и публикуются." stats={[{label:'Государственные программы',value:String(programs.length)},{label:'Повестка',value:selected?.agenda_approved_at?'Утверждена':selected?'На согласовании':'Не создана'}]}/>
+  <StageModuleHeader variant="government" eyebrow="Этап 11 · Правительство Российской Федерации" title="Рассмотрение государственных программ" description="Этап 10: проверка и внесение ГП в повестку. Этап 11: подпись, регистрация, голосование за повестку, обсуждение и поправки к каждой ГП, затем итоговое решение." stats={[{label:'Государственные программы',value:String(programs.length)},{label:'Повестка',value:agendaAccepted?'Принята':agendaVote?.status==='open'?'На голосовании':agendaSigned?'Подписана':selected?'На согласовании':'Не создана'}]}/>
   <div className="govMeetingFlow" aria-label="Порядок рассмотрения">
    <div><span>01</span><strong>Подготовка повестки</strong><small>Из согласованных ГП</small></div>
-   <div><span>02</span><strong>Утверждение</strong><small>Председателем Правительства</small></div>
-   <div><span>03</span><strong>Доклад и вопросы</strong><small>На заседании</small></div>
-   <div><span>04</span><strong>Решение</strong><small>Голосование и публикация</small></div>
+   <div><span>02</span><strong>Подпись и регистрация</strong><small>Председатель и члены Правительства</small></div>
+   <div><span>03</span><strong>Голосование за повестку</strong><small>Утверждение документа</small></div>
+   <div><span>04</span><strong>Обсуждение и поправки</strong><small>По каждой программе</small></div>
+   <div><span>05</span><strong>Решение по ГП</strong><small>Принятие, доработка или отклонение</small></div>
   </div>
-  {canApprove&&<section className="govMeetingAuto govPmReview" aria-label="Предварительное согласование государственных программ">
+  {canSubmit&&<section className="govMeetingAuto govPmReview" aria-label="Предварительное согласование государственных программ">
    <div><span className="govEyebrow">Предварительное согласование</span><h3>ГП, поступившие Председателю Правительства</h3><p>Рассмотрите программу до включения в проект повестки. Возврат требует письменных замечаний; после исправлений программа снова поступит непосредственно Председателю.</p></div>
    {pendingPmPrograms.length===0?<p>Государственных программ, ожидающих решения Председателя, сейчас нет.</p>:
     <div className="govPmReviewItems">{pendingPmPrograms.map(p=><article className="govPmReviewItem" key={p.id}>
@@ -198,7 +225,7 @@ export default function GovernmentProgramSessionLab({g,onOpenVotes,onOpenDocumen
      </label>
      <div className="govPmReviewActions">
       <button type="button" disabled={busy||(pmReasons[p.id]||'').trim().length<10} onClick={()=>void decidePmProgram(p.id,'revision')}>Вернуть на доработку</button>
-      <button type="button" className="primary" disabled={busy} onClick={()=>void decidePmProgram(p.id,'ready')}>Согласовать для включения в повестку</button>
+      <button type="button" className="primary" disabled={busy} onClick={()=>void decidePmProgram(p.id,'ready')}>Внести в повестку</button>
      </div>
     </article>)}</div>}
   </section>}
@@ -212,39 +239,51 @@ export default function GovernmentProgramSessionLab({g,onOpenVotes,onOpenDocumen
   {!selected&&!canApprove&&<p className="govMeetingHint">Повестка появится после формирования и утверждения Председателем Правительства. Согласованные проекты ГП сохраняются в разделе «Работа».</p>}
   {selected&&<>
    <section className="govMeetingAgendaCard" aria-label="Официальная повестка Правительства">
-    <div className="govMeetingAgendaHead"><div><span className="govEyebrow">Официальный документ · Заседание № {selected.session_no}</span><h3>Повестка заседания Правительства</h3><p>{agenda.length} государственных программ · {selected.time_limit_minutes} минут по регламенту. {selected.agenda_approved_at?'Утверждена Председателем Правительства.':'Сформирована автоматически и ожидает утверждения.'}</p></div>
+    <div className="govMeetingAgendaHead"><div><span className="govEyebrow">Официальный документ · Заседание № {selected.session_no}</span><h3>Повестка заседания Правительства</h3><p>{agenda.length} государственных программ · {selected.time_limit_minutes} минут по регламенту. {agendaAccepted?'Принята голосованием Правительства.':agendaVote?.status==='open'?'Голосование по повестке идёт.':agendaVote?.status==='closed'?'Повестка не принята. Необходима корректировка.':agendaSigned?'Подписана Председателем Правительства; ожидается голосование.':'Ожидается личная подпись Председателя Правительства.'}</p></div>
      <div className="govMeetingAgendaHeadActions">{selected.agenda_document_id&&<button type="button" className="secondary" onClick={()=>onOpenDocument?.(selected.agenda_document_id!)} disabled={!onOpenDocument}><FileText size={17}/>Открыть документ</button>}<button type="button" className="secondary" onClick={()=>void load()} disabled={busy}><RefreshCcw size={17}/>Обновить</button></div></div>
     {meetingQuestions.length>0&&<div className="govLegacyQuestions">{meetingQuestions.map((q,i)=><div key={q.id}><span>{i+1}.</span><strong>{q.title}</strong><small>{q.status==='discussed'?'Рассмотрен':'Дополнительный вопрос'}</small></div>)}</div>}
     <div className="govMeetingAgendaActions">
      <div><strong>{selected.status==='closed'?'Заседание завершено':selected.status==='open'?'Заседание открыто':selected.agenda_approved_at?'Повестка утверждена':'Ожидает утверждения'}</strong><small>Председательствующий: {name(selected.chair_user_id)}.</small></div>
-     {canApprove&&selected.status==='draft'&&!selected.agenda_approved_at&&<><button type="button" className="govMeetingRefreshPrograms secondary" aria-label="Обновить список государственных программ" disabled={busy} onClick={()=>void sync()}><RefreshCcw size={17} aria-hidden="true"/><span>Обновить список ГП</span></button><button type="button" className="primary" disabled={busy||agenda.length===0} onClick={()=>void approve()}><ClipboardCheck size={17}/>Сохранить и подписать</button></>}
-     {canApprove&&selected.status==='draft'&&!!selected.agenda_approved_at&&<button type="button" className="primary" disabled={busy} onClick={()=>void open()}><Mic2 size={17}/>Открыть заседание</button>}
-     {canApprove&&selected.status==='open'&&<button type="button" disabled={busy||!!current} onClick={()=>void close()}>Закрыть заседание</button>}
+     {canApprove&&selected.status==='draft'&&!agendaSigned&&<><button type="button" className="govMeetingRefreshPrograms secondary" aria-label="Обновить список государственных программ" disabled={busy} onClick={()=>void sync()}><RefreshCcw size={17} aria-hidden="true"/><span>Обновить список ГП</span></button><button type="button" className="primary" disabled={busy||agenda.length===0} onClick={()=>void approve()}><ClipboardCheck size={17}/>Сохранить и подписать</button></>}
+     {canApprove&&selected.status==='draft'&&agendaSigned&&<button type="button" className="primary" disabled={busy} onClick={()=>void open()}><Mic2 size={17}/>Открыть регистрацию</button>}
+     {canApprove&&selected.status==='open'&&!agendaSigned&&<button type="button" className="primary" disabled={busy||agenda.length===0} onClick={()=>void approve()}><ClipboardCheck size={17}/>Подписать повестку</button>}
+     {canApprove&&selected.status==='open'&&agendaSigned&&!selected.agenda_vote_id&&<button type="button" className="primary" disabled={busy} onClick={()=>void openAgendaVote()}><Vote size={17}/>Открыть голосование по повестке</button>}
+     {agendaVote&&<button type="button" className={agendaVote.status==='open'?'primary':'secondary'} onClick={()=>onOpenVotes(agendaVote.id)}><Vote size={17}/>{agendaVote.status==='open'?'Голосовать за повестку':'Результат голосования по повестке'}</button>}
+     {mayCorrect&&<button type="button" className="secondary" onClick={()=>setAgendaEdit(agendaEdit?.session===selected.id?null:{session:selected.id,original:agendaDoc!.body_text!,body:agendaDoc!.body_text!})}><PencilLine size={16}/>Корректировать текст повестки</button>}
+     {canApprove&&selected.status==='open'&&agendaAccepted&&<button type="button" disabled={busy||!!current||agenda.some(a=>a.status==='pending'&&program(a.program_id)?.status==='ready')} onClick={()=>void close()}>Закрыть заседание</button>}
      {selected.status==='closed'&&autoMinutes&&onOpenDocument&&<button type="button" className="secondary" onClick={()=>onOpenDocument(autoMinutes.id)}><FileText size={17}/>Опубликованный протокол</button>}
     </div>
+    {mayCorrect&&agendaEdit?.session===selected.id&&<div className="govReviewForm"><label>Текст новой редакции<textarea rows={10} maxLength={20000} value={agendaEdit.body} onChange={e=>setAgendaEdit({...agendaEdit,body:e.target.value})}/></label><button type="button" className="primary" disabled={busy||agendaEdit.body.trim().length<80||agendaEdit.body.trim()===agendaEdit.original.trim()} onClick={()=>void saveAgendaText()}>Сохранить корректировку</button></div>}
+    {!agendaAccepted&&selected.status==='open'&&<p className="govMeetingHint">Рассмотрение ГП откроется только после регистрации всех членов Правительства и принятия текущей редакции повестки большинством голосов.</p>}
    </section>
    <section className="govMeetingProgrammeList" aria-label="Представление государственных программ">
-    <div className="govMeetingListHeader"><h3>Государственные программы в повестке</h3><p>Для каждой программы: доклад → вопросы → голосование → оформление решения. До открытия голосования ответственный министр может доработать ГП на Этапе 10 с повторным согласованием.</p></div>
+    <div className="govMeetingListHeader"><h3>Государственные программы в повестке</h3><p>Для каждой программы: обсуждение → поправки → итоговое голосование. Принятая ГП включается в бюджет, возвращённая редактируется, отклонённая окончательна.</p></div>
     {agenda.length===0?<p className="govMeetingHint">В повестке ещё нет государственных программ.</p>:agenda.map((item)=>{
       const p=program(item.program_id),v=vote(item.vote_id);
       const qa=speakerQuestions.filter(q=>q.agenda_item_id===item.id);
       const awaiting=qa.filter(q=>!q.answer_text);
       const speaker=canApprove||p?.responsible_minister_id===me.user_id;
+      const itemProposals=meetingProposals.filter(q=>q.program_id===item.program_id);
+      const pendingAmendments=itemProposals.some(q=>q.status==='submitted');
+      const acceptedAmendments=itemProposals.filter(q=>q.status==='accepted');
+      const unincorporated=acceptedAmendments.some(q=>!q.incorporated_at);
       const mayEdit=!readOnly&&!!onEditProgram&&p?.signed_at==null&&!p?.government_vote_id&&!item.vote_id&&
         !!p&&['draft','revision','minister_review','pm_review','ready'].includes(p.status)&&
         (teacher||p.responsible_minister_id===me.user_id)&&g.stages.some(s=>s.stage_no===11&&s.status==='open');
       return <article className={'govMeetingProgramme govMeetingProgramme-'+item.status} key={item.id}>
-       <header><span className="govMeetingProgrammeNo">{String(item.agenda_no).padStart(2,'0')}</span><div><span className="govEyebrow">{p?.responsible_ministry||'Ответственное министерство'}</span><h4>{p?.title||'Государственная программа'}</h4><p>Докладчик: {name(p?.responsible_minister_id||null)} · Регламент: {item.report_minutes} минут</p></div><strong className="govMeetingProgrammeStatus">{item.status==='pending'?(p?.status==='revision'?'На доработке':'Ожидает доклада'):item.status==='presenting'?'Доклад и вопросы':item.status==='decision'?'Голосование':item.status==='completed'?'Рассмотрена':'Снята с рассмотрения'}</strong></header>
+       <header><span className="govMeetingProgrammeNo">{String(item.agenda_no).padStart(2,'0')}</span><div><span className="govEyebrow">{p?.responsible_ministry||'Ответственное министерство'}</span><h4>{p?.title||'Государственная программа'}</h4><p>Докладчик: {name(p?.responsible_minister_id||null)} · Регламент: {item.report_minutes} минут</p></div><strong className="govMeetingProgrammeStatus">{item.status==='pending'?(p?.status==='revision'?'На доработке':'Ожидает доклада'):item.status==='presenting'?(item.qa_closed_at?'Поправки':'Обсуждение'):item.status==='decision'?'Голосование':item.status==='completed'?'Рассмотрена':'Снята с рассмотрения'}</strong></header>
        {item.result_note&&<p className="govMeetingDecisionNote">{item.result_note}</p>}
-       {item.status==='presenting'&&<div className="govMeetingSpeakerQuestions" aria-label="Вопросы выступающему">
+       {item.status==='presenting'&&!item.qa_closed_at&&<div className="govMeetingSpeakerQuestions" aria-label="Вопросы выступающему">
         <div className="govMeetingSpeakerHead"><div><h5><MessageCircleQuestion size={18}/>Вопросы к докладчику</h5><p>После выступления участники задают вопросы. На каждый вопрос нужно ответить до открытия голосования.</p></div><span>{qa.length} вопросов</span></div>
         {qa.length>0&&<div className="govMeetingSpeakerList">{qa.map(q=><div key={q.id} className="govMeetingSpeakerEntry"><div><strong>{name(q.asked_by)}</strong><p>{q.question_text}</p></div>{q.answer_text?<div className="govMeetingSpeakerAnswer"><strong><CheckCircle2 size={15}/>Ответ: {name(q.answered_by)}</strong><p>{q.answer_text}</p></div>:speaker?<div className="govMeetingSpeakerInput"><label>Ответ на вопрос<textarea rows={2} maxLength={4000} value={answerDrafts[q.id]||''} onChange={e=>setAnswerDrafts(old=>({...old,[q.id]:e.target.value}))}/></label><button type="button" disabled={busy||(answerDrafts[q.id]||'').trim().length<2} onClick={()=>void answer(q.id)}>Ответить</button></div>:<small>Ожидает ответа докладчика</small>}</div>)}</div>}
         {me.kind!=='observer'&&<div className="govMeetingSpeakerInput"><label>Задать вопрос выступающему<textarea rows={2} maxLength={2000} placeholder="Сформулируйте вопрос по целям, мероприятиям или финансированию программы" value={questionDrafts[item.id]||''} onChange={e=>setQuestionDrafts(old=>({...old,[item.id]:e.target.value}))}/></label><button type="button" disabled={busy||(questionDrafts[item.id]||'').trim().length<10} onClick={()=>void ask(item.id)}>Отправить вопрос</button></div>}
-        {canApprove&&<div className="govMeetingSpeakerFinish"><small>{awaiting.length?('Ожидают ответа: '+awaiting.length):'Ответы на вопросы завершены.'}</small><button type="button" className="primary" disabled={busy||awaiting.length>0} onClick={()=>void decision(item.id)}><Vote size={17}/>Завершить вопросы и открыть голосование</button></div>}
+        {canApprove&&<div className="govMeetingSpeakerFinish"><small>{awaiting.length?('Ожидают ответа: '+awaiting.length):'Ответы на вопросы завершены.'}</small><button type="button" className="primary" disabled={busy||awaiting.length>0} onClick={()=>void closeDiscussion(item)}><ClipboardCheck size={17}/>Завершить обсуждение и перейти к поправкам</button></div>}
        </div>}
+       {item.status==='presenting'&&!!item.qa_closed_at&&<div className="govMeetingSpeakerQuestions"><h5>Поправки к государственной программе</h5><p>{pendingAmendments?'Сначала рассмотрите поступившие поправки.':unincorporated?'Одобренные поправки должны быть внесены в паспорт ГП.':'Все поправки рассмотрены или не поступали.'}</p>{canApprove&&unincorporated&&!pendingAmendments&&<button type="button" className="secondary" disabled={busy} onClick={()=>void returnForAmendments(item.program_id)}>Передать на внесение одобренных поправок</button>}{canApprove&&<button type="button" className="primary" disabled={busy||pendingAmendments||unincorporated} onClick={()=>void decision(item.id)}><Vote size={17}/>Открыть итоговое голосование по ГП</button>}</div>}
        <div className="govMeetingProgrammeActions">
         {mayEdit&&<button type="button" className="secondary" disabled={busy} onClick={()=>void editProgramme(p.id)}><PencilLine size={16}/>Редактировать</button>}
-        {canApprove&&selected.status==='open'&&item.status==='pending'&&p?.status!=='revision'&&<button type="button" className="primary" disabled={busy||!!current} onClick={()=>void start(item.id)}><Mic2 size={16}/>Начать представление</button>}
+        {canApprove&&agendaAccepted&&selected.status==='open'&&item.status==='pending'&&(p?.status==='ready'||p?.status==='government_vote')&&<button type="button" className="primary" disabled={busy||!!current} onClick={()=>void start(item.id)}><Mic2 size={16}/>Начать представление</button>}
+        {canApprove&&agendaAccepted&&p?.status==='ready'&&acceptedAmendments.length>0&&<button type="button" className="secondary" disabled={busy} onClick={()=>void confirmAmendments(item.program_id)}>Подтвердить внесение поправок в паспорт ГП</button>}
         {item.vote_id&&<button type="button" className={item.status==='decision'?'primary':'secondary'} onClick={()=>onOpenVotes(item.vote_id!)}><Vote size={17}/>{item.status==='decision'?'Перейти к голосованию':'Открыть результаты голосования'}</button>}
         {p?.status==='adopted'&&canSign&&!g.formalDocuments.some(d=>d.game_id===game!.id&&d.stage_no===11&&d.doc_type==='government_resolution'&&d.metadata?.state_program_id===p.id&&d.status_code==='published')&&<button type="button" className="primary" disabled={busy} onClick={()=>void sign(p.id)}>{p.signed_at?'Опубликовать постановление':'Подписать и опубликовать принятую ГП'}</button>}
        </div>
@@ -252,17 +291,17 @@ export default function GovernmentProgramSessionLab({g,onOpenVotes,onOpenDocumen
       </article>;
      })}
    </section>
-  <details className="govMeetingExtra"><summary>Предложения и замечания к государственным программам</summary><section className="govProgramReview">
+  <details className="govMeetingExtra" open={!!amendmentProgram}><summary>Поправки к государственным программам</summary><section className="govProgramReview">
    <div className="govProgramReviewHeader"><div><h3>Государственные программы на рассмотрении</h3><p>Программы Этапа 10 рассматриваются после включения в повестку. Ранее открытое голосование без поданных голосов можно связать с докладом, не создавая дубликата.</p></div><span>{reviewablePrograms.length} программ</span></div>
    <div className="govProgramReviewGrid">{reviewablePrograms.length?reviewablePrograms.map(p=><article key={p.id}>
     <small>{p.responsible_ministry}</small><h4>{p.title}</h4>
     <span>{p.status==='ready'?'Готова к заседанию':p.status==='adopted'?(p.signed_at?'Подписана и опубликована':'Ожидает подписи Председателя Правительства'):p.status==='revision'?'На доработке':p.status==='rejected'?'Отклонена':p.status==='government_vote'?'На голосовании':'В подготовке и согласовании'}</span>
     <p>{meetingProposals.filter(q=>q.program_id===p.id).length} предложений по изменению</p>
-    <button type="button" onClick={()=>{setReviewProgram(p.id);document.getElementById('gov-review-form')?.scrollIntoView({block:'nearest',behavior:'smooth'})}}>Рассмотреть и предложить правку</button>
+    {amendmentProgram===p.id&&<button type="button" onClick={()=>setReviewProgram(p.id)}>Внести поправку</button>}
    </article>):<p>Сначала включите программу из этапа 10 в повестку заседания.</p>}</div>
-   {reviewablePrograms.length>0&&selected.status!=='closed'&&<div id="gov-review-form" className="govReviewForm">
+   {agendaAccepted&&!!amendmentProgram&&selected.status==='open'&&<div id="gov-review-form" className="govReviewForm">
     <h4>Предложение к программе</h4>
-    <label>Программа<select value={reviewProgram} onChange={e=>setReviewProgram(e.target.value)}><option value="">Выберите программу</option>{reviewablePrograms.map(p=><option value={p.id} key={p.id}>{p.title}</option>)}</select></label>
+    <label>Программа<select value={reviewProgram} onChange={e=>setReviewProgram(e.target.value)}><option value="">Выберите программу</option>{reviewablePrograms.filter(p=>p.id===amendmentProgram).map(p=><option value={p.id} key={p.id}>{p.title}</option>)}</select></label>
     <label>Раздел<select value={reviewSection} onChange={e=>setReviewSection(e.target.value)}><option value="passport">Паспорт</option><option value="goals">Цели и показатели</option><option value="structure">Направления и мероприятия</option><option value="expenses">Финансирование и расходы</option><option value="other">Другое</option></select></label>
     <label>Действующая формулировка<textarea rows={2} value={reviewOriginal} onChange={e=>setReviewOriginal(e.target.value)} placeholder="Укажите исходный фрагмент программы"/></label>
     <label>Предлагаемая редакция<textarea rows={3} value={reviewProposed} onChange={e=>setReviewProposed(e.target.value)} placeholder="Опишите конкретное изменение"/></label>
@@ -270,13 +309,13 @@ export default function GovernmentProgramSessionLab({g,onOpenVotes,onOpenDocumen
     <button type="button" className="primary" disabled={busy||!reviewProgram||reviewProposed.trim().length<5||me.kind==='observer'} onClick={()=>void submitReview()}>Зарегистрировать предложение</button>
    </div>}
    {meetingProposals.length>0&&<div className="govReviewList"><h4>Реестр предложений</h4>{meetingProposals.map(p=><article key={p.id}>
-    <div><b>{programs.find(x=>x.id===p.program_id)?.title||'Госпрограмма'}</b><small>{p.status==='submitted'?'На рассмотрении':p.status==='accepted'?'Одобрено к учёту':'Отклонено'}</small></div>
+    <div><b>{programs.find(x=>x.id===p.program_id)?.title||'Госпрограмма'}</b><small>{p.status==='submitted'?'На рассмотрении':p.status==='accepted'?(p.incorporated_at?'Внесена в паспорт':'Одобрена · ожидает внесения'):'Отклонено'}</small></div>
     <p>{p.proposed_text}</p>{p.justification&&<p>Обоснование: {p.justification}</p>}
-    {canManage&&p.status==='submitted'&&<div className="govMeetingCreateActions"><button type="button" disabled={busy} onClick={()=>void resolveReview(p.id,'accepted')}>Одобрить предложение</button><button type="button" disabled={busy} onClick={()=>void resolveReview(p.id,'rejected')}>Отклонить</button></div>}
+    {canApprove&&p.program_id===amendmentProgram&&p.status==='submitted'&&<div className="govMeetingCreateActions"><button type="button" disabled={busy} onClick={()=>void resolveReview(p.id,'accepted')}>Одобрить предложение</button><button type="button" disabled={busy} onClick={()=>void resolveReview(p.id,'rejected')}>Отклонить</button></div>}
    </article>)}</div>}
-   <p className="govReviewDisclaimer">Одобрение предложения фиксирует решение о корректировке. Подписанный паспорт и бюджет автоматически не изменяются: для изменения утверждённых сумм требуется отдельная процедура.</p>
+   <p className="govReviewDisclaimer">Одобренные поправки вносит ответственное министерство в паспорт ГП. Председатель проверяет изменённую редакцию. До подтверждения внесения поправок итоговое голосование недоступно.</p>
   </section></details>
-   <footer className="govSessionRule"><b>Процедура решения</b><p>Государственные программы разрабатываются на Этапе 10. На Этапе 11 Председатель утверждает автоматически подготовленную повестку, проводятся доклады и ответы на вопросы, затем голосование зарегистрированных участников. Принятые ГП подписываются и публикуются после положительного решения.</p></footer>
+   <footer className="govSessionRule"><b>Процедура решения</b><p>Этап 10: разработка и внесение ГП в повестку. Этап 11: подпись Председателя, регистрация всех членов, голосование за повестку, обсуждение, поправки и голосование по каждой ГП. Принятая программа автоматически учитывается в проекте бюджета. При отсутствии большинства проводится повторное голосование.</p></footer>
   </>}
  </section>;
 }

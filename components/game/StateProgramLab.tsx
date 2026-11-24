@@ -30,14 +30,15 @@ export default function StateProgramLab({g,focusProgramId,revisionOnly=false}:{g
  useEffect(()=>{alive.current=true;return()=>{alive.current=false;request.current++}},[]);
  useEffect(()=>{setPmRevisionReason('')},[selectedId,viewScope]);
  useEffect(()=>{manualProgramChoice.current=false;request.current++;readinessRequest.current++;addressDirty.current=false;addressVersion.current=0;setGoalsDirty(false);setSelectedGoals(['','','','','']);busyRef.current=false;setPrograms([]);setAddresses([]);setPriorities([]);setReadiness({});setGoals([]);setComponents([]);setExpenses([]);setYears([]);setMinistryAssignments([]);setMinistryUnits([]);setSelectedId('');setCreating(false);creatingRef.current=false;selectedRef.current='';setBusy(false);setAddressTitle('Послание Президента Российской Федерации Федеральному Собранию');setAddressBody('');setAddressVideo('');},[viewScope]);
+ const canSubmitProgramme=hasActiveGameRole(g,/^(?:заместитель\s+)?председатель\s+правительства(?:\s|$)/u);
  const isPM=hasActiveGameRole(g,/^председатель\s+правительства(?:\s|$)/u),isMinister=me?.kind==='student'&&!me?.roster_archived_at&&ministryUnits.some(u=>u.head_user_id===me?.user_id),isPresident=hasActiveGameRole(g,/^президент российской федерации$/u);
  // Once the office role arrives, open the programme actually waiting for this chair.
  // Never override a programme the user explicitly selected.
  useEffect(()=>{
-  if(!isPM||manualProgramChoice.current||creatingRef.current)return;
+  if(!canSubmitProgramme||manualProgramChoice.current||creatingRef.current)return;
   const waiting=programs.find(p=>p.status==='pm_review'&&!p.signed_at);
   if(waiting&&selectedId!==waiting.id)setSelectedId(waiting.id);
- },[isPM,programs,selectedId,viewScope]);
+ },[canSubmitProgramme,programs,selectedId,viewScope]);
  async function refreshReadiness(programId:string){
   if(!active()||!game||!programId)return;
   const version=++readinessRequest.current;
@@ -106,7 +107,7 @@ export default function StateProgramLab({g,focusProgramId,revisionOnly=false}:{g
   catch(error){if(active())setError(error);return false}finally{if(active()){busyRef.current=false;setBusy(false)}}
  }
  async function returnForRevision(programId:string){
-  if(!active()||!selected||selected.id!==programId||selected.status!=='pm_review'||!(teacher||isPM))return;
+  if(!active()||!selected||selected.id!==programId||selected.status!=='pm_review'||!(teacher||canSubmitProgramme))return;
   const reason=pmRevisionReason.trim();
   if(reason.length<10||reason.length>1500)return;
   const ok=await run('request_state_program_revision',{p_program_id:programId,p_reason:reason});
@@ -166,7 +167,7 @@ export default function StateProgramLab({g,focusProgramId,revisionOnly=false}:{g
     {activeAddress?.status==='draft'&&!(teacher||isPresident)&&<p className={styles.notice}>Президент ещё не утвердил цели. Можно просматривать раздел, но использовать президентские цели в программах до публикации послания нельзя.</p>}
    </section>
   </section>
-  {(teacher||isPM)&&pendingPmPrograms.length>0&&<section className={styles.programApproval} aria-label="Государственные программы на согласовании Председателя Правительства">
+  {(teacher||canSubmitProgramme)&&pendingPmPrograms.length>0&&<section className={styles.programApproval} aria-label="Государственные программы на согласовании Председателя Правительства">
    <div className={styles.programApprovalHeading}><div><h3>На согласовании Председателя Правительства</h3><p>Выберите поступившую ГП. Ниже можно согласовать её либо вернуть на доработку с замечаниями.</p></div><span className={styles.programApprovalState}>{pendingPmPrograms.length} ГП</span></div>
    <div className={styles.pmReviewQueue}>{pendingPmPrograms.map(p=><button type="button" key={p.id} aria-pressed={!creating&&selectedId===p.id} onClick={()=>{manualProgramChoice.current=true;creatingRef.current=false;setCreating(false);setSelectedId(p.id);document.getElementById('state-program-approval')?.scrollIntoView({block:'start',behavior:'auto'})}}><strong>{p.title}</strong><small>{p.responsible_ministry}</small><span>{!creating&&selectedId===p.id?'Выбрана':'Открыть решение Председателя'}</span></button>)}</div>
   </section>}
@@ -178,27 +179,27 @@ export default function StateProgramLab({g,focusProgramId,revisionOnly=false}:{g
    <section className={styles.panel} aria-label="Проверка готовности программы"><h3>{check?.ready?'Программа готова к согласованию':'Проверка заполнения программы'}</h3>{check&&!check.ready&&<ul>{check.issues.map(x=><li key={x}>{x}</li>)}</ul>}<div className={styles.statList}><div><span>Цели</span><strong>{check?.goals??0}</strong></div><div><span>Направления</span><strong>{check?.directions??0} / 3</strong></div><div><span>Структурные элементы</span><strong>{check?.components??0} / 25</strong></div><div><span>Финансирование по годам</span><strong>{check?.budget_years??0} / {check?.expected_budget_years??0}</strong></div></div></section>
    <section id="state-program-approval" className={styles.programApproval} aria-label="Согласование и подписание государственной программы">
     <div className={styles.programApprovalHeading}>
-     <div><h3>Согласование государственной программы</h3><p>После доклада на заседании члены Правительства голосуют. Принятую программу подписывает и публикует Председатель Правительства.</p></div>
+     <div><h3>Согласование государственной программы</h3><p>Этап 10: разработка, проверка и внесение в повестку. Этап 11: утверждение повестки, регистрация, голосование за повестку, обсуждение и поправки, затем решение по ГП.</p></div>
      <span className={styles.programApprovalState}>{selected.status==='adopted'&&selected.signed_at?'Подписана и опубликована':programStatusLabel[selected.status]}</span>
     </div>
     <ol className={styles.programApprovalSteps} aria-label="Порядок принятия программы">
-     <li>Подготовка и проверка</li><li>Представление и голосование</li><li>Подпись и публикация</li>
+     <li>Подготовка и внесение в повестку</li><li>Обсуждение и поправки</li><li>Голосование и бюджет</li>
     </ol>
     {selected.pm_revision_reason&&['revision','pm_review'].includes(selected.status)&&<div className={styles.programRevisionNotice} role="status"><strong>Замечания Председателя Правительства</strong><p>{selected.pm_revision_reason}</p>{selected.status==='revision'&&<small>Исправьте программу и повторно направьте её Председателю Правительства.</small>}</div>}
     {vote&&<p className={styles.programApprovalNotice} role="status">Голосование Правительства: {vote.status==='open'?'Идёт · голосуют зарегистрированные участники':vote.result_label||'Завершено'}.</p>}
-    {selected.status==='ready'&&<p className={styles.programApprovalNotice}>Программа согласована и автоматически включается в повестку Этапа 11. До открытия голосования ответственный министр может вернуть её на доработку.</p>}
+    {selected.status==='ready'&&<p className={styles.programApprovalNotice}>Программа внесена в проект повестки Этапа 11. После утверждения и голосования за повестку Правительство рассмотрит её на заседании.</p>}
     {selected.status==='adopted'&&<p className={styles.programApprovalNotice}>Правительство поддержало программу. Финансирование включено в бюджетное планирование. Подпись необходима для публикации постановления.</p>}
-    {selected.status==='rejected'&&<p className={styles.programApprovalNotice}>Программа отклонена. Подписание и публикация по данному голосованию недоступны.</p>}
+    {selected.status==='rejected'&&<p className={styles.programApprovalNotice}>Программа окончательно отклонена голосованием Правительства. В бюджет не включается.</p>}
     <div className={styles.programApprovalActions}>
      {(teacher||selected.responsible_minister_id===me.user_id)&&selected.status==='minister_review'&&<><button type="button" disabled={busy} onClick={()=>void run('advance_state_program',{p_program_id:selected.id,p_action:'minister_revision'})}>Вернуть автору на доработку</button><button type="button" disabled={busy} className="primary" onClick={()=>void run('advance_state_program',{p_program_id:selected.id,p_action:'minister_approve'})}>Одобрить и передать Председателю Правительства</button></>}
-     {(teacher||isPM)&&selected.status==='pm_review'&&<div className={styles.programRevisionForm}>
+     {(teacher||canSubmitProgramme)&&selected.status==='pm_review'&&<div className={styles.programRevisionForm}>
       <label className={styles.field}>Причина возврата на доработку
        <textarea rows={3} maxLength={1500} value={pmRevisionReason} disabled={busy} onChange={e=>setPmRevisionReason(e.target.value)} placeholder="Что необходимо исправить в целях, мероприятиях, показателях или финансировании"/>
        <small>Для возврата укажите причину не короче 10 символов. После этого кнопка станет доступна.</small>
       </label>
       <div className={styles.programApprovalActions}>
        <button type="button" disabled={busy||pmRevisionReason.trim().length<10} onClick={()=>void returnForRevision(selected.id)}>Вернуть на доработку</button>
-       <button type="button" disabled={busy} className="primary" onClick={()=>void run('advance_state_program',{p_program_id:selected.id,p_action:'pm_ready'})}>Согласовать для включения в повестку</button>
+       <button type="button" disabled={busy} className="primary" onClick={()=>void run('advance_state_program',{p_program_id:selected.id,p_action:'pm_ready'})}>Внести в повестку</button>
       </div>
      </div>}
      {(teacher||isPM)&&selected.status==='adopted'&&!g.formalDocuments.some(d=>d.game_id===game!.id&&d.stage_no===11&&d.doc_type==='government_resolution'&&d.metadata?.state_program_id===selected.id&&d.status_code==='published')&&<button type="button" disabled={busy} className="primary" onClick={()=>void run('sign_adopted_state_program',{p_program_id:selected.id})}>Подписать и опубликовать принятую программу</button>}

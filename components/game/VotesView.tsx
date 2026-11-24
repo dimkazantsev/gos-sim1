@@ -180,7 +180,7 @@ export default function VotesView({g,onOpenDocument,onOpenStages,focusId,onClear
   finally{setBusy('')}
  }
 
- function canDelete(v:Vote){return v.result_code!=='superseded'&&!!me&&(teacher||v.created_by===me.user_id)}
+ function canDelete(v:Vote){return !(v.stage_no===11&&v.institution_key==='government'&&['government_agenda','state_program'].includes(v.procedure_key))&&v.result_code!=='superseded'&&!!me&&(teacher||v.created_by===me.user_id)}
  function canClose(v:Vote){
   if(teacher)return true;
   if(!me)return false;
@@ -278,6 +278,7 @@ export default function VotesView({g,onOpenDocument,onOpenStages,focusId,onClear
    const doc=v.formal_document_id?documentById.get(v.formal_document_id):undefined;
    const stage=stages.find(s=>s.stage_no===v.stage_no);
    const denominator=Math.max(1,t.yes+t.no+t.abstain);
+   const programme=v.stage_no===11&&v.institution_key==='government'&&v.procedure_key==='state_program'&&!v.tie_breaker_chair;
    const rule=uppercaseFirst(majorityLabel(v.majority_kind,Number(v.majority_value)));
    return <article id={'vote-'+v.id} tabIndex={-1} className={'proceduralVoteCard '+v.status+(focusId===v.id?' isFocused':'')} key={v.id}>
      <header>
@@ -324,10 +325,10 @@ export default function VotesView({g,onOpenDocument,onOpenStages,focusId,onClear
     </details>}
 
     <div className="voteResultBoard">
-     <div className="voteNumber yes"><strong>{t.yes}</strong><span>ЗА</span><small>{pct(t.yes,denominator)}%</small></div>
+     <div className="voteNumber yes"><strong>{t.yes}</strong><span>{programme?'ПРИНЯТЬ':'ЗА'}</span><small>{pct(t.yes,denominator)}%</small></div>
      <div className="voteVisual"><i className="yes" style={{width:pct(t.yes,denominator)+'%'}}/><i className="abstain" style={{width:pct(t.abstain,denominator)+'%'}}/><i className="no" style={{width:pct(t.no,denominator)+'%'}}/></div>
-     <div className="voteNumber abstain"><strong>{t.abstain}</strong><span>ВОЗД.</span><small>{pct(t.abstain,denominator)}%</small></div>
-     <div className="voteNumber no"><strong>{t.no}</strong><span>ПРОТИВ</span><small>{pct(t.no,denominator)}%</small></div>
+     <div className="voteNumber abstain"><strong>{t.abstain}</strong><span>{programme?'НА ДОРАБОТКУ':v.allow_abstain?'ВОЗД.':'—'}</span><small>{pct(t.abstain,denominator)}%</small></div>
+     <div className="voteNumber no"><strong>{t.no}</strong><span>{programme?'ОТКЛОНИТЬ':'ПРОТИВ'}</span><small>{pct(t.no,denominator)}%</small></div>
     </div>
 
     {v.status==='open'?<div className="proceduralVoteActions">
@@ -338,10 +339,10 @@ export default function VotesView({g,onOpenDocument,onOpenStages,focusId,onClear
      {canClose(v)&&<button className="primary closeProceduralVote" disabled={busy===v.id} onClick={async()=>{if(!confirm('Закрыть голосование и зафиксировать результат?'))return;setBusy(v.id);await closeVote(v.id);setBusy('')}}>{busy===v.id?'Подсчитываю…':'Закрыть и применить результат →'}</button>}
     </div>:<div className={'finalVoteDecision '+(v.result_code||'')}>
      <div><small>{v.result_code==='superseded'?'АРХИВ · БЕЗ ПРАВОВЫХ ПОСЛЕДСТВИЙ':'ИТОГОВОЕ РЕШЕНИЕ'}</small><strong>{v.result_label||'Голосование завершено'}</strong>{v.decision_note&&<p>{v.decision_note}</p>}</div>
-     <div><span>За <b>{v.result_yes??t.yes}</b></span><span>Против <b>{v.result_no??t.no}</b></span><span>Воздержались <b>{v.result_abstain??t.abstain}</b></span></div>
+     <div><span>{programme?'Принять':'За'} <b>{v.result_yes??t.yes}</b></span><span>{programme?'Отклонить':'Против'} <b>{v.result_no??t.no}</b></span>{v.allow_abstain&&<span>{programme?'Вернуть на доработку':'Воздержались'} <b>{v.result_abstain??t.abstain}</b></span>}</div>
     </div>}
 
-    <footer><span>Открыто {time(v.opened_at)}</span>{v.closed_at&&<span>Завершено {time(v.closed_at)}</span>}{doc&&<span>{v.formal_step_code==='reference'||v.pass_transition==='none'&&v.fail_transition==='none'?'Результат сам по себе не меняет стадию НПА':'Результат связан с движением НПА'}</span>}</footer>
+    <footer><span>Открыто {time(v.opened_at)}</span>{v.closed_at&&<span>Завершено {time(v.closed_at)}</span>}{doc&&<span>{v.procedure_key==='government_agenda'?'Решение определяет допуск к рассмотрению ГП':v.formal_step_code==='reference'||v.pass_transition==='none'&&v.fail_transition==='none'?'Результат сам по себе не меняет стадию НПА':'Результат связан с движением НПА'}</span>}</footer>
    </article>
   })}</div>
  </div>;
