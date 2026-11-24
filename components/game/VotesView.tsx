@@ -8,7 +8,7 @@ import StyledSelect from '../ui/StyledSelect';
 import InstitutionRegistrationPanel from './InstitutionRegistrationPanel';
 import FormalDocumentPicker from './FormalDocumentPicker';
 import {formalDocumentTitle} from './formalInstitutions';
-import {canReferenceVoteDocument,votePresetForDocument,institutionLabel,majorityLabel} from './proceduralVoting';
+import {canReferenceVoteDocument,chairVotingBodies,referenceDocumentMatchesBody,votePresetForDocument,institutionLabel,majorityLabel} from './proceduralVoting';
 import VoteBallotControls from './VoteBallotControls';
 import {gdVoteAllowance} from './gdVoteAllowance';
 import {formatKsrfVoteBody,uppercaseFirst} from './ksrfVoteText';
@@ -24,21 +24,29 @@ function time(v:string){return new Date(v).toLocaleTimeString('ru-RU',{hour:'2-d
 export default function VotesView({g,onOpenDocument,onOpenStages,focusId,onClearFocus}:{g:ReturnTypeRepublic;onOpenDocument:(id:string)=>void;onOpenStages:()=>void;focusId?:string;onClearFocus?:()=>void}){
  const {votes,ballots,me,teacher,formalDocuments,stages,parties,members,partyMandates,gdMandateCapacity,gdEffectivePresence,createVote,canVote,castVote,closeVote,deleteVote,tally,quorum}=g;
  const [title,setTitle]=useState(''),[body,setBody]=useState(''),[mode,setMode]=useState<'member'|'faction'|'mandate'>('member');
- const [institution,setInstitution]=useState('all'),[quorumValue,setQuorumValue]=useState(0.5),[majorityKind,setMajorityKind]=useState<'yes_no_simple'|'present_majority'|'eligible_majority'|'eligible_fraction'>('present_majority'),[majorityValue,setMajorityValue]=useState(0.5);
+ const [institutionChoice,setInstitution]=useState('all'),[quorumValue,setQuorumValue]=useState(0.5),[majorityKind,setMajorityKind]=useState<'yes_no_simple'|'present_majority'|'eligible_majority'|'eligible_fraction'>('present_majority'),[majorityValue,setMajorityValue]=useState(0.5);
  const [tab,setTab]=useSavedGameState<'open'|'closed'|'all'>(g.game?.id,g.me?.user_id,'votes-tab','open',savedChoice('open','closed','all')),[busy,setBusy]=useState('');
  const [query,setQuery]=useState(''),[units,setUnits]=useState<VotingUnit[]>([]);
  const [formalId,setFormalId]=useState('');
  const [referenceTarget,setReferenceTarget]=useState('');
  const selectedNpa=formalDocuments.find(d=>d.id===formalId);
  const selectedPreset=selectedNpa?votePresetForDocument(selectedNpa):null;
+ const chairBodies=useMemo(()=>me?.kind==='student'&&!me.roster_archived_at?chairVotingBodies([me.role_title||'',...g.officeAssignments.filter(o=>o.user_id===me.user_id&&o.status==='active').map(o=>o.role_title)]):[],[me,g.officeAssignments]);
+ const institution=teacher?institutionChoice:chairBodies.includes(institutionChoice)?institutionChoice:chairBodies[0]||'all';
+ const canBuild=teacher||chairBodies.length>0;
+ const canAttach=(v:Vote)=>teacher||chairBodies.includes(v.institution_key);
+ const canOpenPreset=(p:ReturnType<typeof votePresetForDocument>)=>!!p&&(teacher||chairBodies.includes(p.institutionKey));
  // Index immutable projections once per update rather than scanning every
  // ballot, document and participant again for each displayed vote.
  const openDocumentSteps=useMemo(()=>new Set(votes.filter(v=>v.status==='open'&&v.formal_document_id).map(v=>v.formal_document_id+':'+v.formal_step_code)),[votes]);
  const documentById=useMemo(()=>new Map(formalDocuments.map(d=>[d.id,d])),[formalDocuments]);
  const documentsWithOpenVotes=useMemo(()=>new Set(votes.filter(v=>v.status==='open'&&v.formal_document_id).map(v=>v.formal_document_id)),[votes]);
- const selectableNpas=useMemo(()=>formalDocuments.filter(d=>!documentsWithOpenVotes.has(d.id)&&
-   (!['state_program','meeting_agenda','minutes'].includes(d.doc_type)&&!!votePresetForDocument(d)||canReferenceVoteDocument(d,g.game?.current_round||0))),[formalDocuments,documentsWithOpenVotes,g.game?.current_round]);
- const referenceNpas=useMemo(()=>{if(!referenceTarget)return [];const stage=votes.find(v=>v.id===referenceTarget)?.stage_no||0;return formalDocuments.filter(d=>!documentsWithOpenVotes.has(d.id)&&canReferenceVoteDocument(d,stage))},[formalDocuments,documentsWithOpenVotes,referenceTarget,votes]);
+ const selectableNpas=useMemo(()=>formalDocuments.filter(d=>{
+   if(documentsWithOpenVotes.has(d.id)||['state_program','minutes'].includes(d.doc_type))return false;
+   const preset=votePresetForDocument(d);
+   return preset?teacher||chairBodies.includes(preset.institutionKey):canReferenceVoteDocument(d,g.game?.current_round||0)&&(teacher||chairBodies.some(b=>referenceDocumentMatchesBody(d,b)));
+ }),[formalDocuments,documentsWithOpenVotes,g.game?.current_round,teacher,chairBodies]);
+ const referenceNpas=useMemo(()=>{if(!referenceTarget)return [];const target=votes.find(v=>v.id===referenceTarget);return target?formalDocuments.filter(d=>!documentsWithOpenVotes.has(d.id)&&canReferenceVoteDocument(d,target.stage_no)&&(teacher||referenceDocumentMatchesBody(d,target.institution_key))):[]},[formalDocuments,documentsWithOpenVotes,referenceTarget,votes,teacher]);
  const memberById=useMemo(()=>new Map(members.map(m=>[m.user_id,m])),[members]);
  const ballotByVoteAndVoter=useMemo(()=>{
   const map=new Map<string,typeof ballots>();
@@ -147,8 +155,8 @@ export default function VotesView({g,onOpenDocument,onOpenStages,focusId,onClear
  },[votes,tab,query]);
  const openCount=votes.filter(v=>v.status==='open').length;
 
- async function openNpa(id:string){const d=formalDocuments.find(d=>d.id===id),preset=d?votePresetForDocument(d):null;if(!d||!preset)return;setBusy(id);try{await createVote({...preset,formalDocumentId:id,groupName:null})}finally{setBusy('')}}
- function chooseNpa(ids:string[]){setFormalId(ids[0]||'');const d=formalDocuments.find(d=>d.id===ids[0]);if(d){const preset=votePresetForDocument(d);setTitle(preset?.title||formalDocumentTitle(d.title,d.doc_type));setBody(d.body_text||preset?.body||'');if(preset){setInstitution(preset.institutionKey);setMode(preset.mode);setQuorumValue(preset.quorumValue);setMajorityKind(preset.majorityKind);setMajorityValue(preset.majorityValue)}}}
+ async function openNpa(id:string){const d=formalDocuments.find(d=>d.id===id),preset=d?votePresetForDocument(d):null;if(!d||!preset||!canOpenPreset(preset))return;setBusy(id);try{await createVote({...preset,formalDocumentId:id,groupName:null})}finally{setBusy('')}}
+ function chooseNpa(ids:string[]){setFormalId(ids[0]||'');const d=formalDocuments.find(d=>d.id===ids[0]);if(d){const preset=votePresetForDocument(d);setTitle(preset?.title||formalDocumentTitle(d.title,d.doc_type));setBody(d.body_text||preset?.body||'');if(preset){setInstitution(preset.institutionKey);setMode(preset.mode);setQuorumValue(preset.quorumValue);setMajorityKind(preset.majorityKind);setMajorityValue(preset.majorityValue)}else if(!teacher){const target=chairBodies.find(b=>referenceDocumentMatchesBody(d,b));if(target)setInstitution(target)}}}
  async function create(){
   if(busy)return;
   if(formalId&&!selectableNpas.some(d=>d.id===formalId)){g.setError('Выбранный НПА больше недоступен для этого голосования. Выберите другой документ.');return}
@@ -156,13 +164,14 @@ export default function VotesView({g,onOpenDocument,onOpenStages,focusId,onClear
   try{
   if(selectedNpa){const preset=votePresetForDocument(selectedNpa);if(preset){const ok=await createVote({...preset,title:title||preset.title,body:body||preset.body,formalDocumentId:formalId,groupName:null});if(ok){setTitle('');setBody('');setFormalId('')}return}}
 
-  const ok=await createVote({title,body,mode,institutionKey:institution,procedureKey:!['all','factions'].includes(institution)?'registered_session':'manual',quorumKind:'fraction',quorumValue,majorityKind,majorityValue,allowAbstain:true,tieBreakerChair:institution==='government',formalDocumentId:formalId||null,groupName:null});
+  if(!teacher&&(!chairBodies.includes(institution)||(selectedNpa&&!referenceDocumentMatchesBody(selectedNpa,institution)))){g.setError('Выберите документ своего органа');return}
+  const ok=await createVote({title,body,mode:teacher?mode:institution==='gd'?'mandate':'member',institutionKey:institution,procedureKey:!['all','factions'].includes(institution)?'registered_session':'manual',quorumKind:'fraction',quorumValue:teacher?quorumValue:.5,majorityKind:teacher?majorityKind:institution==='gd'?'eligible_majority':'present_majority',majorityValue:teacher?majorityValue:.5,allowAbstain:true,tieBreakerChair:institution==='government',formalDocumentId:formalId||null,groupName:null});
   if(ok){setTitle('');setBody('');setFormalId('')}
   }finally{setBusy('')}
  }
 
  async function attachReference(voteId:string,ids:string[]){
-  if(!teacher||!ids[0]||busy)return;
+  const target=votes.find(v=>v.id===voteId);if(!target||!canAttach(target)||!ids[0]||busy)return;
   setBusy('reference:'+voteId);
   try{
    const ok=await g.attachVoteReference(voteId,ids[0]);
@@ -235,8 +244,8 @@ export default function VotesView({g,onOpenDocument,onOpenStages,focusId,onClear
     <span aria-label="Голосование пока недоступно">Ожидает заседания</span>
    </article>)}
   </section>}
-  <section className="npaVoteQueue"><header><h2>НПА, ожидающие голосования</h2><span>{pendingNpas.length}</span></header><p>Документы появляются здесь автоматически при переходе на стадию голосования. Правила процедуры берутся из документа.</p>{pendingNpas.map(d=>{const preset=votePresetForDocument(d)!;return <article key={d.id}><div><small>{d.registry_no} · {d.status_label}</small><b>{formalDocumentTitle(d.title,d.doc_type)}</b><span>{institutionLabel(preset.institutionKey)}</span></div><button className="secondary" onClick={()=>onOpenDocument(d.id)}>Открыть НПА</button><button className="primary" disabled={busy===d.id} onClick={()=>void openNpa(d.id)}>{busy===d.id?'Открывается…':'Открыть голосование'}</button></article>})}{!pendingNpas.length&&<span>Сейчас нет документов на стадии голосования.</span>}</section>
-  {teacher&&<details className="teacherDetails voteManual projectDisclosure">
+  <section className="npaVoteQueue"><header><h2>НПА, ожидающие голосования</h2><span>{pendingNpas.length}</span></header><p>Документы появляются здесь автоматически при переходе на стадию голосования. Правила процедуры берутся из документа.</p>{pendingNpas.map(d=>{const preset=votePresetForDocument(d)!;return <article key={d.id}><div><small>{d.registry_no} · {d.status_label}</small><b>{formalDocumentTitle(d.title,d.doc_type)}</b><span>{institutionLabel(preset.institutionKey)}</span></div><button className="secondary" onClick={()=>onOpenDocument(d.id)}>Открыть НПА</button>{canOpenPreset(preset)&&<button className="primary" disabled={busy===d.id} onClick={()=>void openNpa(d.id)}>{busy===d.id?'Открывается…':'Открыть голосование'}</button>}</article>})}{!pendingNpas.length&&<span>Сейчас нет документов на стадии голосования.</span>}</section>
+  {canBuild&&<details className="teacherDetails voteManual projectDisclosure">
    <DisclosureSummary icon={VoteIcon} title="Открыть отдельное голосование" description="Самостоятельный вопрос или документ из реестра НПА"/>
    <div className="teacherDetailsBody">
     <div className="voteBuilder modern">
@@ -244,15 +253,15 @@ export default function VotesView({g,onOpenDocument,onOpenStages,focusId,onClear
      <FormalDocumentPicker documents={selectableNpas} value={formalId?[formalId]:[]} onChange={chooseNpa} multiple={false}/>{selectedNpa&&<p className="civicVoteBase">{votePresetForDocument(selectedNpa)?'Процедурное голосование: орган, кворум и последствия определены стадией НПА. Для чтений требуется заседание ГД.':'Ознакомительное голосование: документ доступен участникам, но результат не меняет его правовой статус.'}</p>}
      <textarea aria-label="Проект решения" value={body} onChange={e=>setBody(e.target.value)} placeholder="Проект решения / пояснение"/>
      <div className="voteBuilderGrid">
-      <StyledSelect disabled={!!selectedPreset||!!busy} label="Кто голосует" value={institution} onChange={key=>{setInstitution(key);setMode(key==='gd'?'mandate':'member');setQuorumValue(VOTING_BODIES.find(b=>b.key===key)?.quorum||.5);setMajorityKind(key==='gd'?'eligible_majority':'present_majority')}} options={[{value:'all',label:'Все участники'},{value:'factions',label:'Фракции'},...VOTING_BODIES.map(b=>({value:b.key,label:b.title})),...units.map(u=>({value:'unit:'+u.id,label:u.title}))]}/>
-      <StyledSelect disabled={!!selectedPreset||!!busy} label="Способ подсчёта" value={mode} onChange={v=>setMode(v as typeof mode)} options={institution==='gd'?[{value:'mandate',label:'По числу депутатских мандатов'}]:['all','factions'].includes(institution)?[{value:'member',label:'Один участник — один голос'},{value:'faction',label:'Одна фракция — один голос'}]:[{value:'member',label:'Один участник — один голос'}]}/>
-      <StyledSelect disabled={!!selectedPreset||!!busy} label="Кворум" value={String(quorumValue)} onChange={v=>setQuorumValue(Number(v))}
+      <StyledSelect disabled={!!selectedPreset||!!busy} label="Кто голосует" value={institution} onChange={key=>{setInstitution(key);setMode(key==='gd'?'mandate':'member');setQuorumValue(VOTING_BODIES.find(b=>b.key===key)?.quorum||.5);setMajorityKind(key==='gd'?'eligible_majority':'present_majority')}} options={teacher?[{value:'all',label:'Все участники'},{value:'factions',label:'Фракции'},...VOTING_BODIES.map(b=>({value:b.key,label:b.title})),...units.map(u=>({value:'unit:'+u.id,label:u.title}))]:chairBodies.map(b=>({value:b,label:institutionLabel(b)}))}/>
+      <StyledSelect disabled={!teacher||!!selectedPreset||!!busy} label="Способ подсчёта" value={teacher||selectedPreset?mode:institution==='gd'?'mandate':'member'} onChange={v=>setMode(v as typeof mode)} options={institution==='gd'?[{value:'mandate',label:'По числу депутатских мандатов'}]:['all','factions'].includes(institution)?[{value:'member',label:'Один участник — один голос'},{value:'faction',label:'Одна фракция — один голос'}]:[{value:'member',label:'Один участник — один голос'}]}/>
+      <StyledSelect disabled={!teacher||!!selectedPreset||!!busy} label="Кворум" value={String(teacher||selectedPreset?quorumValue:.5)} onChange={v=>setQuorumValue(Number(v))}
        options={[...(institution==='ks'?[{value:String(6/11),label:'Кворум КС · 6/11'}]:[]),{value:'0.5',label:'Не менее 1/2'},{value:String(2/3),label:'Не менее 2/3'},{value:'0.75',label:'Не менее 3/4'}]}/>
-      <StyledSelect disabled={!!selectedPreset||!!busy} label="Порог решения" value={majorityKind} onChange={v=>setMajorityKind(v as typeof majorityKind)}
+      <StyledSelect disabled={!teacher||!!selectedPreset||!!busy} label="Порог решения" value={teacher||selectedPreset?majorityKind:institution==='gd'?'eligible_majority':'present_majority'} onChange={v=>setMajorityKind(v as typeof majorityKind)}
        options={[{value:'present_majority',label:'Большинство присутствующих'},{value:'eligible_majority',label:'Большинство от общего состава'},
        {value:'eligible_fraction',label:'Доля от общего состава'},{value:'yes_no_simple',label:'Больше «за», чем «против»'}]}/>
      </div>
-     {majorityKind==='eligible_fraction'&&<StyledSelect disabled={!!selectedPreset||!!busy} label="Необходимая доля" value={String(majorityValue)}
+     {(teacher||selectedPreset)&&majorityKind==='eligible_fraction'&&<StyledSelect disabled={!teacher||!!selectedPreset||!!busy} label="Необходимая доля" value={String(majorityValue)}
        onChange={v=>setMajorityValue(Number(v))} options={[{value:String(2/3),label:'2/3'},{value:'0.75',label:'3/4'}]}/>}
      {selectedNpa?.workflow_key==='budget'&&<p className="civicVoteBase">Бюджет рассматривается установленным составом соответствующего органа.</p>}
      <p className="civicVoteBase">{selectedNpa?.workflow_key==='budget'&&institution==='government'?'Состав Правительства и право голоса фиксируются при открытии процедуры. Учитываются действующие должности и регистрация на заседании.':institution==='gd'?'Общий состав: 450 мандатов. Goust Voting уменьшает доступные голоса, сохраняя базу расчёта кворума.':['government','municipality'].includes(institution)?'Общий состав: '+members.filter(m=>m.kind==='student').length+' участников (итоговый состав определяется полномочиями органа).':'Состав и право голоса фиксируются при открытии процедуры.'}</p><button className="primary" disabled={!!busy||title.trim().length<3} onClick={create}>Открыть голосование</button>
@@ -282,7 +291,7 @@ export default function VotesView({g,onOpenDocument,onOpenStages,focusId,onClear
       </div>
      </header>
 
-    {teacher&&v.status==='open'&&!v.formal_document_id&&!v.formal_step_code&&!v.source_post_id&&['manual','registered_session'].includes(v.procedure_key)&&v.pass_transition==='none'&&v.fail_transition==='none'&&!(ballotByVoteAndVoter.get(v.id)||[]).length&&<div className="voteRelations">{referenceTarget===v.id?<div><FormalDocumentPicker documents={referenceNpas} value={[]} multiple={false} label="Выбрать НПА из реестра" onChange={ids=>void attachReference(v.id,ids)}/><p className="civicVoteBase">Ознакомительная связь, без изменения стадии НПА. После первого голоса недоступна.</p><button type="button" className="secondary" disabled={!!busy} onClick={()=>setReferenceTarget('')}>Отмена</button></div>:<button type="button" className="secondary" disabled={!!busy} onClick={()=>setReferenceTarget(v.id)}>Прикрепить НПА</button>}</div>}
+    {canAttach(v)&&v.status==='open'&&!v.formal_document_id&&!v.formal_step_code&&!v.source_post_id&&['manual','registered_session'].includes(v.procedure_key)&&v.pass_transition==='none'&&v.fail_transition==='none'&&!(ballotByVoteAndVoter.get(v.id)||[]).length&&<div className="voteRelations">{referenceTarget===v.id?<div><FormalDocumentPicker documents={referenceNpas} value={[]} multiple={false} label="Выбрать НПА из реестра" onChange={ids=>void attachReference(v.id,ids)}/><p className="civicVoteBase">Ознакомительная связь, без изменения стадии НПА. После первого голоса недоступна.</p><button type="button" className="secondary" disabled={!!busy} onClick={()=>setReferenceTarget('')}>Отмена</button></div>:<button type="button" className="secondary" disabled={!!busy} onClick={()=>setReferenceTarget(v.id)}>Прикрепить НПА</button>}</div>}
     {(doc||stage)&&<div className="voteRelations">
      {doc&&<button onClick={()=>onOpenDocument(doc.id)}><small>{v.formal_step_code==='reference'?'НПА ДЛЯ ОЗНАКОМЛЕНИЯ':'СВЯЗАННЫЙ НПА'}</small><b>{doc.registry_no}</b><span>{formalDocumentTitle(doc.title,doc.doc_type)}</span><span>Текущая редакция {String(doc.metadata?.revision||1)}</span></button>}
      {stage&&<button onClick={onOpenStages}><small>ЭТАП ИГРЫ</small><b>{stage.stage_no}. {stage.title}</b><span>{v.formal_step_code==='reference'?'Ознакомительное голосование':v.formal_step_code?'Стадия НПА: '+(doc?.workflow_steps.find(step=>step.code===v.formal_step_code)?.label||'Стадия процедуры'):'Открыть описание этапа'}</span></button>}

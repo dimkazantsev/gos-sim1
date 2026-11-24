@@ -30,14 +30,29 @@ function billThreshold(doc:FormalDocument){
  };
 }
 
+export function chairVotingBodies(roles:string[]):string[]{
+ const r=roles.map(x=>x.toLowerCase());
+ return [...(r.some(x=>/председател.*дум|совет.*дум/.test(x))?['gd']:[]),...(r.some(x=>/(^| · )председатель\s+правительства(?:\s|$)/.test(x))?['government']:[])];
+}
+export function referenceDocumentMatchesBody(doc:FormalDocument,body:string){
+ if(doc.doc_type==='meeting_agenda')return (doc.metadata?.institution_key||doc.subject_key)===body;
+ if(body==='government')return ['government','ministry'].includes(doc.subject_key)||doc.current_owner_key==='government';
+ if(body==='gd')return doc.subject_key==='gd'||['gd','gd_staff','gd_council','committee'].includes(doc.current_owner_key)||doc.workflow_key==='bill'&&doc.status_code==='published';
+ return false;
+}
+export function chairReferencePreset(doc:FormalDocument,body:string){
+ return {title:doc.title,body:doc.body_text||'',mode:(body==='gd'?'mandate':'member') as 'mandate'|'member',institutionKey:body,procedureKey:'registered_session',quorumKind:'fraction' as const,quorumValue:.5,majorityKind:(body==='gd'?'eligible_majority':'present_majority') as 'eligible_majority'|'present_majority',majorityValue:.5,allowAbstain:true,tieBreakerChair:body==='government',passTransition:'none',failTransition:'none',formalDocumentId:doc.id,groupName:null};
+}
 export function canReferenceVoteDocument(doc:FormalDocument,stageNo:number){
- return ['fz_bill','fkz_bill','government_resolution','government_order','president_decree','president_order','gd_resolution','sf_resolution','ministry_order','municipal_act','other'].includes(doc.doc_type)
+ return ['fz_bill','fkz_bill','government_resolution','government_order','president_decree','president_order','gd_resolution','sf_resolution','ministry_order','municipal_act','other','meeting_agenda'].includes(doc.doc_type)
+  &&(doc.doc_type!=='meeting_agenda'||doc.status_code==='published'&&['institution_meeting_agenda','duma_session_agenda','government_session_agenda'].includes(String(doc.metadata?.document_kind||'')))
   &&!['rejected','superseded','withdrawn','president_veto','sf_veto','sf_fkz_blocked'].includes(doc.status_code)
   &&!Object.prototype.hasOwnProperty.call(doc.metadata||{},'party_id')
   &&(doc.stage_no===stageNo||doc.status_code==='published');
 }
 
 export function votePresetForDocument(doc:FormalDocument):VotePreset|null{
+ if(['meeting_agenda','minutes'].includes(doc.doc_type))return null;
  const threshold=billThreshold(doc);
 
  if(doc.status_code==='sf_veto'&&['fz_bill','federal_budget'].includes(doc.doc_type)){

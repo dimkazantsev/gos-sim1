@@ -2988,7 +2988,7 @@ export function useRepublicGame(gameId:string){
  }
 
  async function attachVoteReference(voteId:string,documentId:string){
-  if(!teacher||!me)return false;
+  if(!me||me.kind==='observer')return false;
   const epoch=readEpoch.current,uid=authUser.current;
   const r=await supabase.rpc('attach_vote_reference_document',{p_vote_id:voteId,p_document_id:documentId});
   if(!alive.current||epoch!==readEpoch.current||uid!==authUser.current||activeGameRef.current!==gameId)return false;
