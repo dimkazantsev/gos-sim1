@@ -41,7 +41,7 @@ set local role authenticated;
 do $test$
 declare g uuid:=current_setting('qa.budget.game')::uuid;ids jsonb:=current_setting('qa.budget.users')::jsonb;
  pm uuid:=(ids->>'pm')::uuid; chair uuid:=(ids->>'duma_a')::uuid; minister uuid:=(ids->>'minister')::uuid; t uuid:=(ids->>'teacher')::uuid;
- ga uuid; da uuid; v uuid; v2 uuid; denied boolean;
+ ga uuid; da uuid; v uuid; v2 uuid; doc uuid; empty_vote uuid; denied boolean;
 begin
  perform set_config('request.jwt.claim.sub',pm::text,true);
  ga:=public.save_institution_meeting_document(g,13,'government','agenda','QA signed government agenda for a scoped vote.',null);
@@ -76,7 +76,18 @@ begin
  if (select status from public.game_votes where id=v)='open' then perform public.close_procedural_vote(v,'QA close');end if;
  if (select result_code from public.game_votes where id=v)<>'passed' then raise exception 'FAIL PM vote completion';end if;
  if (select status_code from public.formal_documents where id=ga)<>'published' or (select status_code from public.formal_documents where id=da)<>'published' then raise exception 'FAIL agenda status changed';end if;
- perform set_config('qa.chair.gd_agenda',da::text,true);
+ -- Verify a legal Government resolution uses its existing procedural vote,
+ -- and a reference cannot be attached after the first ballot.
+ doc:=public.create_formal_document(g,13,'QA проект постановления Правительства','government_resolution','government','Правительство','QA substantive decision',null,null,null,'government_act','{"registry_independent":true}'::jsonb);
+ perform public.advance_formal_document(doc,'advance','QA agenda for resolution');
+ if (select status_code from public.formal_documents where id=doc)<>'agenda' then raise exception 'FAIL resolution did not enter agenda';end if;
+ v:=public.create_procedural_vote(g,'QA legal resolution','QA','member','government','government_decision','fraction',.5,'present_majority',.5,true,true,doc,'advance','reject');
+ if not exists(select 1 from public.game_votes where id=v and formal_document_id=doc and formal_step_code='agenda' and pass_transition='advance') then raise exception 'FAIL chair procedural NPA';end if;
+ empty_vote:=public.create_procedural_vote(g,'QA late reference','QA','member','government','registered_session','fraction',.5,'present_majority',.5,true,true,null,'none','none');
+ perform public.cast_procedural_vote(empty_vote,'yes');
+ denied:=false;begin perform public.attach_vote_reference_document(empty_vote,ga);exception when insufficient_privilege then denied:=sqlerrm like 'После первого голоса%';end;
+ if not denied then raise exception 'FAIL late reference';end if;
+  perform set_config('qa.chair.gd_agenda',da::text,true);
 end;$test$;
 reset role;
 do $permission$
@@ -85,5 +96,5 @@ begin
  perform set_config('request.jwt.claim.sub',ids->>'duma_a',true);
  if not private.can_close_procedural_vote(g,(ids->>'duma_a')::uuid,'gd',current_setting('qa.chair.gd_agenda')::uuid) then raise exception 'FAIL Duma close authority';end if;
 end;$permission$;
-select 'PASS: chair creates and attaches signed agenda, cross-organ/minister denied, Government vote completed without changing agenda, Duma close authority' result;
+select 'PASS: chair creates and attaches signed agenda, cross-organ/minister denied, Government vote completed without changing agenda, procedural NPA, late link denied, Duma close authority' result;
 rollback;
