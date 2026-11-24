@@ -30,6 +30,13 @@ function billThreshold(doc:FormalDocument){
  };
 }
 
+export function canReferenceVoteDocument(doc:FormalDocument,stageNo:number){
+ return ['fz_bill','fkz_bill','government_resolution','government_order','president_decree','president_order','gd_resolution','sf_resolution','ministry_order','municipal_act','other'].includes(doc.doc_type)
+  &&!['rejected','superseded','withdrawn','president_veto','sf_veto','sf_fkz_blocked'].includes(doc.status_code)
+  &&!Object.prototype.hasOwnProperty.call(doc.metadata||{},'party_id')
+  &&(doc.stage_no===stageNo||doc.status_code==='published');
+}
+
 export function votePresetForDocument(doc:FormalDocument):VotePreset|null{
  const threshold=billThreshold(doc);
 
