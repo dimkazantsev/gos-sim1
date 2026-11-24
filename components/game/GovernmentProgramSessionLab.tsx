@@ -37,7 +37,7 @@ export default function GovernmentProgramSessionLab({g,onOpenVotes,onOpenDocumen
  const canManage=teacher||isPM||isPresident;
  const canSign=(teacher||isPM)&&!readOnly;
  const canApprove=isPM&&!readOnly;
- const canSubmit=(teacher||hasActiveGameRole(g,/^(?:заместитель\s+)?председатель\s+правительства(?:\s|$)/u))&&!readOnly;
+ const canSubmit=(teacher||hasActiveGameRole(g,/^(?:председатель|заместитель\s+председателя)\s+правительства(?:\s|$)/u))&&!readOnly;
 
  async function load(){
   if(!game)return;

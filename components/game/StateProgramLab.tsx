@@ -30,7 +30,7 @@ export default function StateProgramLab({g,focusProgramId,revisionOnly=false}:{g
  useEffect(()=>{alive.current=true;return()=>{alive.current=false;request.current++}},[]);
  useEffect(()=>{setPmRevisionReason('')},[selectedId,viewScope]);
  useEffect(()=>{manualProgramChoice.current=false;request.current++;readinessRequest.current++;addressDirty.current=false;addressVersion.current=0;setGoalsDirty(false);setSelectedGoals(['','','','','']);busyRef.current=false;setPrograms([]);setAddresses([]);setPriorities([]);setReadiness({});setGoals([]);setComponents([]);setExpenses([]);setYears([]);setMinistryAssignments([]);setMinistryUnits([]);setSelectedId('');setCreating(false);creatingRef.current=false;selectedRef.current='';setBusy(false);setAddressTitle('Послание Президента Российской Федерации Федеральному Собранию');setAddressBody('');setAddressVideo('');},[viewScope]);
- const canSubmitProgramme=hasActiveGameRole(g,/^(?:заместитель\s+)?председатель\s+правительства(?:\s|$)/u);
+ const canSubmitProgramme=hasActiveGameRole(g,/^(?:председатель|заместитель\s+председателя)\s+правительства(?:\s|$)/u);
  const isPM=hasActiveGameRole(g,/^председатель\s+правительства(?:\s|$)/u),isMinister=me?.kind==='student'&&!me?.roster_archived_at&&ministryUnits.some(u=>u.head_user_id===me?.user_id),isPresident=hasActiveGameRole(g,/^президент российской федерации$/u);
  // Once the office role arrives, open the programme actually waiting for this chair.
  // Never override a programme the user explicitly selected.
