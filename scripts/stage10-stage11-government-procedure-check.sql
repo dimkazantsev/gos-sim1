@@ -60,6 +60,7 @@ end;$prepare$;
 reset role;
 do $stage$ begin
  perform set_config('request.jwt.claim.sub',current_setting('qa.stage11.users')::jsonb->>'teacher',true);
+ update public.game_stages set status='completed' where game_id=current_setting('qa.stage11.game')::uuid and stage_no=10;
  update public.game_stages set status='open' where game_id=current_setting('qa.stage11.game')::uuid and stage_no=11;
  update public.games set current_round=11 where id=current_setting('qa.stage11.game')::uuid;
 end;$stage$;
