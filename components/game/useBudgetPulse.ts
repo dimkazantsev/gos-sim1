@@ -7,7 +7,7 @@ import type {BudgetCalculation} from './federalBudgetMath';
 import type {Metric,MetricHistory} from './types';
 
 export type BudgetPulse={game_id:string;mode:'baseline'|'draft'|'document'|'published';plan_id:string|null;document_id:string|null;plan_revision:number|null;note:string;calculation:BudgetCalculation;as_of:string;history:MetricHistory[]};
-export const budgetModeLabel=(mode:BudgetPulse['mode'])=>({baseline:'Исходный прогноз 2026 года',draft:'Общий сохраненный черновик',document:'Проект закона в реестре',published:'Опубликованный игровой бюджет'}[mode]);
+export const budgetModeLabel=(mode:BudgetPulse['mode'])=>({baseline:'Прогноз на 2027 год',draft:'Общий сохраненный черновик',document:'Проект закона в реестре',published:'Опубликованный игровой бюджет'}[mode]);
 
 /** One server calculation for all shared panels. Local unsaved work never enters it. */
 export function useBudgetPulse(gameId:string,enabled:boolean){
@@ -47,7 +47,7 @@ export function useBudgetPulse(gameId:string,enabled:boolean){
   if(!enabled)return()=>{alive.current=false;request.current++;};
   // The game shell owns the sole socket. Keep budget authority behind its
   // existing RPC; never cache or calculate unpublished rights offscreen.
-  const relevant=new Set(['formal_documents','state_metrics','game_fiscal_policy','game_fiscal_regions','game_fiscal_rates','budget_simulator_plans','budget_simulator_state','budget_transfer_requests']);
+  const relevant=new Set(['formal_documents','state_metrics','game_fiscal_policy','game_fiscal_regions','game_fiscal_rates','budget_simulator_plans','budget_simulator_state','budget_transfer_requests','state_programs','state_program_budget_commitments']);
   let pending:ReturnType<typeof setTimeout>|undefined,lastAutomaticAt=Date.now();
   let dirtyWhileHidden=document.visibilityState!=='visible';
   // No periodic budget polling: the existing shared Realtime invalidation,
