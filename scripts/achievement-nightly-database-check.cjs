@@ -143,6 +143,40 @@ async function main(){
   assert.equal((await db.query("SELECT has_table_privilege('authenticated','private.achievement_snapshots','SELECT') allowed")).rows[0].allowed,false);
   assert.equal((await db.query("SELECT has_function_privilege('authenticated','private.run_nightly_achievements(timestamptz)','EXECUTE') allowed")).rows[0].allowed,false);
   assert.equal((await db.query("SELECT relrowsecurity enabled FROM pg_class WHERE oid='private.achievement_snapshots'::regclass")).rows[0].enabled,true);
+  // Acceptance: the existing 56 one-student slots cannot finish a 100-player roster.
+  // Exercise the same actual worker and catalog; no production users or calls.
+  for(let n=200;n<260;n++){
+   await db.query('INSERT INTO auth.users VALUES($1)',[id(n)]);
+   await db.query("INSERT INTO public.game_members(game_id,user_id,kind) VALUES($1,$2,'student')",[game,id(n)]);
+   await db.query('INSERT INTO private.fixture_facts(user_id,facts) VALUES($1,$2)',[id(n),JSON.stringify(fullFacts)]);
+  }
+  await db.query('UPDATE private.fixture_facts SET facts=$1,error_code=NULL',[JSON.stringify(fullFacts)]);
+  const slots=Array.from({length:59},(_,i)=>i+1).filter(i=>![11,31,51].includes(i));
+  const date='2026-10-28';
+  const stamp=minute=>date+'T20:'+String(minute).padStart(2,'0')+':00Z';
+  const checked=async()=> (await db.query("SELECT count(*)::int n FROM private.achievement_snapshots WHERE checked_at>='2026-10-28T20:00:00Z'")).rows[0].n;
+  await db.exec('BEGIN');
+  try{
+   for(const minute of slots)await tick(stamp(minute));
+   assert.equal(await checked(),56,'Baseline: original worker can complete only 56 of 100');
+  }finally{await db.exec('ROLLBACK')}
+  await db.exec(fs.readFileSync(path.join(work,'docs/performance/achievement-nightly-capacity-candidate.sql'),'utf8'));
+  async function batchTick(iso){return(await db.query('SELECT private.run_nightly_achievements_batch($1::timestamptz) n',[iso])).rows[0].n}
+  assert.equal(await batchTick(date+'T19:59:00Z'),0);
+  const callsBefore=(await db.query('SELECT count(*)::int n FROM private.fixture_calls')).rows[0].n;
+  let completed=0;
+  for(const minute of slots){
+   const n=await batchTick(stamp(minute));assert(n>=0&&n<=2,'Never exceed two sequential workers per scheduled slot');
+   completed+=n;
+  }
+  assert.equal(completed,100);
+  assert.equal(await checked(),100,'100 active students complete within the existing night window');
+  assert.equal((await db.query('SELECT count(*)::int n FROM private.fixture_calls')).rows[0].n-callsBefore,100,'Exactly one successful calculation per student, no duplicate scans');
+  assert.equal(await batchTick(date+'T20:59:30Z'),0,'Completed roster does no further fact work');
+  assert.equal(await batchTick(date+'T21:00:00Z'),0);
+  assert.equal((await db.query("SELECT has_function_privilege('authenticated','private.run_nightly_achievements_batch(timestamptz)','EXECUTE') allowed")).rows[0].allowed,false);
+  assert.equal((await db.query("SELECT has_function_privilege('anon','private.run_nightly_achievements_batch(timestamptz)','EXECUTE') allowed")).rows[0].allowed,false);
+  console.log(JSON.stringify({status:'PASS',nightlyRoster:100,baselineCompleted:56,adaptiveCompleted:completed,scheduledSlots:slots.length,maxWorkersPerSlot:2,factCalls:100,productionRequests:0}));
   console.log(JSON.stringify({result:'PASS',reproduction_old_reads:2,old_facts_calls:2,new_daytime_reads:100,new_daytime_facts_calls:0,synthetic_students:40,nightly_calculations:40,eligible_awards:4000,simulated_batch_ms:Math.round(measuredMs),checks:['night-window','one-student-per-batch','private-data-and-worker','cross-game-and-anonymous','hidden-awards','existing-earned-preserved','three-attempt-cap','five-minute-retry-gap','query-cancellation-isolation','next-day-retry-reset','idempotent-awards-and-cron'],environment:'PGlite synthetic fixtures; no production or concurrency claim'}));
  }finally{await db.close()}
 }
