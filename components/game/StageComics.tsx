@@ -33,14 +33,16 @@ export default function StageComics({gameId,userId,stages,enabled,onOpenChange}:
   window.addEventListener('online',retryFailed);document.addEventListener('visibilitychange',visible);
   return()=>{window.removeEventListener('online',retryFailed);document.removeEventListener('visibilitychange',visible)};
  },[]);
- // A result waits for an existing dialog (for example, a started blitz attempt).
+ // Watch the document only while an eligible chapter is waiting for another dialog.
+ const chapter=queue.find(c=>!seen.includes(c.id));
+ const awaitingDialog=!!chapter&&enabled;
+ const open=awaitingDialog&&canShow;
  useEffect(()=>{
+  if(!awaitingDialog||open)return;
   function update(){if(!shownRef.current)setCanShow(!document.querySelector('[role="dialog"][aria-modal="true"]'))}
   update();const observer=new MutationObserver(update);observer.observe(document.body,{childList:true,subtree:true});
   return()=>observer.disconnect();
- },[]);
- const chapter=queue.find(c=>!seen.includes(c.id));
- const open=!!chapter&&enabled&&canShow;
+ },[awaitingDialog,open]);
  shownRef.current=open;
  useLayoutEffect(()=>{
   const otherDialog=Array.from(document.querySelectorAll<HTMLElement>('[role="dialog"][aria-modal="true"]')).some(panel=>panel.dataset.automaticComic!=='true');

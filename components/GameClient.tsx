@@ -9,6 +9,7 @@ import dynamic from 'next/dynamic';
 import {ArrowRight,ArrowUpRight,BookOpenText,CalendarDays,ChevronDown,ChevronLeft,ChevronRight,Eye,FileText,GraduationCap,GripVertical,Landmark,LayoutDashboard,LogOut,Menu,MessageCircle,Radio,Settings2,Share2,ShieldCheck,UserRound,Wallet,Vote as VoteIcon} from 'lucide-react';
 import {useRepublicGame} from './game/useRepublicGame';
 import {firstPresenceWriteDelay} from './game/firstPresenceWriteDelay';
+import {usePresenceHeartbeat} from './game/usePresenceHeartbeat';
 import {stageAnalysisPhase} from './game/stageAnalysisWindow';
 import {useActionErrorPlacement} from './game/useActionErrorPlacement';
 import {TurnCountdownPill} from './game/TurnClock';
@@ -251,7 +252,6 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
  const [screenHistory,setScreenHistory,navigationHydrated,navigationRestored]=useSavedGameState<{entries:ScreenLocation[];index:number}>(gameId,g.me?.user_id,'navigation',{
   entries:[{view:'dashboard',stageNo:0,documentId:''}],index:0
  },validScreenHistory);
- const initialSqlPresence=useRef<{scope:string;readyAt:number}>({scope:'',readyAt:0});
  const sharedLinkHandled=useRef(false);
  useEffect(()=>{
   if(!navigationHydrated||!g.me?.user_id||sharedLinkHandled.current)return;
@@ -683,30 +683,7 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
  }
  
 
- useEffect(()=>{
-  if(!me||!g.coreLoaded||previewMode)return;
-  const labels:Record<View,string>={dashboard:'Обзор игры',stages:'Этапы',parties:'Партия',votes:'Голосование',documents:'НПА / Формальные институты',actions:'Политический процесс',grades:'Оценки',profile:'Мой профиль',teacher:'Управление',events:'Ситуационные решения',budget:'Бюджет'};
-  // The database journal is noncritical to joining. Distribute the FIRST
-  // SQL write across users so 100 arrivals do not hit PostgreSQL together.
-  // Realtime Presence already announces who is online immediately.
-  // Preserve the same deadline if the student switches views while joining.
-  const scope=gameId+':'+me.user_id;
-  if(initialSqlPresence.current.scope!==scope)
-   initialSqlPresence.current={scope,readyAt:Date.now()+firstPresenceWriteDelay(me.user_id)};
-  const isReady=()=>Date.now()>=initialSqlPresence.current.readyAt;
-  const visible=()=>{if(document.visibilityState==='visible'&&isReady())void touchPresence(view)};
-  const remaining=Math.max(0,initialSqlPresence.current.readyAt-Date.now());
-  const first=setTimeout(()=>{
-   if(document.visibilityState==='visible')void touchPresence(view,'Открыл раздел «'+labels[view]+'»');
-  },remaining);
-  // Keep the SQL online stamp under the journal's existing 90s freshness
-  // boundary, but avoid an unnecessary ~60s heartbeat on quiet screens.
-  // Stable per-user jitter also avoids synchronous writes after remounts.
-  const heartbeatMs=68000+firstPresenceWriteDelay(me.user_id)%6000;
-  const id=setInterval(visible,heartbeatMs);
-  document.addEventListener('visibilitychange',visible);
-  return()=>{clearTimeout(first);clearInterval(id);document.removeEventListener('visibilitychange',visible)};
- },[gameId,view,me?.user_id,previewMode,g.coreLoaded]);
+ usePresenceHeartbeat({gameId,userId:me?.user_id,view,enabled:g.coreLoaded&&!previewMode,touchPresence});
 
  useEffect(()=>{
   if(!previewMode)return;
