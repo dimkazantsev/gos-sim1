@@ -1134,3 +1134,10 @@
 .fiscalMacroBankActions{display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap}
 .fiscalMacroBankActions button{min-height:44px;display:inline-flex;align-items:center;justify-content:center;gap:8px}
 @media(max-width:550px){.fiscalMacroBankDecision{padding:12px}.fiscalMacroBankActions{display:grid;grid-template-columns:minmax(0,1fr)}.fiscalMacroBankActions button{width:100%}.fiscalMacroBankRateControl{grid-template-columns:48px minmax(0,1fr) 48px}}
+
+/* Stage 11: amendments belong to their own programme, not a second list. */
+.govSessionLab .govMeetingInlineAmendments{min-width:0}
+.govSessionLab .govMeetingInlineAmendments .govReviewForm{background:var(--gs-surface);min-width:0;grid-template-columns:minmax(0,1fr)}
+.govSessionLab .govMeetingInlineAmendments .govReviewList{margin-top:0;min-width:0}
+.govSessionLab .govMeetingInlineAmendments .govReviewList article{min-width:0;background:var(--gs-surface);overflow-wrap:anywhere}
+.govSessionLab .govMeetingInlineAmendments .govMeetingDecisionNote{padding:0}
