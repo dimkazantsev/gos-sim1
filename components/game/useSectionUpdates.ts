@@ -109,7 +109,7 @@ export function useSectionUpdates(gameId:string|undefined,userId:string|undefine
      // Never optimistically hide notifications arriving after that moment.
      if(lastRelevantMutationAt.current<=enteredAtMs){
       optimisticVersion.current+=1;
-      setCounts(previous=>previous[view]===0?previous:({...previous,[view]:0}));
+      setCounts(previous=>({...previous,[view]:0}));
      }
      // The current hook already updates its badge locally. Re-broadcasting
      // this same acknowledgement schedules a redundant get_section_updates RPC.
