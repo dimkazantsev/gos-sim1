@@ -229,7 +229,7 @@ function harness({effects=false,compiledCode=code}={}){
   if(name==='./useGameTableSync')return{notifyGameDataRefresh:(gameId,table)=>notices.push({gameId,table}),notifySectionUpdates:()=>{},setGameRealtimeConnection:()=>{}};
   if(name==='./useBudgetPulse')return{useBudgetPulse:()=>({budgetPulse:null,budgetPulseError:'',refreshBudgetPulse:async()=>{}}),withBudgetIncome:rows=>rows};
   if(name==='./gameRoster')return{currentGameMembers:(rows,id)=>rows.filter(row=>row.game_id===id),currentGameProfiles:(rows,_,id)=>rows.filter(row=>row.game_id===id)};
-  if(name==='./chatChannelSelection'||name==='./chatRealtime'||name==='./chatHistoryPaging'||name==='./coalesceInFlight'||name==='./signDocumentAssetBatch'||name==='./formalDocumentSummary'||name==='./partyProfileSummary'){
+  if(name==='./chatChannelSelection'||name==='./chatRealtime'||name==='./chatHistoryPaging'||name==='./coalesceInFlight'||name==='./signDocumentAssetBatch'||name==='./formalDocumentSummary'||name==='./partyProfileSummary'||name==='./voteReadIndex'){
    const source=fs.readFileSync(path.join(root,'components/game',name.slice(2)+'.ts'),'utf8');
    const compiled=ts.transpileModule(source,{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}}).outputText;
    const child={exports:{}};
