@@ -334,7 +334,7 @@ export function useRepublicGame(gameId:string){
  const recordingStream=useRef<MediaStream|null>(null),previewRef=useRef<RecordingPreview|null>(null),captureRef=useRef<{kind:ChatMediaKind;channelId:string;started:number;discard:boolean}|null>(null),mediaOperationRef=useRef(false),pendingChatUploads=useRef(new WeakMap<Blob,PendingMediaUpload>()),voiceAnalysisRef=useRef<Promise<{waveform:number[];duration:number}|null>|null>(null);
 
  const profiles=useMemo(()=>currentGameProfiles(profileRows,members,gameId),[profileRows,members,gameId]);
- const officeAssignments=useMemo(()=>officeRows.filter(o=>o.game_id===gameId&&members.some(m=>m.user_id===o.user_id)),[officeRows,members,gameId]);
+ const officeAssignments=useMemo(()=>{if(!officeRows.length||!members.length)return [];const ids=new Set(members.map(m=>m.user_id));return officeRows.filter(o=>o.game_id===gameId&&ids.has(o.user_id))},[officeRows,members,gameId]);
  const ballotReadIndex=useMemo(()=>createBallotReadIndex(ballots),[ballots]);
  const mandateReadIndex=useMemo(()=>createMandateReadIndex(members,partyMandates),[members,partyMandates]);
  const institutionReadIndex=useMemo(()=>createInstitutionReadIndex(members,officeAssignments,VOTING_BODIES),[members,officeAssignments]);
