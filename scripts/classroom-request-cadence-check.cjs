@@ -28,5 +28,5 @@ assert(maxHeartbeat<cutoff&&cutoff-maxHeartbeat>16000,'Keep 16s+ timing margin b
 const users=100,hour=3600000;
 const oldRate=users*hour/66000,newRate=users*hour/71000;
 assert(newRate<oldRate,'Fewer background SQL calls expected from the changed interval');
-assert(badge.includes('lastFallbackAt=Date.now();')&&badge.includes('setCounts(r.data as Record<string,number>)'),'Accepted badge reads reset fallback age');
+assert(badge.includes('lastFallbackAt=Date.now();')&&badge.includes('setCounts(previous=>Object.keys(previous).length===Object.keys(next).length&&Object.keys(next).every(key=>previous[key]===next[key])?previous:next)'),'Accepted badge reads reset fallback age and retain unchanged snapshots');
 console.log(JSON.stringify({status:'PASS',scope:'static and deterministic, synthetic 100-user model',connectedBlitzMaxPerHourPerUser:Math.ceil(hour/180000),disconnectedBlitzIntervalMs:45000,oldPresenceHeartbeatMeanMs:66000,newPresenceHeartbeatMeanMs:71000,modeledPresenceRequestReductionPct:Number(((1-newRate/oldRate)*100).toFixed(1)),guestAuditPreserved:true,productionWrites:0}));
