@@ -40,7 +40,9 @@ export function useSectionUpdates(gameId:string|undefined,userId:string|undefine
     // timer expired during active Realtime traffic.
     if(live&&!r.error&&r.data&&startedVersion===optimisticVersion.current){
      lastFallbackAt=Date.now();
-     setCounts(r.data as Record<string,number>);
+     const next=r.data as Record<string,number>;
+     // An unchanged polling snapshot must not rerender the entire game shell.
+     setCounts(previous=>Object.keys(previous).length===Object.keys(next).length&&Object.keys(next).every(key=>previous[key]===next[key])?previous:next);
     }
    }catch{recoveryAfter=Date.now()+30000}
    finally{running=false;if(queued&&live){queued=false;schedule()}}
@@ -107,7 +109,7 @@ export function useSectionUpdates(gameId:string|undefined,userId:string|undefine
      // Never optimistically hide notifications arriving after that moment.
      if(lastRelevantMutationAt.current<=enteredAtMs){
       optimisticVersion.current+=1;
-      setCounts(previous=>({...previous,[view]:0}));
+      setCounts(previous=>previous[view]===0?previous:({...previous,[view]:0}));
      }
      // The current hook already updates its badge locally. Re-broadcasting
      // this same acknowledgement schedules a redundant get_section_updates RPC.
