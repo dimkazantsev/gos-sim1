@@ -53,6 +53,7 @@ function harness(component){
    resolve(failures.has(table)?{data:null,error:{message:'simulated table failure'}}:{data,error:null});
   }catch(error){reject(error);}}};return query;},
   rpc:async(name,args)=>{
+   counts.set('rpc:'+name,(counts.get('rpc:'+name)||0)+1);
    if(name==='save_presidential_inauguration'){serverVenue=args.p_venue;serverHymn=args.p_hymn_path;serverMusic=args.p_ceremonial_music_path;serverCeremonyAt=args.p_scheduled_at;ceremonySaveCount++;}
    if(name==='confirm_presidential_inauguration')ceremonyConfirmCount++;
    if(name==='save_bill_submission_profile')profileNotes.set(args.p_document_id,args.p_note);
@@ -96,7 +97,7 @@ function harness(component){
  const byLabel=name=>nodes(tree,node=>node.props?.['aria-label']===name)[0];
  const clickResults=()=>{const button=all('button',byClass('stage7Tabs')).find(node=>text(node).includes('Итоги и инаугурация'));assert.ok(button,'Results tab must exist even when Stage 6 removed the poll');button.props.onClick();};
  return{
-  g,render,settle,errors,fetches,byClass,all,byLabel,clickResults,setProps:value=>Object.assign(props,value),
+  g,render,settle,errors,fetches,byClass,all,byLabel,clickResults,setProps:value=>Object.assign(props,value),readCount:name=>counts.get(name)||0,
   venueInput:()=>all('input',byClass('inaugurationForm'))[1],
   selectCandidate:()=>all('select',byClass('campaignForm'))[0],
   createEditor(){all('button',byClass('formalTabs'))[0].props.onClick();render();},
@@ -116,6 +117,22 @@ function harness(component){
 async function main(){
  const failures=[];
  async function check(name,fn){try{await fn();console.log('PASS '+name);}catch(error){failures.push(name);console.error('FAIL '+name+': '+error.message);}}
+ await check('Registry browsing defers bill editor queries for 100 clients',async()=>{
+  const clients=Array.from({length:100},()=>harness('DocumentsView'));
+  try{
+   await Promise.all(clients.map(h=>h.settle()));
+   for(const h of clients){
+    assert.equal(h.readCount('institution_units'),0,'Plain registry needs no committee directory');
+    assert.equal(h.readCount('rpc:get_formal_subjects'),0,'Plain registry needs no document creation subjects');
+   }
+   await Promise.all(clients.map(async h=>{h.createEditor();await h.settle()}));
+   for(const h of clients){
+    assert.equal(h.readCount('institution_units'),1,'Bill creation still retrieves the committee directory');
+    assert.equal(h.readCount('rpc:get_formal_subjects'),1,'Creation still retrieves current authority from the server');
+   }
+   console.log('NAVIGATION_REGISTRY: 100 plain registry visits avoid 200 editor-only reads (synthetic transport)');
+  }finally{clients.forEach(h=>h.dispose())}
+ });
  await check('Stage7 standings are usable while candidate photos are delayed',async()=>{
   const h=harness('PresidentialElectionStage7'),slow=h.hold('storage');h.setPhotoPath('game-a/photo');h.setAudioPaths('game-a/hymn',null);
   try{await h.settle();h.clickResults();h.render();assert.match(text(h.byClass('resultBars')),/Candidate a revision 1/,'Election results must not wait for a media URL');assert.equal(h.all('audio',h.byClass('ceremonyAudio')).length,1,'Ready audio must not wait for a delayed photo');}

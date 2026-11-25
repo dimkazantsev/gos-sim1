@@ -1856,11 +1856,10 @@ export function useRepublicGame(gameId:string){
    acceptPartyRows((result.data||[]) as Party[],ticket);
   });
  }
- async function readScopedPartyDocuments(rows:Party[],includeRegistered:boolean){
-  // Full historic packages are kept in Storage, not transferred in the party viewer.
-  const eligible=includeRegistered?rows:activeViewRef.current==='parties'
-   ?rows.filter(p=>p.id===selectedPartyDocuments.current&&p.registration_status!=='registered')
-   :rows.filter(p=>p.registration_status!=='registered');
+ async function readScopedPartyDocuments(rows:Party[],includeRegistered:boolean,selectedId?:string|null){
+  // Capture the requested selection before waiting for the party snapshot.
+  const eligible=includeRegistered?rows:rows.filter(p=>
+   p.registration_status!=='registered'&&(selectedId===undefined||p.id===selectedId));
   if(!eligible.length)return {data:[] as PartyDocument[],error:null};
   const result=await limitedCoreRead(supabase.from('party_documents')
    .select(PARTY_DOCUMENT_COLUMNS).eq('game_id',gameId)
@@ -1872,22 +1871,27 @@ export function useRepublicGame(gameId:string){
   return activeViewRef.current==='actions'||
    (activeViewRef.current==='teacher'&&teacherWorkspaceRef.current==='parties');
  }
- async function loadPartyDocuments(){
-  await readSafely(['partyDocuments'],async ticket=>{
+ async function loadPartyDocuments(navigation=false){
+  const includeRegistered=canLoadRegisteredPartyArchive();
+  const selectedId=activeViewRef.current==='parties'?selectedPartyDocuments.current:undefined;
+  // The shell and the selected-party effect share a single scoped read.
+  const key='party-documents:'+JSON.stringify([includeRegistered,selectedId===undefined?'all':selectedId]);
+  await readNavigationSafely(key,['partyDocuments'],navigation,async ticket=>{
    const pr=await loadCachedParties();
    if(!readCurrent(ticket,'partyDocuments'))return;
    requireSuccessful([pr]);
-   const pd=await readScopedPartyDocuments(pr.data||[],canLoadRegisteredPartyArchive());
+   const pd=await readScopedPartyDocuments(pr.data||[],includeRegistered,selectedId);
    if(!readCurrent(ticket,'partyDocuments'))return;
    requireSuccessful([pd]);
    acceptPartyDocuments(pd.data,ticket);
+   return true;
   });
  }
  async function loadSelectedPartyDocuments(partyId:string){
   // No database read for registered parties; selecting another party drops old files.
   if(activeViewRef.current!=='parties'||!partyId)return;
   selectedPartyDocuments.current=partyId;
-  await loadPartyDocuments();
+  await loadPartyDocuments(true);
  }
  async function loadPartyOfficialDocuments(partyId:string){
   // One RLS-scoped query for the selected party's two official document types.
@@ -1945,9 +1949,8 @@ export function useRepublicGame(gameId:string){
   activeViewRef.current==='parties'||(activeViewRef.current==='teacher'&&teacherWorkspaceRef.current==='parties'),navigation=false){
   // Profile needs party identity and personal images, not party document rows
   // or their Storage signatures. Party/teacher dossiers retain full reads.
-  const scopes:ReadScope[]=includeDocuments?['parties','profiles','partyDocuments']:['parties','profiles'];
   const includeProfileBio=activeViewRef.current==='profile';
-  await readNavigationSafely('party-assets:'+includeDocuments+':'+includeProfileBio,scopes,navigation,async ticket=>{
+  const assets=readNavigationSafely('party-assets:'+includeProfileBio,['parties','profiles'],navigation,async ticket=>{
    // Render each table as soon as its own query completes.
    // An overloaded document service must not make parties disappear.
    const partySnapshot=loadCachedParties();
@@ -1957,18 +1960,7 @@ export function useRepublicGame(gameId:string){
     else acceptPartyRows((data||[]) as Party[],ticket);
     return !error;
    });
-   const documentRead=includeDocuments
-    ?partySnapshot.then(async ({data,error})=>{
-      if(!readCurrent(ticket,'partyDocuments'))return;
-      if(error){setError(error);return}
-      const pd=await readScopedPartyDocuments(data||[],canLoadRegisteredPartyArchive());
-      if(!readCurrent(ticket,'partyDocuments'))return;
-      if(pd.error)setError(pd.error);
-      else acceptPartyDocuments(pd.data,ticket);
-      return !pd.error;
-     })
-    :Promise.resolve(true);
-   const profileQuery=!includeProfileBio
+    const profileQuery=!includeProfileBio
      ?supabase.from('game_profiles').select(PROFILE_ASSET_COLUMNS).eq('game_id',gameId)
      :supabase.from('game_profiles').select('*').eq('game_id',gameId);
     const profileRead=Promise.resolve(profileQuery).then(({data,error})=>{
@@ -2001,9 +1993,10 @@ export function useRepublicGame(gameId:string){
    }
    return !error;
    });
-   const accepted=await Promise.all([partyRead,documentRead,profileRead]);
+   const accepted=await Promise.all([partyRead,profileRead]);
    return accepted.every(value=>value===true);
   });
+  await Promise.all([assets,includeDocuments?loadPartyDocuments(navigation):Promise.resolve()]);
  }
 
  async function loadPartyRepresentation(refreshParties=true,navigation=false){
