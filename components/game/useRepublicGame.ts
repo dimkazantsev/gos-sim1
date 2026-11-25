@@ -7,6 +7,7 @@ import {boundedChatWrite} from '@/lib/boundedChatWrite';
 import {useBudgetPulse,withBudgetIncome} from './useBudgetPulse';
 import {VOTING_BODIES,bodyQuorum} from './votingBodies';
 import {gdVoteAllowance} from './gdVoteAllowance';
+import {createBallotReadIndex,createMandateReadIndex} from './voteReadIndex';
 import {useEffect,useMemo,useRef,useState,type Dispatch,type SetStateAction} from 'react';
 import {useRouter} from 'next/navigation';
 import {supabase} from '@/lib/supabase';
@@ -334,6 +335,8 @@ export function useRepublicGame(gameId:string){
 
  const profiles=useMemo(()=>currentGameProfiles(profileRows,members,gameId),[profileRows,members,gameId]);
  const officeAssignments=useMemo(()=>officeRows.filter(o=>o.game_id===gameId&&members.some(m=>m.user_id===o.user_id)),[officeRows,members,gameId]);
+ const ballotReadIndex=useMemo(()=>createBallotReadIndex(ballots),[ballots]);
+ const mandateReadIndex=useMemo(()=>createMandateReadIndex(members,partyMandates),[members,partyMandates]);
  const visibleMe=me?.game_id===gameId&&me.user_id===authUser.current?me:null;
  const teacher=visibleMe?.kind==='teacher';
  const names=useMemo(()=>Object.fromEntries(memberRows.filter(m=>m.game_id===gameId).map(x=>[x.user_id,x.full_name])),[memberRows,gameId]);
@@ -3035,14 +3038,7 @@ export function useRepublicGame(gameId:string){
  // Parliamentary representation before a party allocation is entered is shared
  // equally across current students; after allocation all GV/penalty reductions
  // come from the verified party mandate records.
- function gdMandateCapacity(uid:string){
-  const totalBase=partyMandates.reduce((n,a)=>n+Math.max(0,Number(a.base_mandates)||0),0);
-  if(totalBase>0)return partyMandates.filter(a=>a.user_id===uid).reduce((n,a)=>n+Math.max(0,Number(a.effective_mandates)||0),0);
-  const roster=members.filter(m=>m.kind==='student'&&!m.roster_archived_at)
-   .sort((a,b)=>String(a.joined_at||'').localeCompare(String(b.joined_at||''))||a.user_id.localeCompare(b.user_id));
-  const rank=roster.findIndex(m=>m.user_id===uid);
-  return rank<0?0:Math.floor(450/roster.length)+(rank<450%roster.length?1:0);
- }
+ function gdMandateCapacity(uid:string){return mandateReadIndex.capacity(uid)}
  function gdEffectivePresence(uid:string,declared:number|null|undefined){
   const capacity=gdMandateCapacity(uid);
   return Math.max(0,Math.min(capacity,declared==null?capacity:Number(declared)||0));
@@ -3089,15 +3085,14 @@ export function useRepublicGame(gameId:string){
   return members.filter(m=>memberMatchesInstitution(m.user_id,v.institution_key||'all')).length;
  }
  function quorum(v:Vote,registrations:{user_id:string;institution_key:string;stage_no:number;present_mandates?:number|null}[]=[]){
-  const eligible=eligibleWeight(v),cast=ballots.filter(b=>b.vote_id===v.id).reduce((n,b)=>n+Number(b.weight),0);
+  const eligible=eligibleWeight(v),cast=ballotReadIndex.cast(v.id);
   const attendance=v.electorate_snapshot?.attendance_required||v.procedure_key==='registered_session';
   const present=v.status==='closed'&&v.result_present!=null?Number(v.result_present):attendance?
    registrations.filter(r=>r.institution_key===v.institution_key&&r.stage_no===v.stage_no)
     .reduce((n,r)=>{
      if(v.institution_key==='gd'){
       if(!v.electorate_snapshot?.weights)return n+gdEffectivePresence(r.user_id,r.present_mandates);
-      const rows=partyMandates.filter(a=>a.user_id===r.user_id);
-      const effective=rows.length?rows.reduce((sum,a)=>sum+Math.max(0,Number(a.effective_mandates)||0),0):null;
+      const effective=mandateReadIndex.effective(r.user_id);
       return n+gdVoteAllowance(Number(v.electorate_snapshot.weights[r.user_id]||0),r.present_mandates,effective);
      }
      return n+(v.electorate_snapshot?Number(v.electorate_snapshot.weights[r.user_id]||0):
@@ -3107,11 +3102,7 @@ export function useRepublicGame(gameId:string){
   const needed=v.quorum_kind==='none'?0:bodyQuorum(v.institution_key,eligible,Number(v.quorum_value));
   return {eligible,cast,present,needed,met:v.quorum_kind==='none'||eligible>0&&present>=needed};
  }
- function tally(v:Vote){
-  const x=ballots.filter(b=>b.vote_id===v.id);
-  const sum=(choice:'yes'|'no'|'abstain')=>x.reduce((a,b)=>a+Number(b[choice==='yes'?'yes_weight':choice==='no'?'no_weight':'abstain_weight']??(b.choice===choice?b.weight:0)),0);
-  const yes=sum('yes'),no=sum('no'),abstain=sum('abstain');return {yes,no,abstain,total:yes+no+abstain};
- }
+ function tally(v:Vote){return ballotReadIndex.tally(v.id)}
  async function castVoteAllocation(v:Vote,yes:number,no:number,abstain:number){
   if(!me||!canVote(v))return false;
   const key=gameId+':'+me.user_id+':'+v.id;

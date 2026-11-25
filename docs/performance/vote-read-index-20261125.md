@@ -1,0 +1,3 @@
+# Vote read indexes: local operation-count regression
+
+On Node 22.16 and TypeScript, synthetic 100 participants, 40 votes, 4,000 ballot rows, 115 mandate rows, 3 repeated reads. Old reference: 984,000 ballot ID accesses, 35,880 base mandate accesses; new lazy indexes: 4,000 and 115. All reference outputs equal (including missing/zero weights, fallback, archived and duplicate allocations). No work before first read; one map per immutable array, at most one entry per vote/user; no new network traffic, no changes to mutation RPCs, roles, rules or CSS. This is an operation-count test, not a measured React render duration or a server benchmark. Old baseline intentionally fails the traversal bound; current module passed locally. Integration and full CI are pending.
