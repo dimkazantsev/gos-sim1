@@ -12,7 +12,7 @@ const fields=FORMAL_DOCUMENT_SUMMARY_COLUMNS.split(',');
 assert(fields.includes('id')&&fields.includes('game_id')&&fields.includes('updated_at')&&fields.includes('status_code'));
 assert(!fields.includes('*')&&!fields.includes('body_text')&&!fields.includes('metadata'),'Never transmit document body or metadata in background reconciliation');
 assert(hook.includes(".select(FORMAL_DOCUMENT_SUMMARY_COLUMNS).eq('game_id',gameId)"),'The read must retain the game filter and Postgres table RLS');
-assert(hook.includes("if(view==='documents')jobs.push(loadFormalRegistry())"),'The document editor must keep its authoritative full registry');
+assert(hook.includes("if(view==='documents')jobs.push(loadFormalRegistry(undefined,allowFreshCore))"),'The document editor must keep its authoritative full registry');
 assert(hook.includes("if(formalFullVersion.current!==formalVersion(summaries as FormalDocument[]))"),'Summary refresh must invalidate changed full-document cache');
 const updated='2026-10-31T11:00:00Z';
 const doc=i=>({id:'doc-'+i,game_id:'game-a',updated_at:updated,stage_no:12,registry_no:'N'+i,title:'Проект '+i,doc_type:'fz_bill',subject_key:'gd_deputy',subject_label:'Депутат',author_id:'student-'+i,
@@ -38,7 +38,7 @@ assert.equal(changedPath[0].file_url,null,'Signed URL cannot be reused for a new
 
 // Full editor read: preserve first-match signed links and authoritative contents.
 {
- const start=hook.indexOf('   setFormalDocuments(previous=>',hook.indexOf(' async function loadFormalDetails(){'));
+ const start=hook.indexOf('   setFormalDocuments(previous=>',hook.indexOf(' async function loadFormalDetails(navigation=false){'));
  const end=hook.indexOf('\n  });',start);
  assert(start>=0&&end>start,'Full registry merge must exist');
  const run=new Function('setFormalDocuments','rows',hook.slice(start,end).replace(/new Map<string,FormalDocument>\(\)/g,'new Map()'));

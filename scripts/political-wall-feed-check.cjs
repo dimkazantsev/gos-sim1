@@ -128,28 +128,40 @@ console.log('PASS Political Process fixed scroll-to-top, mobile dock, chat and r
  * Multiple Realtime invalidations must not multiply expensive RLS reads. */
 async function singleFlightRegression(){
  const source=fs.readFileSync(path.join(root,'components/game/useRepublicGame.ts'),'utf8');
- const start=source.indexOf(' async function loadPoliticalWall(){');
- const end=source.indexOf(' async function loadPoliticalWallSnapshot(){',start);
+ const start=source.indexOf(' async function loadPoliticalWall(navigation=false){');
+ const end=source.indexOf(' async function loadPoliticalWallSnapshot(navigation=false){',start);
  assert(start>=0&&end>start,'Real political-wall loader uses a scoped single-flight wrapper');
  const make=new Function('gameId','authUser','readEpoch','politicalFullMode','politicalWallFlight','alive','activeGameRef','loadPoliticalWallSnapshot',
   source.slice(start,end)+'\nreturn loadPoliticalWall;');
  const gameId='sample-game',authUser={current:'student'},readEpoch={current:1},politicalFullMode={current:false},politicalWallFlight={current:null},alive={current:true},activeGameRef={current:gameId};
  let requests=0;
- const pending=[];
- const snapshot=()=>new Promise(resolve=>{requests++;pending.push(resolve)});
+ const pending=[],reuseFlags=[];
+ const snapshot=reuse=>new Promise(resolve=>{requests++;reuseFlags.push(reuse);pending.push(resolve)});
  const refresh=make(gameId,authUser,readEpoch,politicalFullMode,politicalWallFlight,alive,activeGameRef,snapshot);
- const p1=refresh(),p2=refresh(),p3=refresh();
+ const p1=refresh(true),p2=refresh(true),p3=refresh(true);
  for(let i=0;i<4;i++)await Promise.resolve();
  assert.equal(requests,1,'Simultaneous callers issue just one first-page RPC');
+ refresh(true);refresh(true);pending.shift()();
+ for(let i=0;i<8;i++)await Promise.resolve();
+ assert.equal(requests,1,'Navigation during pending read does not queue another RPC');
+ await Promise.all([p1,p2,p3]);
+ const explicit=refresh();for(let i=0;i<4;i++)await Promise.resolve();
+ assert.equal(requests,2,'Explicit refresh always reads');
  refresh();refresh();pending.shift()();
  for(let i=0;i<6;i++)await Promise.resolve();
- assert.equal(requests,2,'Mutation invalidations during a pending read issue one follow-up RPC');
- pending.shift()();await Promise.all([p1,p2,p3]);
+ assert.equal(requests,3,'Mutation invalidations during a pending read issue one follow-up RPC');
+ pending.shift()();await explicit;
  assert.equal(politicalWallFlight.current,null,'Single-flight state resets after a completed read');
  authUser.current='another-student';
  const switched=refresh();for(let i=0;i<4;i++)await Promise.resolve();
- assert.equal(requests,3,'New authenticated scope has its own authorized request');
+ assert.equal(requests,4,'New authenticated scope has its own authorized request');
  pending.shift()();await switched;
+ assert.equal(politicalWallFlight.current,null);
+ const nav=refresh(true),force=refresh(false);
+ for(let i=0;i<4;i++)await Promise.resolve();
+ assert.equal(requests,5,'Same-turn explicit refresh coalesces with navigation');
+ assert.equal(reuseFlags.at(-1),false,'Explicit refresh before microtask must bypass navigation cache');
+ pending.shift()();await Promise.all([nav,force]);
  assert.equal(politicalWallFlight.current,null);
  console.log('PASS political feed: three simultaneous calls -> one read, dirty burst -> one trailing read, identity isolated');
 }
@@ -157,7 +169,7 @@ singleFlightRegression().catch(error=>{console.error(error);process.exitCode=1})
 
 // Execute the actual first-page media merge with loaded older pages.
 {
- const start=hook.indexOf('    setPoliticalMedia(previous=>{',hook.indexOf(' async function loadPoliticalWallSnapshot(){'));
+ const start=hook.indexOf('    setPoliticalMedia(previous=>{',hook.indexOf(' async function loadPoliticalWallSnapshot(navigation=false){'));
  const end=hook.indexOf('    setPostFormalLinks(',start);
  assert(start>=0&&end>start,'Political media merge must remain present');
  const run=new Function('setPoliticalMedia','previous','rows','politicalOlderLoaded','full',hook.slice(start,end));

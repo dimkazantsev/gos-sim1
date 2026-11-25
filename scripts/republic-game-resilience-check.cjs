@@ -16,6 +16,7 @@ function harness({effects=false,compiledCode=code}={}){
  const slots=[],pendingEffects=[],channels=[],timers=new Map(),listeners=new Map(),counts=new Map(),holds=new Map(),failures=new Set(),failureCodes=new Map();
  let roomLeaveHold=null;
  let cursor=0,dirty=false,revision=1,user='teacher-a',memberKind='teacher',gameId='game-a',authCallback,authError=null,clock=0,requests=0,disposed=false,recorders=0,stoppedTracks=0,withBallots=false,assetPaths=false,signed=0,activeSigns=0,peakSigns=0,batchCalls=0;
+ let realtimeConnected=false;
  let virtualNow=Date.parse('2026-10-26T00:00:00Z'),responseBytes=0,aborted=0,ignoreAbort=false,failFuturePresenceTrack=false;
  const started=new Map(),notices=[],docListeners=new Map(),fixtures=new Map(),queryLog=[],rpcFailures=new Map();
  class ClockDate extends Date{constructor(...args){super(...(args.length?args:[virtualNow]));}static now(){return virtualNow;}}
@@ -226,7 +227,7 @@ function harness({effects=false,compiledCode=code}={}){
    vm.runInNewContext('(function(require,module,exports){'+compiled+'\n})')(requireFor,child,child.exports);
    return child.exports;
   }
-  if(name==='./useGameTableSync')return{notifyGameDataRefresh:(gameId,table)=>notices.push({gameId,table}),notifySectionUpdates:()=>{},setGameRealtimeConnection:()=>{}};
+  if(name==='./useGameTableSync')return{notifyGameDataRefresh:(gameId,table)=>notices.push({gameId,table}),notifySectionUpdates:()=>{},setGameRealtimeConnection:(_game,connected)=>{realtimeConnected=connected},gameRealtimeConnected:()=>realtimeConnected};
   if(name==='./useBudgetPulse')return{useBudgetPulse:()=>({budgetPulse:null,budgetPulseError:'',refreshBudgetPulse:async()=>{}}),withBudgetIncome:rows=>rows};
   if(name==='./gameRoster')return{currentGameMembers:(rows,id)=>rows.filter(row=>row.game_id===id),currentGameProfiles:(rows,_,id)=>rows.filter(row=>row.game_id===id)};
   if(name==='./chatChannelSelection'||name==='./chatRealtime'||name==='./chatHistoryPaging'||name==='./coalesceInFlight'||name==='./signDocumentAssetBatch'||name==='./formalDocumentSummary'||name==='./partyProfileSummary'||name==='./voteReadIndex'){
@@ -329,7 +330,7 @@ async function main(){
   assert(source.includes(".eq('user_id',uid).maybeSingle()"),'Old-server refresh still rechecks membership');
   assert(source.includes("coalesceInFlight(initialCoreReads.current,key,loadCoreSections)"));
   assert(source.includes("if(!cache.full&&!cache.inflight)"),'Do not downgrade full party dossiers');
-  assert(source.includes("if(view==='actions')\n   jobs.push(core?core.then(()=>loadPoliticalWall()):loadPoliticalWall())"),'Full political feed must load only when Political Process is visible');
+  assert(source.includes("if(view==='actions')\n   jobs.push(core?core.then(()=>loadPoliticalWall(allowFreshCore)):loadPoliticalWall(allowFreshCore))"),'Full political feed must load only when Political Process is visible');
   assert(source.includes("const request=limitedCoreRead(query)")&&source.includes(".select(PARTY_LIST_COLUMNS)"));
   assert(source.includes("const response=await limitedCoreRead(supabase.from('game_members').select(MEMBER_ROSTER_COLUMNS)"));
  });
@@ -467,6 +468,46 @@ async function main(){
    await h.render().refresh();await h.settle();
    assert.equal(h.rpcCount('get_game_entry_v5'),2);
   }finally{held.resolve();h.dispose();}
+ });
+ await check('100 clients revisit unchanged sections without duplicate presentation requests',async()=>{
+  const clients=Array.from({length:100},(_,i)=>{const h=harness({effects:true});if(i===1)h.setMemberKind('observer');else if(i>1)h.setUser('student-'+i);return h});
+  const visit=async(h,view)=>{h.render().setActiveView(view);await h.settle()};
+  try{
+   await Promise.all(clients.map(async h=>{
+    await h.settle();await visit(h,'stages');
+    for(const [view,count] of [
+      ['documents',()=>h.readCount('formal_documents')],
+      ['profile',()=>h.readCount('game_profiles')],
+      ['parties',()=>h.rpcCount('get_party_representation_projection')],
+      ['actions',()=>h.rpcCount('get_political_wall_page')]]){
+     await visit(h,view);const first=count();assert(first>0,view+' must load initially');
+     for(let i=0;i<4;i++){await visit(h,'dashboard');await visit(h,view)}
+     assert.equal(count(),first,view+' must reuse accepted unchanged presentation');
+    }
+   }));
+   console.log('NAVIGATION_REUSE: 100 clients x 4 projections x 4 revisits = 1600 duplicate projection invocations avoided (synthetic)');
+  }finally{clients.forEach(h=>h.dispose())}
+ });
+ await check('Navigation reuse expires and explicit refresh and political events still read',async()=>{
+  const h=harness({effects:true});
+  const visit=async view=>{h.render().setActiveView(view);await h.settle()};
+  try{
+   await h.settle();await visit('actions');
+   const before=h.rpcCount('get_political_wall_page');
+   await visit('dashboard');await visit('actions');assert.equal(h.rpcCount('get_political_wall_page'),before);
+   await h.render().refreshPoliticalWall();await h.settle();assert.equal(h.rpcCount('get_political_wall_page'),before+1);
+   await visit('dashboard');h.emit('political_posts');await h.settle();await visit('actions');
+   assert.equal(h.rpcCount('get_political_wall_page'),before+2);
+   await visit('dashboard');await h.advance(16000);await visit('actions');
+   assert.equal(h.rpcCount('get_political_wall_page'),before+3);
+   await visit('dashboard');h.channelStatus('CHANNEL_ERROR');await h.settle();await visit('actions');
+   assert(h.rpcCount('get_political_wall_page')>before+3,'Disconnected navigation revalidates');
+   h.channelStatus('SUBSCRIBED');await h.settle();
+   await visit('dashboard');h.render().setChatOpen(true);await h.settle();
+   const chatReads=h.rpcCount('get_my_chat_overview');
+   await visit('documents');await visit('dashboard');await visit('votes');
+   assert.equal(h.rpcCount('get_my_chat_overview'),chatReads,'Open chat must not refetch just because main view changes');
+  }finally{h.dispose()}
  });
  await check('Missing v4 function retains the prior protected v3 bootstrap',async()=>{
   const h=harness();h.failRpc('get_game_entry_v5','PGRST202');h.failRpc('get_game_entry_v4','PGRST202');
