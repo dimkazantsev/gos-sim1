@@ -23,11 +23,16 @@ function displayClock(){
  const compile=file=>ts.transpileModule(fs.readFileSync(path.join(__dirname,'..','components/game',file),'utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022,jsx:ts.JsxEmit.ReactJSX}}).outputText;
  const countdown={exports:{}};vm.runInNewContext('(function(module,exports){'+compile('turnCountdown.ts')+'})')(countdown,countdown.exports);
  const child={exports:{}},jsx=(type,props)=>({type,props});
- const context={Date:ClockDate,setInterval:(fn,delay)=>{const id=++nextId;timers.set(id,{fn,delay,at:now+delay});return id},clearInterval:id=>timers.delete(id)};
+ const listeners=new Map(),focus=new Map();
+ const target=map=>({addEventListener:(name,fn)=>map.set(name,fn),removeEventListener:(name,fn)=>{if(map.get(name)===fn)map.delete(name)}});
+ const timer=(fn,delay,repeat)=>{const id=++nextId;timers.set(id,{fn,delay,at:now+delay,repeat});return id};
+ const context={Date:ClockDate,document:{...target(listeners),visibilityState:'visible'},window:target(focus),
+  setInterval:(fn,delay)=>timer(fn,delay,true),clearInterval:id=>timers.delete(id),
+  setTimeout:(fn,delay)=>timer(fn,delay,false),clearTimeout:id=>timers.delete(id)};
  const req=name=>name==='react'?react:name==='react/jsx-runtime'?{jsx,jsxs:jsx,Fragment:'fragment'}:name==='./turnCountdown'?countdown.exports:{};
  vm.runInNewContext('(function(require,module,exports){'+compile('TurnClock.tsx')+'})',context)(req,child,child.exports);
  function render(name,endAt){cursor=0;tree=child.exports[name]({endAt});while(effects.length)effects.shift()();cursor=0;tree=child.exports[name]({endAt});return tree}
- return {render,advance(ms){const end=now+ms;for(;;){const next=[...timers.values()].filter(t=>t.at<=end).sort((a,b)=>a.at-b.at)[0];if(!next)break;now=next.at;next.at+=next.delay;next.fn()}now=end},dispose(){for(const slot of slots)slot?.cleanup?.();assert.equal(timers.size,0,'Clock timer stops on unmount')}};
+ return {render,advance(ms){const end=now+ms;for(;;){const entry=[...timers].filter(([,t])=>t.at<=end).sort((a,b)=>a[1].at-b[1].at)[0];if(!entry)break;const [id,next]=entry;now=next.at;if(next.repeat)next.at+=next.delay;else timers.delete(id);next.fn()}now=end},dispose(){for(const slot of slots)slot?.cleanup?.();assert.equal(timers.size,0,'Clock timer stops on unmount');assert.equal(listeners.size+focus.size,0,'Browser listeners stop on unmount')}};
 }
 function words(node){if(Array.isArray(node))return node.map(words).join('');if(node&&typeof node==='object')return words(node.props?.children);return node==null?'':String(node)}
 (async()=>{

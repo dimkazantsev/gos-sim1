@@ -1,4 +1,5 @@
 'use client';
+import '../../app/stage6-cec-workspace-polish.css';
 import {userError} from '@/lib/userError';
 import {IconAction} from '../ui/IconAction';
 import {useEffect,useMemo,useRef,useState} from 'react';

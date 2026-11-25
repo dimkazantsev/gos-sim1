@@ -21,14 +21,20 @@ jobs:
       - run: npm ci --no-audit --no-fund
       - uses: supabase/setup-cli@v3
         with:
-          version: latest
+          version: '3.4.0'
       - name: Initialize isolated local Supabase project
         run: |
           set -euo pipefail
           rm -rf /tmp/blitz-supabase
           mkdir -p /tmp/blitz-supabase
           cd /tmp/blitz-supabase
-          supabase init
+          supabase init --workdir /tmp/blitz-supabase
+          # CLI 3.4 creates JSONC by default. Keep this isolated fixture's TOML
+          # port configuration and existing legacy local stack unchanged.
+          if [ ! -f supabase/config.toml ]; then
+            supabase config convert --to toml --reason ci-or-deploy --workdir /tmp/blitz-supabase
+          fi
+          test -f supabase/config.toml
           # Use a free port for this disposable integration database.
           python3 - <<'PY'
           import pathlib,re,socket
@@ -70,6 +76,9 @@ jobs:
           cd /tmp/blitz-supabase
           DB_URL="$(supabase status -o env | sed -n 's/^DB_URL="\(.*\)"$/\1/p')"
           test -n "$DB_URL"
+          # Fail closed before using any disposable schema fixture.
+          DB_URL="$DB_URL" node -e 'const u=new URL(process.env.DB_URL);if(!["127.0.0.1","localhost","[::1]"].includes(u.hostname))throw Error("Non-local database refused")'
+          psql "$DB_URL" -v ON_ERROR_STOP=1 -f "$GITHUB_WORKSPACE/supabase/tests/blitz_supabase_offline_issuance.sql"
           psql "$DB_URL" -v ON_ERROR_STOP=1 -f "$GITHUB_WORKSPACE/supabase/tests/blitz_supabase_setup.sql"
           psql "$DB_URL" -v ON_ERROR_STOP=1 -f "$GITHUB_WORKSPACE/supabase/migrations/20261012100100_blitz_attempt_lock_hardening.sql"
           psql "$DB_URL" -v ON_ERROR_STOP=1 -c "NOTIFY pgrst, 'reload schema';"

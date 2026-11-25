@@ -6,11 +6,12 @@ function replace(before,after){assert(fixture.includes(before),'Fixture matches:
 replace("ghost:'GhostPolicyLab'","ghost:'GhostPolicyLab',votes:'VotesView',registration:'InstitutionRegistrationPanel'");
 replace("institution_session_registrations:[{user_id:'student-A',stage_no:4,institution_key:'gd',present_mandates:15}]","institution_session_registrations:[{user_id:'student-A',stage_no:4,institution_key:'gd',present_mandates:rev?25:15}]");
 replace("game_votes:[{id:'procedure'","institution_meeting_records:[{game_id:game,stage_no:4,institution_key:'gd',agenda_body:'agenda-'+rev,agenda_approved_at:null}],game_votes:[{id:'procedure'");
-replace("const api={errors,starts,failures,","const api={errors,starts,failures,registration(){return hooks.map(h=>h?.value).find(v=>v&&typeof v.scope==='string'&&Array.isArray(v.rows))},revision(value){revision=value},connection(value){sync.setGameRealtimeConnection('game-A',value)},");
-replace("name==='./useGameTableSync'?sync:","name==='./useGameTableSync'?sync:name==='./useSavedGameState'?{useSavedGameState:(_game,_user,_key,value)=>react.useState(value),savedChoice:()=>()=>true}:name==='./votingBodies'?{VOTING_BODIES:[],bodyQuorum:()=>0}:");
+replace("const api={errors,starts,failures,","const api={errors,starts,failures,registration(){return hooks.map(h=>h?.value).find(v=>v&&typeof v.scope==='string'&&Array.isArray(v.rows))},meetingRows(){return hooks.map(h=>h?.value).find(v=>Array.isArray(v)&&v.some(row=>row&&typeof row.agenda_body==='string'))},revision(value){revision=value},connection(value){sync.setGameRealtimeConnection('game-A',value)},");
+replace("name==='./useGameTableSync'?sync:","name==='./useGameTableSync'?sync:name==='./useSavedGameState'?{useSavedGameState:(_game,_user,_key,value)=>react.useState(value),savedChoice:()=>()=>true}:name==='./votingBodies'?actualVotingBodies:name==='./proceduralVoting'?actualProceduralVoting:");
+replace("let sync;","let sync;const actualVotingBodies={},actualProceduralVoting={};vm.runInNewContext(transpile(source('components/game/votingBodies.ts')),{exports:actualVotingBodies});vm.runInNewContext(transpile(source('components/game/proceduralVoting.ts')),{exports:actualProceduralVoting,require:name=>name==='./votingBodies'?actualVotingBodies:{}});");
 replace("visibilityState:hidden?'hidden':'visible'","visibilityState:hidden?'hidden':'visible',getElementById:()=>null");
 replace("name!=='get_my_institution_meeting_permissions'","name!=='get_my_institution_meeting_permissions'&&name!=='get_gd_session_attendance'");
-replace("profiles:[],partyInvitations:[],votes:[]","profiles:[],partyInvitations:[],formalDocuments:[],ballots:[],partyMandates:[],members:[],votes:[],names:{}");
+replace("profiles:[],partyInvitations:[],votes:[]","profiles:[],partyInvitations:[],formalDocuments:[],ballots:[],partyMandates:[],officeAssignments:[],votes:[],names:{}");
 replace("main().catch(error=>{console.error(error);process.exitCode=1});","module.exports={realm,tick,find};");
 const compiled=new Module(file,module);compiled.filename=file;compiled.paths=module.paths;compiled._compile(fixture,file);
 const {realm,tick,find}=compiled.exports;
@@ -161,7 +162,28 @@ async function staleMeetingActions(){
   await make(ctx)[name](name==='saveStage12Editor'?false:'agenda');assert.equal(busy,false,name+' releases busy on network failure');assert.equal(saving,false,name+' releases saving on network failure');assert.deepEqual(errors,['network failure'],name+' reports a network error');
  }
 }
+
+// Validate actual memoized queue expressions against the previous direct
+// predicates, including closed and unrelated votes. No network or React DOM.
+function indexedDocumentQueues(){
+ const ts=require('typescript'),source=fs.readFileSync(path.join(__dirname,'../components/game/VotesView.tsx'),'utf8');
+ const ast=ts.createSourceFile('VotesView.tsx',source,ts.ScriptTarget.Latest,true,ts.ScriptKind.TSX),nodes={};
+ function visit(n){if(ts.isVariableDeclaration(n)&&['openDocumentSteps','scheduledBills','pendingNpas'].includes(n.name.getText(ast)))nodes[n.name.getText(ast)]=n.getText(ast);ts.forEachChild(n,visit)}visit(ast);
+ assert.equal(Object.keys(nodes).length,3);
+ const code=ts.transpileModule('const '+nodes.openDocumentSteps+';const '+nodes.scheduledBills+';const '+nodes.pendingNpas+';return [scheduledBills,pendingNpas]',{compilerOptions:{target:ts.ScriptTarget.ES2022}}).outputText;
+ const evaluate=new Function('formalDocuments','votes','votePresetForDocument','useMemo',code);
+ const preset=d=>d.status_code==='agenda'?{}:null;
+ for(let shift=0;shift<30;shift++){
+  const documents=Array.from({length:300},(_,i)=>({id:'d'+i,workflow_key:i%3===0?'bill':'government_act',doc_type:i%11===0?'minutes':'government_order',status_code:(i+shift)%7===0?'published':i%3===0?'reading1':'agenda'}));
+  const votes=Array.from({length:200},(_,i)=>({formal_document_id:'d'+(i*7%300),formal_step_code:i%3===0?'reading1':'agenda',status:(i+shift)%5===0?'closed':'open'}));
+  const indexed=evaluate(documents,votes,preset,fn=>fn());
+  const has=d=>votes.some(v=>v.formal_document_id===d.id&&v.formal_step_code===d.status_code&&v.status==='open');
+  assert.deepEqual(indexed,[documents.filter(d=>d.workflow_key==='bill'&&!['published','rejected'].includes(d.status_code)&&!has(d)),documents.filter(d=>d.workflow_key!=='bill'&&!['state_program','meeting_agenda','minutes'].includes(d.doc_type)&&preset(d)&&!has(d))]);
+ }
+}
+
 async function main(){
+ indexedDocumentQueues();
  async function model(old){const sessions=Array.from({length:40},()=>realm('votes',old));await tick();for(const r of sessions)await r.settle();for(let second=0;second<12;second++){for(const r of sessions)for(let i=0;i<8;i++)r.local('institution_session_registrations');for(const r of sessions)await r.advance(1000)}const reads=sessions.reduce((n,r)=>n+r.metrics().reads,0);for(const r of sessions)r.close();return reads}
  async function idle(old){const sessions=Array.from({length:40},()=>realm('votes',old));await tick();for(const r of sessions)await r.settle();for(const r of sessions)await r.advance(20*60000);const reads=sessions.reduce((n,r)=>n+r.metrics().reads,0);for(const r of sessions)r.close();return reads}
  const before=process.env.PERFORMANCE_BASELINE_REF?await model(true):null,reads=await model(false);
@@ -182,7 +204,7 @@ async function main(){
  const registration=realm('registration');await registration.settle();
  const select=find(registration.render(),node=>node.props?.label==='Орган');assert(select,'Registration offers an institution selector');select.props.onChange('ksrf');await registration.settle();registration.revision(1);
  const beforeReturn=registration.count('institution_units');registration.local('institution_meeting_records');await registration.advance(1000);await registration.settle();assert.equal(registration.count('institution_units'),beforeReturn+1,'A late write to A refreshes the shared snapshot while B is open');
- find(registration.render(),node=>node.props?.label==='Орган').props.onChange('gd');await registration.settle();assert.equal(registration.state(12)[0].agenda_body,'agenda-1','Returning to A shows the updated agenda without waiting for background polling');
+ find(registration.render(),node=>node.props?.label==='Орган').props.onChange('gd');await registration.settle();assert.equal(registration.meetingRows()[0].agenda_body,'agenda-1','Returning to A shows the updated agenda without waiting for background polling');
  for(const table of ['institution_meeting_records','institution_session_registrations','institution_units','formal_documents']){const before=registration.count('institution_units');registration.local(table);await registration.advance(1000);await registration.settle();assert.equal(registration.count('institution_units'),before+1,'The real panel hook reloads after '+table+' invalidation')}
  const unrelated=registration.count('institution_units');registration.local('institution_meeting_records','game-B');await registration.advance(1000);assert.equal(registration.count('institution_units'),unrelated,'Another game does not invalidate this panel');registration.close();
  await panelMutations();

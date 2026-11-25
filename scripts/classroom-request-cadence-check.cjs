@@ -18,8 +18,11 @@ assert(shell.includes("notifyGameDataRefresh(gameId,'blitz_assignments');"),'Rec
 assert(shell.includes('},[chatOpen,channelId]);'),'Opening and channel switching share one chat history/pins effect');
 assert(!shell.includes("void loadMessages(channelId,true);void loadChatPins(channelId);void markChatRead(channelId);"),'Old duplicate channel-change loads must not return');
 assert(shell.includes('void loadMessages(channelId,true);')&&shell.includes('void loadChatPins(channelId);'),'Chat still hydrates messages and pins');
-assert(entry.includes('const heartbeatMs=68000+firstPresenceWriteDelay(me.user_id)%6000'));
-assert(entry.includes('const id=setInterval(visible,heartbeatMs)'));
+const presence=f('components/game/usePresenceHeartbeat.ts');
+const lifecycle=f('components/game/presenceHeartbeat.ts');
+assert(entry.includes('usePresenceHeartbeat({gameId,userId:me?.user_id,view,enabled:g.coreLoaded&&!previewMode,touchPresence})'));
+assert(presence.includes('const heartbeatMs=68000+firstPresenceWriteDelay(userId)%6000'));
+assert(lifecycle.includes('timer=options.schedule(tick,options.heartbeatMs)')&&!lifecycle.includes('setInterval'),'Exactly one visibility-aware timer, no hidden polling');
 const minHeartbeat=68000,maxHeartbeat=73999,cutoff=90000;
 assert(maxHeartbeat<cutoff&&cutoff-maxHeartbeat>16000,'Keep 16s+ timing margin before current online cutoff');
 const users=100,hour=3600000;

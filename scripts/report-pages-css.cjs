@@ -35,3 +35,27 @@ function report(paths){
  return{files:sizes.length,rawBytes:sizes.reduce((s,x)=>s+x.bytes,0),gzipBytes:sizes.reduce((s,x)=>s+x.gzipBytes,0),largest:sizes.slice(0,5)};
 }
 console.log('GOS_ID_CSS_ASSETS '+JSON.stringify({initialLinkReferences:styles.length,initialDocument:report(initial),allBuildCss:report(css)}));
+
+const scriptPaths=[...new Set([...html.matchAll(/<script\b[^>]*\bsrc="([^"]+)"[^>]*>/g),...html.matchAll(/<link\b[^>]*>/g)].map(m=>{
+ const tag=m[0];
+ if(tag.startsWith('<link')&&!(/\brel="(?:preload|modulepreload)"/.test(tag)&&(/\bas="script"/.test(tag)||/\brel="modulepreload"/.test(tag))))return null;
+ const url=tag.startsWith('<script')?m[1]:/\bhref="([^"]+)"/.exec(tag)?.[1];
+ if(!url)return null;
+ const pathname=new URL(url,'https://static.invalid').pathname;
+ return pathname.startsWith('/gos-sim1/')&&pathname.endsWith('.js')?join(out,pathname.slice('/gos-sim1/'.length)):null;
+}).filter(Boolean))];
+for(const path of scriptPaths)if(!existsSync(path))throw Error('Missing initial JavaScript asset '+path);
+console.log('GOS_ID_INITIAL_JS_ASSETS '+JSON.stringify(report(scriptPaths)));
+
+// Measure fonts emitted by the existing build and fonts actually preloaded by
+// the entry HTML. Unicode-range remains browser-selected; emitted != fetched.
+const fontAssets=files(join(out,'_next/static')).filter(file=>/\.(?:woff2?|ttf|otf)$/i.test(file));
+const fontPreloads=[...new Set([...html.matchAll(/<link\b[^>]*>/g)].map(m=>m[0]).filter(tag=>/\brel="preload"/.test(tag)&&/\bas="font"/.test(tag)).map(tag=>{
+ const href=/\bhref="([^"]+)"/.exec(tag)?.[1];if(!href)throw Error('Font preload missing href');
+ const pathname=new URL(href,'https://static.invalid').pathname;
+ if(!pathname.startsWith('/gos-sim1/'))throw Error('External or unscoped font preload '+pathname);
+ const file=join(out,pathname.slice('/gos-sim1/'.length));
+ if(!existsSync(file))throw Error('Missing preloaded font '+pathname);
+ return file;
+}))];
+console.log('GOS_ID_FONT_ASSETS '+JSON.stringify({entryPreloads:report(fontPreloads),emittedFonts:report(fontAssets),scope:'preloaded and emitted assets, not measured browser transfers'}));

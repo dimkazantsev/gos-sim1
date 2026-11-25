@@ -106,7 +106,13 @@ const teacher='00000000-0000-0000-0000-000000000001',student='00000000-0000-0000
  await assert.rejects(()=>q("select public.save_institution_meeting_document($1,2,'ksrf','agenda',$2)",[legacyGame,'Поменять повестку после регистрации должно быть невозможно']),/После начала регистрации повестку менять нельзя/);
  assert.equal((await q("select agenda_document_id from institution_meeting_records where game_id=$1",[legacyGame]))[0].agenda_document_id,firstAgenda);
  assert(ui.includes("const gdStage12CanonicalAgenda=body==='gd'&&stage===12;"),'Stage 12 uses one automatic agenda');
- assert(ui.includes('const canWriteAgenda=!gdStage12CanonicalAgenda&&(!agendaHasDocument||!hasSessionRegistrations);'),'Manual editing stays frozen after registration in other stages, and is disabled entirely for the Stage 12 Duma');
+ // Stage 11 now has an automatic Government agenda as well as Stage 12 Duma.
+ const gate=ui.match(/const canWriteAgenda=([^;]+);/);
+ assert(gate,'Manual agenda gate exists');
+ assert(ui.includes("const canonicalGovernmentAgenda=body==='government'&&stage===11;"));
+ const canWrite=new Function('gdStage12CanonicalAgenda','canonicalGovernmentAgenda','agendaHasDocument','hasSessionRegistrations','return '+gate[1]);
+ for(const gd of [false,true])for(const government of [false,true])for(const document of [false,true])for(const registration of [false,true])
+  assert.equal(canWrite(gd,government,document,registration),!gd&&!government&&(!document||!registration),'Both canonical agendas prohibit manual creation; other agendas retain registration lock');
  assert(ui.includes("const preStageKsrf=body==='ksrf'&&(stage===2||stage===3)"),'KSRF leaders can prepare and register before work starts');
  assert(ui.includes('meetingActionsLocked'),'Meeting controls preserve closed-stage rules outside KSRF 2/3');
  assert(ui.includes("meetingActionsLocked?'Этап закрыт'"),'Other closed-stage attendance remains unavailable');

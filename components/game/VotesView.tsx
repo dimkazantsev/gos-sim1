@@ -72,11 +72,12 @@ export default function VotesView({g,onOpenDocument,onOpenStages,focusId,onClear
   return map;
  },[partyMandates]);
 
- const scheduledBills=formalDocuments.filter(d=>d.workflow_key==='bill'
+ // Reuse the already indexed open document steps for both queues.
+ const scheduledBills=useMemo(()=>formalDocuments.filter(d=>d.workflow_key==='bill'
   && !['published','rejected'].includes(d.status_code)
-  && !openDocumentSteps.has(d.id+':'+d.status_code));
- const pendingNpas=formalDocuments.filter(d=>d.workflow_key!=='bill'&&!['state_program','meeting_agenda','minutes'].includes(d.doc_type)&&votePresetForDocument(d)
-  &&!votes.some(v=>v.formal_document_id===d.id&&v.formal_step_code===d.status_code&&v.status==='open'));
+  && !openDocumentSteps.has(d.id+':'+d.status_code)),[formalDocuments,openDocumentSteps]);
+ const pendingNpas=useMemo(()=>formalDocuments.filter(d=>d.workflow_key!=='bill'&&!['state_program','meeting_agenda','minutes'].includes(d.doc_type)&&votePresetForDocument(d)
+  &&!openDocumentSteps.has(d.id+':'+d.status_code)),[formalDocuments,openDocumentSteps]);
  const focused=useRef('');
  useEffect(()=>{if(focusId)setTab('all')},[focusId]);
  const registrationScope=JSON.stringify([g.game?.id,me?.user_id,me?.kind,me?.role_title,me?.roster_archived_at,teacher]);
@@ -121,7 +122,7 @@ export default function VotesView({g,onOpenDocument,onOpenStages,focusId,onClear
  }
  function isRegisteredForVote(v:Vote){
   return !voteNeedsRegistration(v)||
-   checkedIn.some(row=>row.user_id===me?.user_id&&row.institution_key===v.institution_key&&row.stage_no===v.stage_no);
+   (checkinsByInstitutionAndStage.get(v.institution_key+':'+v.stage_no)||[]).some(row=>row.user_id===me?.user_id);
  }
  function canCast(v:Vote){return canVote(v)&&isRegisteredForVote(v)&&(v.institution_key!=='gd'||gdPresentWeight(v)>0)}
  function gdVotePresentWeight(v:Vote,uid:string,declared:number|null){
@@ -130,7 +131,7 @@ export default function VotesView({g,onOpenDocument,onOpenStages,focusId,onClear
    cachedEffectiveByUser.get(uid)??null);
  }
  function gdPresentWeight(v:Vote){
-  const mine=checkedIn.find(r=>r.user_id===me?.user_id&&r.institution_key==='gd'&&r.stage_no===v.stage_no);
+  const mine=(checkinsByInstitutionAndStage.get('gd:'+v.stage_no)||[]).find(r=>r.user_id===me?.user_id);
   return mine?gdVotePresentWeight(v,mine.user_id,mine.present_mandates):0;
  }
  const focusedVote=focusId?votes.find(v=>v.id===focusId):undefined;

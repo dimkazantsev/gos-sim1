@@ -28,7 +28,8 @@ assert(gameClient.includes("landing.searchParams.set('section','profile')"),'Inv
 assert(gameClient.includes('gos-share-section')&&gameClient.includes('gos-share-profile'),'Separate copyable section and profile links');
 assert(!gameClient.includes("landing.searchParams.set('invite'")&&!gameClient.includes("landing.searchParams.set('token'"),'Private codes never appear in the link');
 assert(home.includes("membership=membership.eq('game_id',target)"),'Authenticated link cannot open a different game');
-assert(home.includes('if(target)return;'),'Targeted link must not fall through to remembered game');
+const sharedEntry=home.slice(home.indexOf('// Telegram links arrive'),home.indexOf('const heading=useMemo'));
+assert(sharedEntry.includes(".eq('user_id',userId).is('roster_archived_at',null)")&&sharedEntry.includes('if(target)membership=membership.eq')&&sharedEntry.includes('if(rows.data?.length===1)')&&!sharedEntry.includes('readRememberedGameCodes()')&&!sharedEntry.includes("rpc('resume_member_game'"),'Targeted link uses only authorized membership and never falls through to remembered game');
 assert(home.includes("search.get('gameCode')"),'First-time participants get the public game code prefilled');
 assert(shares.includes('.gosShareLinkControl')&&shares.includes('@media(max-width:560px)'),'Share links follow approved responsive styles');
 console.log('PASS: exact scannable QR, native modal interactions, two entry modes and CSS');

@@ -1,0 +1,8 @@
+# Budget guarded snapshot: live read-only integration evidence
+
+- Candidate branch b91fd613f3cef0984bd868eb709fb03e264cb73a, isolated SQL workflow 45474114814 passed 3 roles, 17 fallback cases, observer writes=0, 2 authorization denials.
+- Current production public.get_budget_pulse(uuid) definition hash 112efe704f7b3fc5bfdf565c8babdaf7. Candidate fallback body after deleting only fast-path declaration and branch is byte-identical (5704 characters). ACL postgres/authenticated/service_role only.
+- Verified actual guard dependencies: prepare_budget_simulator 0ac77b3ce4ff0dc6792da990e2fc9ad5; ensure_budget_simulator 17751cf5db02e51d910aa8db9af0cadb; ensure_fiscal_game eff25b1b4eac78ce7863944576affa1a; budget_seed_status 159258364f9e65fc67b0a4adb5195a10; settle_monetary_inflation 14f08a81a6888f2194a7b21b402b5281; dispatch_budget_risks 04a3c4ecb499dccf9349de40ee3d9700; budget_forecast_signature acfc7aa455d21c48a5d9761d6f17947d.
+- Actual production observer, read-only transaction: one ready snapshot, one original RPC result, full JSON equality excluding as_of, 100 history rows, forecast present, transaction_read_only=on. No player IDs or game data retained in report.
+- Single warm EXPLAIN ANALYZE, same observer and ready cache: old execution 35.121ms + planning .047ms, 3752 shared hits, zero shared reads; candidate SQL execution 18.957ms + planning 6.777ms, 2151 shared hits, zero shared reads. Not a concurrent benchmark or guarantee.
+- Installation not performed: latest presence check found one active session. Preserve original RPC and no production changes until inactive, then guard exact definition/dependency hashes and run read-only public wrapper smoke tests. Do not remove the fallback.

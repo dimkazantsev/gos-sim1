@@ -20,7 +20,16 @@ assert(hook.includes('KSRF_PROPOSAL_REFRESH_EVENT'),'Send proposal invalidations
 assert(hook.includes('const eventName=onlyTable?KSRF_PROPOSAL_REFRESH_EVENT:GAME_DATA_REFRESH_EVENT'),'Do not wake unrelated stage panels');
 assert(hook.includes('window.addEventListener(eventName,local)'),'Subscribe to scoped event only');
 assert(shared.includes("notifyGameDataRefresh(gameId,table)"),'Shared game socket carries proposal table identity');
-assert(shared.includes("'parliamentary_election_rules','regional_election_rules'"),'Subscribe to both game-scoped rule tables');
+const rulesHandler=shared.match(/channel\.on\('broadcast',\{event:'game_rules_changed'\},payload=>\{[\s\S]*?\n  \}\);/);
+assert(rulesHandler,'Shared private rule-change event must be registered');
+const received=[];let callback,connected=true;
+new Function('channel','currentConnection','dirtyTables','reconcileTables','schedule','notifyGameDataRefresh','gameId',rulesHandler[0])(
+ {on:(kind,filter,fn)=>{assert.equal(kind,'broadcast');assert.equal(filter.event,'game_rules_changed');callback=fn}},
+ ()=>connected,new Set(),new Set(),()=>{},(game,table)=>received.push([game,table]),'test-game');
+for(const table of ['parliamentary_election_rules','regional_election_rules','unrelated'])callback({payload:{table}});
+assert.deepEqual(received,[['test-game','parliamentary_election_rules'],['test-game','regional_election_rules']]);
+connected=false;callback({payload:{table:'regional_election_rules'}});
+assert.equal(received.length,2,'Ignore stale connection');
 assert(migration.includes('pg_publication_tables'),'Avoid duplicate publication registration');
 (async()=>{
  const db=new PGlite();
@@ -30,6 +39,6 @@ assert(migration.includes('pg_publication_tables'),'Avoid duplicate publication 
   await db.exec(migration);
   const rows=(await db.query("SELECT tablename FROM pg_publication_tables WHERE pubname='supabase_realtime' ORDER BY tablename")).rows.map(row=>row.tablename);
   assert.deepEqual(rows,['parliamentary_election_rules','regional_election_rules'],'Only two proposal tables are published; migration is idempotent');
-  console.log('PASS KSRF: 2 published tables, 0 dedicated channels, scoped and bounded refresh, immediate proposal rendering');
+  console.log('PASS KSRF: 2 legacy published tables retained during rollout, private shared rules event, 0 dedicated channels, scoped and bounded refresh');
  }finally{await db.close();}
 })().catch(error=>{console.error(error);process.exitCode=1});

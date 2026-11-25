@@ -133,3 +133,20 @@ assert.ok(!telegram.includes("fetch('/api/telegram/"),'Telegram must not POST to
 assert.ok(existsSync(join(built,'data/region-paths.json')),'Shared region data');
 assert.ok(!readFileSync(join(built,'components/game/portableSession.ts'),'utf8').includes("asset('/portable/"),'Portable assets need the repository prefix.');
 console.log(`PASS ${refs.size} HTML asset links, ${scenes.length} scenes, dynamic game entry, recovery route, document attachments and portable files.`);
+
+const staticGame=readFileSync(join(built,'components/StaticGame.tsx'),'utf8');
+assert.ok(staticGame.includes("dynamic(()=>import('./GameClient'),{ssr:false"),'Static login must not eagerly load the whole game');
+assert.ok(!staticGame.includes("import GameClient from"),'No static game dependency on login');
+const rootLayout=readFileSync(join(built,'app/layout.tsx'),'utf8');
+for(const [file,owner] of [["stage6-cec-workspace-polish.css","components/game/PresidentialElectionLab.tsx"],["party-certificate.css","components/game/PartyCertificate.tsx"],["2026-bill-dossier-design.css","components/game/DocumentsView.tsx"]]){
+ assert.ok(!rootLayout.includes("import './"+file+"'"),'Game-specific CSS not in global entry: '+file);
+ assert.ok(readFileSync(join(built,owner),'utf8').includes("import '../../app/"+file+"'"),'Component owns exact approved CSS: '+file);
+}
+
+for(const name of ["interior-user","finance","economy","education","health","foreign","russia"]){
+ const original=join(built,'public/emblems',name+'.png'),variant=join(out,'emblems/optimized',name+'-256.webp');
+ assert.ok(existsSync(variant),'Generated responsive emblem '+name);
+ const webp=readFileSync(variant),source=readFileSync(original);
+ assert.ok(webp.subarray(0,4).toString()==='RIFF'&&webp.subarray(8,12).toString()==='WEBP','Valid WebP '+name);
+ assert.ok(webp.byteLength<source.byteLength,'Smaller emblem '+name);
+}

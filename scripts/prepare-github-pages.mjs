@@ -17,6 +17,8 @@ function transform(name,from,to){
 }
 rmSync(target,{recursive:true,force:true});mkdirSync(target,{recursive:true});
 for(const name of ['app','components','lib','public','data','package.json','package-lock.json','tsconfig.json','next-env.d.ts','public-client-config.json'])cpSync(resolve(root,name),resolve(target,name),{recursive:true});
+mkdirSync(resolve(target,'scripts'),{recursive:true});
+cpSync(resolve(root,'scripts/prepare-emblem-variants.cjs'),resolve(target,'scripts/prepare-emblem-variants.cjs'));
 rmSync(resolve(target,'app/game'),{recursive:true,force:true});rmSync(resolve(target,'app/api'),{recursive:true,force:true});
 transform('lib/supabase.ts',"'build-placeholder-key'",JSON.stringify(publicKey));
 writeFileSync(resolve(target,'next.config.ts'),`export default {output:'export',basePath:${JSON.stringify(base)},assetPrefix:${JSON.stringify(base)},trailingSlash:true,images:{unoptimized:true},experimental:{useTypeScriptCli:false}};\n`);
@@ -47,7 +49,7 @@ let home=readFileSync(resolve(target,'app/page.tsx'),'utf8');
 // Preserve validated Telegram section/deep-link parameters on every transition.
 for(const [method,target] of [
  ['push','r.data'],
- ['replace','rows.data[0].game_id'],['replace','String(resume.data)']
+ ['replace','rows.data[0].game_id']
 ]){
  const original="router."+method+"('/game/'+"+target+"+incomingSectionSuffix())";
  if(!home.includes(original))throw Error('Static game entry adapter is missing: '+original);
@@ -61,8 +63,9 @@ home=home.replaceAll('href="/"','href='+JSON.stringify(base+'/'));
 writeFileSync(resolve(target,'components/StaticLanding.tsx'),home);
 writeFileSync(resolve(target,'components/StaticGame.tsx'),`'use client';
 import {useSearchParams} from 'next/navigation';
-import GameClient from './GameClient';
+import dynamic from 'next/dynamic';
 import Home from './StaticLanding';
+const GameClient=dynamic(()=>import('./GameClient'),{ssr:false,loading:()=> <p>Загрузка игры…</p>});
 export default function StaticGame(){const game=useSearchParams().get('game');return game?<GameClient key={game} gameId={game}/>:<Home/>}
 `);
 writeFileSync(resolve(target,'app/page.tsx'),`import {Suspense} from 'react';import StaticGame from '@/components/StaticGame';export default function Page(){return <Suspense fallback={<p>Загрузка игры…</p>}><StaticGame/></Suspense>};\n`);

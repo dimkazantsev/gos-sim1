@@ -8,7 +8,7 @@ const original=fs.readFileSync('app/2026-npa-workspace-canonical.css','utf8');
 const workflow=fs.readFileSync('app/2026-document-workflow-v2.css','utf8');
 const markup=fs.readFileSync('components/game/DocumentsView.tsx','utf8');
 const layout=fs.readFileSync('app/layout.tsx','utf8');
-assert(layout.includes("import './2026-bill-dossier-design.css';"),'Late canonical style must be loaded');
+assert(markup.includes("import '../../app/2026-bill-dossier-design.css';")&&!layout.includes("import './2026-bill-dossier-design.css';"),'Dossier CSS loads with its own lazy view, not the entry shell');
 for(const name of ['billReadinessPanel','billReadinessStepCopy','billDossierEditorHead','billDossierCard','billProfileForm','billPackageListCanonical','billPackageUpload']) assert(markup.includes(name)&&css.includes(name),name+' is scoped and unchanged');
 assert(css.includes('var(--gs-accent)')&&css.includes('var(--gs-border)'), 'Only established GOС.ID tokens');
 assert(markup.includes("saveBillProfile()")&&markup.includes("uploadBillFile()"),'Existing save and upload controls remain wired');

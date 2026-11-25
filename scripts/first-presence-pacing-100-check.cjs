@@ -21,12 +21,44 @@ const delays=Array.from({length:100},(_,i)=>{
 });
 assert(bins.filter(v=>v>0).length>=12,'Initial SQL writes must cover most seconds');
 assert(Math.max(...bins)<=18,'No new single-second stampede for the isolated 100-user sample');
-const effect=entry.slice(entry.indexOf(" const labels:Record<View,string>="),entry.indexOf(" useEffect(()=>{\n  if(!previewMode)return;",entry.indexOf(" const labels:Record<View,string>=")));
-assert(effect.includes("firstPresenceWriteDelay(me.user_id)"));
-assert(effect.includes("if(initialSqlPresence.current.scope!==scope)"),'A view change must not restart admission pacing');
-assert(effect.includes("clearTimeout(first)"),'Unloading a view must cancel old writes');
-assert(effect.includes("document.visibilityState==='visible'&&isReady()"),'Background tabs must not send SQL presence writes');
-assert(effect.includes("const heartbeatMs=68000+firstPresenceWriteDelay(me.user_id)%6000"),'Steady-state heartbeat must remain inside the journal 90s freshness window');
-assert(effect.includes("const id=setInterval(visible,heartbeatMs)"),'Heartbeat uses deterministic pacing');
-assert(effect.includes("void touchPresence(view,'Открыл раздел"),'First admitted visit must still be recorded');
-console.log(JSON.stringify({status:'PASS',scope:'isolated deterministic scheduling only, not Supabase Auth/DB performance',clients:100,delaysMs:{min:Math.min(...delays),max:Math.max(...delays)},perSecond:bins,peakPerSecond:Math.max(...bins),earliestWriteMs:2000,latestWriteBeforeMs:17000,productionRequests:0}));
+const hook=fs.readFileSync('components/game/usePresenceHeartbeat.ts','utf8');
+assert(entry.includes('usePresenceHeartbeat({gameId,userId:me?.user_id,view,enabled:g.coreLoaded&&!previewMode,touchPresence})'));
+assert(hook.includes('if(admission.current.scope!==scope)'),'View changes retain admission deadline');
+assert(hook.includes('68000+firstPresenceWriteDelay(userId)%6000'));
+assert(hook.includes("document.visibilityState==='visible'"));
+assert(hook.includes("navigation?'Открыл раздел «'+labels[view]+'»':undefined"));
+assert(hook.includes('latest.gameId!==gameId||latest.userId!==userId||latest.view!==view||!latest.enabled'),'Old lifecycle cannot write to a new game or account');
+const schedulerSource=fs.readFileSync('components/game/presenceHeartbeat.ts','utf8');
+const schedulerJS=ts.transpileModule(schedulerSource,{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}}).outputText;
+const schedulerModule={exports:{}};
+vm.runInNewContext('(function(module,exports){'+schedulerJS+'})',{})(schedulerModule,schedulerModule.exports);
+const schedulePresenceHeartbeat=schedulerModule.exports.schedulePresenceHeartbeat;
+function verifyScheduler(schedulePresenceHeartbeat,delays){
+ let totalHiddenCallbacks=0,oldHiddenCallbacks=0,peakTimers=0;
+ for(const readyAt of delays){
+  let now=0,visible=true,nextId=0,callbacks=0;const timers=new Map(),writes=[];
+  const heartbeatMs=68000+readyAt%6000;
+  const options={readyAt,heartbeatMs,write:navigation=>writes.push({at:now,navigation}),isVisible:()=>visible,now:()=>now,
+   schedule:(fn,delay)=>{const id=++nextId;timers.set(id,{at:now+delay,fn});peakTimers=Math.max(peakTimers,timers.size);return id},
+   cancel:id=>timers.delete(id)};
+  function advance(ms){const until=now+ms;while(timers.size){const [id,t]=[...timers].sort((a,b)=>a[1].at-b[1].at)[0];if(t.at>until)break;now=t.at;timers.delete(id);callbacks++;t.fn()}now=until}
+  let lifecycle=schedulePresenceHeartbeat(options);
+  assert.equal(writes.length,0,'Staggered admission');
+  advance(readyAt-1);assert.equal(writes.length,0);
+  visible=false;lifecycle.visibilityChanged();const before=callbacks;
+  advance(3600000);totalHiddenCallbacks+=callbacks-before;oldHiddenCallbacks+=Math.floor((now)/heartbeatMs);
+  assert.equal(writes.length,0);assert.equal(timers.size,0);
+  visible=true;lifecycle.visibilityChanged();assert.equal(writes.length,1);
+  assert.equal(writes[0].navigation,true,'Preserve first journal entry after hidden admission');
+  advance(heartbeatMs);assert.equal(writes.length,2);assert.equal(writes[1].navigation,false);
+  const previous=writes[1].at;assert(previous-writes[0].at<=90000);
+  lifecycle.dispose();assert.equal(timers.size,0);
+  // Switching view keeps original admission deadline, records latest view.
+  lifecycle=schedulePresenceHeartbeat(options);assert.equal(writes[2].navigation,true);
+  lifecycle.dispose();advance(90000);assert.equal(writes.length,3);assert.equal(timers.size,0);
+ }
+ assert.equal(totalHiddenCallbacks,0);assert.equal(peakTimers,1);
+ return {clients:delays.length,oldHiddenHeartbeatCallbacks:oldHiddenCallbacks,newHiddenCallbacks:totalHiddenCallbacks,peakTimers,productionRequests:0};
+}
+const visibilityResult=verifyScheduler(schedulePresenceHeartbeat,delays);
+console.log(JSON.stringify({status:'PASS',scope:'isolated deterministic scheduling only, not Supabase Auth/DB performance',clients:100,delaysMs:{min:Math.min(...delays),max:Math.max(...delays)},perSecond:bins,peakPerSecond:Math.max(...bins),...visibilityResult}));

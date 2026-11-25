@@ -1,7 +1,7 @@
 'use strict';
 // #491 Browser smoke for real current Next.js entry, not a full 16-stage E2E.
 // All Supabase routes are intercepted and return deterministic mock data.
-// 100 independent browser contexts in groups of 10; NOT 100 simultaneous users.
+// 100 independent browser contexts in groups of 2; NOT 100 simultaneous users.
 const assert=require('node:assert/strict');
 const fs=require('node:fs');
 const {performance}=require('node:perf_hooks');
@@ -36,7 +36,7 @@ async function main(){
   async function visit(n,{kind='student',denyJoin=false,teacher=false}={}){
    const width=WIDTHS[n%WIDTHS.length],ctx=await browser.newContext({
     viewport:{width,height:900},deviceScaleFactor:1,reducedMotion:'reduce'});
-   const calls=[];let page;
+   const calls=[],pageErrors=[],failedRequests=[];let page;
    try{
     await ctx.route('**/*',async route=>{
      const req=route.request(),url=new URL(req.url());
@@ -76,16 +76,33 @@ async function main(){
      throw Error('Unexpected Auth request in isolated entry QA: '+path);
     });
     page=await ctx.newPage();
+    page.on('pageerror',e=>{if(pageErrors.length<5)pageErrors.push(String(e.message).slice(0,300))});
+    page.on('requestfailed',r=>{if(failedRequests.length<5)failedRequests.push({url:r.url().split('?')[0],error:r.failure()?.errorText})});
     const start=performance.now();
     await page.goto(ORIGIN+'/',{waitUntil:'domcontentloaded',timeout:30000});
-    // DOM can be visible while Next.js dev is still compiling/hydrating;
-    // controlled inputs get a value tracker only after React mounts.
-    await page.waitForFunction(()=>!!document.querySelector('input[name="fullName"]')?._valueTracker,null,{timeout:30000});
-    if(teacher){
-     await page.getByRole('button',{name:'Преподаватель',exact:true}).click();
-    }else if(kind==='guest'){
-     await page.getByRole('button',{name:'Гость',exact:true}).click();
+    // Verify observable interaction, not React's private input bookkeeping.
+    // A role button can appear in SSR markup before its handlers are mounted.
+    async function chooseRole(name){
+     const button=page.getByRole('button',{name,exact:true});
+     const deadline=performance.now()+15000;
+     do{
+      await button.click({timeout:5000});
+      if(await button.getAttribute('aria-pressed')==='true')return;
+      await page.waitForTimeout(100);
+     }while(performance.now()<deadline);
+     throw Error('Role control never became interactive: '+name);
     }
+    // Personal-password entry is the approved default. Open invitation entry.
+    const firstEntry=page.getByRole('button',{name:'Первый вход по приглашению',exact:true});
+    const roleControls=page.locator('.entryRoles');
+    const deadline=performance.now()+15000;
+    while(!(await roleControls.isVisible())){
+     if(performance.now()>=deadline)throw Error('Invitation entry never became interactive');
+     await firstEntry.click({timeout:5000});
+     if(!(await roleControls.isVisible()))await page.waitForTimeout(100);
+    }
+    await chooseRole(teacher?'Преподаватель':'Гость');
+    if(!teacher&&kind==='student')await chooseRole('Участник');
     await page.locator('input[name="fullName"]').fill('Тестовый Участник '+n);
     await page.locator('input[name="gameCode"]').fill('QA100');
     if(kind==='student'&&!teacher)await page.locator('input[name="group"]').fill('ГМУ-100');
@@ -115,8 +132,7 @@ async function main(){
      assert.deepEqual(calls,['signup','join'],'A rejected invite must not navigate');
      assert.equal(new URL(page.url()).pathname,'/');
     }else{
-     // Next.js dev may not finish loading the game module while other
-     // contexts compile it. Entry acceptance checks the route transition,
+     // Entry acceptance checks the route transition,
      // not the subsequent game bootstrap (which is a separate E2E case).
      await page.waitForURL(url=>url.pathname.includes('/game/'),{
       waitUntil:'commit',timeout:15000
@@ -125,13 +141,17 @@ async function main(){
      entries.push({n,width,role:kind});
     }
     timings.push(performance.now()-start);
-   }catch(e){errors.push({n,width,kind,teacher,denyJoin,error:String(e?.stack||e).slice(0,600),calls,url:page?.url()||''});}
+   }catch(e){errors.push({n,width,kind,teacher,denyJoin,error:String(e?.stack||e).slice(0,600),calls,pageErrors,failedRequests,url:page?.url()||''});}
    finally{await ctx.close();}
   }
   // Bounded fan-out avoids conflating a 100-browser memory stress test
   // with server concurrency. Each request uses an independent context.
-  for(let first=0;first<TOTAL;first+=PARALLEL)
+  for(let first=0;first<TOTAL;first+=PARALLEL){
    await Promise.all(Array.from({length:PARALLEL},(_,i)=>visit(first+i)));
+   // A broken shared login contract must not repeat its 30s timeout 100 times.
+   assert.equal(errors.length,0,'Browser wave failed: '+JSON.stringify(errors.slice(0,2)));
+   if((first+PARALLEL)%10===0)console.log('QA_ENTRY_PROGRESS '+(first+PARALLEL)+'/'+TOTAL);
+  }
   await visit(100,{kind:'guest'});
   await visit(101,{teacher:true});
   await visit(102,{denyJoin:true});

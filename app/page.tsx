@@ -137,13 +137,8 @@ export default function Home(){
     const rows=await membership.limit(2);
     if(!active||rows.error)return;
     if(rows.data?.length===1){router.replace('/game/'+rows.data[0].game_id+incomingSectionSuffix());return}
-    // A targeted invitation must never open a different saved game by mistake.
-    if(target)return;
-    // Multiple games require a game selection; do not open a random game.
-    const saved=readRememberedGameCodes();
-    if(saved.length!==1)return;
-    const resume=await supabase.rpc('resume_member_game',{p_game_code:saved[0]});
-    if(active&&!resume.error&&resume.data)router.replace('/game/'+String(resume.data)+incomingSectionSuffix());
+    // No single authorized membership: keep the entry form available.
+    // Never retry via the revoked legacy resume RPC or a remembered game code.
    }catch{/* A missing session or unavailable server must preserve normal login. */}
   })();
   return()=>{active=false};

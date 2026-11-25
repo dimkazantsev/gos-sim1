@@ -106,3 +106,25 @@ async function main(){
  }finally{await db.close()}
 }
 main().catch(e=>{console.error(e);process.exitCode=1});
+
+/* The comic queue must not observe the entire app when no chapter can open. */
+{
+ const source=require('node:fs').readFileSync('components/game/StageComics.tsx','utf8');
+ const begin=source.indexOf(' useEffect(()=>{\n  if(!awaitingDialog||open)return;');
+ const end=source.indexOf(' },[awaitingDialog,open]);',begin);
+ if(begin<0||end<0)throw Error('Comic observer lifecycle missing');
+ const effect=source.slice(begin,end+' },[awaitingDialog,open]);'.length);
+ const assert=require('node:assert/strict');
+ let observers=0,queries=0,disconnects=0,blocked=true,canShow=false,callback,cleanup;
+ function run(awaitingDialog,open){
+  const document={body:{},querySelector:()=>{queries++;return blocked?{}:null}};
+  class MutationObserver{constructor(fn){observers++;callback=fn}observe(){}disconnect(){disconnects++}}
+  new Function('useEffect','awaitingDialog','open','shownRef','setCanShow','document','MutationObserver',effect)(
+   fn=>{cleanup=fn()},awaitingDialog,open,{current:open},v=>{canShow=v},document,MutationObserver);
+ }
+ run(false,false);assert.equal(observers,0);assert.equal(queries,0);
+ run(true,true);assert.equal(observers,0);assert.equal(queries,0);
+ run(true,false);assert.equal(observers,1);assert.equal(canShow,false);
+ blocked=false;callback();assert.equal(canShow,true);cleanup();assert.equal(disconnects,1);
+ console.log('PASS: no idle/open comic observer, queued chapter still waits for existing dialog');
+}

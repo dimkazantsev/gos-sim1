@@ -3,7 +3,8 @@ const files=['components/game/useRepublicGame.ts','components/GameClient.tsx','c
 for(const file of files){const source=fs.readFileSync(file,'utf8');const ast=ts.createSourceFile(file,source,ts.ScriptTarget.Latest,true,file.endsWith('tsx')?ts.ScriptKind.TSX:ts.ScriptKind.TS);assert.equal(ast.parseDiagnostics.length,0,'Parse '+file)}
 const hook=fs.readFileSync(files[0],'utf8'),shell=fs.readFileSync(files[1],'utf8'),badges=fs.readFileSync(files[2],'utf8'),cache=fs.readFileSync(files[3],'utf8');
 assert(hook.includes('!allowFreshCore||lastCoreSuccessAt.current===0'),'Reuse core across navigation; only first entry or explicit full refresh reopens all collections');
-assert(shell.includes('const heartbeatMs=68000+firstPresenceWriteDelay(me.user_id)%6000'),
+const presence=fs.readFileSync('components/game/usePresenceHeartbeat.ts','utf8');
+assert(shell.includes('usePresenceHeartbeat({gameId,userId:me?.user_id,view,enabled:g.coreLoaded&&!previewMode,touchPresence})')&&presence.includes('const heartbeatMs=68000+firstPresenceWriteDelay(userId)%6000'),
  'Presence 68-74s remains below the unchanged 90s online cutoff');
 assert(hook.includes('previous.view===viewKey&&now-previous.at<60000'),'Coalesce duplicate presence writes');
 assert(hook.includes("p_label:label||null")&&hook.includes("response.error?.code==='PGRST202'"),'One authenticated RPC for navigation; fallback only for unavailable migration');
