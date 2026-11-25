@@ -1,0 +1,22 @@
+name: Budget snapshot isolated SQL regression
+on:
+  pull_request:
+    paths:
+      - 'supabase/migrations/20261125051110_budget_pulse_read_fast_path.sql'
+      - 'docs/performance/budget-pulse-read-fast-path-candidate.sql'
+      - 'scripts/budget-pulse-read-fast-path-check.cjs'
+      - '.github/workflows/budget-read-fast-path.yml'
+permissions:
+  contents: read
+jobs:
+  isolated-sql:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci --ignore-scripts --no-audit --no-fund
+      - run: node scripts/budget-pulse-read-fast-path-check.cjs
