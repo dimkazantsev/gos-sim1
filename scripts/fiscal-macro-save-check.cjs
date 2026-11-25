@@ -26,11 +26,16 @@ assert(parent.includes("sequence.current++;")&&parent.includes('setContext(previ
 assert(parent.includes('void g.refreshBudgetPulse?.()')&&!parent.includes('await g.refreshBudgetPulse?.()'),
  'Forecast is synchronized without locking the form');
 assert(form.includes("g.teacher||key==='key_rate'"),'Preserve Bank of Russia-only rate permissions');
-assert(form.includes("!draft[key]?.trim()||Number(draft[key])!==Number(context.policy[key]??fnbDefaults"),
- 'Cleared numeric inputs must not be silently skipped, including the FNB inputs');
+assert(form.includes("!draft[key]?.trim()||Number(draft[key])!==(key==='inflation'?Math.round(context.policy.inflation):Number(context.policy[key]??fnbDefaults"),
+ 'Cleared numeric inputs must not be silently skipped, including the FNB inputs; compare inflation to the displayed integer');
+assert(form.includes("!Number.isInteger(Number(draft[key]))"),'Reject fractional manual inflation');
+assert(form.includes("maximumFractionDigits:0")&&form.includes("inflationFormat.format(p.inflation)"),'Render whole inflation');
 const changed=(draft,previous)=>draft!==undefined&&(!draft.trim()||Number(draft)!==Number(previous));
 assert(!changed('60','60'));
 assert(!changed('60.0','60'));
 assert(changed('70','60'));
 assert(changed('','60'));
+assert(!changed('21',Math.round(21.00000953)),'Saving another field must preserve accrued inflation');
+assert(changed('22',Math.round(21.00000953)));
+assert(changed('',Math.round(21.00000953)));
 console.log('PASS fiscal save: confirmed update, bounded timeout, no duplicate write, independent refresh');
