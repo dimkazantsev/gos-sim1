@@ -549,7 +549,6 @@ export function useRepublicGame(gameId:string){
   // A channel is keyed by topic in supabase-js. Creating its replacement
   // before removeChannel settles can reuse the leaving object or let a late
   // close remove the replacement. Serialize construction, not just subscribe.
-  const member=me;
   const expectedEpoch=readEpoch.current;
   let cancelled=false,stopConnection:(()=>void)|undefined;
   const startConnection=()=>{
@@ -557,12 +556,12 @@ export function useRepublicGame(gameId:string){
       authUser.current!==me.user_id)return;
    stopConnection=connect();
   };
-  function connect(){
+  const connect=()=>{
   const resumeAfterIdle=realtimeIdleWakeGame.current===gameId;
   if(resumeAfterIdle)realtimeIdleWakeGame.current=null;
   let disposed=false,scheduled=false;
   const subscriptionEpoch=readEpoch.current;
-  const currentConnection=()=>!disposed&&subscriptionEpoch===readEpoch.current&&activeGameRef.current===gameId&&authUser.current===member.user_id;
+  const currentConnection=()=>!disposed&&subscriptionEpoch===readEpoch.current&&activeGameRef.current===gameId&&authUser.current===me.user_id;
   let liveConnected=false,everSubscribed=false,lastPollAt=0,lastChatRecoveryAt=Date.now();
   let dirtyPartyDocuments=false,dirtyChat=false,dirtyPins=false,dirtyOverview=false;
   const dirtyTables=new Set<string>();
@@ -720,9 +719,9 @@ export function useRepublicGame(gameId:string){
    // the server-side Postgres Changes filter. No extra socket/subscription.
    // Pins remain game-scoped because their visibility is channel-based.
    const filter=table==='chat_mentions'
-    ?'game_id=eq.'+gameId+',mentioned_user_id=eq.'+member.user_id
+    ?'game_id=eq.'+gameId+',mentioned_user_id=eq.'+me.user_id
     :table==='chat_channel_state'
-     ?'game_id=eq.'+gameId+',user_id=eq.'+member.user_id
+     ?'game_id=eq.'+gameId+',user_id=eq.'+me.user_id
      :'game_id=eq.'+gameId;
    // The remaining chat events only invalidate counters. Pin updates also
    // need channel_id; message contents stay on their separate full subscription.
@@ -802,7 +801,7 @@ export function useRepublicGame(gameId:string){
    const id=payload.payload?.party_id,operation=payload.payload?.operation;
    partyDeltaVersion.current++;
    // Membership change reaches its owner without another socket subscription.
-   if(payload.payload?.member_user_id===member.user_id)reconcileTables.add('game_members');
+   if(payload.payload?.member_user_id===me.user_id)reconcileTables.add('game_members');
    if(typeof id==='string'&&/^[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}$/i.test(id)
       &&['INSERT','UPDATE','DELETE'].includes(String(operation)))
     changedPartyIds.current.add(id);
@@ -900,7 +899,7 @@ export function useRepublicGame(gameId:string){
    if(typeof table!=='string'||!pushEventTables.has(table))return;
    const targets=Array.isArray(data?.recipients)?data.recipients.filter((id):id is string=>typeof id==='string'):[];
    const caseIds=Array.isArray(data?.case_ids)?data.case_ids.filter((id):id is string=>typeof id==='string'):[];
-   const mine=targets.includes(member.user_id),isTeacher=member.kind==='teacher',open=eventsVisible();
+   const mine=targets.includes(me.user_id),isTeacher=me.kind==='teacher',open=eventsVisible();
    if(table==='event_assignments'||table==='event_collaboration_invites'){
     // Only the addressed student (or an open teacher panel) needs a read.
     if(mine||isTeacher&&open)notifyGameDataRefresh(gameId,table);
@@ -976,7 +975,7 @@ export function useRepublicGame(gameId:string){
   // Keep the original single game channel and its offline/visible-tab recovery.
   void Promise.resolve(realtimeLeavePending.current)
    .catch(()=>{/* Keep private-only retry on next recovery. */})
-   .then(()=>{if(currentConnection())return supabase.realtime.setAuth()})
+   .then(()=>supabase.realtime.setAuth())
    .then(()=>{
    if(!currentConnection())return;
    channel.subscribe(status=>{
@@ -1017,7 +1016,7 @@ export function useRepublicGame(gameId:string){
   });
   // Visible-tab recovery works even when a WebSocket cannot connect.
   // Deterministic jitter prevents 40 simultaneous clients from polling in lockstep.
-  const pollJitter=[...member.user_id].reduce((hash,char)=>(Math.imul(hash,31)+char.charCodeAt(0))>>>0,0)%10000;
+  const pollJitter=[...me.user_id].reduce((hash,char)=>(Math.imul(hash,31)+char.charCodeAt(0))>>>0,0)%10000;
   let poll:ReturnType<typeof setInterval>|null=null;
   const recoveryTick=()=>{
    if(!currentConnection()||document.visibilityState!=='visible')return;
@@ -1081,7 +1080,7 @@ export function useRepublicGame(gameId:string){
   // Spread identical six-second recovery work across the classroom, instead
   // of making 100 devices hit PostgREST at the same wall-clock instant.
   // Keep the interval itself at six seconds: no additional staleness window.
-  const recoveryHash=[...member.user_id].reduce((hash,char)=>
+  const recoveryHash=[...me.user_id].reduce((hash,char)=>
    Math.imul(hash^char.charCodeAt(0),16777619)>>>0,2166136261);
   const initialRecoveryDelay=500+recoveryHash%5500;
   let chatRecovery:ReturnType<typeof setInterval>|null=null;
