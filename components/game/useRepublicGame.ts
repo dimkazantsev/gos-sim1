@@ -7,7 +7,7 @@ import {boundedChatWrite} from '@/lib/boundedChatWrite';
 import {useBudgetPulse,withBudgetIncome} from './useBudgetPulse';
 import {VOTING_BODIES,bodyQuorum} from './votingBodies';
 import {gdVoteAllowance} from './gdVoteAllowance';
-import {createBallotReadIndex,createMandateReadIndex} from './voteReadIndex';
+import {createBallotReadIndex,createMandateReadIndex,createInstitutionReadIndex} from './voteReadIndex';
 import {useEffect,useMemo,useRef,useState,type Dispatch,type SetStateAction} from 'react';
 import {useRouter} from 'next/navigation';
 import {supabase} from '@/lib/supabase';
@@ -337,6 +337,7 @@ export function useRepublicGame(gameId:string){
  const officeAssignments=useMemo(()=>officeRows.filter(o=>o.game_id===gameId&&members.some(m=>m.user_id===o.user_id)),[officeRows,members,gameId]);
  const ballotReadIndex=useMemo(()=>createBallotReadIndex(ballots),[ballots]);
  const mandateReadIndex=useMemo(()=>createMandateReadIndex(members,partyMandates),[members,partyMandates]);
+ const institutionReadIndex=useMemo(()=>createInstitutionReadIndex(members,officeAssignments,VOTING_BODIES),[members,officeAssignments]);
  const visibleMe=me?.game_id===gameId&&me.user_id===authUser.current?me:null;
  const teacher=visibleMe?.kind==='teacher';
  const names=useMemo(()=>Object.fromEntries(memberRows.filter(m=>m.game_id===gameId).map(x=>[x.user_id,x.full_name])),[memberRows,gameId]);
@@ -3044,14 +3045,7 @@ export function useRepublicGame(gameId:string){
   return Math.max(0,Math.min(capacity,declared==null?capacity:Number(declared)||0));
  }
  function partyForUser(uid:string){const m=members.find(x=>x.user_id===uid);return parties.find(p=>p.name===m?.team)}
- function memberMatchesInstitution(uid:string,institution:string){
-  const m=members.find(x=>x.user_id===uid);if(!m||m.kind==='observer')return false;
-  const role=(m.role_title||'').trim();
-  if(institution==='all'||institution==='factions')return m.kind==='student'||(m.kind==='teacher'&&!['','Руководитель симуляции','Преподаватель','Администратор'].includes(role));
-  if(institution==='ksrf'&&m.kind==='student')return true;
-  const body=VOTING_BODIES.find(b=>b.key===institution);
-  return !!body&&(body.role.test(role)||(m.kind==='student'&&officeAssignments.some(o=>o.user_id===uid&&o.status==='active'&&body.role.test(o.role_title))));
- }
+ function memberMatchesInstitution(uid:string,institution:string){return institutionReadIndex(uid,institution)}
  function canVote(v:Vote){
   if(!me||me.kind==='observer'||v.status!=='open')return false;
   if(v.electorate_snapshot?.weights){
