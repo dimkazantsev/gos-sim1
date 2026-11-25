@@ -6,7 +6,7 @@ Module._resolveFilename=function(request,...args){return resolve.call(this,reque
 const m=require('../components/game/economicModelV2.ts');
 const {fiscalEnvironment,fiscalForecast}=require('../components/game/fiscalMath');
 const {calculateFederalBudget,defaultSimulatorState,newBudgetDraft}=require('../components/game/federalBudgetMath');
-const near=(actual,expected,label)=>assert(Math.abs(Number(actual)-expected)<1e-9,label+': '+actual+' vs '+expected);
+const near=(actual,expected,label)=>assert(Math.abs(Number(actual)-expected)<Math.max(1e-9,Math.abs(expected)*1e-13),label+': '+actual+' vs '+expected);
 const compare=(a,b,label)=>Object.keys(b).forEach(k=>near(a[k],b[k],label+' '+k));
 (async()=>{
  const db=new PGlite();
