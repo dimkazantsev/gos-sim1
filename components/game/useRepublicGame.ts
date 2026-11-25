@@ -2260,7 +2260,11 @@ export function useRepublicGame(gameId:string){
     }
     setPoliticalMedia(previous=>{
      const cached=new Map(previous.map(row=>[row.id,row]));
-     const combined=politicalOlderLoaded.current&&!full?[...previous.filter(row=>!rows.some(r=>r.id===row.id)),...rows]:rows;
+     let combined=rows;
+     if(politicalOlderLoaded.current&&!full){
+      const incomingIds=new Set(rows.map(row=>row.id));
+      combined=[...previous.filter(row=>!incomingIds.has(row.id)),...rows];
+     }
      return combined.map(row=>{
       const old=cached.get(row.id);
       return {...row,url:old?.storage_path===row.storage_path?old.url||null:null};
@@ -2501,7 +2505,8 @@ export function useRepublicGame(gameId:string){
    if(!readActive(ticket)||channelRef.current!==cid||result.error||!result.data?.length)return;
    // Inclusive cursor handles identical timestamps. Never re-sign the same
    // media on every poll, particularly with 30 simultaneous participants.
-   const unseen=(result.data as Message[]).filter(m=>!messageRowsRef.current.some(old=>old.id===m.id));
+   const knownMessageIds=new Set(messageRowsRef.current.map(m=>m.id));
+   const unseen=(result.data as Message[]).filter(m=>!knownMessageIds.has(m.id));
    if(!unseen.length)return;
    const rows=await Promise.all(unseen.map(async m=>{
     if(!m.storage_path)return m;

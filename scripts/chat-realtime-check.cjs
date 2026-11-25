@@ -40,7 +40,25 @@ assert(source.includes("},[chatOpen,channelId]);")&&source.includes("void loadMe
  'Opening or switching chats must reconcile messages and pins with a single initial fetch');
 assert(!source.includes("void loadMessages(channelId,true);void loadChatPins(channelId);void markChatRead(channelId);"),
  'Channel initialization must not duplicate the opening effect');
-assert(source.includes('messageRowsRef.current.some(old=>old.id===m.id)'),'Avoid duplicate media signing');
+// Execute the actual recovery selector with an overlapping inclusive cursor.
+{
+ const start=source.indexOf('// Inclusive cursor handles identical timestamps.');
+ const end=source.indexOf('if(!unseen.length)return;',start);
+ assert(start>=0&&end>start,'Recovery selector must remain present');
+ const select=new Function('result','messageRowsRef',source.slice(start,end).replace('(result.data as Message[])','result.data')+'\nreturn unseen;');
+ const previous=Array.from({length:150},(_,i)=>({id:'m'+i,storage_path:'path/'+i}));
+ const incoming=Array.from({length:75},(_,i)=>({id:'m'+(90+i),storage_path:'path/'+(90+i)}));
+ let visits=0;
+ const track=rows=>rows.map(row=>({...row,get id(){visits++;return row.id}}));
+ const actual=select({data:track(incoming)},{current:track(previous)});
+ const measured=visits;
+ assert.deepEqual(actual.map(row=>row.id),incoming.slice(60).map(row=>row.id));
+ assert(measured<=previous.length+incoming.length,'Recovery must use a linear ID lookup, not '+measured+' ID accesses');
+ for(const [oldRows,newRows] of [[[],[]],[[],incoming.slice(0,2)],[previous,[]],[previous,[incoming[0],incoming[74],incoming[74]]]]){
+  assert.deepEqual(select({data:newRows},{current:oldRows}),newRows.filter(row=>!oldRows.some(old=>old.id===row.id)));
+ }
+ console.log('PASS recent chat linear recovery: '+measured+' ID accesses; 60 known messages not re-signed, 15 new messages retained');
+}
 assert(source.includes('void Promise.allSettled([loadMessages(targetChannel),loadChatOverview()])'),'Text sends must not wait for history readback');
 // Prevent 100 personalised read-marker / mention events from fanning out to
 // every connected student. Check that filters remain scoped by both game and

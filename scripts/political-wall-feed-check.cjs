@@ -154,3 +154,28 @@ async function singleFlightRegression(){
  console.log('PASS political feed: three simultaneous calls -> one read, dirty burst -> one trailing read, identity isolated');
 }
 singleFlightRegression().catch(error=>{console.error(error);process.exitCode=1});
+
+// Execute the actual first-page media merge with loaded older pages.
+{
+ const start=hook.indexOf('    setPoliticalMedia(previous=>{',hook.indexOf(' async function loadPoliticalWallSnapshot(){'));
+ const end=hook.indexOf('    setPostFormalLinks(',start);
+ assert(start>=0&&end>start,'Political media merge must remain present');
+ const run=new Function('setPoliticalMedia','previous','rows','politicalOlderLoaded','full',hook.slice(start,end));
+ const merge=(previous,rows,older,full)=>{let result;run(fn=>{result=fn(previous)},previous,rows,{current:older},full);return result};
+ const old=Array.from({length:600},(_,i)=>({id:'p'+i,storage_path:'path/'+i,url:'signed/'+i}));
+ const page=Array.from({length:80},(_,i)=>({id:'p'+(560+i),storage_path:i===0?'changed':'path/'+(560+i),url:null}));
+ const reference=(previous,rows,older,full)=>{
+  const cache=new Map(previous.map(row=>[row.id,row]));
+  const combined=older&&!full?[...previous.filter(row=>!rows.some(r=>r.id===row.id)),...rows]:rows;
+  return combined.map(row=>{const old=cache.get(row.id);return {...row,url:old?.storage_path===row.storage_path?old.url||null:null}});
+ };
+ let visits=0;
+ const track=rows=>rows.map(row=>({...row,get id(){visits++;return row.id}}));
+ const actual=merge(track(old),track(page),true,false),measured=visits;
+ assert.deepEqual(actual,reference(old,page,true,false),'Preserve older pages, current replacements and signed paths');
+ assert(measured<=4*(old.length+page.length),'Media merge must be linear, not '+measured+' ID accesses');
+ for(const [previous,rows,older,full] of [[old,page,false,false],[old,page,true,true],[old,[],true,false],[[],page,true,false],[old,[page[0],page[0]],true,false]]){
+  assert.deepEqual(merge(previous,rows,older,full),reference(previous,rows,older,full));
+ }
+ console.log('PASS political media linear merge: '+measured+' ID accesses; signed URL retained only for unchanged storage path');
+}
