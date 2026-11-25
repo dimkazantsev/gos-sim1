@@ -97,9 +97,18 @@ const flush=()=>new Promise(resolve=>setImmediate(resolve));
  await flush();
  assert.deepEqual([...party.reads].sort(),['game_profiles','party_documents'].sort(),
   'Party screen keeps full document and profile functionality');
- assert.deepEqual(Array.from(party.scopeCalls[0]),['parties','profiles','partyDocuments']);
+ assert.deepEqual(Array.from(party.scopeCalls[0]),['parties','profiles']);
+ assert(party.scopeCalls.some(scopes=>scopes.length===1&&scopes[0]==='partyDocuments'),'Selected documents use their own read version');
  assert.equal(party.documents.length,2,'Full party dossier metadata remains readable');
  assert.equal(party.signs.length,2,'Party screen still signs both existing files');
+ const duplicate=client('parties');
+ await Promise.all([duplicate.loadSelectedPartyDocuments('p1'),duplicate.loadPartyAssets(true,true)]);
+ await duplicate.loadPartyAssets(true,true);
+ await duplicate.loadSelectedPartyDocuments('p1');await flush();
+ assert.equal(duplicate.reads.filter(table=>table==='party_documents').length,1,'Shell and selected-party effect share a single accepted read');
+ assert.equal(duplicate.signs.length,2,'No duplicate file signing on unchanged reentry');
+ await duplicate.loadPartyDocuments();await flush();
+ assert.equal(duplicate.reads.filter(table=>table==='party_documents').length,2,'Explicit invalidation still reads');
 
  const registered=client('parties','registered');
  await registered.loadPartyAssets(true);

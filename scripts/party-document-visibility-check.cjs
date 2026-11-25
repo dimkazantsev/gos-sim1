@@ -14,7 +14,7 @@ assert.match(hook,/async function readScopedPartyDocuments[\s\S]*?from\('party_d
  'Document query must stay game-scoped and restrict the selected party');
 assert.match(hook,/function canLoadRegisteredPartyArchive[\s\S]*?activeViewRef\.current==='teacher'[\s\S]*?teacherWorkspaceRef\.current==='parties'/,
  'Teacher party dossier retains explicit access to registered files');
-assert.match(hook,/async function loadPartyDocuments\(\)[\s\S]*?readScopedPartyDocuments\([\s\S]*?acceptPartyDocuments\(pd\.data,ticket\)/,
+assert.match(hook,/async function loadPartyDocuments\(navigation=false\)[\s\S]*?readNavigationSafely\(key,\['partyDocuments'\],navigation,[\s\S]*?readScopedPartyDocuments\(pr\.data\|\|\[\],includeRegistered,selectedId\)[\s\S]*?acceptPartyDocuments\(pd\.data,ticket\)/,
  'Document state must be updated from the scoped request');
 assert.match(hook,/async function reviewPartyDocument[\s\S]*?update\(\{status,note:note\?\.trim\(\)\|\|null\}\)[\s\S]*?await loadPartyDocuments\(\)/,
  'Review must persist status and note then refresh teacher documents');

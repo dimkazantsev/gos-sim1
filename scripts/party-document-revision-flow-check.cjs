@@ -4,9 +4,9 @@ const assert=require('node:assert/strict'),fs=require('node:fs'),vm=require('nod
 const {PGlite}=require('@electric-sql/pglite');
 const source=fs.readFileSync('components/game/useRepublicGame.ts','utf8');
 const tree=ts.createSourceFile('hook.ts',source,ts.ScriptTarget.Latest,true);
-const wanted=new Set(['signedAssetUrl','acceptPartyDocuments','readScopedPartyDocuments','canLoadRegisteredPartyArchive','loadPartyDocuments','uploadPartyDocument','reviewPartyDocument']);
+const wanted=new Set(['readNavigationSafely','signedAssetUrl','acceptPartyDocuments','readScopedPartyDocuments','canLoadRegisteredPartyArchive','loadPartyDocuments','uploadPartyDocument','reviewPartyDocument']);
 const pieces=[];function visit(n){if(ts.isFunctionDeclaration(n)&&wanted.has(n.name?.text))pieces.push(n.getText(tree));ts.forEachChild(n,visit)}visit(tree);
-assert.equal(pieces.length,7);
+assert.equal(pieces.length,8);
 const code=ts.transpileModule(pieces.join('\n'),{compilerOptions:{target:ts.ScriptTarget.ES2022,module:ts.ModuleKind.None}}).outputText;
 const resolverModule={exports:{}};
 vm.runInNewContext(ts.transpileModule(fs.readFileSync('lib/resolveStoredAsset.ts','utf8'),
@@ -23,6 +23,7 @@ async function actions(){
   const env={api,console,Promise,Map,resolveStoredAsset,crypto:require('node:crypto').webcrypto,teacher,gameId:'game-a',game:{id:'game-a'},me:{user_id:teacher?'teacher':'owner'},parties:[{id:'party-a',game_id:'game-a'}],
     assetSignatures:{current:new Map()},assetSignQueue:{current:{active:0,waiting:[]}},readEpoch:{current:0},alive:{current:true},
    activeViewRef:{current:teacher?'teacher':'parties'},teacherWorkspaceRef:{current:'parties'},
+   navigationReads:{current:new Map()},gameRealtimeConnected:()=>true,
    selectedPartyDocuments:{current:'party-a'},PARTY_DOCUMENT_COLUMNS:'id,game_id,party_id,doc_kind,status,note,version_no',
    limitedCoreRead:async query=>await query,
    loadCachedParties:async()=>({data:[{id:'party-a',game_id:'game-a',registration_status:'draft'}],error:null}),

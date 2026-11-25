@@ -137,7 +137,7 @@ export default function DocumentsView({g,focusId,createTemplate,createStageNo,on
  const createRequisitesReady=!!subjectKey&&!!docType&&issuer.trim().length>=2&&place.trim().length>=2;
  const createFinalReady=creatingBill?createBillReady:createDocumentReady&&createRequisitesReady;
  const subjectsRequest=useRef(0);
- useGameTableSync(readOnly?undefined:g.game?.id,['game_office_assignments','game_members','institution_assignments','institution_units','game_stages'],async()=>{
+ useGameTableSync(readOnly||mode!=='create'?undefined:g.game?.id,['game_office_assignments','game_members','institution_assignments','institution_units','game_stages'],async()=>{
   if(!g.game?.id)return;
   const ticket=++subjectsRequest.current,requestedScope=editorScope;
   const r=await supabase.rpc('get_formal_subjects',{p_game_id:g.game.id});
@@ -239,7 +239,16 @@ export default function DocumentsView({g,focusId,createTemplate,createStageNo,on
  },[selected?.id,selected?.updated_at,localRefresh,formalHistory.length,signedAsset]);
  const lastSigned=documentSignatures[0];
  const [committeeUnits,setCommitteeUnits]=useState<{unit_key:string;title:string;head_user_id:string|null}[]>([]);
- useEffect(()=>{if(!me||!g.game)return;let active=true;void supabase.from('institution_units').select('unit_key,title,head_user_id').eq('game_id',g.game.id).eq('unit_kind','committee').then(r=>{if(active&&!r.error)setCommitteeUnits((r.data||[]) as any)});return()=>{active=false}},[me?.user_id,g.game?.id]);
+ // Registry browsing does not require a committee directory. Fetch it only
+ // for a bill editor or an opened bill whose committee label is displayed.
+ const needsCommitteeUnits=mode==='create'&&!readOnly&&creatingBill||mode==='registry'&&selected?.workflow_key==='bill';
+ useEffect(()=>{
+  if(!needsCommitteeUnits||!me||!g.game)return;
+  let active=true;
+  void supabase.from('institution_units').select('unit_key,title,head_user_id').eq('game_id',g.game.id).eq('unit_kind','committee')
+   .then(r=>{if(active&&!r.error)setCommitteeUnits(r.data||[])});
+  return()=>{active=false};
+ },[needsCommitteeUnits,editorScope,me?.role_title,activeRoles.join('|')]);
  useEffect(()=>{if(focusId&&formalDocuments.some(d=>d.id===focusId)){setQuery('');setFilterSubject('');setFilterStatus('');setSelectedId(focusId);setDetailReturn('registry');setDetailOpen(true);setMode('registry')}},[focusId]);
  useEffect(()=>{
   if(!selected||selected.workflow_key!=='bill'){setBillProfile(null);setBillFiles([]);setBillConclusion(null);setBillReadiness(null);return}
