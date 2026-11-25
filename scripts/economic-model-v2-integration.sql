@@ -153,12 +153,13 @@ begin
  'deficit_pct_gdp',greatest(0,-balance)/(b->>'gdp')::numeric*100,'financing',round(fin,8),'funding_need',need,'funding_gap',round(greatest(0,net_need-fin),8),'cash_excess',round(greatest(0,fin-net_need),8),
  'internal_debt',intr,'external_debt',extr,'debt_total',intr+extr,'debt_pct_gdp',(intr+extr)/(b->>'gdp')::numeric*100,'annual_interest',annual,'interest_delta',interest,'transfer_expense',transfer_exp,'credit_outflow',credit,
  'reserve_remaining',round(s.reserve_remaining+v_oil_change-(d->'financing'->>'reserves')::numeric+case when s.last_plan_id is not null then (s.last_financing->>'reserves')::numeric else 0 end,8),
- 'activity',activity,'economic_model_version',case when v_model_v2 then 2 else 1 end,'business_activity',v_macro,'enterprise_count',v_enterprise_count,'enterprise_factor',v_factors->'enterprise_factor','regional_activity',v_factors->'regional_activity','tax_collection',v_collection,'cost',cost,'fx',fx,'uncertainty',uncertainty,'model_b_additional_channels',v_aux,
+ 'activity',activity,'cost',cost,'fx',fx,'uncertainty',uncertainty,'model_b_additional_channels',v_aux,
  'external_borrowing_limit',(v_access->>'annual_limit')::numeric,'external_borrowing_available',(v_access->>'available')::numeric,
  'external_borrowing_used',(v_access->>'used')::numeric,'external_borrowing_rate',(v_access->>'rate')::numeric,
  'external_borrowing_new',v_external_new,'external_borrowing_over_limit',v_external_over,
  'external_refinance',v_refinance,'external_refinance_eligible',v_due,
  'external_refinance_allocated',v_refinance_allowed,'external_refinance_over_limit',v_refinance_over,'revenue_low',rev*(1-uncertainty),'revenue_high',rev*(1+uncertainty),'expenditure_low',exp*(1-uncertainty),'expenditure_high',exp*(1+uncertainty))||
+ jsonb_build_object('economic_model_version',case when v_model_v2 then 2 else 1 end,'business_activity',v_macro,'enterprise_count',v_enterprise_count,'enterprise_factor',v_factors->'enterprise_factor','regional_activity',v_factors->'regional_activity','tax_collection',v_collection)||
  jsonb_build_object('internal_borrowing_limit',(v_internal_terms->>'annual_limit')::numeric,
  'internal_borrowing_available',(v_internal_terms->>'available')::numeric,
  'internal_borrowing_used',(v_internal_terms->>'used')::numeric,
