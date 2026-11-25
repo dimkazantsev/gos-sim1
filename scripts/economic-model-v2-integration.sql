@@ -472,7 +472,7 @@ begin
   END IF;
   PERFORM set_config('gos.economic_policy_pending',coalesce(v_previous_pending,''),true);
   BEGIN
-   PERFORM private.reconcile_budget_driver(p_game_id);
+   PERFORM private.reconcile_budget_driver_once(p_game_id);
   EXCEPTION WHEN OTHERS THEN
    RAISE WARNING 'ГОС.ID: final v2 macro budget sync failed for game %, SQLSTATE %',p_game_id,SQLSTATE;
   END;
