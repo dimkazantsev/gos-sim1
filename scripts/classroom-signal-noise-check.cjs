@@ -7,7 +7,7 @@ assert(scope.includes('mark_section_read'),'read acknowledgement must still be p
 assert(scope.includes('setCounts(previous=>({...previous,[view]:0}))'),'local badge must clear');
 assert(!scope.includes('notifySectionUpdates(gameId)'),'local acknowledgement must not trigger another get_section_updates RPC');
 assert(hook.includes('lastRelevantMutationAt.current<=enteredAtMs'),'newer updates must not be lost');
-assert(hook.includes('if(r.status===402)blocked=true'),'quota backoff preserved');
+assert(hook.includes('if(r.status===402){blocked=true;stopPolling()}'),'quota backoff preserved and periodic timer released');
 assert(sql.includes("replace(original_qual,'auth.uid()','(select auth.uid())')"),'RLS must use initplan stable uid');
 assert(!/^(?!\s*--).*\b(drop\s+policy|disable\s+row\s+level\s+security|security\s+definer)\b/im.test(sql),'no weakened access policy');
 console.log('PASS: local read marker removes only redundant remote counter refresh; RLS uid-only rewrite preserves policy predicates');

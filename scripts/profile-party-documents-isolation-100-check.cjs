@@ -28,7 +28,7 @@ const helperSource=fs.readFileSync(path.resolve(__dirname,'../components/game/pa
 const helperCode=ts.transpileModule(helperSource,{compilerOptions:{target:ts.ScriptTarget.ES2022,module:ts.ModuleKind.CommonJS}}).outputText;
 const helperModule={exports:{}};
 vm.runInNewContext('(function(module,exports){'+helperCode+'})',{})(helperModule,helperModule.exports);
-const {PROFILE_ASSET_COLUMNS,mergeProfileAssetRows}=helperModule.exports;
+const {PROFILE_ASSET_COLUMNS,mergeProfileAssetRows,retainProfileLinks}=helperModule.exports;
 
 function client(view='profile',registrationStatus='draft'){
  const reads=[],signs=[],scopeCalls=[],errors=[];
@@ -55,7 +55,7 @@ function client(view='profile',registrationStatus='draft'){
   Promise,Map,console,module:{exports:{}},supabase,gameId:'game-1',
   activeViewRef:{current:view},teacherWorkspaceRef:{current:'parties'},
   selectedPartyDocuments:{current:null},PARTY_DOCUMENT_COLUMNS:'id,game_id,party_id,version_no',
-  PROFILE_ASSET_COLUMNS,mergeProfileAssetRows,
+  PROFILE_ASSET_COLUMNS,mergeProfileAssetRows,retainProfileLinks,
   limitedCoreRead:async result=>await result,
   loadCachedParties:()=>Promise.resolve({data:[{id:'p1',logo_path:null,registration_status:registrationStatus}],error:null}),
   readSafely:async(scopes,reader)=>{scopeCalls.push(scopes);await reader({})},
