@@ -15,7 +15,7 @@ import {readLocalGameSnapshot,writeLocalGameSnapshot,deleteLocalGameSnapshot} fr
 import {resolveStoredAsset} from '@/lib/resolveStoredAsset';
 import {signDocumentAssetBatch} from './signDocumentAssetBatch';
 import {FORMAL_DOCUMENT_SUMMARY_COLUMNS,mergeFormalDocumentSummaries,type FormalDocumentSummary} from './formalDocumentSummary';
-import {PARTY_LIST_COLUMNS,PROFILE_ASSET_COLUMNS,normalizePartyRows,mergeProfileAssetRows,type PartyListRow,type ProfileAssetRow} from './partyProfileSummary';
+import {PARTY_LIST_COLUMNS,PROFILE_ASSET_COLUMNS,normalizePartyRows,mergeProfileAssetRows,retainProfileLinks,type PartyListRow,type ProfileAssetRow} from './partyProfileSummary';
 import type {Activity,Ballot,Channel,ChatPin,Crisis,Evaluation,EventItem,FormalDocument,FormalHistory,Game,GameDocument,GameProfile,ImpactLedger,ImpactRule,Member,Message,Metric,MetricHistory,Party,PartyAgreement,PartyDocument,PartyInvitation,PartyMandateAllocation,PartySupportHistory,PoliticalPost,PoliticalPostFormalLink,PoliticalPostMedia,Presence,Stage,Vote,View} from './types';
 import {CRISES,CRISIS_RESPONSE_MINUTES} from './constants';
 import {CHAT_MAX_FILE_BYTES,preferredRecordingMime,recordingFileName,uploadedChatKind,inferChatMime} from './recordingMedia';
@@ -1318,11 +1318,7 @@ export function useRepublicGame(gameId:string){
    const r=await limitedCoreRead(supabase.from('game_profiles').select('*').eq('game_id',gameId));
    if(!readCurrent(ticket))return;
    requireSuccessful([r]);
-   setProfiles(previous=>((r.data||[]) as GameProfile[]).map(row=>{
-    const old=previous.find(p=>p.user_id===row.user_id);
-    return {...row,avatar_url:old?.avatar_path===row.avatar_path?old?.avatar_url:null,
-     signature_url:old?.signature_path===row.signature_path?old?.signature_url:null};
-   }));
+   setProfiles(previous=>retainProfileLinks(previous,(r.data||[]) as GameProfile[]));
   }));
   if(tables.has('chat_channels'))jobs.push(readSafely(['channels'],async ticket=>{
    const r=await limitedCoreRead(supabase.from('chat_channels').select('*')
@@ -1586,10 +1582,7 @@ export function useRepublicGame(gameId:string){
   if(!cr.error)setCrises((cr.data||[]) as Crisis[]);
   if(!dc.error&&dc.data!==null)setDocuments((dc.data||[]) as GameDocument[]);
   if(!pf.error&&readCurrent(ticket,'profiles')){
-   setProfiles(previous=>((pf.data||[]) as GameProfile[]).map(row=>{
-    const old=previous.find(p=>p.user_id===row.user_id);
-    return {...row,avatar_url:old?.avatar_path===row.avatar_path?old?.avatar_url:null,signature_url:old?.signature_path===row.signature_path?old?.signature_url:null};
-   }));
+   setProfiles(previous=>retainProfileLinks(previous,(pf.data||[]) as GameProfile[]));
    setProfileGameId(gameId);
   }
   if(!fd.error&&readCurrent(ticket,'formal')){
@@ -1953,11 +1946,7 @@ export function useRepublicGame(gameId:string){
     const rows=(data||[]) as unknown as GameProfile[];
     setProfiles(previous=>{
      const source=!includeProfileBio?mergeProfileAssetRows(previous,rows as ProfileAssetRow[]):rows;
-     return source.map(row=>{
-      const old=previous.find(p=>p.user_id===row.user_id);
-      return {...row,avatar_url:old?.avatar_path===row.avatar_path?old?.avatar_url||null:null,
-       signature_url:old?.signature_path===row.signature_path?old?.signature_url||null:null};
-     });
+     return retainProfileLinks(previous,source,true);
     });
     // A signature is a private permanent profile asset, not an avatar.
     // The old eager loop signed every participant's signature on every visit,

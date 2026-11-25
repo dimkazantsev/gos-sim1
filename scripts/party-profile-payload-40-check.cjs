@@ -6,7 +6,7 @@ const source=fs.readFileSync('components/game/partyProfileSummary.ts','utf8');
 const hook=fs.readFileSync('components/game/useRepublicGame.ts','utf8');
 const mod={exports:{}},code=ts.transpileModule(source,{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}}).outputText;
 vm.runInNewContext('(function(module,exports){'+code+'})',{})(mod,mod.exports);
-const {PARTY_LIST_COLUMNS,PROFILE_ASSET_COLUMNS,normalizePartyRows,mergeProfileAssetRows}=mod.exports;
+const {PARTY_LIST_COLUMNS,PROFILE_ASSET_COLUMNS,normalizePartyRows,mergeProfileAssetRows,retainProfileLinks}=mod.exports;
 assert(!PARTY_LIST_COLUMNS.includes('registration_note')&&!PARTY_LIST_COLUMNS.includes('description')&&!PARTY_LIST_COLUMNS.includes('ideology'));
 assert(!PROFILE_ASSET_COLUMNS.split(',').includes('bio'));
 assert(PARTY_LIST_COLUMNS.includes('registration_status')&&PARTY_LIST_COLUMNS.includes('ghost_loss_current')&&PARTY_LIST_COLUMNS.includes('mandates'));
@@ -44,6 +44,38 @@ assert.equal(cached[0].bio,profiles[0].bio,'A matching version can preserve an a
 const changed=mergeProfileAssetRows(profiles,[{...take(profiles,PROFILE_ASSET_COLUMNS)[0],updated_at:'2026-10-31T12:00:00Z'}]);
 assert.equal(changed[0].bio,null,'A changed user bio cannot remain stale');
 assert.equal(mergeProfileAssetRows(profiles,[]).length,0,'Revoked profiles disappear');
+
+
+ // Compare all three former signed-link reconciliation paths, including
+ // duplicate prior IDs, changed paths, missing links, and empty projections.
+ const referenceLinks=(previous,rows,normalize)=>rows.map(row=>{
+  const old=previous.find(p=>p.user_id===row.user_id);
+  const avatar=old?.avatar_path===row.avatar_path?old?.avatar_url:null;
+  const signature=old?.signature_path===row.signature_path?old?.signature_url:null;
+  return {...row,avatar_url:normalize?avatar||null:avatar,signature_url:normalize?signature||null:signature};
+ });
+ const prior=Array.from({length:100},(_,i)=>({...profile('u-'+i),avatar_path:'p-'+i,avatar_url:i%7===0?'':'a-'+i,signature_path:i%3===0?'sig-'+i:null,signature_url:i%4===0?undefined:'s-'+i}));
+ const fresh=prior.map((row,i)=>({...profile(row.user_id),avatar_path:i%5===0?'new-'+i:row.avatar_path,signature_path:i%6===0?'new-s-'+i:row.signature_path}));
+ const mixed=[...prior,{...prior[0],avatar_url:'wrong-second-row',signature_url:'wrong-second-row'}];
+ const variants=[fresh,[{...fresh[1],avatar_path:prior[1].avatar_path},...fresh.slice(2,5),{...profile('new'),avatar_path:undefined,signature_path:undefined}],[]];
+ for(const normalize of [false,true])for(const rows of variants){
+  const expected=referenceLinks(mixed,rows,normalize),actual=retainProfileLinks(mixed,rows,normalize);
+  assert.equal(actual.length,expected.length);
+  for(let i=0;i<rows.length;i++){
+   assert.equal(JSON.stringify(actual[i]),JSON.stringify(expected[i]));
+   for(const key of ['avatar_url','signature_url']){
+    assert.equal(Object.hasOwn(actual[i],key),true);
+    assert.equal(actual[i][key],expected[i][key]);
+   }
+  }
+ }
+ assert.equal(retainProfileLinks(mixed,[{...prior[0]}])[0].avatar_url,'','First prior row wins');
+ let priorReads=0;
+ const measured=prior.map(row=>({...row,get user_id(){priorReads++;return row.user_id}}));
+ retainProfileLinks(measured,fresh);
+ assert(priorReads<=100,'100 prior profile identifiers should be read once, not searched per row: '+priorReads);
+ assert.equal((hook.match(/retainProfileLinks\(previous,/g)||[]).length,3,'All three existing profile merge paths must use the index');
+ console.log(JSON.stringify({profileRows:100,priorIdentifierReads:priorReads,scope:'synthetic signed-link reconciliation; no network'}));
 
 async function main(){
  const clients=Array.from({length:40},(_,i)=>{const h=harness({effects:true});h.setUser('student-'+i);h.fixture('game_parties',parties);h.fixture('game_profiles',profiles);return h});
