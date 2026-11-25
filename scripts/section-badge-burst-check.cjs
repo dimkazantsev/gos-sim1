@@ -7,7 +7,7 @@ const js=ts.transpileModule(source,{compilerOptions:{module:ts.ModuleKind.Common
 let now=1_000_000;
 function session(n,view='chat'){
  const timers=[],events=new Map(),docs=new Map(),calls=[],cleanups=[];
- let state={},marked=false,lateVote=false;
+ let state={},marked=false,lateVote=false,quota=false,pollTicks=0;
  const registered=(map,key,fn)=>{const list=map.get(key)||[];list.push(fn);map.set(key,list)};
  const removed=(map,key,fn)=>map.set(key,(map.get(key)||[]).filter(x=>x!==fn));
  const window={addEventListener:(k,f)=>registered(events,k,f),removeEventListener:(k,f)=>removed(events,k,f)};
@@ -15,6 +15,7 @@ function session(n,view='chat'){
  const schedule=(f,delay,period=0)=>{const t={f,due:now+delay,period,cancelled:false};timers.push(t);return t};
  const supabase={rpc:async function(method,args){
   calls.push({at:now,method,args});
+  if(quota&&method==='get_section_updates')return{status:402,error:{code:'quota'}};
   if(method==='mark_section_read'){marked=true;return{status:200,error:null}}
   return{status:200,data:{documents:0,votes:lateVote?4:marked?0:4,events:0},error:null}
  }};
@@ -34,11 +35,12 @@ function session(n,view='chat'){
  vm.runInNewContext('(function(require,module,exports){'+js+'})',env)(requireMock,mod,mod.exports);
  mod.exports.useSectionUpdates('game-a','student-'+n,view,false);
  return {calls,document,
-  getCounts(){return state},setLateVote(){lateVote=true},
+  getCounts(){return state},setLateVote(){lateVote=true},setQuota(){quota=true},
+  getPollTicks(){return pollTicks},activePolls(){return timers.filter(t=>!t.cancelled&&t.period).length},
   event(type='gos-sims:refresh',table='game_votes'){if(type==='gos-sims:refresh')lateVote=true;for(const f of events.get(type)||[])f({type,detail:{gameId:'game-a',table}})},
   visible(next){document.visibilityState=next?'visible':'hidden';for(const f of docs.get('visibilitychange')||[])f()},
   tick(){for(const t of timers){if(t.cancelled||t.due>now)continue;
-   if(t.period){t.due+=t.period;while(t.due<=now)t.due+=t.period}else t.cancelled=true;
+   if(t.period){pollTicks++;t.due+=t.period;while(t.due<=now)t.due+=t.period}else t.cancelled=true;
    t.f();
   }
   // Timer lists compact after elapsed tests; callbacks may append new timers.
@@ -119,5 +121,24 @@ async function tick(clients,steps=1){for(let i=0;i<steps;i++){now+=1000;for(cons
  const peakMarks=Math.max(...markSeconds.values());
  assert(peakMarks<=20,'One-second first-dashboard SQL write peak must be bounded: '+peakMarks);
  dashboardClients.forEach(c=>c.dispose());
+ const hidden=Array.from({length:100},(_,i)=>session(5000+i));
+ await tick(hidden,12);
+ hidden.forEach(c=>c.visible(false));
+ const beforePolls=hidden.reduce((n,c)=>n+c.getPollTicks(),0),beforeReads=hidden.reduce((n,c)=>n+c.calls.length,0);
+ await tick(hidden,600);
+ assert.equal(hidden.reduce((n,c)=>n+c.getPollTicks(),0),beforePolls,'Hidden clients must not execute periodic badge callbacks');
+ assert.equal(hidden.reduce((n,c)=>n+c.calls.length,0),beforeReads,'Hidden clients must not issue badge RPCs');
+ assert(hidden.every(c=>c.activePolls()===0),'Hidden clients must release the periodic timer');
+ hidden.forEach(c=>{c.visible(true);c.visible(true)});await tick(hidden,2);
+ assert(hidden.every(c=>c.activePolls()===1),'Visible clients resume precisely one timer');
+ assert.equal(hidden.reduce((n,c)=>n+c.calls.length,0),beforeReads+100,'Visible clients reconcile exactly once');
+ hidden.forEach(c=>c.dispose());
+ const quota=session(9999);quota.setQuota();await tick([quota],12);
+ assert.equal(quota.calls.length,1,'One failed quota read');
+ assert.equal(quota.activePolls(),0,'HTTP 402 must release badge periodic timer');
+ quota.visible(false);quota.visible(true);await tick([quota],180);
+ assert.equal(quota.activePolls(),0,'HTTP 402 must not restart polling on focus');
+ assert.equal(quota.calls.length,1,'No automatic retries after HTTP 402');quota.dispose();
+ console.log('PASS: 100 hidden clients, zero periodic badge callbacks; exactly one resume; HTTP 402 stops timer.');
  console.log(JSON.stringify({status:'PASS',clients:100,burstEvents:6000,burstSeconds:60,burstRpcCalls:burstReads,initialBadgeReads:initialReads,peakReadsPerSecond:peak,initialDashboardMarks:marks.length,peakDashboardMarksPerSecond:peakMarks,baselineClients:40,baselineInvalidations:24000,baselineRpcCalls:reads,source:'actual useSectionUpdates transpiled TS',network:'synthetic',liveDatabaseReads:0,hidden_tab:'paused',on_return:'reconciled',confirmedRead:'optimistic',concurrentNotification:'preserved'},null,2));
 })().catch(error=>{console.error(error);process.exitCode=1});
