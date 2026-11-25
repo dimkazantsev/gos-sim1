@@ -92,6 +92,15 @@ async function main(){
      }while(performance.now()<deadline);
      throw Error('Role control never became interactive: '+name);
     }
+    // Personal-password entry is the approved default. Open invitation entry.
+    const firstEntry=page.getByRole('button',{name:'Первый вход по приглашению',exact:true});
+    const roleControls=page.locator('.entryRoles');
+    const deadline=performance.now()+15000;
+    while(!(await roleControls.isVisible())){
+     if(performance.now()>=deadline)throw Error('Invitation entry never became interactive');
+     await firstEntry.click({timeout:5000});
+     if(!(await roleControls.isVisible()))await page.waitForTimeout(100);
+    }
     await chooseRole(teacher?'Преподаватель':'Гость');
     if(!teacher&&kind==='student')await chooseRole('Участник');
     await page.locator('input[name="fullName"]').fill('Тестовый Участник '+n);
