@@ -546,6 +546,17 @@ export function useRepublicGame(gameId:string){
   // lightweight entry, so teachers can see who is connected immediately.
   // Full SQL bootstrap stays deferred until a section is requested.
   if(!me?.user_id||me.game_id!==gameId||realtimeIdleSuspended)return;
+  // A channel is keyed by topic in supabase-js. Creating its replacement
+  // before removeChannel settles can reuse the leaving object or let a late
+  // close remove the replacement. Serialize construction, not just subscribe.
+  const expectedEpoch=readEpoch.current;
+  let cancelled=false,stopConnection:(()=>void)|undefined;
+  const startConnection=()=>{
+   if(cancelled||expectedEpoch!==readEpoch.current||activeGameRef.current!==gameId||
+      authUser.current!==me.user_id)return;
+   stopConnection=connect();
+  };
+  const connect=()=>{
   const resumeAfterIdle=realtimeIdleWakeGame.current===gameId;
   if(resumeAfterIdle)realtimeIdleWakeGame.current=null;
   let disposed=false,scheduled=false;
@@ -590,6 +601,7 @@ export function useRepublicGame(gameId:string){
   // Events received while hidden remain dirty and reconcile on return;
   // clearing the flags while hidden would silently lose these updates.
   const resumePending=()=>{
+   if(!currentConnection())return;
    // Keep Auth and the single private Realtime connection alive. Stop only
    // automatic UI polling and deferred reads while the tab is invisible.
    if(document.visibilityState!=='visible'){
@@ -715,6 +727,7 @@ export function useRepublicGame(gameId:string){
    // need channel_id; message contents stay on their separate full subscription.
    channel.on('postgres_changes',{event:'*',schema:'public',table,filter,
     select:table==='chat_pins'?['game_id','channel_id']:['game_id']},payload=>{
+    if(!currentConnection())return;
     if(table==='chat_pins'){
      const next=payload.new as Partial<ChatPin>|null,previous=payload.old as Partial<ChatPin>|null;
      if(chatOpenRef.current&&channelRef.current&&
@@ -966,7 +979,7 @@ export function useRepublicGame(gameId:string){
    .then(()=>{
    if(!currentConnection())return;
    channel.subscribe(status=>{
-    if(disposed)return;
+    if(!currentConnection())return;
     const wasConnected=liveConnected;
     liveConnected=status==='SUBSCRIBED';
     if(!liveConnected)navigationReads.current.clear();
@@ -1006,7 +1019,7 @@ export function useRepublicGame(gameId:string){
   const pollJitter=[...me.user_id].reduce((hash,char)=>(Math.imul(hash,31)+char.charCodeAt(0))>>>0,0)%10000;
   let poll:ReturnType<typeof setInterval>|null=null;
   const recoveryTick=()=>{
-   if(document.visibilityState!=='visible')return;
+   if(!currentConnection()||document.visibilityState!=='visible')return;
    // Realtime already dispatches targeted refreshes. A backup full read is
    // necessary only occasionally while connected; polling every 30s even
    // on healthy subscriptions multiplied database requests and egress.
@@ -1102,6 +1115,15 @@ export function useRepublicGame(gameId:string){
    if(liveRef.current===channel)liveRef.current=null;
    realtimeLeavePending.current=supabase.removeChannel(channel).catch(()=>{});
   };
+  }
+  const pending=realtimeLeavePending.current;
+  if(pending){
+   void pending.then(()=>{
+    if(realtimeLeavePending.current===pending)realtimeLeavePending.current=null;
+    startConnection();
+   });
+  }else startConnection();
+  return()=>{cancelled=true;stopConnection?.()};
  },[gameId,me?.user_id,me?.kind,me?.role_title,me?.team,me?.group_name,me?.roster_archived_at,realtimeIdleSuspended]);
 
  useEffect(()=>()=>{

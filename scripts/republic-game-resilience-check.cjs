@@ -293,6 +293,23 @@ async function main(){
  await check('Newer full refresh survives a late response from the same game',async()=>{
   const h=harness(),old=h.hold('games');const first=h.render().refresh();await tick();h.setRevision(2);await h.render().refresh();assert.equal(h.render().game.current_round,2);old.resolve();await first;assert.equal(h.render().game.current_round,2);h.dispose();
  });
+ await check('Realtime waits for previous room removal before constructing a replacement',async()=>{
+  const h=harness({effects:true});
+  try{
+   await h.settle();
+   assert.equal(h.channelsInfo().length,1);
+   h.holdRoomLeave();
+   h.render('game-b');await h.settle();
+   assert.equal(h.render().game.id,'game-b');
+   assert.equal(h.channelsInfo().length,1,'No replacement room may be constructed while the previous leave is pending');
+   h.render('game-a');await h.settle();
+   assert.equal(h.channelsInfo().length,1,'Rapid navigation must not queue additional room constructions');
+   h.releaseRoomLeave();await h.settle();
+   assert.equal(h.channelsInfo().length,1);
+   assert.equal(h.channelsInfo()[0].topic,'gos-id-live:game-a');
+   assert.equal(h.channelsInfo()[0].private,true);
+  }finally{h.releaseRoomLeave();h.dispose()}
+ });
  await check('Party documents realtime refreshes only documents, not every core table',async()=>{
   const h=harness({effects:true});
   await h.settle();
