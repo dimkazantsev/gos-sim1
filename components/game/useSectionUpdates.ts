@@ -17,6 +17,7 @@ export function useSectionUpdates(gameId:string|undefined,userId:string|undefine
   optimisticVersion.current+=1;
   lastRelevantMutationAt.current=0;
   if(!gameId||!userId||readOnly)return;
+  const scopedGameId=gameId;
   let live=true,running=false,queued=false,blocked=false,initialPending=true;
   let lastFallbackAt=Date.now(),lastFocusAt=0,lastStartedAt=0,recoveryAfter=0;
   // FNV-1a avoids grouping sequential participant IDs into the same second.
@@ -68,13 +69,13 @@ export function useSectionUpdates(gameId:string|undefined,userId:string|undefine
   function startPolling(){
    if(!live||blocked||poll!==null||document.visibilityState!=='visible')return;
    poll=setInterval(()=>{
-   if(document.visibilityState!=='visible')return;
-   const now=Date.now();
-   // The shared game WebSocket delivers invalidation events immediately.
-   // Poll rarely while subscribed, but retain 30-40s recovery offline.
-   if(gameRealtimeConnected(gameId)&&now-lastFallbackAt<300000)return;
-   lastFallbackAt=now;schedule();
-  },90000+userJitter);
+    if(document.visibilityState!=='visible')return;
+    const now=Date.now();
+    // The shared game WebSocket delivers invalidation events immediately.
+    // Poll rarely while subscribed, retaining regular recovery offline.
+    if(gameRealtimeConnected(scopedGameId)&&now-lastFallbackAt<300000)return;
+    lastFallbackAt=now;schedule();
+   },90000+userJitter);
   }
   startPolling();
   window.addEventListener(GAME_DATA_REFRESH_EVENT,invalidated);

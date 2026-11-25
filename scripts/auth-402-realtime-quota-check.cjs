@@ -82,18 +82,18 @@ assert(gameShell.includes("['event_assignments','event_collaboration_invites']")
  'Event badges retain scoped reconciliation for assignments and invitations');
 assert(source.includes('if(partyDocs)notifySectionUpdates(gameId)'),
  'Party document changes invalidate teacher section counters');
-assert(sectionSource.includes('gameRealtimeConnected(gameId)'),
+assert(sectionSource.includes('gameRealtimeConnected(scopedGameId)'),
  'Section badges must reuse shared WebSocket health instead of always polling');
 assert(sectionSource.includes("window.addEventListener(GAME_DATA_REFRESH_EVENT,invalidated)"),
  'Section badges still respond to pushed changes');
-const sectionPollStart=sectionSource.indexOf('  const poll=setInterval(()=>{');
+const sectionPollStart=sectionSource.indexOf('  function startPolling(){');
 const sectionPollEnd=sectionSource.indexOf('  window.addEventListener(GAME_DATA_REFRESH_EVENT',sectionPollStart);
 assert(sectionPollStart>=0&&sectionPollEnd>sectionPollStart);
 let pollClock=1_000_000,sectionReads=0,connected=true,sectionTick=null;
 const sectionEnv={
  document:{visibilityState:'visible'},Date:{now:()=>pollClock},
- gameRealtimeConnected:()=>connected,gameId:'game-one',
- lastFallbackAt:pollClock,
+ gameRealtimeConnected:()=>connected,scopedGameId:'game-one',
+ live:true,blocked:false,poll:null,lastFallbackAt:pollClock,
  load:()=>{sectionReads++;return Promise.resolve()},
  schedule:()=>{sectionReads++},
  setInterval:fn=>{sectionTick=fn;return 1},
