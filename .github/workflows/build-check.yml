@@ -413,6 +413,7 @@ jobs:
       - run: node scripts/chat-30day-retention-check.cjs
       - run: node scripts/fast-entry-desktop-align-check.cjs
       - run: node scripts/fiscal-model-check.cjs
+      - run: node scripts/economic-model-v2-check.cjs
       - run: node scripts/fiscal-macro-save-check.cjs
       - run: node scripts/fiscal-relative-activity-sql-check.cjs
       - run: node scripts/classroom-signal-noise-check.cjs
