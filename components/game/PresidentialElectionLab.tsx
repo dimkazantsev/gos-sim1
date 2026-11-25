@@ -45,6 +45,22 @@ function preserveDrafts<T>(drafts:Record<string,T>,previous:Record<string,T>,nex
  return {...next,...Object.fromEntries(Object.entries(drafts).filter(([id,value])=>JSON.stringify(value)!==JSON.stringify(previous[id])))};
 }
 
+// Independent reads fill freed slots without increasing the four-request cap.
+async function readStage6Bounded<T extends readonly (()=>Promise<unknown>)[]>(
+ tasks:T,active:()=>boolean
+):Promise<{[K in keyof T]:Awaited<ReturnType<T[K]>>}>{
+ const results:unknown[]=new Array(tasks.length);
+ let next=0;
+ await Promise.all(Array.from({length:Math.min(4,tasks.length)},async()=>{
+  while(active()){
+   const index=next++;
+   if(index>=tasks.length)return;
+   results[index]=await tasks[index]();
+  }
+ }));
+ return results as {[K in keyof T]:Awaited<ReturnType<T[K]>>};
+}
+
 export default function PresidentialElectionLab({g}:{g:ReturnTypeRepublic}){
  const {game,me,teacher,members,parties,currentStage,setError}=g;
  const signedAssets=useMemo(()=>createScopedSignedAssetBatchCache(async paths=>{
@@ -121,29 +137,26 @@ export default function PresidentialElectionLab({g}:{g:ReturnTypeRepublic}){
     const current=()=>scopeCurrent()&&!controller.signal.aborted&&(!passive||document.visibilityState==='visible');
     let timeout:ReturnType<typeof setTimeout>|undefined;
     try{await Promise.race([(async()=>{
-  const [a,b,p,d]=await Promise.all([
-   supabase.from('presidential_election_settings').select('*').eq('game_id',game.id).abortSignal(controller.signal).maybeSingle(),
-   supabase.from('presidential_candidates').select('*').eq('game_id',game.id).is('archived_at',null).order('created_at').abortSignal(controller.signal),
-   supabase.from('presidential_candidate_program_points').select('id,candidate_id,point_no,body').eq('game_id',game.id).order('point_no').abortSignal(controller.signal),
-   supabase.from('presidential_candidate_documents').select('*').eq('game_id',game.id).is('archived_at',null).order('created_at').abortSignal(controller.signal)
-  ]);
+  const results=await readStage6Bounded([
+   async()=>supabase.from('presidential_election_settings').select('*').eq('game_id',game.id).abortSignal(controller.signal).maybeSingle(),
+   async()=>supabase.from('presidential_candidates').select('*').eq('game_id',game.id).is('archived_at',null).order('created_at').abortSignal(controller.signal),
+   async()=>supabase.from('presidential_candidate_program_points').select('id,candidate_id,point_no,body').eq('game_id',game.id).order('point_no').abortSignal(controller.signal),
+   async()=>supabase.from('presidential_candidate_documents').select('*').eq('game_id',game.id).is('archived_at',null).order('created_at').abortSignal(controller.signal),
+   async()=>supabase.from('presidential_support_group').select('id,candidate_id,supporter_user_id').eq('game_id',game.id).order('created_at').abortSignal(controller.signal),
+   async()=>supabase.from('presidential_signature_batches').select('id,candidate_id,direction_label,signatures').eq('game_id',game.id).order('direction_label').abortSignal(controller.signal),
+   async()=>{
+    const cd=await supabase.from('presidential_cec_decisions').select('*').eq('game_id',game.id).order('created_at',{ascending:false}).abortSignal(controller.signal);
+    // Notes depend on the registry; retain its error fallback and scoped read.
+    const cn=current()&&(cd.error||(cd.data||[]).length>0)
+     ? await supabase.from('presidential_cec_private_notes').select('decision_id,candidate_id,private_summary').eq('game_id',game.id).order('created_at',{ascending:false}).abortSignal(controller.signal)
+     : {data:[] as CecPrivateNote[],error:null};
+    return {cd,cn};
+   },
+   async()=>supabase.from('presidential_candidate_private_profiles').select('candidate_id,birth_date,birth_place,contact_phone,contact_email,address_text,passport_note').eq('game_id',game.id).abortSignal(controller.signal),
+   async()=>supabase.rpc('get_presidential_student_system_vote',{p_game_id:game.id}).abortSignal(controller.signal),
+  ] as const,current);
   if(!current())return;
-  const [sg,sb,cd]=await Promise.all([
-   supabase.from('presidential_support_group').select('id,candidate_id,supporter_user_id').eq('game_id',game.id).order('created_at').abortSignal(controller.signal),
-   supabase.from('presidential_signature_batches').select('id,candidate_id,direction_label,signatures').eq('game_id',game.id).order('direction_label').abortSignal(controller.signal),
-   supabase.from('presidential_cec_decisions').select('*').eq('game_id',game.id).order('created_at',{ascending:false}).abortSignal(controller.signal)
-  ]);
-  if(!current())return;
-  const [pp,sd,cn]=await Promise.all([
-   supabase.from('presidential_candidate_private_profiles').select('candidate_id,birth_date,birth_place,contact_phone,contact_email,address_text,passport_note').eq('game_id',game.id).abortSignal(controller.signal),
-   supabase.rpc('get_presidential_student_system_vote',{p_game_id:game.id}).abortSignal(controller.signal),
-   // The notes are rendered only for accepted registry rows. On a failed
-   // registry read retain the existing independent RLS-protected notes read.
-   cd.error||(cd.data||[]).length>0
-    ? supabase.from('presidential_cec_private_notes').select('decision_id,candidate_id,private_summary').eq('game_id',game.id).order('created_at',{ascending:false}).abortSignal(controller.signal)
-    : Promise.resolve({data:[] as CecPrivateNote[],error:null})
-  ]);
-  if(!current())return;
+  const [a,b,p,d,sg,sb,{cd,cn},pp,sd]=results;
   const error=[a,b,p,d,sg,sb,cd,cn,pp,sd].find(x=>x.error)?.error;if(error)setError(userError(error));
   if(!a.error&&a.data)setSettings(a.data as Settings);
   if(!sd.error)setSystemDecisionComplete(Boolean(sd.data?.closed));
