@@ -75,7 +75,28 @@ export default function ChatPanel({g,draft:text,onDraftChange:setText,previewCha
  },[g.game?.id,g.chatDirectoryLoaded,socialChannelsReady]);
  const [sending,setSending]=useState(false);
  const [retentionClock,setRetentionClock]=useState(()=>Date.now());
- useEffect(()=>{const id=window.setInterval(()=>setRetentionClock(Date.now()),60*60*1000);return()=>window.clearInterval(id)},[]);
+ useEffect(()=>{
+  // Wake only when a currently loaded message actually reaches the existing 30-day boundary.
+  let deadline=Infinity;
+  for(const rows of [messages,allPinnedMessages])for(const m of rows){
+   if(m.channel_id!==channelId)continue;
+   const expiry=Date.parse(m.created_at)+30*24*60*60*1000;
+   if(expiry>retentionClock&&expiry<deadline)deadline=expiry;
+  }
+  if(!Number.isFinite(deadline))return;
+  let timer=0;
+  const schedule=()=>{
+   window.clearTimeout(timer);
+   const now=Date.now(),remaining=deadline-now;
+   if(remaining<=0){setRetentionClock(now);return}
+   // Thirty days exceed the browser's maximum delay; rearm without a render.
+   timer=window.setTimeout(schedule,Math.min(remaining,2147483647));
+  };
+  const resume=()=>{if(document.visibilityState==='visible')schedule()};
+  schedule();
+  document.addEventListener('visibilitychange',resume);
+  return()=>{window.clearTimeout(timer);document.removeEventListener('visibilitychange',resume)};
+ },[messages,allPinnedMessages,channelId,retentionClock]);
  const [uploading,setUploading]=useState(false);
  const [pendingFile,setPendingFile]=useState<{file:File;gameId:string;channelId:string;userId:string}|null>(null);
  const [recordElapsed,setRecordElapsed]=useState(0);

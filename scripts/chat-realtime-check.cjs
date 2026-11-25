@@ -28,6 +28,34 @@ const unchanged=mergeChatMessages([media],[{...media,url:undefined}]);
 assert.equal(unchanged[0].url,'signed','Repeated Realtime payload must preserve signed media');
 assert.equal(mergeChatMessages([media],[{...media,url:'updated'}])[0].url,'updated');
 const panel=fs.readFileSync('components/game/ChatPanel.tsx','utf8');
+
+// Execute the actual production retention effect with deterministic timers.
+const retentionStart=panel.indexOf(' useEffect(()=>{\n  // Wake only when');
+const retentionEnd=panel.indexOf(' const [uploading',retentionStart);
+assert(retentionStart>=0&&retentionEnd>retentionStart);
+const mountRetention=new Function('useEffect','messages','allPinnedMessages','channelId','retentionClock','setRetentionClock','window','document','Date',panel.slice(retentionStart,retentionEnd));
+const DAY=86400000,now=Date.parse('2026-11-25T12:00:00Z');
+function retentionRealm(messages=[],pins=[],channel='public',clock=now){
+ let at=now,id=0,callbacks=0,cleanup,visible=true;const pending=new Map(),events=new Set(),updates=[];
+ const win={setTimeout(fn,delay){assert(delay>0&&delay<=2147483647);pending.set(++id,{fn,due:at+delay});return id},clearTimeout(n){pending.delete(n)}};
+ const doc={get visibilityState(){return visible?'visible':'hidden'},addEventListener(n,f){assert.equal(n,'visibilitychange');events.add(f)},removeEventListener(n,f){events.delete(f)}};
+ const attach=(rows=messages,allPins=pins,selected=channel,retention=clock)=>{cleanup?.();mountRetention(fn=>{cleanup=fn()},rows,allPins,selected,retention,v=>updates.push(v),win,doc,{now:()=>at,parse:Date.parse})};
+ attach();
+ return {pending,updates,events,attach,get callbacks(){return callbacks},advance(ms){const end=at+ms;for(;;){const due=[...pending.entries()].sort((a,b)=>a[1].due-b[1].due)[0];if(!due||due[1].due>end)break;at=due[1].due;pending.delete(due[0]);callbacks++;due[1].fn()}at=end},sleep(ms){at+=ms;visible=false},resume(){visible=true;for(const fn of events)fn()},close(){cleanup?.()}};
+}
+const recent=make('recent','public',new Date(now).toISOString());
+const idle=Array.from({length:100},()=>retentionRealm([recent]));
+for(const client of idle){client.advance(DAY);assert.equal(client.callbacks,0);assert.equal(client.updates.length,0);client.close();assert.equal(client.pending.size,0)}
+const empty=retentionRealm();assert.equal(empty.pending.size,0);assert.equal(empty.events.size,0);empty.close();
+const boundary=make('boundary','public',new Date(now-30*DAY+1000).toISOString());
+const other=make('other','private',new Date(now-30*DAY+100).toISOString());
+const exact=retentionRealm([recent,other],[boundary]);exact.advance(999);assert.equal(exact.updates.length,0);exact.advance(1);assert.deepEqual(exact.updates,[now+1000]);exact.attach([recent,other],[boundary],'public',now+1000);assert.equal(exact.pending.size,1);exact.close();assert.equal(exact.pending.size,0);assert.equal(exact.events.size,0);
+const hidden=retentionRealm([boundary]);hidden.sleep(2000);hidden.resume();assert.deepEqual(hidden.updates,[now+2000]);hidden.close();
+const stale=retentionRealm([make('stale','public',new Date(now-30*DAY-100).toISOString())],[],'public',now-1000);assert.deepEqual(stale.updates,[now]);stale.close();
+const cap=retentionRealm([recent]);cap.advance(2147483647);assert.equal(cap.callbacks,1);assert.equal(cap.updates.length,0);cap.advance(30*DAY-2147483647);assert.deepEqual(cap.updates,[now+30*DAY]);cap.close();
+const switched=retentionRealm([boundary,other]);switched.attach([boundary,other],[],'private');switched.advance(100);assert.deepEqual(switched.updates,[now+100]);switched.close();
+console.log('PASS chat retention: 100 clients x 24h, zero callbacks versus 2400 hourly baseline; exact expiry, pins, switch, stale clock, hidden resume and delay cap');
+
 const source=fs.readFileSync('components/game/useRepublicGame.ts','utf8');
 assert(source.includes("table:'chat_messages'")&&source.includes("payload.eventType==='INSERT'"),'Subscribe to message payloads directly');
 assert(source.includes('setMessages(previous=>mergeChatMessages(previous,[row],chatWindowLimit()))'),'Render incoming chat messages immediately and retain explicitly paged history');
