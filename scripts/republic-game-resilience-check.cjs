@@ -470,11 +470,11 @@ async function main(){
   }finally{held.resolve();h.dispose();}
  });
  await check('100 clients revisit unchanged sections without duplicate presentation requests',async()=>{
-  const clients=Array.from({length:100},()=>harness({effects:true}));
+  const clients=Array.from({length:100},(_,i)=>{const h=harness({effects:true});if(i===1)h.setMemberKind('observer');else if(i>1)h.setUser('student-'+i);return h});
   const visit=async(h,view)=>{h.render().setActiveView(view);await h.settle()};
   try{
    await Promise.all(clients.map(async h=>{
-    await h.settle();
+    await h.settle();await visit(h,'stages');
     for(const [view,count] of [
       ['documents',()=>h.readCount('formal_documents')],
       ['profile',()=>h.readCount('game_profiles')],
@@ -502,6 +502,11 @@ async function main(){
    assert.equal(h.rpcCount('get_political_wall_page'),before+3);
    await visit('dashboard');h.channelStatus('CHANNEL_ERROR');await h.settle();await visit('actions');
    assert(h.rpcCount('get_political_wall_page')>before+3,'Disconnected navigation revalidates');
+   h.channelStatus('SUBSCRIBED');await h.settle();
+   await visit('dashboard');h.render().setChatOpen(true);await h.settle();
+   const chatReads=h.rpcCount('get_my_chat_overview');
+   await visit('documents');await visit('dashboard');await visit('votes');
+   assert.equal(h.rpcCount('get_my_chat_overview'),chatReads,'Open chat must not refetch just because main view changes');
   }finally{h.dispose()}
  });
  await check('Missing v4 function retains the prior protected v3 bootstrap',async()=>{

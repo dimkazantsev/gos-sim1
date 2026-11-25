@@ -13,13 +13,15 @@ const source=fs.readFileSync(path.resolve(__dirname,'../components/game/useRepub
 const start=source.indexOf(' function acceptPartyDocuments(');
 const end=source.indexOf('\n async function loadPartyRepresentation(',start);
 assert(start>=0&&end>start,'Party asset loader boundaries must match production code');
-assert(source.includes("if(view==='parties'||view==='profile')jobs.push(loadPartyAssets(view==='parties'))"),
+assert(source.includes("if(view==='parties'||view==='profile')jobs.push(loadPartyAssets(view==='parties',allowFreshCore))"),
  'Profile must explicitly skip party documents; parties must retain them');
 assert(source.includes("if(workspace==='parties')jobs.push(loadPartyDossierRows(),loadPartyAssets(true));"),
  'Teacher party dossier must load documents only when opened');
 assert(!source.includes("if(view==='teacher')jobs.push(loadPartyDocuments())"),
  'Overview must not fetch party documents');
-const extracted=source.slice(start,end)+'\nmodule.exports={loadPartyAssets,loadPartyDocuments,loadSelectedPartyDocuments};';
+const helperStart=source.indexOf(' async function readNavigationSafely('),helperEnd=source.indexOf(' function formalVersion(',helperStart);
+assert(helperStart>=0&&helperEnd>helperStart,'Actual navigation reuse helper must be exercised');
+const extracted=source.slice(helperStart,helperEnd)+source.slice(start,end)+'\nmodule.exports={loadPartyAssets,loadPartyDocuments,loadSelectedPartyDocuments};';
 const output=ts.transpileModule(extracted,{compilerOptions:{
  target:ts.ScriptTarget.ES2022,module:ts.ModuleKind.CommonJS
 }}).outputText;
@@ -59,6 +61,7 @@ function client(view='profile',registrationStatus='draft'){
   limitedCoreRead:async result=>await result,
   loadCachedParties:()=>Promise.resolve({data:[{id:'p1',logo_path:null,registration_status:registrationStatus}],error:null}),
   readSafely:async(scopes,reader)=>{scopeCalls.push(scopes);await reader({})},
+  navigationReads:{current:new Map()},gameRealtimeConnected:()=>true,
   readCurrent:()=>true,requireSuccessful:()=>{},
   signedAssetUrl:async(bucket,objectPath)=>{signs.push({bucket,objectPath});return 'signed://'+objectPath},
   // This route-isolation fixture models signing results; the separate batch test
@@ -79,6 +82,7 @@ const flush=()=>new Promise(resolve=>setImmediate(resolve));
 (async()=>{
  const first=client();
  await first.loadPartyAssets(false);
+ await first.loadPartyAssets(false,true);
  await flush();
  assert.deepEqual([...first.reads],['game_profiles'],'Profile should read profiles, not documents');
  assert.deepEqual(Array.from(first.scopeCalls[0]),['parties','profiles'],'Profile should not invalidate document scope');

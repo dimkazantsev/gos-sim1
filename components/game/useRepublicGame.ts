@@ -969,6 +969,7 @@ export function useRepublicGame(gameId:string){
     if(disposed)return;
     const wasConnected=liveConnected;
     liveConnected=status==='SUBSCRIBED';
+    if(!liveConnected)navigationReads.current.clear();
     if(wasConnected&&!liveConnected){
      networkPresenceEpoch++;
      networkPresenceTracked=false;
