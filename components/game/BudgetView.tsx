@@ -57,7 +57,7 @@ export default function BudgetView({g,readOnly=false,onOpenDocument,onOpenEvents
  const labels:Record<string,string>={enterprises:'Предприятия, ед.',employees_per_firm:'Работники на предприятие, чел.',monthly_wage:'Средняя зарплата в месяц, ₽',profit_per_firm:'Прибыль на предприятие, млн ₽ в год',consumption_per_firm:'Оборот на предприятие, млн ₽ в год',expenditure:'Расходы региона, млн ₽',transfer_in:'Ранее полученные трансферты, млн ₽',debt:'Исходный долг региона, млн ₽',compliance:'Собираемость, от 0 до 1'};
  return <div className="budgetPage"><header className="budgetHero"><div><small>ЭТАП 13 · ФЕДЕРАЛЬНЫЙ БЮДЖЕТ</small><h1>Бюджет</h1><p>Макроэкономические параметры и пять последовательных шагов от расчёта доходов до закона. События, госпрограммы и региональные заявки связаны с общими расходами.</p></div><button type="button" className="secondary" onClick={()=>void load()} disabled={busy}><RefreshCw size={18}/> Обновить данные</button></header>
   {error&&<p role="alert" className="budgetNotice">{error}</p>}
-  {!ready?<p role="status">Загружаем общие исходные данные бюджета…</p>:<><FiscalMacroPanel g={g} context={context} readOnly={readOnly} onOpenDocument={onOpenDocument} onSaved={changed=>{
+  {!ready?<p role="status">Загружаем общие исходные данные бюджета…</p>:<><FiscalMacroPanel g={g} context={context} enterpriseCount={regions.reduce((sum,r)=>sum+r.enterprises,0)} readOnly={readOnly} onOpenDocument={onOpenDocument} onSaved={changed=>{
    if(!mounted.current||live.current!==scope)return;
    // Keep the editor responsive once the server has committed the decision.
    // Discard a pre-save budget read that could otherwise overwrite new figures.
