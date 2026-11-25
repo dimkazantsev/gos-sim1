@@ -5,6 +5,9 @@ on:
       - '.github/workflows/private-realtime-auth-100.yml'
       - 'supabase/tests/gos_private_realtime_100_local.cjs'
       - 'supabase/tests/private_realtime_100_local_setup.sql'
+      - 'supabase/tests/game_rules_realtime_local_setup.sql'
+      - 'supabase/tests/gos_game_rules_realtime_local.cjs'
+      - 'supabase/migrations/20261124194908_game_rules_private_broadcast.sql'
       - 'supabase/migrations/20261029180000_private_game_broadcast_documents.sql'
       - 'supabase/migrations/20261029200000_private_room_presence_track.sql'
 permissions:
@@ -26,7 +29,9 @@ jobs:
           cache: npm
       - run: npm ci --no-audit --no-fund
       - name: Check local-only runner syntax
-        run: node --check supabase/tests/gos_private_realtime_100_local.cjs
+        run: |
+          node --check supabase/tests/gos_private_realtime_100_local.cjs
+          node --check supabase/tests/gos_game_rules_realtime_local.cjs
       - name: Verify production private Presence policy in isolated PGlite
         run: node scripts/private-game-presence-100-clients-check.cjs
       - uses: supabase/setup-cli@v3
@@ -66,10 +71,13 @@ jobs:
           psql "$DB_URL" -v ON_ERROR_STOP=1 -f "$GITHUB_WORKSPACE/supabase/tests/private_realtime_100_local_setup.sql"
           psql "$DB_URL" -v ON_ERROR_STOP=1 -f "$GITHUB_WORKSPACE/supabase/migrations/20261029180000_private_game_broadcast_documents.sql"
           psql "$DB_URL" -v ON_ERROR_STOP=1 -f "$GITHUB_WORKSPACE/supabase/migrations/20261029200000_private_room_presence_track.sql"
+          psql "$DB_URL" -v ON_ERROR_STOP=1 -1 -f "$GITHUB_WORKSPACE/supabase/tests/game_rules_realtime_local_setup.sql" -f "$GITHUB_WORKSPACE/supabase/migrations/20261124194908_game_rules_private_broadcast.sql"
           psql "$DB_URL" -v ON_ERROR_STOP=1 -c "NOTIFY pgrst, 'reload schema';"
           sleep 2
       - name: Verify 100 real private JWT channels, 102 Presence tracks and role denial
         run: node supabase/tests/gos_private_realtime_100_local.cjs
+      - name: Verify actual rule Broadcast delivery and cross-game isolation
+        run: node supabase/tests/gos_game_rules_realtime_local.cjs
       - name: Destroy disposable local instance
         if: always()
         run: |
