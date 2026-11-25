@@ -35,6 +35,28 @@ assert.equal(mergeFormalDocumentSummaries(prior,[]).length,0,'Deleted/RLS-hidden
 const changedPath=mergeFormalDocumentSummaries(prior,[{...selectedRows[0],source_file_path:'new-file.pdf'}]);
 assert.equal(changedPath[0].file_url,null,'Signed URL cannot be reused for a new storage file');
 
+
+// Full editor read: preserve first-match signed links and authoritative contents.
+{
+ const start=hook.indexOf('   setFormalDocuments(previous=>',hook.indexOf(' async function loadFormalDetails(){'));
+ const end=hook.indexOf('\n  });',start);
+ assert(start>=0&&end>start,'Full registry merge must exist');
+ const run=new Function('setFormalDocuments','rows',hook.slice(start,end).replace(/new Map<string,FormalDocument>\(\)/g,'new Map()'));
+ const merge=(previous,rows)=>{let result;run(fn=>{result=fn(previous)},rows);return result};
+ const previous=Array.from({length:300},(_,i)=>({id:'d'+i,source_file_path:'p/'+i,file_url:'signed/'+i,body_text:'old'}));
+ const rows=Array.from({length:300},(_,i)=>({id:'d'+(i+30),source_file_path:i===0?'changed':i===299?null:'p/'+(i+30),body_text:'new',metadata:{revision:2}}));
+ const reference=(previous,rows)=>rows.map(row=>{const old=previous.find(doc=>doc.id===row.id);return {...row,file_url:old?.source_file_path===row.source_file_path?old?.file_url||null:null}});
+ let visits=0;
+ const track=a=>a.map(row=>({...row,get id(){visits++;return row.id}}));
+ const actual=merge(track(previous),track(rows)),measured=visits;
+ assert.deepEqual(actual,reference(previous,rows));
+ assert(measured<=4*(previous.length+rows.length),'Full registry merge must be linear; ID accesses: '+measured);
+ for(const [old,next] of [[[],[]],[[],rows],[previous,[]],[[previous[0],{...previous[0],file_url:'second'}],[{...previous[0],body_text:'new'}]],[previous,[{id:'new',source_file_path:undefined}]]]){
+  assert.deepEqual(merge(old,next),reference(old,next),'Preserve ordering, scope, first-match URL and null handling');
+ }
+ console.log('PASS full document merge: '+measured+' ID accesses for 300 retained and 300 fetched documents');
+}
+
 async function main(){
  const clients=Array.from({length:40},(_,i)=>{const h=harness({effects:true});h.setUser('student-'+i);return h});
  try{
