@@ -1,4 +1,4 @@
-import type {Ballot,Member,PartyMandateAllocation} from './types';
+import type {Ballot,Member,PartyMandateAllocation,GameOfficeAssignment} from './types';
 
 type BallotTotals={cast:number;yes:number;no:number;abstain:number};
 const emptyTotals:Readonly<BallotTotals>={cast:0,yes:0,no:0,abstain:0};
@@ -56,4 +56,22 @@ export function createMandateReadIndex(members:readonly Member[],allocations:rea
   return fallbackByUser.get(uid)??0;
  }
  return {effective,capacity};
+}
+
+/** Lazily index the already scoped roster and active appointments. Server voting authority is unchanged. */
+export function createInstitutionReadIndex(members:readonly Member[],offices:readonly GameOfficeAssignment[],bodies:readonly {key:string;role:RegExp}[]){
+ let byUser:Map<string,Member>|undefined,activeRoles:Map<string,string[]>|undefined;
+ return function matches(uid:string,institution:string){
+  if(!byUser){byUser=new Map();for(const member of members){const id=member.user_id;if(!byUser.has(id))byUser.set(id,member)}}
+  const m=byUser.get(uid);if(!m||m.kind==='observer')return false;
+  const role=(m.role_title||'').trim();
+  if(institution==='all'||institution==='factions')return m.kind==='student'||(m.kind==='teacher'&&!['','Руководитель симуляции','Преподаватель','Администратор'].includes(role));
+  if(institution==='ksrf'&&m.kind==='student')return true;
+  const body=bodies.find(b=>b.key===institution);
+  if(!body)return false;
+  if(body.role.test(role))return true;
+  if(m.kind!=='student')return false;
+  if(!activeRoles){activeRoles=new Map();for(const o of offices){if(o.status!=='active')continue;const id=o.user_id;let list=activeRoles.get(id);if(!list){list=[];activeRoles.set(id,list)}list.push(o.role_title)}}
+  return activeRoles.get(uid)?.some(title=>body.role.test(title))??false;
+ };
 }

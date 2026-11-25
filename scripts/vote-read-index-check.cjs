@@ -56,3 +56,45 @@ if(!baseline){
  assert(hook.includes('return mandateReadIndex.capacity(uid)')&&hook.includes('mandateReadIndex.effective(r.user_id)'));
  assert(hook.includes("supabase.rpc('cast_vote_allocation'"),'Authoritative server admission and write unchanged');
 }
+
+// Read-side institution eligibility must remain identical to the pre-index hook.
+if(!baseline){
+ const votingBodiesModule={};
+ new Function('exports',ts.transpileModule(fs.readFileSync('components/game/votingBodies.ts','utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}}).outputText)(votingBodiesModule);
+ const VOTING_BODIES=votingBodiesModule.VOTING_BODIES;
+ function referenceInstitution(members,officeAssignments){
+ function memberMatchesInstitution(uid,institution){
+  const m=members.find(x=>x.user_id===uid);if(!m||m.kind==='observer')return false;
+  const role=(m.role_title||'').trim();
+  if(institution==='all'||institution==='factions')return m.kind==='student'||(m.kind==='teacher'&&!['','Руководитель симуляции','Преподаватель','Администратор'].includes(role));
+  if(institution==='ksrf'&&m.kind==='student')return true;
+  const body=VOTING_BODIES.find(b=>b.key===institution);
+  return !!body&&(body.role.test(role)||(m.kind==='student'&&officeAssignments.some(o=>o.user_id===uid&&o.status==='active'&&body.role.test(o.role_title))));
+ }
+
+  return memberMatchesInstitution;
+ }
+ const roster=Array.from({length:100},(_,i)=>({user_id:'u'+i,kind:i%13===0?'observer':i%11===0?'teacher':'student',role_title:['Депутат','Сенатор','Министр','Преподаватель',''][i%5]}));
+ const offices=roster.flatMap((m,i)=>[{user_id:m.user_id,status:i%3?'active':'inactive',role_title:'Министр'},{user_id:m.user_id,status:'active',role_title:'Депутат'}]);
+ let memberVisits=0,officeVisits=0;
+ const countedMembers=roster.map(m=>({...m,get user_id(){memberVisits++;return m.user_id}}));
+ const countedOffices=offices.map(o=>({...o,get user_id(){officeVisits++;return o.user_id}}));
+ const old=referenceInstitution(roster,offices),next=exportsModel.createInstitutionReadIndex(countedMembers,countedOffices,VOTING_BODIES);
+ assert.equal(memberVisits+officeVisits,0,'No indexing on unused voting screens');
+ let cases=0;
+ for(const uid of [...roster.map(m=>m.user_id),'missing'])for(const key of ['all','factions','unknown',...VOTING_BODIES.map(b=>b.key)]){
+  assert.equal(next(uid,key),old(uid,key),uid+' '+key);cases++;
+ }
+ assert.equal(memberVisits,roster.length);
+ assert.equal(officeVisits,offices.filter(o=>o.status==='active').length);
+ const duplicate=[{user_id:'d',kind:'observer',role_title:'Министр'},{user_id:'d',kind:'student',role_title:'Министр'}];
+ assert.equal(exportsModel.createInstitutionReadIndex(duplicate,[],VOTING_BODIES)('d','government'),false,'First roster entry wins as with find');
+ const inactive=[{user_id:'u',kind:'student',role_title:''}];
+ assert.equal(exportsModel.createInstitutionReadIndex(inactive,[{user_id:'u',status:'inactive',role_title:'Министр'}],VOTING_BODIES)('u','government'),false);
+ assert.equal(exportsModel.createInstitutionReadIndex(inactive,[{user_id:'u',status:'active',role_title:'Министр'}],VOTING_BODIES)('u','government'),true);
+ const hook=fs.readFileSync('components/game/useRepublicGame.ts','utf8');
+ assert(hook.includes('useMemo(()=>createInstitutionReadIndex(members,officeAssignments,VOTING_BODIES),[members,officeAssignments])'));
+ assert(hook.includes('return institutionReadIndex(uid,institution)'));
+ console.log(JSON.stringify({institutionCases:cases,memberVisits,officeVisits}));
+ console.log('PASS: identical scoped roster/appointment eligibility, lazy indexes, inactive and duplicate cases.');
+}

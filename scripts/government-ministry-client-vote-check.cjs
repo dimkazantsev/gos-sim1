@@ -11,6 +11,9 @@ const compiledBodies=ts.transpileModule(definitions,{compilerOptions:{module:ts.
 const bodyExports={};
 vm.runInNewContext(compiledBodies,{exports:bodyExports});
 const bodies=bodyExports.VOTING_BODIES;
+const indexExports={};
+vm.runInNewContext(ts.transpileModule(read('components/game/voteReadIndex.ts'),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2020}}).outputText,{exports:indexExports});
+assert.equal(typeof indexExports.createInstitutionReadIndex,'function','Actual institution index must load');
 assert(bodies&&bodies.find(b=>b.key==='government'),'Government configuration must exist');
 const role=bodies.find(b=>b.key==='government').role;
 assert(role.test('Министерство по экономической политике'),'Existing confirmed ministerial appointment must match');
@@ -30,7 +33,8 @@ function check({base='Президент Российской Федерации
  const members=[me];
  const officeAssignments=appointments.map(([title,status])=>({game_id:'qa',user_id:me.user_id,role_title:title,status}));
  const exports={};
- vm.runInNewContext(compiled,{members,officeAssignments,VOTING_BODIES:bodies,me,gdMandateCapacity:()=>0,
+ const institutionReadIndex=indexExports.createInstitutionReadIndex(members,officeAssignments,bodies);
+ vm.runInNewContext(compiled,{members,officeAssignments,VOTING_BODIES:bodies,institutionReadIndex,me,gdMandateCapacity:()=>0,
   partyForUser:()=>null,partyMandates:[],exports});
  const vote={status:'open',institution_key:institution,voting_mode:'member',electorate_snapshot:{weights:included?{'qa-president':1}:{},eligible:2}};
  return {allowed:exports.check.canVote(vote),role:exports.check.memberMatchesInstitution(me.user_id,institution)};
