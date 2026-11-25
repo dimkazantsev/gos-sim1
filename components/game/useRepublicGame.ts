@@ -1324,18 +1324,8 @@ export function useRepublicGame(gameId:string){
    requireSuccessful([ba]);for(const id of ids)changedVoteIds.current.delete(id);
    setBallots(previous=>[...previous.filter(row=>!ids.includes(row.vote_id)),...(ba.data||[]) as Ballot[]]);
   }));
-  if(tables.has('game_events'))jobs.push(readSafely(['events'],async ticket=>{
-   const r=await limitedCoreRead(supabase.from('game_events').select('*')
-    .eq('game_id',gameId).order('published_at',{ascending:false}).limit(100));
-   if(!readCurrent(ticket))return;
-   requireSuccessful([r]);setEvents((r.data||[]) as EventItem[]);
-  }));
-  if(tables.has('game_documents'))jobs.push(readSafely(['documents'],async ticket=>{
-   const r=await limitedCoreRead(supabase.from('game_documents').select('*')
-    .eq('game_id',gameId).order('created_at',{ascending:false}));
-   if(!readCurrent(ticket))return;
-   requireSuccessful([r]);setDocuments((r.data||[]) as GameDocument[]);
-  }));
+  if(tables.has('game_events'))jobs.push(loadColdEntry('events',true));
+  if(tables.has('game_documents'))jobs.push(loadColdEntry('documents',true));
   if(tables.has('game_crises'))jobs.push(readSafely(['crises'],async ticket=>{
    const r=await limitedCoreRead(supabase.from('game_crises').select('*')
     .eq('game_id',gameId).order('created_at',{ascending:false}));
@@ -1354,12 +1344,7 @@ export function useRepublicGame(gameId:string){
    if(!readCurrent(ticket))return;
    requireSuccessful([r]);setChannels((r.data||[]) as Channel[]);
   }));
-  if(tables.has('game_evaluations'))jobs.push(readSafely(['evaluations'],async ticket=>{
-   const result=await limitedCoreRead(supabase.from('game_evaluations').select('*')
-    .eq('game_id',gameId).order('stage_no'));
-   if(!readCurrent(ticket))return;
-   requireSuccessful([result]);setEvaluations((result.data||[]) as Evaluation[]);
-  }));
+  if(tables.has('game_evaluations'))jobs.push(loadColdEntry('evaluations',true));
   if(tables.has('game_parties'))jobs.push(readSafely(['parties'],async ticket=>{
    const ids=[...changedPartyIds.current],version=partyDeltaVersion.current;
    const full=partyDeltaNeedsFull.current||!ids.length||ids.length>16||lastCoreSuccessAt.current===0;
@@ -1634,7 +1619,7 @@ export function useRepublicGame(gameId:string){
    return loadCoreSections();
  }
 
- async function loadColdEntry(key:'events'|'evaluations'|'documents'):Promise<void>{
+ async function loadColdEntry(key:'events'|'evaluations'|'documents',force=false):Promise<void>{
   const uid=authUser.current;
   if(!uid||!acceptedMember.current||acceptedMember.current.game_id!==gameId)return;
   const scope=gameId+':'+uid+':'+readEpoch.current;
@@ -1643,9 +1628,12 @@ export function useRepublicGame(gameId:string){
    coldEntry.current={scope,loaded:new Set(),running:new Map()};
   }
   const current=coldEntry.current;
-  if(current.loaded.has(key))return;
+  // A successful targeted refresh also fulfils lazy entry. Explicit writes
+  // and reconciliation must start a new authorised read, never join an old one.
   const existing=current.running.get(key);
-  if(existing)return existing;
+  if(!force&&existing)return existing;
+  if(!force&&current.loaded.has(key))return;
+  current.loaded.delete(key);
   const task=readSafely([key],async ticket=>{
    const result=key==='events'
     ?await limitedCoreRead(supabase.from('game_events').select('*').eq('game_id',gameId)
@@ -3197,23 +3185,7 @@ export function useRepublicGame(gameId:string){
  // Use the same read-ticket generation as the Realtime reconciliation path:
  // a delayed HTTP result must not repopulate a previous user/game.
  async function refreshChangedFeed(table:'game_events'|'game_documents'){
-  if(table==='game_events'){
-   await readSafely(['events'],async ticket=>{
-    const result=await limitedCoreRead(supabase.from('game_events').select('*')
-     .eq('game_id',gameId).order('published_at',{ascending:false}).limit(100));
-    if(!readCurrent(ticket))return;
-    requireSuccessful([result]);
-    setEvents((result.data||[]) as EventItem[]);
-   });
-  }else{
-   await readSafely(['documents'],async ticket=>{
-    const result=await limitedCoreRead(supabase.from('game_documents').select('*')
-     .eq('game_id',gameId).order('created_at',{ascending:false}));
-    if(!readCurrent(ticket))return;
-    requireSuccessful([result]);
-    setDocuments((result.data||[]) as GameDocument[]);
-   });
-  }
+  await loadColdEntry(table==='game_events'?'events':'documents',true);
   notifyGameDataRefresh(gameId,table);
  }
 
