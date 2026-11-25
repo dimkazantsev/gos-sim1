@@ -32,17 +32,36 @@ export default function BudgetView({g,readOnly=false,onOpenDocument,onOpenEvents
   const requested=scope,version=++sequence.current,gameId=g.game.id,abort=new AbortController();
   reads.current?.cancel();
   let timeout:ReturnType<typeof setTimeout>|undefined,cancel=()=>{};
+  // One authorised workspace read. The old RPC remains available for a rolling
+  // deployment, but ordinary errors must never trigger three additional reads.
+  async function readWorkspace(){
+   let fiscal=await supabase.rpc('get_fiscal_budget',{p_game_id:gameId,p_workspace:true}).abortSignal(abort.signal);
+   if(abort.signal.aborted)throw new Error('Обновление бюджета отменено.');
+   if(fiscal.error?.code==='PGRST202'){
+    fiscal=await supabase.rpc('get_fiscal_budget',{p_game_id:gameId}).abortSignal(abort.signal);
+   }
+   if(fiscal.error)throw fiscal.error;
+   if(!fiscal.data||!Array.isArray(fiscal.data.regions))throw new Error('Не удалось получить общие исходные данные бюджета. Обновите раздел.');
+   if(fiscal.data.context&&Array.isArray(fiscal.data.programs))
+    return {fiscal:fiscal.data,context:fiscal.data.context,programs:fiscal.data.programs};
+   // Legacy response shape: only this compatibility path requests the other
+   // two projections. Retain the same scope, abort signal and timeout.
+   if(abort.signal.aborted)throw new Error('Обновление бюджета отменено.');
+   const [context,programs]=await Promise.all([supabase.rpc('get_fiscal_context',{p_game_id:gameId}).abortSignal(abort.signal),supabase.rpc('get_signed_state_program_budget',{p_game_id:gameId}).abortSignal(abort.signal)]);
+   if(context.error||programs.error)throw context.error||programs.error;
+   if(!context.data)throw new Error('Не удалось получить общие исходные данные бюджета. Обновите раздел.');
+   return {fiscal:fiscal.data,context:context.data,programs:programs.data||[]};
+  }
   const promise=(async()=>{
-  try{const [f,m,p]=await Promise.race([
-   Promise.all([supabase.rpc('get_fiscal_budget',{p_game_id:gameId}).abortSignal(abort.signal),supabase.rpc('get_fiscal_context',{p_game_id:gameId}).abortSignal(abort.signal),supabase.rpc('get_signed_state_program_budget',{p_game_id:gameId}).abortSignal(abort.signal)]),
+  try{const snapshot=await Promise.race([
+   readWorkspace(),
    new Promise<never>((_,reject)=>{
     cancel=()=>{clearTimeout(timeout);abort.abort();reject(new Error('Обновление бюджета отменено.'));};
     timeout=setTimeout(()=>{abort.abort();reject(new Error('Не удалось обновить бюджет за 18 секунд. Повторите попытку.'));},18000);
    })
   ]);if(!mounted.current||live.current!==requested||version!==sequence.current)return;
-   const failure=f.error||m.error||p.error;if(failure){setError(userError(failure));return;}
-   if(!f.data||!m.data){setError('Не удалось получить общие исходные данные бюджета. Обновите раздел.');return;}
-   setRegions(f.data.regions||[]);setRates(f.data.rates||[]);setProposals(f.data.proposals||[]);setCanPropose(!!f.data.can_propose);setContext(m.data);setPrograms(p.data||[]);setReady(true);setError('');
+   const f=snapshot.fiscal;
+   setRegions(f.regions||[]);setRates(f.rates||[]);setProposals(f.proposals||[]);setCanPropose(!!f.can_propose);setContext(snapshot.context);setPrograms(snapshot.programs);setReady(true);setError('');
   }catch(e){if(mounted.current&&live.current===requested&&version===sequence.current)setError(userError(e));}
   })().finally(()=>{clearTimeout(timeout);if(reads.current?.cancel===cancel)reads.current=null;});
   reads.current={scope,promise,cancel};
