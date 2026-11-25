@@ -2031,10 +2031,14 @@ export function useRepublicGame(gameId:string){
    requireSuccessful([response]);
    const rows=(response.data||[]) as FormalDocument[];
    formalFullVersion.current=formalVersion(rows);
-   setFormalDocuments(previous=>rows.map(row=>{
-    const old=previous.find(doc=>doc.id===row.id);
-    return {...row,file_url:old?.source_file_path===row.source_file_path?old.file_url||null:null};
-   }));
+   setFormalDocuments(previous=>{
+    const cached=new Map<string,FormalDocument>();
+    for(const doc of previous)if(!cached.has(doc.id))cached.set(doc.id,doc);
+    return rows.map(row=>{
+     const old=cached.get(row.id);
+     return {...row,file_url:old?.source_file_path===row.source_file_path?old?.file_url||null:null};
+    });
+   });
   });
  }
  async function loadFormalRegistry(ids?:string[]){
