@@ -29,6 +29,7 @@ jobs:
       - run: npm ci
       - run: npm run typecheck
       - run: node scripts/ui-terminology-brand-check.cjs
+      - run: node scripts/budget-read-concurrency-check.cjs
       - run: node scripts/fiscal-macro-save-check.cjs
       - run: node scripts/bank-rate-adoption-document-check.cjs
       - run: node scripts/cutoff-price-law-contract-check.cjs
