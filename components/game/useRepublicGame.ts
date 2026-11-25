@@ -2203,8 +2203,9 @@ export function useRepublicGame(gameId:string){
   const work=Promise.resolve().then(async()=>{
    let reuse=navigation;
    do{
+    const canReuse=reuse&&!flight.queued;
     flight.queued=false;
-    await loadPoliticalWallSnapshot(reuse);
+    await loadPoliticalWallSnapshot(canReuse);
     reuse=false;
    }while(flight.queued&&alive.current&&activeGameRef.current===gameId
      &&scope===gameId+':'+(authUser.current||'')+':'+readEpoch.current+':'+(politicalFullMode.current?'full':'page'));

@@ -135,8 +135,8 @@ async function singleFlightRegression(){
   source.slice(start,end)+'\nreturn loadPoliticalWall;');
  const gameId='sample-game',authUser={current:'student'},readEpoch={current:1},politicalFullMode={current:false},politicalWallFlight={current:null},alive={current:true},activeGameRef={current:gameId};
  let requests=0;
- const pending=[];
- const snapshot=()=>new Promise(resolve=>{requests++;pending.push(resolve)});
+ const pending=[],reuseFlags=[];
+ const snapshot=reuse=>new Promise(resolve=>{requests++;reuseFlags.push(reuse);pending.push(resolve)});
  const refresh=make(gameId,authUser,readEpoch,politicalFullMode,politicalWallFlight,alive,activeGameRef,snapshot);
  const p1=refresh(true),p2=refresh(true),p3=refresh(true);
  for(let i=0;i<4;i++)await Promise.resolve();
@@ -156,6 +156,12 @@ async function singleFlightRegression(){
  const switched=refresh();for(let i=0;i<4;i++)await Promise.resolve();
  assert.equal(requests,4,'New authenticated scope has its own authorized request');
  pending.shift()();await switched;
+ assert.equal(politicalWallFlight.current,null);
+ const nav=refresh(true),force=refresh(false);
+ for(let i=0;i<4;i++)await Promise.resolve();
+ assert.equal(requests,5,'Same-turn explicit refresh coalesces with navigation');
+ assert.equal(reuseFlags.at(-1),false,'Explicit refresh before microtask must bypass navigation cache');
+ pending.shift()();await Promise.all([nav,force]);
  assert.equal(politicalWallFlight.current,null);
  console.log('PASS political feed: three simultaneous calls -> one read, dirty burst -> one trailing read, identity isolated');
 }
