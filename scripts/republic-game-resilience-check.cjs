@@ -286,9 +286,43 @@ function harness({effects=false,compiledCode=code}={}){
  };
 }
 
+function checkRowIndexes(source){
+ const wall=source.indexOf('async function loadPoliticalWall(');
+ const mediaEnd=source.indexOf('return combined.map(row=>{',wall);
+ const mediaStart=source.lastIndexOf('const cached=new Map(previous.map(row=>[row.id,row]));',mediaEnd);
+ const chatStart=source.indexOf('// Inclusive cursor handles identical timestamps.');
+ const chatEnd=source.indexOf('if(!unseen.length)return;',chatStart);
+ assert(wall>=0&&mediaStart>wall&&mediaEnd>mediaStart&&chatStart>=0&&chatEnd>chatStart);
+ const compile=(params,body,result)=>vm.runInNewContext('(function('+params+'){'+ts.transpileModule(body,{compilerOptions:{target:ts.ScriptTarget.ES2022}}).outputText+';return '+result+'})');
+ const merge=compile('previous,rows,politicalOlderLoaded,full',source.slice(mediaStart,mediaEnd),'combined');
+ const unseen=compile('messageRowsRef,result',source.slice(chatStart,chatEnd),'unseen');
+ const ids=rows=>Array.from(rows,x=>x.id);
+ let visits=0;
+ const make=(n,start)=>Array.from({length:n},(_,i)=>({get id(){visits++;return String(start+i)},storage_path:'p'+(start+i)}));
+ const old=make(1000,0),fresh=make(75,950);
+ visits=0;
+ const merged=merge(old,fresh,{current:true},false),mediaVisits=visits;
+ assert.deepEqual(ids(merged),Array.from({length:1025},(_,i)=>String(i)));
+ assert(mediaVisits<=2075,'Media refresh must index each refreshed ID once');
+ visits=0;
+ const newRows=unseen({current:old},{data:fresh}),chatVisits=visits;
+ assert.deepEqual(ids(newRows),Array.from({length:25},(_,i)=>String(i+1000)));
+ assert(chatVisits<=1075,'Chat recovery must index each known ID once');
+ const duplicate=[{id:'950',storage_path:'changed'},{id:'950',storage_path:'duplicate'},{id:'new'}];
+ assert.deepEqual(ids(merge(old,duplicate,{current:true},false)),ids([...old.filter(x=>x.id!=='950'),...duplicate]));
+ assert.deepEqual(ids(merge(old,duplicate,{current:false},false)),ids(duplicate));
+ assert.deepEqual(ids(merge(old,duplicate,{current:true},true)),ids(duplicate));
+ assert.deepEqual(ids(merge([],duplicate,{current:true},false)),ids(duplicate));
+ assert.deepEqual(ids(unseen({current:old},{data:duplicate})),['new']);
+ assert.deepEqual(ids(unseen({current:[]},{data:duplicate})),ids(duplicate));
+ assert.deepEqual(ids(unseen({current:old},{data:[]})),[]);
+ console.log('PASS row refresh identifier visits: media='+mediaVisits+', chat='+chatVisits);
+}
+
 async function main(){
  const failures=[];
  async function check(name,fn){try{await fn();console.log('PASS '+name);}catch(error){failures.push(name);console.error('FAIL '+name+': '+error.message);}}
+ await check('Row refresh indexes preserve order, duplicates and linear identifier reads',()=>checkRowIndexes(fs.readFileSync(path.join(root,'components/game/useRepublicGame.ts'),'utf8')));
  await check('Newer full refresh survives a late response from the same game',async()=>{
   const h=harness(),old=h.hold('games');const first=h.render().refresh();await tick();h.setRevision(2);await h.render().refresh();assert.equal(h.render().game.current_round,2);old.resolve();await first;assert.equal(h.render().game.current_round,2);h.dispose();
  });
