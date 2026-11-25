@@ -38,3 +38,25 @@ export function mergeProfileAssetRows(
   };
  });
 }
+
+/** Reuse only previously authorized links whose backing paths are unchanged.
+ * First matching row wins, matching the former Array.find implementation.
+ * Full snapshots preserve undefined; the asset-only path normalizes to null.
+ */
+export function retainProfileLinks(
+ previous:readonly GameProfile[],rows:readonly GameProfile[],normalizeMissing=false
+):GameProfile[]{
+ if(!rows.length)return [];
+ const cached=new Map<string,GameProfile>();
+ for(const profile of previous){
+  const id=profile.user_id;
+  if(!cached.has(id))cached.set(id,profile);
+ }
+ return rows.map(row=>{
+  const old=cached.get(row.user_id);
+  const avatar=old?.avatar_path===row.avatar_path?old?.avatar_url:null;
+  const signature=old?.signature_path===row.signature_path?old?.signature_url:null;
+  return {...row,avatar_url:normalizeMissing?avatar||null:avatar,
+   signature_url:normalizeMissing?signature||null:signature};
+ });
+}

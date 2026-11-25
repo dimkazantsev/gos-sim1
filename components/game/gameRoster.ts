@@ -21,9 +21,15 @@ export const REPUBLIC_LEADERSHIP=[
 ] as const;
 
 export function republicOfficeHolders(members:Member[],offices:GameOfficeAssignment[],gameId:string,role:RegExp){
+ const officesByUser=new Map<string,GameOfficeAssignment[]>();
+ for(const office of offices){
+  if(office.game_id!==gameId)continue;
+  const rows=officesByUser.get(office.user_id);
+  if(rows)rows.push(office);else officesByUser.set(office.user_id,[office]);
+ }
  return currentGameMembers(members,gameId).filter(member=>{
   if(member.kind==='observer')return false;
-  const assignments=offices.filter(o=>o.game_id===gameId&&o.user_id===member.user_id&&role.test(o.role_title.trim()));
+  const assignments=(officesByUser.get(member.user_id)||[]).filter(o=>role.test(o.role_title.trim()));
   if(assignments.length)return assignments.some(o=>o.status==='active');
   // Older appointments and the teacher's voluntary role use the current title.
   return (member.role_title||'').split(' · ').some(title=>role.test(title.trim()));
