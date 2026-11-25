@@ -1,7 +1,11 @@
 // Isolated parity checks. No production requests or writes.
 const assert=require('node:assert/strict'),fs=require('node:fs'),ts=require('typescript'),{PGlite}=require('@electric-sql/pglite');
 require.extensions['.ts']=(module,file)=>module._compile(ts.transpileModule(fs.readFileSync(file,'utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}}).outputText,file);
+const path=require('node:path'),Module=require('node:module'),resolve=Module._resolveFilename,root=path.resolve(__dirname,'..');
+Module._resolveFilename=function(request,...args){return resolve.call(this,request.startsWith('@/')?path.join(root,request.slice(2)):request,...args)};
 const m=require('../components/game/economicModelV2.ts');
+const {fiscalEnvironment,fiscalForecast}=require('../components/game/fiscalMath');
+const {calculateFederalBudget,defaultSimulatorState,newBudgetDraft}=require('../components/game/federalBudgetMath');
 const near=(actual,expected,label)=>assert(Math.abs(Number(actual)-expected)<1e-9,label+': '+actual+' vs '+expected);
 const compare=(a,b,label)=>Object.keys(b).forEach(k=>near(a[k],b[k],label+' '+k));
 (async()=>{
@@ -26,6 +30,28 @@ const compare=(a,b,label)=>Object.keys(b).forEach(k=>near(a[k],b[k],label+' '+k)
   near(m.economicManualV2(1,56,1),.56,'Manual base');
   near(m.enterpriseFactorsV2(242100,242100,269000,.56).activity,.504,'10% fewer enterprises at constant activity');
   near(m.economicCollectionV2(1,1,10,10,.015),.05,'Collection without enterprise count double counting');
+  const region={region_code:'54',enterprises:269000,activity_multiplier:1,employees_per_firm:10,monthly_wage:50000,profit_per_firm:3,consumption_per_firm:4,expenditure:20000,transfer_in:3000,debt:4000,compliance:.95,cost_multiplier:1,profile:'industrial'};
+  const context={policy:{economic_model_version:2,key_rate:16,fx_rate:80,oil_price:75,cutoff_price:60,inflation:6,baseline_economy:50,baseline_trust:50,collection_lawfulness_reference:50,tax_activity_reference:1},metrics:{economy:50,public_trust:50,lawfulness:50}};
+  const state=defaultSimulatorState(context,[region]),draft=newBudgetDraft();
+  const calc=(ctx,rs=[region])=>calculateFederalBudget(draft,state,ctx,rs,[],[]);
+  const baseline=calc(context);
+  near(baseline.revenue,40283300,'Neutral 2026 baseline');
+  const manual={...context,policy:{...context.policy,activity_override:56,activity_reference:1}};
+  const reduced=calc(manual,[{...region,enterprises:242100}]),normal=calc(manual);
+  near(normal.business_activity,fiscalEnvironment(manual).activity,'Federal and regional macro activity');
+  near(reduced.activity/normal.activity,.9,'Independent firm count');
+  near(reduced.tax_collection,normal.tax_collection,'Firm count not included twice in collection');
+  assert.equal(reduced.enterprise_count,242100);
+  const zero=calc({...context,policy:{...context.policy,activity_override:0,activity_reference:1}});
+  near(zero.activity,0,'Federal zero activity');
+  assert.equal(zero.income_lines.find(x=>x.key==='turnover').amount,0);
+  const legal={...context,metrics:{...context.metrics,lawfulness:60}};
+  near(calc(legal).tax_collection-baseline.tax_collection,.02,'Federal law +10 points');
+  const profitLine=fiscalForecast(region,[],undefined,legal).lines.find(x=>x.key==='profit');
+  near(profitLine.amount/(profitLine.base*profitLine.rate*.01),.97,'Regional law +10 points');
+  const stronger=calc({...context,metrics:{...context.metrics,economy:60}});
+  assert(stronger.business_activity>1.10);
+  for(const line of normal.income_lines)near(normal.income_details.filter(x=>x.group_key===line.key).reduce((sum,x)=>sum+x.amount,0),line.amount,'Income detail reconciliation '+line.key);
   console.log('PASS economic model v2: TS/SQL parity, manual and zero activity, separate enterprise factor, coefficient and extreme scenarios');
  }finally{await db.close()}
 })().catch(e=>{console.error(e);process.exitCode=1});
