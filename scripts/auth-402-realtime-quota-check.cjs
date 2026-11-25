@@ -121,8 +121,9 @@ const to=source.indexOf('  // Realtime handles unread counters while chat is clo
 assert(from>=0&&to>from,'Live fallback polling section found');
 const snippet=source.slice(from,to);
 assert(snippet.includes('const recoveryTick=()=>{'),'Expected 30–40s polling callback');
-let clock=1_000_000,tick=null,changed=0;
+let clock=1_000_000,tick=null,changed=0,connectionCurrent=true;
 const env={
+ currentConnection:()=>connectionCurrent,
  Date:{now:()=>clock},
  setInterval(fn){tick=fn;return 1},
  document:{visibilityState:'visible'},
@@ -159,4 +160,7 @@ assert.equal(changed,2,'Disconnected client recovers on next normal poll');
 assert(env.reconcileTables.has('session_recovery')&&env.reconcileTables.has('game_stages')
  &&env.reconcileTables.has('game_votes'),'Disconnected recovery requests only identity, stages and votes');
 assert(!env.reconcileTables.has('*'),'Disconnection must not trigger a full entry bundle');
+connectionCurrent=false;env.reconcileTables.clear();clock+=300000;tick();
+assert.equal(changed,2,'A stale connection cannot initiate recovery reads');
+assert.equal(env.reconcileTables.size,0,'A stale connection cannot queue invalidations');
 console.log('PASS: 402 visible, connected 5-minute badge fallback, game realtime 3-minute fallback, syntax.');
