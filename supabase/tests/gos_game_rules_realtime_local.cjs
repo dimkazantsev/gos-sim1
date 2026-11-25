@@ -57,6 +57,15 @@ async function join(item,id,allow=true){
  else assert.notEqual(result.status,'SUBSCRIBED','Foreign JWT must not join the target room');
  return room;
 }
+function verifyRulePayload(payload,table){
+ assert(payload&&typeof payload==='object','Rule Broadcast payload required');
+ // Realtime attaches its own message UUID to the application payload.
+ // Permit that metadata only; no rule records, game IDs or user data.
+ assert.deepEqual(Object.keys(payload).sort(),['id','table'],'Only table and server message ID may be broadcast');
+ assert.equal(payload.table,table);
+ assert.match(payload.id,/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i,'Realtime message UUID');
+ return payload.id;
+}
 async function change(table,action,targets,run){
  const before=rooms.map(room=>room.received.length);
  const rows=data(await run(),table+' '+action);
@@ -66,12 +75,14 @@ async function change(table,action,targets,run){
  // One notification per changed game and statement, not one per changed row.
  // Non-target rooms must receive none. Also validate the complete payload.
  await sleep(350);
+ const deliveredIds=[];
  for(let i=0;i<rooms.length;i++){
   const room=rooms[i],expected=targets.includes(room)?1:0;
   const messages=room.received.slice(before[i]);
   assert.equal(messages.length,expected,table+' '+action+' delivery count for '+room.label);
-  if(expected)assert.deepEqual(messages[0],{table},'Only table metadata may be broadcast');
+  if(expected)deliveredIds.push(verifyRulePayload(messages[0],table));
  }
+ assert.equal(new Set(deliveredIds).size,1,'All target rooms must receive the same statement message');
 }
 async function main(){
  await preflight();
