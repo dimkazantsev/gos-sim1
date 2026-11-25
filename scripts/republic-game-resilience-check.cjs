@@ -356,6 +356,25 @@ async function main(){
   assert.equal(h.readCount('game_members'),membersBefore);
   h.dispose();
  });
+ await check('Targeted cold-feed reads satisfy later lazy entry without hiding updates',async()=>{
+  const h=harness({effects:true});
+  try{
+   await h.settle();
+   const tables=['game_events','game_documents','game_evaluations'];
+   const before=tables.map(table=>h.readCount(table));
+   assert.equal(await h.render().publishEvent('Новость','Текст'),true);
+   assert.equal(await h.render().createDocument({title:'Документ',type:'Документ',body:'Текст'}),true);
+   await h.render().setEvaluation('teacher-a',4,'Проверка');
+   await h.settle();
+   const after=tables.map(table=>h.readCount(table));
+   assert.deepEqual(after,before.map(n=>n+1),'Writes always refresh the affected RLS-scoped collection');
+   for(const view of ['events','documents','grades']){h.render().setActiveView(view);await h.settle()}
+   assert.deepEqual(tables.map(table=>h.readCount(table)),after,'Opening a just-refreshed collection must not fetch it again');
+   await h.render().publishEvent('Следующая новость','Текст');
+   assert.equal(h.readCount('game_events'),after[0]+1,'A later write still forces a new read');
+   console.log(JSON.stringify({scenario:'teacher writes three cold collections then opens each view',targetedReads:3,redundantNavigationReads:0,productionRequests:0}));
+  }finally{h.dispose()}
+ });
  await check('Non-Realtime dashboard data stays synchronised without full entry',async()=>{
   const h=harness({effects:true});
   try{
