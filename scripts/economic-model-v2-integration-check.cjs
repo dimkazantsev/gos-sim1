@@ -1,0 +1,54 @@
+// Runs exact candidate SQL against an isolated in-memory PostgreSQL schema.
+const assert=require('node:assert/strict'),fs=require('node:fs'),{PGlite}=require('@electric-sql/pglite');
+const base=require('../data/federal-budget-2026.json');
+const near=(a,b,label)=>assert(Math.abs(Number(a)-Number(b))<=Math.max(1e-8,Math.abs(Number(b))*1e-12),label+': '+a+' vs '+b);
+const uid=n=>'10000000-0000-0000-0000-'+String(n).padStart(12,'0');
+const active=uid(1),archived=uid(2),fresh=uid(3),teacher=uid(10),student=uid(11);
+(async()=>{const db=new PGlite();try{
+ await db.exec(fs.readFileSync('scripts/economic-model-v2-integration-fixture.sql','utf8'));
+ await db.query('INSERT INTO private.budget_baseline VALUES(2026,$1::jsonb)',[JSON.stringify(base)]);
+ const anchor={enterprises:269000,key_rate:16,fx_rate:80,oil_price:75,inflation:6,economy:50,trust:50,tax_activity_reference:1,regional_activity_reference:.56,aux_metrics:{security:50,social_stability:50,elite_support:50,international_standing:50,legitimacy:50,media_climate:50}};
+ for(const [g,status] of [[active,'active'],[archived,'archived'],[fresh,'active']]){
+  await db.query('INSERT INTO games VALUES($1,$2)',[g,status]);
+  await db.query('INSERT INTO game_fiscal_policy(game_id,key_rate,fx_rate,oil_price,cutoff_price,inflation,federal_expenditure,municipal_expenditure,baseline_economy,baseline_trust,updated_at,activity_override,activity_reference,collection_lawfulness_reference) VALUES($1,16,80,75,60,6,100,40,50,50,now(),$2,1,50)',[g,g===fresh?null:56]);
+  await db.query("INSERT INTO game_fiscal_regions VALUES($1,'54',269000,1,100)",[g]);
+  await db.query("INSERT INTO state_metrics(game_id,metric_key,value) VALUES($1,'economy',50),($1,'public_trust',50),($1,'lawfulness',50),($1,'social_tension',80),($1,'security',50),($1,'social_stability',50),($1,'elite_support',50),($1,'international_standing',50),($1,'legitimacy',50),($1,'media_climate',50)",[g]);
+  await db.query("INSERT INTO game_members VALUES($1,$2,'teacher','Преподаватель',null),($1,$3,'student','Депутат',null)",[g,teacher,student]);
+  if(g!==fresh)await db.query('INSERT INTO budget_simulator_state(game_id,anchor,internal_debt,external_debt,reserve_remaining,last_financing,fnb_fx_units) VALUES($1,$2::jsonb,$3,$4,$5,$6::jsonb,$7)',[g,JSON.stringify(anchor),base.internal_debt_end,base.external_debt_end,base.reserve_available_model,JSON.stringify(base.financing),base.reserve_available_model*.25/80]);
+ }
+ const core=fs.readFileSync('scripts/economic-model-v2-core.sql','utf8'),integration=fs.readFileSync('scripts/economic-model-v2-integration.sql','utf8');
+ await db.exec(core+'\n'+integration);
+ await db.exec("CREATE CONSTRAINT TRIGGER sync_budget_from_fiscal_ledger AFTER INSERT ON public.fiscal_change_ledger DEFERRABLE INITIALLY DEFERRED FOR EACH ROW EXECUTE FUNCTION private.sync_budget_from_fiscal_ledger(); CREATE CONSTRAINT TRIGGER sync_budget_after_driver_change AFTER UPDATE OF value ON public.state_metrics DEFERRABLE INITIALLY DEFERRED FOR EACH ROW EXECUTE FUNCTION private.reconcile_budget_driver_trigger();");
+ const draft={financing:base.financing,income_changes:{},spending_changes:{},revenue_adjustments:{},transfer_ids:[]};
+ const calc=async g=>(await db.query('SELECT private.calculate_budget_simulator($1,$2::jsonb) c',[g,JSON.stringify(draft)])).rows[0].c;
+ const get=async g=>(await db.query('SELECT p.activity_reference,p.activity_override,s.anchor,s.version FROM game_fiscal_policy p JOIN budget_simulator_state s USING(game_id) WHERE p.game_id=$1',[g])).rows[0];
+ const old=await get(archived),current=await get(active);
+ assert.equal(old.anchor.economic_model_version,undefined);assert.equal(old.version,1);near(old.activity_reference,1,'Archived reference preserved');
+ assert.equal(current.anchor.economic_model_version,2);assert.equal(current.version,2);near(current.activity_reference,.9/.98,'Manual baseline transfer');
+ const original=await calc(active),legacy=await calc(archived);
+ near(original.business_activity,.56*.98,'Preserve displayed old activity during migration');
+ assert.equal(original.enterprise_count,269000);assert.equal(legacy.economic_model_version,1);assert.equal(legacy.business_activity,null);
+ for(const line of original.income_lines)near(original.income_details.filter(x=>x.group_key===line.key).reduce((s,x)=>s+Number(x.amount),0),line.amount,'Income detail '+line.key);
+ const freshForecast=await calc(fresh);assert.equal(freshForecast.economic_model_version,2);assert.equal(freshForecast.enterprise_count,269000);
+ await db.query('UPDATE game_fiscal_regions SET enterprises=242100 WHERE game_id=$1',[active]);
+ const fewer=await calc(active);near(fewer.activity/original.activity,.9,'Separate count factor');near(fewer.tax_collection,original.tax_collection,'Do not double count firms in compliance');
+ await db.query("SELECT set_config('request.jwt.claim.sub',$1,false)",[teacher]);
+ const ctx=(await db.query('SELECT public.get_fiscal_context($1) c',[active])).rows[0].c;
+ assert.equal(ctx.policy.economic_model_version,2);
+ await db.query("SELECT public.set_fiscal_policy($1,$2::jsonb,'Проверка исходной активности')",[active,JSON.stringify({activity_override:65})]);
+ let after=await calc(active);near(after.business_activity,.65,'Exact manual activity after immediate derived effects');
+ let calls=(await db.query('SELECT count(*)::int n FROM private.reconcile_calls WHERE game_id=$1',[active])).rows[0].n;
+ assert.equal(calls,1,'One forecast calculation after save and deferred triggers');
+ const reference=(await get(active)).activity_reference;
+ await db.query("SELECT public.set_fiscal_policy($1,$2::jsonb,'Проверка ключевой ставки')",[active,JSON.stringify({key_rate:21})]);
+ after=await calc(active);assert(after.business_activity<.65);near((await get(active)).activity_reference,reference,'Rate never rebases manual activity');
+ calls=(await db.query('SELECT count(*)::int n FROM private.reconcile_calls WHERE game_id=$1',[active])).rows[0].n;assert.equal(calls,2);
+ await db.query("SELECT set_config('request.jwt.claim.sub',$1,false)",[student]);
+ await assert.rejects(()=>db.query("SELECT public.set_fiscal_policy($1,$2::jsonb,'Попытка изменения активности')",[active,JSON.stringify({activity_override:100})]),/Ключевую ставку меняет/);
+ await db.query("SELECT set_config('request.jwt.claim.sub',$1,false)",[teacher]);
+ await db.query("SELECT public.set_fiscal_policy($1,$2::jsonb,'Проверка нулевой активности')",[active,JSON.stringify({activity_override:0})]);
+ const zero=await calc(active);near(zero.activity,0,'Zero activity');near(zero.income_lines.find(x=>x.key==='turnover').amount,0,'Zero turnover');
+ const rights=(await db.query("SELECT has_function_privilege('authenticated','private.economic_manual_v2(numeric,numeric,numeric)','EXECUTE') allowed")).rows[0];assert.equal(rights.allowed,false);
+ assert.deepEqual((await get(archived)).anchor,old.anchor,'Archived game not revalued');
+ console.log('PASS economic v2 integration: actual SQL calculator, migration, active/archived isolation, manual and zero activity, roles, one recompute');
+ }finally{await db.close()}})().catch(e=>{console.error(e);process.exitCode=1});

@@ -1,7 +1,8 @@
 import catalog from '@/data/taxes-2026.json';
+import {economicAuxV2,economicAutomaticV2,economicManualV2,economicCollectionV2} from './economicModelV2';
 export type FiscalRegion={game_id:string;region_code:string;name:string;profile:string;disputed:boolean;budget_year:number;enterprises:number;employees_per_firm:number;monthly_wage:number;profit_per_firm:number;consumption_per_firm:number;expenditure:number;transfer_in:number;budget_credit_cash?:number;debt:number;compliance:number;activity_multiplier:number;cost_multiplier:number;observations:Record<string,number|null>;source_url:string;source_year:number};
 export type FiscalRate={region_code:string;tax_key:string;rate:number};
-export type FiscalPolicy={budget_aux_anchor?:Record<string,number>;fnb_total?:number;fnb_liquid?:number;fnb_fx_share?:number;monetary_last_settled_on?:string;monetary_last_effect_date?:string|null;monetary_last_daily_effect?:number;monetary_cumulative_effect?:number;monetary_last_day_details?:Array<{date:string;change:number}>;tax_activity_reference?:number;key_rate:number;fx_rate:number;oil_price:number;cutoff_price:number;inflation:number;federal_expenditure:number;municipal_expenditure:number;baseline_economy:number;baseline_trust:number;activity_override?:number|null;activity_reference?:number|null;collection_lawfulness_reference?:number|null;updated_at:string};
+export type FiscalPolicy={economic_model_version?:number;budget_aux_anchor?:Record<string,number>;fnb_total?:number;fnb_liquid?:number;fnb_fx_share?:number;monetary_last_settled_on?:string;monetary_last_effect_date?:string|null;monetary_last_daily_effect?:number;monetary_cumulative_effect?:number;monetary_last_day_details?:Array<{date:string;change:number}>;tax_activity_reference?:number;key_rate:number;fx_rate:number;oil_price:number;cutoff_price:number;inflation:number;federal_expenditure:number;municipal_expenditure:number;baseline_economy:number;baseline_trust:number;activity_override?:number|null;activity_reference?:number|null;collection_lawfulness_reference?:number|null;updated_at:string};
 export type FiscalContext={policy:FiscalPolicy;metrics:Record<string,number>;can_change_rate:boolean;can_issue_bank_rate_decision?:boolean};
 /** Model B additional channels: four anchor-relative activity drivers,
  * two tax-collection drivers, plus the approved PERMANENT level-based
@@ -22,14 +23,16 @@ export function modelBAdditionalChannels(metrics:Record<string,number>,anchors?:
 const clamp=(v:number,min:number,max:number)=>Math.max(min,Math.min(max,v));
 export function fiscalEnvironment(c?:FiscalContext|null){
  if(!c)return {activity:1,cost:1,fx:80,uncertainty:.04};
- const aux=modelBAdditionalChannels(c.metrics,c.policy.budget_aux_anchor);
  const p=c.policy,economy=(c.metrics.economy??p.baseline_economy)-p.baseline_economy,trust=(c.metrics.public_trust??p.baseline_trust)-p.baseline_trust;
- const fx=p.fx_rate*clamp(1-economy*.001-trust*.001-(p.key_rate-16)*.0015,.75,1.3);
+ const v2=p.economic_model_version===2;
+ const aux=v2?economicAuxV2(c.metrics,p.budget_aux_anchor??{}):modelBAdditionalChannels(c.metrics,p.budget_aux_anchor);
+ const newMacro=v2?economicAutomaticV2(p.key_rate,p.fx_rate,economy,trust,aux.activity_adjustment):null;
+ const fx=newMacro?.fx??p.fx_rate*clamp(1-economy*.001-trust*.001-(p.key_rate-16)*.0015,.75,1.3);
  // A manual value is a new starting level, not a permanent freeze.
  // The reference factor is captured when the teacher sets that level.
- const automatic=clamp(1-(p.key_rate-16)*.007+economy*.002+trust*.001-(fx/80-1)*.06+aux.activity_adjustment,.65,1.4);
+ const automatic=newMacro?.automatic??clamp(1-(p.key_rate-16)*.007+economy*.002+trust*.001-(fx/80-1)*.06+aux.activity_adjustment,.65,1.4);
  const reference=p.activity_reference!=null&&p.activity_reference>0?p.activity_reference:automatic;
- const activity=p.activity_override!=null?clamp(p.activity_override/100*automatic/reference,0,10):automatic;
+ const activity=v2?economicManualV2(automatic,p.activity_override,p.activity_reference):p.activity_override!=null?clamp(p.activity_override/100*automatic/reference,0,10):automatic;
  const cost=clamp(1+(p.inflation-6)*.004+(fx/80-1)*.02,.7,1.6);
  const uncertainty=clamp(.04+Math.abs(economy)*.001+Math.abs(trust)*.001+Math.abs(p.inflation-6)*.003,.025,.2);
  return {activity,cost,fx,uncertainty};
@@ -42,11 +45,19 @@ export function fiscalForecast(r:FiscalRegion,rates:FiscalRate[],preview?:{tax:s
  const bases:Record<string,number>={consumption:r.enterprises*r.consumption_per_firm*a,payroll:employees*r.monthly_wage*12/1e6*macro.activity,profit:r.enterprises*r.profit_per_firm*a,corporate_assets:r.enterprises*18*fixedBaseFactor,horsepower:r.enterprises*2*120*fixedBaseFactor,land_value:r.enterprises*3*fixedBaseFactor,housing_value:employees*2.5*fixedBaseFactor,tourism_income:(r.profile==='tourism'?r.enterprises*3:r.enterprises*.2)*macro.activity,oil_income:r.profile==='resources'?r.enterprises*4*oilFactor:0,gambling_income:0};
  const law=context?.metrics.lawfulness,ref=context?.policy.collection_lawfulness_reference;
  const trust=context?.metrics.public_trust,trustRef=context?.policy.baseline_trust;
- // Limit the total regional collection adjustment to +/-1 percentage point.
- const adjustment=clamp((law!=null&&ref!=null?(law-ref)*.0003:0)+(trust!=null&&trustRef!=null?(trust-trustRef)*.0005:0)+(context?modelBAdditionalChannels(context.metrics,context.policy.budget_aux_anchor).collection_adjustment:0),-.01,.01);
- const economicCollectionShift=clamp(
- (macro.activity/Math.max(.01,context?.policy.tax_activity_reference??macro.activity)-1)*.12,-.06,.015);
- const effectiveCollection=clamp(r.compliance+adjustment+economicCollectionShift,0,1);
+ const lawDelta=law!=null&&ref!=null?law-ref:0;
+ const trustDelta=trust!=null&&trustRef!=null?trust-trustRef:0;
+ let collectionDelta:number;
+ if(context?.policy.economic_model_version===2){
+  const aux=economicAuxV2(context.metrics,context.policy.budget_aux_anchor??{});
+  collectionDelta=economicCollectionV2(macro.activity,context.policy.tax_activity_reference??macro.activity,lawDelta,trustDelta,aux.collection_adjustment);
+ }else{
+  // Preserve archived and pre-migration model behaviour.
+  const adjustment=clamp(lawDelta*.0003+trustDelta*.0005+(context?modelBAdditionalChannels(context.metrics,context.policy.budget_aux_anchor).collection_adjustment:0),-.01,.01);
+  const economicCollectionShift=clamp((macro.activity/Math.max(.01,context?.policy.tax_activity_reference??macro.activity)-1)*.12,-.06,.015);
+  collectionDelta=adjustment+economicCollectionShift;
+ }
+ const effectiveCollection=clamp(r.compliance+collectionDelta,0,1);
  const lines=catalog.taxes.map(t=>{
   const scope=t.level==='federal'?'00':r.region_code;
   const rate=preview?.tax===t.key?preview.rate:rates.find(x=>x.tax_key===t.key&&x.region_code===scope)?.rate??t.default_rate;
