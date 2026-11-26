@@ -26,14 +26,14 @@ assert(css.includes('var(--gs-accent)')&&css.includes('var(--gs-border)'),'Use a
 assert(css.includes(':focus-within')&&css.includes('focus')||css.includes(':focus-within'),'Keyboard focus is visible');
 const cssBundle=['app/design-tokens.css','app/globals.css','app/design-views.css','app/2026-civic-portal.css','app/vote-ballot-panel.css'].map(file=>fs.readFileSync(path.join(root,file),'utf8')).join('\n');
 const original=React.useState;
-function htmlFor({partial=false,split=false,canCast=true,maxWeight=225}){
+function htmlFor({partial=false,split=false,canCast=true,maxWeight=225,embedded=false}){
  let index=0;const states=[partial,split,maxWeight,Math.floor(maxWeight/3),Math.floor(maxWeight/3),Math.floor(maxWeight/3),false];
  React.useState=(initial)=>[states[index++]??initial,()=>{}];
  try{
   const rendered=renderToStaticMarkup(React.createElement(Ballot,{
-   vote:{voting_mode:'mandate',allow_abstain:true},maxWeight,canCast,onSubmit:async()=>true
+   vote:{voting_mode:embedded?'member':'mandate',allow_abstain:!embedded,institution_key:embedded?'government':'gd'},maxWeight,canCast,onSubmit:async()=>true
   }));
-  return '<!doctype html><html lang="ru"><head><meta name="viewport" content="width=device-width,initial-scale=1"><style>'+cssBundle+'</style></head><body><main class="civicVotes" style="padding:12px;max-width:1500px;margin:auto"><div class="proceduralVoteActions">'+rendered+'</div></main></body></html>';
+  return '<!doctype html><html lang="ru"><head><meta name="viewport" content="width=device-width,initial-scale=1"><style>'+cssBundle+'</style></head><body><main class="'+(embedded?'civicRegistration':'civicVotes')+'" style="padding:12px;max-width:1500px;margin:auto"><div class="proceduralVoteActions">'+rendered+'</div></main></body></html>';
  }finally{React.useState=original}
 }
 assert.match(htmlFor({}),/Доступные депутатские голоса/);
@@ -46,10 +46,10 @@ if(!executable)throw Error('Chromium is required to check actual responsive layo
 (async()=>{
  const browser=await chromium.launch({headless:true,executablePath:executable,args:['--no-sandbox','--disable-dev-shm-usage']});
  try{
-  for(const mode of ['default','partial','split']){
+  for(const mode of ['default','partial','split','embedded']){
    for(const width of [320,375,430,768,820,1024,1440]){
     const page=await browser.newPage({viewport:{width,height:900}});
-    await page.setContent(htmlFor({partial:mode==='partial',split:mode==='split'}));
+    await page.setContent(htmlFor({partial:mode==='partial',split:mode==='split',embedded:mode==='embedded',...(mode==='embedded'?{canCast:false,maxWeight:0}:{})}));
     const geo=await page.evaluate(()=>{
      const panel=document.querySelector('.civicBallotModern');
      const selectors=['.civicBallotMode','.civicBallotQuota','.civicBallotAmount input','.civicBallotChoices button','.civicBallotSplitField input','.civicBallotSubmit'];
@@ -68,6 +68,21 @@ if(!executable)throw Error('Chromium is required to check actual responsive layo
     }
     if(mode==='partial')assert(geo.items.some(x=>x.tag==='INPUT'),'The quantity input is visible');
     if(mode==='split')assert(geo.items.filter(x=>x.tag==='INPUT').length>=3,'Split has three inputs');
+    // Check real text geometry, not only the outer container: the previous
+    // selector silently missed shared ballots embedded outside .civicVotes.
+    const spacing=await page.evaluate(()=>{
+     const panel=document.querySelector('.civicBallotModern');
+     const top=panel.querySelector('.civicBallotTopCopy');
+     const quota=panel.querySelector('.civicBallotQuota');
+     const choices=panel.querySelector('.civicBallotChoices');
+     const rect=el=>el.getBoundingClientRect();
+     const gap=(el,a,b,axis)=>{const x=rect(el.querySelector(a)),y=rect(el.querySelector(b));return axis==='y'?y.top-x.bottom:y.left-x.right};
+     const buttons=choices?[...choices.querySelectorAll('button')]:[];
+     return {headerGap:gap(top,'span','strong','y'),quotaGap:gap(quota,'b','span','x'),choiceGaps:buttons.map(b=>gap(b,'span','b','x')),disabled:buttons.every(b=>b.disabled),count:buttons.length,gridWidth:choices?rect(choices).width:0,buttonWidth:buttons.length?rect(buttons[0]).width:0};
+    });
+    assert(spacing.headerGap>=3&&spacing.quotaGap>=6,`Joined header/quota: ${mode} ${width}px ${JSON.stringify(spacing)}`);
+    assert(spacing.choiceGaps.every(g=>g>=7),`Joined choice labels: ${mode} ${width}px ${JSON.stringify(spacing)}`);
+    if(mode==='embedded'){assert(spacing.disabled&&spacing.count===2,'Zero eligible votes stay disabled');if(width>650)assert(spacing.buttonWidth>spacing.gridWidth*.45,'Two buttons must fill the row');}
     await page.close();
     console.log('PASS: '+mode+' ballot at '+width+'px');
    }
