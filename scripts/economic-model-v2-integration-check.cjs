@@ -50,5 +50,43 @@ const active=uid(1),archived=uid(2),fresh=uid(3),teacher=uid(10),student=uid(11)
  const zero=await calc(active);near(zero.activity,0,'Zero activity');near(zero.income_lines.find(x=>x.key==='turnover').amount,0,'Zero turnover');
  const rights=(await db.query("SELECT has_function_privilege('authenticated','private.economic_manual_v2(numeric,numeric,numeric)','EXECUTE') allowed")).rows[0];assert.equal(rights.allowed,false);
  assert.deepEqual((await get(archived)).anchor,old.anchor,'Archived game not revalued');
+
+ // Exercise the exact server candidate as well as the original fixture implementation.
+ // The extra relations are minimal isolated fixtures for the production cache signature.
+ await db.exec("ALTER TABLE public.state_metrics ADD COLUMN id uuid DEFAULT gen_random_uuid(), ADD COLUMN previous_value numeric, ADD COLUMN updated_at timestamptz; ALTER TABLE public.budget_finance_contracts ADD COLUMN issued_month int, ADD COLUMN issued_rubles numeric; CREATE TABLE public.state_programs(id uuid,game_id uuid); CREATE TABLE public.state_program_goals(id uuid,game_id uuid); CREATE TABLE public.state_program_components(id uuid,game_id uuid); CREATE TABLE public.state_program_expenses(id uuid,game_id uuid); CREATE TABLE public.state_program_budget_commitments(game_id uuid,program_id uuid,budget_year int); CREATE TABLE public.budget_simulator_plans(id uuid,game_id uuid,status text,title text,draft jsonb,updated_at timestamptz); CREATE TABLE public.budget_income_history(id bigint GENERATED ALWAYS AS IDENTITY,game_id uuid,plan_id uuid,value numeric,previous_value numeric,expenditure numeric,mode text,note text); CREATE TABLE private.budget_forecast_cache(game_id uuid PRIMARY KEY,input_signature text,calculation jsonb,updated_at timestamptz DEFAULT now()); DROP FUNCTION private.reconcile_budget_driver(uuid);");
+ await db.exec(fs.readFileSync('supabase/changes/economic_model_v2_hardening_candidate.sql','utf8'));
+ const adjustedDraft={...draft,revenue_adjustments:{turnover:123}};
+ const adjusted=(await db.query('SELECT private.calculate_budget_simulator($1,$2::jsonb) c',[active,JSON.stringify(adjustedDraft)])).rows[0].c;
+ near(adjusted.income_lines.find(x=>x.key==='turnover').amount,123,'Actual candidate: zero taxable base with direct adjustment');
+ const adjustmentLines=adjusted.income_details.filter(x=>x.group_key==='turnover');
+ near(adjustmentLines.reduce((s,x)=>s+Number(x.amount),0),123,'Actual candidate: detail reconciliation');
+ assert.equal(adjustmentLines.filter(x=>x.key==='adjustment:turnover').length,1);
+ assert(adjustmentLines.filter(x=>x.key!=='adjustment:turnover').every(x=>Number(x.base)===0));
+ await db.query("INSERT INTO public.state_metrics(game_id,metric_key,value) VALUES($1,'budget',0)",[active]);
+ await db.query('SELECT private.reconcile_budget_driver($1)',[active]);
+ const synced=(await db.query("SELECT m.value,c.calculation FROM public.state_metrics m JOIN private.budget_forecast_cache c USING(game_id) WHERE m.game_id=$1 AND m.metric_key='budget'",[active])).rows[0];
+ near(synced.value,synced.calculation.revenue,'Actual candidate: dashboard and cache');
+ await db.query("SELECT public.set_fiscal_policy($1,$2::jsonb,'Проверка курса и фонда')",[active,JSON.stringify({fx_rate:100,fnb_total:2000,fnb_liquid:1000,fnb_fx_share:25})]);
+ const fnb=(await db.query('SELECT fnb_fx_units,reserve_remaining FROM budget_simulator_state WHERE game_id=$1',[active])).rows[0];
+ near(fnb.fnb_fx_units,2.5,'Actual candidate: FNB conversion uses new exchange rate');
+ near(fnb.reserve_remaining,1000,'Actual candidate: FNB liquid amount');
+ await db.query("INSERT INTO public.budget_finance_contracts(id,game_id,source_key,principal,maturity_month,status,issued_month,issued_rubles) VALUES($1,$2,'external',100,5,'due',0,100)",[uid(20),active]);
+ const signature=async()=>(await db.query('SELECT private.budget_forecast_signature($1,$2::jsonb) s',[active,JSON.stringify(draft)])).rows[0].s;
+ const beforeMaturity=await signature();
+ await db.query('UPDATE public.budget_finance_contracts SET maturity_month=6 WHERE id=$1',[uid(20)]);
+ assert.notEqual(await signature(),beforeMaturity,'Actual candidate: debt maturity invalidates cache');
+ const testValues=(await db.query("SELECT private.bounded_collection_v2(1.061093,.70,.995) AS a,private.bounded_collection_v2(1.041093,.70,.995) AS b,private.bounded_collection_v2(.95,.70,.995) AS neutral")).rows[0];
+ assert(Number(testValues.a)>Number(testValues.b),'Actual candidate: no high-end plateau');
+ near(testValues.neutral,.95,'Actual candidate: neutral collecting rate');
+ const newGame=uid(4);
+ await db.query("INSERT INTO public.games VALUES($1,'active');",[newGame]);
+ await db.query("INSERT INTO public.game_fiscal_regions VALUES($1,'54',100,1,100)",[newGame]);
+ await db.query("INSERT INTO public.state_metrics(game_id,metric_key,value) VALUES($1,'lawfulness',43)",[newGame]);
+ await db.query('SELECT private.ensure_budget_simulator($1)',[newGame]);
+ near((await db.query('SELECT collection_lawfulness_reference FROM game_fiscal_policy WHERE game_id=$1',[newGame])).rows[0].collection_lawfulness_reference,43,'Actual candidate: first initialization captures lawfulness');
+ const privateGrant=(await db.query("SELECT has_function_privilege('authenticated','private.bounded_collection_v2(numeric,numeric,numeric)','EXECUTE') allowed")).rows[0];
+ assert.equal(privateGrant.allowed,false);
+ console.log('PASS exact hardening SQL: detail reconciliation, FNB, cache maturity, dashboard, law reference and private privileges');
+
  console.log('PASS economic v2 integration: actual SQL calculator, migration, active/archived isolation, manual and zero activity, roles, one recompute');
  }finally{await db.close()}})().catch(e=>{console.error(e);process.exitCode=1});

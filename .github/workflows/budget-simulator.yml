@@ -36,6 +36,8 @@ jobs:
       - run: node scripts/inflation-spending-contract-check.cjs
       - run: node scripts/monetary-policy-calendar-check.cjs
       - run: node scripts/budget-simulator-math-check.cjs
+      - run: node scripts/economic-model-v2-check.cjs
+      - run: node scripts/economic-model-v2-integration-check.cjs
       - run: node scripts/external-finance-policy-check.cjs
       - run: node scripts/budget-workflow-math-check.cjs
       - run: node scripts/economy-b-budget-driver-sync-check.cjs
