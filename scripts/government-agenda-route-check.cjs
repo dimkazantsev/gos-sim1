@@ -1,0 +1,20 @@
+const assert=require('node:assert/strict');
+const fs=require('node:fs'),path=require('node:path'),ts=require('typescript');
+const source=fs.readFileSync(path.join(__dirname,'../components/game/documentRoute.ts'),'utf8');
+const mod={exports:{}};
+new Function('require','module','exports',ts.transpileModule(source,{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}}).outputText)(require,mod,mod.exports);
+const {documentRoute,governmentAgendaVotes}=mod.exports;
+const d={id:'doc',game_id:'game',stage_no:11,doc_type:'meeting_agenda',subject_key:'government',metadata:{document_kind:'government_session_agenda'},body_text:'approved text',status_code:'published',status_label:'Подписано',workflow_steps:[{code:'draft'},{code:'published'}],current_step:1,current_owner_key:'system'};
+const v={id:'vote',game_id:'game',stage_no:11,formal_document_id:'doc',institution_key:'government',procedure_key:'government_agenda',body:'approved text',status:'closed',result_code:'passed',result_quorum_met:true,opened_at:'2026-11-26T12:00:00Z'};
+assert.equal(documentRoute(d,v).progress,100);
+assert.equal(documentRoute(d,v).step,3);
+assert.equal(documentRoute(d,v).status,'Повестка утверждена');
+assert.equal(documentRoute(d).progress,67);
+assert.equal(documentRoute({...d,status_code:'draft'},v).progress,0);
+for(const change of [{body:'other text'},{game_id:'other'},{result_quorum_met:false},{result_code:'no_majority'},{status:'open'},{procedure_key:'manual'},{formal_document_id:'other'}])
+ assert.equal(documentRoute(d,{...v,...change}).progress,67);
+assert.equal(governmentAgendaVotes([v,{...v,id:'replacement',opened_at:'2026-11-26T13:00:00Z',result_code:'superseded'}]).get('doc').id,'vote');
+assert.equal(governmentAgendaVotes([v,{...v,id:'new',opened_at:'2026-11-26T13:00:00Z',status:'open',result_code:null}]).get('doc').id,'new');
+assert.equal(documentRoute({...d,doc_type:'government_resolution',current_step:0}).progress,100);
+assert.equal(documentRoute({...d,status_code:'rejected'},v).governmentAgenda,false);
+console.log('PASS: document route: linked vote, quorum, revision, unsigned, open, rejected, superseded, legacy publication');
