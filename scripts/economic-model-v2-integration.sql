@@ -14,7 +14,7 @@ CREATE OR REPLACE FUNCTION private.budget_income_details_v2(p_game uuid, d jsonb
  SET search_path TO 'public', 'private', 'pg_temp'
 AS $function$
 declare model jsonb:='[{"key":"oil_ndpi","group_key":"oil_gas","label":"Налоги на добычу нефти и газа","share":0.8,"reference_rate":40,"rate_unit":"percent","base_unit":"million_rubles","federal_share":1,"model_rate":true,"base_label":"Расчётная стоимость добычи","driver_note":"Цена нефти и курс рубля"},{"key":"oil_extra","group_key":"oil_gas","label":"Дополнительные нефтегазовые поступления","share":0.2,"reference_rate":25,"rate_unit":"percent","base_unit":"million_rubles","federal_share":1,"model_rate":true,"base_label":"Расчётный доход нефтегазового сектора","driver_note":"Цена нефти и курс рубля"},{"key":"vat","group_key":"turnover","label":"НДС","share":0.72,"reference_rate":22,"rate_unit":"percent","base_unit":"million_rubles","federal_share":1,"model_rate":false,"base_label":"Облагаемый оборот без НДС","driver_note":"Предприятия, занятость, спрос и решения в игре"},{"key":"excise","group_key":"turnover","label":"Акцизы","share":0.18,"reference_rate":20,"rate_unit":"percent","base_unit":"million_rubles","federal_share":1,"model_rate":true,"base_label":"Расчётная стоимость подакцизных товаров","driver_note":"Деловая активность и объём потребления"},{"key":"customs","group_key":"turnover","label":"Таможенные пошлины","share":0.1,"reference_rate":10,"rate_unit":"percent","base_unit":"million_rubles","federal_share":1,"model_rate":true,"base_label":"Расчётная стоимость облагаемого импорта","driver_note":"Деловая активность и внешняя торговля"},{"key":"profit","group_key":"income","label":"Налог на прибыль · федеральная часть","share":0.8,"reference_rate":25,"rate_unit":"percent","base_unit":"million_rubles","federal_share":0.32,"model_rate":false,"base_label":"Облагаемая прибыль организаций","driver_note":"Предприятия, активность и принятые налоговые решения"},{"key":"personal_income","group_key":"income","label":"Федеральные поступления налога на доходы физических лиц","share":0.2,"reference_rate":15,"rate_unit":"percent","base_unit":"million_rubles","federal_share":1,"model_rate":true,"base_label":"Расчётная база федеральных поступлений","driver_note":"Деловая активность; ставка усреднена для игры"},{"key":"dividends","group_key":"assets","label":"Дивиденды по государственной доле","share":0.6,"reference_rate":100,"rate_unit":"percent","base_unit":"million_rubles","federal_share":1,"model_rate":true,"base_label":"Прогноз выплат по государственной доле","driver_note":"Прогноз распределяемых выплат"},{"key":"asset_interest","group_key":"assets","label":"Доходы от размещения средств и использования имущества","share":0.4,"reference_rate":100,"rate_unit":"percent","base_unit":"million_rubles","federal_share":1,"model_rate":true,"base_label":"Прогноз процентных, арендных и иных платежей","driver_note":"Утверждённый прогноз неналоговых поступлений"},{"key":"rent","group_key":"rent","label":"Платежи за другие природные ресурсы","share":1,"reference_rate":8,"rate_unit":"percent","base_unit":"million_rubles","federal_share":1,"model_rate":true,"base_label":"Расчётная стоимость использования ресурсов","driver_note":"Объём производства и деловая активность"},{"key":"recycling","group_key":"recycling","label":"Утилизационный сбор","share":1,"reference_rate":200000,"rate_unit":"rubles","base_unit":"units","federal_share":1,"model_rate":true,"base_label":"Количество объектов, с которых взимается сбор","driver_note":"Производство и ввоз; рублёвая ставка усреднена для игры"},{"key":"other","group_key":"other","label":"Прочие налоговые и неналоговые доходы","share":1,"reference_rate":100,"rate_unit":"percent","base_unit":"million_rubles","federal_share":1,"model_rate":true,"base_label":"Прогноз остальных поступлений","driver_note":"Подтверждённые изменения прогнозных поступлений"}]'::jsonb;
- b jsonb;l jsonb;m jsonb;rate numeric;divisor numeric;driver numeric;raw_group numeric;group_tax numeric;scale numeric;tax_base numeric;amount numeric;vat numeric;profit numeric;collection numeric;v_collection numeric;rows jsonb:='[]';
+ b jsonb;l jsonb;m jsonb;rate numeric;divisor numeric;driver numeric;raw_group numeric;group_tax numeric;group_amount numeric;scale numeric;tax_base numeric;amount numeric;vat numeric;profit numeric;collection numeric;v_collection numeric;rows jsonb:='[]';adjustments jsonb:='[]';
 begin
  select data into b from private.budget_baseline where year=2026;
  vat:=coalesce((select r.rate from game_fiscal_rates r where r.game_id=p_game and r.region_code='00' and r.tax_key='vat'),22);
@@ -25,7 +25,13 @@ begin
   driver:=case l->>'driver' when 'oil' then p_oil when 'activity' then p_activity else 1 end*(1+coalesce((d->'income_changes'->>(l->>'key'))::numeric,0)/100);
   group_tax:=case l->>'key' when 'turnover' then 1+.72*(vat/22-1) when 'income' then 1+.8*(profit/25-1) else 1 end;
   raw_group:=(l->>'amount')::numeric*driver*group_tax;
-  select case when raw_group>0 then (value->>'amount')::numeric/raw_group else 0 end into scale from jsonb_array_elements(groups) where value->>'key'=l->>'key';
+  select (value->>'amount')::numeric into group_amount from jsonb_array_elements(groups) where value->>'key'=l->>'key';
+  scale:=case when raw_group>0 then group_amount/raw_group else 0 end;
+  IF raw_group<=0 AND group_amount>0 AND NOT EXISTS(
+   SELECT 1 FROM jsonb_array_elements(adjustments) j WHERE j->>'key'='adjustment:'||(l->>'key')
+  ) THEN
+   adjustments:=adjustments||jsonb_build_array(jsonb_build_object('key','adjustment:'||(l->>'key'),'group_key',l->>'key','label','Корректировка доходов · '||(l->>'label'),'rate',100,'rate_unit','percent','base',group_amount,'base_unit','million_rubles','collection',1,'federal_share',1,'amount',group_amount,'baseline',0,'base_label','Сохранённая отдельная корректировка','driver_note','Не является налоговой базой','model_rate',true));
+  END IF;
   rate:=case m->>'key' when 'vat' then vat when 'profit' then profit else (m->>'reference_rate')::numeric end;
   divisor:=case m->>'rate_unit' when 'rubles' then (m->>'reference_rate')::numeric/1000000 else (m->>'reference_rate')::numeric/100 end;
   collection:=case when m->>'key' in ('dividends','asset_interest','other') then 1 else v_collection end;
@@ -33,7 +39,7 @@ begin
   amount:=tax_base*case m->>'rate_unit' when 'rubles' then rate/1000000 else rate/100 end*collection*(m->>'federal_share')::numeric;
   rows:=rows||jsonb_build_array(m||jsonb_build_object('rate',rate,'base',tax_base,'collection',collection,'amount',amount,'baseline',(l->>'amount')::numeric*(m->>'share')::numeric));
  end loop;
- return rows;
+ return rows||adjustments;
 end;$function$
 ;
 REVOKE ALL ON FUNCTION private.budget_income_details_v2(uuid,jsonb,jsonb,numeric,numeric,numeric) FROM PUBLIC,anon,authenticated;
@@ -79,9 +85,9 @@ begin
  profit:=coalesce((select rate from game_fiscal_rates where game_id=p_game and region_code='00' and tax_key='profit'),25);
  IF v_model_v2 THEN
   -- Enterprise numbers only change the taxable base, not collection a second time.
-  v_collection:=greatest(.70,least(.995,.95+private.economic_collection_v2(v_macro,
+  v_collection:=private.bounded_collection_v2(.95+private.economic_collection_v2(v_macro,
     coalesce((a->>'regional_activity_reference')::numeric,1),
-    coalesce((select m.value-p.collection_lawfulness_reference from state_metrics m where m.game_id=p_game and m.metric_key='lawfulness'),0),t,v_collection_adj)));
+    coalesce((select m.value-p.collection_lawfulness_reference from state_metrics m where m.game_id=p_game and m.metric_key='lawfulness'),0),t,v_collection_adj),.70,.995);
  ELSE
  v_collection:=greatest(.85,least(.995,.95+private.budget_tax_compliance_shift(activity,a)+coalesce((select (m.value-p.collection_lawfulness_reference)*.0003 from state_metrics m where m.game_id=p_game and m.metric_key='lawfulness' and p.collection_lawfulness_reference is not null),0)+t*.0005+v_collection_adj));
  END IF;
@@ -222,8 +228,9 @@ declare p game_fiscal_policy%rowtype;b jsonb;a jsonb;begin
     and exists(select 1 from budget_simulator_state where game_id=p_game) then
    return;
  end if;
- insert into game_fiscal_policy(game_id,federal_expenditure,municipal_expenditure,baseline_economy,baseline_trust)
- select p_game,coalesce(sum(expenditure)*.6,0),coalesce(sum(expenditure)*.25,0),coalesce((select value from state_metrics where game_id=p_game and metric_key='economy'),50),coalesce((select value from state_metrics where game_id=p_game and metric_key='public_trust'),50)
+ insert into game_fiscal_policy(game_id,federal_expenditure,municipal_expenditure,baseline_economy,baseline_trust,collection_lawfulness_reference)
+ select p_game,coalesce(sum(expenditure)*.6,0),coalesce(sum(expenditure)*.25,0),coalesce((select value from state_metrics where game_id=p_game and metric_key='economy'),50),coalesce((select value from state_metrics where game_id=p_game and metric_key='public_trust'),50),
+ (select value from state_metrics where game_id=p_game and metric_key='lawfulness')
  from game_fiscal_regions where game_id=p_game on conflict(game_id) do nothing;
  select * into p from game_fiscal_policy where game_id=p_game;
  select data into b from private.budget_baseline where year=2026;
@@ -269,6 +276,7 @@ BEGIN
    OR (NEW.before_values->'fx_rate') IS DISTINCT FROM (NEW.after_values->'fx_rate')
    OR (NEW.before_values->'activity_override') IS DISTINCT FROM (NEW.after_values->'activity_override')
    OR (NEW.before_values->'oil_price') IS DISTINCT FROM (NEW.after_values->'oil_price')
+   OR (NEW.before_values->'cutoff_price') IS DISTINCT FROM (NEW.after_values->'cutoff_price')
    OR (NEW.before_values->'inflation') IS DISTINCT FROM (NEW.after_values->'inflation')
    OR (NEW.before_values->'fnb_total') IS DISTINCT FROM (NEW.after_values->'fnb_total')
    OR (NEW.before_values->'fnb_liquid') IS DISTINCT FROM (NEW.after_values->'fnb_liquid')
@@ -447,7 +455,7 @@ begin
     or v_total::text in ('NaN','Infinity','-Infinity') or v_liquid::text in ('NaN','Infinity','-Infinity')
   then raise exception 'ФНБ: общий объём до 50 трлн рублей, доступная сумма не выше общей, валютная доля от 0 до 100.';end if;
   update budget_simulator_state set fnb_total=v_total,reserve_remaining=v_liquid,
-   fnb_fx_units=round(v_liquid*v_share/100/v_fx_old,8),version=version+1,updated_at=now()
+   fnb_fx_units=round(v_liquid*v_share/100/greatest(.01,(new_row->>'fx_rate')::numeric),8),version=version+1,updated_at=now()
    where game_id=p_game_id;
   new_row:=new_row||jsonb_build_object('fnb_total',v_total,'fnb_liquid',v_liquid,'fnb_fx_share',v_share);
  end if;

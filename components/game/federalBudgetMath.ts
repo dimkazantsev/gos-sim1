@@ -1,7 +1,7 @@
 import baseline from '@/data/federal-budget-2026.json';
 import revenueModel from '@/data/budget-revenue-model.json';
 import {modelBAdditionalChannels,MODEL_B_AUX_KEYS,type FiscalContext,type FiscalRate,type FiscalRegion} from './fiscalMath';
-import {economicAuxV2,economicAutomaticV2,economicManualV2,economicCollectionV2,enterpriseFactorsV2} from './economicModelV2';
+import {economicAuxV2,economicAutomaticV2,economicManualV2,economicCollectionV2,boundedCollectionV2,enterpriseFactorsV2} from './economicModelV2';
 import {externalFinancingTerms,type ExternalFinanceContract} from './externalFinancePolicy';
 
 export const FINANCING_SOURCES = [
@@ -67,17 +67,22 @@ export function calculateFederalBudget(draft:BudgetDraft,state:SimulatorState,co
  const law=context?.metrics.lawfulness,ref=p?.collection_lawfulness_reference,lawDelta=law!=null&&ref!=null?law-ref:0;
  const taxActivityReference=Math.max(.01,a.tax_activity_reference??activity);
  const taxActivityShift=clamp((activity/taxActivityReference-1)*.12,-.06,.015);
- const collectionRate=business!==null?clamp(.95+economicCollectionV2(business,a.regional_activity_reference??1,lawDelta,trust,aux.collection_adjustment),.70,.995):clamp(.95+lawDelta*.0003+trust*.0005+aux.collection_adjustment+taxActivityShift,.85,.995);
+ const collectionRate=business!==null?boundedCollectionV2(.95+economicCollectionV2(business,a.regional_activity_reference??1,lawDelta,trust,aux.collection_adjustment),.70,.995):clamp(.95+lawDelta*.0003+trust*.0005+aux.collection_adjustment+taxActivityShift,.85,.995);
  const collectionFactor=collectionRate/.95;
  const taxableGroups=new Set(['oil_gas','turnover','income','rent','recycling']);
  const income_lines=baseline.income_lines.map(l=>{const driver=l.driver==='oil'?oil:l.driver==='activity'?activity:1;const tax=l.key==='turnover'?1+.72*(vat/22-1):l.key==='income'?1+.8*(profit/25-1):1;return {key:l.key,label:l.label,baseline:l.amount,amount:round(Math.max(0,l.amount*driver*tax*(1+(draft.income_changes[l.key]??0)/100)*(taxableGroups.has(l.key)?collectionFactor:1)+(draft.revenue_adjustments[l.key]??0)))};});
+ const zeroGroupAdjustments:BudgetIncomeDetail[]=[];
  const income_details:BudgetIncomeDetail[]=revenueModel.map(m=>{
   const l=baseline.income_lines.find(x=>x.key===m.group_key)!;
   const driver=l.driver==='oil'?oil:l.driver==='activity'?activity:1;
   const groupTax=l.key==='turnover'?1+.72*(vat/22-1):l.key==='income'?1+.8*(profit/25-1):1;
   const baseDriver=driver*(1+(draft.income_changes[l.key]??0)/100);
   const rawGroup=l.amount*baseDriver*groupTax;
-  const scale=rawGroup>0?income_lines.find(x=>x.key===l.key)!.amount/rawGroup:0;
+  const groupAmount=income_lines.find(x=>x.key===l.key)!.amount;
+  const scale=rawGroup>0?groupAmount/rawGroup:0;
+  if(v2&&rawGroup<=0&&groupAmount>0&&!zeroGroupAdjustments.some(x=>x.group_key===l.key)){
+   zeroGroupAdjustments.push({key:'adjustment:'+l.key,group_key:l.key,label:'Корректировка доходов · '+l.label,rate:100,rate_unit:'percent',base:groupAmount,base_unit:'million_rubles',collection:1,federal_share:1,amount:groupAmount,baseline:0,base_label:'Сохранённая отдельная корректировка',driver_note:'Не является налоговой базой',model_rate:true});
+  }
   const rate=m.key==='vat'?vat:m.key==='profit'?profit:m.reference_rate;
   const divisor=m.rate_unit==='rubles'?m.reference_rate/1e6:m.reference_rate/100;
   // The initial 95% is calibrated to preserve the active game's accepted budget.
@@ -87,6 +92,7 @@ export function calculateFederalBudget(draft:BudgetDraft,state:SimulatorState,co
   const amount=base*(m.rate_unit==='rubles'?rate/1e6:rate/100)*collection*m.federal_share;
   return {...m,rate,base,collection,amount,baseline:l.amount*m.share};
  });
+ income_details.push(...zeroGroupAdjustments);
  const selected=requests.filter(r=>draft.transfer_ids.includes(r.id)&&r.status!=='rejected');
  const transfer_expense=budgetMoneySum(...selected.filter(r=>r.kind!=='budget_credit').map(r=>Number(r.amount))),credit_outflow=budgetMoneySum(...selected.filter(r=>r.kind==='budget_credit').map(r=>Number(r.amount)));
  const annual_interest=FINANCING_SOURCES.filter(s=>s.debt!=='none').reduce((sum,s)=>sum+fundingAnnualInterest(s.key,draft,state,key,access.rate,p?.inflation??key),0);

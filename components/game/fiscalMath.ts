@@ -1,5 +1,5 @@
 import catalog from '@/data/taxes-2026.json';
-import {economicAuxV2,economicAutomaticV2,economicManualV2,economicCollectionV2} from './economicModelV2';
+import {economicAuxV2,economicAutomaticV2,economicManualV2,economicCollectionV2,boundedCollectionV2} from './economicModelV2';
 export type FiscalRegion={game_id:string;region_code:string;name:string;profile:string;disputed:boolean;budget_year:number;enterprises:number;employees_per_firm:number;monthly_wage:number;profit_per_firm:number;consumption_per_firm:number;expenditure:number;transfer_in:number;budget_credit_cash?:number;debt:number;compliance:number;activity_multiplier:number;cost_multiplier:number;observations:Record<string,number|null>;source_url:string;source_year:number};
 export type FiscalRate={region_code:string;tax_key:string;rate:number};
 export type FiscalPolicy={economic_model_version?:number;budget_aux_anchor?:Record<string,number>;fnb_total?:number;fnb_liquid?:number;fnb_fx_share?:number;monetary_last_settled_on?:string;monetary_last_effect_date?:string|null;monetary_last_daily_effect?:number;monetary_cumulative_effect?:number;monetary_last_day_details?:Array<{date:string;change:number}>;tax_activity_reference?:number;key_rate:number;fx_rate:number;oil_price:number;cutoff_price:number;inflation:number;federal_expenditure:number;municipal_expenditure:number;baseline_economy:number;baseline_trust:number;activity_override?:number|null;activity_reference?:number|null;collection_lawfulness_reference?:number|null;updated_at:string};
@@ -57,7 +57,7 @@ export function fiscalForecast(r:FiscalRegion,rates:FiscalRate[],preview?:{tax:s
   const economicCollectionShift=clamp((macro.activity/Math.max(.01,context?.policy.tax_activity_reference??macro.activity)-1)*.12,-.06,.015);
   collectionDelta=adjustment+economicCollectionShift;
  }
- const effectiveCollection=clamp(r.compliance+collectionDelta,0,1);
+ const effectiveCollection=context?.policy.economic_model_version===2?boundedCollectionV2(r.compliance+collectionDelta,0,1):clamp(r.compliance+collectionDelta,0,1);
  const lines=catalog.taxes.map(t=>{
   const scope=t.level==='federal'?'00':r.region_code;
   const rate=preview?.tax===t.key?preview.rate:rates.find(x=>x.tax_key===t.key&&x.region_code===scope)?.rate??t.default_rate;

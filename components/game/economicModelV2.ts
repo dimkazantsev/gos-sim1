@@ -30,3 +30,12 @@ export function enterpriseFactorsV2(count:number,weighted:number,baseline:number
  const regional_activity=count>0?weighted/count:0;
  return {enterprise_factor,regional_activity,activity:clamp(enterprise_factor*regional_activity*macro,0,10)};
 }
+
+// Preserve the linear coefficients in the interior and smoothly
+// approach existing limits within a 2.5 percentage-point shoulder.
+export function boundedCollectionV2(raw:number,min:number,max:number){
+ const h=Math.min(.025,(max-min)/2);
+ if(raw>max-h)return max-h*h/(raw-max+2*h);
+ if(raw<min+h)return min+h*h/(min+2*h-raw);
+ return raw;
+}

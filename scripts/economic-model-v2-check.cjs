@@ -27,6 +27,16 @@ const compare=(a,b,label)=>Object.keys(b).forEach(k=>near(a[k],b[k],label+' '+k)
    const row=(await db.query('SELECT private.economic_aux_v2($1::jsonb,$2::jsonb) aux,private.economic_automatic_v2($3,$4,$5,$6,$7) auto,private.economic_manual_v2($8,$9,$10) activity,private.economic_collection_v2($11,1,$12,$6,$13) collection,private.enterprise_factors_v2($14,$15,269000,$11) factors',[JSON.stringify(s.metrics),JSON.stringify(s.anchors),s.key,s.fx,s.e,s.t,aux.activity_adjustment,auto.automatic,s.override,s.reference,activity,s.law,aux.collection_adjustment,s.count,s.weighted])).rows[0];
    compare(row.aux,aux,'Aux');compare(row.auto,auto,'Automatic');near(row.activity,activity,'Manual');near(row.collection,collection,'Collection');compare(row.factors,factors,'Enterprises');
   }
+  for(const raw of [-1,.70,.725,.95,.97,.995,1.041093,1.061093,2]){
+   const value=m.boundedCollectionV2(raw,.70,.995);
+   assert(value>=.70&&value<=.995);
+   const row=(await db.query('SELECT private.bounded_collection_v2($1,.70,.995) value',[raw])).rows[0];
+   near(row.value,value,'Smooth collection SQL/TS parity');
+  }
+  for(let i=-100;i<200;i++)assert(m.boundedCollectionV2((i+1)/100,.70,.995)>m.boundedCollectionV2(i/100,.70,.995),'Strict monotonicity');
+  near(m.boundedCollectionV2(.95,.70,.995),.95,'Baseline unchanged');
+  near(m.boundedCollectionV2(.97,.70,.995),.97,'Approved +10 legal points unchanged');
+  assert(m.boundedCollectionV2(1.061093,.70,.995)>m.boundedCollectionV2(1.041093,.70,.995),'No plateau');
   near(m.economicManualV2(1,56,1),.56,'Manual base');
   near(m.enterpriseFactorsV2(242100,242100,269000,.56).activity,.504,'10% fewer enterprises at constant activity');
   near(m.economicCollectionV2(1,1,10,10,.015),.05,'Collection without enterprise count double counting');
@@ -45,6 +55,10 @@ const compare=(a,b,label)=>Object.keys(b).forEach(k=>near(a[k],b[k],label+' '+k)
   const zero=calc({...context,policy:{...context.policy,activity_override:0,activity_reference:1}});
   near(zero.activity,0,'Federal zero activity');
   assert.equal(zero.income_lines.find(x=>x.key==='turnover').amount,0);
+  const zeroWithAdjustment=calculateFederalBudget({...draft,revenue_adjustments:{...draft.revenue_adjustments,turnover:123}},state,{...context,policy:{...context.policy,activity_override:0,activity_reference:1}},[region],[],[]);
+  near(zeroWithAdjustment.income_lines.find(x=>x.key==='turnover').amount,123,'Zero base with direct adjustment');
+  near(zeroWithAdjustment.income_details.filter(x=>x.group_key==='turnover').reduce((s,x)=>s+x.amount,0),123,'Adjustment detail reconciliation');
+  assert.equal(zeroWithAdjustment.income_details.filter(x=>x.key==='adjustment:turnover').length,1);
   const legal={...context,metrics:{...context.metrics,lawfulness:60}};
   near(calc(legal).tax_collection-baseline.tax_collection,.02,'Federal law +10 points');
   const profitLine=fiscalForecast(region,[],undefined,legal).lines.find(x=>x.key==='profit');
