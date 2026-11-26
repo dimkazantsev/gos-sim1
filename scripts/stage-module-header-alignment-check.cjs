@@ -19,17 +19,21 @@ if(!chrome)throw Error('Chrome/Chromium executable required');
    const page=await browser.newPage({viewport:{width,height:900},deviceScaleFactor:1});
    try{
     await page.setContent('<!DOCTYPE html><html lang="ru"><meta name="viewport" content="width=device-width,initial-scale=1"><style>*{box-sizing:border-box}body{margin:0;background:#f6f8ff}'+css+'</style><header class="header"><div class="copy"><span class="eyebrow">Этап 16 · Рефлексия</span><h2>Разбор построенного государства</h2><p>Восстановите решения и последствия.</p></div><dl class="stats"><div><dt>Завершённые этапы</dt><dd data-numeric="true">3 / 16</dd></div><div><dt>Рефлексии участников</dt><dd data-numeric="true">0 / 2</dd><span>Сдали все шесть разделов</span></div></dl></header><header class="header government"><div class="copy">Правительственный модуль</div><dl class="stats"><div><dt>Регистрация</dt><dd data-numeric="true">2 / 3</dd></div></dl></header>');
+    // Wait for layout before measuring actual geometry, not a serialized CSS keyword.
+    await page.evaluate(async()=>{await document.fonts.ready;await new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));});
     const result=await page.locator('header.header').first().evaluate(el=>{
      const box=x=>x.getBoundingClientRect();
      const cards=[...el.querySelectorAll('.stats>div')].map(card=>{
       const r=box(card),dt=box(card.querySelector('dt')),dd=box(card.querySelector('dd'));
-      return {y:r.y,titleY:dt.y,valueY:dd.y,relativeTitleY:dt.y-r.y,relativeValueY:dd.y-r.y,justify:getComputedStyle(card).justifyContent};
+      const style=getComputedStyle(card);
+      return {y:r.y,titleY:dt.y,valueY:dd.y,relativeTitleY:dt.y-r.y,relativeValueY:dd.y-r.y,expectedTitleY:parseFloat(style.paddingTop)+parseFloat(style.borderTopWidth),justify:style.justifyContent};
      });
      return {cards,overflow:document.documentElement.scrollWidth>document.documentElement.clientWidth+1};
     });
     const cards=result.cards;
     assert(!result.overflow,width+'px: horizontal overflow');
-    assert(cards.every(c=>c.justify==='flex-start'),width+'px: top alignment');
+    assert.equal(cards.length,2,width+'px: missing KPI cards');
+    assert(cards.every(c=>Math.abs(c.relativeTitleY-c.expectedTitleY)<1.1),width+'px: top alignment '+JSON.stringify(cards));
     assert(Math.abs(cards[0].relativeTitleY-cards[1].relativeTitleY)<1.1,width+'px: mismatched title padding');
     assert(Math.abs(cards[0].relativeValueY-cards[1].relativeValueY)<1.1,width+'px: mismatched counter line');
     if(Math.abs(cards[0].y-cards[1].y)<1.1){
