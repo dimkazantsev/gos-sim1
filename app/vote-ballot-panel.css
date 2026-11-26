@@ -153,8 +153,9 @@
 }
 .voteResultBoard>.voteNumber strong{line-height:1.15}
 .voteResultBoard>.voteNumber span{
+ display:grid;place-items:center;align-self:stretch;width:100%;
  margin:0;min-width:0;max-width:100%;font-size:12px;
- line-height:1.4;overflow-wrap:anywhere;
+ line-height:1.4;text-align:center;overflow-wrap:anywhere;
 }
 .voteResultBoard>.voteNumber small{margin:0;line-height:1.4}
 .voteResultBoard>.voteVisual{
