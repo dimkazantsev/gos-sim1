@@ -138,3 +138,33 @@
  .civicBallotModern .civicBallotQuota b{font-size:22px}
  .civicBallot.civicBallotModern .civicBallotSplitField{grid-template-columns:minmax(0,1fr)}
 }
+
+/* Shared result summary: three equally sized cells and one full-width distribution bar.
+   Override the legacy fixed 80px columns, including the mobile rules. */
+.voteResultBoard{
+ display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;
+ align-items:stretch;min-width:0;margin-top:12px;
+}
+.voteResultBoard>.voteNumber{
+ display:grid;grid-template-rows:auto minmax(2.8em,1fr) auto;
+ align-items:center;justify-items:center;gap:4px;min-width:0;
+ padding:10px 6px;line-height:1.4;overflow-wrap:anywhere;
+ font-variant-numeric:tabular-nums;
+}
+.voteResultBoard>.voteNumber strong{line-height:1.15}
+.voteResultBoard>.voteNumber span{
+ display:grid;place-items:center;align-self:stretch;width:100%;
+ margin:0;min-width:0;max-width:100%;font-size:12px;
+ line-height:1.4;text-align:center;overflow-wrap:anywhere;
+}
+.voteResultBoard>.voteNumber small{margin:0;line-height:1.4}
+.voteResultBoard>.voteVisual{
+ grid-column:1/-1;grid-row:2;order:0;width:100%;min-width:0;
+}
+@media(max-width:480px){
+ .voteResultBoard{gap:6px}
+ .voteResultBoard>.voteNumber{padding:9px 4px;gap:3px}
+ .voteResultBoard>.voteNumber span{font-size:10px}
+ .voteResultBoard>.voteNumber strong{font-size:25px}
+ .voteResultBoard>.voteNumber small{font-size:11px}
+}
