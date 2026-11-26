@@ -43,12 +43,11 @@ export function referenceDocumentMatchesBody(doc:FormalDocument,body:string){
 export function chairReferencePreset(doc:FormalDocument,body:string){
  return {title:doc.title,body:doc.body_text||'',mode:(body==='gd'?'mandate':'member') as 'mandate'|'member',institutionKey:body,procedureKey:'registered_session',quorumKind:'fraction' as const,quorumValue:.5,majorityKind:(body==='gd'?'eligible_majority':'present_majority') as 'eligible_majority'|'present_majority',majorityValue:.5,allowAbstain:true,tieBreakerChair:body==='government',passTransition:'none',failTransition:'none',formalDocumentId:doc.id,groupName:null};
 }
-export function canReferenceVoteDocument(doc:FormalDocument,stageNo:number){
+export function canReferenceVoteDocument(doc:FormalDocument,_stageNo:number){
  return ['fz_bill','fkz_bill','government_resolution','government_order','president_decree','president_order','gd_resolution','sf_resolution','ministry_order','municipal_act','other','meeting_agenda'].includes(doc.doc_type)
   &&(doc.doc_type!=='meeting_agenda'||doc.status_code==='published'&&['institution_meeting_agenda','duma_session_agenda','government_session_agenda'].includes(String(doc.metadata?.document_kind||'')))
   &&!['rejected','superseded','withdrawn','president_veto','sf_veto','sf_fkz_blocked'].includes(doc.status_code)
-  &&!Object.prototype.hasOwnProperty.call(doc.metadata||{},'party_id')
-  &&(doc.stage_no===stageNo||doc.status_code==='published');
+  &&!Object.prototype.hasOwnProperty.call(doc.metadata||{},'party_id');
 }
 
 export function votePresetForDocument(doc:FormalDocument):VotePreset|null{
