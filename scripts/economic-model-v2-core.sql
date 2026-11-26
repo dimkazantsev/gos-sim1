@@ -36,3 +36,12 @@ RETURNS jsonb LANGUAGE sql IMMUTABLE PARALLEL SAFE SET search_path TO '' AS $f$
 $f$;
 
 REVOKE ALL ON FUNCTION private.economic_aux_v2(jsonb,jsonb),private.economic_automatic_v2(numeric,numeric,numeric,numeric,numeric),private.economic_manual_v2(numeric,numeric,numeric),private.economic_collection_v2(numeric,numeric,numeric,numeric,numeric),private.enterprise_factors_v2(numeric,numeric,numeric,numeric) FROM PUBLIC,anon,authenticated;
+
+CREATE OR REPLACE FUNCTION private.bounded_collection_v2(raw numeric,lo numeric,hi numeric)
+RETURNS numeric LANGUAGE sql IMMUTABLE PARALLEL SAFE STRICT SET search_path TO '' AS $f$
+ WITH s AS (SELECT least(.025,(hi-lo)/2) h)
+ SELECT CASE WHEN raw>hi-h THEN hi-h*h/(raw-hi+2*h)
+             WHEN raw<lo+h THEN lo+h*h/(lo+2*h-raw)
+             ELSE raw END FROM s
+$f$;
+REVOKE ALL ON FUNCTION private.bounded_collection_v2(numeric,numeric,numeric) FROM PUBLIC,anon,authenticated;
