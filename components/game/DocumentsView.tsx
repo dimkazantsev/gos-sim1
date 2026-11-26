@@ -11,7 +11,7 @@ import type {FormalDocument,FormalHistory} from './types';
 import {FORMAL_SUBJECTS,FORMAL_TYPES,inferFormal,formalSignature,ownerLabel,formalDocumentTypeLabel,formalDocumentTitle,formalSubjectDisplayLabel} from './formalInstitutions';
 import {chairVotingBodies,canReferenceVoteDocument,referenceDocumentMatchesBody,chairReferencePreset,votePresetForDocument} from './proceduralVoting';
 import {documentSigningAuthority} from './documentSignerTitle';
-import {documentRoute,governmentAgendaVotes,isGovernmentAgenda} from './documentRoute';
+import {documentRoute,governmentAgendaVotes} from './documentRoute';
 import {ArrowLeft,BookOpen,CheckCircle2,ChevronDown,CircleAlert,CircleDot,Clock3,ClipboardList,FilePlus2,FileText,Paperclip,Plus,Printer,Route,Search,Trash2,Undo2,Upload,Vote,X,XCircle} from 'lucide-react';
 import StyledSelect from '../ui/StyledSelect';
 import DocumentPaper from './DocumentPaper';
@@ -223,7 +223,7 @@ export default function DocumentsView({g,focusId,createTemplate,createStageNo,on
   return()=>{active=false};
  },[selected?.id,selected?.updated_at,localRefresh]);
  useEffect(()=>{
-  if(!selected?.id||!['gd','ksrf','central_bank'].includes(selected.subject_key)&&!['meeting_agenda','minutes'].includes(selected.doc_type)){setInstitutionSigners(null);return}
+  if(!selected?.id||!['gd','ksrf','central_bank'].includes(selected.subject_key)&&!['meeting_agenda','minutes'].includes(selected.doc_type)&&!(selected.doc_type==='state_program'&&selected.status_code==='published')){setInstitutionSigners(null);return}
   let alive=true;
   void (async()=>{
    try{
@@ -436,7 +436,7 @@ export default function DocumentsView({g,focusId,createTemplate,createStageNo,on
   const signer=selected?.metadata;
   const signing=h.action.startsWith('Подпис')||h.to_status==='signed'||/^подписан[оа]/i.test(h.note||'');
   if(signing&&signer?.signed_by===h.actor_id&&typeof signer.signed_name==='string'&&signer.signed_name&&typeof signer.signed_role==='string'&&/^председатель\s+правительства/i.test(signer.signed_role))return signer.signed_name;
-  if(signing&&/^председатель\s+правительства/i.test(h.note||'')){
+  if(signing&&(/^председатель\s+правительства/i.test(h.note||'')||selected?.doc_type==='state_program')){
    const roleSigner=institutionSigners?.required.find(x=>x.user_id===h.actor_id&&x.signed&&/^председатель\s+правительства/i.test(x.office));
    if(roleSigner?.display_name&&documentSignatures.some(x=>x.history_id===h.id&&x.signer_id===h.actor_id))return roleSigner.display_name;
   }
