@@ -25,6 +25,26 @@ assert(src.includes('submitting.current=true')&&src.includes('submitting.current
 assert(css.includes('var(--gs-accent)')&&css.includes('var(--gs-border)'),'Use approved project tokens');
 assert(css.includes(':focus-within')&&css.includes('focus')||css.includes(':focus-within'),'Keyboard focus is visible');
 const cssBundle=['app/design-tokens.css','app/globals.css','app/design-views.css','app/2026-civic-portal.css','app/vote-ballot-panel.css'].map(file=>fs.readFileSync(path.join(root,file),'utf8')).join('\n');
+// Render the actual result JSX from VotesView, rather than duplicating its markup.
+const voteView=fs.readFileSync(path.join(root,'components/game/VotesView.tsx'),'utf8');
+const resultStart=voteView.indexOf('<div className="voteResultBoard">');
+const resultEnd=voteView.indexOf('{v.status===\'open\'?<div className="proceduralVoteActions">',resultStart);
+assert(resultStart>=0&&resultEnd>resultStart,'Find actual result board');
+const resultJs=ts.transpileModule('export default function Board({t,programme,v,denominator,pct}){return ('+voteView.slice(resultStart,resultEnd).trim()+');}',{compilerOptions:{module:ts.ModuleKind.CommonJS,jsx:ts.JsxEmit.ReactJSX,target:ts.ScriptTarget.ES2022}}).outputText;
+const resultModule={exports:{}};
+new Function('require','module','exports',resultJs)(require,resultModule,resultModule.exports);
+const ResultBoard=resultModule.exports.default;
+const resultCss=fs.readFileSync(path.join(root,'app/layout.tsx'),'utf8').match(/import '\.\/[^']+\.css';/g).map(line=>{
+ const file=line.match(/'\.\/([^']+)'/)[1];
+ let content=fs.readFileSync(path.join(root,'app',file),'utf8');
+ if(file==='globals.css')content=content.replace(/@import '\.\/([^']+)' layer\(legacy\);/g,(_,name)=>'@layer legacy {\n'+fs.readFileSync(path.join(root,'app',name),'utf8')+'\n}');
+ return content;
+}).join('\n');
+function resultHtml(programme,t){
+ const denominator=450;
+ const rendered=renderToStaticMarkup(React.createElement(ResultBoard,{t,programme,v:{allow_abstain:true},denominator,pct:(value,total)=>Math.round(100*value/total)}));
+ return '<!doctype html><html lang="ru"><head><meta name="viewport" content="width=device-width,initial-scale=1"><style>'+resultCss+'</style></head><body><main class="civicVotes" style="padding:12px;max-width:1500px;margin:auto"><article class="proceduralVoteCard" style="padding:12px">'+rendered+'</article></main></body></html>';
+}
 const original=React.useState;
 function htmlFor({partial=false,split=false,canCast=true,maxWeight=225,embedded=false}){
  let index=0;const states=[partial,split,maxWeight,Math.floor(maxWeight/3),Math.floor(maxWeight/3),Math.floor(maxWeight/3),false];
@@ -85,6 +105,32 @@ if(!executable)throw Error('Chromium is required to check actual responsive layo
     if(mode==='embedded'){assert(spacing.disabled&&spacing.count===2,'Zero eligible votes stay disabled');if(width>650)assert(spacing.buttonWidth>spacing.gridWidth*.45,'Two buttons must fill the row');}
     await page.close();
     console.log('PASS: '+mode+' ballot at '+width+'px');
+   }
+  }
+  for(const programme of [true,false]){
+   for(const width of [320,375,430,768,1024,1440]){
+    const page=await browser.newPage({viewport:{width,height:900}});
+    for(const tally of [{yes:0,no:0,abstain:0},{yes:225,no:150,abstain:75}]){
+     await page.setContent(resultHtml(programme,tally));
+     const geometry=await page.evaluate(()=>{
+      const board=document.querySelector('.voteResultBoard'),bar=board.querySelector('.voteVisual');
+      const rect=el=>{const r=el.getBoundingClientRect();return {left:r.left,right:r.right,top:r.top,bottom:r.bottom,width:r.width,height:r.height}};
+      const cells=[...board.querySelectorAll('.voteNumber')].map(el=>({box:rect(el),value:rect(el.querySelector('strong')),label:rect(el.querySelector('span')),percentage:rect(el.querySelector('small')),overflow:el.scrollWidth-el.clientWidth}));
+      return {board:rect(board),bar:rect(bar),cells,overflow:document.documentElement.scrollWidth-innerWidth,segments:[...bar.children].map(el=>el.style.width)};
+     });
+     const {cells,bar,board}=geometry,first=cells[0];
+     assert.equal(cells.length,3);
+     for(const cell of cells){
+      for(const key of ['width','height','top','bottom'])assert(Math.abs(cell.box[key]-first.box[key])<=1,'Unequal vote result cards: '+JSON.stringify({width,programme,geometry}));
+      for(const key of ['value','label','percentage'])assert(Math.abs(cell[key].top-first[key].top)<=1,'Misaligned vote '+key+': '+JSON.stringify({width,programme,geometry}));
+      assert(cell.overflow<=1&&cell.label.left>=cell.box.left-1&&cell.label.right<=cell.box.right+1,'Result label overflow');
+     }
+     assert(bar.top>=first.box.bottom+5&&Math.abs(bar.width-board.width)<=1,'Distribution bar has its own full-width row');
+     assert(geometry.overflow<=1,'Result page must not scroll horizontally');
+     assert.deepEqual(geometry.segments,[tally.yes,tally.abstain,tally.no].map(x=>Math.round(x/450*100)+'%'),'Existing vote shares preserved');
+    }
+    await page.close();
+    console.log('PASS: aligned '+(programme?'programme':'standard')+' results at '+width+'px');
    }
   }
  }finally{await browser.close()}
