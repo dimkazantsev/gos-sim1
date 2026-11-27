@@ -192,14 +192,16 @@
       "legal_urls": [
         "https://www.consultant.ru/document/cons_doc_LAW_19702/",
         "https://www.consultant.ru/document/cons_doc_LAW_19702/6288b672abcacbdfce848217bd5f3b6dcfa76913/",
-        "https://www.consultant.ru/document/cons_doc_LAW_15234/"
+        "https://www.consultant.ru/document/cons_doc_LAW_61801/96fbc469f91f57235cc842a85e0516a99f23dc85/",
+        "https://www.consultant.ru/document/cons_doc_LAW_61801/ca9e5658710519f09ab2fdb8196fcb3eb024a051/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
       "financial_review_status": "draft_requires_integration",
       "checked_norm_urls": [
         "https://www.consultant.ru/document/cons_doc_LAW_19702/6288b672abcacbdfce848217bd5f3b6dcfa76913/",
-        "https://www.consultant.ru/document/cons_doc_LAW_15234/"
+        "https://www.consultant.ru/document/cons_doc_LAW_61801/96fbc469f91f57235cc842a85e0516a99f23dc85/",
+        "https://www.consultant.ru/document/cons_doc_LAW_61801/ca9e5658710519f09ab2fdb8196fcb3eb024a051/"
       ],
       "review_date": "2026-11-28",
       "targeted_option_review": {
