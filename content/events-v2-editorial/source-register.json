@@ -2195,8 +2195,17 @@
       ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
-      "review_date": "2026-11-27",
-      "source_scope": "specific_norm_checked_partial"
+      "review_date": "2026-11-28",
+      "source_scope": "specific_norm_checked_partial",
+      "checked_norm_urls": [
+        "https://minjust.gov.ru/ru/documents/8011/",
+        "https://www.consultant.ru/document/cons_doc_LAW_34661/91a591b505fde94f1d7015578d2ae37f3d6e20ac/"
+      ],
+      "targeted_option_review": {
+        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "option_count": 5,
+        "remaining": "Компетентный орган производства; проверка не подменяет предусмотренный КоАП пересмотр постановлений."
+      }
     },
     {
       "case_key": "bank-legal-2026-091",
@@ -2212,8 +2221,17 @@
       ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
-      "review_date": "2026-11-27",
-      "source_scope": "specific_norm_checked_partial"
+      "review_date": "2026-11-28",
+      "source_scope": "specific_norm_checked_partial",
+      "checked_norm_urls": [
+        "https://minjust.gov.ru/ru/documents/8011/",
+        "https://www.consultant.ru/document/cons_doc_LAW_103023/780c9842ff82f94d415db6b22a625ea65f69b662/"
+      ],
+      "targeted_option_review": {
+        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "option_count": 5,
+        "remaining": "Орган услуги; компетенция распорядителя, способ закупки и возможность цифрового канала требуют проверки по конкретной услуге."
+      }
     },
     {
       "case_key": "bank-legal-2026-092",
@@ -2228,8 +2246,16 @@
       ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
-      "review_date": "2026-11-27",
-      "source_scope": "specific_norm_checked_partial"
+      "review_date": "2026-11-28",
+      "source_scope": "specific_norm_checked_partial",
+      "checked_norm_urls": [
+        "https://minjust.gov.ru/ru/documents/8011/"
+      ],
+      "targeted_option_review": {
+        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "option_count": 5,
+        "remaining": "Конкретный регион и его правила опубликования не названы; календарь и переходные меры не изменяют установленную законом дату."
+      }
     },
     {
       "case_key": "bank-legal-2026-093",
@@ -2242,12 +2268,23 @@
       "legal_urls": [
         "https://minjust.gov.ru/ru/documents/8011/",
         "https://duma.gov.ru/media/files/7Yh7Q0KU4D7oknJkHhAEc0fGlP8Gn6Uz.pdf",
-        "https://kodeks.karelia.ru/api/show/901700817"
+        "https://kodeks.karelia.ru/api/show/901700817",
+        "https://www.consultant.ru/law/review/lawmaking/reglduma/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
-      "review_date": "2026-11-27",
-      "source_scope": "constitutional_text_checked_regulation_current_text_unavailable"
+      "review_date": "2026-11-28",
+      "source_scope": "constitutional_text_checked_regulation_current_text_unavailable",
+      "checked_norm_urls": [
+        "https://minjust.gov.ru/ru/documents/8011/",
+        "https://kodeks.karelia.ru/api/show/901700817",
+        "https://www.consultant.ru/law/review/lawmaking/reglduma/"
+      ],
+      "targeted_option_review": {
+        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "option_count": 5,
+        "remaining": "Ответственный комитет предлагает; Совет ГД назначает; палата голосует. Конкретный комплект документов и экспертиза по законопроекту отдельно проверяются."
+      }
     },
     {
       "case_key": "bank-legal-2026-094",
@@ -2340,8 +2377,16 @@
       ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
-      "review_date": "2026-11-27",
-      "source_scope": "specific_norm_checked_partial"
+      "review_date": "2026-11-28",
+      "source_scope": "specific_norm_checked_partial",
+      "checked_norm_urls": [
+        "https://minjust.gov.ru/ru/documents/8011/"
+      ],
+      "targeted_option_review": {
+        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "option_count": 5,
+        "remaining": "Конкретная программа и вид межбюджетного трансферта не названы. Исполнение — компетентный распорядитель; новые критерии только по применимому порядку."
+      }
     },
     {
       "case_key": "bank-legal-2026-098",
@@ -2358,8 +2403,18 @@
       ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
-      "review_date": "2026-11-27",
-      "source_scope": "specific_norm_checked_partial"
+      "review_date": "2026-11-28",
+      "source_scope": "specific_norm_checked_partial",
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_32459/cb1de735e98c141e8261445e5deb739bcd629797/",
+        "https://www.consultant.ru/document/cons_doc_LAW_32459/1224d47b5c29fdee0b8681bb7d80932b34634909/",
+        "https://www.consultant.ru/document/cons_doc_LAW_32459/5201289aa509dda5d86c24fa198ace17a882ef32/"
+      ],
+      "targeted_option_review": {
+        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "option_count": 5,
+        "remaining": "Регистрация и приостановление — компетенция уполномоченного органа; принятие устава — компетенция партии. Не считать консультацию официальным решением."
+      }
     },
     {
       "case_key": "bank-legal-2026-099",
@@ -2375,8 +2430,17 @@
       ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
-      "review_date": "2026-11-27",
-      "source_scope": "specific_norm_checked_partial"
+      "review_date": "2026-11-28",
+      "source_scope": "specific_norm_checked_partial",
+      "checked_norm_urls": [
+        "https://minjust.gov.ru/ru/documents/8011/",
+        "https://www.consultant.ru/document/cons_doc_LAW_32459/1224d47b5c29fdee0b8681bb7d80932b34634909/"
+      ],
+      "targeted_option_review": {
+        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "option_count": 5,
+        "remaining": "Уполномоченный регистрирующий орган, а не коллектив голосующих. Не исключены законные основания отказа в других фактических ситуациях."
+      }
     },
     {
       "case_key": "bank-legal-2026-100",
@@ -2828,12 +2892,25 @@
       "legal_basis": "8-ФЗ, ст. 8, 19, 20; БК РФ, ст. 36: открытые бюджетные сведения предоставляются по применимому порядку. Ссылка на доступный официальный источник может быть достаточной в предусмотренном законом случае; здесь ссылки не работают, а основание ограничения не названо. Восстановление доступа к обязательным материалам не заменяется выбором формата дополнительной публикации.",
       "legal_urls": [
         "https://www.consultant.ru/document/cons_doc_LAW_84602/8c8845d11ca0258e4a0ec282f95cafa1ce10a857/",
-        "https://www.consultant.ru/document/cons_doc_LAW_19702/ac7eb6cf1d15c2a4225e64864e980f435d2142bc/"
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/ac7eb6cf1d15c2a4225e64864e980f435d2142bc/",
+        "https://www.consultant.ru/document/cons_doc_LAW_84602/9cb82487223f45f1c1d94025d2b030701b363ee0/",
+        "https://www.consultant.ru/document/cons_doc_LAW_84602/9219f5a8eee4e40c3490a3fefaf3757321617d31/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
-      "review_date": "2026-11-27",
-      "source_scope": "specific_norm_and_related_search_results_partial"
+      "review_date": "2026-11-28",
+      "source_scope": "specific_norm_and_related_search_results_partial",
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_84602/8c8845d11ca0258e4a0ec282f95cafa1ce10a857/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/ac7eb6cf1d15c2a4225e64864e980f435d2142bc/",
+        "https://www.consultant.ru/document/cons_doc_LAW_84602/9cb82487223f45f1c1d94025d2b030701b363ee0/",
+        "https://www.consultant.ru/document/cons_doc_LAW_84602/9219f5a8eee4e40c3490a3fefaf3757321617d31/"
+      ],
+      "targeted_option_review": {
+        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "option_count": 5,
+        "remaining": "Орган, располагающий информацией; конкретные обязательные форматы и требования доступности определяются отдельно."
+      }
     },
     {
       "case_key": "bank-legal-2026-121",
@@ -3014,8 +3091,16 @@
       ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
-      "review_date": "2026-11-27",
-      "source_scope": "previous_constitution_text_and_case_specific_reasoning"
+      "review_date": "2026-11-28",
+      "source_scope": "previous_constitution_text_and_case_specific_reasoning",
+      "checked_norm_urls": [
+        "https://minjust.gov.ru/ru/documents/8011/"
+      ],
+      "targeted_option_review": {
+        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "option_count": 5,
+        "remaining": "Вид судопроизводства не задан. Только суд решает процессуальные вопросы; административный орган и голосующие не распоряжаются принятием дела."
+      }
     },
     {
       "case_key": "bank-legal-2026-132",
@@ -3163,8 +3248,17 @@
       ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
-      "review_date": "2026-11-27",
-      "source_scope": "specific_norm_and_related_search_results_partial"
+      "review_date": "2026-11-28",
+      "source_scope": "specific_norm_and_related_search_results_partial",
+      "checked_norm_urls": [
+        "https://minjust.gov.ru/ru/documents/8011/",
+        "https://www.consultant.ru/document/cons_doc_LAW_5142/5b4886fd41d95bd272f7a06c75e26762630ac683/"
+      ],
+      "targeted_option_review": {
+        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "option_count": 5,
+        "remaining": "Исполнитель публичного договора, уполномоченный контрольный орган и суд действуют в своей компетенции. Конкретный отраслевой режим услуги не задан."
+      }
     },
     {
       "case_key": "bank-legal-2026-141",
@@ -3247,8 +3341,16 @@
       ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
-      "review_date": "2026-11-27",
-      "source_scope": "previous_constitution_text_and_case_specific_reasoning"
+      "review_date": "2026-11-28",
+      "source_scope": "previous_constitution_text_and_case_specific_reasoning",
+      "checked_norm_urls": [
+        "https://minjust.gov.ru/ru/documents/8011/"
+      ],
+      "targeted_option_review": {
+        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "option_count": 5,
+        "remaining": "Процессуальная подсудность определяется законом, не руководителем ответчика. Вид конкретного спора не установлен."
+      }
     },
     {
       "case_key": "bank-legal-2026-146",
@@ -3312,8 +3414,16 @@
       ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
-      "review_date": "2026-11-27",
-      "source_scope": "previous_constitution_text_and_case_specific_reasoning"
+      "review_date": "2026-11-28",
+      "source_scope": "previous_constitution_text_and_case_specific_reasoning",
+      "checked_norm_urls": [
+        "https://minjust.gov.ru/ru/documents/8011/"
+      ],
+      "targeted_option_review": {
+        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "option_count": 5,
+        "remaining": "Компетентный орган либо суд устраняет отказ по установленному порядку; вид правоотношения и способы отмены не конкретизированы."
+      }
     },
     {
       "case_key": "bank-legal-2026-150",
