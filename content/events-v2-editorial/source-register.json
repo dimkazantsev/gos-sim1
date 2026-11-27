@@ -2936,8 +2936,17 @@
       ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
-      "review_date": "2026-11-27",
-      "source_scope": "specific_norm_and_related_search_results_partial"
+      "review_date": "2026-11-28",
+      "source_scope": "specific_norm_and_related_search_results_partial",
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_61801/7336c78762a98b5f4f698b8c3800dca1111acc16/",
+        "https://www.consultant.ru/document/cons_doc_LAW_436110/15f0efd3c8311b53608abd85f9c02157e1457f55/"
+      ],
+      "targeted_option_review": {
+        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "option_count": 5,
+        "remaining": "Не определены архитектура системы, правовой статус оператора и применимость специальных режимов 572-ФЗ; согласие само по себе не подтверждает законность всей системы."
+      }
     },
     {
       "case_key": "bank-legal-2026-119",
@@ -3074,12 +3083,22 @@
       "legal_basis": "НК РФ, ст. 3, 17: налоговое обязательство и элементы налога определяются законодательством, а не информационной памяткой. Ставка 2% дана только как параметр конкретной учебной истории; вид налога, территория и период не названы, поэтому утверждать реальную универсальную ставку нельзя. Для точного расчёта нужны эти условия.",
       "legal_urls": [
         "https://www.consultant.ru/document/cons_doc_LAW_19671/d03926665a6af79635a902fe666ce607ad1cdab0/",
-        "https://www.consultant.ru/document/cons_doc_LAW_19671/"
+        "https://www.consultant.ru/document/cons_doc_LAW_19671/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19671/27c48775695f5049e317dfe269ede10c3394b4ae/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
-      "review_date": "2026-11-27",
-      "source_scope": "specific_norm_and_related_search_results_partial"
+      "review_date": "2026-11-28",
+      "source_scope": "specific_norm_and_related_search_results_partial",
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_19671/d03926665a6af79635a902fe666ce607ad1cdab0/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19671/27c48775695f5049e317dfe269ede10c3394b4ae/"
+      ],
+      "targeted_option_review": {
+        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "option_count": 5,
+        "remaining": "Не названы конкретный налог, налоговый период и вид требования; применяется надлежащая процедура исправления налогового акта."
+      }
     },
     {
       "case_key": "bank-legal-2026-125",
@@ -3095,8 +3114,16 @@
       ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
-      "review_date": "2026-11-27",
-      "source_scope": "specific_norm_and_related_search_results_partial"
+      "review_date": "2026-11-28",
+      "source_scope": "specific_norm_and_related_search_results_partial",
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_19671/fe653fbf45334f84d241e4e49bfda1a84dd76f1d/"
+      ],
+      "targeted_option_review": {
+        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "option_count": 5,
+        "remaining": "Не определены даты перечисления, взыскания, заявления и возврата, основание начисления процентов и специальные исключения; не рассчитывать проценты произвольно."
+      }
     },
     {
       "case_key": "bank-legal-2026-126",
@@ -3108,12 +3135,24 @@
       "legal_basis": "НК РФ, ст. 3 и 56; Конституция РФ, ст. 19: дискриминационный партийный критерий несовместим с равным применением налогового законодательства. Льгота возможна лишь в пределах полномочий соответствующего органа, с объективной категорией и в надлежащем нормативном акте. Конкретные местные полномочия и условия земельного налога требуют проверки.",
       "legal_urls": [
         "https://www.consultant.ru/document/cons_doc_LAW_19671/d03926665a6af79635a902fe666ce607ad1cdab0/",
-        "https://minjust.gov.ru/ru/documents/8011/"
+        "https://minjust.gov.ru/ru/documents/8011/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19671/4cada6c7ce0d8a4a287f0eeb6d5c1ed5f4d08045/",
+        "https://www.consultant.ru/document/cons_doc_LAW_28165/fe0bf8fd35bf98d9d68a14f1a0237b0b1f6e25f7/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
-      "review_date": "2026-11-27",
-      "source_scope": "specific_norm_and_related_search_results_partial"
+      "review_date": "2026-11-28",
+      "source_scope": "specific_norm_and_related_search_results_partial",
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_19671/d03926665a6af79635a902fe666ce607ad1cdab0/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19671/4cada6c7ce0d8a4a287f0eeb6d5c1ed5f4d08045/",
+        "https://www.consultant.ru/document/cons_doc_LAW_28165/fe0bf8fd35bf98d9d68a14f1a0237b0b1f6e25f7/"
+      ],
+      "targeted_option_review": {
+        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "option_count": 5,
+        "remaining": "Конкретные категории, муниципальный акт, ставки и бюджетный расчёт требуют проверки; льгота не предоставляется голосованием в кейсе."
+      }
     },
     {
       "case_key": "bank-legal-2026-127",
@@ -3129,8 +3168,16 @@
       ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
-      "review_date": "2026-11-27",
-      "source_scope": "specific_norm_and_related_search_results_partial"
+      "review_date": "2026-11-28",
+      "source_scope": "specific_norm_and_related_search_results_partial",
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_61763/871fb1003dab1dd3ef350f8f7f0f0d10ea20b5c6/"
+      ],
+      "targeted_option_review": {
+        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "option_count": 5,
+        "remaining": "Не названы товар и отраслевой режим; законные основания контроля, меры и компетенция устанавливаются отдельно."
+      }
     },
     {
       "case_key": "bank-legal-2026-128",
@@ -3145,8 +3192,16 @@
       ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
-      "review_date": "2026-11-27",
-      "source_scope": "specific_norm_and_related_search_results_partial"
+      "review_date": "2026-11-28",
+      "source_scope": "specific_norm_and_related_search_results_partial",
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_33773/79da6e3bbbc8eb967db0714e8378269bfea9f83c/"
+      ],
+      "targeted_option_review": {
+        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "option_count": 5,
+        "remaining": "Ст. 39.11 и последующие правила торгов, кадастровый статус и документация отдельно не проверены; дополнительное информирование не заменяет обязательное извещение."
+      }
     },
     {
       "case_key": "bank-legal-2026-129",
@@ -3474,12 +3529,22 @@
       "resolved_source_url": null,
       "legal_basis": "210-ФЗ, ст. 7, ч. 1 п. 2, ст. 7.1: документы, находящиеся в распоряжении органов и подлежащие межведомственному получению, не требуются от заявителя, кроме предусмотренных законом исключений. В истории исключение отсутствует. Добровольное представление допустимо, но не является условием регистрации.",
       "legal_urls": [
-        "https://www.consultant.ru/document/cons_doc_LAW_103023/a593eaab768d34bf2d7419322eac79481e73cf03/"
+        "https://www.consultant.ru/document/cons_doc_LAW_103023/a593eaab768d34bf2d7419322eac79481e73cf03/",
+        "https://www.consultant.ru/document/cons_doc_LAW_103023/dae12f04d4f7e53b43596ece42c666374101e68b/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
-      "review_date": "2026-11-27",
-      "source_scope": "specific_norm_and_related_search_results_partial"
+      "review_date": "2026-11-28",
+      "source_scope": "specific_norm_and_related_search_results_partial",
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_103023/a593eaab768d34bf2d7419322eac79481e73cf03/",
+        "https://www.consultant.ru/document/cons_doc_LAW_103023/dae12f04d4f7e53b43596ece42c666374101e68b/"
+      ],
+      "targeted_option_review": {
+        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "option_count": 5,
+        "remaining": "Конкретный регламент услуги, каналы и сроки межведомственных запросов требуют проверки; МФЦ и орган действуют каждый в своей компетенции."
+      }
     },
     {
       "case_key": "bank-legal-2026-147",
@@ -3494,8 +3559,16 @@
       ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
-      "review_date": "2026-11-27",
-      "source_scope": "specific_norm_and_related_search_results_partial"
+      "review_date": "2026-11-28",
+      "source_scope": "specific_norm_and_related_search_results_partial",
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_5142/4ad68a20a41c7429791e5942e898312c4569ef46/"
+      ],
+      "targeted_option_review": {
+        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "option_count": 5,
+        "remaining": "Особый режим, конкретная процедура реквизиции и условия добровольного возврата требуют установления; не обещать одновременно полный размер компенсации и возврат без урегулирования."
+      }
     },
     {
       "case_key": "bank-legal-2026-148",
@@ -3511,8 +3584,16 @@
       ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
-      "review_date": "2026-11-27",
-      "source_scope": "prior_article_evidence_and_special_regime_unresolved"
+      "review_date": "2026-11-28",
+      "source_scope": "prior_article_evidence_and_special_regime_unresolved",
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/1b6959f23cc516d0e11ddc2e213ca2dca83560df/"
+      ],
+      "targeted_option_review": {
+        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "option_count": 5,
+        "remaining": "Условия конкретной субсидии, соглашение, основания возврата и объём контроля требуют проверки; ввод объекта не означает выполнения всех условий."
+      }
     },
     {
       "case_key": "bank-legal-2026-149",
@@ -3552,8 +3633,17 @@
       ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
-      "review_date": "2026-11-27",
-      "source_scope": "specific_norm_and_related_search_results_partial"
+      "review_date": "2026-11-28",
+      "source_scope": "specific_norm_and_related_search_results_partial",
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_48601/e7b86a940bc71a71af7b9288590f1ca92a69d878/",
+        "https://www.consultant.ru/document/cons_doc_LAW_82959/168ac76599fb643077ad0b13c4f2dc2c6126333a/"
+      ],
+      "targeted_option_review": {
+        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "option_count": 5,
+        "remaining": "Порядок уведомления утверждает представитель нанимателя; уголовная квалификация и действия с предметом передачи требуют установления обстоятельств."
+      }
     },
     {
       "case_key": "bank-budget-bridge",
