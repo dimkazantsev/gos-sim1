@@ -4353,7 +4353,9 @@
         "https://11.rosguard.gov.ru/uploads/2025/07/5_grazhdanskijj_kodeks_rossijjskojj_federacii_chast_pervaya.pdf"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "option_analysis_status": "draft",
+      "source_scope": "inherited_basis_requires_current_verification"
     },
     {
       "case_key": "bank-expanded-light-08-01",
@@ -4368,7 +4370,9 @@
         "https://minjust.gov.ru/ru/documents/8011/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "option_analysis_status": "draft",
+      "source_scope": "inherited_basis_requires_current_verification"
     },
     {
       "case_key": "bank-expanded-light-09-01",
@@ -4383,7 +4387,9 @@
         "https://mintrud.gov.ru/docs/laws/129"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "option_analysis_status": "draft",
+      "source_scope": "inherited_basis_requires_current_verification"
     },
     {
       "case_key": "bank-expanded-light-10-01",
@@ -4397,7 +4403,9 @@
         "https://18.mchs.gov.ru/uploads/resource/2026-01-27/teksty-normativnyh-pravovyh-aktov-reguliruyushchih-osushchestvlenie-federalnogo-gosudarstvennogo-pozharnogo-nadzora_1769497965271437721.pdf"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "option_analysis_status": "draft",
+      "source_scope": "inherited_basis_requires_current_verification"
     },
     {
       "case_key": "bank-expanded-light-11-01",
@@ -4412,7 +4420,9 @@
         "https://11.rosguard.gov.ru/uploads/2025/07/5_grazhdanskijj_kodeks_rossijjskojj_federacii_chast_pervaya.pdf"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "option_analysis_status": "draft",
+      "source_scope": "inherited_basis_requires_current_verification"
     },
     {
       "case_key": "bank-expanded-light-12-01",
@@ -4427,7 +4437,9 @@
         "http://www.kremlin.ru/acts/bank/36698"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "option_analysis_status": "draft",
+      "source_scope": "inherited_basis_requires_current_verification"
     },
     {
       "case_key": "bank-expanded-light-13-01",
@@ -4441,7 +4453,9 @@
         "https://mintrud.gov.ru/docs/laws/129"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "option_analysis_status": "draft",
+      "source_scope": "inherited_basis_requires_current_verification"
     },
     {
       "case_key": "bank-expanded-light-14-01",
@@ -4456,7 +4470,9 @@
         "https://sfr.gov.ru/order/law_rehabilitation~11198"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "option_analysis_status": "draft",
+      "source_scope": "inherited_basis_requires_current_verification"
     },
     {
       "case_key": "bank-expanded-light-15-01",
@@ -4471,7 +4487,9 @@
         "https://mintrud.gov.ru/docs/laws/129"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "option_analysis_status": "draft",
+      "source_scope": "inherited_basis_requires_current_verification"
     },
     {
       "case_key": "bank-expanded-light-16-01",
@@ -4486,7 +4504,9 @@
         "https://mchs.gov.ru/dokumenty/bazovye-normativnye-pravovye-akty/federalnye-zakony/5788"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "option_analysis_status": "draft",
+      "source_scope": "inherited_basis_requires_current_verification"
     },
     {
       "case_key": "bank-expanded-light-17-01",
@@ -4501,7 +4521,9 @@
         "https://11.rosguard.gov.ru/uploads/2025/07/5_grazhdanskijj_kodeks_rossijjskojj_federacii_chast_pervaya.pdf"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "option_analysis_status": "draft",
+      "source_scope": "inherited_basis_requires_current_verification"
     },
     {
       "case_key": "bank-expanded-light-18-01",
@@ -4516,7 +4538,9 @@
         "https://rospatent.gov.ru/ru/documents/grazhdanskiy-kodeks-rossiyskoy-federacii-chast-chetvertaya"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "option_analysis_status": "draft",
+      "source_scope": "inherited_basis_requires_current_verification"
     },
     {
       "case_key": "bank-expanded-light-19-01",
@@ -4531,7 +4555,9 @@
         "https://minjust.gov.ru/ru/pages/grazhdanskij-kodeks/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "option_analysis_status": "draft",
+      "source_scope": "inherited_basis_requires_current_verification"
     },
     {
       "case_key": "bank-expanded-light-20-01",
@@ -4546,7 +4572,9 @@
         "https://mintrud.gov.ru/docs/laws/108"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "option_analysis_status": "draft",
+      "source_scope": "inherited_basis_requires_current_verification"
     },
     {
       "case_key": "bank-expanded-serious-04-01",
@@ -4560,7 +4588,9 @@
         "https://minzdrav.gov.ru/en/documents/7025-federalnyy-zakon-ot-21-noyabrya-2011-g-323-fz-ob-osnovah-ohrany-zdorovya-grazhdan-v-rossiyskoy-federatsii"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "option_analysis_status": "draft",
+      "source_scope": "inherited_basis_requires_current_verification"
     },
     {
       "case_key": "bank-expanded-serious-05-01",
@@ -4575,7 +4605,9 @@
         "https://epp.genproc.gov.ru/ru/proc_74/mass-media/news/main/e8471469/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "option_analysis_status": "draft",
+      "source_scope": "inherited_basis_requires_current_verification"
     },
     {
       "case_key": "bank-expanded-serious-06-01",
@@ -4589,7 +4621,9 @@
         "https://mchs.gov.ru/dokumenty/bazovye-normativnye-pravovye-akty/federalnye-zakony/5788"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "option_analysis_status": "draft",
+      "source_scope": "inherited_basis_requires_current_verification"
     },
     {
       "case_key": "bank-expanded-serious-07-01",
@@ -4604,7 +4638,9 @@
         "https://epp.genproc.gov.ru/ru/gprf/mass-media/news/main/e470391/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "option_analysis_status": "draft",
+      "source_scope": "inherited_basis_requires_current_verification"
     },
     {
       "case_key": "bank-expanded-serious-08-01",
@@ -4619,7 +4655,9 @@
         "https://mintrud.gov.ru/docs/laws/116"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "option_analysis_status": "draft",
+      "source_scope": "inherited_basis_requires_current_verification"
     },
     {
       "case_key": "bank-expanded-serious-09-01",
@@ -4634,7 +4672,9 @@
         "https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "option_analysis_status": "draft",
+      "source_scope": "inherited_basis_requires_current_verification"
     },
     {
       "case_key": "bank-expanded-serious-10-01",
@@ -4648,7 +4688,9 @@
         "https://sfr.gov.ru/order/law_rehabilitation~11198"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "option_analysis_status": "draft",
+      "source_scope": "inherited_basis_requires_current_verification"
     },
     {
       "case_key": "bank-expanded-serious-11-01",
@@ -4663,7 +4705,9 @@
         "https://mintrud.gov.ru/docs/mintrud/orders/2960"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "option_analysis_status": "draft",
+      "source_scope": "inherited_basis_requires_current_verification"
     },
     {
       "case_key": "bank-expanded-serious-12-01",
@@ -4678,7 +4722,9 @@
         "https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "option_analysis_status": "draft",
+      "source_scope": "inherited_basis_requires_current_verification"
     },
     {
       "case_key": "bank-expanded-serious-13-01",
@@ -4692,7 +4738,9 @@
         "https://mintrans.gov.ru/storage/app/media/epd/0811201.pdf"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "option_analysis_status": "draft",
+      "source_scope": "inherited_basis_requires_current_verification"
     },
     {
       "case_key": "bank-expanded-serious-14-01",
@@ -4707,7 +4755,9 @@
         "https://epp.genproc.gov.ru/upload/iblock/0d0/hghg8nrmg2v25zrox7cvk28868b3fr21.pdf"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "option_analysis_status": "draft",
+      "source_scope": "inherited_basis_requires_current_verification"
     },
     {
       "case_key": "bank-expanded-serious-15-01",
@@ -4721,7 +4771,9 @@
         "https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "option_analysis_status": "draft",
+      "source_scope": "inherited_basis_requires_current_verification"
     },
     {
       "case_key": "bank-expanded-serious-16-01",
@@ -4736,7 +4788,9 @@
         "https://mintrud.gov.ru/docs/laws/116"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "option_analysis_status": "draft",
+      "source_scope": "inherited_basis_requires_current_verification"
     },
     {
       "case_key": "bank-expanded-serious-17-01",
@@ -4751,7 +4805,9 @@
         "http://www.kremlin.ru/acts/bank/36698"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "option_analysis_status": "draft",
+      "source_scope": "inherited_basis_requires_current_verification"
     },
     {
       "case_key": "bank-expanded-serious-18-01",
@@ -4766,7 +4822,9 @@
         "https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "option_analysis_status": "draft",
+      "source_scope": "inherited_basis_requires_current_verification"
     },
     {
       "case_key": "bank-expanded-serious-19-01",
@@ -4781,7 +4839,9 @@
         "https://minjust.gov.ru/ru/documents/8011/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "option_analysis_status": "draft",
+      "source_scope": "inherited_basis_requires_current_verification"
     },
     {
       "case_key": "bank-expanded-serious-20-01",
@@ -4796,7 +4856,9 @@
         "https://11.rosguard.gov.ru/uploads/2025/07/5_grazhdanskijj_kodeks_rossijjskojj_federacii_chast_pervaya.pdf"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "option_analysis_status": "draft",
+      "source_scope": "inherited_basis_requires_current_verification"
     },
     {
       "case_key": "bank-expanded-serious-21-01",
@@ -4810,7 +4872,9 @@
         "https://minzdrav.gov.ru/en/documents/7025-federalnyy-zakon-ot-21-noyabrya-2011-g-323-fz-ob-osnovah-ohrany-zdorovya-grazhdan-v-rossiyskoy-federatsii"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "option_analysis_status": "draft",
+      "source_scope": "inherited_basis_requires_current_verification"
     },
     {
       "case_key": "bank-expanded-serious-22-01",
@@ -4826,7 +4890,9 @@
         "https://epp.genproc.gov.ru/ru/proc_75/mass-media/news/main/e8245653/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "option_analysis_status": "draft",
+      "source_scope": "inherited_basis_requires_current_verification"
     },
     {
       "case_key": "bank-expanded-serious-23-01",
@@ -4841,7 +4907,9 @@
         "https://minjust.gov.ru/ru/documents/8011/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "option_analysis_status": "draft",
+      "source_scope": "inherited_basis_requires_current_verification"
     },
     {
       "case_key": "bank-expanded-serious-24-01",
@@ -4855,7 +4923,9 @@
         "https://01.mchs.gov.ru/deyatelnost/napravleniya-deyatelnosti/grazhdanskaya-zashchita/preduprezhdenie-chrezvychaynyh-situaciy/1-1-normativnye-pravovye-akty/2-federalnye-zakony/federalnyy-zakon-ot-21-iyulya-1997-g-n-117-fz-o-bezopasnosti-gidrotehnicheskih-sooruzheniy"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "option_analysis_status": "draft",
+      "source_scope": "inherited_basis_requires_current_verification"
     },
     {
       "case_key": "bank-expanded-serious-25-01",
@@ -4870,7 +4940,9 @@
         "https://epp.genproc.gov.ru/ru/proc_35/activity/combating-corruption/zakon/federal/e345084/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "option_analysis_status": "draft",
+      "source_scope": "inherited_basis_requires_current_verification"
     },
     {
       "case_key": "bank-expanded-serious-26-01",
@@ -4884,7 +4956,9 @@
         "https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "option_analysis_status": "draft",
+      "source_scope": "inherited_basis_requires_current_verification"
     },
     {
       "case_key": "bank-expanded-serious-27-01",
@@ -4899,7 +4973,9 @@
         "https://epp.genproc.gov.ru/upload/iblock/0d0/hghg8nrmg2v25zrox7cvk28868b3fr21.pdf"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "option_analysis_status": "draft",
+      "source_scope": "inherited_basis_requires_current_verification"
     },
     {
       "case_key": "bank-expanded-serious-28-01",
@@ -4913,7 +4989,9 @@
         "https://mchs.gov.ru/dokumenty/bazovye-normativnye-pravovye-akty/federalnye-zakony/5788"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "option_analysis_status": "draft",
+      "source_scope": "inherited_basis_requires_current_verification"
     },
     {
       "case_key": "bank-expanded-serious-29-01",
@@ -4928,7 +5006,9 @@
         "https://fcmk.minzdrav.gov.ru/wp-content/uploads/2025/09/ob-osnovah-ohrany-zdorovya-grazhdan-v-rossijskoj-federaczii.pdf"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "option_analysis_status": "draft",
+      "source_scope": "inherited_basis_requires_current_verification"
     },
     {
       "case_key": "bank-expanded-serious-30-01",
@@ -4943,7 +5023,9 @@
         "https://epp.genproc.gov.ru/ru/proc_26/activity/legal-education/explain/e239070/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "option_analysis_status": "draft",
+      "source_scope": "inherited_basis_requires_current_verification"
     },
     {
       "case_key": "bank-library",
@@ -4958,7 +5040,9 @@
         "https://minjust.gov.ru/ru/pages/grazhdanskij-kodeks/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "option_analysis_status": "draft",
+      "source_scope": "inherited_basis_requires_current_verification"
     },
     {
       "case_key": "bank-media-rumour",
@@ -4973,7 +5057,9 @@
         "https://epp.genproc.gov.ru/ru/proc_72/activity/legal-education/explain/e1331886/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "option_analysis_status": "draft",
+      "source_scope": "inherited_basis_requires_current_verification"
     },
     {
       "case_key": "bank-meeting",
@@ -4987,7 +5073,9 @@
         "https://11.rosguard.gov.ru/uploads/2025/07/5_grazhdanskijj_kodeks_rossijjskojj_federacii_chast_pervaya.pdf"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "option_analysis_status": "draft",
+      "source_scope": "inherited_basis_requires_current_verification"
     },
     {
       "case_key": "bank-public-hearing",
@@ -5003,7 +5091,9 @@
         "https://okn.alania.gov.ru/documents/819"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "option_analysis_status": "draft",
+      "source_scope": "inherited_basis_requires_current_verification"
     },
     {
       "case_key": "bank-records",
@@ -5018,7 +5108,9 @@
         "https://mintrud.gov.ru/docs/laws/129"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "option_analysis_status": "draft",
+      "source_scope": "inherited_basis_requires_current_verification"
     }
   ]
 }
