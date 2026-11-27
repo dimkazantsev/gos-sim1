@@ -2258,12 +2258,22 @@
       "resolved_source_url": null,
       "legal_basis": "Конституция РФ, ст. 104, ч. 3. Заключение Правительства требуется до внесения данного расходного законопроекта; оно не равнозначно утверждению проекта и не заменяет бюджетную процедуру.",
       "legal_urls": [
-        "https://minjust.gov.ru/ru/documents/8011/"
+        "https://minjust.gov.ru/ru/documents/8011/",
+        "https://www.consultant.ru/document/cons_doc_LAW_28399/3f8c850abc4dc2ba4207acc563b176d93bdcf5f7/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
       "review_date": "2026-11-27",
-      "source_scope": "specific_norm_checked_partial"
+      "source_scope": "specific_norm_checked_partial",
+      "checked_norm_urls": [
+        "https://minjust.gov.ru/ru/documents/8011/",
+        "https://www.consultant.ru/document/cons_doc_LAW_28399/3f8c850abc4dc2ba4207acc563b176d93bdcf5f7/"
+      ],
+      "targeted_option_review": {
+        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "option_count": 5,
+        "remaining": "Регламент внесения, содержание финансового обоснования и конкретный бюджетный механизм."
+      }
     },
     {
       "case_key": "bank-legal-2026-095",
@@ -2274,12 +2284,22 @@
       "resolved_source_url": null,
       "legal_basis": "Конституция РФ, ст. 107, ч. 3. Преодоление президентского отклонения в прежней редакции требует не менее двух третей от общего числа сенаторов и депутатов соответственно. Новая инициатива имеет собственную процедуру и не заменяет повторное одобрение прежнего текста.",
       "legal_urls": [
-        "https://minjust.gov.ru/ru/documents/8011/"
+        "https://minjust.gov.ru/ru/documents/8011/",
+        "https://www.consultant.ru/document/cons_doc_LAW_28399/bdb6e3b84ca23ec909e111e3d18908e25a355111/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
       "review_date": "2026-11-27",
-      "source_scope": "specific_norm_checked_partial"
+      "source_scope": "specific_norm_checked_partial",
+      "checked_norm_urls": [
+        "https://minjust.gov.ru/ru/documents/8011/",
+        "https://www.consultant.ru/document/cons_doc_LAW_28399/bdb6e3b84ca23ec909e111e3d18908e25a355111/"
+      ],
+      "targeted_option_review": {
+        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "option_count": 5,
+        "remaining": "Регламенты палат, конкретный график рассмотрения и оформление новой инициативы."
+      }
     },
     {
       "case_key": "bank-legal-2026-096",
@@ -2290,12 +2310,22 @@
       "resolved_source_url": null,
       "legal_basis": "Конституция РФ, ст. 107, ч. 3. При своевременном запросе Президента срок подписи приостанавливается; при подтверждении конституционности закон подписывается в трёхдневный срок от решения КС, при неподтверждении возвращается в ГД без подписи.",
       "legal_urls": [
-        "https://minjust.gov.ru/ru/documents/8011/"
+        "https://minjust.gov.ru/ru/documents/8011/",
+        "https://www.consultant.ru/document/cons_doc_LAW_28399/bdb6e3b84ca23ec909e111e3d18908e25a355111/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
       "review_date": "2026-11-27",
-      "source_scope": "specific_norm_checked_partial"
+      "source_scope": "specific_norm_checked_partial",
+      "checked_norm_urls": [
+        "https://minjust.gov.ru/ru/documents/8011/",
+        "https://www.consultant.ru/document/cons_doc_LAW_28399/bdb6e3b84ca23ec909e111e3d18908e25a355111/"
+      ],
+      "targeted_option_review": {
+        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "option_count": 5,
+        "remaining": "Процессуальная допустимость и форма конкретного запроса, специальное законодательство о КС."
+      }
     },
     {
       "case_key": "bank-legal-2026-097",
@@ -2597,7 +2627,15 @@
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
       "review_date": "2026-11-27",
-      "source_scope": "specific_norm_and_related_search_results_partial"
+      "source_scope": "specific_norm_and_related_search_results_partial",
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_34683/6a7ba42d8fda3a1ba186a9eb5c806921998ae7d1/"
+      ],
+      "targeted_option_review": {
+        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "option_count": 5,
+        "remaining": "Применимость ст. 178–180 ТК, преимущественное право, сроки уведомлений, коллективные и индивидуальные обстоятельства."
+      }
     },
     {
       "case_key": "bank-legal-2026-113",
@@ -2614,7 +2652,16 @@
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
       "review_date": "2026-11-27",
-      "source_scope": "specific_norm_and_related_search_results_partial"
+      "source_scope": "specific_norm_and_related_search_results_partial",
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_34683/cc065f088bd92d312b5fae714377b25f557ac44a/",
+        "https://www.consultant.ru/document/cons_doc_LAW_34683/ede188a86ee930ba7b9e1163bc567d7897a43921/"
+      ],
+      "targeted_option_review": {
+        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "option_count": 5,
+        "remaining": "Оформление исправлений договора, конкретная редакция перечня иных категорий, режим персональных данных."
+      }
     },
     {
       "case_key": "bank-legal-2026-114",
@@ -2626,12 +2673,25 @@
       "legal_basis": "ТК РФ, ст. 114, 136, 236: отпуск не заменяет заработную плату. При установленной задолженности компенсация за задержку рассчитывается по действующей норме, включая период до фактического расчёта. Необходимо погасить долг и компенсацию независимо от выбранной дополнительной меры. Конкретный расчёт невозможен без дат и динамики ставки.",
       "legal_urls": [
         "https://www.consultant.ru/document/cons_doc_LAW_34683/7c8d2fe49f0c8b8d13723803f2e82228f99b6d7e/",
-        "https://www.consultant.ru/document/cons_doc_LAW_34683/"
+        "https://www.consultant.ru/document/cons_doc_LAW_34683/",
+        "https://www.consultant.ru/document/cons_doc_LAW_34683/cfa9a86846908928276ee2f2274d3d4a0a6c8640/",
+        "https://www.consultant.ru/document/cons_doc_LAW_34683/a0a891ee650687026ef53d5d1194983419be6793/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
       "review_date": "2026-11-27",
-      "source_scope": "specific_norm_and_related_search_results_partial"
+      "source_scope": "specific_norm_and_related_search_results_partial",
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_34683/7c8d2fe49f0c8b8d13723803f2e82228f99b6d7e/",
+        "https://www.consultant.ru/document/cons_doc_LAW_34683/",
+        "https://www.consultant.ru/document/cons_doc_LAW_34683/cfa9a86846908928276ee2f2274d3d4a0a6c8640/",
+        "https://www.consultant.ru/document/cons_doc_LAW_34683/a0a891ee650687026ef53d5d1194983419be6793/"
+      ],
+      "targeted_option_review": {
+        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "option_count": 5,
+        "remaining": "Даты каждой выплаты, история ключевой ставки, размер частичных платежей, правовой статус работодателя и источник средств; точный размер компенсации не рассчитан."
+      }
     },
     {
       "case_key": "bank-legal-2026-115",
@@ -2642,12 +2702,22 @@
       "resolved_source_url": null,
       "legal_basis": "ТК РФ, ст. 99, 259: для матери ребёнка двух лет нужны письменное согласие, отсутствие медицинского запрета и письменное ознакомление с правом отказа. В заданной неаварийной ситуации принуждение недопустимо. Остальные работники также привлекаются только с соблюдением применимых норм и ограничений.",
       "legal_urls": [
-        "https://www.consultant.ru/document/cons_doc_LAW_34683/b3b98c8b54f919c352560aadad5f95df943fd9fe/"
+        "https://www.consultant.ru/document/cons_doc_LAW_34683/b3b98c8b54f919c352560aadad5f95df943fd9fe/",
+        "https://www.consultant.ru/document/cons_doc_LAW_34683/ff4c79fea2e01934abc407be13af36cc7a15054c/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
       "review_date": "2026-11-27",
-      "source_scope": "specific_norm_and_related_search_results_partial"
+      "source_scope": "specific_norm_and_related_search_results_partial",
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_34683/b3b98c8b54f919c352560aadad5f95df943fd9fe/",
+        "https://www.consultant.ru/document/cons_doc_LAW_34683/ff4c79fea2e01934abc407be13af36cc7a15054c/"
+      ],
+      "targeted_option_review": {
+        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "option_count": 5,
+        "remaining": "Конкретные лимиты сверхурочной работы по действующей на дату исполнения редакции, оплата, графики, основания срочных договоров."
+      }
     },
     {
       "case_key": "bank-legal-2026-116",
@@ -2665,7 +2735,17 @@
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
       "review_date": "2026-11-27",
-      "source_scope": "specific_norm_and_related_search_results_partial"
+      "source_scope": "specific_norm_and_related_search_results_partial",
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_61801/26edb2934b899bf9c74c3a8f7e574651c6565e6d/",
+        "https://www.consultant.ru/document/cons_doc_LAW_121895/9f906d460f9454a8a0d290738d9fc2798c1e865a/",
+        "https://www.consultant.ru/document/cons_doc_LAW_61801/d3fe43a7c415353b17faab255bc0de92bea127da/"
+      ],
+      "targeted_option_review": {
+        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "option_count": 5,
+        "remaining": "Конкретный состав инцидента, законные основания обработки, правила доступа и техническое исполнение."
+      }
     },
     {
       "case_key": "bank-legal-2026-117",
@@ -2676,12 +2756,22 @@
       "resolved_source_url": null,
       "legal_basis": "152-ФЗ, ст. 19, 21: оператор прекращает неправомерную обработку и принимает меры защиты. При установлении неправомерной или случайной передачи, повлекшей нарушение прав субъектов, действует специальная обязанность уведомления по ч. 3.1 ст. 21. Наличие именно этих условий, масштаб и сроки реагирования проверяются ответственным оператором; не предполагается автоматически зарубежное хранение.",
       "legal_urls": [
-        "https://www.consultant.ru/document/cons_doc_LAW_61801/d3fe43a7c415353b17faab255bc0de92bea127da/"
+        "https://www.consultant.ru/document/cons_doc_LAW_61801/d3fe43a7c415353b17faab255bc0de92bea127da/",
+        "https://www.consultant.ru/document/cons_doc_LAW_61801/ca9e5658710519f09ab2fdb8196fcb3eb024a051/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
       "review_date": "2026-11-27",
-      "source_scope": "specific_norm_and_related_search_results_partial"
+      "source_scope": "specific_norm_and_related_search_results_partial",
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_61801/d3fe43a7c415353b17faab255bc0de92bea127da/",
+        "https://www.consultant.ru/document/cons_doc_LAW_61801/ca9e5658710519f09ab2fdb8196fcb3eb024a051/"
+      ],
+      "targeted_option_review": {
+        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "option_count": 5,
+        "remaining": "Конкретная категория оператора, правила ведомственного документооборота, сроки хранения, технические меры; зарубежное размещение не предполагается."
+      }
     },
     {
       "case_key": "bank-legal-2026-118",
@@ -2710,12 +2800,23 @@
       "legal_basis": "59-ФЗ, ст. 10, ч. 1 п. 4 и ст. 12: по обычному письменному обращению в компетенции органа нужен ответ по существу; общий срок 30 дней с регистрации, исключения и допустимое продление регулируются законом. Здесь не задано законное исключение. Обещание ремонта требует подтверждённых данных, а не выдуманного срока.",
       "legal_urls": [
         "https://www.consultant.ru/document/cons_doc_LAW_59999/ca24c3b3a2032a1f727146f988f406723bf9ea1a/",
-        "https://www.consultant.ru/document/cons_doc_LAW_59999/23fb391f3632e3f68a11e40c5a7711f3513cc674/"
+        "https://www.consultant.ru/document/cons_doc_LAW_59999/23fb391f3632e3f68a11e40c5a7711f3513cc674/",
+        "https://base.garant.ru/12146661/3d3a9e2eb4f30c73ea6671464e2a54b5/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
       "review_date": "2026-11-27",
-      "source_scope": "specific_norm_and_related_search_results_partial"
+      "source_scope": "specific_norm_and_related_search_results_partial",
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_59999/ca24c3b3a2032a1f727146f988f406723bf9ea1a/",
+        "https://www.consultant.ru/document/cons_doc_LAW_59999/23fb391f3632e3f68a11e40c5a7711f3513cc674/",
+        "https://base.garant.ru/12146661/3d3a9e2eb4f30c73ea6671464e2a54b5/"
+      ],
+      "targeted_option_review": {
+        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "option_count": 5,
+        "remaining": "Особенности конкретной услуги, компетенция должностного лица и локальная процедура рассмотрения."
+      }
     },
     {
       "case_key": "bank-legal-2026-120",
@@ -3249,7 +3350,13 @@
       ],
       "option_analysis_status": "draft",
       "source_scope": "specific_norm_and_related_search_results_partial",
-      "review_date": "2026-11-27"
+      "review_date": "2026-11-27",
+      "documentary_recheck": {
+        "date": "2026-11-27",
+        "status": "official_index_rechecked_full_text_unavailable",
+        "notes": "Сведения о времени вызова и пострадавших исключены из учебного текста: для выбора управленческого решения они не нужны; полная публикация при повторном открытии не получена.",
+        "additional_source_urls": []
+      }
     },
     {
       "case_key": "bank-budget-health",
@@ -3291,7 +3398,15 @@
       ],
       "option_analysis_status": "draft",
       "source_scope": "specific_norm_and_related_search_results_partial",
-      "review_date": "2026-11-27"
+      "review_date": "2026-11-27",
+      "documentary_recheck": {
+        "date": "2026-11-27",
+        "status": "official_index_and_official_channel_rechecked_full_text_unavailable",
+        "notes": "Официальный индекс и опубликованный материал прокуратуры в Telegram подтверждают основу эпизода; полный текст исходной страницы не получен. Технический акт о запрете занятий в конкретных помещениях — явно заданное учебное условие, не утверждение об историческом акте.",
+        "additional_source_urls": [
+          "https://t.me/s/samara_proc?before=2653"
+        ]
+      }
     },
     {
       "case_key": "bank-bus",
@@ -3302,14 +3417,24 @@
       "resolved_source_url": null,
       "legal_basis": "220-ФЗ, ст. 14: при регулируемых тарифах перевозки организуются на предусмотренном законом договорном основании; конкретное изменение расписания и маршрута зависит от вида маршрута, договора и компетенции. Фактическое исполнение нельзя подменять опубликованным графиком. Вид тарифа исторического маршрута не подтверждён в данном проходе.",
       "legal_urls": [
-        "https://www.consultant.ru/document/cons_doc_LAW_182659/2a81d1737eb14693e515423a77157b0fb20088c8/"
+        "https://www.consultant.ru/document/cons_doc_LAW_182659/2a81d1737eb14693e515423a77157b0fb20088c8/",
+        "https://base.garant.ru/71129200/888134b28b1397ffae87a0ab1e117954/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
-      "checked_norm_urls": [],
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_182659/2a81d1737eb14693e515423a77157b0fb20088c8/",
+        "https://base.garant.ru/71129200/888134b28b1397ffae87a0ab1e117954/"
+      ],
       "option_analysis_status": "draft",
       "source_scope": "specific_norm_and_related_search_results_partial",
-      "review_date": "2026-11-27"
+      "review_date": "2026-11-27",
+      "documentary_recheck": {
+        "date": "2026-11-27",
+        "status": "official_index_rechecked_full_text_unavailable",
+        "notes": "Фактическая основа подтверждена доступным индексом прокуратуры; полный текст исходной страницы не получен. Регулируемый тариф и контракт заданы только в учебной постановке.",
+        "additional_source_urls": []
+      }
     },
     {
       "case_key": "bank-cat-mayor",
@@ -3660,8 +3785,8 @@
       "audience": "single",
       "title": "Владивосток: отключение электроэнергии после аварии на подстанции",
       "source_url": "https://epp.genproc.gov.ru/ru/proc_25/mass-media/news/regional/e6353259/",
-      "source_status": "official_search_index_core_episode_confirmed_full_text_unavailable",
-      "resolved_source_url": null,
+      "source_status": "official_article_text_retrieved_and_read",
+      "resolved_source_url": "https://epp.genproc.gov.ru/ru/proc_25/mass-media/news/regional/e6353259/",
       "legal_basis": "Статья 38 Закона №35-ФЗ «Об электроэнергетике» регулирует гарантии надёжного обеспечения потребителей электрической энергией. При аварии технические переключения и восстановление выполняют уполномоченные специалисты; органы власти координируют защиту населения и информирование в пределах компетенции. Источники: https://01.mchs.gov.ru/deyatelnost/napravleniya-deyatelnosti/grazhdanskaya-zashchita/preduprezhdenie-chrezvychaynyh-situaciy/1-1-normativnye-pravovye-akty/2-federalnye-zakony/federalnyy-zakon-ot-21-dekabrya-1994-g-n-68-fz-o-zashchite-naseleniya-i-territoriy-ot-chrezvychaynyh-situaciy-prirodnogo-i-tehnogennogo-haraktera",
       "legal_urls": [
         "https://www.consultant.ru/document/cons_doc_LAW_41502/71ca306c624a4f313cf976323f4f5930a5124b0d/"
@@ -3669,9 +3794,17 @@
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
       "option_analysis_status": "draft",
-      "checked_norm_urls": [],
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_41502/71ca306c624a4f313cf976323f4f5930a5124b0d/"
+      ],
       "source_scope": "specific_norm_and_related_search_results_partial",
-      "review_date": "2026-11-27"
+      "review_date": "2026-11-27",
+      "documentary_recheck": {
+        "date": "2026-11-27",
+        "status": "official_article_text_retrieved_and_read",
+        "notes": "Получен и прочитан текст официальной публикации от 11.11.2025 15:43 (поисковая выдача содержит полный текст сообщения). Число жителей и объекты относятся к первоначальному сообщению прокуратуры, не окончательному итогу расследования.",
+        "additional_source_urls": []
+      }
     },
     {
       "case_key": "bank-curated-serious-07",
@@ -3872,13 +4005,23 @@
       "source_status": "official_search_index_core_episode_confirmed_full_text_unavailable",
       "resolved_source_url": null,
       "legal_basis": "Статья 17 Закона №257-ФЗ регулирует содержание автомобильных дорог; статья 12 Закона №196-ФЗ — безопасность при ремонте и содержании. Конкретные обязанности зависят от владельца дороги и её категории. Временная схема движения не заменяет устранение установленного дефекта. Источники: https://01.mchs.gov.ru/deyatelnost/napravleniya-deyatelnosti/grazhdanskaya-zashchita/preduprezhdenie-chrezvychaynyh-situaciy/1-1-normativnye-pravovye-akty/2-federalnye-zakony/federalnyy-zakon-ot-21-dekabrya-1994-g-n-68-fz-o-zashchite-naseleniya-i-territoriy-ot-chrezvychaynyh-situaciy-prirodnogo-i-tehnogennogo-haraktera https://mintrans.gov.ru/storage/app/media/epd/0811201.pdf",
-      "legal_urls": [],
+      "legal_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_72386/1692e755d61192abb296c96e101a443f4b701edf/"
+      ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
       "option_analysis_status": "draft",
-      "checked_norm_urls": [],
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_72386/1692e755d61192abb296c96e101a443f4b701edf/"
+      ],
       "source_scope": "inherited_basis_requires_current_verification",
-      "review_date": "2026-11-27"
+      "review_date": "2026-11-27",
+      "documentary_recheck": {
+        "date": "2026-11-27",
+        "status": "official_index_rechecked_full_text_unavailable",
+        "notes": "Доступен индекс официального сообщения, полный текст не получен. Угроза проезду спецслужб явно обозначена как условие учебной задачи.",
+        "additional_source_urls": []
+      }
     },
     {
       "case_key": "bank-curated-serious-19",
