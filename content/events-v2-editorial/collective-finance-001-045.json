@@ -487,7 +487,51 @@
       "history_protected": true,
       "legal_review": {
         "basis": "БК РФ, статьи 38 и 132: целевой характер средств и субсидии из федерального бюджета бюджетам субъектов РФ. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
-        "status": "requires_case_specific_current_law_review"
+        "status": "requires_case_specific_current_law_review",
+        "checked_norm_urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/0859896f05c16d5719eafdf624507adf8887f0c7/",
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/9a0e8abcbe24837343cdcc599bccf0f09413968a/",
+          "https://base.garant.ru/483424511/36bfb7176e3e8bfebe718035887e4efc/"
+        ],
+        "collective_option_analysis": {
+          "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+          "date": "2026-11-28",
+          "norm": "БК РФ, статьи 38 и 132: целевой характер средств и субсидии из федерального бюджета бюджетам субъектов РФ. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
+          "urls": [
+            "https://www.consultant.ru/document/cons_doc_LAW_19702/0859896f05c16d5719eafdf624507adf8887f0c7/",
+            "https://www.consultant.ru/document/cons_doc_LAW_19702/9a0e8abcbe24837343cdcc599bccf0f09413968a/",
+            "https://base.garant.ru/483424511/36bfb7176e3e8bfebe718035887e4efc/"
+          ],
+          "source_scope": "Адресные справочные тексты статей и официальные разъяснения/поисковые выдержки; специальные и региональные условия требуют окончательной проверки.",
+          "options": [
+            {
+              "key": "option_1",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Перераспределение возможно уполномоченным органом в пределах допустимого изменения бюджетной росписи; до доведения лимитов договор не заключается."
+            },
+            {
+              "key": "option_2",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Отдельные этапы допустимы после проверки технической самостоятельности и согласования результатов федеральной субсидии."
+            },
+            {
+              "key": "option_3",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Приоритет загрязнённых участков должен соответствовать цели и показателям соглашения, а не произвольно менять объект."
+            },
+            {
+              "key": "option_4",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Дополнительные средства запрашиваются у органа с бюджетными полномочиями; заявка сама не создаёт лимитов."
+            },
+            {
+              "key": "option_5",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Сокращённый первый этап допустим, если сохраняются согласованные результаты либо соглашение предварительно изменено."
+            }
+          ],
+          "remaining": "Федеральный порядок субсидии, соглашение, закупочная документация и применимость исключений 431-ФЗ."
+        }
       },
       "implementation_review": {
         "status": "draft",
@@ -500,7 +544,7 @@
       "audience": "all",
       "category": "Региональные финансы",
       "original_situation": "В Республике Алтай муниципальный совет предлагает туристический налог 5% уже в 2026 году. Отель включил сумму в новый прайс.\n\nСовет обсуждает проект решения на очередной сессии, а владельцы гостиниц уже уведомили гостей о новых ценах. В таблице администратора смешаны предельная ставка соответствующего года и ставка будущего периода. Один турист забронировал номер заранее и требует объяснить изменение стоимости. Участнику доступны календарь введения налога, проект муниципального акта и расчёт на одну ночёвку.",
-      "mandatory_boundary": "Туристический налог рассчитывается по действующему пределу ставки и федеральным исключениям; незаконный прайс исправлен.",
+      "mandatory_boundary": "В 2026 году ставка не превышает 2%; расчёт налога исправляется по НК РФ. Цена проживания и налоговое обязательство гостиницы не тождественны.",
       "decision_options": [
         "Предложить ставку ниже предела для поддержки спроса на размещение",
         "Предложить допустимую ставку с направлением дополнительных ресурсов на туристическую инфраструктуру",
@@ -627,7 +671,49 @@
       "history_protected": true,
       "legal_review": {
         "basis": "НК РФ, статья 418.5: предельная ставка туристического налога в 2026 году — 2 процента. Источники: https://www.nalog.gov.ru/rn77/taxation/tax_legislation/",
-        "status": "requires_case_specific_current_law_review"
+        "status": "requires_case_specific_current_law_review",
+        "checked_norm_urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_28165/58051460fe04ca74ab709af54bb5768dc71ed783/",
+          "https://www.nalog.gov.ru/rn78/taxation/taxes/tourist_tax/"
+        ],
+        "collective_option_analysis": {
+          "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+          "date": "2026-11-28",
+          "norm": "НК РФ, статья 418.5: предельная ставка туристического налога в 2026 году — 2 процента. Источники: https://www.nalog.gov.ru/rn77/taxation/tax_legislation/",
+          "urls": [
+            "https://www.consultant.ru/document/cons_doc_LAW_28165/58051460fe04ca74ab709af54bb5768dc71ed783/",
+            "https://www.nalog.gov.ru/rn78/taxation/taxes/tourist_tax/"
+          ],
+          "source_scope": "Адресные справочные тексты статей и официальные разъяснения/поисковые выдержки; специальные и региональные условия требуют окончательной проверки.",
+          "options": [
+            {
+              "key": "option_1",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Совет вправе установить ставку ниже предела, соблюдая порядок вступления акта в силу; минимальный налог рассчитывается отдельно."
+            },
+            {
+              "key": "option_2",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Допустимая ставка и отдельное решение об ассигнованиях на инфраструктуру не означают автоматического целевого закрепления налоговых доходов."
+            },
+            {
+              "key": "option_3",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Допустимые критерии — сезонность, тип и категория средства размещения; не индивидуальные договорённости с гостиницами."
+            },
+            {
+              "key": "option_4",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Сохранение минимальной допустимой нагрузки требует соблюдения муниципального акта и правил минимального налога."
+            },
+            {
+              "key": "option_5",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Консультации не меняют действующую ставку; будущий акт применяется только с надлежащей даты."
+            }
+          ],
+          "remaining": "Муниципальный акт, минимальный налог, льготы и договор с гостем. Налогоплательщик — поставщик услуги, не турист."
+        }
       },
       "implementation_review": {
         "status": "draft",
@@ -762,7 +848,49 @@
       "history_protected": true,
       "legal_review": {
         "basis": "БК РФ, статьи 38 и 140: целевое использование средств и субвенции на переданные полномочия. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
-        "status": "requires_case_specific_current_law_review"
+        "status": "requires_case_specific_current_law_review",
+        "checked_norm_urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/aba5757994f1d3d2f17a4f4262fb9519d2de5238/",
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/9a0e8abcbe24837343cdcc599bccf0f09413968a/"
+        ],
+        "collective_option_analysis": {
+          "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+          "date": "2026-11-28",
+          "norm": "БК РФ, статьи 38 и 140: целевое использование средств и субвенции на переданные полномочия. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
+          "urls": [
+            "https://www.consultant.ru/document/cons_doc_LAW_19702/aba5757994f1d3d2f17a4f4262fb9519d2de5238/",
+            "https://www.consultant.ru/document/cons_doc_LAW_19702/9a0e8abcbe24837343cdcc599bccf0f09413968a/"
+          ],
+          "source_scope": "Адресные справочные тексты статей и официальные разъяснения/поисковые выдержки; специальные и региональные условия требуют окончательной проверки.",
+          "options": [
+            {
+              "key": "option_1",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Перенос фонтана сохраняет субвенцию для переданного полномочия; новые расходы только из иных разрешённых источников."
+            },
+            {
+              "key": "option_2",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Смета не является разрешением на оплату; необходимы самостоятельное основание, ассигнования и закупочная процедура."
+            },
+            {
+              "key": "option_3",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Инициативный конкурс допустим при установленном муниципальном порядке и самостоятельном финансировании."
+            },
+            {
+              "key": "option_4",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Пожертвование допустимо при законном принятии и учёте; не допускается встречное преимущество в закупке."
+            },
+            {
+              "key": "option_5",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Ремонт общественного пространства требует самостоятельного бюджетного основания, равно как и новый фонтан."
+            }
+          ],
+          "remaining": "Закон субъекта о передаче полномочия, методика субвенции, местный бюджет и порядок инициативных проектов."
+        }
       },
       "implementation_review": {
         "status": "draft",
@@ -902,7 +1030,49 @@
       "history_protected": false,
       "legal_review": {
         "basis": "БК РФ, статьи 161 и 219: принятие обязательств казённым учреждением в пределах доведённых лимитов. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
-        "status": "requires_case_specific_current_law_review"
+        "status": "requires_case_specific_current_law_review",
+        "checked_norm_urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/58dfb94af2d30178f6bfdd70fad25ec5a89377cd/",
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/15d7c58c01bf75dcd6cf84a008bfef761ba731eb/"
+        ],
+        "collective_option_analysis": {
+          "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+          "date": "2026-11-28",
+          "norm": "БК РФ, статьи 161 и 219: принятие обязательств казённым учреждением в пределах доведённых лимитов. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
+          "urls": [
+            "https://www.consultant.ru/document/cons_doc_LAW_19702/58dfb94af2d30178f6bfdd70fad25ec5a89377cd/",
+            "https://www.consultant.ru/document/cons_doc_LAW_19702/15d7c58c01bf75dcd6cf84a008bfef761ba731eb/"
+          ],
+          "source_scope": "Адресные справочные тексты статей и официальные разъяснения/поисковые выдержки; специальные и региональные условия требуют окончательной проверки.",
+          "options": [
+            {
+              "key": "option_1",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Ремонт опасных участков возможен в пределах доведённых лимитов при выполнении обязательных требований безопасности."
+            },
+            {
+              "key": "option_2",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Изменить смету и лимиты вправе уполномоченный распорядитель; новый договор заключается после надлежащего обеспечения."
+            },
+            {
+              "key": "option_3",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Техническое разделение допустимо только без искусственного обхода закупочных требований и с обеспечением каждого обязательства."
+            },
+            {
+              "key": "option_4",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Временное размещение допустимо при пригодности помещений и соблюдении требований к образовательному процессу; не заменяет обязательное устранение опасности."
+            },
+            {
+              "key": "option_5",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Перенос косметики не допускает сохранения опасных условий; расходы на обязательные меры обеспечиваются законным способом."
+            }
+          ],
+          "remaining": "Состояние уже принятого обязательства, решение распорядителя, требования безопасности и отсутствие применимого исключения из общего правила ЛБО."
+        }
       },
       "implementation_review": {
         "status": "draft",
@@ -1172,7 +1342,49 @@
       "history_protected": false,
       "legal_review": {
         "basis": "НК РФ, статья 394: ставки земельного налога с учётом категории и использования участка. Источники: https://www.nalog.gov.ru/rn77/taxation/tax_legislation/",
-        "status": "requires_case_specific_current_law_review"
+        "status": "requires_case_specific_current_law_review",
+        "checked_norm_urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_28165/fd2ac88b2311a6053a128cfa43aa07672e826213/",
+          "https://www.nalog.gov.ru/rn77/news/activities_fts/16639383/"
+        ],
+        "collective_option_analysis": {
+          "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+          "date": "2026-11-28",
+          "norm": "НК РФ, статья 394: ставки земельного налога с учётом категории и использования участка. Источники: https://www.nalog.gov.ru/rn77/taxation/tax_legislation/",
+          "urls": [
+            "https://www.consultant.ru/document/cons_doc_LAW_28165/fd2ac88b2311a6053a128cfa43aa07672e826213/",
+            "https://www.nalog.gov.ru/rn77/news/activities_fts/16639383/"
+          ],
+          "source_scope": "Адресные справочные тексты статей и официальные разъяснения/поисковые выдержки; специальные и региональные условия требуют окончательной проверки.",
+          "options": [
+            {
+              "key": "option_1",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Представительный орган вправе предложить пониженную ставку для земли, подпадающей под соответствующую категорию; предел для используемых сельхозземель — 0,3%."
+            },
+            {
+              "key": "option_2",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Сохранение ставки возможно только если она законна; налоговый орган исправляет ошибочный расчёт по подтверждённым сведениям."
+            },
+            {
+              "key": "option_3",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Консультация помогает подать необходимые документы, но не заменяет рассмотрение налоговым органом."
+            },
+            {
+              "key": "option_4",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Прогноз допустим для бюджетного планирования; он не меняет действующее налоговое обязательство."
+            },
+            {
+              "key": "option_5",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Неналоговые меры поддержки допустимы при отдельном правовом и бюджетном основании, независимо от исправления начисления."
+            }
+          ],
+          "remaining": "Муниципальные ставки, подтверждение сельхозиспользования, компетенция налогового органа; позиция КС 52-П об ИЖС не переносится автоматически на пастбище."
+        }
       },
       "implementation_review": {
         "status": "draft",
@@ -1530,7 +1742,7 @@
       "title": "Северный резерв",
       "audience": "all",
       "category": "Региональные финансы",
-      "original_situation": "В Коми резервный фонд исполнительной власти хотят использовать для ежегодного планового праздника. Непредвиденных обстоятельств не возникло.\n\nПраздник проводится каждый год, дата известна с начала бюджетного планирования. Организатор не получил ассигнования по обычной программе и предлагает провести оплату через резерв. В фонде предусмотрены деньги на внезапные аварии коммунальной инфраструктуры. Участник изучает положение о резервном фонде, заявку и календарь расходов до подготовки распоряжения об использовании средств.",
+      "original_situation": "В Коми резервный фонд исполнительной власти хотят использовать для ежегодного планового праздника. Непредвиденных обстоятельств не возникло.\n\nПраздник проводится каждый год, дата известна с начала бюджетного планирования. Организатор не получил ассигнования по обычной программе и предлагает провести оплату через резерв. В фонде предусмотрены деньги на внезапные аварии коммунальной инфраструктуры. Участник изучает положение о резервном фонде, заявку и календарь расходов до подготовки распоряжения об использовании средств.\n\nВ учебном условии действующее положение о резервном фонде не предусматривает финансирование этого ежегодного мероприятия по иным основаниям.",
       "mandatory_boundary": "Плановый праздник не финансируется как непредвиденный расход; используются надлежащие ассигнования.",
       "decision_options": [
         "Предложить меньшую программу праздника в пределах доступных средств",
@@ -1653,7 +1865,47 @@
       "history_protected": true,
       "legal_review": {
         "basis": "БК РФ, статья 81: резервные фонды исполнительных органов предназначены для непредвиденных расходов. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
-        "status": "requires_case_specific_current_law_review"
+        "status": "requires_case_specific_current_law_review",
+        "checked_norm_urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/55d68b8b11dce341557f8bc5b72a4a20c5c8e00c/"
+        ],
+        "collective_option_analysis": {
+          "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+          "date": "2026-11-28",
+          "norm": "БК РФ, статья 81: резервные фонды исполнительных органов предназначены для непредвиденных расходов. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
+          "urls": [
+            "https://www.consultant.ru/document/cons_doc_LAW_19702/55d68b8b11dce341557f8bc5b72a4a20c5c8e00c/"
+          ],
+          "source_scope": "Адресные справочные тексты статей и официальные разъяснения/поисковые выдержки; специальные и региональные условия требуют окончательной проверки.",
+          "options": [
+            {
+              "key": "option_1",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Уменьшенный формат возможен за счёт надлежащих ассигнований, а не резервного фонда вне его установленного порядка."
+            },
+            {
+              "key": "option_2",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Изменение бюджета проходит компетентную процедуру; решение о празднике не заменяет бюджетное разрешение."
+            },
+            {
+              "key": "option_3",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Софинансирование оформляется законно, без встречного преимущества и с надлежащим учётом."
+            },
+            {
+              "key": "option_4",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Использование действующих площадок возможно в рамках полномочий и имеющихся ресурсов, не освобождает от обязательных требований безопасности."
+            },
+            {
+              "key": "option_5",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Перенос необязательного расхода позволяет включить его в очередное планирование; резерв не используется автоматически."
+            }
+          ],
+          "remaining": "Действующее положение о резервном фонде, бюджетная классификация, закупки и конкретные источники финансирования. Статья 81 допускает также иные мероприятия, предусмотренные порядком фонда."
+        }
       },
       "implementation_review": {
         "status": "draft",
@@ -1933,7 +2185,49 @@
       "history_protected": true,
       "legal_review": {
         "basis": "БК РФ, статьи 6 и 138: нецелевой характер дотации на выравнивание и её правовой режим. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
-        "status": "requires_case_specific_current_law_review"
+        "status": "requires_case_specific_current_law_review",
+        "checked_norm_urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/055a71948dbf2a4fc2478437cd89cd864ee8e6e5/",
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/958d77bbceed0d6b2ee32ddbb1a6fb2572b4ab9f/"
+        ],
+        "collective_option_analysis": {
+          "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+          "date": "2026-11-28",
+          "norm": "БК РФ, статьи 6 и 138: нецелевой характер дотации на выравнивание и её правовой режим. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
+          "urls": [
+            "https://www.consultant.ru/document/cons_doc_LAW_19702/055a71948dbf2a4fc2478437cd89cd864ee8e6e5/",
+            "https://www.consultant.ru/document/cons_doc_LAW_19702/958d77bbceed0d6b2ee32ddbb1a6fb2572b4ab9f/"
+          ],
+          "source_scope": "Адресные справочные тексты статей и официальные разъяснения/поисковые выдержки; специальные и региональные условия требуют окончательной проверки.",
+          "options": [
+            {
+              "key": "option_1",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Добровольная консультация допустима, но не может превращаться в новое целевое условие уже предоставленной дотации."
+            },
+            {
+              "key": "option_2",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Самостоятельность расходования сохраняется при соблюдении общих бюджетных ограничений и требований отчётности."
+            },
+            {
+              "key": "option_3",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Контроль законных условий межбюджетных трансфертов допустим; цвет сам по себе не создаёт основания возврата дотации."
+            },
+            {
+              "key": "option_4",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Отдельная программа может иметь собственные законные критерии и источник средств; не распространяется задним числом на дотацию."
+            },
+            {
+              "key": "option_5",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Публичное обсуждение допустимо для будущего решения, но не устанавливает основания возврата межбюджетного трансферта."
+            }
+          ],
+          "remaining": "Региональный порядок дотации, применимые общие условия межбюджетных трансфертов, правовые основания требования возврата."
+        }
       },
       "implementation_review": {
         "status": "draft",
@@ -2068,7 +2362,49 @@
       "history_protected": false,
       "legal_review": {
         "basis": "Федеральный закон №44-ФЗ, статья 93: специальные основания закупки у единственного поставщика, в том числе при аварии. Источники: https://pravo.gov.ru/",
-        "status": "requires_case_specific_current_law_review"
+        "status": "requires_case_specific_current_law_review",
+        "checked_norm_urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_144624/ab3273e757a9e718cbb3741596bc36eb8138e4f6/",
+          "https://epp.genproc.gov.ru/ru/proc_11/activity/legal-education/explain/e8339988/"
+        ],
+        "collective_option_analysis": {
+          "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+          "date": "2026-11-28",
+          "norm": "Федеральный закон №44-ФЗ, статья 93: специальные основания закупки у единственного поставщика, в том числе при аварии. Источники: https://pravo.gov.ru/",
+          "urls": [
+            "https://www.consultant.ru/document/cons_doc_LAW_144624/ab3273e757a9e718cbb3741596bc36eb8138e4f6/",
+            "https://epp.genproc.gov.ru/ru/proc_11/activity/legal-education/explain/e8339988/"
+          ],
+          "source_scope": "Адресные справочные тексты статей и официальные разъяснения/поисковые выдержки; специальные и региональные условия требуют окончательной проверки.",
+          "options": [
+            {
+              "key": "option_1",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Пункт 9 части 1 статьи 93 допускает необходимый аварийный объём при нецелесообразности затрат времени на конкуренцию; контроль не должен задерживать безопасный ремонт."
+            },
+            {
+              "key": "option_2",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Временное снабжение и этапный ремонт допустимы, если обеспечена безопасность и срочная часть не расширяется сверх необходимого."
+            },
+            {
+              "key": "option_3",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Плановую замену соседней трубы следует отделить от аварийного основания и закупать по применимой обычной процедуре."
+            },
+            {
+              "key": "option_4",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Будущий запас материалов не автоматически относится к текущей аварии; закупка требует отдельного основания, расчёта и ассигнований."
+            },
+            {
+              "key": "option_5",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Мониторинг после ремонта является самостоятельной профилактической мерой и не заменяет немедленное устранение аварии."
+            }
+          ],
+          "remaining": "Статус заказчика, подтверждение аварии, нецелесообразность конкурентной процедуры по срокам, обоснование объёма, цены и оформления закупки."
+        }
       },
       "implementation_review": {
         "status": "draft",
@@ -4785,8 +5121,8 @@
       "title": "Музей без задания",
       "audience": "all",
       "category": "Региональные финансы",
-      "original_situation": "Во Владимирской области бюджетному музею уменьшают субсидию на задание, не меняя объём задания и не обосновывая изменение нормативных затрат.\n\nМузей должен провести то же число выставок и экскурсий, что предусмотрено действующим заданием. Уменьшение финансирования объясняется общим желанием экономии, без изменения расчёта нормативов. Сотрудники предупреждают о закрытии части экспозиции. Участник сопоставляет задание, расчёт затрат и проект соглашения; решение требуется до уведомления учреждения о новом объёме субсидии.",
-      "mandatory_boundary": "Задание музея и нормативные затраты согласуются с финансированием по установленной процедуре.",
+      "original_situation": "Во Владимирской области бюджетному музею уменьшают субсидию на задание, не меняя объём задания и не обосновывая изменение нормативных затрат.\n\nМузей должен провести то же число выставок и экскурсий, что предусмотрено действующим заданием. Уменьшение финансирования объясняется общим желанием экономии, без изменения расчёта нормативов. Сотрудники предупреждают о закрытии части экспозиции. Участник сопоставляет задание, расчёт затрат и проект соглашения; решение требуется до уведомления учреждения о новом объёме субсидии.\n\nМузей является учреждением субъекта РФ. В учебном условии учредитель не применяет специального порядка перераспределения расходов на содержание имущества или налоги и не представил иного законного расчёта изменения финансового обеспечения.",
+      "mandatory_boundary": "Учредитель проверяет объём задания, нормативные затраты и применимый в 2026 году специальный режим. Необоснованное снижение не считается подтверждённым решением.",
       "decision_options": [
         "Предложить сохранить объём задания с обоснованным финансированием",
         "Подготовить допустимое уменьшение необязательных мероприятий и задания",
@@ -4913,7 +5249,51 @@
       "history_protected": false,
       "legal_review": {
         "basis": "БК РФ, статьи 69.2 и 78.1: государственное задание и субсидия бюджетному учреждению. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
-        "status": "requires_case_specific_current_law_review"
+        "status": "requires_case_specific_current_law_review",
+        "checked_norm_urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/98fb008eca1e2f13f66ab5ec498e60445050880d/",
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/2a2fd8efeffb727e38658d8fcbfc12849b352733/",
+          "https://www.consultant.ru/document/cons_doc_LAW_520034/be253379a4fe5a503be23c127f4d3019890ccf53/"
+        ],
+        "collective_option_analysis": {
+          "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+          "date": "2026-11-28",
+          "norm": "БК РФ, статьи 69.2 и 78.1: государственное задание и субсидия бюджетному учреждению. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
+          "urls": [
+            "https://www.consultant.ru/document/cons_doc_LAW_19702/98fb008eca1e2f13f66ab5ec498e60445050880d/",
+            "https://www.consultant.ru/document/cons_doc_LAW_19702/2a2fd8efeffb727e38658d8fcbfc12849b352733/",
+            "https://www.consultant.ru/document/cons_doc_LAW_520034/be253379a4fe5a503be23c127f4d3019890ccf53/"
+          ],
+          "source_scope": "Адресные справочные тексты статей и официальные разъяснения/поисковые выдержки; специальные и региональные условия требуют окончательной проверки.",
+          "options": [
+            {
+              "key": "option_1",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Сохранить задание с надлежащим расчётом финансового обеспечения — допустимый вариант; размер зависит от установленных нормативов."
+            },
+            {
+              "key": "option_2",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Сокращение мероприятий возможно после решения учредителя и соблюдения порядка изменения задания, а не по одному желанию экономии."
+            },
+            {
+              "key": "option_3",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Совместные выставки возможны в пределах задания и прав учреждения; не заменяют расчёт субсидии."
+            },
+            {
+              "key": "option_4",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Этапное обновление допустимо при выполнении задания и требований доступности; не оправдывает произвольное уменьшение финансирования."
+            },
+            {
+              "key": "option_5",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Дополнительные образовательные проекты могут финансироваться на отдельном правовом основании без двойного финансирования одной услуги."
+            }
+          ],
+          "remaining": "Региональный порядок задания и финансирования; ст. 10 431-ФЗ временно приостанавливает отдельные положения ст. 9.2 7-ФЗ до 01.01.2027. Не применять без проверки общее правило об изменении задания; специальная ч. 4 касается федеральных учреждений."
+        }
       },
       "implementation_review": {
         "status": "draft",
