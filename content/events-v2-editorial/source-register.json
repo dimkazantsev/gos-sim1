@@ -5859,14 +5859,36 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "Статьи 219 и 264.1 БК РФ разграничивают исполнение расходов и бюджетную отчётность; статья 38 закрепляет адресность и целевой характер средств. Надлежащая проверка сопоставляет документы и реальное движение денег. Ошибочная строка отчёта сама по себе не доказывает хищение. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
-      "legal_urls": [],
+      "legal_basis": "БК РФ, ст. 219 п. 2, 6, 264.1 и 38: стадии исполнения расхода, первичные документы и бюджетная отчётность. Плановое назначение не подтверждает выплату; требуется сверка конкретной операции.",
+      "legal_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/15d7c58c01bf75dcd6cf84a008bfef761ba731eb/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/a822d521b7e939dc36b96b17da82719f28c22c59/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/9a0e8abcbe24837343cdcc599bccf0f09413968a/"
+      ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
       "option_analysis_status": "draft",
-      "checked_norm_urls": [],
-      "source_scope": "inherited_basis_requires_current_verification",
-      "review_date": "2026-11-27"
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/15d7c58c01bf75dcd6cf84a008bfef761ba731eb/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/a822d521b7e939dc36b96b17da82719f28c22c59/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/9a0e8abcbe24837343cdcc599bccf0f09413968a/"
+      ],
+      "source_scope": "specific_norm_and_related_search_results_partial",
+      "review_date": "2026-11-28",
+      "norm_recheck_2026_11_28": {
+        "status": "targeted_norm_and_individual_alternatives_reviewed_not_full_acceptance",
+        "limitation": "Вид учреждения и гранта не определены; ст. 219 относится к соответствующим бюджетным операциям, а не автоматически к любому грантовому договору.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/15d7c58c01bf75dcd6cf84a008bfef761ba731eb/",
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/a822d521b7e939dc36b96b17da82719f28c22c59/",
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/9a0e8abcbe24837343cdcc599bccf0f09413968a/"
+        ]
+      },
+      "targeted_individual_review": {
+        "status": "targeted_norm_and_individual_alternatives_reviewed_not_full_acceptance",
+        "option_count": 5,
+        "remaining": "Вид учреждения и гранта не определены; ст. 219 относится к соответствующим бюджетным операциям, а не автоматически к любому грантовому договору."
+      }
     },
     {
       "case_key": "bank-curated-serious-11",
@@ -5999,14 +6021,36 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "Статья 14 Закона №273-ФЗ регулирует язык образования и изучение родного языка в пределах возможностей системы; выбор оформляется в предусмотренном законом порядке. Статьи 16 и 28 регулируют электронное обучение и компетенцию организации. Добровольный факультатив не позволяет произвольно уменьшать обязательную программу или отбирать детей по происхождению. Источники: https://minobrnauki.gov.ru/open_ministry/gossluzhba/entry/files/Федеральный%20закон%20от%2029.12.2012%20N%20273-ФЗ%20(ред.%20от%2015.10.2025.pdf",
-      "legal_urls": [],
+      "legal_basis": "273-ФЗ от 29.12.2012, ст. 14 ч. 4, 6, ст. 16 и 28: изучение родного языка в предусмотренных законом пределах, заявления при приёме/переводе, образовательные стандарты, компетенция школы и допустимые дистанционные технологии.",
+      "legal_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_140174/bf7fadb3532c712ccd28cc2599243fb8018ed869/",
+        "https://www.consultant.ru/document/cons_doc_LAW_140174/9ab9b85e5291f25d6986b5301ab79c23f0055ca4/",
+        "https://www.consultant.ru/document/cons_doc_LAW_140174/552097cad5942f36c9484dbde7ebf92db1f783f3/"
+      ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
       "option_analysis_status": "draft",
-      "checked_norm_urls": [],
-      "source_scope": "inherited_basis_requires_current_verification",
-      "review_date": "2026-11-27"
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_140174/bf7fadb3532c712ccd28cc2599243fb8018ed869/",
+        "https://www.consultant.ru/document/cons_doc_LAW_140174/9ab9b85e5291f25d6986b5301ab79c23f0055ca4/",
+        "https://www.consultant.ru/document/cons_doc_LAW_140174/552097cad5942f36c9484dbde7ebf92db1f783f3/"
+      ],
+      "source_scope": "specific_norm_and_related_search_results_partial",
+      "review_date": "2026-11-28",
+      "norm_recheck_2026_11_28": {
+        "status": "targeted_norm_and_individual_alternatives_reviewed_not_full_acceptance",
+        "limitation": "Не следует отождествлять факультатив с обязательным предметом учебного плана; конкретный язык, уровень программы, порядок изменения и договор с университетом уточняются.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_140174/bf7fadb3532c712ccd28cc2599243fb8018ed869/",
+          "https://www.consultant.ru/document/cons_doc_LAW_140174/9ab9b85e5291f25d6986b5301ab79c23f0055ca4/",
+          "https://www.consultant.ru/document/cons_doc_LAW_140174/552097cad5942f36c9484dbde7ebf92db1f783f3/"
+        ]
+      },
+      "targeted_individual_review": {
+        "status": "targeted_norm_and_individual_alternatives_reviewed_not_full_acceptance",
+        "option_count": 5,
+        "remaining": "Не следует отождествлять факультатив с обязательным предметом учебного плана; конкретный язык, уровень программы, порядок изменения и договор с университетом уточняются."
+      }
     },
     {
       "case_key": "bank-curated-serious-18",
@@ -6605,13 +6649,33 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "Закон №565-ФЗ о занятости и стандарт организации обучения, утверждённый приказом Минтруда №611н от 07.11.2024, регулируют соответствующее полномочие. Профессиональная ориентация и проверка оснований обучения отделены от интереса подрядчика заполнить группу. Действующее предложение работодателя не является само по себе гарантированным трудовым договором. Источники: https://mintrud.gov.ru/docs/mintrud/orders/2960",
-      "legal_urls": [],
+      "legal_basis": "565-ФЗ, ст. 30 ч. 1, 7–12; приказ Минтруда 07.11.2024 №611н: основания направления безработных и других предусмотренных категорий, региональный перечень востребованных профессий, установленная процедура. Свободные места у подрядчика не заменяют критерии.",
+      "legal_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_464093/6a5cdcfae3020b422c6853a80844ded33a0db563/",
+        "https://www.consultant.ru/document/cons_doc_LAW_498161/"
+      ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
       "option_analysis_status": "draft",
-      "source_scope": "inherited_basis_requires_current_verification",
-      "review_date": "2026-11-27"
+      "source_scope": "specific_norm_and_related_search_results_partial",
+      "review_date": "2026-11-28",
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_464093/6a5cdcfae3020b422c6853a80844ded33a0db563/",
+        "https://www.consultant.ru/document/cons_doc_LAW_498161/"
+      ],
+      "norm_recheck_2026_11_28": {
+        "status": "targeted_norm_and_individual_alternatives_reviewed_not_full_acceptance",
+        "limitation": "Статус безработного и конкретная региональная программа не подтверждены; условия практики и фактическое трудоустройство отдельно.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_464093/6a5cdcfae3020b422c6853a80844ded33a0db563/",
+          "https://www.consultant.ru/document/cons_doc_LAW_498161/"
+        ]
+      },
+      "targeted_individual_review": {
+        "status": "targeted_norm_and_individual_alternatives_reviewed_not_full_acceptance",
+        "option_count": 5,
+        "remaining": "Статус безработного и конкретная региональная программа не подтверждены; условия практики и фактическое трудоустройство отдельно."
+      }
     },
     {
       "case_key": "bank-curated-v2-28",
@@ -7330,13 +7394,36 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "ГК РФ, статьи 209–210: распоряжение имуществом и его содержание; Федеральный закон № 273-ФЗ от 29.12.2012, статьи 28 и 41: компетенция и безопасность образовательной организации. Результат конкурса сам по себе не передаёт права на земельный участок. Источники: https://11.rosguard.gov.ru/uploads/2025/07/5_grazhdanskijj_kodeks_rossijjskojj_federacii_chast_pervaya.pdf http://www.kremlin.ru/acts/bank/36698",
-      "legal_urls": [],
+      "legal_basis": "ГК РФ, ст. 209; 273-ФЗ, ст. 28 и 41: правовое основание использования участка, компетенция образовательной организации и безопасные условия. Победа в конкурсе не передаёт право на муниципальную землю.",
+      "legal_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_5142/9bc79ae09d078798e7a4ee4647ac9ea495da9fa0/",
+        "https://www.consultant.ru/document/cons_doc_LAW_140174/552097cad5942f36c9484dbde7ebf92db1f783f3/",
+        "https://www.consultant.ru/document/cons_doc_LAW_140174/48b9101fff215f3aeb122d86593a129a34d96d3c/"
+      ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
       "option_analysis_status": "draft",
-      "source_scope": "inherited_basis_requires_current_verification",
-      "review_date": "2026-11-27"
+      "source_scope": "specific_norm_and_related_search_results_partial",
+      "review_date": "2026-11-28",
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_5142/9bc79ae09d078798e7a4ee4647ac9ea495da9fa0/",
+        "https://www.consultant.ru/document/cons_doc_LAW_140174/552097cad5942f36c9484dbde7ebf92db1f783f3/",
+        "https://www.consultant.ru/document/cons_doc_LAW_140174/48b9101fff215f3aeb122d86593a129a34d96d3c/"
+      ],
+      "norm_recheck_2026_11_28": {
+        "status": "targeted_norm_and_individual_alternatives_reviewed_not_full_acceptance",
+        "limitation": "Категория земли, основание предоставления, разрешённое использование и санитарные условия требуют отдельной проверки.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_5142/9bc79ae09d078798e7a4ee4647ac9ea495da9fa0/",
+          "https://www.consultant.ru/document/cons_doc_LAW_140174/552097cad5942f36c9484dbde7ebf92db1f783f3/",
+          "https://www.consultant.ru/document/cons_doc_LAW_140174/48b9101fff215f3aeb122d86593a129a34d96d3c/"
+        ]
+      },
+      "targeted_individual_review": {
+        "status": "targeted_norm_and_individual_alternatives_reviewed_not_full_acceptance",
+        "option_count": 5,
+        "remaining": "Категория земли, основание предоставления, разрешённое использование и санитарные условия требуют отдельной проверки."
+      }
     },
     {
       "case_key": "bank-expanded-light-13-01",
@@ -7686,13 +7773,39 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "ТК РФ, статьи 178 и 180: гарантии и процедуры при сокращении; Федеральный закон №565-ФЗ и стандарт Минтруда, утверждённый приказом №611н от 07.11.2024: профессиональное обучение в установленном порядке. Участие в программе и выплаты зависят от соответствующих условий, а не от устного обещания администрации. Источники: https://git15.rostrud.gov.ru/upload/iblock/449/trudovoy-kodeks-rossiyskoy-federatsii-ot-30.12.2001-_-197_fz.pdf https://mintrud.gov.ru/docs/mintrud/orders/2960",
-      "legal_urls": [],
+      "legal_basis": "ТК РФ, ст. 178 и 180: гарантии и установленное предупреждение при сокращении; 565-ФЗ, ст. 30 и приказ №611н: отдельные основания направления на обучение. Выплаты и обучение не взаимозаменяемы.",
+      "legal_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_34683/0526867a7eace3f1f88798592ed0bdf3589f0528/",
+        "https://www.consultant.ru/document/cons_doc_LAW_34683/6887e2fd9f9775c467fb9cc45fbc5874a04174cc/",
+        "https://www.consultant.ru/document/cons_doc_LAW_464093/6a5cdcfae3020b422c6853a80844ded33a0db563/",
+        "https://www.consultant.ru/document/cons_doc_LAW_498161/"
+      ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
       "option_analysis_status": "draft",
-      "source_scope": "inherited_basis_requires_current_verification",
-      "review_date": "2026-11-27"
+      "source_scope": "specific_norm_and_related_search_results_partial",
+      "review_date": "2026-11-28",
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_34683/0526867a7eace3f1f88798592ed0bdf3589f0528/",
+        "https://www.consultant.ru/document/cons_doc_LAW_34683/6887e2fd9f9775c467fb9cc45fbc5874a04174cc/",
+        "https://www.consultant.ru/document/cons_doc_LAW_464093/6a5cdcfae3020b422c6853a80844ded33a0db563/",
+        "https://www.consultant.ru/document/cons_doc_LAW_498161/"
+      ],
+      "norm_recheck_2026_11_28": {
+        "status": "targeted_norm_and_individual_alternatives_reviewed_not_full_acceptance",
+        "limitation": "Статус работников и специальные сроки предупреждения для отдельных категорий проверяются по применимым нормам; не обещать одинаковые выплаты.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_34683/0526867a7eace3f1f88798592ed0bdf3589f0528/",
+          "https://www.consultant.ru/document/cons_doc_LAW_34683/6887e2fd9f9775c467fb9cc45fbc5874a04174cc/",
+          "https://www.consultant.ru/document/cons_doc_LAW_464093/6a5cdcfae3020b422c6853a80844ded33a0db563/",
+          "https://www.consultant.ru/document/cons_doc_LAW_498161/"
+        ]
+      },
+      "targeted_individual_review": {
+        "status": "targeted_norm_and_individual_alternatives_reviewed_not_full_acceptance",
+        "option_count": 5,
+        "remaining": "Статус работников и специальные сроки предупреждения для отдельных категорий проверяются по применимым нормам; не обещать одинаковые выплаты."
+      }
     },
     {
       "case_key": "bank-expanded-serious-12-01",
@@ -7701,13 +7814,39 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "ТК РФ, статьи 129 и 135: состав оплаты труда и установление системы оплаты; БК РФ, статьи 65 и 86: расходы соотносятся с компетенцией и расходными обязательствами. Условия новой меры устанавливаются надлежащим актом и не отменяют существующие обязательные выплаты. Источники: https://git15.rostrud.gov.ru/upload/iblock/449/trudovoy-kodeks-rossiyskoy-federatsii-ot-30.12.2001-_-197_fz.pdf https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
-      "legal_urls": [],
+      "legal_basis": "ТК РФ, ст. 135, 144: система оплаты работников публичных учреждений определяется применимыми актами и локальными документами; БК РФ, ст. 83, 86: правовое и финансовое основание новых расходов. Новая компенсация не отменяет обязательные выплаты.",
+      "legal_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_34683/ec0a7a4cf2bbf1f8f89970fd480c3fc9ed860f82/",
+        "https://www.consultant.ru/document/cons_doc_LAW_34683/3816fd5d518f93c48736f765abed0dd5cfb6ffd0/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/deb860cae9c5187f73ff9e422a7e77ade2c35946/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/4ce55543bc62fa4c4587fa50514b56aa0121a671/"
+      ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
       "option_analysis_status": "draft",
-      "source_scope": "inherited_basis_requires_current_verification",
-      "review_date": "2026-11-27"
+      "source_scope": "specific_norm_and_related_search_results_partial",
+      "review_date": "2026-11-28",
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_34683/ec0a7a4cf2bbf1f8f89970fd480c3fc9ed860f82/",
+        "https://www.consultant.ru/document/cons_doc_LAW_34683/3816fd5d518f93c48736f765abed0dd5cfb6ffd0/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/deb860cae9c5187f73ff9e422a7e77ade2c35946/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/4ce55543bc62fa4c4587fa50514b56aa0121a671/"
+      ],
+      "norm_recheck_2026_11_28": {
+        "status": "targeted_norm_and_individual_alternatives_reviewed_not_full_acceptance",
+        "limitation": "Вид меры — элемент оплаты или отдельная компенсация — требует определения; уровень учредителя и действующая система оплаты не установлены.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_34683/ec0a7a4cf2bbf1f8f89970fd480c3fc9ed860f82/",
+          "https://www.consultant.ru/document/cons_doc_LAW_34683/3816fd5d518f93c48736f765abed0dd5cfb6ffd0/",
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/deb860cae9c5187f73ff9e422a7e77ade2c35946/",
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/4ce55543bc62fa4c4587fa50514b56aa0121a671/"
+        ]
+      },
+      "targeted_individual_review": {
+        "status": "targeted_norm_and_individual_alternatives_reviewed_not_full_acceptance",
+        "option_count": 5,
+        "remaining": "Вид меры — элемент оплаты или отдельная компенсация — требует определения; уровень учредителя и действующая система оплаты не установлены."
+      }
     },
     {
       "case_key": "bank-expanded-serious-13-01",
@@ -7769,13 +7908,36 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "БК РФ, статьи 33, 37 и 83: сбалансированность, достоверность показателей и финансовое обеспечение новых расходных обязательств; изменение бюджета проходит установленную процедуру. Сокращение плановой строки само по себе не прекращает договорные обязательства. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
-      "legal_urls": [],
+      "legal_basis": "БК РФ, ст. 33, 83, 219: сбалансированность, основание новых обязательств, учёт и исполнение расходов. Сокращение плановой строки не отменяет действующий договор или установленную гарантию.",
+      "legal_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/bfe84bef16378ca35200b610fe85a50ee121673c/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/deb860cae9c5187f73ff9e422a7e77ade2c35946/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/15d7c58c01bf75dcd6cf84a008bfef761ba731eb/"
+      ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
       "option_analysis_status": "draft",
-      "source_scope": "inherited_basis_requires_current_verification",
-      "review_date": "2026-11-27"
+      "source_scope": "specific_norm_and_related_search_results_partial",
+      "review_date": "2026-11-28",
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/bfe84bef16378ca35200b610fe85a50ee121673c/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/deb860cae9c5187f73ff9e422a7e77ade2c35946/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/15d7c58c01bf75dcd6cf84a008bfef761ba731eb/"
+      ],
+      "norm_recheck_2026_11_28": {
+        "status": "targeted_norm_and_individual_alternatives_reviewed_not_full_acceptance",
+        "limitation": "Федеральный или региональный порядок изменения бюджета, ограничения дефицита и долга требуют конкретных данных.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/bfe84bef16378ca35200b610fe85a50ee121673c/",
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/deb860cae9c5187f73ff9e422a7e77ade2c35946/",
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/15d7c58c01bf75dcd6cf84a008bfef761ba731eb/"
+        ]
+      },
+      "targeted_individual_review": {
+        "status": "targeted_norm_and_individual_alternatives_reviewed_not_full_acceptance",
+        "option_count": 5,
+        "remaining": "Федеральный или региональный порядок изменения бюджета, ограничения дефицита и долга требуют конкретных данных."
+      }
     },
     {
       "case_key": "bank-expanded-serious-16-01",
@@ -7784,13 +7946,36 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "Федеральный закон от 25.12.2008 №273-ФЗ, статьи 10–11: личная заинтересованность и её урегулирование; Федеральный закон №44-ФЗ, статья 31: требования, относящиеся к конфликту интересов в закупке. Конкретные последствия определяются по установленным фактам и компетенции. Источники: https://epp.genproc.gov.ru/ru/proc_35/activity/combating-corruption/zakon/federal/e345084/ https://mintrud.gov.ru/docs/laws/116",
-      "legal_urls": [],
+      "legal_basis": "44-ФЗ, ст. 39 ч. 6, 7, 9, 10: требования к составу комиссии, уведомление, замена при выявлении запрещённых обстоятельств, обжалование. 273-ФЗ от 25.12.2008, ст. 10–11: личная заинтересованность и урегулирование. Отсутствие голоса не исключает нарушения состава комиссии.",
+      "legal_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_144624/b64e0c2e16f5016ebbfd89affc9ba333cc094b20/",
+        "https://www.consultant.ru/document/cons_doc_LAW_82959/5d02242ebd04c398d2acf7c53dbc79659b85e8f3/",
+        "https://www.consultant.ru/document/cons_doc_LAW_82959/64ca591ea83268ee3d33f6e564cbcac0d3a073d9/"
+      ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
       "option_analysis_status": "draft",
-      "source_scope": "inherited_basis_requires_current_verification",
-      "review_date": "2026-11-27"
+      "source_scope": "specific_norm_and_related_search_results_partial",
+      "review_date": "2026-11-28",
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_144624/b64e0c2e16f5016ebbfd89affc9ba333cc094b20/",
+        "https://www.consultant.ru/document/cons_doc_LAW_82959/5d02242ebd04c398d2acf7c53dbc79659b85e8f3/",
+        "https://www.consultant.ru/document/cons_doc_LAW_82959/64ca591ea83268ee3d33f6e564cbcac0d3a073d9/"
+      ],
+      "norm_recheck_2026_11_28": {
+        "status": "targeted_norm_and_individual_alternatives_reviewed_not_full_acceptance",
+        "limitation": "Конкретная степень родства, личная заинтересованность, состав комиссии и стадия исполнения проверяются по документам. Не предрешать действительность уже заключённого контракта или уголовную ответственность.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_144624/b64e0c2e16f5016ebbfd89affc9ba333cc094b20/",
+          "https://www.consultant.ru/document/cons_doc_LAW_82959/5d02242ebd04c398d2acf7c53dbc79659b85e8f3/",
+          "https://www.consultant.ru/document/cons_doc_LAW_82959/64ca591ea83268ee3d33f6e564cbcac0d3a073d9/"
+        ]
+      },
+      "targeted_individual_review": {
+        "status": "targeted_norm_and_individual_alternatives_reviewed_not_full_acceptance",
+        "option_count": 5,
+        "remaining": "Конкретная степень родства, личная заинтересованность, состав комиссии и стадия исполнения проверяются по документам. Не предрешать действительность уже заключённого контракта или уголовную ответственность."
+      }
     },
     {
       "case_key": "bank-expanded-serious-17-01",
@@ -7833,13 +8018,33 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "ГК РФ, статьи 209–210: полномочия собственника и содержание помещений; Конституция РФ, статья 44, часть 2: право на участие в культурной жизни и доступ к культурным ценностям. Конкретные решения по библиотечной сети принимаются учредителем с соблюдением применимого законодательства и процедур. Источники: https://11.rosguard.gov.ru/uploads/2025/07/5_grazhdanskijj_kodeks_rossijjskojj_federacii_chast_pervaya.pdf https://minjust.gov.ru/ru/documents/8011/",
-      "legal_urls": [],
+      "legal_basis": "78-ФЗ от 29.12.1994, ст. 23: реорганизация или ликвидация библиотеки относится к компетенции собственника/учредителя, для муниципальной библиотеки в сельском поселении предусмотрен учёт результатов опроса жителей. ГК РФ, ст. 209: правомочия собственника.",
+      "legal_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_5434/01787aaced15764bfd33c9fdde36837a3b4f6f0d/",
+        "https://www.consultant.ru/document/cons_doc_LAW_5142/9bc79ae09d078798e7a4ee4647ac9ea495da9fa0/"
+      ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
       "option_analysis_status": "draft",
-      "source_scope": "inherited_basis_requires_current_verification",
-      "review_date": "2026-11-27"
+      "source_scope": "specific_norm_and_related_search_results_partial",
+      "review_date": "2026-11-28",
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_5434/01787aaced15764bfd33c9fdde36837a3b4f6f0d/",
+        "https://www.consultant.ru/document/cons_doc_LAW_5142/9bc79ae09d078798e7a4ee4647ac9ea495da9fa0/"
+      ],
+      "norm_recheck_2026_11_28": {
+        "status": "targeted_norm_and_individual_alternatives_reviewed_not_full_acceptance",
+        "limitation": "Полный текст ст. 23 при прямом открытии ограничен; содержание подтверждено поисковым извлечением. Закрытие филиала не автоматически реорганизация юридического лица; проверить тип учреждения и местные акты.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_5434/01787aaced15764bfd33c9fdde36837a3b4f6f0d/",
+          "https://www.consultant.ru/document/cons_doc_LAW_5142/9bc79ae09d078798e7a4ee4647ac9ea495da9fa0/"
+        ]
+      },
+      "targeted_individual_review": {
+        "status": "targeted_norm_and_individual_alternatives_reviewed_not_full_acceptance",
+        "option_count": 5,
+        "remaining": "Полный текст ст. 23 при прямом открытии ограничен; содержание подтверждено поисковым извлечением. Закрытие филиала не автоматически реорганизация юридического лица; проверить тип учреждения и местные акты."
+      }
     },
     {
       "case_key": "bank-expanded-serious-20-01",
@@ -7848,13 +8053,42 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "БК РФ, статьи 36 и 83: прозрачность бюджета и финансовое обеспечение новых обязательств; ГК РФ, статья 309: надлежащее исполнение договоров. Слушания обеспечивают участие, но их популярный итог сам по себе не изменяет договор и бюджет. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721 https://11.rosguard.gov.ru/uploads/2025/07/5_grazhdanskijj_kodeks_rossijjskojj_federacii_chast_pervaya.pdf",
-      "legal_urls": [],
+      "legal_basis": "БК РФ, ст. 36, 83, 219; 33-ФЗ от 20.03.2025, ст. 47 и 16: публичные слушания по проекту местного бюджета и компетенция представительного органа. Рекомендации не отменяют договорные обязательства и не образуют автоматических расходов.",
+      "legal_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/ac7eb6cf1d15c2a4225e64864e980f435d2142bc/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/deb860cae9c5187f73ff9e422a7e77ade2c35946/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/15d7c58c01bf75dcd6cf84a008bfef761ba731eb/",
+        "https://www.consultant.ru/document/cons_doc_LAW_501319/5d1b5174c78b997b5d1ca9641cc99a7106174666/",
+        "https://www.consultant.ru/document/cons_doc_LAW_501319/724d2a13a1e8150bc5e9245707a9f71b50db9dad/"
+      ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
       "option_analysis_status": "draft",
-      "source_scope": "inherited_basis_requires_current_verification",
-      "review_date": "2026-11-27"
+      "source_scope": "specific_norm_and_related_search_results_partial",
+      "review_date": "2026-11-28",
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/ac7eb6cf1d15c2a4225e64864e980f435d2142bc/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/deb860cae9c5187f73ff9e422a7e77ade2c35946/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/15d7c58c01bf75dcd6cf84a008bfef761ba731eb/",
+        "https://www.consultant.ru/document/cons_doc_LAW_501319/5d1b5174c78b997b5d1ca9641cc99a7106174666/",
+        "https://www.consultant.ru/document/cons_doc_LAW_501319/724d2a13a1e8150bc5e9245707a9f71b50db9dad/"
+      ],
+      "norm_recheck_2026_11_28": {
+        "status": "targeted_norm_and_individual_alternatives_reviewed_not_full_acceptance",
+        "limitation": "Конкретная местная процедура слушаний и действующие условия контракта не заданы.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/ac7eb6cf1d15c2a4225e64864e980f435d2142bc/",
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/deb860cae9c5187f73ff9e422a7e77ade2c35946/",
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/15d7c58c01bf75dcd6cf84a008bfef761ba731eb/",
+          "https://www.consultant.ru/document/cons_doc_LAW_501319/5d1b5174c78b997b5d1ca9641cc99a7106174666/",
+          "https://www.consultant.ru/document/cons_doc_LAW_501319/724d2a13a1e8150bc5e9245707a9f71b50db9dad/"
+        ]
+      },
+      "targeted_individual_review": {
+        "status": "targeted_norm_and_individual_alternatives_reviewed_not_full_acceptance",
+        "option_count": 5,
+        "remaining": "Конкретная местная процедура слушаний и действующие условия контракта не заданы."
+      }
     },
     {
       "case_key": "bank-expanded-serious-21-01",
@@ -7879,14 +8113,48 @@
       "title": "Забайкалье: жалобы на плесень в школьной столовой и проверка питания",
       "source_url": "https://epp.genproc.gov.ru/ru/proc_75/mass-media/news/main/e8245653/",
       "source_status": "official_article_read_core_episode_confirmed",
-      "resolved_source_url": null,
-      "legal_basis": "Федеральный закон от 29.12.2012 №273-ФЗ, статья 37: организация питания обучающихся; Федеральный закон №52-ФЗ, статья 17: санитарные требования к питанию. Необходимые меры определяются компетентной проверкой; сообщение о жалобе не позволяет объявить доказанным любой продукт или диагноз. Источники: http://www.kremlin.ru/acts/bank/36698 https://39.rospotrebnadzor.ru/content/federalnyy-zakon-ot-30031999-no-52-fz-o-sanitarno-epidemiologicheskom-blagopoluchii https://epp.genproc.gov.ru/ru/proc_75/mass-media/news/main/e8245653/",
-      "legal_urls": [],
+      "resolved_source_url": "https://epp.genproc.gov.ru/ru/proc_75/mass-media/news/main/e8245653/",
+      "legal_basis": "273-ФЗ от 29.12.2012, ст. 37, 28; 52-ФЗ, ст. 17: организация питания и соблюдение санитарных требований. Сообщение прокуратуры от 03.12.2025 подтверждает отдельный случай и последующее устранение выявленных нарушений.",
+      "legal_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_140174/e5372d6d5b4babeec9319080838dea4cf2f7661e/",
+        "https://www.consultant.ru/document/cons_doc_LAW_22481/434bb9ed79d4e9e735c9fd704cc084d7abec87cf/",
+        "https://www.consultant.ru/document/cons_doc_LAW_140174/552097cad5942f36c9484dbde7ebf92db1f783f3/",
+        "https://epp.genproc.gov.ru/ru/proc_75/mass-media/news/main/e8245653/"
+      ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
       "option_analysis_status": "draft",
-      "source_scope": "inherited_basis_requires_current_verification",
-      "review_date": "2026-11-27"
+      "source_scope": "specific_norm_and_related_search_results_partial",
+      "review_date": "2026-11-28",
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_140174/e5372d6d5b4babeec9319080838dea4cf2f7661e/",
+        "https://www.consultant.ru/document/cons_doc_LAW_22481/434bb9ed79d4e9e735c9fd704cc084d7abec87cf/",
+        "https://www.consultant.ru/document/cons_doc_LAW_140174/552097cad5942f36c9484dbde7ebf92db1f783f3/",
+        "https://epp.genproc.gov.ru/ru/proc_75/mass-media/news/main/e8245653/"
+      ],
+      "norm_recheck_2026_11_28": {
+        "status": "targeted_norm_and_individual_alternatives_reviewed_not_full_acceptance",
+        "limitation": "Официальный источник прочитан: подтверждён отдельный случай плесени, нарушения организации питания, их устранение и последующие пробы без выявленных отклонений; исход административного дела в публикации не установлен. Конкретные санитарные правила и контракт отдельно.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_140174/e5372d6d5b4babeec9319080838dea4cf2f7661e/",
+          "https://www.consultant.ru/document/cons_doc_LAW_22481/434bb9ed79d4e9e735c9fd704cc084d7abec87cf/",
+          "https://www.consultant.ru/document/cons_doc_LAW_140174/552097cad5942f36c9484dbde7ebf92db1f783f3/",
+          "https://epp.genproc.gov.ru/ru/proc_75/mass-media/news/main/e8245653/"
+        ]
+      },
+      "targeted_individual_review": {
+        "status": "targeted_norm_and_individual_alternatives_reviewed_not_full_acceptance",
+        "option_count": 5,
+        "remaining": "Официальный источник прочитан: подтверждён отдельный случай плесени, нарушения организации питания, их устранение и последующие пробы без выявленных отклонений; исход административного дела в публикации не установлен. Конкретные санитарные правила и контракт отдельно."
+      },
+      "documentary_recheck": {
+        "date": "2026-11-28",
+        "status": "official_article_reopened_core_episode_confirmed",
+        "additional_source_urls": [
+          "https://epp.genproc.gov.ru/ru/proc_75/mass-media/news/main/e8245653/"
+        ],
+        "notes": "Официальный источник прочитан: подтверждён отдельный случай плесени, нарушения организации питания, их устранение и последующие пробы без выявленных отклонений; исход административного дела в публикации не установлен. Конкретные санитарные правила и контракт отдельно."
+      }
     },
     {
       "case_key": "bank-expanded-serious-23-01",
@@ -7895,13 +8163,33 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "Федеральный закон №273-ФЗ от 29.12.2012, статья 56: целевое обучение и условия соответствующего договора; Конституция РФ, статья 37: свобода труда. Конкретные обязательства и последствия проверяются по действующему режиму договора и не возникают из одного лозунга программы. Источники: http://www.kremlin.ru/acts/bank/36698 https://minjust.gov.ru/ru/documents/8011/",
-      "legal_urls": [],
+      "legal_basis": "273-ФЗ от 29.12.2012, ст. 56: договор о целевом обучении заключается при поступлении или в процессе СПО/ВО с предусмотренным заказчиком, определяет поддержку, трудоустройство и обязательства сторон; последствия неисполнения установлены законом и подзаконным порядком.",
+      "legal_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_140174/996280ab805aa876a422585d066764f23a792ccf/",
+        "https://www.consultant.ru/law/hotdocs/94701.html"
+      ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
       "option_analysis_status": "draft",
-      "source_scope": "inherited_basis_requires_current_verification",
-      "review_date": "2026-11-27"
+      "source_scope": "specific_norm_and_related_search_results_partial",
+      "review_date": "2026-11-28",
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_140174/996280ab805aa876a422585d066764f23a792ccf/",
+        "https://www.consultant.ru/law/hotdocs/94701.html"
+      ],
+      "norm_recheck_2026_11_28": {
+        "status": "targeted_norm_and_individual_alternatives_reviewed_not_full_acceptance",
+        "limitation": "Проверить тип программы, квоту, категорию заказчика, требования к размещению предложений и исключения. Не устанавливать универсальную сумму санкций.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_140174/996280ab805aa876a422585d066764f23a792ccf/",
+          "https://www.consultant.ru/law/hotdocs/94701.html"
+        ]
+      },
+      "targeted_individual_review": {
+        "status": "targeted_norm_and_individual_alternatives_reviewed_not_full_acceptance",
+        "option_count": 5,
+        "remaining": "Проверить тип программы, квоту, категорию заказчика, требования к размещению предложений и исключения. Не устанавливать универсальную сумму санкций."
+      }
     },
     {
       "case_key": "bank-expanded-serious-24-01",
@@ -7945,13 +8233,36 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "Федеральный закон №25-ФЗ, статья 14, часть 1, пункт 5: запрет вознаграждений в связи с должностными обязанностями; Федеральный закон от 25.12.2008 №273-ФЗ, статьи 10–11: конфликт интересов. Передача на служебный учёт не означает автоматического признания любого такого подарка допустимым протокольным. Источники: https://epp.genproc.gov.ru/ru/proc_17/activity/legal-education/explain/e186999/ https://epp.genproc.gov.ru/ru/proc_35/activity/combating-corruption/zakon/federal/e345084/",
-      "legal_urls": [],
+      "legal_basis": "25-ФЗ от 02.03.2007, ст. 14 ч. 1 п. 5: запрет должностного вознаграждения; особый порядок официальных подарков не распространяется автоматически на обычную благодарность подрядчика. 273-ФЗ от 25.12.2008, ст. 10–11: проверка заинтересованности и урегулирование.",
+      "legal_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_66530/0e27b65ea87acd6ae64bf6ba3df4ef07fd637e84/",
+        "https://www.consultant.ru/document/cons_doc_LAW_82959/5d02242ebd04c398d2acf7c53dbc79659b85e8f3/",
+        "https://www.consultant.ru/document/cons_doc_LAW_82959/64ca591ea83268ee3d33f6e564cbcac0d3a073d9/"
+      ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
       "option_analysis_status": "draft",
-      "source_scope": "inherited_basis_requires_current_verification",
-      "review_date": "2026-11-27"
+      "source_scope": "specific_norm_and_related_search_results_partial",
+      "review_date": "2026-11-28",
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_66530/0e27b65ea87acd6ae64bf6ba3df4ef07fd637e84/",
+        "https://www.consultant.ru/document/cons_doc_LAW_82959/5d02242ebd04c398d2acf7c53dbc79659b85e8f3/",
+        "https://www.consultant.ru/document/cons_doc_LAW_82959/64ca591ea83268ee3d33f6e564cbcac0d3a073d9/"
+      ],
+      "norm_recheck_2026_11_28": {
+        "status": "targeted_norm_and_individual_alternatives_reviewed_not_full_acceptance",
+        "limitation": "Локальный порядок возврата, передачи предмета и уведомления определяется применимыми актами; не утверждать автоматически наличие взятки.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_66530/0e27b65ea87acd6ae64bf6ba3df4ef07fd637e84/",
+          "https://www.consultant.ru/document/cons_doc_LAW_82959/5d02242ebd04c398d2acf7c53dbc79659b85e8f3/",
+          "https://www.consultant.ru/document/cons_doc_LAW_82959/64ca591ea83268ee3d33f6e564cbcac0d3a073d9/"
+        ]
+      },
+      "targeted_individual_review": {
+        "status": "targeted_norm_and_individual_alternatives_reviewed_not_full_acceptance",
+        "option_count": 5,
+        "remaining": "Локальный порядок возврата, передачи предмета и уведомления определяется применимыми актами; не утверждать автоматически наличие взятки."
+      }
     },
     {
       "case_key": "bank-expanded-serious-26-01",
@@ -7960,13 +8271,36 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "БК РФ, статьи 38 и 139: целевой характер и субсидии местным бюджетам; статья 81: резерв для предусмотренных непредвиденных расходов. Наличие аварии не означает автоматического применения любого резерва: основание и компетенция проверяются отдельно. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
-      "legal_urls": [],
+      "legal_basis": "БК РФ, ст. 38, 139, 81: целевой характер, условия субсидий местным бюджетам, предусмотренный порядок резервного фонда. Авария сама по себе не создаёт права перечислить средства без основания.",
+      "legal_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/9a0e8abcbe24837343cdcc599bccf0f09413968a/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/8196c04ca89900439f387e81fad411d6965f41cf/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/55d68b8b11dce341557f8bc5b72a4a20c5c8e00c/"
+      ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
       "option_analysis_status": "draft",
-      "source_scope": "inherited_basis_requires_current_verification",
-      "review_date": "2026-11-27"
+      "source_scope": "specific_norm_and_related_search_results_partial",
+      "review_date": "2026-11-28",
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/9a0e8abcbe24837343cdcc599bccf0f09413968a/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/8196c04ca89900439f387e81fad411d6965f41cf/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/55d68b8b11dce341557f8bc5b72a4a20c5c8e00c/"
+      ],
+      "norm_recheck_2026_11_28": {
+        "status": "targeted_norm_and_individual_alternatives_reviewed_not_full_acceptance",
+        "limitation": "Конкретный региональный порядок, соглашения, вид трансферта и основание резервного фонда отдельно не установлены.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/9a0e8abcbe24837343cdcc599bccf0f09413968a/",
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/8196c04ca89900439f387e81fad411d6965f41cf/",
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/55d68b8b11dce341557f8bc5b72a4a20c5c8e00c/"
+        ]
+      },
+      "targeted_individual_review": {
+        "status": "targeted_norm_and_individual_alternatives_reviewed_not_full_acceptance",
+        "option_count": 5,
+        "remaining": "Конкретный региональный порядок, соглашения, вид трансферта и основание резервного фонда отдельно не установлены."
+      }
     },
     {
       "case_key": "bank-expanded-serious-27-01",
