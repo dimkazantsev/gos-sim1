@@ -1,0 +1,508 @@
+{
+  "status": "diagnostic_only",
+  "definition": "Порядковые оценки ресурсов и времени — редакционные допущения, а не новые показатели или рублёвые начисления. Доминирование в расширенном пространстве не заменяет проверки действующих игровых эффектов.",
+  "summary": {
+    "cases": 189,
+    "options": 947,
+    "baseDominated": 228,
+    "expandedDominated": 126,
+    "expandedCases": 99
+  },
+  "remaining": [
+    {
+      "case_key": "budget-region-2026-63-technical-college",
+      "title": "Новые предприятия и нехватка специалистов",
+      "dominated": 1
+    },
+    {
+      "case_key": "budget-region-2026-72-temporary-family-housing",
+      "title": "Временное размещение семей после аварии",
+      "dominated": 1
+    },
+    {
+      "case_key": "bank-curated-serious-01",
+      "title": "Кибератака на реестр",
+      "dominated": 1
+    },
+    {
+      "case_key": "bank-curated-serious-02",
+      "title": "Сочи: оползень повредил коллектор и создал угрозу жилому дому",
+      "dominated": 1
+    },
+    {
+      "case_key": "bank-curated-v2-14",
+      "title": "Голосование без связи",
+      "dominated": 2
+    },
+    {
+      "case_key": "bank-curated-v2-27",
+      "title": "Два вопроса в одной клетке",
+      "dominated": 1
+    },
+    {
+      "case_key": "bank-expanded-serious-01-01",
+      "title": "Челябинск: аварийный дом на улице Якутской и затянувшееся расселение",
+      "dominated": 1
+    },
+    {
+      "case_key": "bank-expanded-serious-02-01",
+      "title": "Водозабор на реке",
+      "dominated": 1
+    },
+    {
+      "case_key": "bank-expanded-serious-03-01",
+      "title": "Отопительный сезон",
+      "dominated": 1
+    },
+    {
+      "case_key": "bank-legal-2026-004",
+      "title": "Курортные дни",
+      "dominated": 1
+    },
+    {
+      "case_key": "bank-legal-2026-006",
+      "title": "Смета школы",
+      "dominated": 1
+    },
+    {
+      "case_key": "bank-legal-2026-009",
+      "title": "Грант родственнику",
+      "dominated": 1
+    },
+    {
+      "case_key": "bank-legal-2026-012",
+      "title": "Цифровое имущество",
+      "dominated": 2
+    },
+    {
+      "case_key": "bank-legal-2026-018",
+      "title": "Оружейный заказ",
+      "dominated": 1
+    },
+    {
+      "case_key": "bank-legal-2026-019",
+      "title": "Угольный вычет",
+      "dominated": 1
+    },
+    {
+      "case_key": "bank-legal-2026-020",
+      "title": "Кассовый разрыв",
+      "dominated": 1
+    },
+    {
+      "case_key": "bank-legal-2026-021",
+      "title": "Экспортный аванс",
+      "dominated": 1
+    },
+    {
+      "case_key": "bank-legal-2026-023",
+      "title": "Пляжная плата",
+      "dominated": 1
+    },
+    {
+      "case_key": "bank-legal-2026-026",
+      "title": "Минеральный курорт",
+      "dominated": 1
+    },
+    {
+      "case_key": "bank-legal-2026-030",
+      "title": "Каспийская квота",
+      "dominated": 1
+    },
+    {
+      "case_key": "bank-legal-2026-032",
+      "title": "Пограничный автобус",
+      "dominated": 1
+    },
+    {
+      "case_key": "bank-legal-2026-033",
+      "title": "Музей без задания",
+      "dominated": 1
+    },
+    {
+      "case_key": "bank-legal-2026-039",
+      "title": "Особая зона",
+      "dominated": 1
+    },
+    {
+      "case_key": "bank-legal-2026-040",
+      "title": "Кластерный конкурс",
+      "dominated": 2
+    },
+    {
+      "case_key": "bank-legal-2026-041",
+      "title": "Рыбный рейс",
+      "dominated": 1
+    },
+    {
+      "case_key": "bank-legal-2026-044",
+      "title": "Ювелирная касса",
+      "dominated": 1
+    },
+    {
+      "case_key": "bank-legal-2026-045",
+      "title": "Курганский паводок",
+      "dominated": 2
+    },
+    {
+      "case_key": "bank-legal-2026-046",
+      "title": "Неиспользованный остаток",
+      "dominated": 2
+    },
+    {
+      "case_key": "bank-legal-2026-047",
+      "title": "Склад агломерации",
+      "dominated": 1
+    },
+    {
+      "case_key": "bank-legal-2026-048",
+      "title": "Инвестор без прибыли",
+      "dominated": 2
+    },
+    {
+      "case_key": "bank-legal-2026-049",
+      "title": "Золотой резерв",
+      "dominated": 1
+    },
+    {
+      "case_key": "bank-legal-2026-050",
+      "title": "Кадастровое возражение",
+      "dominated": 1
+    },
+    {
+      "case_key": "bank-legal-2026-053",
+      "title": "Новгородский аудит",
+      "dominated": 1
+    },
+    {
+      "case_key": "bank-legal-2026-054",
+      "title": "Научный аванс",
+      "dominated": 2
+    },
+    {
+      "case_key": "bank-legal-2026-055",
+      "title": "Омская концессия",
+      "dominated": 3
+    },
+    {
+      "case_key": "bank-legal-2026-056",
+      "title": "Газовый расчёт",
+      "dominated": 2
+    },
+    {
+      "case_key": "bank-legal-2026-057",
+      "title": "Орловский отбор",
+      "dominated": 2
+    },
+    {
+      "case_key": "bank-legal-2026-059",
+      "title": "Пермское соглашение",
+      "dominated": 1
+    },
+    {
+      "case_key": "bank-legal-2026-060",
+      "title": "Псковский мост",
+      "dominated": 1
+    },
+    {
+      "case_key": "bank-legal-2026-061",
+      "title": "Ростовская закупка",
+      "dominated": 2
+    },
+    {
+      "case_key": "bank-legal-2026-062",
+      "title": "Рязанская отчётность",
+      "dominated": 1
+    },
+    {
+      "case_key": "bank-legal-2026-065",
+      "title": "Сахалинская доля",
+      "dominated": 2
+    },
+    {
+      "case_key": "bank-legal-2026-066",
+      "title": "Уральский залог",
+      "dominated": 1
+    },
+    {
+      "case_key": "bank-legal-2026-067",
+      "title": "Смоленское пожертвование",
+      "dominated": 2
+    },
+    {
+      "case_key": "bank-legal-2026-069",
+      "title": "Тверская гарантия",
+      "dominated": 1
+    },
+    {
+      "case_key": "bank-legal-2026-071",
+      "title": "Тульская неустойка",
+      "dominated": 2
+    },
+    {
+      "case_key": "bank-legal-2026-072",
+      "title": "Тюменский знаменатель",
+      "dominated": 2
+    },
+    {
+      "case_key": "bank-legal-2026-073",
+      "title": "Ульяновский самолёт",
+      "dominated": 1
+    },
+    {
+      "case_key": "bank-legal-2026-075",
+      "title": "Забайкальский ваучер",
+      "dominated": 1
+    },
+    {
+      "case_key": "bank-legal-2026-076",
+      "title": "Ярославская территория",
+      "dominated": 1
+    },
+    {
+      "case_key": "bank-legal-2026-077",
+      "title": "Московский торговый объект",
+      "dominated": 2
+    },
+    {
+      "case_key": "bank-legal-2026-079",
+      "title": "Биробиджанское исполнение",
+      "dominated": 2
+    },
+    {
+      "case_key": "bank-legal-2026-080",
+      "title": "Ненецкий норматив",
+      "dominated": 1
+    },
+    {
+      "case_key": "bank-legal-2026-081",
+      "title": "Югорское соглашение",
+      "dominated": 1
+    },
+    {
+      "case_key": "bank-legal-2026-082",
+      "title": "Чукотский северный завоз",
+      "dominated": 2
+    },
+    {
+      "case_key": "bank-legal-2026-083",
+      "title": "Ямальский платёж",
+      "dominated": 1
+    },
+    {
+      "case_key": "bank-legal-2026-085",
+      "title": "Севастопольская земля",
+      "dominated": 1
+    },
+    {
+      "case_key": "bank-legal-2026-086",
+      "title": "Донецкая восстановительная смета",
+      "dominated": 1
+    },
+    {
+      "case_key": "bank-legal-2026-087",
+      "title": "Луганский переходный учёт",
+      "dominated": 1
+    },
+    {
+      "case_key": "bank-legal-2026-092",
+      "title": "Закон без опубликования",
+      "dominated": 1
+    },
+    {
+      "case_key": "bank-legal-2026-096",
+      "title": "Проверка конституционности до подписи",
+      "dominated": 1
+    },
+    {
+      "case_key": "bank-legal-2026-098",
+      "title": "Устав без обязательных положений",
+      "dominated": 1
+    },
+    {
+      "case_key": "bank-legal-2026-099",
+      "title": "Отказ из-за политической позиции",
+      "dominated": 1
+    },
+    {
+      "case_key": "bank-legal-2026-100",
+      "title": "Неотмеченная агитация",
+      "dominated": 1
+    },
+    {
+      "case_key": "bank-legal-2026-101",
+      "title": "Один бюллетень за соседа",
+      "dominated": 1
+    },
+    {
+      "case_key": "bank-legal-2026-102",
+      "title": "Победитель с конфликтом интересов",
+      "dominated": 1
+    },
+    {
+      "case_key": "bank-legal-2026-104",
+      "title": "Техническое задание под марку",
+      "dominated": 1
+    },
+    {
+      "case_key": "bank-legal-2026-106",
+      "title": "Жалоба на закупку после договора",
+      "dominated": 1
+    },
+    {
+      "case_key": "bank-legal-2026-107",
+      "title": "Подпись под чужим полномочием",
+      "dominated": 1
+    },
+    {
+      "case_key": "bank-legal-2026-109",
+      "title": "Неустойка за каждый день",
+      "dominated": 2
+    },
+    {
+      "case_key": "bank-legal-2026-110",
+      "title": "Отказ от гарантийного ремонта",
+      "dominated": 1
+    },
+    {
+      "case_key": "bank-legal-2026-111",
+      "title": "Цифровая подписка после отказа",
+      "dominated": 1
+    },
+    {
+      "case_key": "bank-legal-2026-112",
+      "title": "Больничный и увольнение",
+      "dominated": 1
+    },
+    {
+      "case_key": "bank-legal-2026-113",
+      "title": "Испытание для беременной",
+      "dominated": 1
+    },
+    {
+      "case_key": "bank-legal-2026-115",
+      "title": "Обязательная сверхурочная смена",
+      "dominated": 2
+    },
+    {
+      "case_key": "bank-legal-2026-116",
+      "title": "Публичный список диагнозов",
+      "dominated": 2
+    },
+    {
+      "case_key": "bank-legal-2026-117",
+      "title": "Паспорт на личную почту",
+      "dominated": 1
+    },
+    {
+      "case_key": "bank-legal-2026-120",
+      "title": "Тайна вместо открытого бюджета",
+      "dominated": 2
+    },
+    {
+      "case_key": "bank-legal-2026-121",
+      "title": "Согласование мирного собрания",
+      "dominated": 1
+    },
+    {
+      "case_key": "bank-legal-2026-123",
+      "title": "Протокол без извещения",
+      "dominated": 2
+    },
+    {
+      "case_key": "bank-legal-2026-125",
+      "title": "Излишне взысканный налог",
+      "dominated": 1
+    },
+    {
+      "case_key": "bank-legal-2026-127",
+      "title": "Региональный запрет торговли",
+      "dominated": 1
+    },
+    {
+      "case_key": "bank-legal-2026-131",
+      "title": "Доступ к правосудию через начальника",
+      "dominated": 1
+    },
+    {
+      "case_key": "bank-legal-2026-132",
+      "title": "Доказательство из слухов",
+      "dominated": 1
+    },
+    {
+      "case_key": "bank-legal-2026-133",
+      "title": "Обязательное примирение без согласия",
+      "dominated": 1
+    },
+    {
+      "case_key": "bank-legal-2026-134",
+      "title": "Срок обращения и уважительная причина",
+      "dominated": 2
+    },
+    {
+      "case_key": "bank-legal-2026-135",
+      "title": "Банкротство и один любимый кредитор",
+      "dominated": 1
+    },
+    {
+      "case_key": "bank-legal-2026-137",
+      "title": "Договор с несовершеннолетним",
+      "dominated": 1
+    },
+    {
+      "case_key": "bank-legal-2026-138",
+      "title": "Благоустройство без слушаний",
+      "dominated": 1
+    },
+    {
+      "case_key": "bank-legal-2026-139",
+      "title": "Публичное обещание компенсации",
+      "dominated": 1
+    },
+    {
+      "case_key": "bank-legal-2026-140",
+      "title": "Национальность как основание отказа",
+      "dominated": 1
+    },
+    {
+      "case_key": "bank-legal-2026-141",
+      "title": "Личная переписка для служебного отчёта",
+      "dominated": 1
+    },
+    {
+      "case_key": "bank-legal-2026-142",
+      "title": "Чужое фото в партийной программе",
+      "dominated": 1
+    },
+    {
+      "case_key": "bank-legal-2026-143",
+      "title": "Лицензия управляющей организации и приказ инспекции",
+      "dominated": 1
+    },
+    {
+      "case_key": "bank-legal-2026-146",
+      "title": "Лишняя справка для услуги",
+      "dominated": 1
+    },
+    {
+      "case_key": "bank-legal-2026-147",
+      "title": "Реквизиция без компенсации",
+      "dominated": 2
+    },
+    {
+      "case_key": "bank-legal-2026-148",
+      "title": "Государственная помощь без контроля",
+      "dominated": 1
+    },
+    {
+      "case_key": "bank-legal-2026-149",
+      "title": "Ненормативный акт против закона",
+      "dominated": 1
+    },
+    {
+      "case_key": "bank-legal-2026-150",
+      "title": "Вознаграждение за обязательную услугу",
+      "dominated": 2
+    }
+  ]
+}
