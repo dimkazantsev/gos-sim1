@@ -652,10 +652,24 @@
       "resolved_source_url": null,
       "legal_basis": "БК РФ, статьи 38 и 132: целевой характер средств и субсидии из федерального бюджета бюджетам субъектов РФ. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
       "legal_urls": [
-        "https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721"
+        "https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/0859896f05c16d5719eafdf624507adf8887f0c7/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/9a0e8abcbe24837343cdcc599bccf0f09413968a/",
+        "https://base.garant.ru/483424511/36bfb7176e3e8bfebe718035887e4efc/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/0859896f05c16d5719eafdf624507adf8887f0c7/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/9a0e8abcbe24837343cdcc599bccf0f09413968a/",
+        "https://base.garant.ru/483424511/36bfb7176e3e8bfebe718035887e4efc/"
+      ],
+      "review_date": "2026-11-28",
+      "targeted_option_review": {
+        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "option_count": 5,
+        "remaining": "Федеральный порядок субсидии, соглашение, закупочная документация и применимость исключений 431-ФЗ."
+      }
     },
     {
       "case_key": "bank-legal-2026-004",
@@ -666,10 +680,22 @@
       "resolved_source_url": null,
       "legal_basis": "НК РФ, статья 418.5: предельная ставка туристического налога в 2026 году — 2 процента. Источники: https://www.nalog.gov.ru/rn77/taxation/tax_legislation/",
       "legal_urls": [
-        "https://www.nalog.gov.ru/rn77/taxation/tax_legislation/"
+        "https://www.nalog.gov.ru/rn77/taxation/tax_legislation/",
+        "https://www.consultant.ru/document/cons_doc_LAW_28165/58051460fe04ca74ab709af54bb5768dc71ed783/",
+        "https://www.nalog.gov.ru/rn78/taxation/taxes/tourist_tax/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_28165/58051460fe04ca74ab709af54bb5768dc71ed783/",
+        "https://www.nalog.gov.ru/rn78/taxation/taxes/tourist_tax/"
+      ],
+      "review_date": "2026-11-28",
+      "targeted_option_review": {
+        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "option_count": 5,
+        "remaining": "Муниципальный акт, минимальный налог, льготы и договор с гостем. Налогоплательщик — поставщик услуги, не турист."
+      }
     },
     {
       "case_key": "bank-legal-2026-005",
@@ -680,10 +706,22 @@
       "resolved_source_url": null,
       "legal_basis": "БК РФ, статьи 38 и 140: целевое использование средств и субвенции на переданные полномочия. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
       "legal_urls": [
-        "https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721"
+        "https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/aba5757994f1d3d2f17a4f4262fb9519d2de5238/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/9a0e8abcbe24837343cdcc599bccf0f09413968a/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/aba5757994f1d3d2f17a4f4262fb9519d2de5238/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/9a0e8abcbe24837343cdcc599bccf0f09413968a/"
+      ],
+      "review_date": "2026-11-28",
+      "targeted_option_review": {
+        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "option_count": 5,
+        "remaining": "Закон субъекта о передаче полномочия, методика субвенции, местный бюджет и порядок инициативных проектов."
+      }
     },
     {
       "case_key": "bank-legal-2026-006",
@@ -694,10 +732,22 @@
       "resolved_source_url": null,
       "legal_basis": "БК РФ, статьи 161 и 219: принятие обязательств казённым учреждением в пределах доведённых лимитов. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
       "legal_urls": [
-        "https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721"
+        "https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/58dfb94af2d30178f6bfdd70fad25ec5a89377cd/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/15d7c58c01bf75dcd6cf84a008bfef761ba731eb/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/58dfb94af2d30178f6bfdd70fad25ec5a89377cd/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/15d7c58c01bf75dcd6cf84a008bfef761ba731eb/"
+      ],
+      "review_date": "2026-11-28",
+      "targeted_option_review": {
+        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "option_count": 5,
+        "remaining": "Состояние уже принятого обязательства, решение распорядителя, требования безопасности и отсутствие применимого исключения из общего правила ЛБО."
+      }
     },
     {
       "case_key": "bank-legal-2026-007",
@@ -722,10 +772,22 @@
       "resolved_source_url": null,
       "legal_basis": "НК РФ, статья 394: ставки земельного налога с учётом категории и использования участка. Источники: https://www.nalog.gov.ru/rn77/taxation/tax_legislation/",
       "legal_urls": [
-        "https://www.nalog.gov.ru/rn77/taxation/tax_legislation/"
+        "https://www.nalog.gov.ru/rn77/taxation/tax_legislation/",
+        "https://www.consultant.ru/document/cons_doc_LAW_28165/fd2ac88b2311a6053a128cfa43aa07672e826213/",
+        "https://www.nalog.gov.ru/rn77/news/activities_fts/16639383/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_28165/fd2ac88b2311a6053a128cfa43aa07672e826213/",
+        "https://www.nalog.gov.ru/rn77/news/activities_fts/16639383/"
+      ],
+      "review_date": "2026-11-28",
+      "targeted_option_review": {
+        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "option_count": 5,
+        "remaining": "Муниципальные ставки, подтверждение сельхозиспользования, компетенция налогового органа; позиция КС 52-П об ИЖС не переносится автоматически на пастбище."
+      }
     },
     {
       "case_key": "bank-legal-2026-009",
@@ -793,10 +855,20 @@
       "resolved_source_url": null,
       "legal_basis": "БК РФ, статья 81: резервные фонды исполнительных органов предназначены для непредвиденных расходов. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
       "legal_urls": [
-        "https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721"
+        "https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/55d68b8b11dce341557f8bc5b72a4a20c5c8e00c/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/55d68b8b11dce341557f8bc5b72a4a20c5c8e00c/"
+      ],
+      "review_date": "2026-11-28",
+      "targeted_option_review": {
+        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "option_count": 5,
+        "remaining": "Действующее положение о резервном фонде, бюджетная классификация, закупки и конкретные источники финансирования. Статья 81 допускает также иные мероприятия, предусмотренные порядком фонда."
+      }
     },
     {
       "case_key": "bank-legal-2026-012",
@@ -821,10 +893,22 @@
       "resolved_source_url": null,
       "legal_basis": "БК РФ, статьи 6 и 138: нецелевой характер дотации на выравнивание и её правовой режим. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
       "legal_urls": [
-        "https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721"
+        "https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/055a71948dbf2a4fc2478437cd89cd864ee8e6e5/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/958d77bbceed0d6b2ee32ddbb1a6fb2572b4ab9f/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/055a71948dbf2a4fc2478437cd89cd864ee8e6e5/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/958d77bbceed0d6b2ee32ddbb1a6fb2572b4ab9f/"
+      ],
+      "review_date": "2026-11-28",
+      "targeted_option_review": {
+        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "option_count": 5,
+        "remaining": "Региональный порядок дотации, применимые общие условия межбюджетных трансфертов, правовые основания требования возврата."
+      }
     },
     {
       "case_key": "bank-legal-2026-014",
@@ -835,10 +919,22 @@
       "resolved_source_url": null,
       "legal_basis": "Федеральный закон №44-ФЗ, статья 93: специальные основания закупки у единственного поставщика, в том числе при аварии. Источники: https://pravo.gov.ru/",
       "legal_urls": [
-        "https://pravo.gov.ru/"
+        "https://pravo.gov.ru/",
+        "https://www.consultant.ru/document/cons_doc_LAW_144624/ab3273e757a9e718cbb3741596bc36eb8138e4f6/",
+        "https://epp.genproc.gov.ru/ru/proc_11/activity/legal-education/explain/e8339988/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_144624/ab3273e757a9e718cbb3741596bc36eb8138e4f6/",
+        "https://epp.genproc.gov.ru/ru/proc_11/activity/legal-education/explain/e8339988/"
+      ],
+      "review_date": "2026-11-28",
+      "targeted_option_review": {
+        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "option_count": 5,
+        "remaining": "Статус заказчика, подтверждение аварии, нецелесообразность конкурентной процедуры по срокам, обоснование объёма, цены и оформления закупки."
+      }
     },
     {
       "case_key": "bank-legal-2026-015",
@@ -1175,10 +1271,24 @@
       "resolved_source_url": null,
       "legal_basis": "БК РФ, статьи 69.2 и 78.1: государственное задание и субсидия бюджетному учреждению. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
       "legal_urls": [
-        "https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721"
+        "https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/98fb008eca1e2f13f66ab5ec498e60445050880d/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/2a2fd8efeffb727e38658d8fcbfc12849b352733/",
+        "https://www.consultant.ru/document/cons_doc_LAW_520034/be253379a4fe5a503be23c127f4d3019890ccf53/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/98fb008eca1e2f13f66ab5ec498e60445050880d/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/2a2fd8efeffb727e38658d8fcbfc12849b352733/",
+        "https://www.consultant.ru/document/cons_doc_LAW_520034/be253379a4fe5a503be23c127f4d3019890ccf53/"
+      ],
+      "review_date": "2026-11-28",
+      "targeted_option_review": {
+        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "option_count": 5,
+        "remaining": "Региональный порядок задания и финансирования; ст. 10 431-ФЗ временно приостанавливает отдельные положения ст. 9.2 7-ФЗ до 01.01.2027. Не применять без проверки общее правило об изменении задания; специальная ч. 4 касается федеральных учреждений."
+      }
     },
     {
       "case_key": "bank-legal-2026-034",
