@@ -357,3 +357,208 @@
   }
 }
 ```
+
+## Дополнительная редактура 116–130
+15 коллективных кейсов / 75 вариантов. Уточнены правовые ограничения и реальные предметы коллективного выбора. Проверены доступные фрагменты конкретных норм, не все связанные процедуры. Для 130 сохранён ранее найденный официальный источник, в этом проходе он не открыт. Условные коэффициенты не приравниваются к реальным расходам. Кейс 124 оставлен с явно условной ставкой, вид налога и период требуется конкретизировать для полной правовой проверки. Проверки изменённого диапазона:
+```json
+{
+  "sums": {
+    "baseBefore": 17,
+    "baseAfter": 7,
+    "extBefore": 10,
+    "extAfter": 2
+  },
+  "results": [
+    {
+      "case_key": "bank-legal-2026-116",
+      "before": [
+        2,
+        5
+      ],
+      "after": [
+        3
+      ],
+      "extBefore": [
+        2,
+        5
+      ],
+      "extAfter": [
+        3
+      ],
+      "history_protected": false
+    },
+    {
+      "case_key": "bank-legal-2026-117",
+      "before": [
+        2,
+        3
+      ],
+      "after": [],
+      "extBefore": [
+        2
+      ],
+      "extAfter": [],
+      "history_protected": false
+    },
+    {
+      "case_key": "bank-legal-2026-118",
+      "before": [],
+      "after": [],
+      "extBefore": [],
+      "extAfter": [],
+      "history_protected": false
+    },
+    {
+      "case_key": "bank-legal-2026-119",
+      "before": [
+        3
+      ],
+      "after": [],
+      "extBefore": [],
+      "extAfter": [],
+      "history_protected": false
+    },
+    {
+      "case_key": "bank-legal-2026-120",
+      "before": [
+        3,
+        5
+      ],
+      "after": [],
+      "extBefore": [
+        3,
+        5
+      ],
+      "extAfter": [],
+      "history_protected": false
+    },
+    {
+      "case_key": "bank-legal-2026-121",
+      "before": [
+        3,
+        5
+      ],
+      "after": [
+        5
+      ],
+      "extBefore": [
+        3
+      ],
+      "extAfter": [],
+      "history_protected": false
+    },
+    {
+      "case_key": "bank-legal-2026-122",
+      "before": [],
+      "after": [],
+      "extBefore": [],
+      "extAfter": [],
+      "history_protected": false
+    },
+    {
+      "case_key": "bank-legal-2026-123",
+      "before": [
+        4,
+        5
+      ],
+      "after": [
+        3
+      ],
+      "extBefore": [
+        4,
+        5
+      ],
+      "extAfter": [
+        3
+      ],
+      "history_protected": false
+    },
+    {
+      "case_key": "bank-legal-2026-124",
+      "before": [],
+      "after": [],
+      "extBefore": [],
+      "extAfter": [],
+      "history_protected": false
+    },
+    {
+      "case_key": "bank-legal-2026-125",
+      "before": [
+        3
+      ],
+      "after": [],
+      "extBefore": [
+        3
+      ],
+      "extAfter": [],
+      "history_protected": false
+    },
+    {
+      "case_key": "bank-legal-2026-126",
+      "before": [
+        5
+      ],
+      "after": [
+        5
+      ],
+      "extBefore": [],
+      "extAfter": [],
+      "history_protected": true
+    },
+    {
+      "case_key": "bank-legal-2026-127",
+      "before": [
+        1,
+        5
+      ],
+      "after": [
+        5
+      ],
+      "extBefore": [
+        1
+      ],
+      "extAfter": [],
+      "history_protected": false
+    },
+    {
+      "case_key": "bank-legal-2026-128",
+      "before": [
+        5
+      ],
+      "after": [
+        5
+      ],
+      "extBefore": [],
+      "extAfter": [],
+      "history_protected": false
+    },
+    {
+      "case_key": "bank-legal-2026-129",
+      "before": [],
+      "after": [],
+      "extBefore": [],
+      "extAfter": [],
+      "history_protected": false
+    },
+    {
+      "case_key": "bank-legal-2026-130",
+      "before": [
+        3
+      ],
+      "after": [
+        3
+      ],
+      "extBefore": [],
+      "extAfter": [],
+      "history_protected": false
+    }
+  ],
+  "bank": {
+    "cases": 189,
+    "options": 947,
+    "baseDominated": 197,
+    "expandedDominated": 102,
+    "expandedCases": 80
+  }
+}
+```

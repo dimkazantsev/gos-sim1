@@ -4,9 +4,9 @@
   "summary": {
     "cases": 189,
     "options": 947,
-    "baseDominated": 207,
-    "expandedDominated": 110,
-    "expandedCases": 85
+    "baseDominated": 197,
+    "expandedDominated": 102,
+    "expandedCases": 80
   },
   "remaining": [
     {
@@ -305,41 +305,6 @@
       "dominated": 1
     },
     {
-      "case_key": "bank-legal-2026-116",
-      "title": "Публичный список диагнозов",
-      "dominated": 2
-    },
-    {
-      "case_key": "bank-legal-2026-117",
-      "title": "Паспорт на личную почту",
-      "dominated": 1
-    },
-    {
-      "case_key": "bank-legal-2026-120",
-      "title": "Тайна вместо открытого бюджета",
-      "dominated": 2
-    },
-    {
-      "case_key": "bank-legal-2026-121",
-      "title": "Согласование мирного собрания",
-      "dominated": 1
-    },
-    {
-      "case_key": "bank-legal-2026-123",
-      "title": "Протокол без извещения",
-      "dominated": 2
-    },
-    {
-      "case_key": "bank-legal-2026-125",
-      "title": "Излишне взысканный налог",
-      "dominated": 1
-    },
-    {
-      "case_key": "bank-legal-2026-127",
-      "title": "Региональный запрет торговли",
-      "dominated": 1
-    },
-    {
       "case_key": "bank-legal-2026-131",
       "title": "Доступ к правосудию через начальника",
       "dominated": 1
@@ -433,7 +398,17 @@
       "case_key": "bank-legal-2026-105",
       "title": "Приёмка того, чего нет",
       "dominated": 1
+    },
+    {
+      "case_key": "bank-legal-2026-116",
+      "title": "Публичный список диагнозов",
+      "dominated": 1
+    },
+    {
+      "case_key": "bank-legal-2026-123",
+      "title": "Протокол без извещения",
+      "dominated": 1
     }
   ],
-  "note": "090–115: адресная редактура; вне диапазона перенесены исходные диагностические значения. Полный пересчёт нужен перед выпуском."
+  "note": "090–130: адресная редактура; вне диапазона перенесены исходные диагностические значения. Полный пересчёт нужен перед выпуском."
 }

@@ -2272,12 +2272,16 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "Федеральный закон №152-ФЗ, статьи 5, 7 и 10; Федеральный закон №323-ФЗ, статья 13: сведения о здоровье требуют специальных оснований и соблюдения врачебной тайны. Удобство очереди само по себе не оправдывает публичное раскрытие идентифицируемых диагнозов. Источники: https://minzdrav.gov.ru/special/ministry/web-site/perechen-informatsii-o-deyatelnosti-minzdrava-rossii-dostup-k-kotoroy-ogranichen-federalnym-zakonodatelstvom",
+      "legal_basis": "152-ФЗ, ст. 10; 323-ФЗ, ст. 13: сведения о здоровье и диагнозе относятся к охраняемым категориям; по условию нет основания для их публичного раскрытия. Прекращение раскрытия и проверка обязанностей оператора обязательны. Дополнительные меры не заменяют реагирование на инцидент.",
       "legal_urls": [
-        "https://minzdrav.gov.ru/special/ministry/web-site/perechen-informatsii-o-deyatelnosti-minzdrava-rossii-dostup-k-kotoroy-ogranichen-federalnym-zakonodatelstvom"
+        "https://www.consultant.ru/document/cons_doc_LAW_61801/26edb2934b899bf9c74c3a8f7e574651c6565e6d/",
+        "https://www.consultant.ru/document/cons_doc_LAW_121895/9f906d460f9454a8a0d290738d9fc2798c1e865a/",
+        "https://www.consultant.ru/document/cons_doc_LAW_61801/d3fe43a7c415353b17faab255bc0de92bea127da/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "review_date": "2026-11-27",
+      "source_scope": "specific_norm_and_related_search_results_partial"
     },
     {
       "case_key": "bank-legal-2026-117",
@@ -2286,12 +2290,14 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "Федеральный закон №152-ФЗ, статьи 5, 7, 19 и 21: ограничение целей обработки, конфиденциальность, меры безопасности и действия оператора при выявленном нарушении. Служебная цель не разрешает произвольно пересылать паспортные сканы в личный почтовый сервис. Источники: https://mintrud.gov.ru/docs/laws/130",
+      "legal_basis": "152-ФЗ, ст. 19, 21: оператор прекращает неправомерную обработку и принимает меры защиты. При установлении неправомерной или случайной передачи, повлекшей нарушение прав субъектов, действует специальная обязанность уведомления по ч. 3.1 ст. 21. Наличие именно этих условий, масштаб и сроки реагирования проверяются ответственным оператором; не предполагается автоматически зарубежное хранение.",
       "legal_urls": [
-        "https://mintrud.gov.ru/docs/laws/130"
+        "https://www.consultant.ru/document/cons_doc_LAW_61801/d3fe43a7c415353b17faab255bc0de92bea127da/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "review_date": "2026-11-27",
+      "source_scope": "specific_norm_and_related_search_results_partial"
     },
     {
       "case_key": "bank-legal-2026-118",
@@ -2300,12 +2306,15 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "Федеральный закон №152-ФЗ, статьи 6 и 11; Федеральный закон №572-ФЗ — применимые специальные правила идентификации с использованием биометрии. Табличка о видеонаблюдении не заменяет предусмотренного основания и условий биометрической идентификации. Исключения из письменного согласия проверяются отдельно. Источники: https://mintrud.gov.ru/docs/laws/130",
+      "legal_basis": "152-ФЗ, ст. 11: при использовании физиологических признаков для установления личности действует режим биометрических данных, письменное согласие требуется кроме предусмотренных исключений. 572-ФЗ, ст. 3: в применимом режиме отказ от биометрической идентификации не должен сам по себе приводить к отказу в услуге. Для конкретной системы дополнительно проверяются требования к её виду и оператору. По условию законного исключения нет.",
       "legal_urls": [
-        "https://mintrud.gov.ru/docs/laws/130"
+        "https://www.consultant.ru/document/cons_doc_LAW_61801/7336c78762a98b5f4f698b8c3800dca1111acc16/",
+        "https://www.consultant.ru/document/cons_doc_LAW_436110/15f0efd3c8311b53608abd85f9c02157e1457f55/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "review_date": "2026-11-27",
+      "source_scope": "specific_norm_and_related_search_results_partial"
     },
     {
       "case_key": "bank-legal-2026-119",
@@ -2314,12 +2323,15 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "Федеральный закон №59-ФЗ, статьи 10 и 12: орган обеспечивает рассмотрение обращения по существу и ответ в установленный срок; реклама достижений не заменяет ответа на поставленные вопросы. Это обычное обращение гражданина, а не редакционный запрос СМИ. Источники: https://mintrud.gov.ru/docs/laws/108",
+      "legal_basis": "59-ФЗ, ст. 10, ч. 1 п. 4 и ст. 12: по обычному письменному обращению в компетенции органа нужен ответ по существу; общий срок 30 дней с регистрации, исключения и допустимое продление регулируются законом. Здесь не задано законное исключение. Обещание ремонта требует подтверждённых данных, а не выдуманного срока.",
       "legal_urls": [
-        "https://mintrud.gov.ru/docs/laws/108"
+        "https://www.consultant.ru/document/cons_doc_LAW_59999/ca24c3b3a2032a1f727146f988f406723bf9ea1a/",
+        "https://www.consultant.ru/document/cons_doc_LAW_59999/23fb391f3632e3f68a11e40c5a7711f3513cc674/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "review_date": "2026-11-27",
+      "source_scope": "specific_norm_and_related_search_results_partial"
     },
     {
       "case_key": "bank-legal-2026-120",
@@ -2328,12 +2340,15 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "Федеральный закон №8-ФЗ, статьи 8, 19 и 20; БК РФ, статья 36: открытость бюджетных сведений и мотивированное ограничение доступа только на законном основании. Информационный запрос нельзя автоматически подменять общей перепиской по закону №59-ФЗ. Источники: https://epp.genproc.gov.ru/ru/proc_60/activity/legal-education/explain/e607368/",
+      "legal_basis": "8-ФЗ, ст. 8, 19, 20; БК РФ, ст. 36: открытые бюджетные сведения предоставляются по применимому порядку. Ссылка на доступный официальный источник может быть достаточной в предусмотренном законом случае; здесь ссылки не работают, а основание ограничения не названо. Восстановление доступа к обязательным материалам не заменяется выбором формата дополнительной публикации.",
       "legal_urls": [
-        "https://epp.genproc.gov.ru/ru/proc_60/activity/legal-education/explain/e607368/"
+        "https://www.consultant.ru/document/cons_doc_LAW_84602/8c8845d11ca0258e4a0ec282f95cafa1ce10a857/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/ac7eb6cf1d15c2a4225e64864e980f435d2142bc/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "review_date": "2026-11-27",
+      "source_scope": "specific_norm_and_related_search_results_partial"
     },
     {
       "case_key": "bank-legal-2026-121",
@@ -2342,12 +2357,15 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "Конституция РФ, статья 31; Федеральный закон №54-ФЗ, статьи 7 и 12: уведомление о публичном мероприятии и обязанности уполномоченного органа. Нельзя вводить не предусмотренное законом партийное согласование вместо установленной процедуры. Источники: https://epp.genproc.gov.ru/ru/proc_77/activity/legal-education/about-law/e1999257/",
+      "legal_basis": "Конституция РФ, ст. 31; 54-ФЗ, ст. 7, 12: уведомление рассматривает уполномоченный орган по законной процедуре, включая предусмотренные предложения и меры безопасности. Партийное согласие не является самостоятельным требованием. Конкретный региональный порядок и сроки для иных форм мероприятия требуют отдельной проверки.",
       "legal_urls": [
-        "https://epp.genproc.gov.ru/ru/proc_77/activity/legal-education/about-law/e1999257/"
+        "https://minjust.gov.ru/ru/documents/8011/",
+        "https://www.consultant.ru/document/cons_doc_LAW_48103/cfdb57568397a35cd74ece39f294e3c2d80337ce/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "review_date": "2026-11-27",
+      "source_scope": "specific_norm_and_related_search_results_partial"
     },
     {
       "case_key": "bank-legal-2026-122",
@@ -2356,12 +2374,14 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "КоАП РФ, статьи 1.5, 2.1, 24.5 и 26.1: ответственность требует установленных элементов административного правонарушения; отсутствие состава исключает производство. Профилактическая цель не заменяет доказывание. Источники: https://epp.genproc.gov.ru/ru/proc_27/activity/legal-education/explain/e251163/",
+      "legal_basis": "КоАП РФ, ст. 24.5, ч. 1 п. 2: отсутствие состава исключает производство; предположение о риске не заменяет установление признаков правонарушения. В случае неустранимой недоказанности применяется презумпция невиновности по ст. 1.5. Конкретное процессуальное основание решения устанавливается уполномоченным лицом по материалам дела, а не голосованием.",
       "legal_urls": [
-        "https://epp.genproc.gov.ru/ru/proc_27/activity/legal-education/explain/e251163/"
+        "https://www.consultant.ru/document/cons_doc_LAW_34661/7f47b148e60467b00c0f1705dac5c97386201451/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "review_date": "2026-11-27",
+      "source_scope": "specific_norm_and_related_search_results_partial"
     },
     {
       "case_key": "bank-legal-2026-123",
@@ -2370,12 +2390,14 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "КоАП РФ, статьи 25.1, 28.2 и 29.7: право участвовать в деле, представлять объяснения и предусмотренные условия действий в отсутствие лица. Последствия нарушения извещения оцениваются при проверке законности постановления с учётом стадии производства. Источники: https://epp.genproc.gov.ru/ru/proc_59/activity/legal-education/explain/e592740/",
+      "legal_basis": "КоАП РФ, ст. 25.1, ч. 2: рассмотрение в отсутствие лица возможно при предусмотренных исключениях или надлежащем извещении и соблюдении условий о ходатайстве. Здесь уведомление не подтверждено, исключения отсутствуют, доводы могли влиять на исход. Законность постановления проверяется в надлежащем порядке пересмотра; голосование не отменяет постановление.",
       "legal_urls": [
-        "https://epp.genproc.gov.ru/ru/proc_59/activity/legal-education/explain/e592740/"
+        "https://www.consultant.ru/document/cons_doc_LAW_34661/0147088a5497571bd1de83d7a7f6ce9ea7504a22/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "review_date": "2026-11-27",
+      "source_scope": "specific_norm_and_related_search_results_partial"
     },
     {
       "case_key": "bank-legal-2026-124",
@@ -2384,12 +2406,15 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "НК РФ, статьи 1, 4 и 17; Конституция РФ, статья 57: налоговая обязанность и её элементы устанавливаются законодательством. Информационная памятка инспекции не изменяет предусмотренную законом ставку. Источники: https://www.nalog.gov.ru/rn77/taxation/tax_legislation/",
+      "legal_basis": "НК РФ, ст. 3, 17: налоговое обязательство и элементы налога определяются законодательством, а не информационной памяткой. Ставка 2% дана только как параметр конкретной учебной истории; вид налога, территория и период не названы, поэтому утверждать реальную универсальную ставку нельзя. Для точного расчёта нужны эти условия.",
       "legal_urls": [
-        "https://www.nalog.gov.ru/rn77/taxation/tax_legislation/"
+        "https://www.consultant.ru/document/cons_doc_LAW_19671/d03926665a6af79635a902fe666ce607ad1cdab0/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19671/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "review_date": "2026-11-27",
+      "source_scope": "specific_norm_and_related_search_results_partial"
     },
     {
       "case_key": "bank-legal-2026-125",
@@ -2398,12 +2423,15 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "НК РФ, статьи 78–79: зачёт и возврат положительного сальдо ЕНС по установленной процедуре. Отмена взыскания требует корректного отражения расчётов; неопределённое удержание до будущего налога не заменяет рассмотрение заявления. Основания процентов проверяются отдельно по виду нарушения. Источники: https://www.nalog.gov.ru/rn77/taxation/debt/vozvrat_saldoens/",
+      "legal_basis": "НК РФ, ст. 79: по заявлению возвращаются средства в пределах положительного сальдо ЕНС на дату формирования поручения, с учётом предусмотренных законом условий и исключений. По условию отмена отражена и иных обязательств нет. Сумма 480 тыс. рублей — заданный факт учебной истории, не автоматическое начисление в игровую модель. Проценты требуют самостоятельной проверки условий и дат.",
       "legal_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_19671/fe653fbf45334f84d241e4e49bfda1a84dd76f1d/",
         "https://www.nalog.gov.ru/rn77/taxation/debt/vozvrat_saldoens/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "review_date": "2026-11-27",
+      "source_scope": "specific_norm_and_related_search_results_partial"
     },
     {
       "case_key": "bank-legal-2026-126",
@@ -2412,12 +2440,15 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "НК РФ, статьи 3 и 56; Конституция РФ, статья 19: недопустимость дискриминационного налогообложения и равенство перед законом. Партийная принадлежность не заменяет допустимое правовое основание налогового преимущества. Источники: https://www.nalog.gov.ru/rn77/taxation/tax_legislation/",
+      "legal_basis": "НК РФ, ст. 3 и 56; Конституция РФ, ст. 19: дискриминационный партийный критерий несовместим с равным применением налогового законодательства. Льгота возможна лишь в пределах полномочий соответствующего органа, с объективной категорией и в надлежащем нормативном акте. Конкретные местные полномочия и условия земельного налога требуют проверки.",
       "legal_urls": [
-        "https://www.nalog.gov.ru/rn77/taxation/tax_legislation/"
+        "https://www.consultant.ru/document/cons_doc_LAW_19671/d03926665a6af79635a902fe666ce607ad1cdab0/",
+        "https://minjust.gov.ru/ru/documents/8011/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "review_date": "2026-11-27",
+      "source_scope": "specific_norm_and_related_search_results_partial"
     },
     {
       "case_key": "bank-legal-2026-127",
@@ -2426,12 +2457,15 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "Конституция РФ, статьи 8 и 74; Федеральный закон №135-ФЗ, статья 15: единство экономического пространства и пределы ограничивающих конкуренцию актов органов власти. Ограничение оборота требует предусмотренного федеральным законом основания и компетенции. Источники: http://www.kremlin.ru/acts/constitution",
+      "legal_basis": "135-ФЗ, ст. 15; Конституция РФ, ст. 8 и 74: органы не могут вводить необоснованные ограничения конкуренции и движения товаров, кроме предусмотренных федеральным законодательством случаев. В истории основания и специальный режим отсутствуют. Законный контроль конкретных нарушений сохраняется.",
       "legal_urls": [
-        "http://www.kremlin.ru/acts/constitution"
+        "https://www.consultant.ru/document/cons_doc_LAW_61763/871fb1003dab1dd3ef350f8f7f0f0d10ea20b5c6/",
+        "https://minjust.gov.ru/ru/documents/8011/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "review_date": "2026-11-27",
+      "source_scope": "specific_norm_and_related_search_results_partial"
     },
     {
       "case_key": "bank-legal-2026-128",
@@ -2440,12 +2474,14 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "ЗК РФ, статьи 39.6 и 39.11: предоставление публичной земли в аренду и основания торгов либо предусмотренных исключений. Письмо поддержки не является самостоятельным основанием прямой аренды. Источники: https://epp.genproc.gov.ru/ru/proc_63/activity/legal-education/explain/e8311071/",
+      "legal_basis": "ЗК РФ, ст. 39.6, п. 1–2: договор аренды публичной земли по общему правилу заключается на аукционе, кроме предусмотренных законом исключений. В условии исключения отсутствуют; письмо поддержки не заменяет правового основания. Процедурные условия ст. 39.11 и последующих статей проверяются при подготовке торгов.",
       "legal_urls": [
-        "https://epp.genproc.gov.ru/ru/proc_63/activity/legal-education/explain/e8311071/"
+        "https://www.consultant.ru/document/cons_doc_LAW_33773/79da6e3bbbc8eb967db0714e8378269bfea9f83c/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "review_date": "2026-11-27",
+      "source_scope": "specific_norm_and_related_search_results_partial"
     },
     {
       "case_key": "bank-legal-2026-129",
@@ -2454,13 +2490,15 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "Федеральный закон от 25.06.2002 №73-ФЗ, статья 34.1, пункты 1, 2 и 6; Федеральный закон от 05.04.2016 №95-ФЗ, переходное правило о разрешениях, выданных до 03.10.2016. В условии установлена действующая защитная зона и исключены применимые исключения. Для нового нелинейного капитального объекта действует запрет строительства. Источники: https://epp.genproc.gov.ru/ru/proc_44/activity/legal-education/explain/e426555/ https://www.consultant.ru/law/podborki/statya_34.1._zaschitnye_zony_obektov_kulturnogo_naslediya/",
+      "legal_basis": "73-ФЗ, ст. 34.1, п. 1, 2, 6; 95-ФЗ от 05.04.2016: в действующей защитной зоне строительство нового нелинейного капитального объекта запрещено при заданном отсутствии исключений и прежнего разрешения. Правила зон охраны и защитных зон не смешиваются; конкретные меры прекращения работ принимает компетентный орган.",
       "legal_urls": [
-        "https://epp.genproc.gov.ru/ru/proc_44/activity/legal-education/explain/e426555/",
-        "https://www.consultant.ru/law/podborki/statya_34.1._zaschitnye_zony_obektov_kulturnogo_naslediya/"
+        "https://www.consultant.ru/document/cons_doc_LAW_37318/f8f2eca6ba8522da15e1e300e16c09439c9eb45c/",
+        "https://epp.genproc.gov.ru/ru/proc_44/activity/legal-education/explain/e426555/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "review_date": "2026-11-27",
+      "source_scope": "specific_norm_and_related_search_results_partial"
     },
     {
       "case_key": "bank-legal-2026-130",
@@ -2469,12 +2507,14 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "Федеральный закон №7-ФЗ, статьи 16 и 34: плата за негативное воздействие и обязанность соблюдать требования охраны окружающей среды имеют самостоятельное значение. Внесение платы не заменяет соблюдение разрешительных условий и предусмотренные меры устранения нарушения. Источники: https://epp.genproc.gov.ru/ru/proc_27/activity/legal-education/explain/e260271/",
+      "legal_basis": "7-ФЗ, ст. 16, 34: плата за негативное воздействие не отменяет самостоятельные природоохранные обязанности и соблюдение применимых разрешительных условий. Выявленное нарушение рассматривается компетентным органом. Вид разрешения и специальный порядок воздействия в задаче не конкретизированы; голосование не может разрешить продолжение незаконных выбросов.",
       "legal_urls": [
         "https://epp.genproc.gov.ru/ru/proc_27/activity/legal-education/explain/e260271/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "review_date": "2026-11-27",
+      "source_scope": "prior_official_explanation_not_reopened"
     },
     {
       "case_key": "bank-legal-2026-131",
