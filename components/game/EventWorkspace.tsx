@@ -22,7 +22,7 @@ type CaseRow={id:string;game_id:string;case_key:string;title:string;situation:st
 type Assignment={id:string;case_id:string;game_id:string;recipient_id:string;status:string;created_at:string;vote_round?:number;runoff_options?:string[]|null};
 type Decision={id:string;case_id:string;actor_id:string;choice:string;role_snapshot?:string;vote_round?:number};
 type Authority={decision_id:string;case_id:string;actor_id:string;authority_ok:boolean;lawful:boolean;strategy_point:boolean;role_snapshot:string;legal_basis:string;score_share?:number};
-type Outcome={case_id:string;winner:string;trust_delta:number;votes_count:number;assignments_count:number;media_post_id:string|null;requested_trust_delta?:number;resolution_kind?:string;winning_fiscal_effect?:EventFiscalEffect|null;winning_description?:string|null};
+type Outcome={case_id:string;winner:string;trust_delta:number;votes_count:number;assignments_count:number;media_post_id:string|null;requested_trust_delta?:number;resolution_kind?:string;winning_fiscal_effect?:EventFiscalEffect|null;winning_description?:string|null;collective_metric_effects?:Record<string,number>|null};
 type EventCompact={titles:{id:string;title:string}[];positive:number|null;negative:number|null};
 const EVENT_FEED_PAGE_SIZE=10;
 type OptionDraft={label:string;trust:number;description:string;lawful:boolean|null;authorizedRoles:string;legalBasis:string;protectsRoleInterest:boolean};
@@ -282,7 +282,8 @@ export default function EventWorkspace({g,readOnly=false,mode='feed'}:{g:ReturnT
  },[game?.id,me?.user_id,feedScope,requestedIds,loadedMap,titles,retryPage]);
  const seenAssignments=teacher?assignments:mine;
  const caseIds=new Set(seenAssignments.map(a=>a.case_id));
- const relevantDecisions=teacher?decisions:decisions.filter(d=>caseIds.has(d.case_id)&&d.actor_id===me?.user_id);
+ const roundByCase=new Map(assignments.map(a=>[a.case_id,a.vote_round??1]));
+ const relevantDecisions=decisions.filter(d=>(d.vote_round??1)===(roundByCase.get(d.case_id)??1)&&(teacher||(caseIds.has(d.case_id)&&d.actor_id===me?.user_id)));
  const completedCount=relevantDecisions.length;
  const effect=(d:Decision)=>{const c=cases.find(c=>c.id===d.case_id);return c?resolvedValue(d,c):0};
  const yesCount=teacher?(effectCounts?.positive??0):relevantDecisions.filter(d=>effect(d)>0).length;
@@ -302,9 +303,9 @@ export default function EventWorkspace({g,readOnly=false,mode='feed'}:{g:ReturnT
   {mode==='manage'&&teacher&&<div className="eventDecisionOverview" aria-label="Статистика решений по игровым событиям">
    <article><small>Назначено заданий</small><strong>{seenAssignments.length}</strong><span>{teacher?'Всем участникам':'Вам'}</span></article>
    <article><small>Решено</small><strong>{completedCount}<em> / {seenAssignments.length}</em></strong><span>{ratio(completedCount,seenAssignments.length)}% заданий</span></article>
-   <article><small>В интересах общества</small><strong>{effectCounts?yesCount:'—'}</strong><span>{effectCounts?ratio(yesCount,relevantDecisions.length)+'%':'—'} от ответов</span></article>
-   <article><small>Негативные последствия</small><strong>{effectCounts?noCount:'—'}</strong><span>{effectCounts?ratio(noCount,relevantDecisions.length)+'%':'—'} от ответов</span></article>
-   <article><small>Нейтральные решения</small><strong>{effectCounts?neutralCount:'—'}</strong><span>{effectCounts?ratio(neutralCount,relevantDecisions.length)+'%':'—'} от ответов</span></article>
+   <article><small>Рост доверия</small><strong>{effectCounts?yesCount:'—'}</strong><span>{effectCounts?ratio(yesCount,relevantDecisions.length)+'%':'—'} от ответов</span></article>
+   <article><small>Снижение доверия</small><strong>{effectCounts?noCount:'—'}</strong><span>{effectCounts?ratio(noCount,relevantDecisions.length)+'%':'—'} от ответов</span></article>
+   <article><small>Без изменения доверия</small><strong>{effectCounts?neutralCount:'—'}</strong><span>{effectCounts?ratio(neutralCount,relevantDecisions.length)+'%':'—'} от ответов</span></article>
   </div>}
   {mode==='manage'&&teacher&&<EventAutopilotPanel g={g} panelMode="settings" onChanged={()=>reload(true)} readyCaseCount={readyCaseCount} readOnly={readOnly}/>}
   {mode==='manage'&&teacher&&<details className="eventComposerPanel civicDisclosure projectDisclosure">
@@ -385,9 +386,10 @@ export default function EventWorkspace({g,readOnly=false,mode='feed'}:{g:ReturnT
        {(chosenEffect?.description||outcome.winning_description)&&<p>{chosenEffect?.description||outcome.winning_description}</p>}
        <span>Фактическое изменение доверия: {outcome.trust_delta>0?'+':''}{outcome.trust_delta} п.п. · Голосов: {outcome.votes_count}/{outcome.assignments_count}</span>
        {outcome.requested_trust_delta!==undefined&&outcome.requested_trust_delta!==outcome.trust_delta&&<span>Расчётный эффект: {outcome.requested_trust_delta>0?'+':''}{outcome.requested_trust_delta} п.п. · Достигнута граница показателя.</span>}
+       {collectiveMode&&outcome.collective_metric_effects&&Object.entries(outcome.collective_metric_effects).map(([key,value])=><span key={key}>{({economy:'Экономика',elite_support:'Поддержка элит',international_standing:'Международное положение',media_climate:'Медийный климат',security:'Безопасность',social_stability:'Социальная стабильность',social_tension:'Социальная напряжённость'} as Record<string,string>)[key]||key}: {value>0?'+':''}{Number(value).toLocaleString('ru-RU')} п.п. (прямой эффект)</span>)}
        {outcome.winner!=='tie'&&<span>Региональные последствия: {describeEventFiscalEffect(chosenEffect?.fiscal_effect??outcome.winning_fiscal_effect).join('; ')||'прямое изменение экономических параметров для этого варианта не предусмотрено'}. Изменение доверия учитывается отдельно; фактический бюджет рассчитывается по действующей модели.</span>}
       </div>}
-      {teacher&&responded.length>0&&!outcome&&<button type="button" disabled={!!busyId||readOnly} className="eventFinalize" onClick={()=>void finalize(c.id,collectiveMode?round:undefined)}>Подвести итог по полученным голосам</button>}
+      {teacher&&(responded.length>0||(collectiveMode&&round===2))&&!outcome&&<button type="button" disabled={!!busyId||readOnly} className="eventFinalize" onClick={()=>void finalize(c.id,collectiveMode?round:undefined)}>Подвести итог по полученным голосам</button>}
       {teacher&&(authority.some(a=>a.case_id===c.id)||invites.some(i=>i.transfer_stage_no!=null))&&<div className="eventAuthorityTable"><h4>Полномочия и баллы</h4>{transferMode&&invites.filter(i=>i.transfer_stage_no!=null).map(i=><article key={i.id}><b>{g.names[i.inviter_id]||'Участник'}</b><span>Передача: {g.names[i.recipient_id]||'Участник'}</span><strong>Кредит кейса: 0,5 балла</strong></article>)}{authority.filter(a=>a.case_id===c.id).map(a=><article key={a.decision_id}><b>{g.names[a.actor_id]||'Участник'}</b><span>{a.role_snapshot||'Без должности'}</span><strong>{transferMode?'Кредит кейса: '+(a.score_share===undefined?'—':Number(a.score_share).toLocaleString('ru-RU')):a.authority_ok&&a.lawful?'Правовой критерий: 1 балл':'Правовой критерий: 0 баллов'}</strong><small>{a.legal_basis}</small>{a.strategy_point&&<span>Защита интересов своей роли: учитывается в стратегии</span>}</article>)}</div>}
       </>}
      </div>

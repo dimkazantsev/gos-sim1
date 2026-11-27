@@ -58,11 +58,26 @@ const [game,other,sender,expert,wrong,archived,outsider,teacher]=[1,2,10,11,12,1
  await assert.rejects(()=>ballot(sender,'option_1'),/второй тур/);
  await ballot(sender,'round2:option_1');await ballot(expert,'round2:option_1');await ballot(wrong,'round2:option_2');
  assert.equal((await rows('SELECT winner FROM event_case_outcomes WHERE case_id=$1',[cc]))[0].winner,'option_1');
+ assert.deepEqual((await rows('SELECT collective_metric_effects FROM event_case_outcomes WHERE case_id=$1',[cc]))[0].collective_metric_effects,{elite_support:-2,social_tension:-1});
  assert.equal((await rows('SELECT count(*)::int n FROM event_decisions WHERE case_id=$1',[cc]))[0].n,6);
  assert.equal((await rows('SELECT count(*)::int n FROM event_authority_evidence WHERE case_id=$1',[cc]))[0].n,0);
  assert.equal(Number((await rows("SELECT value FROM state_metrics WHERE game_id=$1 AND metric_key='lawfulness'",[game]))[0].value),law);
  assert.equal(Number((await rows("SELECT value FROM state_metrics WHERE game_id=$1 AND metric_key='elite_support'",[game]))[0].value),48);
  await auth(teacher);await query('SELECT public.finalize_event_case_round($1,2)',[cc]);assert.equal(Number((await rows("SELECT value FROM state_metrics WHERE game_id=$1 AND metric_key='elite_support'",[game]))[0].value),48);
+ const makeCollective=async(n,p=cp)=>{const id=uid(n);await query("INSERT INTO event_cases(id,game_id,audience,status,effect_plan,decision_options,title) VALUES($1,$2,'all','ready',$3::jsonb,'[\"А\",\"Б\",\"В\"]','Дилемма')",[id,game,JSON.stringify(p)]);for(const u of [sender,expert,wrong])await query("INSERT INTO event_assignments(case_id,game_id,recipient_id,stage_no) VALUES($1,$2,$3,7)",[id,game,u]);return id;};
+ const cast=async(id,u,key)=>{await auth(u);const a=(await rows('SELECT id FROM event_assignments WHERE case_id=$1 AND recipient_id=$2',[id,u]))[0];await query('SELECT public.submit_event_decision($1,$2,NULL)',[a.id,key]);};
+ const tie=await makeCollective(111);
+ for(const [u,k] of [[sender,'option_1'],[expert,'option_2'],[wrong,'option_3']])await cast(tie,u,k);
+ for(const [u,k] of [[sender,'round2:option_1'],[expert,'round2:option_2'],[wrong,'round2:option_3']])await cast(tie,u,k);
+ assert.equal((await rows('SELECT winner FROM event_case_outcomes WHERE case_id=$1',[tie]))[0].winner,'tie');
+ assert.equal((await rows("SELECT count(*)::int n FROM event_trust_ledger WHERE action_key=$1",['choice-'+tie]))[0].n,0);
+ const direct=await makeCollective(112);
+ await cast(direct,sender,'option_2');await cast(direct,expert,'option_2');await cast(direct,wrong,'option_1');
+ assert.equal((await rows('SELECT winner FROM event_case_outcomes WHERE case_id=$1',[direct]))[0].winner,'option_2');
+ assert.equal(Number((await rows("SELECT value FROM state_metrics WHERE game_id=$1 AND metric_key='elite_support'",[game]))[0].value),50);
+ const invalid=await makeCollective(113,{...cp,best_option_key:'option_1'});
+ await assert.rejects(()=>cast(invalid,sender,'option_1'),/Коллективная разметка недопустима/);
+ await assert.rejects(()=>query("SELECT private.event_v2_validate_collective($1::jsonb,$2::jsonb,'{}')",[JSON.stringify({...cp,options:[{...cp.options[0],metric_effects:{lawfulness:-3}},...cp.options.slice(1)]}),JSON.stringify(['А','Б','В'])]),/Недопустимый или двойной эффект/);
  console.log('PASS collective: two rounds, no interim outcome, stale ballot rejected, final effects once, lawfulness unchanged');
  console.log('PASS actual individual transfer SQL: wrong/archived/cross-game, refusal, one assignment, unchanged stage, independent credit, wrong/right answer, no repeat, legacy');
  }finally{await db.close()}

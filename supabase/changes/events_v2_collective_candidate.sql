@@ -1,13 +1,15 @@
 -- Step 3 candidate, apply after step 2 only during final V2 release.
+ALTER TABLE public.event_case_outcomes ADD COLUMN collective_metric_effects jsonb;
 ALTER TABLE public.event_decisions ADD COLUMN vote_round integer NOT NULL DEFAULT 1 CHECK (vote_round IN (1,2));
 ALTER TABLE public.event_decisions DROP CONSTRAINT event_decisions_case_id_actor_id_key;
 ALTER TABLE public.event_decisions ADD CONSTRAINT event_decisions_case_actor_round_key UNIQUE(case_id,actor_id,vote_round);
 CREATE OR REPLACE FUNCTION private.event_v2_validate_collective(p_plan jsonb,p_labels jsonb,p_scene jsonb) RETURNS void
 LANGUAGE plpgsql IMMUTABLE SET search_path TO '' AS $f$
-DECLARE o jsonb;v record;
+DECLARE o jsonb;v record;idx integer:=0;
 BEGIN
  IF p_plan ? 'best_option_key' OR jsonb_typeof(p_plan->'options') IS DISTINCT FROM 'array' OR jsonb_array_length(p_plan->'options')<>jsonb_array_length(p_labels) THEN RAISE EXCEPTION 'Коллективная разметка недопустима';END IF;
  FOR o IN SELECT value FROM jsonb_array_elements(p_plan->'options') LOOP
+  idx:=idx+1;IF o->>'key' IS DISTINCT FROM 'option_'||idx THEN RAISE EXCEPTION 'Неверный ключ варианта';END IF;
   IF NOT coalesce((o->>'lawful')::boolean,false) OR jsonb_typeof(o->'trust') IS DISTINCT FROM 'number' OR abs((o->>'trust')::numeric)>4 THEN RAISE EXCEPTION 'Недопустимый коллективный вариант';END IF;
   IF o ? 'metric_effects' AND jsonb_typeof(o->'metric_effects') IS DISTINCT FROM 'object' THEN RAISE EXCEPTION 'Недопустимые последствия';END IF;
   FOR v IN SELECT * FROM jsonb_each(coalesce(o->'metric_effects','{}')) LOOP
@@ -16,20 +18,21 @@ BEGIN
   IF o ? 'fiscal_effect' AND (jsonb_typeof(o->'fiscal_effect') IS DISTINCT FROM 'object' OR nullif(p_scene->>'region_code','') IS NULL) THEN RAISE EXCEPTION 'Региональный эффект без региона';END IF;
  END LOOP;
 END $f$;
-CREATE OR REPLACE FUNCTION private.event_v2_apply_collective_metrics(p_case uuid,p_winner text) RETURNS void
+CREATE OR REPLACE FUNCTION private.event_v2_apply_collective_metrics(p_case uuid,p_winner text) RETURNS jsonb
 LANGUAGE plpgsql SECURITY DEFINER SET search_path TO '' AS $f$
-DECLARE c public.event_cases%rowtype;v record;mid uuid;oldval numeric;newval numeric;d numeric;
+DECLARE c public.event_cases%rowtype;v record;mid uuid;oldval numeric;newval numeric;d numeric;result jsonb:='{}';
 BEGIN
- IF p_winner !~ '^option_[1-6]$' THEN RETURN;END IF;
+ IF p_winner !~ '^option_[1-6]$' THEN RETURN result;END IF;
  SELECT * INTO c FROM public.event_cases WHERE id=p_case;
- IF NOT coalesce((c.audience IN ('group','all') AND c.effect_plan->>'rules_version'='2'),false) THEN RETURN;END IF;
+ IF NOT coalesce((c.audience IN ('group','all') AND c.effect_plan->>'rules_version'='2'),false) THEN RETURN result;END IF;
  FOR v IN SELECT * FROM jsonb_each(coalesce(c.effect_plan->'options'->(substring(p_winner from 8)::int-1)->'metric_effects','{}')) ORDER BY key LOOP
   d:=(v.value::text)::numeric;IF d=0 THEN CONTINUE;END IF;
   UPDATE public.state_metrics m SET previous_value=m.value,value=greatest(coalesce(m.min_value,0),least(coalesce(m.max_value,100),m.value+d))
   WHERE m.game_id=c.game_id AND m.metric_key=v.key AND greatest(coalesce(m.min_value,0),least(coalesce(m.max_value,100),m.value+d)) IS DISTINCT FROM m.value
   RETURNING id,previous_value,value INTO mid,oldval,newval;
-  IF FOUND THEN INSERT INTO public.state_metric_history(game_id,metric_id,metric_key,value,previous_value,delta,source_type,source_id,actor_id,note) VALUES(c.game_id,mid,v.key,newval,oldval,newval-oldval,'event_collective',c.id::text,NULL,'Коллективное решение: '||c.title);END IF;
+  IF FOUND THEN result:=result||jsonb_build_object(v.key,newval-oldval);INSERT INTO public.state_metric_history(game_id,metric_id,metric_key,value,previous_value,delta,source_type,source_id,actor_id,note) VALUES(c.game_id,mid,v.key,newval,oldval,newval-oldval,'event_collective',c.id::text,NULL,'Коллективное решение: '||c.title);ELSE result:=result||jsonb_build_object(v.key,0);END IF;
  END LOOP;
+ RETURN result;
 END $f$;
 REVOKE ALL ON FUNCTION private.event_v2_validate_collective(jsonb,jsonb,jsonb),private.event_v2_apply_collective_metrics(uuid,text) FROM PUBLIC,anon,authenticated;
 CREATE OR REPLACE FUNCTION public.finalize_event_case_round(p_case_id uuid,p_round integer) RETURNS jsonb
@@ -52,7 +55,7 @@ CREATE OR REPLACE FUNCTION private.finalize_game_case(p_case uuid, p_allow_pendi
 AS $function$
 declare c public.event_cases%rowtype;n integer;assigned integer;yes_count integer;no_count integer;
  winner text;requested numeric:=0;actual numeric:=0;info jsonb;post_id uuid;author uuid;media text;label text;
- tallies jsonb;best integer;winners integer;idx integer;kind text;lead text;body text;pending integer;v_round int:=1;v_finalists jsonb;v_cutoff int;v_collective boolean:=false;
+ tallies jsonb;best integer;winners integer;idx integer;kind text;lead text;body text;pending integer;v_round int:=1;v_finalists jsonb;v_cutoff int;v_collective boolean:=false;v_effects jsonb;
 begin
  select * into c from public.event_cases where id=p_case for update;
  if c.id is null then raise exception 'Событие недоступно';end if;
@@ -95,8 +98,11 @@ begin
   (case choice when 'accept' then 0 when 'reject' then 1 else substring(choice from 8)::integer-1 end)->>'trust')::numeric,0)<0)
  into yes_count,no_count from public.event_decisions where case_id=c.id and vote_round=v_round;
  label:=case when winner='tie' then 'Большинство участников не поддержало единый вариант — решение не принято' else c.decision_options->>idx end;
- perform private.apply_event_trust_delta(c.game_id,'choice-'||c.id,requested,'Итог события: '||c.title||'; '||label);
- select delta into actual from public.event_trust_ledger where game_id=c.game_id and action_key='choice-'||c.id;
+ if not (v_collective and winner='tie') then
+  perform private.apply_event_trust_delta(c.game_id,'choice-'||c.id,requested,'Итог события: '||c.title||'; '||label);
+  select delta into actual from public.event_trust_ledger where game_id=c.game_id and action_key='choice-'||c.id;
+ end if;
+ if v_collective then v_effects:=private.event_v2_apply_collective_metrics(c.id,winner);end if;
  media:=coalesce(nullif(c.comic_scene->>'media_label',''),case
   when c.category ilike '%Эколог%' then 'Экологический Вестник Республики'
   when c.category ilike '%Эконом%' then 'Деловая Газета Республики'
@@ -116,8 +122,8 @@ begin
   'events',c.id::text,'published',c.comic_scene||jsonb_build_object('title',c.title,'category',c.category,'case_key',c.case_key),true)
  returning id into post_id;
  insert into public.event_case_outcomes(game_id,case_id,winner,yes_votes,no_votes,votes_count,assignments_count,
-  trust_delta,requested_trust_delta,resolution_kind,option_tallies,media_post_id)
- values(c.game_id,c.id,winner,yes_count,no_count,n,assigned,actual,requested,kind,tallies,post_id);
+  trust_delta,requested_trust_delta,resolution_kind,option_tallies,media_post_id,collective_metric_effects)
+ values(c.game_id,c.id,winner,yes_count,no_count,n,assigned,actual,requested,kind,tallies,post_id,v_effects);
  update public.event_assignments set status='resolved' where case_id=c.id and status='pending';
  return jsonb_build_object('winner',winner,'trust_delta',actual,'requested_trust_delta',requested,'post_id',post_id);
 end;
@@ -261,3 +267,47 @@ begin
  end if;
 end;
 $function$;
+
+CREATE OR REPLACE FUNCTION public.event_feed_compact_summary(p_game_id uuid, p_case_ids uuid[])
+ RETURNS jsonb
+ LANGUAGE plpgsql
+ STABLE SECURITY DEFINER
+ SET search_path TO ''
+AS $function$
+DECLARE
+ v_teacher boolean;
+ v_titles jsonb;
+ v_positive integer := 0;
+ v_negative integer := 0;
+BEGIN
+ IF (SELECT auth.uid()) IS NULL OR p_game_id IS NULL OR p_case_ids IS NULL
+   OR cardinality(p_case_ids) > 400 OR NOT private.is_game_member(p_game_id) THEN
+  RAISE EXCEPTION 'Нет доступа к игре или неверный запрос.' USING errcode='42501';
+ END IF;
+ v_teacher := private.is_game_teacher(p_game_id);
+ SELECT coalesce(jsonb_agg(jsonb_build_object('id',c.id,'title',c.title) ORDER BY c.id),'[]'::jsonb)
+ INTO v_titles
+ FROM public.event_cases c
+ WHERE c.game_id=p_game_id AND c.id=ANY(p_case_ids)
+   AND (v_teacher OR (private.is_game_member(c.game_id) AND private.assigned_game_case(c.id,c.game_id)));
+ IF v_teacher THEN
+  SELECT count(*) FILTER(WHERE score>0),count(*) FILTER(WHERE score<0)
+  INTO v_positive,v_negative
+  FROM (
+   SELECT coalesce((
+    c.effect_plan->'options'->(
+     CASE WHEN d.choice='accept' THEN 0
+          WHEN d.choice='reject' THEN 1
+          WHEN d.choice ~ '^option_[0-9]+$' THEN substring(d.choice from 8)::integer-1
+          ELSE NULL END
+    )->>'trust'
+   )::numeric,0) AS score
+   FROM public.event_decisions d
+   INNER JOIN public.event_cases c ON c.id=d.case_id AND c.game_id=d.game_id
+   WHERE d.game_id=p_game_id AND d.vote_round=coalesce((c.comic_scene->>'vote_round')::int,1)
+  ) evaluated;
+ END IF;
+ RETURN jsonb_build_object('titles',v_titles,
+   'positive',CASE WHEN v_teacher THEN v_positive ELSE NULL END,
+   'negative',CASE WHEN v_teacher THEN v_negative ELSE NULL END);
+END $function$;

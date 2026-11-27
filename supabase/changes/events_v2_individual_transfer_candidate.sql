@@ -133,7 +133,7 @@ begin
  select * into c from public.event_cases where id=new.case_id for update;
  select * into a from public.event_assignments where id=new.assignment_id;
  if c.id is null or a.case_id<>c.id or a.game_id<>new.game_id or a.recipient_id<>new.actor_id or a.status<>'pending' or new.actor_id<>auth.uid() then raise exception 'Некорректное назначение';end if;
- if not exists(select 1 from public.game_members where game_id=c.game_id and user_id=auth.uid() and kind='student' and (not coalesce((c.audience='single' AND c.effect_plan->>'rules_version'='2'),false) or roster_archived_at is null)) then raise exception 'Голосует только участник';end if;
+ if not exists(select 1 from public.game_members where game_id=c.game_id and user_id=auth.uid() and kind='student' and (c.effect_plan->>'rules_version' IS DISTINCT FROM '2' or roster_archived_at is null)) then raise exception 'Голосует только участник';end if;
  if exists(select 1 from public.event_case_outcomes where case_id=c.id) or exists(select 1 from public.event_collaboration_invites where case_id=c.id and status='pending') then raise exception 'Дождитесь ответа на приглашения';end if;
  if new.choice!~'^option_[1-6]$' or substring(new.choice from 8)::int>jsonb_array_length(c.decision_options) then raise exception 'Вариант недоступен';end if;
  if (c.audience IN ('group','all') AND c.effect_plan->>'rules_version'='2') then
@@ -152,7 +152,7 @@ AS $function$
 declare c public.event_cases%rowtype;d record;o jsonb;qualified uuid[];ok boolean;lawful boolean;v_stage integer;violations int:=0;legal_delta numeric;v_authority_delta numeric;old_value numeric;new_value numeric;m public.state_metrics%rowtype;
 begin
  select * into c from public.event_cases where id=new.case_id;
- if (c.audience IN ('group','all') AND c.effect_plan->>'rules_version'='2') then perform private.event_v2_apply_collective_metrics(c.id,new.winner);return new;end if;
+ if (c.audience IN ('group','all') AND c.effect_plan->>'rules_version'='2') then return new;end if;
  -- Each decision inherits its assignment's immutable stage. Parallel stages
  -- must never use the highest currently opened stage as attribution.
  for d in select * from public.event_decisions where case_id=c.id loop
@@ -514,7 +514,7 @@ BEGIN
    FROM (SELECT id,case_id,actor_id,choice,role_snapshot,vote_round FROM public.event_decisions
     WHERE game_id=p_game_id AND (v_full_view OR case_id=ANY(v_cases))) x),'[]'::jsonb),
   'outcomes',coalesce((SELECT jsonb_agg(to_jsonb(x) ORDER BY x.case_id)
-   FROM (SELECT o.case_id,o.winner,o.trust_delta,o.votes_count,o.assignments_count,o.media_post_id,o.requested_trust_delta,o.resolution_kind,
+   FROM (SELECT o.case_id,o.winner,o.trust_delta,o.votes_count,o.assignments_count,o.media_post_id,o.requested_trust_delta,o.resolution_kind,o.collective_metric_effects,
      (v_winning->(o.case_id::text)->'winning_fiscal_effect') AS winning_fiscal_effect,
      (v_winning->(o.case_id::text)->>'winning_description') AS winning_description
    FROM public.event_case_outcomes o
