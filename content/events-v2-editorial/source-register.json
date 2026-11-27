@@ -2854,9 +2854,9 @@
       "source_url": "https://67.mchs.gov.ru/deyatelnost/press-centr/novosti/5250655",
       "source_status": "official_search_index_core_episode_confirmed_full_text_unavailable",
       "resolved_source_url": null,
-      "legal_basis": "Статья 30 Федерального закона от 08.11.2007 № 257-ФЗ регулирует временное ограничение или прекращение движения, организацию объезда и информирование пользователей. Она не освобождает от отдельных процедур обследования и финансирования реконструкции. Источники: https://www.consultant.ru/document/cons_doc_LAW_72386/",
+      "legal_basis": "257-ФЗ, ст. 30: ограничение или прекращение движения и информирование об объезде осуществляются по компетенции владельца дороги и уполномоченных органов; статья не регулирует все спасательные полномочия. 68-ФЗ и специальные правила спасательных работ требуют отдельной проверки. В учебном выборе оценивается организационный план, а не самостоятельное распоряжение депутата аварийными службами.",
       "legal_urls": [
-        "https://www.consultant.ru/document/cons_doc_LAW_72386/"
+        "https://www.consultant.ru/document/cons_doc_LAW_72386/d815e149e72342151144533709e7ebcf7aa60b8c/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
@@ -2864,7 +2864,8 @@
         "https://www.consultant.ru/document/cons_doc_LAW_72386/d815e149e72342151144533709e7ebcf7aa60b8c/"
       ],
       "option_analysis_status": "draft",
-      "source_scope": "specific_federal_norm_checked_partial"
+      "source_scope": "specific_norm_and_related_search_results_partial",
+      "review_date": "2026-11-27"
     },
     {
       "case_key": "bank-budget-health",
@@ -2873,9 +2874,10 @@
       "source_url": "https://epp.genproc.gov.ru/ru/proc_70/mass-media/news/main/e6347877/",
       "source_status": "official_article_read_core_episode_confirmed",
       "resolved_source_url": null,
-      "legal_basis": "Статья 10 Федерального закона от 21.11.2011 № 323-ФЗ связывает доступность медицинской помощи в том числе с организацией её оказания и необходимым количеством квалифицированных медицинских работников. Источники: https://mintrud.gov.ru/docs/laws/104",
+      "legal_basis": "323-ФЗ, ст. 10 и 79: доступность связана с реальной организацией помощи и кадровыми возможностями; сведения о доступности должны быть достоверны. Направление в другие учреждения возможно по применимым правилам; доступность измеряется реальными приёмами, а не только количеством талонов.",
       "legal_urls": [
-        "https://mintrud.gov.ru/docs/laws/104"
+        "https://www.consultant.ru/document/cons_doc_LAW_121895/e63d3344841b2f5636a73710e906a23ebaf9ab82/",
+        "https://www.consultant.ru/document/cons_doc_LAW_121895/256d3c9ccb172b31210f5f1728fd5a3f538a3cce/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
@@ -2883,7 +2885,8 @@
         "https://www.consultant.ru/document/cons_doc_LAW_121895/e63d3344841b2f5636a73710e906a23ebaf9ab82/"
       ],
       "option_analysis_status": "draft",
-      "source_scope": "specific_federal_norm_checked_partial"
+      "source_scope": "specific_norm_and_related_search_results_partial",
+      "review_date": "2026-11-27"
     },
     {
       "case_key": "bank-budget-school",
@@ -2892,9 +2895,9 @@
       "source_url": "https://epp.genproc.gov.ru/ru/proc_63/mass-media/news/regional/e5982928/",
       "source_status": "official_search_index_core_episode_confirmed_full_text_unavailable",
       "resolved_source_url": null,
-      "legal_basis": "Часть 6 статьи 28 и статья 41 Федерального закона от 29.12.2012 № 273-ФЗ требуют обеспечивать безопасные условия обучения и охрану здоровья обучающихся; ремонт и финансирование оформляются в пределах компетенции школы и учредителя. Источники: https://www.consultant.ru/document/cons_doc_LAW_140174/",
+      "legal_basis": "273-ФЗ от 29.12.2012, ст. 28, ч. 6 п. 2, ст. 41: школа обязана обеспечивать безопасные условия обучения и охрану здоровья. Технические и финансовые решения принимаются в применимой компетенции; в учебной постановке нельзя продолжать занятия в признанных опасными помещениях.",
       "legal_urls": [
-        "https://www.consultant.ru/document/cons_doc_LAW_140174/"
+        "https://www.consultant.ru/document/cons_doc_LAW_140174/552097cad5942f36c9484dbde7ebf92db1f783f3/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
@@ -2903,7 +2906,8 @@
         "https://www.consultant.ru/document/cons_doc_LAW_140174/48b9101fff215f3aeb122d86593a129a34d96d3c/"
       ],
       "option_analysis_status": "draft",
-      "source_scope": "specific_federal_norm_checked_partial"
+      "source_scope": "specific_norm_and_related_search_results_partial",
+      "review_date": "2026-11-27"
     },
     {
       "case_key": "bank-bus",
@@ -2912,15 +2916,16 @@
       "source_url": "https://epp.genproc.gov.ru/ru/gprf/mass-media/news/archive/e476430/",
       "source_status": "official_search_index_core_episode_confirmed_full_text_unavailable",
       "resolved_source_url": null,
-      "legal_basis": "Статья 14 Федерального закона от 13.07.2015 № 220-ФЗ предусматривает организацию регулярных перевозок по регулируемым тарифам на предусмотренном законом договорном основании. Изменения оформляет уполномоченный участник, а не случайный организатор поездок. Источники: https://www.consultant.ru/document/cons_doc_LAW_182659/",
+      "legal_basis": "220-ФЗ, ст. 14: при регулируемых тарифах перевозки организуются на предусмотренном законом договорном основании; конкретное изменение расписания и маршрута зависит от вида маршрута, договора и компетенции. Фактическое исполнение нельзя подменять опубликованным графиком. Вид тарифа исторического маршрута не подтверждён в данном проходе.",
       "legal_urls": [
-        "https://www.consultant.ru/document/cons_doc_LAW_182659/"
+        "https://www.consultant.ru/document/cons_doc_LAW_182659/2a81d1737eb14693e515423a77157b0fb20088c8/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
       "checked_norm_urls": [],
       "option_analysis_status": "draft",
-      "source_scope": "inherited_basis_requires_current_verification"
+      "source_scope": "specific_norm_and_related_search_results_partial",
+      "review_date": "2026-11-27"
     },
     {
       "case_key": "bank-cat-mayor",
@@ -2929,9 +2934,11 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "Статьи 5 и 7 Федерального закона от 27.07.2006 № 152-ФЗ закрепляют ограничение обработки конкретной целью и конфиденциальность персональных данных. Открытое размещение требует самостоятельного законного основания; случайное присутствие документа в кадре его не создаёт. Источники: https://mintrud.gov.ru/docs/laws/130",
+      "legal_basis": "152-ФЗ, ст. 5, 7; ГК РФ, ст. 152.2: без самостоятельного законного основания нельзя раскрывать идентифицируемые личные сведения. Удаление звука, ограничение комментариев и согласие автора записи не заменяют проверку прав субъекта данных. Для передачи оригинала проверяется необходимость доступа.",
       "legal_urls": [
-        "https://mintrud.gov.ru/docs/laws/130"
+        "https://www.consultant.ru/document/cons_doc_LAW_61801/96fbc469f91f57235cc842a85e0516a99f23dc85/",
+        "https://www.consultant.ru/document/cons_doc_LAW_61801/a15bab6050028753706f22c32fe60627a7be79f9/",
+        "https://www.consultant.ru/document/cons_doc_LAW_5142/9c307a0f2164645c15ca4e3146ff5f6e56060b23/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
@@ -2940,7 +2947,8 @@
         "https://www.consultant.ru/document/cons_doc_LAW_61801/a15bab6050028753706f22c32fe60627a7be79f9/"
       ],
       "option_analysis_status": "draft",
-      "source_scope": "specific_federal_norm_checked_partial"
+      "source_scope": "specific_norm_and_related_search_results_partial",
+      "review_date": "2026-11-27"
     },
     {
       "case_key": "bank-ceremony",
@@ -2949,16 +2957,16 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "Статья 309 ГК РФ требует надлежащего исполнения обязательства по его условиям; статья 34 БК РФ закрепляет эффективность бюджетных расходов. Конкретный церемониальный жест законом не предписан: его меняют в пределах договора и полномочий организатора. Источники: https://11.rosguard.gov.ru/uploads/2025/07/5_grazhdanskijj_kodeks_rossijjskojj_federacii_chast_pervaya.pdf https://www.consultant.ru/document/cons_doc_LAW_19702/",
+      "legal_basis": "ГК РФ, ст. 309; БК РФ, ст. 34: исполнение договора по его условиям и эффективность расходов. Закон не устанавливает обязательный церемониальный жест. Дополнительную закупку нельзя оформлять распоряжением неуполномоченной ведущей; необходимость и законное основание должны быть проверены до обязательства.",
       "legal_urls": [
-        "https://11.rosguard.gov.ru/uploads/2025/07/5_grazhdanskijj_kodeks_rossijjskojj_federacii_chast_pervaya.pdf",
-        "https://www.consultant.ru/document/cons_doc_LAW_19702/"
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/9d0dc5bffbe52f6f95e97813e0ef420708952b4e/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
       "checked_norm_urls": [],
       "option_analysis_status": "draft",
-      "source_scope": "inherited_basis_requires_current_verification"
+      "source_scope": "specific_norm_and_related_search_results_partial",
+      "review_date": "2026-11-27"
     },
     {
       "case_key": "bank-curated-light-01",
@@ -2967,9 +2975,10 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "Статьи 1229 и 1259 ГК РФ охраняют права автора изображения; использование требует предусмотренного законом основания. Открытый конкурс здесь является обоснованным способом выбора, а не безусловной федеральной обязанностью для любого талисмана. Источники: https://www.consultant.ru/document/cons_doc_LAW_64629/",
+      "legal_basis": "ГК РФ, ст. 1229, 1259, 1270, 1286: охраняемая работа используется по разрешению правообладателя или предусмотренному исключению. Возраст автора и полномочия представителей проверяются отдельно по ст. 26 и другим нормам; в истории разрешение касалось выставки, не тиража. Прозрачность конкурса — управленческий критерий, не универсальная обязанность.",
       "legal_urls": [
-        "https://www.consultant.ru/document/cons_doc_LAW_64629/"
+        "https://www.consultant.ru/document/cons_doc_LAW_64629/98ad2641f95945c4b7956150260564c8b44028d9/",
+        "https://www.consultant.ru/document/cons_doc_LAW_5142/7b6abd47219e2aa6081ac21b41e9e83d80fb45df/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
@@ -2977,7 +2986,8 @@
         "https://www.consultant.ru/document/cons_doc_LAW_64629/98ad2641f95945c4b7956150260564c8b44028d9/"
       ],
       "option_analysis_status": "draft",
-      "source_scope": "specific_federal_norm_checked_partial"
+      "source_scope": "specific_norm_and_related_search_results_partial",
+      "review_date": "2026-11-27"
     },
     {
       "case_key": "bank-curated-light-02",
@@ -2986,10 +2996,11 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "Статья 44 Конституции РФ гарантирует свободу творчества и участие в культурной жизни. Статьи 5 и 7 Закона № 152-ФЗ ограничивают обработку персональных данных и требуют конфиденциальности. Показ исторической процедуры не требует раскрытия личности заявителя. Источники: https://minjust.gov.ru/ru/documents/8011/ https://mintrud.gov.ru/docs/laws/130",
+      "legal_basis": "152-ФЗ, ст. 7, 10; Конституция РФ, ст. 44: культурная деятельность не отменяет конфиденциальность и особый режим сведений о здоровье. Обезличивание должно исключать идентификацию; права на изображения проверяются отдельно.",
       "legal_urls": [
         "https://minjust.gov.ru/ru/documents/8011/",
-        "https://mintrud.gov.ru/docs/laws/130"
+        "https://www.consultant.ru/document/cons_doc_LAW_61801/a15bab6050028753706f22c32fe60627a7be79f9/",
+        "https://www.consultant.ru/document/cons_doc_LAW_61801/26edb2934b899bf9c74c3a8f7e574651c6565e6d/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
@@ -2998,7 +3009,8 @@
         "https://www.consultant.ru/document/cons_doc_LAW_61801/26edb2934b899bf9c74c3a8f7e574651c6565e6d/"
       ],
       "option_analysis_status": "draft",
-      "source_scope": "specific_federal_norm_checked_partial"
+      "source_scope": "specific_norm_and_related_search_results_partial",
+      "review_date": "2026-11-27"
     },
     {
       "case_key": "bank-curated-light-03",
@@ -3007,15 +3019,16 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "Статья 13 Закона от 27.12.2018 № 498-ФЗ требует безопасности при выгуле и соблюдения установленных требований; конкретные допустимые территории проверяются по региональным и местным правилам. Согласованный график не легализует запрещённое использование участка. Источники: https://base.garant.ru/72139416/4d6cc5b8235f826b2c67847b967f8695/",
+      "legal_basis": "498-ФЗ, ст. 13: при выгуле соблюдаются требования безопасности и установленные ограничения. Назначение участка и конкретные местные правила не названы: ни отсутствие построек, ни согласие жителей не устанавливают разрешённое использование. Условие выбора — не начинать работы до компетентного решения.",
       "legal_urls": [
-        "https://base.garant.ru/72139416/4d6cc5b8235f826b2c67847b967f8695/"
+        "https://www.consultant.ru/document/cons_doc_LAW_314646/8542fa4c9d641b61bf26a98656aae6b4ae72b5dd/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
       "checked_norm_urls": [],
       "option_analysis_status": "draft",
-      "source_scope": "inherited_basis_requires_current_verification"
+      "source_scope": "specific_norm_and_related_search_results_partial",
+      "review_date": "2026-11-27"
     },
     {
       "case_key": "bank-curated-light-04",
@@ -3024,10 +3037,10 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "Статьи 14 и 15 Закона от 24.11.1995 № 181-ФЗ предусматривают доступность информации и транспортной инфраструктуры. Статья 1229 ГК РФ требует законного основания использования охраняемых произведений; бесплатное чтение автором не означает передачи всех прав на запись. Источники: https://mintrud.gov.ru/docs/laws/75 https://www.consultant.ru/document/cons_doc_LAW_64629/",
+      "legal_basis": "181-ФЗ, ст. 15; ГК РФ, ст. 1229: условия доступного пользования транспортом и информацией должны сохраняться. Разрешение автора текста не означает разрешение правообладателя записи. Специальные требования к информированию пассажиров проверяются отдельно; литературный формат не заменяет доступные объявления.",
       "legal_urls": [
-        "https://mintrud.gov.ru/docs/laws/75",
-        "https://www.consultant.ru/document/cons_doc_LAW_64629/"
+        "https://www.consultant.ru/document/cons_doc_LAW_8559/1f3d91284a26982ce51392b5fd178e392fe53404/",
+        "https://www.consultant.ru/document/cons_doc_LAW_64629/98ad2641f95945c4b7956150260564c8b44028d9/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
@@ -3035,7 +3048,8 @@
         "https://www.consultant.ru/document/cons_doc_LAW_64629/98ad2641f95945c4b7956150260564c8b44028d9/"
       ],
       "option_analysis_status": "draft",
-      "source_scope": "specific_federal_norm_checked_partial"
+      "source_scope": "specific_norm_and_related_search_results_partial",
+      "review_date": "2026-11-27"
     },
     {
       "case_key": "bank-curated-light-05",
@@ -3044,16 +3058,17 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "Статья 34 БК РФ требует эффективности использования бюджетных средств. Статья 33 Закона № 44-ФЗ регулирует описание объекта закупки: требования должны соответствовать потребности заказчика. Испытание прототипа здесь — способ обосновать решение, а не обязательная процедура для любой скамейки. Источники: https://www.consultant.ru/document/cons_doc_LAW_19702/ https://mintrud.gov.ru/docs/laws/116",
+      "legal_basis": "БК РФ, ст. 34; 44-ФЗ, ст. 33: эффективность расходования и обоснование характеристик закупки. Испытание прототипа — управленческий инструмент, не универсальная юридическая обязанность. В истории фактически обозначены препятствия для уборки и доступа к люкам; обязательные технические требования проверяются до утверждения проекта.",
       "legal_urls": [
-        "https://www.consultant.ru/document/cons_doc_LAW_19702/",
-        "https://mintrud.gov.ru/docs/laws/116"
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/9d0dc5bffbe52f6f95e97813e0ef420708952b4e/",
+        "https://www.consultant.ru/document/cons_doc_LAW_144624/d6aec91603ff628ea274b8552ce2849e06e0aa4c/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
       "checked_norm_urls": [],
       "option_analysis_status": "draft",
-      "source_scope": "inherited_basis_requires_current_verification"
+      "source_scope": "specific_norm_and_related_search_results_partial",
+      "review_date": "2026-11-27"
     },
     {
       "case_key": "bank-curated-light-06",
@@ -3062,10 +3077,10 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "Статья 33 Конституции РФ закрепляет право граждан на обращения. Статьи 8 и 10 Закона № 59-ФЗ предусматривают регистрацию, направление по компетенции и рассмотрение поступивших обращений. Игровые фишки не являются решением органа власти и не заменяют ответ заявителю. Источники: https://minjust.gov.ru/ru/documents/8011/ https://mintrud.gov.ru/docs/laws/108",
+      "legal_basis": "59-ФЗ, ст. 8, 10: обращения, поступившие в установленном порядке, регистрируются и рассматриваются по компетенции; игровая активность сама по себе не является официальным обращением. Учебные карточки не наделяют авторов правом устанавливать обязательные правила услуг.",
       "legal_urls": [
         "https://minjust.gov.ru/ru/documents/8011/",
-        "https://mintrud.gov.ru/docs/laws/108"
+        "https://www.consultant.ru/document/cons_doc_LAW_59999/ca24c3b3a2032a1f727146f988f406723bf9ea1a/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
@@ -3073,7 +3088,8 @@
         "https://www.consultant.ru/document/cons_doc_LAW_59999/"
       ],
       "option_analysis_status": "draft",
-      "source_scope": "specific_federal_norm_checked_partial"
+      "source_scope": "specific_norm_and_related_search_results_partial",
+      "review_date": "2026-11-27"
     },
     {
       "case_key": "bank-curated-light-07",

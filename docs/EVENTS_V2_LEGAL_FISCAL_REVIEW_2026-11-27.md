@@ -872,3 +872,190 @@
   }
 }
 ```
+
+## Индивидуальные кейсы 1–12, устранение неопределённых вариантов
+12 ситуаций / 60 вариантов. Условные варианты заменены конкретными допустимыми, но неполными действиями; прежний ключ не изменён. Для каждого кейса дана отдельная редакционная квалификация полномочий; машинное соответствие игровым ролям пока не проверено, authorized_roles сохранены. Источники норм просмотрены в доступных фрагментах, фактические первоисточники происшествий в этом проходе не перепроверялись. Снято 26 lawful:null за счёт изменения формулировок, не автоматической маркировки. Все записи остаются черновиками и заблокированы для выпуска. Полный пересчёт банка на родительском коммите e39f6a7: 330/1660, 180 прямых и 87 расширенных перекосов, 300 неопределённых индивидуальных альтернатив, структурных нарушений не выявлено. После этой редакции ожидается 274 неопределённых, проверить полным пересчётом. Адресная проверка:
+```json
+[
+  {
+    "key": "bank-budget-bridge",
+    "before": 2,
+    "after": 0,
+    "best": "option_5",
+    "options": 5,
+    "lengths": [
+      107,
+      114,
+      107,
+      124,
+      119
+    ],
+    "history_protected": false
+  },
+  {
+    "key": "bank-budget-health",
+    "before": 1,
+    "after": 0,
+    "best": "option_2",
+    "options": 5,
+    "lengths": [
+      112,
+      117,
+      116,
+      105,
+      136
+    ],
+    "history_protected": false
+  },
+  {
+    "key": "bank-budget-school",
+    "before": 2,
+    "after": 0,
+    "best": "option_4",
+    "options": 5,
+    "lengths": [
+      113,
+      125,
+      113,
+      117,
+      105
+    ],
+    "history_protected": false
+  },
+  {
+    "key": "bank-bus",
+    "before": 2,
+    "after": 0,
+    "best": "option_1",
+    "options": 5,
+    "lengths": [
+      117,
+      120,
+      129,
+      134,
+      121
+    ],
+    "history_protected": false
+  },
+  {
+    "key": "bank-cat-mayor",
+    "before": 2,
+    "after": 0,
+    "best": "option_3",
+    "options": 5,
+    "lengths": [
+      127,
+      123,
+      120,
+      111,
+      112
+    ],
+    "history_protected": false
+  },
+  {
+    "key": "bank-ceremony",
+    "before": 3,
+    "after": 0,
+    "best": "option_5",
+    "options": 5,
+    "lengths": [
+      111,
+      119,
+      116,
+      127,
+      102
+    ],
+    "history_protected": false
+  },
+  {
+    "key": "bank-curated-light-01",
+    "before": 2,
+    "after": 0,
+    "best": "option_2",
+    "options": 5,
+    "lengths": [
+      134,
+      114,
+      129,
+      120,
+      118
+    ],
+    "history_protected": false
+  },
+  {
+    "key": "bank-curated-light-02",
+    "before": 1,
+    "after": 0,
+    "best": "option_4",
+    "options": 5,
+    "lengths": [
+      118,
+      122,
+      135,
+      104,
+      113
+    ],
+    "history_protected": false
+  },
+  {
+    "key": "bank-curated-light-03",
+    "before": 4,
+    "after": 0,
+    "best": "option_1",
+    "options": 5,
+    "lengths": [
+      116,
+      113,
+      121,
+      117,
+      117
+    ],
+    "history_protected": false
+  },
+  {
+    "key": "bank-curated-light-04",
+    "before": 4,
+    "after": 0,
+    "best": "option_3",
+    "options": 5,
+    "lengths": [
+      130,
+      123,
+      110,
+      131,
+      118
+    ],
+    "history_protected": false
+  },
+  {
+    "key": "bank-curated-light-05",
+    "before": 2,
+    "after": 0,
+    "best": "option_5",
+    "options": 5,
+    "lengths": [
+      125,
+      121,
+      110,
+      125,
+      113
+    ],
+    "history_protected": false
+  },
+  {
+    "key": "bank-curated-light-06",
+    "before": 1,
+    "after": 0,
+    "best": "option_2",
+    "options": 5,
+    "lengths": [
+      119,
+      109,
+      106,
+      106,
+      116
+    ],
+    "history_protected": false
+  }
+]
+```
