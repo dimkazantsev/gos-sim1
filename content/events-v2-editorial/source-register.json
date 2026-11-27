@@ -5911,14 +5911,36 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "Статьи 5, 6 и 19 Закона №152-ФЗ требуют законной цели, соразмерного объёма и защиты персональных данных. Применимые авиационные ограничения и порядок использования воздушного пространства соблюдаются отдельно. Не каждая съёмка автоматически является биометрической, но различимые сведения о человеке нельзя использовать для любой цели подрядчика. Источники: https://mintrud.gov.ru/docs/laws/130",
-      "legal_urls": [],
+      "legal_basis": "152-ФЗ, ст. 5, 6, 19: законная цель, минимальный объём, ограниченный срок и защита данных. Полёты регулируются отдельно.",
+      "legal_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_61801/96fbc469f91f57235cc842a85e0516a99f23dc85/",
+        "https://www.consultant.ru/document/cons_doc_LAW_61801/315f051396c88f1e4f827ba3f2ae313d999a1873/",
+        "https://www.consultant.ru/document/cons_doc_LAW_61801/ca9e5658710519f09ab2fdb8196fcb3eb024a051/"
+      ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
       "option_analysis_status": "draft",
-      "checked_norm_urls": [],
-      "source_scope": "inherited_basis_requires_current_verification",
-      "review_date": "2026-11-27"
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_61801/96fbc469f91f57235cc842a85e0516a99f23dc85/",
+        "https://www.consultant.ru/document/cons_doc_LAW_61801/315f051396c88f1e4f827ba3f2ae313d999a1873/",
+        "https://www.consultant.ru/document/cons_doc_LAW_61801/ca9e5658710519f09ab2fdb8196fcb3eb024a051/"
+      ],
+      "source_scope": "specific_norm_and_related_search_results_partial",
+      "review_date": "2026-11-28",
+      "norm_recheck_2026_11_28": {
+        "status": "targeted_norm_and_all_individual_alternatives_reviewed_not_full_acceptance",
+        "limitation": "Режим воздушного пространства и основания конкретного оператора не установлены.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_61801/96fbc469f91f57235cc842a85e0516a99f23dc85/",
+          "https://www.consultant.ru/document/cons_doc_LAW_61801/315f051396c88f1e4f827ba3f2ae313d999a1873/",
+          "https://www.consultant.ru/document/cons_doc_LAW_61801/ca9e5658710519f09ab2fdb8196fcb3eb024a051/"
+        ]
+      },
+      "targeted_individual_review": {
+        "status": "targeted_norm_and_all_individual_alternatives_reviewed_not_full_acceptance",
+        "option_count": 5,
+        "remaining": "Режим воздушного пространства и основания конкретного оператора не установлены."
+      }
     },
     {
       "case_key": "bank-curated-serious-17",
@@ -5995,14 +6017,33 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "Статья 6 Закона №68-ФЗ предусматривает оперативное и достоверное информирование населения об угрозах и защитных мерах. Проверка сообщения и сохранение материалов относятся к компетенции соответствующих служб. Официальное опровержение должно отличать установленный статус от ещё проверяемых обстоятельств. Источники: https://01.mchs.gov.ru/deyatelnost/napravleniya-deyatelnosti/grazhdanskaya-zashchita/preduprezhdenie-chrezvychaynyh-situaciy/1-1-normativnye-pravovye-akty/2-federalnye-zakony/federalnyy-zakon-ot-21-dekabrya-1994-g-n-68-fz-o-zashchite-naseleniya-i-territoriy-ot-chrezvychaynyh-situaciy-prirodnogo-i-tehnogennogo-haraktera",
-      "legal_urls": [],
+      "legal_basis": "68-ФЗ, ст. 6 и 11: компетентные органы обеспечивают своевременное достоверное информирование, официальное предупреждение не заменяется частным сообщением.",
+      "legal_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_5295/511234bf0190c9b2b49d27b4645f9b5de217ae6d/",
+        "https://www.consultant.ru/document/cons_doc_LAW_5295/cf148e8662eafdb9539fb6f19024dfdb5c33aaa2/"
+      ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
       "option_analysis_status": "draft",
-      "checked_norm_urls": [],
-      "source_scope": "inherited_basis_requires_current_verification",
-      "review_date": "2026-11-27"
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_5295/511234bf0190c9b2b49d27b4645f9b5de217ae6d/",
+        "https://www.consultant.ru/document/cons_doc_LAW_5295/cf148e8662eafdb9539fb6f19024dfdb5c33aaa2/"
+      ],
+      "source_scope": "specific_norm_and_related_search_results_partial",
+      "review_date": "2026-11-28",
+      "norm_recheck_2026_11_28": {
+        "status": "targeted_norm_and_all_individual_alternatives_reviewed_not_full_acceptance",
+        "limitation": "Регламент пресс-службы и передачи материалов полиции не установлен.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_5295/511234bf0190c9b2b49d27b4645f9b5de217ae6d/",
+          "https://www.consultant.ru/document/cons_doc_LAW_5295/cf148e8662eafdb9539fb6f19024dfdb5c33aaa2/"
+        ]
+      },
+      "targeted_individual_review": {
+        "status": "targeted_norm_and_all_individual_alternatives_reviewed_not_full_acceptance",
+        "option_count": 5,
+        "remaining": "Регламент пресс-службы и передачи материалов полиции не установлен."
+      }
     },
     {
       "case_key": "bank-curated-serious-21",
@@ -6155,14 +6196,33 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "Статьи 5 и 21 Закона №152-ФЗ предусматривают точность данных и уточнение недостоверных сведений. Право на конкретную выплату и ручной маршрут определяются применимым актом и регламентом. Исправление технической ошибки не означает предоставление новой льготы или отмену проверок для остальных заявителей. Источники: https://mintrud.gov.ru/docs/laws/130",
-      "legal_urls": [],
+      "legal_basis": "152-ФЗ, ст. 5 ч. 6 и ст. 21 ч. 2: уточнение подтверждённо неточных сведений; блокирование не должно нарушать права. Семь рабочих дней на уточнение в предусмотренном случае не равны сроку выплаты.",
+      "legal_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_61801/96fbc469f91f57235cc842a85e0516a99f23dc85/",
+        "https://www.consultant.ru/document/cons_doc_LAW_61801/d3fe43a7c415353b17faab255bc0de92bea127da/"
+      ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
       "option_analysis_status": "draft",
-      "checked_norm_urls": [],
-      "source_scope": "inherited_basis_requires_current_verification",
-      "review_date": "2026-11-27"
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_61801/96fbc469f91f57235cc842a85e0516a99f23dc85/",
+        "https://www.consultant.ru/document/cons_doc_LAW_61801/d3fe43a7c415353b17faab255bc0de92bea127da/"
+      ],
+      "source_scope": "specific_norm_and_related_search_results_partial",
+      "review_date": "2026-11-28",
+      "norm_recheck_2026_11_28": {
+        "status": "targeted_norm_and_all_individual_alternatives_reviewed_not_full_acceptance",
+        "limitation": "Выплата и обязательность ручного маршрута заданы учебным регламентом, а не 152-ФЗ.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_61801/96fbc469f91f57235cc842a85e0516a99f23dc85/",
+          "https://www.consultant.ru/document/cons_doc_LAW_61801/d3fe43a7c415353b17faab255bc0de92bea127da/"
+        ]
+      },
+      "targeted_individual_review": {
+        "status": "targeted_norm_and_all_individual_alternatives_reviewed_not_full_acceptance",
+        "option_count": 5,
+        "remaining": "Выплата и обязательность ручного маршрута заданы учебным регламентом, а не 152-ФЗ."
+      }
     },
     {
       "case_key": "bank-curated-v2-07",
@@ -6228,13 +6288,36 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "Статья 6 Закона №68-ФЗ предусматривает оперативное достоверное информирование, статья 11 — полномочия по защите населения. Положение о системах оповещения, утверждённое приказом МЧС и Минцифры №578/365, регулирует организацию оповещения. Технический запуск и получение предупреждения населением проверяются как связанные, но разные результаты. Источники: https://01.mchs.gov.ru/deyatelnost/napravleniya-deyatelnosti/grazhdanskaya-zashchita/preduprezhdenie-chrezvychaynyh-situaciy/1-1-normativnye-pravovye-akty/2-federalnye-zakony/federalnyy-zakon-ot-21-dekabrya-1994-g-n-68-fz-o-zashchite-naseleniya-i-territoriy-ot-chrezvychaynyh-situaciy-prirodnogo-i-tehnogennogo-haraktera",
-      "legal_urls": [],
+      "legal_basis": "68-ФЗ, ст. 6 и 11; приказ МЧС и Минцифры от 31.07.2020 №578/365: организация оповещения. Адресный охват — управленческая проверка, не универсальный технический норматив.",
+      "legal_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_5295/511234bf0190c9b2b49d27b4645f9b5de217ae6d/",
+        "https://www.consultant.ru/document/cons_doc_LAW_5295/cf148e8662eafdb9539fb6f19024dfdb5c33aaa2/",
+        "https://mchs.gov.ru/dokumenty/bazovye-normativnye-pravovye-akty/normativnye-pravovye-akty-mchs-rossii/5175"
+      ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
       "option_analysis_status": "draft",
-      "source_scope": "inherited_basis_requires_current_verification",
-      "review_date": "2026-11-27"
+      "source_scope": "specific_norm_and_related_search_results_partial",
+      "review_date": "2026-11-28",
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_5295/511234bf0190c9b2b49d27b4645f9b5de217ae6d/",
+        "https://www.consultant.ru/document/cons_doc_LAW_5295/cf148e8662eafdb9539fb6f19024dfdb5c33aaa2/",
+        "https://mchs.gov.ru/dokumenty/bazovye-normativnye-pravovye-akty/normativnye-pravovye-akty-mchs-rossii/5175"
+      ],
+      "norm_recheck_2026_11_28": {
+        "status": "targeted_norm_and_all_individual_alternatives_reviewed_not_full_acceptance",
+        "limitation": "Официальная карточка приказа найдена; полный технический текст и местные требования не сверены.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_5295/511234bf0190c9b2b49d27b4645f9b5de217ae6d/",
+          "https://www.consultant.ru/document/cons_doc_LAW_5295/cf148e8662eafdb9539fb6f19024dfdb5c33aaa2/",
+          "https://mchs.gov.ru/dokumenty/bazovye-normativnye-pravovye-akty/normativnye-pravovye-akty-mchs-rossii/5175"
+        ]
+      },
+      "targeted_individual_review": {
+        "status": "targeted_norm_and_all_individual_alternatives_reviewed_not_full_acceptance",
+        "option_count": 5,
+        "remaining": "Официальная карточка приказа найдена; полный технический текст и местные требования не сверены."
+      }
     },
     {
       "case_key": "bank-curated-v2-11",
@@ -6487,13 +6570,45 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "Статьи 17.1–17.2 Закона от 11.08.1995 №135-ФЗ регулируют права добровольцев и деятельность организаторов. Специальные аварийно-спасательные работы имеют собственные требования допуска и подготовки. Статьи 5–7 Закона №152-ФЗ ограничивают объём и раскрытие персональных данных; общий чат не является универсальным основанием публикации семейных сведений. Источники: https://55.mchs.gov.ru/uploads/resource/2024-11-19/federalnyy-zakon-ot-11-08-1995-135-fz-o-blagotvoritelnoy-deyatelnosti-i-dobrovolchestve-volonterstve_1732008979979343504.pdf https://mintrud.gov.ru/docs/laws/130",
-      "legal_urls": [],
+      "legal_basis": "135-ФЗ от 11.08.1995, ст. 17.1–17.2: добровольчество и взаимодействие. 151-ФЗ, ст. 23: статус спасателя требует аттестации. 152-ФЗ, ст. 5–7: минимизация и основание раскрытия данных.",
+      "legal_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_7495/d12634a3b32eea709b2c4fc1b24c6533c88154e6/",
+        "https://www.consultant.ru/document/cons_doc_LAW_7495/22e1ff556ca88e8c67cd2fdd322441c5db2a5578/",
+        "https://www.consultant.ru/document/cons_doc_LAW_7746/0cf20b126d8520d6515e74936a1e675e0e19cf0f/",
+        "https://www.consultant.ru/document/cons_doc_LAW_61801/96fbc469f91f57235cc842a85e0516a99f23dc85/",
+        "https://www.consultant.ru/document/cons_doc_LAW_61801/315f051396c88f1e4f827ba3f2ae313d999a1873/",
+        "https://www.consultant.ru/document/cons_doc_LAW_61801/a15bab6050028753706f22c32fe60627a7be79f9/"
+      ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
       "option_analysis_status": "draft",
-      "source_scope": "inherited_basis_requires_current_verification",
-      "review_date": "2026-11-27"
+      "source_scope": "specific_norm_and_related_search_results_partial",
+      "review_date": "2026-11-28",
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_7495/d12634a3b32eea709b2c4fc1b24c6533c88154e6/",
+        "https://www.consultant.ru/document/cons_doc_LAW_7495/22e1ff556ca88e8c67cd2fdd322441c5db2a5578/",
+        "https://www.consultant.ru/document/cons_doc_LAW_7746/0cf20b126d8520d6515e74936a1e675e0e19cf0f/",
+        "https://www.consultant.ru/document/cons_doc_LAW_61801/96fbc469f91f57235cc842a85e0516a99f23dc85/",
+        "https://www.consultant.ru/document/cons_doc_LAW_61801/315f051396c88f1e4f827ba3f2ae313d999a1873/",
+        "https://www.consultant.ru/document/cons_doc_LAW_61801/a15bab6050028753706f22c32fe60627a7be79f9/"
+      ],
+      "norm_recheck_2026_11_28": {
+        "status": "targeted_norm_and_all_individual_alternatives_reviewed_not_full_acceptance",
+        "limitation": "Специальный допуск к опасным работам проверяется отдельно; не вся бытовая помощь требует статуса спасателя.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_7495/d12634a3b32eea709b2c4fc1b24c6533c88154e6/",
+          "https://www.consultant.ru/document/cons_doc_LAW_7495/22e1ff556ca88e8c67cd2fdd322441c5db2a5578/",
+          "https://www.consultant.ru/document/cons_doc_LAW_7746/0cf20b126d8520d6515e74936a1e675e0e19cf0f/",
+          "https://www.consultant.ru/document/cons_doc_LAW_61801/96fbc469f91f57235cc842a85e0516a99f23dc85/",
+          "https://www.consultant.ru/document/cons_doc_LAW_61801/315f051396c88f1e4f827ba3f2ae313d999a1873/",
+          "https://www.consultant.ru/document/cons_doc_LAW_61801/a15bab6050028753706f22c32fe60627a7be79f9/"
+        ]
+      },
+      "targeted_individual_review": {
+        "status": "targeted_norm_and_all_individual_alternatives_reviewed_not_full_acceptance",
+        "option_count": 5,
+        "remaining": "Специальный допуск к опасным работам проверяется отдельно; не вся бытовая помощь требует статуса спасателя."
+      }
     },
     {
       "case_key": "bank-curated-v2-29",
@@ -7233,13 +7348,36 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "Федеральный закон №68-ФЗ, статьи 6, 11 и 14: информирование, полномочия органов и обязанности организаций по защите от ЧС. Наличие угрозы и маршрут определяются оперативной оценкой; учебный пример не устанавливает универсальный порог эвакуации. Источники: https://mchs.gov.ru/dokumenty/bazovye-normativnye-pravovye-akty/federalnye-zakony/5788",
-      "legal_urls": [],
+      "legal_basis": "68-ФЗ, ст. 6, 11, 14: своевременная информация и распределение полномочий при угрозе ЧС. Решение об эвакуации принимает компетентный субъект.",
+      "legal_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_5295/511234bf0190c9b2b49d27b4645f9b5de217ae6d/",
+        "https://www.consultant.ru/document/cons_doc_LAW_5295/cf148e8662eafdb9539fb6f19024dfdb5c33aaa2/",
+        "https://www.consultant.ru/document/cons_doc_LAW_5295/a053d1a23c215d14941f99fd381dba6f90ce4969/"
+      ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
       "option_analysis_status": "draft",
-      "source_scope": "inherited_basis_requires_current_verification",
-      "review_date": "2026-11-27"
+      "source_scope": "specific_norm_and_related_search_results_partial",
+      "review_date": "2026-11-28",
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_5295/511234bf0190c9b2b49d27b4645f9b5de217ae6d/",
+        "https://www.consultant.ru/document/cons_doc_LAW_5295/cf148e8662eafdb9539fb6f19024dfdb5c33aaa2/",
+        "https://www.consultant.ru/document/cons_doc_LAW_5295/a053d1a23c215d14941f99fd381dba6f90ce4969/"
+      ],
+      "norm_recheck_2026_11_28": {
+        "status": "targeted_norm_and_all_individual_alternatives_reviewed_not_full_acceptance",
+        "limitation": "Конкретный уровень реагирования, маршруты и полномочия зависят от оперативного решения.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_5295/511234bf0190c9b2b49d27b4645f9b5de217ae6d/",
+          "https://www.consultant.ru/document/cons_doc_LAW_5295/cf148e8662eafdb9539fb6f19024dfdb5c33aaa2/",
+          "https://www.consultant.ru/document/cons_doc_LAW_5295/a053d1a23c215d14941f99fd381dba6f90ce4969/"
+        ]
+      },
+      "targeted_individual_review": {
+        "status": "targeted_norm_and_all_individual_alternatives_reviewed_not_full_acceptance",
+        "option_count": 6,
+        "remaining": "Конкретный уровень реагирования, маршруты и полномочия зависят от оперативного решения."
+      }
     },
     {
       "case_key": "bank-expanded-serious-07-01",
@@ -7247,14 +7385,48 @@
       "title": "Орск: защита эвакуированных жителей при паводке 2024 года",
       "source_url": "https://epp.genproc.gov.ru/ru/gprf/mass-media/news/main/e470391/",
       "source_status": "official_article_read_core_episode_confirmed",
-      "resolved_source_url": null,
-      "legal_basis": "Федеральный закон №68-ФЗ, статьи 6, 11 и 18: информирование, полномочия по защите населения и права граждан при ЧС. Социальные выплаты, медицинская помощь и охрана имущества осуществляются соответствующими компетентными организациями; единый штаб не отменяет их правовые основания. Источники: https://mchs.gov.ru/dokumenty/bazovye-normativnye-pravovye-akty/federalnye-zakony/5788 https://epp.genproc.gov.ru/ru/gprf/mass-media/news/main/e470391/",
-      "legal_urls": [],
+      "resolved_source_url": "https://epp.genproc.gov.ru/ru/gprf/mass-media/news/main/e470391/",
+      "legal_basis": "68-ФЗ, ст. 6, 11, 18: информирование, полномочия и права граждан при ЧС. Условия и размеры гарантий устанавливаются отдельно. Сообщение Генпрокуратуры от 09.04.2024 подтверждает работу комиссии.",
+      "legal_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_5295/511234bf0190c9b2b49d27b4645f9b5de217ae6d/",
+        "https://www.consultant.ru/document/cons_doc_LAW_5295/cf148e8662eafdb9539fb6f19024dfdb5c33aaa2/",
+        "https://www.consultant.ru/document/cons_doc_LAW_5295/89a47e3902762347b06bc7a5d7c25f74c86fbda0/",
+        "https://epp.genproc.gov.ru/ru/gprf/mass-media/news/main/e470391/"
+      ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
       "option_analysis_status": "draft",
-      "source_scope": "inherited_basis_requires_current_verification",
-      "review_date": "2026-11-27"
+      "source_scope": "specific_norm_and_related_search_results_partial",
+      "review_date": "2026-11-28",
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_5295/511234bf0190c9b2b49d27b4645f9b5de217ae6d/",
+        "https://www.consultant.ru/document/cons_doc_LAW_5295/cf148e8662eafdb9539fb6f19024dfdb5c33aaa2/",
+        "https://www.consultant.ru/document/cons_doc_LAW_5295/89a47e3902762347b06bc7a5d7c25f74c86fbda0/",
+        "https://epp.genproc.gov.ru/ru/gprf/mass-media/news/main/e470391/"
+      ],
+      "norm_recheck_2026_11_28": {
+        "status": "targeted_norm_and_all_individual_alternatives_reviewed_not_full_acceptance",
+        "limitation": "Историческая публикация подтверждает действия комиссии, не получение каждой выплаты; региональные порядки 2024 года отдельно не проверены.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_5295/511234bf0190c9b2b49d27b4645f9b5de217ae6d/",
+          "https://www.consultant.ru/document/cons_doc_LAW_5295/cf148e8662eafdb9539fb6f19024dfdb5c33aaa2/",
+          "https://www.consultant.ru/document/cons_doc_LAW_5295/89a47e3902762347b06bc7a5d7c25f74c86fbda0/",
+          "https://epp.genproc.gov.ru/ru/gprf/mass-media/news/main/e470391/"
+        ]
+      },
+      "targeted_individual_review": {
+        "status": "targeted_norm_and_all_individual_alternatives_reviewed_not_full_acceptance",
+        "option_count": 6,
+        "remaining": "Историческая публикация подтверждает действия комиссии, не получение каждой выплаты; региональные порядки 2024 года отдельно не проверены."
+      },
+      "documentary_recheck": {
+        "date": "2026-11-28",
+        "status": "official_article_reopened_core_episode_confirmed",
+        "additional_source_urls": [
+          "https://epp.genproc.gov.ru/ru/gprf/mass-media/news/main/e470391/"
+        ],
+        "notes": "Подтверждены комиссия, выплаты, средства реабилитации и ПВР в Орске и Новотроицке; не итог каждой выплаты."
+      }
     },
     {
       "case_key": "bank-expanded-serious-08-01",
@@ -7359,13 +7531,36 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "Федеральный закон №68-ФЗ, статьи 6 и 14: информирование и обязанности организаций по защите от ЧС; Федеральный закон №7-ФЗ, статья 11: достоверная экологическая информация. Отсутствие окончательных замеров нельзя скрывать или превращать в установленное отсутствие риска. Источники: https://mchs.gov.ru/dokumenty/bazovye-normativnye-pravovye-akty/federalnye-zakony/5788 https://epp.genproc.gov.ru/upload/iblock/0d0/hghg8nrmg2v25zrox7cvk28868b3fr21.pdf",
-      "legal_urls": [],
+      "legal_basis": "68-ФЗ, ст. 6, 14: достоверная информация и обязанности организации; 7-ФЗ, ст. 11: право на достоверную экологическую информацию. Оценка воздуха и симптомов относится к компетентным специалистам.",
+      "legal_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_5295/511234bf0190c9b2b49d27b4645f9b5de217ae6d/",
+        "https://www.consultant.ru/document/cons_doc_LAW_5295/a053d1a23c215d14941f99fd381dba6f90ce4969/",
+        "https://www.consultant.ru/document/cons_doc_LAW_34823/bff976b2d5a0e4eaf44a1ffbfcefdff8a779515f/"
+      ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
       "option_analysis_status": "draft",
-      "source_scope": "inherited_basis_requires_current_verification",
-      "review_date": "2026-11-27"
+      "source_scope": "specific_norm_and_related_search_results_partial",
+      "review_date": "2026-11-28",
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_5295/511234bf0190c9b2b49d27b4645f9b5de217ae6d/",
+        "https://www.consultant.ru/document/cons_doc_LAW_5295/a053d1a23c215d14941f99fd381dba6f90ce4969/",
+        "https://www.consultant.ru/document/cons_doc_LAW_34823/bff976b2d5a0e4eaf44a1ffbfcefdff8a779515f/"
+      ],
+      "norm_recheck_2026_11_28": {
+        "status": "targeted_norm_and_all_individual_alternatives_reviewed_not_full_acceptance",
+        "limitation": "Вид вещества, специальные требования безопасности и критерии оценки не установлены.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_5295/511234bf0190c9b2b49d27b4645f9b5de217ae6d/",
+          "https://www.consultant.ru/document/cons_doc_LAW_5295/a053d1a23c215d14941f99fd381dba6f90ce4969/",
+          "https://www.consultant.ru/document/cons_doc_LAW_34823/bff976b2d5a0e4eaf44a1ffbfcefdff8a779515f/"
+        ]
+      },
+      "targeted_individual_review": {
+        "status": "targeted_norm_and_all_individual_alternatives_reviewed_not_full_acceptance",
+        "option_count": 6,
+        "remaining": "Вид вещества, специальные требования безопасности и критерии оценки не установлены."
+      }
     },
     {
       "case_key": "bank-expanded-serious-15-01",
@@ -7515,13 +7710,33 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "Федеральный закон №117-ФЗ, статьи 8–9: общие требования безопасности и обязанности собственника и эксплуатирующей организации. Региональное финансирование не снимает эксплуатационные обязанности, а временный режим должен иметь техническое основание. Источники: https://01.mchs.gov.ru/deyatelnost/napravleniya-deyatelnosti/grazhdanskaya-zashchita/preduprezhdenie-chrezvychaynyh-situaciy/1-1-normativnye-pravovye-akty/2-federalnye-zakony/federalnyy-zakon-ot-21-iyulya-1997-g-n-117-fz-o-bezopasnosti-gidrotehnicheskih-sooruzheniy",
-      "legal_urls": [],
+      "legal_basis": "117-ФЗ, ст. 8, 9: допустимый риск, контроль, квалификация, безопасная эксплуатация и проектная документация реконструкции. Ответственность несёт собственник или эксплуатант.",
+      "legal_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_15265/5fad08db97e966e0463657702e4a515649f0da30/",
+        "https://www.consultant.ru/document/cons_doc_LAW_15265/b650c2dccb9363ff0b2efcabd8723ff22c5a55d6/"
+      ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
       "option_analysis_status": "draft",
-      "source_scope": "inherited_basis_requires_current_verification",
-      "review_date": "2026-11-27"
+      "source_scope": "specific_norm_and_related_search_results_partial",
+      "review_date": "2026-11-28",
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_15265/5fad08db97e966e0463657702e4a515649f0da30/",
+        "https://www.consultant.ru/document/cons_doc_LAW_15265/b650c2dccb9363ff0b2efcabd8723ff22c5a55d6/"
+      ],
+      "norm_recheck_2026_11_28": {
+        "status": "targeted_norm_and_all_individual_alternatives_reviewed_not_full_acceptance",
+        "limitation": "Класс сооружения и технические условия не установлены; будущие редакции 2027 года не применяются.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_15265/5fad08db97e966e0463657702e4a515649f0da30/",
+          "https://www.consultant.ru/document/cons_doc_LAW_15265/b650c2dccb9363ff0b2efcabd8723ff22c5a55d6/"
+        ]
+      },
+      "targeted_individual_review": {
+        "status": "targeted_norm_and_all_individual_alternatives_reviewed_not_full_acceptance",
+        "option_count": 5,
+        "remaining": "Класс сооружения и технические условия не установлены; будущие редакции 2027 года не применяются."
+      }
     },
     {
       "case_key": "bank-expanded-serious-25-01",
@@ -7575,13 +7790,36 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "Федеральный закон №68-ФЗ, статьи 6, 11 и 14: информирование и организация мер защиты в пределах компетенции. Ответственный канал, техническое подключение и подтверждение получения являются различными действиями; сам закон не объявляет любую отправку сообщения успешным оповещением. Источники: https://mchs.gov.ru/dokumenty/bazovye-normativnye-pravovye-akty/federalnye-zakony/5788",
-      "legal_urls": [],
+      "legal_basis": "68-ФЗ, ст. 6, 11, 14: своевременная информация и организационные обязанности. Двусторонняя проверка связи — условие надёжной координации, не универсальный технический норматив.",
+      "legal_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_5295/511234bf0190c9b2b49d27b4645f9b5de217ae6d/",
+        "https://www.consultant.ru/document/cons_doc_LAW_5295/cf148e8662eafdb9539fb6f19024dfdb5c33aaa2/",
+        "https://www.consultant.ru/document/cons_doc_LAW_5295/a053d1a23c215d14941f99fd381dba6f90ce4969/"
+      ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
       "option_analysis_status": "draft",
-      "source_scope": "inherited_basis_requires_current_verification",
-      "review_date": "2026-11-27"
+      "source_scope": "specific_norm_and_related_search_results_partial",
+      "review_date": "2026-11-28",
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_5295/511234bf0190c9b2b49d27b4645f9b5de217ae6d/",
+        "https://www.consultant.ru/document/cons_doc_LAW_5295/cf148e8662eafdb9539fb6f19024dfdb5c33aaa2/",
+        "https://www.consultant.ru/document/cons_doc_LAW_5295/a053d1a23c215d14941f99fd381dba6f90ce4969/"
+      ],
+      "norm_recheck_2026_11_28": {
+        "status": "targeted_norm_and_all_individual_alternatives_reviewed_not_full_acceptance",
+        "limitation": "Конкретное подключение и эксплуатационные разрешения определяются оператором.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_5295/511234bf0190c9b2b49d27b4645f9b5de217ae6d/",
+          "https://www.consultant.ru/document/cons_doc_LAW_5295/cf148e8662eafdb9539fb6f19024dfdb5c33aaa2/",
+          "https://www.consultant.ru/document/cons_doc_LAW_5295/a053d1a23c215d14941f99fd381dba6f90ce4969/"
+        ]
+      },
+      "targeted_individual_review": {
+        "status": "targeted_norm_and_all_individual_alternatives_reviewed_not_full_acceptance",
+        "option_count": 6,
+        "remaining": "Конкретное подключение и эксплуатационные разрешения определяются оператором."
+      }
     },
     {
       "case_key": "bank-expanded-serious-29-01",
