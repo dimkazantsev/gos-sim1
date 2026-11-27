@@ -19,7 +19,8 @@
         "https://www.consultant.ru/document/cons_doc_LAW_19702/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "financial_review_status": "draft_requires_integration"
     },
     {
       "case_key": "budget-region-2026-05-essential-services-gap",
@@ -33,7 +34,8 @@
         "https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "financial_review_status": "draft_requires_integration"
     },
     {
       "case_key": "budget-region-2026-10-hospital-equipment",
@@ -47,7 +49,8 @@
         "https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "financial_review_status": "draft_requires_integration"
     },
     {
       "case_key": "budget-region-2026-14-credit",
@@ -61,7 +64,8 @@
         "https://www.consultant.ru/document/cons_doc_LAW_19702/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "financial_review_status": "draft_requires_integration"
     },
     {
       "case_key": "budget-region-2026-22-drought-irrigation",
@@ -75,7 +79,8 @@
         "https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "financial_review_status": "draft_requires_integration"
     },
     {
       "case_key": "budget-region-2026-25-bridge-detour",
@@ -89,7 +94,8 @@
         "https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "financial_review_status": "draft_requires_integration"
     },
     {
       "case_key": "budget-region-2026-27-delegated",
@@ -103,7 +109,8 @@
         "https://www.consultant.ru/document/cons_doc_LAW_19702/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "financial_review_status": "draft_requires_integration"
     },
     {
       "case_key": "budget-region-2026-38-emergency",
@@ -117,7 +124,8 @@
         "https://www.consultant.ru/document/cons_doc_LAW_19702/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "financial_review_status": "draft_requires_integration"
     },
     {
       "case_key": "budget-region-2026-38-forest-recovery",
@@ -131,7 +139,8 @@
         "https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "financial_review_status": "draft_requires_integration"
     },
     {
       "case_key": "budget-region-2026-39-credit-return",
@@ -145,7 +154,8 @@
         "https://www.consultant.ru/document/cons_doc_LAW_19702/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "financial_review_status": "draft_requires_integration"
     },
     {
       "case_key": "budget-region-2026-40-industrial-grid",
@@ -159,7 +169,8 @@
         "https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "financial_review_status": "draft_requires_integration"
     },
     {
       "case_key": "budget-region-2026-42-employment-retraining",
@@ -173,7 +184,8 @@
         "https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "financial_review_status": "draft_requires_integration"
     },
     {
       "case_key": "budget-region-2026-43-rural-cultural-centres",
@@ -187,7 +199,8 @@
         "https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "financial_review_status": "draft_requires_integration"
     },
     {
       "case_key": "budget-region-2026-45-rural-broadband",
@@ -201,7 +214,8 @@
         "https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "financial_review_status": "draft_requires_integration"
     },
     {
       "case_key": "budget-region-2026-47-food-logistics",
@@ -215,7 +229,8 @@
         "https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "financial_review_status": "draft_requires_integration"
     },
     {
       "case_key": "budget-region-2026-54-cluster",
@@ -229,7 +244,8 @@
         "https://www.consultant.ru/document/cons_doc_LAW_19702/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "financial_review_status": "draft_requires_integration"
     },
     {
       "case_key": "budget-region-2026-54-school-capacity",
@@ -243,7 +259,8 @@
         "https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "financial_review_status": "draft_requires_integration"
     },
     {
       "case_key": "budget-region-2026-56-flood-drainage",
@@ -257,7 +274,8 @@
         "https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "financial_review_status": "draft_requires_integration"
     },
     {
       "case_key": "budget-region-2026-59-consolidation",
@@ -271,7 +289,8 @@
         "https://www.consultant.ru/document/cons_doc_LAW_19702/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "financial_review_status": "draft_requires_integration"
     },
     {
       "case_key": "budget-region-2026-59-heating-network",
@@ -285,7 +304,8 @@
         "https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "financial_review_status": "draft_requires_integration"
     },
     {
       "case_key": "budget-region-2026-63-technical-college",
@@ -299,7 +319,8 @@
         "https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "financial_review_status": "draft_requires_integration"
     },
     {
       "case_key": "budget-region-2026-64-wastewater-cleaning",
@@ -313,7 +334,8 @@
         "https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "financial_review_status": "draft_requires_integration"
     },
     {
       "case_key": "budget-region-2026-72-temporary-family-housing",
@@ -327,7 +349,8 @@
         "https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "financial_review_status": "draft_requires_integration"
     },
     {
       "case_key": "budget-region-2026-77-recipient-insolvent",
@@ -341,7 +364,8 @@
         "https://www.consultant.ru/document/cons_doc_LAW_19702/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "financial_review_status": "draft_requires_integration"
     },
     {
       "case_key": "budget-risk-2026-bank_credit",
@@ -355,7 +379,8 @@
         "https://www.cbr.ru/faq/bank_s/otzyv_licenzii/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "financial_review_status": "draft_requires_integration"
     },
     {
       "case_key": "budget-risk-2026-external",
@@ -369,7 +394,8 @@
         "https://www.consultant.ru/document/cons_doc_LAW_19702/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "financial_review_status": "draft_requires_integration"
     },
     {
       "case_key": "budget-risk-2026-ofz_fixed",
@@ -383,7 +409,8 @@
         "https://www.consultant.ru/document/cons_doc_LAW_19702/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "financial_review_status": "draft_requires_integration"
     },
     {
       "case_key": "budget-risk-2026-ofz_float",
@@ -397,7 +424,8 @@
         "https://www.consultant.ru/document/cons_doc_LAW_19702/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "financial_review_status": "draft_requires_integration"
     },
     {
       "case_key": "budget-risk-2026-privatization",
@@ -411,7 +439,8 @@
         "https://www.consultant.ru/document/cons_doc_LAW_19702/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "financial_review_status": "draft_requires_integration"
     },
     {
       "case_key": "budget-risk-2026-reserves",
@@ -425,7 +454,8 @@
         "https://www.consultant.ru/document/cons_doc_LAW_19702/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "financial_review_status": "draft_requires_integration"
     },
     {
       "case_key": "bank-curated-serious-01",
@@ -2675,7 +2705,12 @@
         "https://www.consultant.ru/document/cons_doc_LAW_72386/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_72386/d815e149e72342151144533709e7ebcf7aa60b8c/"
+      ],
+      "option_analysis_status": "draft",
+      "source_scope": "specific_federal_norm_checked_partial"
     },
     {
       "case_key": "bank-budget-health",
@@ -2689,7 +2724,12 @@
         "https://mintrud.gov.ru/docs/laws/104"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_121895/e63d3344841b2f5636a73710e906a23ebaf9ab82/"
+      ],
+      "option_analysis_status": "draft",
+      "source_scope": "specific_federal_norm_checked_partial"
     },
     {
       "case_key": "bank-budget-school",
@@ -2703,7 +2743,13 @@
         "https://www.consultant.ru/document/cons_doc_LAW_140174/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_140174/552097cad5942f36c9484dbde7ebf92db1f783f3/",
+        "https://www.consultant.ru/document/cons_doc_LAW_140174/48b9101fff215f3aeb122d86593a129a34d96d3c/"
+      ],
+      "option_analysis_status": "draft",
+      "source_scope": "specific_federal_norm_checked_partial"
     },
     {
       "case_key": "bank-bus",
@@ -2717,7 +2763,10 @@
         "https://www.consultant.ru/document/cons_doc_LAW_182659/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "checked_norm_urls": [],
+      "option_analysis_status": "draft",
+      "source_scope": "inherited_basis_requires_current_verification"
     },
     {
       "case_key": "bank-cat-mayor",
@@ -2731,7 +2780,13 @@
         "https://mintrud.gov.ru/docs/laws/130"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_61801/96fbc469f91f57235cc842a85e0516a99f23dc85/",
+        "https://www.consultant.ru/document/cons_doc_LAW_61801/a15bab6050028753706f22c32fe60627a7be79f9/"
+      ],
+      "option_analysis_status": "draft",
+      "source_scope": "specific_federal_norm_checked_partial"
     },
     {
       "case_key": "bank-ceremony",
@@ -2746,7 +2801,10 @@
         "https://www.consultant.ru/document/cons_doc_LAW_19702/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "checked_norm_urls": [],
+      "option_analysis_status": "draft",
+      "source_scope": "inherited_basis_requires_current_verification"
     },
     {
       "case_key": "bank-curated-light-01",
@@ -2760,7 +2818,12 @@
         "https://www.consultant.ru/document/cons_doc_LAW_64629/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_64629/98ad2641f95945c4b7956150260564c8b44028d9/"
+      ],
+      "option_analysis_status": "draft",
+      "source_scope": "specific_federal_norm_checked_partial"
     },
     {
       "case_key": "bank-curated-light-02",
@@ -2775,7 +2838,13 @@
         "https://mintrud.gov.ru/docs/laws/130"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_61801/a15bab6050028753706f22c32fe60627a7be79f9/",
+        "https://www.consultant.ru/document/cons_doc_LAW_61801/26edb2934b899bf9c74c3a8f7e574651c6565e6d/"
+      ],
+      "option_analysis_status": "draft",
+      "source_scope": "specific_federal_norm_checked_partial"
     },
     {
       "case_key": "bank-curated-light-03",
@@ -2789,7 +2858,10 @@
         "https://base.garant.ru/72139416/4d6cc5b8235f826b2c67847b967f8695/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "checked_norm_urls": [],
+      "option_analysis_status": "draft",
+      "source_scope": "inherited_basis_requires_current_verification"
     },
     {
       "case_key": "bank-curated-light-04",
@@ -2804,7 +2876,12 @@
         "https://www.consultant.ru/document/cons_doc_LAW_64629/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_64629/98ad2641f95945c4b7956150260564c8b44028d9/"
+      ],
+      "option_analysis_status": "draft",
+      "source_scope": "specific_federal_norm_checked_partial"
     },
     {
       "case_key": "bank-curated-light-05",
@@ -2819,7 +2896,10 @@
         "https://mintrud.gov.ru/docs/laws/116"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "checked_norm_urls": [],
+      "option_analysis_status": "draft",
+      "source_scope": "inherited_basis_requires_current_verification"
     },
     {
       "case_key": "bank-curated-light-06",
@@ -2834,7 +2914,12 @@
         "https://mintrud.gov.ru/docs/laws/108"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_59999/"
+      ],
+      "option_analysis_status": "draft",
+      "source_scope": "specific_federal_norm_checked_partial"
     },
     {
       "case_key": "bank-curated-light-07",
@@ -2849,7 +2934,10 @@
         "https://11.rosguard.gov.ru/uploads/2025/07/5_grazhdanskijj_kodeks_rossijjskojj_federacii_chast_pervaya.pdf"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "checked_norm_urls": [],
+      "option_analysis_status": "draft",
+      "source_scope": "inherited_basis_requires_current_verification"
     },
     {
       "case_key": "bank-curated-light-08",
@@ -2864,7 +2952,10 @@
         "https://minjust.gov.ru/ru/documents/8011/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "checked_norm_urls": [],
+      "option_analysis_status": "draft",
+      "source_scope": "inherited_basis_requires_current_verification"
     },
     {
       "case_key": "bank-curated-light-09",
@@ -2879,7 +2970,10 @@
         "https://minjust.gov.ru/ru/documents/8011/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "checked_norm_urls": [],
+      "option_analysis_status": "draft",
+      "source_scope": "inherited_basis_requires_current_verification"
     },
     {
       "case_key": "bank-curated-light-10",
@@ -2894,7 +2988,12 @@
         "https://www.consultant.ru/document/cons_doc_LAW_64629/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_144624/17c58c1903f7b6212924ba9ce701489655e9a8e0/"
+      ],
+      "option_analysis_status": "draft",
+      "source_scope": "specific_federal_norm_checked_partial"
     },
     {
       "case_key": "bank-curated-light-11",
@@ -2909,7 +3008,10 @@
         "https://11.rosguard.gov.ru/uploads/2025/07/5_grazhdanskijj_kodeks_rossijjskojj_federacii_chast_pervaya.pdf"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "checked_norm_urls": [],
+      "option_analysis_status": "draft",
+      "source_scope": "inherited_basis_requires_current_verification"
     },
     {
       "case_key": "bank-curated-light-12",
@@ -2923,7 +3025,10 @@
         "https://minjust.gov.ru/ru/documents/8011/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "checked_norm_urls": [],
+      "option_analysis_status": "draft",
+      "source_scope": "inherited_basis_requires_current_verification"
     },
     {
       "case_key": "bank-curated-light-13",
@@ -2937,7 +3042,12 @@
         "https://mintrud.gov.ru/docs/laws/116"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_144624/17c58c1903f7b6212924ba9ce701489655e9a8e0/"
+      ],
+      "option_analysis_status": "draft",
+      "source_scope": "specific_federal_norm_checked_partial"
     },
     {
       "case_key": "bank-curated-light-14",
@@ -2952,7 +3062,12 @@
         "https://mintrud.gov.ru/docs/laws/130"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_61801/a15bab6050028753706f22c32fe60627a7be79f9/"
+      ],
+      "option_analysis_status": "draft",
+      "source_scope": "specific_federal_norm_checked_partial"
     },
     {
       "case_key": "bank-curated-serious-04",

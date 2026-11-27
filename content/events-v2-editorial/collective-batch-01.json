@@ -92,6 +92,18 @@
         "status": "requires_case_specific_current_law_review",
         "source_status": "fictional_or_unverified_source",
         "note": "Обязательные нормы вынесены в исходные условия. Параметры учебной модели предложены, не являются реальными суммами или статистикой. Не применять до юридической и бюджетной приёмки."
+      },
+      "financial_review": {
+        "status": "draft_requires_integration",
+        "kind": "calculation_correction",
+        "amount_mln": null,
+        "requested_federal_mln": null,
+        "regional_cofinance_mln": null,
+        "note": "900 млн ₽ — разница в оценке потребности, не автоматически новая дотация. Уточнение методики и исходных данных не зависит от голосования.",
+        "automatic_budget_delta": 0,
+        "automatic_enterprise_delta": 0,
+        "rule": "Исходное событие учитывается один раз по подтверждённому факту; выбранная рекомендация не создаёт платёж, долг, доход или предприятие. Влияние реализации требует отдельного подтверждённого решения и проверки реестров.",
+        "legacy_effects_retained_for_review": true
       }
     },
     {
@@ -184,6 +196,18 @@
         "status": "requires_case_specific_current_law_review",
         "source_status": "fictional_or_unverified_source",
         "note": "Обязательные нормы вынесены в исходные условия. Параметры учебной модели предложены, не являются реальными суммами или статистикой. Не применять до юридической и бюджетной приёмки."
+      },
+      "financial_review": {
+        "status": "draft_requires_integration",
+        "kind": "pending_transfer",
+        "amount_mln": 420,
+        "requested_federal_mln": 420,
+        "regional_cofinance_mln": 0,
+        "note": "Разрыв в 420 млн ₽ — подтверждённая потребность, а не перечисление или рост доходов. Обязательные выплаты исполняются по закону.",
+        "automatic_budget_delta": 0,
+        "automatic_enterprise_delta": 0,
+        "rule": "Исходное событие учитывается один раз по подтверждённому факту; выбранная рекомендация не создаёт платёж, долг, доход или предприятие. Влияние реализации требует отдельного подтверждённого решения и проверки реестров.",
+        "legacy_effects_retained_for_review": true
       }
     },
     {
@@ -277,6 +301,18 @@
         "status": "requires_case_specific_current_law_review",
         "source_status": "fictional_or_unverified_source",
         "note": "Обязательные нормы вынесены в исходные условия. Параметры учебной модели предложены, не являются реальными суммами или статистикой. Не применять до юридической и бюджетной приёмки."
+      },
+      "financial_review": {
+        "status": "draft_requires_integration",
+        "kind": "pending_transfer",
+        "amount_mln": 675,
+        "requested_federal_mln": 540,
+        "regional_cofinance_mln": 135,
+        "note": "Смета и софинансирование не являются фактическими расходами. Оборудование и услуги — только после решения и исполнения.",
+        "automatic_budget_delta": 0,
+        "automatic_enterprise_delta": 0,
+        "rule": "Исходное событие учитывается один раз по подтверждённому факту; выбранная рекомендация не создаёт платёж, долг, доход или предприятие. Влияние реализации требует отдельного подтверждённого решения и проверки реестров.",
+        "legacy_effects_retained_for_review": true
       }
     },
     {
@@ -370,6 +406,18 @@
         "status": "requires_case_specific_current_law_review",
         "source_status": "fictional_or_unverified_source",
         "note": "Обязательные нормы вынесены в исходные условия. Параметры учебной модели предложены, не являются реальными суммами или статистикой. Не применять до юридической и бюджетной приёмки."
+      },
+      "financial_review": {
+        "status": "draft_requires_integration",
+        "kind": "pending_loan",
+        "amount_mln": 2400,
+        "requested_federal_mln": null,
+        "regional_cofinance_mln": null,
+        "note": "Кредит 2400 млн ₽ — возвратный источник. Основной долг возникает при привлечении, а не по голосованию. Семь предприятий в старом эффекте не подтверждены как новые.",
+        "automatic_budget_delta": 0,
+        "automatic_enterprise_delta": 0,
+        "rule": "Исходное событие учитывается один раз по подтверждённому факту; выбранная рекомендация не создаёт платёж, долг, доход или предприятие. Влияние реализации требует отдельного подтверждённого решения и проверки реестров.",
+        "legacy_effects_retained_for_review": true
       }
     },
     {
@@ -463,6 +511,18 @@
         "status": "requires_case_specific_current_law_review",
         "source_status": "fictional_or_unverified_source",
         "note": "Обязательные нормы вынесены в исходные условия. Параметры учебной модели предложены, не являются реальными суммами или статистикой. Не применять до юридической и бюджетной приёмки."
+      },
+      "financial_review": {
+        "status": "draft_requires_integration",
+        "kind": "pending_transfer",
+        "amount_mln": 700,
+        "requested_federal_mln": 560,
+        "regional_cofinance_mln": 140,
+        "note": "30 приостановивших работу хозяйств — исходное состояние, не автоматическое закрытие юридических лиц. Восстановление не гарантировано заявкой.",
+        "automatic_budget_delta": 0,
+        "automatic_enterprise_delta": 0,
+        "rule": "Исходное событие учитывается один раз по подтверждённому факту; выбранная рекомендация не создаёт платёж, долг, доход или предприятие. Влияние реализации требует отдельного подтверждённого решения и проверки реестров.",
+        "legacy_effects_retained_for_review": true
       }
     },
     {
@@ -556,6 +616,18 @@
         "status": "requires_case_specific_current_law_review",
         "source_status": "fictional_or_unverified_source",
         "note": "Обязательные нормы вынесены в исходные условия. Параметры учебной модели предложены, не являются реальными суммами или статистикой. Не применять до юридической и бюджетной приёмки."
+      },
+      "financial_review": {
+        "status": "draft_requires_integration",
+        "kind": "pending_transfer",
+        "amount_mln": 1800,
+        "requested_federal_mln": 1440,
+        "regional_cofinance_mln": 360,
+        "note": "8 приостановивших работу перевозчиков — исходное состояние. Безопасный объезд обязателен, смета не означает выплату.",
+        "automatic_budget_delta": 0,
+        "automatic_enterprise_delta": 0,
+        "rule": "Исходное событие учитывается один раз по подтверждённому факту; выбранная рекомендация не создаёт платёж, долг, доход или предприятие. Влияние реализации требует отдельного подтверждённого решения и проверки реестров.",
+        "legacy_effects_retained_for_review": true
       }
     },
     {
@@ -649,6 +721,18 @@
         "status": "requires_case_specific_current_law_review",
         "source_status": "fictional_or_unverified_source",
         "note": "Обязательные нормы вынесены в исходные условия. Параметры учебной модели предложены, не являются реальными суммами или статистикой. Не применять до юридической и бюджетной приёмки."
+      },
+      "financial_review": {
+        "status": "draft_requires_integration",
+        "kind": "calculation_correction",
+        "amount_mln": null,
+        "requested_federal_mln": null,
+        "regional_cofinance_mln": null,
+        "note": "240 повторных записей и 60 новых обращений не равны 180 получателям без проверки статуса. Расчёт субвенции исправляется независимо от голоса.",
+        "automatic_budget_delta": 0,
+        "automatic_enterprise_delta": 0,
+        "rule": "Исходное событие учитывается один раз по подтверждённому факту; выбранная рекомендация не создаёт платёж, долг, доход или предприятие. Влияние реализации требует отдельного подтверждённого решения и проверки реестров.",
+        "legacy_effects_retained_for_review": true
       }
     },
     {
@@ -743,6 +827,18 @@
         "status": "requires_case_specific_current_law_review",
         "source_status": "fictional_or_unverified_source",
         "note": "Обязательные нормы вынесены в исходные условия. Параметры учебной модели предложены, не являются реальными суммами или статистикой. Не применять до юридической и бюджетной приёмки."
+      },
+      "financial_review": {
+        "status": "draft_requires_integration",
+        "kind": "emergency_request",
+        "amount_mln": 600,
+        "requested_federal_mln": null,
+        "regional_cofinance_mln": null,
+        "note": "600 млн ₽ — запрос на подтверждённые работы. Старые 70 млн расходов и 12 предприятий нельзя начислять без решения и подтверждённого результата.",
+        "automatic_budget_delta": 0,
+        "automatic_enterprise_delta": 0,
+        "rule": "Исходное событие учитывается один раз по подтверждённому факту; выбранная рекомендация не создаёт платёж, долг, доход или предприятие. Влияние реализации требует отдельного подтверждённого решения и проверки реестров.",
+        "legacy_effects_retained_for_review": true
       }
     },
     {
@@ -836,6 +932,18 @@
         "status": "requires_case_specific_current_law_review",
         "source_status": "fictional_or_unverified_source",
         "note": "Обязательные нормы вынесены в исходные условия. Параметры учебной модели предложены, не являются реальными суммами или статистикой. Не применять до юридической и бюджетной приёмки."
+      },
+      "financial_review": {
+        "status": "draft_requires_integration",
+        "kind": "pending_transfer",
+        "amount_mln": 1100,
+        "requested_federal_mln": 880,
+        "regional_cofinance_mln": 220,
+        "note": "2400 га — площадь ущерба, не размер восстановленной территории. Заявка на восстановление не даёт фактического расхода.",
+        "automatic_budget_delta": 0,
+        "automatic_enterprise_delta": 0,
+        "rule": "Исходное событие учитывается один раз по подтверждённому факту; выбранная рекомендация не создаёт платёж, долг, доход или предприятие. Влияние реализации требует отдельного подтверждённого решения и проверки реестров.",
+        "legacy_effects_retained_for_review": true
       }
     },
     {
@@ -929,6 +1037,18 @@
         "status": "requires_case_specific_current_law_review",
         "source_status": "fictional_or_unverified_source",
         "note": "Обязательные нормы вынесены в исходные условия. Параметры учебной модели предложены, не являются реальными суммами или статистикой. Не применять до юридической и бюджетной приёмки."
+      },
+      "financial_review": {
+        "status": "draft_requires_integration",
+        "kind": "existing_debt",
+        "amount_mln": 850,
+        "requested_federal_mln": null,
+        "regional_cofinance_mln": null,
+        "note": "850 млн ₽ — действующее обязательство по возврату кредита; не списывается и не переносится голосованием.",
+        "automatic_budget_delta": 0,
+        "automatic_enterprise_delta": 0,
+        "rule": "Исходное событие учитывается один раз по подтверждённому факту; выбранная рекомендация не создаёт платёж, долг, доход или предприятие. Влияние реализации требует отдельного подтверждённого решения и проверки реестров.",
+        "legacy_effects_retained_for_review": true
       }
     },
     {
@@ -1022,6 +1142,18 @@
         "status": "requires_case_specific_current_law_review",
         "source_status": "fictional_or_unverified_source",
         "note": "Обязательные нормы вынесены в исходные условия. Параметры учебной модели предложены, не являются реальными суммами или статистикой. Не применять до юридической и бюджетной приёмки."
+      },
+      "financial_review": {
+        "status": "draft_requires_integration",
+        "kind": "pending_transfer",
+        "amount_mln": 1000,
+        "requested_federal_mln": 800,
+        "regional_cofinance_mln": 200,
+        "note": "8 уже работающих предприятий — исходный факт; прежде чем добавить к реестру, сверить исходную базу и историю. 20 участков не равны 20 предприятиям.",
+        "automatic_budget_delta": 0,
+        "automatic_enterprise_delta": 0,
+        "rule": "Исходное событие учитывается один раз по подтверждённому факту; выбранная рекомендация не создаёт платёж, долг, доход или предприятие. Влияние реализации требует отдельного подтверждённого решения и проверки реестров.",
+        "legacy_effects_retained_for_review": true
       }
     },
     {
@@ -1116,6 +1248,18 @@
         "status": "requires_case_specific_current_law_review",
         "source_status": "fictional_or_unverified_source",
         "note": "Обязательные нормы вынесены в исходные условия. Параметры учебной модели предложены, не являются реальными суммами или статистикой. Не применять до юридической и бюджетной приёмки."
+      },
+      "financial_review": {
+        "status": "draft_requires_integration",
+        "kind": "pending_transfer",
+        "amount_mln": 600,
+        "requested_federal_mln": 480,
+        "regional_cofinance_mln": 120,
+        "note": "Снижение заказов и приостановка деятельности не означают прекращение регистрации. Переобучение не создаёт рабочие места автоматически.",
+        "automatic_budget_delta": 0,
+        "automatic_enterprise_delta": 0,
+        "rule": "Исходное событие учитывается один раз по подтверждённому факту; выбранная рекомендация не создаёт платёж, долг, доход или предприятие. Влияние реализации требует отдельного подтверждённого решения и проверки реестров.",
+        "legacy_effects_retained_for_review": true
       }
     },
     {
@@ -1209,6 +1353,18 @@
         "status": "requires_case_specific_current_law_review",
         "source_status": "fictional_or_unverified_source",
         "note": "Обязательные нормы вынесены в исходные условия. Параметры учебной модели предложены, не являются реальными суммами или статистикой. Не применять до юридической и бюджетной приёмки."
+      },
+      "financial_review": {
+        "status": "draft_requires_integration",
+        "kind": "pending_transfer",
+        "amount_mln": 200,
+        "requested_federal_mln": 160,
+        "regional_cofinance_mln": 40,
+        "note": "Ремонт пяти центров требует утверждённого финансирования; временные услуги и капитальные работы различаются.",
+        "automatic_budget_delta": 0,
+        "automatic_enterprise_delta": 0,
+        "rule": "Исходное событие учитывается один раз по подтверждённому факту; выбранная рекомендация не создаёт платёж, долг, доход или предприятие. Влияние реализации требует отдельного подтверждённого решения и проверки реестров.",
+        "legacy_effects_retained_for_review": true
       }
     },
     {
@@ -1301,6 +1457,18 @@
         "status": "requires_case_specific_current_law_review",
         "source_status": "fictional_or_unverified_source",
         "note": "Обязательные нормы вынесены в исходные условия. Параметры учебной модели предложены, не являются реальными суммами или статистикой. Не применять до юридической и бюджетной приёмки."
+      },
+      "financial_review": {
+        "status": "draft_requires_integration",
+        "kind": "pending_transfer",
+        "amount_mln": 450,
+        "requested_federal_mln": 360,
+        "regional_cofinance_mln": 90,
+        "note": "18 поселений — план охвата; подключения подтверждаются фактическим вводом, а не решением группы.",
+        "automatic_budget_delta": 0,
+        "automatic_enterprise_delta": 0,
+        "rule": "Исходное событие учитывается один раз по подтверждённому факту; выбранная рекомендация не создаёт платёж, долг, доход или предприятие. Влияние реализации требует отдельного подтверждённого решения и проверки реестров.",
+        "legacy_effects_retained_for_review": true
       }
     },
     {
@@ -1394,6 +1562,18 @@
         "status": "requires_case_specific_current_law_review",
         "source_status": "fictional_or_unverified_source",
         "note": "Обязательные нормы вынесены в исходные условия. Параметры учебной модели предложены, не являются реальными суммами или статистикой. Не применять до юридической и бюджетной приёмки."
+      },
+      "financial_review": {
+        "status": "draft_requires_integration",
+        "kind": "pending_transfer",
+        "amount_mln": 700,
+        "requested_federal_mln": 560,
+        "regional_cofinance_mln": 140,
+        "note": "10 уже действующих производителей не начислять повторно; склад и снижение потерь — результаты будущего исполнения.",
+        "automatic_budget_delta": 0,
+        "automatic_enterprise_delta": 0,
+        "rule": "Исходное событие учитывается один раз по подтверждённому факту; выбранная рекомендация не создаёт платёж, долг, доход или предприятие. Влияние реализации требует отдельного подтверждённого решения и проверки реестров.",
+        "legacy_effects_retained_for_review": true
       }
     },
     {
@@ -1488,6 +1668,18 @@
         "status": "requires_case_specific_current_law_review",
         "source_status": "fictional_or_unverified_source",
         "note": "Обязательные нормы вынесены в исходные условия. Параметры учебной модели предложены, не являются реальными суммами или статистикой. Не применять до юридической и бюджетной приёмки."
+      },
+      "financial_review": {
+        "status": "draft_requires_integration",
+        "kind": "mixed_financing",
+        "amount_mln": null,
+        "requested_federal_mln": null,
+        "regional_cofinance_mln": null,
+        "note": "1 800 млн ₽ и 400 млн ₽ относятся к разным механизмам поддержки; сверить исходную смету и условия. Не зачислять частной компании межбюджетную субсидию.",
+        "automatic_budget_delta": 0,
+        "automatic_enterprise_delta": 0,
+        "rule": "Исходное событие учитывается один раз по подтверждённому факту; выбранная рекомендация не создаёт платёж, долг, доход или предприятие. Влияние реализации требует отдельного подтверждённого решения и проверки реестров.",
+        "legacy_effects_retained_for_review": true
       }
     },
     {
@@ -1580,6 +1772,18 @@
         "status": "requires_case_specific_current_law_review",
         "source_status": "fictional_or_unverified_source",
         "note": "Обязательные нормы вынесены в исходные условия. Параметры учебной модели предложены, не являются реальными суммами или статистикой. Не применять до юридической и бюджетной приёмки."
+      },
+      "financial_review": {
+        "status": "draft_requires_integration",
+        "kind": "pending_transfer",
+        "amount_mln": 1200,
+        "requested_federal_mln": 960,
+        "regional_cofinance_mln": 240,
+        "note": "Заявка на школу не меняет число учебных мест до ввода объекта.",
+        "automatic_budget_delta": 0,
+        "automatic_enterprise_delta": 0,
+        "rule": "Исходное событие учитывается один раз по подтверждённому факту; выбранная рекомендация не создаёт платёж, долг, доход или предприятие. Влияние реализации требует отдельного подтверждённого решения и проверки реестров.",
+        "legacy_effects_retained_for_review": true
       }
     },
     {
@@ -1674,6 +1878,18 @@
         "status": "requires_case_specific_current_law_review",
         "source_status": "fictional_or_unverified_source",
         "note": "Обязательные нормы вынесены в исходные условия. Параметры учебной модели предложены, не являются реальными суммами или статистикой. Не применять до юридической и бюджетной приёмки."
+      },
+      "financial_review": {
+        "status": "draft_requires_integration",
+        "kind": "pending_transfer",
+        "amount_mln": 1350,
+        "requested_federal_mln": 1080,
+        "regional_cofinance_mln": 270,
+        "note": "Подтопление и остановка бизнеса — исходные обстоятельства; восстановление требует подтверждения. Заявка не означает расход.",
+        "automatic_budget_delta": 0,
+        "automatic_enterprise_delta": 0,
+        "rule": "Исходное событие учитывается один раз по подтверждённому факту; выбранная рекомендация не создаёт платёж, долг, доход или предприятие. Влияние реализации требует отдельного подтверждённого решения и проверки реестров.",
+        "legacy_effects_retained_for_review": true
       }
     },
     {
@@ -1766,6 +1982,18 @@
         "status": "requires_case_specific_current_law_review",
         "source_status": "fictional_or_unverified_source",
         "note": "Обязательные нормы вынесены в исходные условия. Параметры учебной модели предложены, не являются реальными суммами или статистикой. Не применять до юридической и бюджетной приёмки."
+      },
+      "financial_review": {
+        "status": "draft_requires_integration",
+        "kind": "accounting_correction",
+        "amount_mln": 700,
+        "requested_federal_mln": null,
+        "regional_cofinance_mln": null,
+        "note": "700 млн ₽ — одна операция, не 1400 млн ₽. При консолидации исключить внутрисистемный трансферт, не менять сам платёж.",
+        "automatic_budget_delta": 0,
+        "automatic_enterprise_delta": 0,
+        "rule": "Исходное событие учитывается один раз по подтверждённому факту; выбранная рекомендация не создаёт платёж, долг, доход или предприятие. Влияние реализации требует отдельного подтверждённого решения и проверки реестров.",
+        "legacy_effects_retained_for_review": true
       }
     },
     {
@@ -1859,6 +2087,18 @@
         "status": "requires_case_specific_current_law_review",
         "source_status": "fictional_or_unverified_source",
         "note": "Обязательные нормы вынесены в исходные условия. Параметры учебной модели предложены, не являются реальными суммами или статистикой. Не применять до юридической и бюджетной приёмки."
+      },
+      "financial_review": {
+        "status": "draft_requires_integration",
+        "kind": "pending_transfer",
+        "amount_mln": 900,
+        "requested_federal_mln": 720,
+        "regional_cofinance_mln": 180,
+        "note": "12 участков — план ремонта, не подтверждённый результат. Смета не означает списание средств.",
+        "automatic_budget_delta": 0,
+        "automatic_enterprise_delta": 0,
+        "rule": "Исходное событие учитывается один раз по подтверждённому факту; выбранная рекомендация не создаёт платёж, долг, доход или предприятие. Влияние реализации требует отдельного подтверждённого решения и проверки реестров.",
+        "legacy_effects_retained_for_review": true
       }
     },
     {
@@ -1952,6 +2192,18 @@
         "status": "requires_case_specific_current_law_review",
         "source_status": "fictional_or_unverified_source",
         "note": "Обязательные нормы вынесены в исходные условия. Параметры учебной модели предложены, не являются реальными суммами или статистикой. Не применять до юридической и бюджетной приёмки."
+      },
+      "financial_review": {
+        "status": "draft_requires_integration",
+        "kind": "pending_transfer",
+        "amount_mln": 500,
+        "requested_federal_mln": 400,
+        "regional_cofinance_mln": 100,
+        "note": "12 уже работающих предприятий — исходный факт, не результат голосования; 600 мест — план подготовки.",
+        "automatic_budget_delta": 0,
+        "automatic_enterprise_delta": 0,
+        "rule": "Исходное событие учитывается один раз по подтверждённому факту; выбранная рекомендация не создаёт платёж, долг, доход или предприятие. Влияние реализации требует отдельного подтверждённого решения и проверки реестров.",
+        "legacy_effects_retained_for_review": true
       }
     },
     {
@@ -2045,6 +2297,18 @@
         "status": "requires_case_specific_current_law_review",
         "source_status": "fictional_or_unverified_source",
         "note": "Обязательные нормы вынесены в исходные условия. Параметры учебной модели предложены, не являются реальными суммами или статистикой. Не применять до юридической и бюджетной приёмки."
+      },
+      "financial_review": {
+        "status": "draft_requires_integration",
+        "kind": "pending_transfer",
+        "amount_mln": 800,
+        "requested_federal_mln": 640,
+        "regional_cofinance_mln": 160,
+        "note": "62% нормативно очищенных стоков — исходное состояние. Новые подключения и мощность требуют подтверждённого ввода.",
+        "automatic_budget_delta": 0,
+        "automatic_enterprise_delta": 0,
+        "rule": "Исходное событие учитывается один раз по подтверждённому факту; выбранная рекомендация не создаёт платёж, долг, доход или предприятие. Влияние реализации требует отдельного подтверждённого решения и проверки реестров.",
+        "legacy_effects_retained_for_review": true
       }
     },
     {
@@ -2138,6 +2402,18 @@
         "status": "requires_case_specific_current_law_review",
         "source_status": "fictional_or_unverified_source",
         "note": "Обязательные нормы вынесены в исходные условия. Параметры учебной модели предложены, не являются реальными суммами или статистикой. Не применять до юридической и бюджетной приёмки."
+      },
+      "financial_review": {
+        "status": "draft_requires_integration",
+        "kind": "pending_transfer",
+        "amount_mln": 900,
+        "requested_federal_mln": 720,
+        "regional_cofinance_mln": 180,
+        "note": "240 семей размещены временно. Заявка не означает выдачу жилья или денег; права различаются по статусу.",
+        "automatic_budget_delta": 0,
+        "automatic_enterprise_delta": 0,
+        "rule": "Исходное событие учитывается один раз по подтверждённому факту; выбранная рекомендация не создаёт платёж, долг, доход или предприятие. Влияние реализации требует отдельного подтверждённого решения и проверки реестров.",
+        "legacy_effects_retained_for_review": true
       }
     },
     {
@@ -2231,6 +2507,18 @@
         "status": "requires_case_specific_current_law_review",
         "source_status": "fictional_or_unverified_source",
         "note": "Обязательные нормы вынесены в исходные условия. Параметры учебной модели предложены, не являются реальными суммами или статистикой. Не применять до юридической и бюджетной приёмки."
+      },
+      "financial_review": {
+        "status": "draft_requires_integration",
+        "kind": "existing_claim",
+        "amount_mln": 320,
+        "requested_federal_mln": null,
+        "regional_cofinance_mln": null,
+        "note": "320 млн ₽ — сумма ранее предоставленной поддержки; требование возврата не является поступлением до взыскания. Старые 30 млн расходов не подтверждены.",
+        "automatic_budget_delta": 0,
+        "automatic_enterprise_delta": 0,
+        "rule": "Исходное событие учитывается один раз по подтверждённому факту; выбранная рекомендация не создаёт платёж, долг, доход или предприятие. Влияние реализации требует отдельного подтверждённого решения и проверки реестров.",
+        "legacy_effects_retained_for_review": true
       }
     },
     {
@@ -2323,6 +2611,18 @@
         "status": "requires_case_specific_current_law_review",
         "source_status": "fictional_or_unverified_source",
         "note": "Обязательные нормы вынесены в исходные условия. Параметры учебной модели предложены, не являются реальными суммами или статистикой. Не применять до юридической и бюджетной приёмки."
+      },
+      "financial_review": {
+        "status": "draft_requires_integration",
+        "kind": "existing_debt",
+        "amount_mln": 1200,
+        "requested_federal_mln": null,
+        "regional_cofinance_mln": null,
+        "note": "1200 млн ₽ — остаток основного долга. Отзыв лицензии не погашает долг; 25 млн обслуживания из старой модели не подтверждены условиями договора.",
+        "automatic_budget_delta": 0,
+        "automatic_enterprise_delta": 0,
+        "rule": "Исходное событие учитывается один раз по подтверждённому факту; выбранная рекомендация не создаёт платёж, долг, доход или предприятие. Влияние реализации требует отдельного подтверждённого решения и проверки реестров.",
+        "legacy_effects_retained_for_review": true
       }
     },
     {
@@ -2416,6 +2716,18 @@
         "status": "requires_case_specific_current_law_review",
         "source_status": "fictional_or_unverified_source",
         "note": "Обязательные нормы вынесены в исходные условия. Параметры учебной модели предложены, не являются реальными суммами или статистикой. Не применять до юридической и бюджетной приёмки."
+      },
+      "financial_review": {
+        "status": "draft_requires_integration",
+        "kind": "fx_revaluation",
+        "amount_mln": null,
+        "requested_federal_mln": null,
+        "regional_cofinance_mln": null,
+        "note": "Курс вырос на 15%; рублёвый эквивалент = валютный номинал × новый курс. Не добавлять 200 млн без номинала и графика.",
+        "automatic_budget_delta": 0,
+        "automatic_enterprise_delta": 0,
+        "rule": "Исходное событие учитывается один раз по подтверждённому факту; выбранная рекомендация не создаёт платёж, долг, доход или предприятие. Влияние реализации требует отдельного подтверждённого решения и проверки реестров.",
+        "legacy_effects_retained_for_review": true
       }
     },
     {
@@ -2508,6 +2820,18 @@
         "status": "requires_case_specific_current_law_review",
         "source_status": "fictional_or_unverified_source",
         "note": "Обязательные нормы вынесены в исходные условия. Параметры учебной модели предложены, не являются реальными суммами или статистикой. Не применять до юридической и бюджетной приёмки."
+      },
+      "financial_review": {
+        "status": "draft_requires_integration",
+        "kind": "actual_borrowing",
+        "amount_mln": 620,
+        "requested_federal_mln": null,
+        "regional_cofinance_mln": null,
+        "note": "План 1000 млн ₽, факт 620 млн ₽, разница 380 млн ₽. Недополученная сумма не является долгом или деньгами. 120 млн обслуживания не выводятся из этих фактов.",
+        "automatic_budget_delta": 0,
+        "automatic_enterprise_delta": 0,
+        "rule": "Исходное событие учитывается один раз по подтверждённому факту; выбранная рекомендация не создаёт платёж, долг, доход или предприятие. Влияние реализации требует отдельного подтверждённого решения и проверки реестров.",
+        "legacy_effects_retained_for_review": true
       }
     },
     {
@@ -2600,6 +2924,18 @@
         "status": "requires_case_specific_current_law_review",
         "source_status": "fictional_or_unverified_source",
         "note": "Обязательные нормы вынесены в исходные условия. Параметры учебной модели предложены, не являются реальными суммами или статистикой. Не применять до юридической и бюджетной приёмки."
+      },
+      "financial_review": {
+        "status": "draft_requires_integration",
+        "kind": "contract_coupon",
+        "amount_mln": null,
+        "requested_federal_mln": null,
+        "regional_cofinance_mln": null,
+        "note": "Купон = ключевая ставка + 0,5 п.п. Неподтверждённую надбавку 2 п.п. исключить; номинал и период нужны для суммы.",
+        "automatic_budget_delta": 0,
+        "automatic_enterprise_delta": 0,
+        "rule": "Исходное событие учитывается один раз по подтверждённому факту; выбранная рекомендация не создаёт платёж, долг, доход или предприятие. Влияние реализации требует отдельного подтверждённого решения и проверки реестров.",
+        "legacy_effects_retained_for_review": true
       }
     },
     {
@@ -2692,6 +3028,18 @@
         "status": "requires_case_specific_current_law_review",
         "source_status": "fictional_or_unverified_source",
         "note": "Обязательные нормы вынесены в исходные условия. Параметры учебной модели предложены, не являются реальными суммами или статистикой. Не применять до юридической и бюджетной приёмки."
+      },
+      "financial_review": {
+        "status": "draft_requires_integration",
+        "kind": "forecast_correction",
+        "amount_mln": 500,
+        "requested_federal_mln": null,
+        "regional_cofinance_mln": null,
+        "note": "500 млн ₽ — исключаемый прогноз дивидендов проданного пакета, не новый кассовый расход. Не вычитать повторно, если прогноз уже исправлен.",
+        "automatic_budget_delta": 0,
+        "automatic_enterprise_delta": 0,
+        "rule": "Исходное событие учитывается один раз по подтверждённому факту; выбранная рекомендация не создаёт платёж, долг, доход или предприятие. Влияние реализации требует отдельного подтверждённого решения и проверки реестров.",
+        "legacy_effects_retained_for_review": true
       }
     },
     {
@@ -2785,6 +3133,18 @@
         "status": "requires_case_specific_current_law_review",
         "source_status": "fictional_or_unverified_source",
         "note": "Обязательные нормы вынесены в исходные условия. Параметры учебной модели предложены, не являются реальными суммами или статистикой. Не применять до юридической и бюджетной приёмки."
+      },
+      "financial_review": {
+        "status": "draft_requires_integration",
+        "kind": "liquidity_correction",
+        "amount_mln": 10000,
+        "requested_federal_mln": null,
+        "regional_cofinance_mln": null,
+        "note": "10 000 млн ₽ — недоступная часть финансирования; не списывать стоимость ФНБ и не начислять 90 млн обслуживания без расчёта.",
+        "automatic_budget_delta": 0,
+        "automatic_enterprise_delta": 0,
+        "rule": "Исходное событие учитывается один раз по подтверждённому факту; выбранная рекомендация не создаёт платёж, долг, доход или предприятие. Влияние реализации требует отдельного подтверждённого решения и проверки реестров.",
+        "legacy_effects_retained_for_review": true
       }
     },
     {
