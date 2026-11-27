@@ -4118,12 +4118,13 @@
       "resolved_source_url": null,
       "legal_basis": "ГК РФ, статьи 1229, 1259 и 1286: использование охраняемого творческого рассказа требует соответствующего правового основания и согласованного объёма лицензии. Сам факт владения записью не передаёт исключительное право. Источники: https://rospatent.gov.ru/ru/documents/grazhdanskiy-kodeks-rossiyskoy-federacii-chast-chetvertaya",
       "legal_urls": [
-        "https://rospatent.gov.ru/ru/documents/grazhdanskiy-kodeks-rossiyskoy-federacii-chast-chetvertaya"
+        "https://www.consultant.ru/document/cons_doc_LAW_64629/98ad2641f95945c4b7956150260564c8b44028d9/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
       "option_analysis_status": "draft",
-      "source_scope": "inherited_basis_requires_current_verification"
+      "source_scope": "specific_norm_and_related_search_results_partial",
+      "review_date": "2026-11-27"
     },
     {
       "case_key": "bank-curated-v2-36",
@@ -4133,14 +4134,12 @@
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
       "legal_basis": "ГК РФ, статьи 209 и 210: собственник определяет использование имущества и несёт бремя его содержания; статья 1064 закрепляет общие основания возмещения причинённого вреда. Эти нормы не устанавливают универсальную освещённость в люксах. Источники: https://11.rosguard.gov.ru/uploads/2025/07/5_grazhdanskijj_kodeks_rossijjskojj_federacii_chast_pervaya.pdf https://minjust.gov.ru/ru/pages/grazhdanskij-kodeks/",
-      "legal_urls": [
-        "https://11.rosguard.gov.ru/uploads/2025/07/5_grazhdanskijj_kodeks_rossijjskojj_federacii_chast_pervaya.pdf",
-        "https://minjust.gov.ru/ru/pages/grazhdanskij-kodeks/"
-      ],
+      "legal_urls": [],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
       "option_analysis_status": "draft",
-      "source_scope": "inherited_basis_requires_current_verification"
+      "source_scope": "inherited_basis_requires_current_verification",
+      "review_date": "2026-11-27"
     },
     {
       "case_key": "bank-curated-v2-37",
@@ -4150,13 +4149,12 @@
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
       "legal_basis": "Закон РФ № 2300-1, статьи 4 и 7: качество и безопасность услуги; статья 29 предусматривает требования при недостатках выполненной работы или оказанной услуги. Леворукость сама по себе не означает инвалидность. Источники: https://44.rospotrebnadzor.ru/osnovnye_napravlenij/zacshita_prav_potreb/normativnye_dokument/48/",
-      "legal_urls": [
-        "https://44.rospotrebnadzor.ru/osnovnye_napravlenij/zacshita_prav_potreb/normativnye_dokument/48/"
-      ],
+      "legal_urls": [],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
       "option_analysis_status": "draft",
-      "source_scope": "inherited_basis_requires_current_verification"
+      "source_scope": "inherited_basis_requires_current_verification",
+      "review_date": "2026-11-27"
     },
     {
       "case_key": "bank-curated-v2-38",
@@ -4166,14 +4164,12 @@
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
       "legal_basis": "ГК РФ, статьи 209 и 210: полномочия собственника и содержание имущества. Федеральный закон № 38-ФЗ, статья 19: установка рекламной конструкции имеет самостоятельный правовой порядок; предложение бесплатно осветить столы его не заменяет. Источники: https://11.rosguard.gov.ru/uploads/2025/07/5_grazhdanskijj_kodeks_rossijjskojj_federacii_chast_pervaya.pdf https://epp.genproc.gov.ru/ru/proc_66/activity/legal-education/explain/e1216647/",
-      "legal_urls": [
-        "https://11.rosguard.gov.ru/uploads/2025/07/5_grazhdanskijj_kodeks_rossijjskojj_federacii_chast_pervaya.pdf",
-        "https://epp.genproc.gov.ru/ru/proc_66/activity/legal-education/explain/e1216647/"
-      ],
+      "legal_urls": [],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
       "option_analysis_status": "draft",
-      "source_scope": "inherited_basis_requires_current_verification"
+      "source_scope": "inherited_basis_requires_current_verification",
+      "review_date": "2026-11-27"
     },
     {
       "case_key": "bank-curated-v2-39",
@@ -4184,12 +4180,13 @@
       "resolved_source_url": null,
       "legal_basis": "ГК РФ, статья 136: плоды вещи принадлежат собственнику, если иное не установлено законом, договором или существом отношений; статья 209 — распоряжение имуществом. Труд добровольца не создаёт автоматически долю в каждом яблоке. Источники: https://11.rosguard.gov.ru/uploads/2025/07/5_grazhdanskijj_kodeks_rossijjskojj_federacii_chast_pervaya.pdf",
       "legal_urls": [
-        "https://11.rosguard.gov.ru/uploads/2025/07/5_grazhdanskijj_kodeks_rossijjskojj_federacii_chast_pervaya.pdf"
+        "https://www.consultant.ru/document/cons_doc_LAW_5142/e76cbd72b7917a719160f39231998418094c73b4/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
       "option_analysis_status": "draft",
-      "source_scope": "inherited_basis_requires_current_verification"
+      "source_scope": "specific_norm_and_related_search_results_partial",
+      "review_date": "2026-11-27"
     },
     {
       "case_key": "bank-curated-v2-40",
@@ -4200,13 +4197,13 @@
       "resolved_source_url": null,
       "legal_basis": "Федеральный закон от 24.11.1995 № 181-ФЗ, статья 15: обеспечение доступности объектов и услуг для инвалидов в пределах установленных обязанностей. ГК РФ, статья 210: содержание имущества. Испытание техники не отменяет прав пользователей площади. Источники: https://sfr.gov.ru/order/law_rehabilitation~11198 https://11.rosguard.gov.ru/uploads/2025/07/5_grazhdanskijj_kodeks_rossijjskojj_federacii_chast_pervaya.pdf",
       "legal_urls": [
-        "https://sfr.gov.ru/order/law_rehabilitation~11198",
-        "https://11.rosguard.gov.ru/uploads/2025/07/5_grazhdanskijj_kodeks_rossijjskojj_federacii_chast_pervaya.pdf"
+        "https://www.consultant.ru/document/cons_doc_LAW_8559/1f3d91284a26982ce51392b5fd178e392fe53404/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
       "option_analysis_status": "draft",
-      "source_scope": "inherited_basis_requires_current_verification"
+      "source_scope": "specific_norm_and_related_search_results_partial",
+      "review_date": "2026-11-27"
     },
     {
       "case_key": "bank-curated-v2-41",
@@ -4217,13 +4214,13 @@
       "resolved_source_url": null,
       "legal_basis": "ГК РФ, статьи 721 и 723: согласованное качество результата и защита заказчика при недостатках. Изменение размещения панели и подтверждение зарядки требуют оформления; приёмка сиденья не доказывает работу разъёмов. Источники: https://minjust.gov.ru/ru/pages/grazhdanskij-kodeks/ https://zpp.rospotrebnadzor.ru/adjudications/federal/66RS0052-01-2019-000514-19",
       "legal_urls": [
-        "https://minjust.gov.ru/ru/pages/grazhdanskij-kodeks/",
-        "https://zpp.rospotrebnadzor.ru/adjudications/federal/66RS0052-01-2019-000514-19"
+        "https://www.consultant.ru/document/cons_doc_LAW_9027/0f3422f73df7bee03d56085359c80be8d2981ead/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
       "option_analysis_status": "draft",
-      "source_scope": "inherited_basis_requires_current_verification"
+      "source_scope": "specific_norm_and_related_search_results_partial",
+      "review_date": "2026-11-27"
     },
     {
       "case_key": "bank-curated-v2-42",
@@ -4233,13 +4230,12 @@
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
       "legal_basis": "Закон РФ № 2300-1, статьи 4, 10 и 12: качество услуги, достоверная информация и последствия её непредоставления. Правка произношения не является процедурой переименования географического объекта. Источники: https://44.rospotrebnadzor.ru/osnovnye_napravlenij/zacshita_prav_potreb/normativnye_dokument/48/",
-      "legal_urls": [
-        "https://44.rospotrebnadzor.ru/osnovnye_napravlenij/zacshita_prav_potreb/normativnye_dokument/48/"
-      ],
+      "legal_urls": [],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
       "option_analysis_status": "draft",
-      "source_scope": "inherited_basis_requires_current_verification"
+      "source_scope": "inherited_basis_requires_current_verification",
+      "review_date": "2026-11-27"
     },
     {
       "case_key": "bank-curated-v2-43",
@@ -4250,12 +4246,13 @@
       "resolved_source_url": null,
       "legal_basis": "Федеральный закон № 29-ФЗ, статья 3: требования к нахождению пищевой продукции в обращении. Предупреждение волонтёра не подменяет сведения, позволяющие установить безопасность и условия использования продукта. Источники: https://13.rospotrebnadzor.ru/sites/default/files/federalnyy_zakon_ot_2_yanvarya_2000_g_n_29_fz_o_kachestve_i_bezopasnosti_pishchevyh_p.pdf",
       "legal_urls": [
-        "https://13.rospotrebnadzor.ru/sites/default/files/federalnyy_zakon_ot_2_yanvarya_2000_g_n_29_fz_o_kachestve_i_bezopasnosti_pishchevyh_p.pdf"
+        "https://www.consultant.ru/document/cons_doc_LAW_25584/e9278b4da9d697e7ffac54e2c395f58c8306f72c/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
       "option_analysis_status": "draft",
-      "source_scope": "inherited_basis_requires_current_verification"
+      "source_scope": "specific_norm_and_related_search_results_partial",
+      "review_date": "2026-11-27"
     },
     {
       "case_key": "bank-curated-v2-44",
@@ -4266,13 +4263,13 @@
       "resolved_source_url": null,
       "legal_basis": "Закон РФ № 2300-1, статьи 7 и 10: безопасность оказываемой услуги и необходимая информация потребителю. Доступность объектов для инвалидов обеспечивается по статье 15 Федерального закона № 181-ФЗ. Источники: https://44.rospotrebnadzor.ru/osnovnye_napravlenij/zacshita_prav_potreb/normativnye_dokument/48/ https://sfr.gov.ru/order/law_rehabilitation~11198",
       "legal_urls": [
-        "https://44.rospotrebnadzor.ru/osnovnye_napravlenij/zacshita_prav_potreb/normativnye_dokument/48/",
-        "https://sfr.gov.ru/order/law_rehabilitation~11198"
+        "https://www.consultant.ru/document/cons_doc_LAW_8559/1f3d91284a26982ce51392b5fd178e392fe53404/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
       "option_analysis_status": "draft",
-      "source_scope": "inherited_basis_requires_current_verification"
+      "source_scope": "specific_norm_and_related_search_results_partial",
+      "review_date": "2026-11-27"
     },
     {
       "case_key": "bank-curated-v2-45",
@@ -4282,13 +4279,12 @@
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
       "legal_basis": "ГК РФ, статьи 1064 и 1095: общие основания ответственности за вред и вред вследствие недостатков услуги. Прежняя карта сама по себе не устраняет возникшую опасность; требуется проверка фактической организации маршрута. Источники: https://minjust.gov.ru/ru/pages/grazhdanskij-kodeks/",
-      "legal_urls": [
-        "https://minjust.gov.ru/ru/pages/grazhdanskij-kodeks/"
-      ],
+      "legal_urls": [],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
       "option_analysis_status": "draft",
-      "source_scope": "inherited_basis_requires_current_verification"
+      "source_scope": "inherited_basis_requires_current_verification",
+      "review_date": "2026-11-27"
     },
     {
       "case_key": "bank-curated-v2-46",
@@ -4298,14 +4294,12 @@
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
       "legal_basis": "ГК РФ, статьи 209 и 210: собственник определяет допустимое использование и обеспечивает содержание имущества; статья 1064 — общие основания ответственности за вред. Снятие замков требует продуманного порядка учёта и хранения. Источники: https://11.rosguard.gov.ru/uploads/2025/07/5_grazhdanskijj_kodeks_rossijjskojj_federacii_chast_pervaya.pdf https://minjust.gov.ru/ru/pages/grazhdanskij-kodeks/",
-      "legal_urls": [
-        "https://11.rosguard.gov.ru/uploads/2025/07/5_grazhdanskijj_kodeks_rossijjskojj_federacii_chast_pervaya.pdf",
-        "https://minjust.gov.ru/ru/pages/grazhdanskij-kodeks/"
-      ],
+      "legal_urls": [],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
       "option_analysis_status": "draft",
-      "source_scope": "inherited_basis_requires_current_verification"
+      "source_scope": "inherited_basis_requires_current_verification",
+      "review_date": "2026-11-27"
     },
     {
       "case_key": "bank-curated-v2-47",
@@ -4316,12 +4310,14 @@
       "resolved_source_url": null,
       "legal_basis": "ГК РФ, статьи 1229, 1259 и 1270: исключительное право и использование произведения; статья 1260 — производное произведение с соблюдением прав автора исходного. Конкурсное одобрение не заменяет необходимое разрешение. Источники: https://rospatent.gov.ru/ru/documents/grazhdanskiy-kodeks-rossiyskoy-federacii-chast-chetvertaya",
       "legal_urls": [
-        "https://rospatent.gov.ru/ru/documents/grazhdanskiy-kodeks-rossiyskoy-federacii-chast-chetvertaya"
+        "https://www.consultant.ru/document/cons_doc_LAW_64629/98ad2641f95945c4b7956150260564c8b44028d9/",
+        "https://www.consultant.ru/document/cons_doc_LAW_64629/dffcf0b87b80ff38f430dc822a0074e76ccd41a0/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
       "option_analysis_status": "draft",
-      "source_scope": "inherited_basis_requires_current_verification"
+      "source_scope": "specific_norm_and_related_search_results_partial",
+      "review_date": "2026-11-27"
     },
     {
       "case_key": "bank-curated-v2-48",
@@ -4331,14 +4327,12 @@
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
       "legal_basis": "ГК РФ, статьи 209 и 210: решение владельца об использовании и содержании имущества. Градостроительный кодекс РФ, статья 1, пункты 36 и 38: благоустройство и его элементы; конкретный порядок работ определяется применимыми местными правилами. Источники: https://11.rosguard.gov.ru/uploads/2025/07/5_grazhdanskijj_kodeks_rossijjskojj_federacii_chast_pervaya.pdf https://okn.alania.gov.ru/documents/819",
-      "legal_urls": [
-        "https://11.rosguard.gov.ru/uploads/2025/07/5_grazhdanskijj_kodeks_rossijjskojj_federacii_chast_pervaya.pdf",
-        "https://okn.alania.gov.ru/documents/819"
-      ],
+      "legal_urls": [],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
       "option_analysis_status": "draft",
-      "source_scope": "inherited_basis_requires_current_verification"
+      "source_scope": "inherited_basis_requires_current_verification",
+      "review_date": "2026-11-27"
     },
     {
       "case_key": "bank-curated-v2-49",
@@ -4348,14 +4342,12 @@
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
       "legal_basis": "Закон РФ № 2300-1, статьи 10 и 28: информация об услуге и права потребителя при нарушении сроков её выполнения; ГК РФ, статья 450 — изменение договора по соглашению сторон, если не предусмотрено иное. Источники: https://44.rospotrebnadzor.ru/osnovnye_napravlenij/zacshita_prav_potreb/normativnye_dokument/48/ https://11.rosguard.gov.ru/uploads/2025/07/5_grazhdanskijj_kodeks_rossijjskojj_federacii_chast_pervaya.pdf",
-      "legal_urls": [
-        "https://44.rospotrebnadzor.ru/osnovnye_napravlenij/zacshita_prav_potreb/normativnye_dokument/48/",
-        "https://11.rosguard.gov.ru/uploads/2025/07/5_grazhdanskijj_kodeks_rossijjskojj_federacii_chast_pervaya.pdf"
-      ],
+      "legal_urls": [],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
       "option_analysis_status": "draft",
-      "source_scope": "inherited_basis_requires_current_verification"
+      "source_scope": "inherited_basis_requires_current_verification",
+      "review_date": "2026-11-27"
     },
     {
       "case_key": "bank-curated-v2-50",
@@ -4366,12 +4358,14 @@
       "resolved_source_url": null,
       "legal_basis": "ГК РФ, статьи 1314 и 1317: права на совместное исполнение и исключительное право исполнителя; статьи 1229 и 1270 — отдельные права на музыкальное произведение. Разрешение на репетиционную запись не означает разрешение на любое публичное использование. Источники: https://rospatent.gov.ru/ru/documents/grazhdanskiy-kodeks-rossiyskoy-federacii-chast-chetvertaya",
       "legal_urls": [
-        "https://rospatent.gov.ru/ru/documents/grazhdanskiy-kodeks-rossiyskoy-federacii-chast-chetvertaya"
+        "https://www.consultant.ru/document/cons_doc_LAW_64629/98ad2641f95945c4b7956150260564c8b44028d9/",
+        "https://www.consultant.ru/document/cons_doc_LAW_64629/dffcf0b87b80ff38f430dc822a0074e76ccd41a0/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
       "option_analysis_status": "draft",
-      "source_scope": "inherited_basis_requires_current_verification"
+      "source_scope": "specific_norm_and_related_search_results_partial",
+      "review_date": "2026-11-27"
     },
     {
       "case_key": "bank-environment",
@@ -4381,14 +4375,12 @@
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
       "legal_basis": "Федеральный закон № 7-ФЗ, статья 11: право граждан на достоверную экологическую информацию. Конституция РФ, статья 42: право на благоприятную окружающую среду и достоверную информацию о её состоянии. Конкретные контрольные действия выполняет компетентный орган, а не пресс-служба. Источники: https://epp.genproc.gov.ru/upload/iblock/0d0/hghg8nrmg2v25zrox7cvk28868b3fr21.pdf https://minjust.gov.ru/ru/documents/8011/",
-      "legal_urls": [
-        "https://epp.genproc.gov.ru/upload/iblock/0d0/hghg8nrmg2v25zrox7cvk28868b3fr21.pdf",
-        "https://minjust.gov.ru/ru/documents/8011/"
-      ],
+      "legal_urls": [],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
       "option_analysis_status": "draft",
-      "source_scope": "inherited_basis_requires_current_verification"
+      "source_scope": "inherited_basis_requires_current_verification",
+      "review_date": "2026-11-27"
     },
     {
       "case_key": "bank-expanded-light-01-01",
@@ -4399,13 +4391,13 @@
       "resolved_source_url": null,
       "legal_basis": "ГК РФ, статья 723: права заказчика при недостатках результата работ; статьи 309 и 310: надлежащее исполнение обязательства и пределы его одностороннего изменения. Конкретный срок требования определяется применимым договором и законом. Источники: https://zpp.rospotrebnadzor.ru/adjudications/federal/66RS0052-01-2019-000514-19 https://11.rosguard.gov.ru/uploads/2025/07/5_grazhdanskijj_kodeks_rossijjskojj_federacii_chast_pervaya.pdf",
       "legal_urls": [
-        "https://zpp.rospotrebnadzor.ru/adjudications/federal/66RS0052-01-2019-000514-19",
-        "https://11.rosguard.gov.ru/uploads/2025/07/5_grazhdanskijj_kodeks_rossijjskojj_federacii_chast_pervaya.pdf"
+        "https://www.consultant.ru/document/cons_doc_LAW_9027/0f3422f73df7bee03d56085359c80be8d2981ead/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
       "option_analysis_status": "draft",
-      "source_scope": "inherited_basis_requires_current_verification"
+      "source_scope": "specific_norm_and_related_search_results_partial",
+      "review_date": "2026-11-27"
     },
     {
       "case_key": "bank-expanded-light-02-01",
@@ -4416,12 +4408,13 @@
       "resolved_source_url": null,
       "legal_basis": "Федеральный закон № 8-ФЗ, статьи 8 и 11: достоверность и своевременность информации о деятельности органа. Сувенирная идея не меняет содержание протокола и требует самостоятельного решения в пределах компетенции. Источники: https://mintrud.gov.ru/docs/laws/129",
       "legal_urls": [
-        "https://mintrud.gov.ru/docs/laws/129"
+        "https://www.consultant.ru/document/cons_doc_LAW_84602/e4fb380d53822434913f8449aa9b9e6bdf9f67a4/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
       "option_analysis_status": "draft",
-      "source_scope": "inherited_basis_requires_current_verification"
+      "source_scope": "specific_norm_and_related_search_results_partial",
+      "review_date": "2026-11-27"
     },
     {
       "case_key": "bank-expanded-light-03-01",
@@ -4431,13 +4424,12 @@
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
       "legal_basis": "ГК РФ, статьи 309 и 421: содержание обязательства определяется законом и договором; дополнительная услуга требует самостоятельного основания. Нормы не устанавливают обязательного разрезания ленты перед использованием принятого парка. Источники: https://11.rosguard.gov.ru/uploads/2025/07/5_grazhdanskijj_kodeks_rossijjskojj_federacii_chast_pervaya.pdf",
-      "legal_urls": [
-        "https://11.rosguard.gov.ru/uploads/2025/07/5_grazhdanskijj_kodeks_rossijjskojj_federacii_chast_pervaya.pdf"
-      ],
+      "legal_urls": [],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
       "option_analysis_status": "draft",
-      "source_scope": "inherited_basis_requires_current_verification"
+      "source_scope": "inherited_basis_requires_current_verification",
+      "review_date": "2026-11-27"
     },
     {
       "case_key": "bank-expanded-light-04-01",
@@ -4448,13 +4440,13 @@
       "resolved_source_url": null,
       "legal_basis": "Федеральный закон № 181-ФЗ, статья 15: доступность услуг и необходимая помощь инвалидам. ГК РФ, статья 309: исполнение согласованных условий услуги. Конкретное техническое решение выбирается по обстоятельствам, а не предписывается этими статьями как единственный способ. Источники: https://sfr.gov.ru/order/law_rehabilitation~11198 https://11.rosguard.gov.ru/uploads/2025/07/5_grazhdanskijj_kodeks_rossijjskojj_federacii_chast_pervaya.pdf",
       "legal_urls": [
-        "https://sfr.gov.ru/order/law_rehabilitation~11198",
-        "https://11.rosguard.gov.ru/uploads/2025/07/5_grazhdanskijj_kodeks_rossijjskojj_federacii_chast_pervaya.pdf"
+        "https://www.consultant.ru/document/cons_doc_LAW_8559/1f3d91284a26982ce51392b5fd178e392fe53404/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
       "option_analysis_status": "draft",
-      "source_scope": "inherited_basis_requires_current_verification"
+      "source_scope": "specific_norm_and_related_search_results_partial",
+      "review_date": "2026-11-27"
     },
     {
       "case_key": "bank-expanded-light-05-01",
@@ -4465,13 +4457,13 @@
       "resolved_source_url": null,
       "legal_basis": "ГК РФ, статьи 1057 и 1058: условия публичного конкурса и предусмотренные пределы их изменения; статья 1229: использование произведения с учётом исключительного права. Применимость режима публичного конкурса зависит от содержания объявленных условий. Источники: https://minjust.gov.ru/ru/pages/grazhdanskij-kodeks/ https://rospatent.gov.ru/ru/documents/grazhdanskiy-kodeks-rossiyskoy-federacii-chast-chetvertaya",
       "legal_urls": [
-        "https://minjust.gov.ru/ru/pages/grazhdanskij-kodeks/",
-        "https://rospatent.gov.ru/ru/documents/grazhdanskiy-kodeks-rossiyskoy-federacii-chast-chetvertaya"
+        "https://www.consultant.ru/document/cons_doc_LAW_64629/98ad2641f95945c4b7956150260564c8b44028d9/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
       "option_analysis_status": "draft",
-      "source_scope": "inherited_basis_requires_current_verification"
+      "source_scope": "specific_norm_and_related_search_results_partial",
+      "review_date": "2026-11-27"
     },
     {
       "case_key": "bank-expanded-light-06-01",
@@ -4482,13 +4474,13 @@
       "resolved_source_url": null,
       "legal_basis": "Федеральный закон № 8-ФЗ, статьи 8 и 11: достоверность информации о деятельности органа. Закон РФ № 2124-1 «О СМИ», статьи 39–40: специальный режим редакционных запросов; бытовая тема не превращает неподтверждённую причинность в факт. Источники: https://mintrud.gov.ru/docs/laws/129 https://epp.genproc.gov.ru/ru/proc_72/activity/legal-education/explain/e1331886/",
       "legal_urls": [
-        "https://mintrud.gov.ru/docs/laws/129",
-        "https://epp.genproc.gov.ru/ru/proc_72/activity/legal-education/explain/e1331886/"
+        "https://www.consultant.ru/document/cons_doc_LAW_84602/e4fb380d53822434913f8449aa9b9e6bdf9f67a4/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
       "option_analysis_status": "draft",
-      "source_scope": "inherited_basis_requires_current_verification"
+      "source_scope": "specific_norm_and_related_search_results_partial",
+      "review_date": "2026-11-27"
     },
     {
       "case_key": "bank-expanded-light-07-01",
