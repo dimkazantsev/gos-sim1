@@ -1,0 +1,252 @@
+{
+  "status": "partial_review_not_release",
+  "checked_on": "2026-11-27",
+  "live": {
+    "cases": 330,
+    "options": 1660,
+    "keys_and_audiences_match": true,
+    "assigned": 65,
+    "closed": 54,
+    "open_without_votes": [
+      "bank-curated-serious-11",
+      "bank-curated-v2-09",
+      "bank-expanded-serious-09-01",
+      "bank-legal-2026-018",
+      "bank-legal-2026-026",
+      "bank-legal-2026-073",
+      "bank-legal-2026-084"
+    ],
+    "open_with_votes": [
+      "bank-curated-v2-27",
+      "bank-legal-2026-100",
+      "bank-legal-2026-107",
+      "bank-legal-2026-141"
+    ]
+  },
+  "legacy_effects": {
+    "regional_cases": 89,
+    "cyclic_exact_matches": 87,
+    "formula": "activity=0.004+((case_number-1)%7)*0.001; expenditure=15+((case_number-1)%17)",
+    "note": "Числовая закономерность, не доказательство реального расхода; не переносить автоматически."
+  },
+  "article_evidence": [
+    {
+      "law": "БК РФ",
+      "article": "34",
+      "url": "https://www.consultant.ru/document/cons_doc_LAW_19702/9d0dc5bffbe52f6f95e97813e0ef420708952b4e/",
+      "checked_on": "2026-11-27",
+      "scope": "Проверен текст указанной нормы, не все связанные требования",
+      "potential_case_keys": [
+        "bank-legal-2026-055"
+      ]
+    },
+    {
+      "law": "БК РФ",
+      "article": "78",
+      "url": "https://www.consultant.ru/document/cons_doc_LAW_19702/1b6959f23cc516d0e11ddc2e213ca2dca83560df/",
+      "checked_on": "2026-11-27",
+      "scope": "Проверен текст указанной нормы, не все связанные требования",
+      "potential_case_keys": [
+        "budget-region-2026-77-recipient-insolvent",
+        "bank-legal-2026-001",
+        "bank-legal-2026-016",
+        "bank-legal-2026-022",
+        "bank-legal-2026-028",
+        "bank-legal-2026-031",
+        "bank-legal-2026-032",
+        "bank-legal-2026-040",
+        "bank-legal-2026-041",
+        "bank-legal-2026-042",
+        "bank-legal-2026-045",
+        "bank-legal-2026-048",
+        "bank-legal-2026-052",
+        "bank-legal-2026-054",
+        "bank-legal-2026-057",
+        "bank-legal-2026-058",
+        "bank-legal-2026-073",
+        "bank-legal-2026-081",
+        "bank-legal-2026-083",
+        "bank-legal-2026-148",
+        "bank-expanded-serious-09-01",
+        "bank-expanded-serious-18-01"
+      ]
+    },
+    {
+      "law": "БК РФ",
+      "article": "78.1",
+      "url": "https://www.consultant.ru/document/cons_doc_LAW_19702/2a2fd8efeffb727e38658d8fcbfc12849b352733/",
+      "checked_on": "2026-11-27",
+      "scope": "Проверен текст указанной нормы, не все связанные требования",
+      "potential_case_keys": [
+        "bank-legal-2026-033"
+      ]
+    },
+    {
+      "law": "БК РФ",
+      "article": "81",
+      "url": "https://www.consultant.ru/document/cons_doc_LAW_19702/55d68b8b11dce341557f8bc5b72a4a20c5c8e00c/",
+      "checked_on": "2026-11-27",
+      "scope": "Проверен текст указанной нормы, не все связанные требования",
+      "potential_case_keys": [
+        "budget-region-2026-38-emergency",
+        "bank-legal-2026-011"
+      ]
+    },
+    {
+      "law": "БК РФ",
+      "article": "92.1",
+      "url": "https://www.consultant.ru/document/cons_doc_LAW_19702/6f11e8bb720f79997a479fc6c1e98b78f23c3755/",
+      "checked_on": "2026-11-27",
+      "scope": "Проверен текст указанной нормы, не все связанные требования",
+      "potential_case_keys": []
+    },
+    {
+      "law": "БК РФ",
+      "article": "129",
+      "url": "https://www.consultant.ru/document/cons_doc_LAW_19702/62d1eb76438332da325fe9cfc2da30b674aecfa1/",
+      "checked_on": "2026-11-27",
+      "scope": "Проверен текст указанной нормы, не все связанные требования",
+      "potential_case_keys": []
+    },
+    {
+      "law": "БК РФ",
+      "article": "130",
+      "url": "https://www.consultant.ru/document/cons_doc_LAW_19702/2969fdd52be4b13b4c2e858fab8ccf131e6562d8/",
+      "checked_on": "2026-11-27",
+      "scope": "Проверен текст указанной нормы, не все связанные требования",
+      "potential_case_keys": []
+    },
+    {
+      "law": "БК РФ",
+      "article": "131",
+      "url": "https://www.consultant.ru/document/cons_doc_LAW_19702/42df670934cd2c8f62a9ef153b2826b4d39b3ff4/",
+      "checked_on": "2026-11-27",
+      "scope": "Проверен текст указанной нормы, не все связанные требования",
+      "potential_case_keys": [
+        "budget-region-2026-05-equalization",
+        "budget-region-2026-05-essential-services-gap"
+      ]
+    },
+    {
+      "law": "БК РФ",
+      "article": "132",
+      "url": "https://www.consultant.ru/document/cons_doc_LAW_19702/0859896f05c16d5719eafdf624507adf8887f0c7/",
+      "checked_on": "2026-11-27",
+      "scope": "Проверен текст указанной нормы, не все связанные требования",
+      "potential_case_keys": [
+        "budget-region-2026-10-hospital-equipment",
+        "budget-region-2026-22-drought-irrigation",
+        "budget-region-2026-25-bridge-detour",
+        "budget-region-2026-38-forest-recovery",
+        "budget-region-2026-40-industrial-grid",
+        "budget-region-2026-42-employment-retraining",
+        "budget-region-2026-43-rural-cultural-centres",
+        "budget-region-2026-45-rural-broadband",
+        "budget-region-2026-47-food-logistics",
+        "budget-region-2026-54-cluster",
+        "budget-region-2026-54-school-capacity",
+        "budget-region-2026-56-flood-drainage",
+        "budget-region-2026-59-heating-network",
+        "budget-region-2026-63-technical-college",
+        "budget-region-2026-64-wastewater-cleaning",
+        "budget-region-2026-72-temporary-family-housing",
+        "bank-legal-2026-003"
+      ]
+    },
+    {
+      "law": "БК РФ",
+      "article": "133",
+      "url": "https://www.consultant.ru/document/cons_doc_LAW_19702/6288b672abcacbdfce848217bd5f3b6dcfa76913/",
+      "checked_on": "2026-11-27",
+      "scope": "Проверен текст указанной нормы, не все связанные требования",
+      "potential_case_keys": [
+        "budget-region-2026-27-delegated"
+      ]
+    },
+    {
+      "law": "БК РФ",
+      "article": "139",
+      "url": "https://www.consultant.ru/document/cons_doc_LAW_19702/8196c04ca89900439f387e81fad411d6965f41cf/",
+      "checked_on": "2026-11-27",
+      "scope": "Проверен текст указанной нормы, не все связанные требования",
+      "potential_case_keys": [
+        "bank-legal-2026-060",
+        "bank-expanded-serious-26-01"
+      ]
+    },
+    {
+      "law": "БК РФ",
+      "article": "219",
+      "url": "https://www.consultant.ru/document/cons_doc_LAW_19702/15d7c58c01bf75dcd6cf84a008bfef761ba731eb/",
+      "checked_on": "2026-11-27",
+      "scope": "Проверен текст указанной нормы, не все связанные требования",
+      "potential_case_keys": [
+        "bank-legal-2026-006",
+        "bank-legal-2026-079",
+        "bank-legal-2026-139"
+      ]
+    },
+    {
+      "law": "НК РФ",
+      "article": "12",
+      "url": "https://www.consultant.ru/document/cons_doc_LAW_19671/ab54b1f6e016638e006428e90971b05636b17cbf/",
+      "checked_on": "2026-11-27",
+      "scope": "Проверен текст указанной нормы, не все связанные требования",
+      "potential_case_keys": [
+        "bank-legal-2026-002",
+        "bank-legal-2026-025",
+        "bank-legal-2026-059",
+        "bank-legal-2026-076"
+      ]
+    },
+    {
+      "law": "НК РФ",
+      "article": "56",
+      "url": "https://www.consultant.ru/document/cons_doc_LAW_19671/4cada6c7ce0d8a4a287f0eeb6d5c1ed5f4d08045/",
+      "checked_on": "2026-11-27",
+      "scope": "Проверен текст указанной нормы, не все связанные требования",
+      "potential_case_keys": [
+        "bank-legal-2026-002",
+        "bank-legal-2026-025",
+        "bank-legal-2026-126"
+      ]
+    },
+    {
+      "law": "НК РФ",
+      "article": "418.5",
+      "url": "https://www.consultant.ru/document/cons_doc_LAW_28165/58051460fe04ca74ab709af54bb5768dc71ed783/",
+      "checked_on": "2026-11-27",
+      "scope": "Проверен текст указанной нормы, не все связанные требования",
+      "potential_case_keys": [
+        "bank-legal-2026-004"
+      ]
+    },
+    {
+      "law": "44-ФЗ",
+      "article": "94",
+      "url": "https://www.consultant.ru/document/cons_doc_LAW_144624/17c58c1903f7b6212924ba9ce701489655e9a8e0/",
+      "checked_on": "2026-11-27",
+      "scope": "Проверен текст указанной нормы, не все связанные требования",
+      "potential_case_keys": [
+        "bank-legal-2026-105"
+      ]
+    },
+    {
+      "law": "44-ФЗ",
+      "article": "95",
+      "url": "https://www.consultant.ru/document/cons_doc_LAW_144624/f4823c3311874efd0ecdfa668c9705968edbc47c/",
+      "checked_on": "2026-11-27",
+      "scope": "Проверен текст указанной нормы, не все связанные требования",
+      "potential_case_keys": [
+        "bank-legal-2026-051"
+      ]
+    }
+  ],
+  "unavailable_documentary_full_text": [
+    "bank-budget-bridge",
+    "bank-budget-school",
+    "bank-bus",
+    "bank-curated-serious-06",
+    "bank-curated-serious-18"
+  ]
+}
