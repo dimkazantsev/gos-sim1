@@ -130,7 +130,14 @@
         "source_scope": "specific_norm_and_related_search_results_partial",
         "competence_review": {
           "status": "draft_mapping_pending",
-          "note": "Земельный орган проверяет основания и режим предоставления; обсуждение жителей выявляет потребности, но не заменяет правоустанавливающее решение."
+          "note": "Земельный орган проверяет основания и режим предоставления; обсуждение жителей выявляет потребности, но не заменяет правоустанавливающее решение.",
+          "game_portfolio_candidate": {
+            "office_key": "ministry_internal",
+            "office_title": "Министерство по внутренней политике и государству",
+            "scope": "Рекомендация профильному участнику подготовить решение/координировать обращение к действительному исполнителю; не наделяет правом самостоятельно исполнять действие, распоряжаться средствами или заменять реальный орган.",
+            "status": "proposed_not_authorization",
+            "legacy_role_match_needs_replacement": true
+          }
         },
         "checked_norm_urls": [
           "https://www.consultant.ru/document/cons_doc_LAW_33773/79da6e3bbbc8eb967db0714e8378269bfea9f83c/"
@@ -271,7 +278,14 @@
         "source_scope": "inherited_basis_requires_current_verification",
         "competence_review": {
           "status": "draft_mapping_pending",
-          "note": "Уполномоченные органы и операторы системы оповещения проверяют техническое состояние и фактическую доступность предупреждения."
+          "note": "Уполномоченные органы и операторы системы оповещения проверяют техническое состояние и фактическую доступность предупреждения.",
+          "game_portfolio_candidate": {
+            "office_key": "ministry_defence",
+            "office_title": "Министерство по обороне и внутренней безопасности",
+            "scope": "Рекомендация профильному участнику подготовить решение/координировать обращение к действительному исполнителю; не наделяет правом самостоятельно исполнять действие, распоряжаться средствами или заменять реальный орган.",
+            "status": "proposed_not_authorization",
+            "legacy_role_match_needs_replacement": true
+          }
         },
         "checked_norm_urls": []
       }
@@ -405,7 +419,14 @@
         "source_scope": "inherited_basis_requires_current_verification",
         "competence_review": {
           "status": "draft_mapping_pending",
-          "note": "Собственник и уполномоченное учреждение проверяют режим имущества, правила доступа и финансирование."
+          "note": "Собственник и уполномоченное учреждение проверяют режим имущества, правила доступа и финансирование.",
+          "game_portfolio_candidate": {
+            "office_key": "ministry_social",
+            "office_title": "Министерство по социальной политике",
+            "scope": "Рекомендация профильному участнику подготовить решение/координировать обращение к действительному исполнителю; не наделяет правом самостоятельно исполнять действие, распоряжаться средствами или заменять реальный орган.",
+            "status": "proposed_not_authorization",
+            "legacy_role_match_needs_replacement": true
+          }
         },
         "checked_norm_urls": []
       }
@@ -539,7 +560,14 @@
         "source_scope": "specific_norm_and_related_search_results_partial",
         "competence_review": {
           "status": "draft_mapping_pending",
-          "note": "Перевозчик обеспечивает безопасность, техническое состояние и режим труда водителей; диспетчер информирует пассажиров и организует законную подмену."
+          "note": "Перевозчик обеспечивает безопасность, техническое состояние и режим труда водителей; диспетчер информирует пассажиров и организует законную подмену.",
+          "game_portfolio_candidate": {
+            "office_key": "ministry_economic",
+            "office_title": "Министерство по экономической политике",
+            "scope": "Рекомендация профильному участнику подготовить решение/координировать обращение к действительному исполнителю; не наделяет правом самостоятельно исполнять действие, распоряжаться средствами или заменять реальный орган.",
+            "status": "proposed_not_authorization",
+            "legacy_role_match_needs_replacement": true
+          }
         },
         "checked_norm_urls": [
           "https://www.consultant.ru/document/cons_doc_LAW_8585/16db67ba2656536d83e1eeb8bc449a68755c77c3/"
@@ -680,7 +708,14 @@
         "source_scope": "inherited_basis_requires_current_verification",
         "competence_review": {
           "status": "draft_mapping_pending",
-          "note": "Уполномоченные органы и лаборатории проверяют экологические показатели; школа принимает допустимые меры охраны здоровья."
+          "note": "Уполномоченные органы и лаборатории проверяют экологические показатели; школа принимает допустимые меры охраны здоровья.",
+          "game_portfolio_candidate": {
+            "office_key": "ministry_economic",
+            "office_title": "Министерство по экономической политике",
+            "scope": "Рекомендация профильному участнику подготовить решение/координировать обращение к действительному исполнителю; не наделяет правом самостоятельно исполнять действие, распоряжаться средствами или заменять реальный орган.",
+            "status": "proposed_not_authorization",
+            "legacy_role_match_needs_replacement": true
+          }
         },
         "checked_norm_urls": []
       }
@@ -814,7 +849,14 @@
         "source_scope": "inherited_basis_requires_current_verification",
         "competence_review": {
           "status": "draft_mapping_pending",
-          "note": "Организатор и компетентный орган оформляют изменение обсуждения, извещение и учёт замечаний по применимым правилам."
+          "note": "Организатор и компетентный орган оформляют изменение обсуждения, извещение и учёт замечаний по применимым правилам.",
+          "game_portfolio_candidate": {
+            "office_key": "ministry_internal",
+            "office_title": "Министерство по внутренней политике и государству",
+            "scope": "Рекомендация профильному участнику подготовить решение/координировать обращение к действительному исполнителю; не наделяет правом самостоятельно исполнять действие, распоряжаться средствами или заменять реальный орган.",
+            "status": "proposed_not_authorization",
+            "legacy_role_match_needs_replacement": true
+          }
         },
         "checked_norm_urls": []
       }
@@ -948,7 +990,14 @@
         "source_scope": "specific_norm_and_related_search_results_partial",
         "competence_review": {
           "status": "draft_mapping_pending",
-          "note": "Ответственный за резерв исключает непригодные продукты и отражает фактический остаток; обмен оформляется отдельно."
+          "note": "Ответственный за резерв исключает непригодные продукты и отражает фактический остаток; обмен оформляется отдельно.",
+          "game_portfolio_candidate": {
+            "office_key": "ministry_defence",
+            "office_title": "Министерство по обороне и внутренней безопасности",
+            "scope": "Рекомендация профильному участнику подготовить решение/координировать обращение к действительному исполнителю; не наделяет правом самостоятельно исполнять действие, распоряжаться средствами или заменять реальный орган.",
+            "status": "proposed_not_authorization",
+            "legacy_role_match_needs_replacement": true
+          }
         },
         "checked_norm_urls": [
           "https://www.consultant.ru/document/cons_doc_LAW_25584/e9278b4da9d697e7ffac54e2c395f58c8306f72c/"
@@ -1089,7 +1138,14 @@
         "source_scope": "specific_norm_and_related_search_results_partial",
         "competence_review": {
           "status": "draft_mapping_pending",
-          "note": "Водохозяйственные и разрешительные органы проверяют основание водопользования; инвестор предоставляет проектные сведения."
+          "note": "Водохозяйственные и разрешительные органы проверяют основание водопользования; инвестор предоставляет проектные сведения.",
+          "game_portfolio_candidate": {
+            "office_key": "ministry_economic",
+            "office_title": "Министерство по экономической политике",
+            "scope": "Рекомендация профильному участнику подготовить решение/координировать обращение к действительному исполнителю; не наделяет правом самостоятельно исполнять действие, распоряжаться средствами или заменять реальный орган.",
+            "status": "proposed_not_authorization",
+            "legacy_role_match_needs_replacement": true
+          }
         },
         "checked_norm_urls": [
           "https://www.consultant.ru/document/cons_doc_LAW_60683/d8506cc78b9dc825c874fa280a0e0f5b72080d53/"
@@ -1225,7 +1281,14 @@
         "source_scope": "specific_norm_and_related_search_results_partial",
         "competence_review": {
           "status": "draft_mapping_pending",
-          "note": "Уполномоченный собственник проверяет порядок предоставления имущества и исключения статьи 17.1."
+          "note": "Уполномоченный собственник проверяет порядок предоставления имущества и исключения статьи 17.1.",
+          "game_portfolio_candidate": {
+            "office_key": "ministry_economic",
+            "office_title": "Министерство по экономической политике",
+            "scope": "Рекомендация профильному участнику подготовить решение/координировать обращение к действительному исполнителю; не наделяет правом самостоятельно исполнять действие, распоряжаться средствами или заменять реальный орган.",
+            "status": "proposed_not_authorization",
+            "legacy_role_match_needs_replacement": true
+          }
         },
         "checked_norm_urls": [
           "https://www.consultant.ru/document/cons_doc_LAW_61763/eeb8f51df68fc096ecadf011932a85ef5e6a0ee1/"
@@ -1361,7 +1424,14 @@
         "source_scope": "specific_norm_and_related_search_results_partial",
         "competence_review": {
           "status": "draft_mapping_pending",
-          "note": "Заказчик проверяет фактический охват и этапы контракта; оператор устраняет подтверждённые недостатки."
+          "note": "Заказчик проверяет фактический охват и этапы контракта; оператор устраняет подтверждённые недостатки.",
+          "game_portfolio_candidate": {
+            "office_key": "ministry_economic",
+            "office_title": "Министерство по экономической политике",
+            "scope": "Рекомендация профильному участнику подготовить решение/координировать обращение к действительному исполнителю; не наделяет правом самостоятельно исполнять действие, распоряжаться средствами или заменять реальный орган.",
+            "status": "proposed_not_authorization",
+            "legacy_role_match_needs_replacement": true
+          }
         },
         "checked_norm_urls": [
           "https://www.consultant.ru/document/cons_doc_LAW_144624/17c58c1903f7b6212924ba9ce701489655e9a8e0/"
@@ -1497,7 +1567,14 @@
         "source_scope": "inherited_basis_requires_current_verification",
         "competence_review": {
           "status": "draft_mapping_pending",
-          "note": "Уполномоченный собственник или учреждение проверяет условия передачи автобуса и расходы; перевозчик отвечает за безопасность."
+          "note": "Уполномоченный собственник или учреждение проверяет условия передачи автобуса и расходы; перевозчик отвечает за безопасность.",
+          "game_portfolio_candidate": {
+            "office_key": "ministry_foreign",
+            "office_title": "Министерство по внешней политике",
+            "scope": "Рекомендация профильному участнику подготовить решение/координировать обращение к действительному исполнителю; не наделяет правом самостоятельно исполнять действие, распоряжаться средствами или заменять реальный орган.",
+            "status": "proposed_not_authorization",
+            "legacy_role_match_needs_replacement": true
+          }
         },
         "checked_norm_urls": []
       }
@@ -1631,7 +1708,14 @@
         "source_scope": "inherited_basis_requires_current_verification",
         "competence_review": {
           "status": "draft_mapping_pending",
-          "note": "Владелец дороги и орган дорожного надзора проверяют знак и опасность; должностные лица применяют ответственность по законным основаниям."
+          "note": "Владелец дороги и орган дорожного надзора проверяют знак и опасность; должностные лица применяют ответственность по законным основаниям.",
+          "game_portfolio_candidate": {
+            "office_key": "ministry_internal",
+            "office_title": "Министерство по внутренней политике и государству",
+            "scope": "Рекомендация профильному участнику подготовить решение/координировать обращение к действительному исполнителю; не наделяет правом самостоятельно исполнять действие, распоряжаться средствами или заменять реальный орган.",
+            "status": "proposed_not_authorization",
+            "legacy_role_match_needs_replacement": true
+          }
         },
         "checked_norm_urls": []
       }
@@ -1765,7 +1849,14 @@
         "source_scope": "specific_norm_and_related_search_results_partial",
         "competence_review": {
           "status": "draft_mapping_pending",
-          "note": "Оператор уточняет неточные данные; комиссия и уполномоченный орган применяют правила стипендии."
+          "note": "Оператор уточняет неточные данные; комиссия и уполномоченный орган применяют правила стипендии.",
+          "game_portfolio_candidate": {
+            "office_key": "ministry_social",
+            "office_title": "Министерство по социальной политике",
+            "scope": "Рекомендация профильному участнику подготовить решение/координировать обращение к действительному исполнителю; не наделяет правом самостоятельно исполнять действие, распоряжаться средствами или заменять реальный орган.",
+            "status": "proposed_not_authorization",
+            "legacy_role_match_needs_replacement": true
+          }
         },
         "checked_norm_urls": [
           "https://www.consultant.ru/document/cons_doc_LAW_61801/d3fe43a7c415353b17faab255bc0de92bea127da/"
@@ -1896,7 +1987,14 @@
         "source_scope": "specific_norm_and_related_search_results_partial",
         "competence_review": {
           "status": "draft_mapping_pending",
-          "note": "Владелец дороги определяет защитные меры; заказчик оформляет дополнительные работы по допустимому основанию."
+          "note": "Владелец дороги определяет защитные меры; заказчик оформляет дополнительные работы по допустимому основанию.",
+          "game_portfolio_candidate": {
+            "office_key": "ministry_internal",
+            "office_title": "Министерство по внутренней политике и государству",
+            "scope": "Рекомендация профильному участнику подготовить решение/координировать обращение к действительному исполнителю; не наделяет правом самостоятельно исполнять действие, распоряжаться средствами или заменять реальный орган.",
+            "status": "proposed_not_authorization",
+            "legacy_role_match_needs_replacement": true
+          }
         },
         "checked_norm_urls": [
           "https://www.consultant.ru/document/cons_doc_LAW_144624/f4823c3311874efd0ecdfa668c9705968edbc47c/"
@@ -2032,7 +2130,14 @@
         "source_scope": "specific_norm_and_related_search_results_partial",
         "competence_review": {
           "status": "draft_mapping_pending",
-          "note": "Заказчик фиксирует недопоставку; библиотека согласует обслуживание; перевозчик проверяет транспорт и водителей."
+          "note": "Заказчик фиксирует недопоставку; библиотека согласует обслуживание; перевозчик проверяет транспорт и водителей.",
+          "game_portfolio_candidate": {
+            "office_key": "ministry_social",
+            "office_title": "Министерство по социальной политике",
+            "scope": "Рекомендация профильному участнику подготовить решение/координировать обращение к действительному исполнителю; не наделяет правом самостоятельно исполнять действие, распоряжаться средствами или заменять реальный орган.",
+            "status": "proposed_not_authorization",
+            "legacy_role_match_needs_replacement": true
+          }
         },
         "checked_norm_urls": [
           "https://www.consultant.ru/document/cons_doc_LAW_144624/17c58c1903f7b6212924ba9ce701489655e9a8e0/",
@@ -2169,7 +2274,14 @@
         "source_scope": "specific_norm_and_related_search_results_partial",
         "competence_review": {
           "status": "draft_mapping_pending",
-          "note": "Организатор услуги восстанавливает очередь по подтверждённым записям и законным приоритетам; оператор исправляет отображение."
+          "note": "Организатор услуги восстанавливает очередь по подтверждённым записям и законным приоритетам; оператор исправляет отображение.",
+          "game_portfolio_candidate": {
+            "office_key": "ministry_internal",
+            "office_title": "Министерство по внутренней политике и государству",
+            "scope": "Рекомендация профильному участнику подготовить решение/координировать обращение к действительному исполнителю; не наделяет правом самостоятельно исполнять действие, распоряжаться средствами или заменять реальный орган.",
+            "status": "proposed_not_authorization",
+            "legacy_role_match_needs_replacement": true
+          }
         },
         "checked_norm_urls": [
           "https://www.consultant.ru/document/cons_doc_LAW_103023/ec44362ff44a1158aa5b56cf5c77285e3c470b4e/"
@@ -2305,7 +2417,14 @@
         "source_scope": "inherited_basis_requires_current_verification",
         "competence_review": {
           "status": "draft_mapping_pending",
-          "note": "Служба занятости и образовательная организация проверяют основания обучения, потребности и соответствие практики."
+          "note": "Служба занятости и образовательная организация проверяют основания обучения, потребности и соответствие практики.",
+          "game_portfolio_candidate": {
+            "office_key": "ministry_social",
+            "office_title": "Министерство по социальной политике",
+            "scope": "Рекомендация профильному участнику подготовить решение/координировать обращение к действительному исполнителю; не наделяет правом самостоятельно исполнять действие, распоряжаться средствами или заменять реальный орган.",
+            "status": "proposed_not_authorization",
+            "legacy_role_match_needs_replacement": true
+          }
         },
         "checked_norm_urls": []
       }
@@ -2434,7 +2553,14 @@
         "source_scope": "inherited_basis_requires_current_verification",
         "competence_review": {
           "status": "draft_mapping_pending",
-          "note": "Координатор распределяет допустимые задачи по подготовке добровольцев; специальные работы выполняют допущенные лица."
+          "note": "Координатор распределяет допустимые задачи по подготовке добровольцев; специальные работы выполняют допущенные лица.",
+          "game_portfolio_candidate": {
+            "office_key": "ministry_internal",
+            "office_title": "Министерство по внутренней политике и государству",
+            "scope": "Рекомендация профильному участнику подготовить решение/координировать обращение к действительному исполнителю; не наделяет правом самостоятельно исполнять действие, распоряжаться средствами или заменять реальный орган.",
+            "status": "proposed_not_authorization",
+            "legacy_role_match_needs_replacement": true
+          }
         },
         "checked_norm_urls": []
       }
@@ -2568,7 +2694,14 @@
         "source_scope": "inherited_basis_requires_current_verification",
         "competence_review": {
           "status": "draft_mapping_pending",
-          "note": "Управляющая организация отвечает за внутреннюю сеть; орган охраны определяет допустимый фасадный проект."
+          "note": "Управляющая организация отвечает за внутреннюю сеть; орган охраны определяет допустимый фасадный проект.",
+          "game_portfolio_candidate": {
+            "office_key": "ministry_social",
+            "office_title": "Министерство по социальной политике",
+            "scope": "Рекомендация профильному участнику подготовить решение/координировать обращение к действительному исполнителю; не наделяет правом самостоятельно исполнять действие, распоряжаться средствами или заменять реальный орган.",
+            "status": "proposed_not_authorization",
+            "legacy_role_match_needs_replacement": true
+          }
         },
         "checked_norm_urls": []
       }
@@ -2702,7 +2835,14 @@
         "source_scope": "inherited_basis_requires_current_verification",
         "competence_review": {
           "status": "draft_mapping_pending",
-          "note": "Заказчик перевозок проверяет фактический спрос; оператор ограничивает сведения необходимым объёмом."
+          "note": "Заказчик перевозок проверяет фактический спрос; оператор ограничивает сведения необходимым объёмом.",
+          "game_portfolio_candidate": {
+            "office_key": "ministry_social",
+            "office_title": "Министерство по социальной политике",
+            "scope": "Рекомендация профильному участнику подготовить решение/координировать обращение к действительному исполнителю; не наделяет правом самостоятельно исполнять действие, распоряжаться средствами или заменять реальный орган.",
+            "status": "proposed_not_authorization",
+            "legacy_role_match_needs_replacement": true
+          }
         },
         "checked_norm_urls": []
       }
@@ -2836,7 +2976,14 @@
         "source_scope": "inherited_basis_requires_current_verification",
         "competence_review": {
           "status": "draft_mapping_pending",
-          "note": "Организатор согласует безопасную замену номера и соблюдает условия продажи билетов; закупка оформляется по надлежащему основанию."
+          "note": "Организатор согласует безопасную замену номера и соблюдает условия продажи билетов; закупка оформляется по надлежащему основанию.",
+          "game_portfolio_candidate": {
+            "office_key": "ministry_social",
+            "office_title": "Министерство по социальной политике",
+            "scope": "Рекомендация профильному участнику подготовить решение/координировать обращение к действительному исполнителю; не наделяет правом самостоятельно исполнять действие, распоряжаться средствами или заменять реальный орган.",
+            "status": "proposed_not_authorization",
+            "legacy_role_match_needs_replacement": true
+          }
         },
         "checked_norm_urls": []
       }
@@ -2970,7 +3117,14 @@
         "source_scope": "inherited_basis_requires_current_verification",
         "competence_review": {
           "status": "draft_mapping_pending",
-          "note": "Владелец птиц организует безопасное перемещение; дорожное регулирование осуществляют уполномоченные лица; школа сообщает о риске."
+          "note": "Владелец птиц организует безопасное перемещение; дорожное регулирование осуществляют уполномоченные лица; школа сообщает о риске.",
+          "game_portfolio_candidate": {
+            "office_key": "ministry_defence",
+            "office_title": "Министерство по обороне и внутренней безопасности",
+            "scope": "Рекомендация профильному участнику подготовить решение/координировать обращение к действительному исполнителю; не наделяет правом самостоятельно исполнять действие, распоряжаться средствами или заменять реальный орган.",
+            "status": "proposed_not_authorization",
+            "legacy_role_match_needs_replacement": true
+          }
         },
         "checked_norm_urls": []
       }
@@ -3104,7 +3258,14 @@
         "source_scope": "inherited_basis_requires_current_verification",
         "competence_review": {
           "status": "draft_mapping_pending",
-          "note": "Организатор обеспечивает расписание; заказчик фиксирует недостаток и предъявляет гарантийное требование."
+          "note": "Организатор обеспечивает расписание; заказчик фиксирует недостаток и предъявляет гарантийное требование.",
+          "game_portfolio_candidate": {
+            "office_key": "ministry_internal",
+            "office_title": "Министерство по внутренней политике и государству",
+            "scope": "Рекомендация профильному участнику подготовить решение/координировать обращение к действительному исполнителю; не наделяет правом самостоятельно исполнять действие, распоряжаться средствами или заменять реальный орган.",
+            "status": "proposed_not_authorization",
+            "legacy_role_match_needs_replacement": true
+          }
         },
         "checked_norm_urls": []
       }
@@ -3238,7 +3399,14 @@
         "source_scope": "inherited_basis_requires_current_verification",
         "competence_review": {
           "status": "draft_mapping_pending",
-          "note": "Организатор обмена устанавливает единые допустимые условия; владельцы передают семена на согласованных условиях."
+          "note": "Организатор обмена устанавливает единые допустимые условия; владельцы передают семена на согласованных условиях.",
+          "game_portfolio_candidate": {
+            "office_key": "ministry_social",
+            "office_title": "Министерство по социальной политике",
+            "scope": "Рекомендация профильному участнику подготовить решение/координировать обращение к действительному исполнителю; не наделяет правом самостоятельно исполнять действие, распоряжаться средствами или заменять реальный орган.",
+            "status": "proposed_not_authorization",
+            "legacy_role_match_needs_replacement": true
+          }
         },
         "checked_norm_urls": []
       }
@@ -3372,7 +3540,14 @@
         "source_scope": "specific_norm_and_related_search_results_partial",
         "competence_review": {
           "status": "draft_mapping_pending",
-          "note": "Организатор согласует участие и объём использования; правообладатели разрешают использование, а редактор сверяет исторические сведения."
+          "note": "Организатор согласует участие и объём использования; правообладатели разрешают использование, а редактор сверяет исторические сведения.",
+          "game_portfolio_candidate": {
+            "office_key": "ministry_social",
+            "office_title": "Министерство по социальной политике",
+            "scope": "Рекомендация профильному участнику подготовить решение/координировать обращение к действительному исполнителю; не наделяет правом самостоятельно исполнять действие, распоряжаться средствами или заменять реальный орган.",
+            "status": "proposed_not_authorization",
+            "legacy_role_match_needs_replacement": true
+          }
         },
         "checked_norm_urls": [
           "https://www.consultant.ru/document/cons_doc_LAW_64629/98ad2641f95945c4b7956150260564c8b44028d9/"
@@ -3508,7 +3683,14 @@
         "source_scope": "inherited_basis_requires_current_verification",
         "competence_review": {
           "status": "draft_mapping_pending",
-          "note": "Владелец площадки согласует освещение, технический специалист проверяет оба маршрута, организаторы обеспечивают безопасное посещение."
+          "note": "Владелец площадки согласует освещение, технический специалист проверяет оба маршрута, организаторы обеспечивают безопасное посещение.",
+          "game_portfolio_candidate": {
+            "office_key": "ministry_social",
+            "office_title": "Министерство по социальной политике",
+            "scope": "Рекомендация профильному участнику подготовить решение/координировать обращение к действительному исполнителю; не наделяет правом самостоятельно исполнять действие, распоряжаться средствами или заменять реальный орган.",
+            "status": "proposed_not_authorization",
+            "legacy_role_match_needs_replacement": true
+          }
         },
         "checked_norm_urls": []
       }
@@ -3642,7 +3824,14 @@
         "source_scope": "inherited_basis_requires_current_verification",
         "competence_review": {
           "status": "draft_mapping_pending",
-          "note": "Исполнитель услуги и техник отвечают за устойчивость оборудования и безопасный проход; посетитель оценивает удобство испытанного места."
+          "note": "Исполнитель услуги и техник отвечают за устойчивость оборудования и безопасный проход; посетитель оценивает удобство испытанного места.",
+          "game_portfolio_candidate": {
+            "office_key": "ministry_social",
+            "office_title": "Министерство по социальной политике",
+            "scope": "Рекомендация профильному участнику подготовить решение/координировать обращение к действительному исполнителю; не наделяет правом самостоятельно исполнять действие, распоряжаться средствами или заменять реальный орган.",
+            "status": "proposed_not_authorization",
+            "legacy_role_match_needs_replacement": true
+          }
         },
         "checked_norm_urls": []
       }
@@ -3776,7 +3965,14 @@
         "source_scope": "inherited_basis_requires_current_verification",
         "competence_review": {
           "status": "draft_mapping_pending",
-          "note": "Владелец территории согласует режим и размещение освещения; применимый местный режим шума и порядок рекламной конструкции проверяются отдельно."
+          "note": "Владелец территории согласует режим и размещение освещения; применимый местный режим шума и порядок рекламной конструкции проверяются отдельно.",
+          "game_portfolio_candidate": {
+            "office_key": "ministry_internal",
+            "office_title": "Министерство по внутренней политике и государству",
+            "scope": "Рекомендация профильному участнику подготовить решение/координировать обращение к действительному исполнителю; не наделяет правом самостоятельно исполнять действие, распоряжаться средствами или заменять реальный орган.",
+            "status": "proposed_not_authorization",
+            "legacy_role_match_needs_replacement": true
+          }
         },
         "checked_norm_urls": []
       }
@@ -3910,7 +4106,14 @@
         "source_scope": "specific_norm_and_related_search_results_partial",
         "competence_review": {
           "status": "draft_mapping_pending",
-          "note": "Собственник или уполномоченный владелец принимает решение об урожае; добровольцы участвуют по согласованным условиям."
+          "note": "Собственник или уполномоченный владелец принимает решение об урожае; добровольцы участвуют по согласованным условиям.",
+          "game_portfolio_candidate": {
+            "office_key": "ministry_social",
+            "office_title": "Министерство по социальной политике",
+            "scope": "Рекомендация профильному участнику подготовить решение/координировать обращение к действительному исполнителю; не наделяет правом самостоятельно исполнять действие, распоряжаться средствами или заменять реальный орган.",
+            "status": "proposed_not_authorization",
+            "legacy_role_match_needs_replacement": true
+          }
         },
         "checked_norm_urls": [
           "https://www.consultant.ru/document/cons_doc_LAW_5142/e76cbd72b7917a719160f39231998418094c73b4/"
@@ -4046,7 +4249,14 @@
         "source_scope": "specific_norm_and_related_search_results_partial",
         "competence_review": {
           "status": "draft_mapping_pending",
-          "note": "Владелец площади и компетентный орган проверяют доступность и допустимость изменения объекта; оператор испытания обеспечивает безопасный маршрут."
+          "note": "Владелец площади и компетентный орган проверяют доступность и допустимость изменения объекта; оператор испытания обеспечивает безопасный маршрут.",
+          "game_portfolio_candidate": {
+            "office_key": "ministry_internal",
+            "office_title": "Министерство по внутренней политике и государству",
+            "scope": "Рекомендация профильному участнику подготовить решение/координировать обращение к действительному исполнителю; не наделяет правом самостоятельно исполнять действие, распоряжаться средствами или заменять реальный орган.",
+            "status": "proposed_not_authorization",
+            "legacy_role_match_needs_replacement": true
+          }
         },
         "checked_norm_urls": [
           "https://www.consultant.ru/document/cons_doc_LAW_8559/1f3d91284a26982ce51392b5fd178e392fe53404/"
@@ -4182,7 +4392,14 @@
         "source_scope": "specific_norm_and_related_search_results_partial",
         "competence_review": {
           "status": "draft_mapping_pending",
-          "note": "Заказчик предъявляет требования к результату; подрядчик предлагает исправление; владелец согласует благоустройство и допустимые работы с деревом."
+          "note": "Заказчик предъявляет требования к результату; подрядчик предлагает исправление; владелец согласует благоустройство и допустимые работы с деревом.",
+          "game_portfolio_candidate": {
+            "office_key": "ministry_economic",
+            "office_title": "Министерство по экономической политике",
+            "scope": "Рекомендация профильному участнику подготовить решение/координировать обращение к действительному исполнителю; не наделяет правом самостоятельно исполнять действие, распоряжаться средствами или заменять реальный орган.",
+            "status": "proposed_not_authorization",
+            "legacy_role_match_needs_replacement": true
+          }
         },
         "checked_norm_urls": [
           "https://www.consultant.ru/document/cons_doc_LAW_9027/0f3422f73df7bee03d56085359c80be8d2981ead/"
@@ -4318,7 +4535,14 @@
         "source_scope": "inherited_basis_requires_current_verification",
         "competence_review": {
           "status": "draft_mapping_pending",
-          "note": "Исполнитель проверяет достоверность произношения и исправляет содержание услуги; официальное наименование проверяется по компетентному источнику."
+          "note": "Исполнитель проверяет достоверность произношения и исправляет содержание услуги; официальное наименование проверяется по компетентному источнику.",
+          "game_portfolio_candidate": {
+            "office_key": "ministry_social",
+            "office_title": "Министерство по социальной политике",
+            "scope": "Рекомендация профильному участнику подготовить решение/координировать обращение к действительному исполнителю; не наделяет правом самостоятельно исполнять действие, распоряжаться средствами или заменять реальный орган.",
+            "status": "proposed_not_authorization",
+            "legacy_role_match_needs_replacement": true
+          }
         },
         "checked_norm_urls": []
       }
@@ -4452,7 +4676,14 @@
         "source_scope": "specific_norm_and_related_search_results_partial",
         "competence_review": {
           "status": "draft_mapping_pending",
-          "note": "Организатор питания исключает непроверенные продукты из выдачи; сведения дарителя оцениваются ответственным за безопасность лицом."
+          "note": "Организатор питания исключает непроверенные продукты из выдачи; сведения дарителя оцениваются ответственным за безопасность лицом.",
+          "game_portfolio_candidate": {
+            "office_key": "ministry_social",
+            "office_title": "Министерство по социальной политике",
+            "scope": "Рекомендация профильному участнику подготовить решение/координировать обращение к действительному исполнителю; не наделяет правом самостоятельно исполнять действие, распоряжаться средствами или заменять реальный орган.",
+            "status": "proposed_not_authorization",
+            "legacy_role_match_needs_replacement": true
+          }
         },
         "checked_norm_urls": [
           "https://www.consultant.ru/document/cons_doc_LAW_25584/e9278b4da9d697e7ffac54e2c395f58c8306f72c/"
@@ -4588,7 +4819,14 @@
         "source_scope": "specific_norm_and_related_search_results_partial",
         "competence_review": {
           "status": "draft_mapping_pending",
-          "note": "Владелец вокзала и перевозчик согласуют размещение инструмента, обязательные сообщения и доступность; музыканты соблюдают утверждённый режим."
+          "note": "Владелец вокзала и перевозчик согласуют размещение инструмента, обязательные сообщения и доступность; музыканты соблюдают утверждённый режим.",
+          "game_portfolio_candidate": {
+            "office_key": "ministry_social",
+            "office_title": "Министерство по социальной политике",
+            "scope": "Рекомендация профильному участнику подготовить решение/координировать обращение к действительному исполнителю; не наделяет правом самостоятельно исполнять действие, распоряжаться средствами или заменять реальный орган.",
+            "status": "proposed_not_authorization",
+            "legacy_role_match_needs_replacement": true
+          }
         },
         "checked_norm_urls": [
           "https://www.consultant.ru/document/cons_doc_LAW_8559/1f3d91284a26982ce51392b5fd178e392fe53404/"
@@ -4724,7 +4962,14 @@
         "source_scope": "inherited_basis_requires_current_verification",
         "competence_review": {
           "status": "draft_mapping_pending",
-          "note": "Организатор обеспечивает безопасный согласованный маршрут; изменение трассы требует предусмотренной проверки и согласования."
+          "note": "Организатор обеспечивает безопасный согласованный маршрут; изменение трассы требует предусмотренной проверки и согласования.",
+          "game_portfolio_candidate": {
+            "office_key": "ministry_social",
+            "office_title": "Министерство по социальной политике",
+            "scope": "Рекомендация профильному участнику подготовить решение/координировать обращение к действительному исполнителю; не наделяет правом самостоятельно исполнять действие, распоряжаться средствами или заменять реальный орган.",
+            "status": "proposed_not_authorization",
+            "legacy_role_match_needs_replacement": true
+          }
         },
         "checked_norm_urls": []
       }
@@ -4858,7 +5103,14 @@
         "source_scope": "inherited_basis_requires_current_verification",
         "competence_review": {
           "status": "draft_mapping_pending",
-          "note": "Владелец ограждения обеспечивает защиту и обследование; снятие предметов выполняется по согласованной процедуре с учётом прав владельцев."
+          "note": "Владелец ограждения обеспечивает защиту и обследование; снятие предметов выполняется по согласованной процедуре с учётом прав владельцев.",
+          "game_portfolio_candidate": {
+            "office_key": "ministry_social",
+            "office_title": "Министерство по социальной политике",
+            "scope": "Рекомендация профильному участнику подготовить решение/координировать обращение к действительному исполнителю; не наделяет правом самостоятельно исполнять действие, распоряжаться средствами или заменять реальный орган.",
+            "status": "proposed_not_authorization",
+            "legacy_role_match_needs_replacement": true
+          }
         },
         "checked_norm_urls": []
       }
@@ -4992,7 +5244,14 @@
         "source_scope": "specific_norm_and_related_search_results_partial",
         "competence_review": {
           "status": "draft_mapping_pending",
-          "note": "Организатор конкурса проверяет правовые основания; дизайнер разрабатывает самостоятельный макет; правообладатель разрешает предусмотренное использование."
+          "note": "Организатор конкурса проверяет правовые основания; дизайнер разрабатывает самостоятельный макет; правообладатель разрешает предусмотренное использование.",
+          "game_portfolio_candidate": {
+            "office_key": "ministry_social",
+            "office_title": "Министерство по социальной политике",
+            "scope": "Рекомендация профильному участнику подготовить решение/координировать обращение к действительному исполнителю; не наделяет правом самостоятельно исполнять действие, распоряжаться средствами или заменять реальный орган.",
+            "status": "proposed_not_authorization",
+            "legacy_role_match_needs_replacement": true
+          }
         },
         "checked_norm_urls": [
           "https://www.consultant.ru/document/cons_doc_LAW_64629/98ad2641f95945c4b7956150260564c8b44028d9/",
@@ -5129,7 +5388,14 @@
         "source_scope": "inherited_basis_requires_current_verification",
         "competence_review": {
           "status": "draft_mapping_pending",
-          "note": "Владелец объекта и компетентная служба благоустройства согласуют перенос; специалист оценивает состояние дерева и допустимость работ."
+          "note": "Владелец объекта и компетентная служба благоустройства согласуют перенос; специалист оценивает состояние дерева и допустимость работ.",
+          "game_portfolio_candidate": {
+            "office_key": "ministry_internal",
+            "office_title": "Министерство по внутренней политике и государству",
+            "scope": "Рекомендация профильному участнику подготовить решение/координировать обращение к действительному исполнителю; не наделяет правом самостоятельно исполнять действие, распоряжаться средствами или заменять реальный орган.",
+            "status": "proposed_not_authorization",
+            "legacy_role_match_needs_replacement": true
+          }
         },
         "checked_norm_urls": []
       }
@@ -5263,7 +5529,14 @@
         "source_scope": "inherited_basis_requires_current_verification",
         "competence_review": {
           "status": "draft_mapping_pending",
-          "note": "Организатор отменяет опасные заезды и оформляет предусмотренные права потребителей; перенос согласуется по применимым условиям."
+          "note": "Организатор отменяет опасные заезды и оформляет предусмотренные права потребителей; перенос согласуется по применимым условиям.",
+          "game_portfolio_candidate": {
+            "office_key": "ministry_social",
+            "office_title": "Министерство по социальной политике",
+            "scope": "Рекомендация профильному участнику подготовить решение/координировать обращение к действительному исполнителю; не наделяет правом самостоятельно исполнять действие, распоряжаться средствами или заменять реальный орган.",
+            "status": "proposed_not_authorization",
+            "legacy_role_match_needs_replacement": true
+          }
         },
         "checked_norm_urls": []
       }
@@ -5397,7 +5670,14 @@
         "source_scope": "specific_norm_and_related_search_results_partial",
         "competence_review": {
           "status": "draft_mapping_pending",
-          "note": "Организатор проверяет основания публичного использования произведения, исполнения и фонограммы; разрешение должно исходить от надлежащего правообладателя."
+          "note": "Организатор проверяет основания публичного использования произведения, исполнения и фонограммы; разрешение должно исходить от надлежащего правообладателя.",
+          "game_portfolio_candidate": {
+            "office_key": "ministry_social",
+            "office_title": "Министерство по социальной политике",
+            "scope": "Рекомендация профильному участнику подготовить решение/координировать обращение к действительному исполнителю; не наделяет правом самостоятельно исполнять действие, распоряжаться средствами или заменять реальный орган.",
+            "status": "proposed_not_authorization",
+            "legacy_role_match_needs_replacement": true
+          }
         },
         "checked_norm_urls": [
           "https://www.consultant.ru/document/cons_doc_LAW_64629/98ad2641f95945c4b7956150260564c8b44028d9/",
@@ -5539,7 +5819,14 @@
         "source_scope": "inherited_basis_requires_current_verification",
         "competence_review": {
           "status": "draft_mapping_pending",
-          "note": "Компетентный природоохранный орган организует контроль; лаборатории берут сопоставимые пробы; водозабор получает подтверждённые предупреждения."
+          "note": "Компетентный природоохранный орган организует контроль; лаборатории берут сопоставимые пробы; водозабор получает подтверждённые предупреждения.",
+          "game_portfolio_candidate": {
+            "office_key": "ministry_economic",
+            "office_title": "Министерство по экономической политике",
+            "scope": "Рекомендация профильному участнику подготовить решение/координировать обращение к действительному исполнителю; не наделяет правом самостоятельно исполнять действие, распоряжаться средствами или заменять реальный орган.",
+            "status": "proposed_not_authorization",
+            "legacy_role_match_needs_replacement": true
+          }
         },
         "checked_norm_urls": []
       }
@@ -5678,7 +5965,14 @@
         "source_scope": "specific_norm_and_related_search_results_partial",
         "competence_review": {
           "status": "draft_mapping_pending",
-          "note": "Заказчик сверяет результат и предъявляет требования подрядчику; коммунальная служба выполняет только согласованные временные меры."
+          "note": "Заказчик сверяет результат и предъявляет требования подрядчику; коммунальная служба выполняет только согласованные временные меры.",
+          "game_portfolio_candidate": {
+            "office_key": "ministry_internal",
+            "office_title": "Министерство по внутренней политике и государству",
+            "scope": "Рекомендация профильному участнику подготовить решение/координировать обращение к действительному исполнителю; не наделяет правом самостоятельно исполнять действие, распоряжаться средствами или заменять реальный орган.",
+            "status": "proposed_not_authorization",
+            "legacy_role_match_needs_replacement": true
+          }
         },
         "checked_norm_urls": [
           "https://www.consultant.ru/document/cons_doc_LAW_9027/0f3422f73df7bee03d56085359c80be8d2981ead/"
@@ -5819,7 +6113,14 @@
         "source_scope": "specific_norm_and_related_search_results_partial",
         "competence_review": {
           "status": "draft_mapping_pending",
-          "note": "Аппарат заседания подтверждает протокол; пресс-служба сообщает достоверные сведения; сувенирное решение требует отдельного основания."
+          "note": "Аппарат заседания подтверждает протокол; пресс-служба сообщает достоверные сведения; сувенирное решение требует отдельного основания.",
+          "game_portfolio_candidate": {
+            "office_key": "ministry_internal",
+            "office_title": "Министерство по внутренней политике и государству",
+            "scope": "Рекомендация профильному участнику подготовить решение/координировать обращение к действительному исполнителю; не наделяет правом самостоятельно исполнять действие, распоряжаться средствами или заменять реальный орган.",
+            "status": "proposed_not_authorization",
+            "legacy_role_match_needs_replacement": true
+          }
         },
         "checked_norm_urls": [
           "https://www.consultant.ru/document/cons_doc_LAW_84602/e4fb380d53822434913f8449aa9b9e6bdf9f67a4/"
@@ -5960,7 +6261,14 @@
         "source_scope": "inherited_basis_requires_current_verification",
         "competence_review": {
           "status": "draft_mapping_pending",
-          "note": "Организатор изменяет символический жест в рамках программы; заказчик оформляет дополнительные расходы только по основанию."
+          "note": "Организатор изменяет символический жест в рамках программы; заказчик оформляет дополнительные расходы только по основанию.",
+          "game_portfolio_candidate": {
+            "office_key": "ministry_social",
+            "office_title": "Министерство по социальной политике",
+            "scope": "Рекомендация профильному участнику подготовить решение/координировать обращение к действительному исполнителю; не наделяет правом самостоятельно исполнять действие, распоряжаться средствами или заменять реальный орган.",
+            "status": "proposed_not_authorization",
+            "legacy_role_match_needs_replacement": true
+          }
         },
         "checked_norm_urls": []
       }
@@ -6099,7 +6407,14 @@
         "source_scope": "specific_norm_and_related_search_results_partial",
         "competence_review": {
           "status": "draft_mapping_pending",
-          "note": "Организатор обеспечивает доступность выступления; технический специалист проверяет резерв; обратная связь подтверждает слышимость."
+          "note": "Организатор обеспечивает доступность выступления; технический специалист проверяет резерв; обратная связь подтверждает слышимость.",
+          "game_portfolio_candidate": {
+            "office_key": "ministry_internal",
+            "office_title": "Министерство по внутренней политике и государству",
+            "scope": "Рекомендация профильному участнику подготовить решение/координировать обращение к действительному исполнителю; не наделяет правом самостоятельно исполнять действие, распоряжаться средствами или заменять реальный орган.",
+            "status": "proposed_not_authorization",
+            "legacy_role_match_needs_replacement": true
+          }
         },
         "checked_norm_urls": [
           "https://www.consultant.ru/document/cons_doc_LAW_8559/1f3d91284a26982ce51392b5fd178e392fe53404/"
@@ -6240,7 +6555,14 @@
         "source_scope": "specific_norm_and_related_search_results_partial",
         "competence_review": {
           "status": "draft_mapping_pending",
-          "note": "Организатор применяет объявленные условия и предусмотренный порядок изменений; техническая комиссия оценивает допустимость; правообладатели оформляют использование."
+          "note": "Организатор применяет объявленные условия и предусмотренный порядок изменений; техническая комиссия оценивает допустимость; правообладатели оформляют использование.",
+          "game_portfolio_candidate": {
+            "office_key": "ministry_social",
+            "office_title": "Министерство по социальной политике",
+            "scope": "Рекомендация профильному участнику подготовить решение/координировать обращение к действительному исполнителю; не наделяет правом самостоятельно исполнять действие, распоряжаться средствами или заменять реальный орган.",
+            "status": "proposed_not_authorization",
+            "legacy_role_match_needs_replacement": true
+          }
         },
         "checked_norm_urls": [
           "https://www.consultant.ru/document/cons_doc_LAW_64629/98ad2641f95945c4b7956150260564c8b44028d9/"
@@ -6381,7 +6703,14 @@
         "source_scope": "specific_norm_and_related_search_results_partial",
         "competence_review": {
           "status": "draft_mapping_pending",
-          "note": "Пресс-служба проверяет факты и допустимость раскрытия; редакционный запрос рассматривается по специальным правилам; внутренние сведения не раскрываются автоматически."
+          "note": "Пресс-служба проверяет факты и допустимость раскрытия; редакционный запрос рассматривается по специальным правилам; внутренние сведения не раскрываются автоматически.",
+          "game_portfolio_candidate": {
+            "office_key": "ministry_internal",
+            "office_title": "Министерство по внутренней политике и государству",
+            "scope": "Рекомендация профильному участнику подготовить решение/координировать обращение к действительному исполнителю; не наделяет правом самостоятельно исполнять действие, распоряжаться средствами или заменять реальный орган.",
+            "status": "proposed_not_authorization",
+            "legacy_role_match_needs_replacement": true
+          }
         },
         "checked_norm_urls": [
           "https://www.consultant.ru/document/cons_doc_LAW_84602/e4fb380d53822434913f8449aa9b9e6bdf9f67a4/"
