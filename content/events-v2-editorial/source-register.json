@@ -3081,7 +3081,12 @@
         "https://mintrud.gov.ru/docs/laws/112"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "option_analysis_status": "draft",
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_156558/f496bba45a6529882c567252bb9eef69357470c1/"
+      ],
+      "source_scope": "specific_federal_norm_checked_partial"
     },
     {
       "case_key": "bank-curated-serious-05",
@@ -3095,7 +3100,10 @@
         "https://checklist.fsvps.gov.ru/checks/forms/index?formId=3"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "option_analysis_status": "draft",
+      "checked_norm_urls": [],
+      "source_scope": "inherited_basis_requires_current_verification"
     },
     {
       "case_key": "bank-curated-serious-06",
@@ -3109,7 +3117,10 @@
         "https://01.mchs.gov.ru/deyatelnost/napravleniya-deyatelnosti/grazhdanskaya-zashchita/preduprezhdenie-chrezvychaynyh-situaciy/1-1-normativnye-pravovye-akty/2-federalnye-zakony/federalnyy-zakon-ot-21-dekabrya-1994-g-n-68-fz-o-zashchite-naseleniya-i-territoriy-ot-chrezvychaynyh-situaciy-prirodnogo-i-tehnogennogo-haraktera"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "option_analysis_status": "draft",
+      "checked_norm_urls": [],
+      "source_scope": "inherited_basis_requires_current_verification"
     },
     {
       "case_key": "bank-curated-serious-07",
@@ -3123,7 +3134,10 @@
         "https://archives.gov.ru/documents/rules/pravila-2020.shtml"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "option_analysis_status": "draft",
+      "checked_norm_urls": [],
+      "source_scope": "inherited_basis_requires_current_verification"
     },
     {
       "case_key": "bank-curated-serious-08",
@@ -3137,7 +3151,10 @@
         "https://fish.gov.ru/otraslevaya-deyatelnost/akvakultura/sohranenie-vodnyh-bioresursov/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "option_analysis_status": "draft",
+      "checked_norm_urls": [],
+      "source_scope": "inherited_basis_requires_current_verification"
     },
     {
       "case_key": "bank-curated-serious-09",
@@ -3151,7 +3168,13 @@
         "https://mintrud.gov.ru/docs/laws/116"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "option_analysis_status": "draft",
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_61763/75fad2ba0bd186dad16ff04a2efe55ae3f9ff7e6/",
+        "https://www.consultant.ru/document/cons_doc_LAW_61763/dd1cb1470320c15ddb30d1033ae07c96f53aa1c3/"
+      ],
+      "source_scope": "specific_federal_norm_checked_partial"
     },
     {
       "case_key": "bank-curated-serious-10",
@@ -3165,7 +3188,10 @@
         "https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "option_analysis_status": "draft",
+      "checked_norm_urls": [],
+      "source_scope": "inherited_basis_requires_current_verification"
     },
     {
       "case_key": "bank-curated-serious-11",
@@ -3179,7 +3205,10 @@
         "https://minobrnauki.gov.ru/open_ministry/gossluzhba/entry/files/Федеральный%20закон%20от%2029.12.2012%20N%20273-ФЗ%20(ред.%20от%2015.10.2025.pdf"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "option_analysis_status": "draft",
+      "checked_norm_urls": [],
+      "source_scope": "inherited_basis_requires_current_verification"
     },
     {
       "case_key": "bank-curated-serious-12",
@@ -3194,7 +3223,10 @@
         "https://01.mchs.gov.ru/deyatelnost/napravleniya-deyatelnosti/grazhdanskaya-zashchita/preduprezhdenie-chrezvychaynyh-situaciy/1-1-normativnye-pravovye-akty/2-federalnye-zakony/federalnyy-zakon-ot-21-dekabrya-1994-g-n-68-fz-o-zashchite-naseleniya-i-territoriy-ot-chrezvychaynyh-situaciy-prirodnogo-i-tehnogennogo-haraktera"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "option_analysis_status": "draft",
+      "checked_norm_urls": [],
+      "source_scope": "inherited_basis_requires_current_verification"
     },
     {
       "case_key": "bank-curated-serious-13",
@@ -3209,7 +3241,12 @@
         "http://www.kremlin.ru/acts/constitution"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "option_analysis_status": "draft",
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_156558/f496bba45a6529882c567252bb9eef69357470c1/"
+      ],
+      "source_scope": "specific_federal_norm_checked_partial"
     },
     {
       "case_key": "bank-curated-serious-14",
@@ -3223,7 +3260,10 @@
         "http://www.kremlin.ru/acts/constitution"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "option_analysis_status": "draft",
+      "checked_norm_urls": [],
+      "source_scope": "inherited_basis_requires_current_verification"
     },
     {
       "case_key": "bank-curated-serious-15",
@@ -3237,7 +3277,10 @@
         "https://www.ksrf.ru/about/legalbases/Guarantee/Chapter2.php"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "option_analysis_status": "draft",
+      "checked_norm_urls": [],
+      "source_scope": "inherited_basis_requires_current_verification"
     },
     {
       "case_key": "bank-curated-serious-16",
@@ -3251,7 +3294,10 @@
         "https://mintrud.gov.ru/docs/laws/130"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "option_analysis_status": "draft",
+      "checked_norm_urls": [],
+      "source_scope": "inherited_basis_requires_current_verification"
     },
     {
       "case_key": "bank-curated-serious-17",
@@ -3265,7 +3311,10 @@
         "https://minobrnauki.gov.ru/open_ministry/gossluzhba/entry/files/Федеральный%20закон%20от%2029.12.2012%20N%20273-ФЗ%20(ред.%20от%2015.10.2025.pdf"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "option_analysis_status": "draft",
+      "checked_norm_urls": [],
+      "source_scope": "inherited_basis_requires_current_verification"
     },
     {
       "case_key": "bank-curated-serious-18",
@@ -3280,7 +3329,10 @@
         "https://mintrans.gov.ru/storage/app/media/epd/0811201.pdf"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "option_analysis_status": "draft",
+      "checked_norm_urls": [],
+      "source_scope": "inherited_basis_requires_current_verification"
     },
     {
       "case_key": "bank-curated-serious-19",
@@ -3295,7 +3347,10 @@
         "https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "option_analysis_status": "draft",
+      "checked_norm_urls": [],
+      "source_scope": "inherited_basis_requires_current_verification"
     },
     {
       "case_key": "bank-curated-serious-20",
@@ -3309,7 +3364,10 @@
         "https://01.mchs.gov.ru/deyatelnost/napravleniya-deyatelnosti/grazhdanskaya-zashchita/preduprezhdenie-chrezvychaynyh-situaciy/1-1-normativnye-pravovye-akty/2-federalnye-zakony/federalnyy-zakon-ot-21-dekabrya-1994-g-n-68-fz-o-zashchite-naseleniya-i-territoriy-ot-chrezvychaynyh-situaciy-prirodnogo-i-tehnogennogo-haraktera"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "option_analysis_status": "draft",
+      "checked_norm_urls": [],
+      "source_scope": "inherited_basis_requires_current_verification"
     },
     {
       "case_key": "bank-curated-serious-21",
@@ -3323,7 +3381,10 @@
         "https://01.mchs.gov.ru/deyatelnost/napravleniya-deyatelnosti/grazhdanskaya-zashchita/preduprezhdenie-chrezvychaynyh-situaciy/1-1-normativnye-pravovye-akty/2-federalnye-zakony/federalnyy-zakon-ot-21-dekabrya-1994-g-n-68-fz-o-zashchite-naseleniya-i-territoriy-ot-chrezvychaynyh-situaciy-prirodnogo-i-tehnogennogo-haraktera"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "option_analysis_status": "draft",
+      "checked_norm_urls": [],
+      "source_scope": "inherited_basis_requires_current_verification"
     },
     {
       "case_key": "bank-curated-serious-22",
@@ -3337,7 +3398,12 @@
         "https://minobrnauki.gov.ru/open_ministry/gossluzhba/entry/files/Федеральный%20закон%20от%2029.12.2012%20N%20273-ФЗ%20(ред.%20от%2015.10.2025.pdf"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "option_analysis_status": "draft",
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_140174/95d9ecc180e13e58ff632723375f109b36986b8c/"
+      ],
+      "source_scope": "specific_federal_norm_checked_partial"
     },
     {
       "case_key": "bank-curated-serious-23",
@@ -3351,7 +3417,10 @@
         "http://www.kremlin.ru/acts/constitution"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "option_analysis_status": "draft",
+      "checked_norm_urls": [],
+      "source_scope": "inherited_basis_requires_current_verification"
     },
     {
       "case_key": "bank-curated-serious-24",
@@ -3365,7 +3434,12 @@
         "http://www.kremlin.ru/acts/constitution"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "option_analysis_status": "draft",
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_37318/555d42c04d8e6d7d9874776c46e180043cc8cb0c/"
+      ],
+      "source_scope": "specific_federal_norm_checked_partial"
     },
     {
       "case_key": "bank-curated-v2-02",
@@ -3379,7 +3453,10 @@
         "https://roszdravnadzor.gov.ru/faq/medicines"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "option_analysis_status": "draft",
+      "checked_norm_urls": [],
+      "source_scope": "inherited_basis_requires_current_verification"
     },
     {
       "case_key": "bank-curated-v2-03",
@@ -3393,7 +3470,13 @@
         "https://git15.rostrud.gov.ru/upload/iblock/449/trudovoy-kodeks-rossiyskoy-federatsii-ot-30.12.2001-_-197_fz.pdf"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "option_analysis_status": "draft",
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_34683/bd14cccf0a1f074ef104e82522f7e2dea04d651f/",
+        "https://www.consultant.ru/document/cons_doc_LAW_34683/d11de7be54026a50672948edfb583e5f37bc48b6/"
+      ],
+      "source_scope": "specific_federal_norm_checked_partial"
     },
     {
       "case_key": "bank-curated-v2-04",
@@ -3407,7 +3490,10 @@
         "http://www.kremlin.ru/acts/constitution"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "option_analysis_status": "draft",
+      "checked_norm_urls": [],
+      "source_scope": "inherited_basis_requires_current_verification"
     },
     {
       "case_key": "bank-curated-v2-05",
@@ -3421,7 +3507,10 @@
         "https://01.mchs.gov.ru/deyatelnost/napravleniya-deyatelnosti/grazhdanskaya-zashchita/preduprezhdenie-chrezvychaynyh-situaciy/1-1-normativnye-pravovye-akty/2-federalnye-zakony/federalnyy-zakon-ot-21-dekabrya-1994-g-n-68-fz-o-zashchite-naseleniya-i-territoriy-ot-chrezvychaynyh-situaciy-prirodnogo-i-tehnogennogo-haraktera"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "option_analysis_status": "draft",
+      "checked_norm_urls": [],
+      "source_scope": "inherited_basis_requires_current_verification"
     },
     {
       "case_key": "bank-curated-v2-06",
@@ -3435,7 +3524,10 @@
         "https://mintrud.gov.ru/docs/laws/130"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "option_analysis_status": "draft",
+      "checked_norm_urls": [],
+      "source_scope": "inherited_basis_requires_current_verification"
     },
     {
       "case_key": "bank-curated-v2-07",
@@ -3450,7 +3542,12 @@
         "https://mintrud.gov.ru/docs/laws/112"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "option_analysis_status": "draft",
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_156558/f496bba45a6529882c567252bb9eef69357470c1/"
+      ],
+      "source_scope": "specific_federal_norm_checked_partial"
     },
     {
       "case_key": "bank-curated-v2-08",
@@ -3464,7 +3561,12 @@
         "https://epp.genproc.gov.ru/ru/proc_91/activity/legal-education/explain/e2075484/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "option_analysis_status": "draft",
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_122867/018c76d39ac10ec567e2f9fbcfca7298f2e026ee/"
+      ],
+      "source_scope": "specific_federal_norm_checked_partial"
     },
     {
       "case_key": "bank-curated-v2-09",
