@@ -45,6 +45,10 @@ for(const c of cases){
  collectiveReviewCount++;collectiveReviewOptions+=review.options.length;
 }
 console.log(JSON.stringify({collectiveReviewCount,collectiveReviewOptions},null,2));
+// All collective alternatives must have explicit case-specific analysis before this editorial gate passes.
+assert.equal(collectiveReviewCount,189,'Collective case review incomplete');
+assert.equal(collectiveReviewOptions,947,'Collective option review incomplete');
+
 const blocked=cases.filter(c=>c.verified!==true||c.editorial_status!=='approved'||c.legal_review.status!=='verified_current'||c.effect_plan.options.some(o=>typeof o.lawful!=='boolean')).length;
 console.log(JSON.stringify({cases:cases.length,options:count,individual,collective,longestCorrect:long,shortestCorrect:short,meanCorrectToOtherLength:ratio/individual,positions,unknownIndividualLawfulness:unknown,dominatedOptions:dominated,dominatedCases,activationBlocked:blocked,documentaryFull:reg.cases.filter(c=>c.source_status==='official_article_read_core_episode_confirmed').length,documentaryIndexed:reg.cases.filter(c=>c.source_status==='official_search_index_core_episode_confirmed_full_text_unavailable').length},null,2));
 if(process.argv.includes('--release')){assert.equal(blocked,0,'Legal/editorial release gate: unverified cases must never be activated');assert.equal(dominatedCases,0,'Collective consequences require final economic balance review');}
