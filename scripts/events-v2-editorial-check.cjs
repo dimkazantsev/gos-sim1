@@ -14,10 +14,14 @@ for(const c of cases){
   individual++;const i=Number(plan.best_option_key.split('_')[1])-1;assert.ok(i>=0&&i<o.length,c.case_key);assert.equal(o[i].lawful,true,c.case_key);unknown+=o.filter(x=>x.lawful===null).length;
   const l=labels.map(x=>x.length);long+=l[i]===Math.max(...l);short+=l[i]===Math.min(...l);ratio+=l[i]/((l.reduce((a,b)=>a+b,0)-l[i])/(l.length-1));positions[i+1]=(positions[i+1]||0)+1;
  }else{
-  collective++;assert.ok(c.mandatory_boundary,c.case_key);assert.ok(!('best_option_key' in plan),c.case_key);assert.ok(o.every(x=>x.lawful===true),c.case_key);const v=o.map(x=>[x.trust,x.metric_effects?.elite_support??0,x.metric_effects?.economy??0]);assert.ok(v.every(x=>x.every(Number.isFinite)),c.case_key);assert.ok(v.every(x=>x.every(y=>Math.abs(y)<=4)),c.case_key);
+  collective++;assert.ok(c.mandatory_boundary,c.case_key);assert.ok(!('best_option_key' in plan),c.case_key);assert.ok(o.every(x=>x.lawful===true),c.case_key);const metricKeys=[...new Set(o.flatMap(x=>Object.keys(x.metric_effects??{})))].sort(); const v=o.map(x=>[x.trust,...metricKeys.map(k=>(k==='social_tension'?-1:1)*(x.metric_effects?.[k]??0))]);assert.ok(v.every(x=>x.every(Number.isFinite)),c.case_key);assert.ok(v.every(x=>x.every(y=>Math.abs(y)<=4)),c.case_key);
   const d=v.filter((a,i)=>v.some((b,j)=>i!==j&&b.every((x,k)=>x>=a[k])&&b.some((x,k)=>x>a[k]))).length;dominated+=d;dominatedCases+=d>0;
  }
 }
+const reviewed=cases.filter(c=>c.legal_review.option_analysis);assert.equal(reviewed.length,20);for(const c of reviewed){const a=c.legal_review.option_analysis;assert.equal(a.length,c.decision_options.length);assert.equal(a.filter(x=>x.classification==='best').length,1);for(const [i,x] of a.entries()){assert.equal(x.key,c.effect_plan.options[i].key);assert.ok(x.reason);assert.equal(x.lawfulness_proposal,c.effect_plan.options[i].lawful);}}
+const financial=cases.filter(c=>c.financial_review);assert.equal(financial.length,30);for(const c of financial){const f=c.financial_review;assert.equal(f.automatic_budget_delta,0);assert.equal(f.automatic_enterprise_delta,0);assert.ok(f.note);if(f.kind==='pending_transfer')assert.equal(f.amount_mln,f.requested_federal_mln+f.regional_cofinance_mln,c.case_key);}
+const calibrated=cases.filter(c=>c.balance_review);assert.equal(calibrated.length,10);for(const c of calibrated){assert.ok(c.effect_plan.options.every(o=>o.calibration_reason&&Number.isFinite(o.metric_effects[c.balance_review.additional_dimension])));}
+console.log(JSON.stringify({reviewedIndividualCases:reviewed.length,reviewedIndividualOptions:reviewed.reduce((n,c)=>n+c.decision_options.length,0),financialCases:financial.length,checkedCofinancing:financial.filter(c=>c.financial_review.kind==='pending_transfer').length,calibratedCases:calibrated.length,calibratedOptions:calibrated.reduce((n,c)=>n+c.decision_options.length,0)},null,2));
 assert.equal(count,1660);assert.equal(individual,141);assert.equal(collective,189);
 assert.ok(long/individual<=.30,'Longest answer remains too predictive');
 assert.ok(short/individual<=.30,'Shortest answer remains too predictive');

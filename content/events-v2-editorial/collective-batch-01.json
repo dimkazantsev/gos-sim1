@@ -26,10 +26,12 @@
             "trust": 2,
             "metric_effects": {
               "elite_support": -1,
-              "economy": 0
+              "economy": 0,
+              "media_climate": 1
             },
             "description": "Быстрее появляются достоверные данные; другие проверки откладываются.",
-            "legal_basis": "БК РФ, статья 131: дотации на выравнивание бюджетной обеспеченности субъектов РФ. Источники: https://www.consultant.ru/document/cons_doc_LAW_19702/"
+            "legal_basis": "БК РФ, статья 131: дотации на выравнивание бюджетной обеспеченности субъектов РФ. Источники: https://www.consultant.ru/document/cons_doc_LAW_19702/",
+            "calibration_reason": "Быстрая проверка снижает неопределённость публичных сообщений."
           },
           {
             "key": "option_2",
@@ -37,10 +39,12 @@
             "trust": 1,
             "metric_effects": {
               "elite_support": 1,
-              "economy": -1
+              "economy": -1,
+              "media_climate": 0
             },
             "description": "Участники доверяют расчёту; согласование отнимает время.",
-            "legal_basis": "БК РФ, статья 131: дотации на выравнивание бюджетной обеспеченности субъектов РФ. Источники: https://www.consultant.ru/document/cons_doc_LAW_19702/"
+            "legal_basis": "БК РФ, статья 131: дотации на выравнивание бюджетной обеспеченности субъектов РФ. Источники: https://www.consultant.ru/document/cons_doc_LAW_19702/",
+            "calibration_reason": "Совместная сверка улучшает согласованность муниципальных данных, но не предполагает отдельной публикации."
           },
           {
             "key": "option_3",
@@ -48,10 +52,12 @@
             "trust": 3,
             "metric_effects": {
               "elite_support": -2,
-              "economy": 0
+              "economy": 0,
+              "media_climate": 2
             },
             "description": "Прозрачность растёт; политическое руководство несёт репутационные издержки.",
-            "legal_basis": "БК РФ, статья 131: дотации на выравнивание бюджетной обеспеченности субъектов РФ. Источники: https://www.consultant.ru/document/cons_doc_LAW_19702/"
+            "legal_basis": "БК РФ, статья 131: дотации на выравнивание бюджетной обеспеченности субъектов РФ. Источники: https://www.consultant.ru/document/cons_doc_LAW_19702/",
+            "calibration_reason": "Открытый расчёт предоставляет проверяемую основу для публичной дискуссии."
           },
           {
             "key": "option_4",
@@ -59,10 +65,12 @@
             "trust": -2,
             "metric_effects": {
               "elite_support": 1,
-              "economy": 1
+              "economy": 1,
+              "media_climate": -1
             },
             "description": "Снижается риск кассового разрыва; жители теряют ожидаемые проекты.",
-            "legal_basis": "БК РФ, статья 131: дотации на выравнивание бюджетной обеспеченности субъектов РФ. Источники: https://www.consultant.ru/document/cons_doc_LAW_19702/"
+            "legal_basis": "БК РФ, статья 131: дотации на выравнивание бюджетной обеспеченности субъектов РФ. Источники: https://www.consultant.ru/document/cons_doc_LAW_19702/",
+            "calibration_reason": "Перенос проектов вызывает критические публикации о распределении ресурсов."
           },
           {
             "key": "option_5",
@@ -70,10 +78,12 @@
             "trust": 0,
             "metric_effects": {
               "elite_support": -1,
-              "economy": 2
+              "economy": 2,
+              "media_climate": 0
             },
             "description": "Сокращается будущая зависимость; текущая потребность решается медленнее.",
-            "legal_basis": "БК РФ, статья 131: дотации на выравнивание бюджетной обеспеченности субъектов РФ. Источники: https://www.consultant.ru/document/cons_doc_LAW_19702/"
+            "legal_basis": "БК РФ, статья 131: дотации на выравнивание бюджетной обеспеченности субъектов РФ. Источники: https://www.consultant.ru/document/cons_doc_LAW_19702/",
+            "calibration_reason": "Налоговый план ещё не подтверждает текущую величину дотации."
           }
         ]
       },
@@ -104,6 +114,13 @@
         "automatic_enterprise_delta": 0,
         "rule": "Исходное событие учитывается один раз по подтверждённому факту; выбранная рекомендация не создаёт платёж, долг, доход или предприятие. Влияние реализации требует отдельного подтверждённого решения и проверки реестров.",
         "legacy_effects_retained_for_review": true
+      },
+      "balance_review": {
+        "status": "draft_requires_final_calibration",
+        "additional_dimension": "media_climate",
+        "dominated_before": 0,
+        "dominated_after": 0,
+        "note": "Шкала соответствует содержанию кейса. Величины условны. До релиза отделить политический сигнал принятия решения от подтверждённого факта исполнения."
       }
     },
     {
@@ -131,10 +148,12 @@
             "trust": 3,
             "metric_effects": {
               "elite_support": -1,
-              "economy": 0
+              "economy": 0,
+              "social_stability": 2
             },
             "description": "Учреждения быстрее получают ресурс при утверждении; федеральный резерв сокращается.",
-            "legal_basis": "БК РФ, статьи 37, 131 и 184.2: достоверный прогноз, дотации и обоснование бюджетных показателей. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721"
+            "legal_basis": "БК РФ, статьи 37, 131 и 184.2: достоверный прогноз, дотации и обоснование бюджетных показателей. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
+            "calibration_reason": "Полное покрытие разрыва снижает конфликт получателей после обеспечения заявки."
           },
           {
             "key": "option_2",
@@ -142,10 +161,12 @@
             "trust": 1,
             "metric_effects": {
               "elite_support": 1,
-              "economy": -1
+              "economy": -1,
+              "social_stability": 0
             },
             "description": "Сохраняется ресурс центра; другие региональные проекты ждут.",
-            "legal_basis": "БК РФ, статьи 37, 131 и 184.2: достоверный прогноз, дотации и обоснование бюджетных показателей. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721"
+            "legal_basis": "БК РФ, статьи 37, 131 и 184.2: достоверный прогноз, дотации и обоснование бюджетных показателей. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
+            "calibration_reason": "Частичное покрытие сохраняет спор о региональных приоритетах."
           },
           {
             "key": "option_3",
@@ -153,10 +174,12 @@
             "trust": 1,
             "metric_effects": {
               "elite_support": -1,
-              "economy": 2
+              "economy": 2,
+              "social_stability": 1
             },
             "description": "Сокращаются задержки; возрастает нагрузка на финансовый орган.",
-            "legal_basis": "БК РФ, статьи 37, 131 и 184.2: достоверный прогноз, дотации и обоснование бюджетных показателей. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721"
+            "legal_basis": "БК РФ, статьи 37, 131 и 184.2: достоверный прогноз, дотации и обоснование бюджетных показателей. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
+            "calibration_reason": "Быстрое устранение разрыва уменьшает неопределённость при наличии источника."
           },
           {
             "key": "option_4",
@@ -164,10 +187,12 @@
             "trust": -2,
             "metric_effects": {
               "elite_support": 2,
-              "economy": 1
+              "economy": 1,
+              "social_stability": -1
             },
             "description": "Обязательства защищены; жители недовольны переносом.",
-            "legal_basis": "БК РФ, статьи 37, 131 и 184.2: достоверный прогноз, дотации и обоснование бюджетных показателей. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721"
+            "legal_basis": "БК РФ, статьи 37, 131 и 184.2: достоверный прогноз, дотации и обоснование бюджетных показателей. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
+            "calibration_reason": "Перенос иных мероприятий сталкивает интересы получателей."
           },
           {
             "key": "option_5",
@@ -175,10 +200,12 @@
             "trust": 1,
             "metric_effects": {
               "elite_support": -1,
-              "economy": 2
+              "economy": 2,
+              "social_stability": -2
             },
             "description": "Поддерживается будущая база; немедленное решение требует отдельного финансирования.",
-            "legal_basis": "БК РФ, статьи 37, 131 и 184.2: достоверный прогноз, дотации и обоснование бюджетных показателей. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721"
+            "legal_basis": "БК РФ, статьи 37, 131 и 184.2: достоверный прогноз, дотации и обоснование бюджетных показателей. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
+            "calibration_reason": "Долгосрочное восстановление заказов не устраняет острую неопределённость выплат."
           }
         ]
       },
@@ -208,6 +235,13 @@
         "automatic_enterprise_delta": 0,
         "rule": "Исходное событие учитывается один раз по подтверждённому факту; выбранная рекомендация не создаёт платёж, долг, доход или предприятие. Влияние реализации требует отдельного подтверждённого решения и проверки реестров.",
         "legacy_effects_retained_for_review": true
+      },
+      "balance_review": {
+        "status": "draft_requires_final_calibration",
+        "additional_dimension": "social_stability",
+        "dominated_before": 0,
+        "dominated_after": 1,
+        "note": "Шкала соответствует содержанию кейса. Величины условны. До релиза отделить политический сигнал принятия решения от подтверждённого факта исполнения."
       }
     },
     {
@@ -235,10 +269,12 @@
             "trust": 3,
             "metric_effects": {
               "elite_support": -2,
-              "economy": 1
+              "economy": 1,
+              "social_stability": 1
             },
             "description": "Доступность растёт; велика потребность в софинансировании.",
-            "legal_basis": "БК РФ, статьи 38 и 132; Федеральный закон №323-ФЗ, статья 10: доступность медицинской помощи. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721"
+            "legal_basis": "БК РФ, статьи 38 и 132; Федеральный закон №323-ФЗ, статья 10: доступность медицинской помощи. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
+            "calibration_reason": "Комплексный проект отвечает долгосрочному запросу, но требует времени."
           },
           {
             "key": "option_2",
@@ -246,10 +282,12 @@
             "trust": 2,
             "metric_effects": {
               "elite_support": -1,
-              "economy": -1
+              "economy": -1,
+              "social_stability": 2
             },
             "description": "Очередь сокращается быстро; временные услуги дороже на один приём.",
-            "legal_basis": "БК РФ, статьи 38 и 132; Федеральный закон №323-ФЗ, статья 10: доступность медицинской помощи. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721"
+            "legal_basis": "БК РФ, статьи 38 и 132; Федеральный закон №323-ФЗ, статья 10: доступность медицинской помощи. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
+            "calibration_reason": "Выездная диагностика отвечает срочному запросу после организации услуги."
           },
           {
             "key": "option_3",
@@ -257,10 +295,12 @@
             "trust": 0,
             "metric_effects": {
               "elite_support": 2,
-              "economy": 1
+              "economy": 1,
+              "social_stability": -1
             },
             "description": "Умеренные вложения; удалённые поселения ждут дольше.",
-            "legal_basis": "БК РФ, статьи 38 и 132; Федеральный закон №323-ФЗ, статья 10: доступность медицинской помощи. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721"
+            "legal_basis": "БК РФ, статьи 38 и 132; Федеральный закон №323-ФЗ, статья 10: доступность медицинской помощи. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
+            "calibration_reason": "Один кабинет сохраняет территориальное неравенство."
           },
           {
             "key": "option_4",
@@ -268,10 +308,12 @@
             "trust": 1,
             "metric_effects": {
               "elite_support": 0,
-              "economy": -1
+              "economy": -1,
+              "social_stability": 1
             },
             "description": "Доступ сохраняется; возрастает транспортная нагрузка.",
-            "legal_basis": "БК РФ, статьи 38 и 132; Федеральный закон №323-ФЗ, статья 10: доступность медицинской помощи. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721"
+            "legal_basis": "БК РФ, статьи 38 и 132; Федеральный закон №323-ФЗ, статья 10: доступность медицинской помощи. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
+            "calibration_reason": "Межрайонный маршрут обеспечивает альтернативу, но поездки остаются издержкой."
           },
           {
             "key": "option_5",
@@ -279,10 +321,12 @@
             "trust": -1,
             "metric_effects": {
               "elite_support": 1,
-              "economy": 2
+              "economy": 2,
+              "social_stability": -2
             },
             "description": "Снижается риск недоиспользования; оборудование поступит позднее.",
-            "legal_basis": "БК РФ, статьи 38 и 132; Федеральный закон №323-ФЗ, статья 10: доступность медицинской помощи. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721"
+            "legal_basis": "БК РФ, статьи 38 и 132; Федеральный закон №323-ФЗ, статья 10: доступность медицинской помощи. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
+            "calibration_reason": "Последовательное обучение и поставка отсрочивают улучшение доступности."
           }
         ]
       },
@@ -313,6 +357,13 @@
         "automatic_enterprise_delta": 0,
         "rule": "Исходное событие учитывается один раз по подтверждённому факту; выбранная рекомендация не создаёт платёж, долг, доход или предприятие. Влияние реализации требует отдельного подтверждённого решения и проверки реестров.",
         "legacy_effects_retained_for_review": true
+      },
+      "balance_review": {
+        "status": "draft_requires_final_calibration",
+        "additional_dimension": "social_stability",
+        "dominated_before": 0,
+        "dominated_after": 0,
+        "note": "Шкала соответствует содержанию кейса. Величины условны. До релиза отделить политический сигнал принятия решения от подтверждённого факта исполнения."
       }
     },
     {
@@ -550,10 +601,12 @@
             "trust": 2,
             "metric_effects": {
               "elite_support": -1,
-              "economy": 2
+              "economy": 2,
+              "social_stability": 0
             },
             "description": "Сообщение восстановится быстрее при финансировании; дороже организация работ.",
-            "legal_basis": "БК РФ, статьи 38 и 132; Федеральный закон №257-ФЗ, статьи 17 и 30: содержание дороги и ограничения движения. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721"
+            "legal_basis": "БК РФ, статьи 38 и 132; Федеральный закон №257-ФЗ, статьи 17 и 30: содержание дороги и ограничения движения. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
+            "calibration_reason": "Строительство ещё не решает текущую проблему доступности."
           },
           {
             "key": "option_2",
@@ -561,10 +614,12 @@
             "trust": 1,
             "metric_effects": {
               "elite_support": 1,
-              "economy": -1
+              "economy": -1,
+              "social_stability": 1
             },
             "description": "Снижается пик расходов; логистические издержки сохраняются дольше.",
-            "legal_basis": "БК РФ, статьи 38 и 132; Федеральный закон №257-ФЗ, статьи 17 и 30: содержание дороги и ограничения движения. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721"
+            "legal_basis": "БК РФ, статьи 38 и 132; Федеральный закон №257-ФЗ, статьи 17 и 30: содержание дороги и ограничения движения. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
+            "calibration_reason": "Поддержка перевозчиков на объезде уменьшает конфликт вокруг текущих перевозок."
           },
           {
             "key": "option_3",
@@ -572,10 +627,12 @@
             "trust": 0,
             "metric_effects": {
               "elite_support": 2,
-              "economy": 1
+              "economy": 1,
+              "social_stability": 2
             },
             "description": "Снижается риск переплаты; жители ждут капитального результата.",
-            "legal_basis": "БК РФ, статьи 38 и 132; Федеральный закон №257-ФЗ, статьи 17 и 30: содержание дороги и ограничения движения. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721"
+            "legal_basis": "БК РФ, статьи 38 и 132; Федеральный закон №257-ФЗ, статьи 17 и 30: содержание дороги и ограничения движения. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
+            "calibration_reason": "Приоритет временной доступности отвечает непосредственному недовольству."
           },
           {
             "key": "option_4",
@@ -583,10 +640,12 @@
             "trust": -1,
             "metric_effects": {
               "elite_support": 1,
-              "economy": 2
+              "economy": 2,
+              "social_stability": -1
             },
             "description": "Экономятся средства; качество прилегающей среды улучшается позже.",
-            "legal_basis": "БК РФ, статьи 38 и 132; Федеральный закон №257-ФЗ, статьи 17 и 30: содержание дороги и ограничения движения. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721"
+            "legal_basis": "БК РФ, статьи 38 и 132; Федеральный закон №257-ФЗ, статьи 17 и 30: содержание дороги и ограничения движения. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
+            "calibration_reason": "Сокращение благоустройства оставляет конфликт местных интересов."
           },
           {
             "key": "option_5",
@@ -594,10 +653,12 @@
             "trust": 1,
             "metric_effects": {
               "elite_support": -2,
-              "economy": 2
+              "economy": 2,
+              "social_stability": 1
             },
             "description": "Растёт ресурс проекта; другие дорожные объекты конкурируют за лимиты.",
-            "legal_basis": "БК РФ, статьи 38 и 132; Федеральный закон №257-ФЗ, статьи 17 и 30: содержание дороги и ограничения движения. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721"
+            "legal_basis": "БК РФ, статьи 38 и 132; Федеральный закон №257-ФЗ, статьи 17 и 30: содержание дороги и ограничения движения. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
+            "calibration_reason": "Согласование программ распределяет ответственность, но конкуренция за лимиты сохраняется."
           }
         ]
       },
@@ -628,6 +689,13 @@
         "automatic_enterprise_delta": 0,
         "rule": "Исходное событие учитывается один раз по подтверждённому факту; выбранная рекомендация не создаёт платёж, долг, доход или предприятие. Влияние реализации требует отдельного подтверждённого решения и проверки реестров.",
         "legacy_effects_retained_for_review": true
+      },
+      "balance_review": {
+        "status": "draft_requires_final_calibration",
+        "additional_dimension": "social_stability",
+        "dominated_before": 1,
+        "dominated_after": 0,
+        "note": "Шкала соответствует содержанию кейса. Величины условны. До релиза отделить политический сигнал принятия решения от подтверждённого факта исполнения."
       }
     },
     {
@@ -655,10 +723,12 @@
             "trust": 1,
             "metric_effects": {
               "elite_support": -1,
-              "economy": 1
+              "economy": 1,
+              "social_stability": 2
             },
             "description": "Меньше повторных ошибок; выше начальная административная нагрузка.",
-            "legal_basis": "БК РФ, статья 133: субвенции из федерального бюджета бюджетам субъектов РФ. Источники: https://www.consultant.ru/document/cons_doc_LAW_19702/"
+            "legal_basis": "БК РФ, статья 133: субвенции из федерального бюджета бюджетам субъектов РФ. Источники: https://www.consultant.ru/document/cons_doc_LAW_19702/",
+            "calibration_reason": "Единое обучение уменьшает различия в обращении с получателями."
           },
           {
             "key": "option_2",
@@ -666,10 +736,12 @@
             "trust": 0,
             "metric_effects": {
               "elite_support": 2,
-              "economy": 1
+              "economy": 1,
+              "social_stability": -1
             },
             "description": "Экономнее постоянного аудита; отдельные ошибки обнаруживаются позднее.",
-            "legal_basis": "БК РФ, статья 133: субвенции из федерального бюджета бюджетам субъектов РФ. Источники: https://www.consultant.ru/document/cons_doc_LAW_19702/"
+            "legal_basis": "БК РФ, статья 133: субвенции из федерального бюджета бюджетам субъектов РФ. Источники: https://www.consultant.ru/document/cons_doc_LAW_19702/",
+            "calibration_reason": "Выборочная сверка оставляет часть конфликтов нерешёнными дольше."
           },
           {
             "key": "option_3",
@@ -677,10 +749,12 @@
             "trust": 2,
             "metric_effects": {
               "elite_support": -1,
-              "economy": 0
+              "economy": 0,
+              "social_stability": 1
             },
             "description": "Быстрее исправляются сложные участки; охват контроля неравномерен.",
-            "legal_basis": "БК РФ, статья 133: субвенции из федерального бюджета бюджетам субъектов РФ. Источники: https://www.consultant.ru/document/cons_doc_LAW_19702/"
+            "legal_basis": "БК РФ, статья 133: субвенции из федерального бюджета бюджетам субъектов РФ. Источники: https://www.consultant.ru/document/cons_doc_LAW_19702/",
+            "calibration_reason": "Адресная помощь снижает локальные споры."
           },
           {
             "key": "option_4",
@@ -688,10 +762,12 @@
             "trust": 3,
             "metric_effects": {
               "elite_support": -2,
-              "economy": 0
+              "economy": 0,
+              "social_stability": 1
             },
             "description": "Растёт доверие; увеличивается число обращений на обработку.",
-            "legal_basis": "БК РФ, статья 133: субвенции из федерального бюджета бюджетам субъектов РФ. Источники: https://www.consultant.ru/document/cons_doc_LAW_19702/"
+            "legal_basis": "БК РФ, статья 133: субвенции из федерального бюджета бюджетам субъектов РФ. Источники: https://www.consultant.ru/document/cons_doc_LAW_19702/",
+            "calibration_reason": "Канал исправлений помогает получателям, но увеличивает нагрузку."
           },
           {
             "key": "option_5",
@@ -699,10 +775,12 @@
             "trust": 1,
             "metric_effects": {
               "elite_support": 0,
-              "economy": 2
+              "economy": 2,
+              "social_stability": 0
             },
             "description": "Снижается ручная нагрузка после внедрения; требуется подготовка.",
-            "legal_basis": "БК РФ, статья 133: субвенции из федерального бюджета бюджетам субъектов РФ. Источники: https://www.consultant.ru/document/cons_doc_LAW_19702/"
+            "legal_basis": "БК РФ, статья 133: субвенции из федерального бюджета бюджетам субъектов РФ. Источники: https://www.consultant.ru/document/cons_doc_LAW_19702/",
+            "calibration_reason": "Межведомственный обмен требует подготовки."
           }
         ]
       },
@@ -733,6 +811,13 @@
         "automatic_enterprise_delta": 0,
         "rule": "Исходное событие учитывается один раз по подтверждённому факту; выбранная рекомендация не создаёт платёж, долг, доход или предприятие. Влияние реализации требует отдельного подтверждённого решения и проверки реестров.",
         "legacy_effects_retained_for_review": true
+      },
+      "balance_review": {
+        "status": "draft_requires_final_calibration",
+        "additional_dimension": "social_stability",
+        "dominated_before": 1,
+        "dominated_after": 0,
+        "note": "Шкала соответствует содержанию кейса. Величины условны. До релиза отделить политический сигнал принятия решения от подтверждённого факта исполнения."
       }
     },
     {
@@ -760,10 +845,12 @@
             "trust": 3,
             "metric_effects": {
               "elite_support": -2,
-              "economy": 1
+              "economy": 1,
+              "social_stability": 2
             },
             "description": "Услуги возвращаются быстрее; резерв уменьшается.",
-            "legal_basis": "БК РФ, статьи 38 и 81: целевое назначение и непредвиденные расходы резервного фонда. Источники: https://www.consultant.ru/document/cons_doc_LAW_19702/"
+            "legal_basis": "БК РФ, статьи 38 и 81: целевое назначение и непредвиденные расходы резервного фонда. Источники: https://www.consultant.ru/document/cons_doc_LAW_19702/",
+            "calibration_reason": "Приоритет пострадавших сетей отвечает острому запросу жителей."
           },
           {
             "key": "option_2",
@@ -771,10 +858,12 @@
             "trust": 1,
             "metric_effects": {
               "elite_support": 1,
-              "economy": 1
+              "economy": 1,
+              "social_stability": 0
             },
             "description": "Сохраняется запас; часть предприятий ждёт.",
-            "legal_basis": "БК РФ, статьи 38 и 81: целевое назначение и непредвиденные расходы резервного фонда. Источники: https://www.consultant.ru/document/cons_doc_LAW_19702/"
+            "legal_basis": "БК РФ, статьи 38 и 81: целевое назначение и непредвиденные расходы резервного фонда. Источники: https://www.consultant.ru/document/cons_doc_LAW_19702/",
+            "calibration_reason": "Оставшиеся участки ждут восстановления."
           },
           {
             "key": "option_3",
@@ -782,10 +871,12 @@
             "trust": 2,
             "metric_effects": {
               "elite_support": -1,
-              "economy": 2
+              "economy": 2,
+              "social_stability": -1
             },
             "description": "Экономическая активность восстанавливается; временные меры требуют ресурса.",
-            "legal_basis": "БК РФ, статьи 38 и 81: целевое назначение и непредвиденные расходы резервного фонда. Источники: https://www.consultant.ru/document/cons_doc_LAW_19702/"
+            "legal_basis": "БК РФ, статьи 38 и 81: целевое назначение и непредвиденные расходы резервного фонда. Источники: https://www.consultant.ru/document/cons_doc_LAW_19702/",
+            "calibration_reason": "Временные решения для бизнеса могут вызвать спор о распределении ресурсов."
           },
           {
             "key": "option_4",
@@ -793,10 +884,12 @@
             "trust": 0,
             "metric_effects": {
               "elite_support": 2,
-              "economy": 0
+              "economy": 0,
+              "social_stability": -1
             },
             "description": "Расходы предсказуемы; восстановление менее срочных объектов откладывается.",
-            "legal_basis": "БК РФ, статьи 38 и 81: целевое назначение и непредвиденные расходы резервного фонда. Источники: https://www.consultant.ru/document/cons_doc_LAW_19702/"
+            "legal_basis": "БК РФ, статьи 38 и 81: целевое назначение и непредвиденные расходы резервного фонда. Источники: https://www.consultant.ru/document/cons_doc_LAW_19702/",
+            "calibration_reason": "Очередность по риску оставляет менее срочные объекты ждать."
           },
           {
             "key": "option_5",
@@ -804,10 +897,12 @@
             "trust": 1,
             "metric_effects": {
               "elite_support": -1,
-              "economy": 1
+              "economy": 1,
+              "social_stability": 2
             },
             "description": "Сохраняется целевое использование; решение зависит от согласования.",
-            "legal_basis": "БК РФ, статьи 38 и 81: целевое назначение и непредвиденные расходы резервного фонда. Источники: https://www.consultant.ru/document/cons_doc_LAW_19702/"
+            "legal_basis": "БК РФ, статьи 38 и 81: целевое назначение и непредвиденные расходы резервного фонда. Источники: https://www.consultant.ru/document/cons_doc_LAW_19702/",
+            "calibration_reason": "Запрос на полное восстановление объединяет интересы территорий, но требует согласования."
           }
         ]
       },
@@ -839,6 +934,13 @@
         "automatic_enterprise_delta": 0,
         "rule": "Исходное событие учитывается один раз по подтверждённому факту; выбранная рекомендация не создаёт платёж, долг, доход или предприятие. Влияние реализации требует отдельного подтверждённого решения и проверки реестров.",
         "legacy_effects_retained_for_review": true
+      },
+      "balance_review": {
+        "status": "draft_requires_final_calibration",
+        "additional_dimension": "social_stability",
+        "dominated_before": 1,
+        "dominated_after": 0,
+        "note": "Шкала соответствует содержанию кейса. Величины условны. До релиза отделить политический сигнал принятия решения от подтверждённого факта исполнения."
       }
     },
     {
@@ -866,10 +968,12 @@
             "trust": 2,
             "metric_effects": {
               "elite_support": -2,
-              "economy": 1
+              "economy": 1,
+              "security": 2
             },
             "description": "Уменьшается долгосрочный риск; крупная смета требует поддержки.",
-            "legal_basis": "БК РФ, статьи 38 и 132; Лесной кодекс РФ, статья 62: лесовосстановление. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721"
+            "legal_basis": "БК РФ, статьи 38 и 132; Лесной кодекс РФ, статья 62: лесовосстановление. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
+            "calibration_reason": "Комплексное устранение опасностей снижает долгосрочный риск после исполнения."
           },
           {
             "key": "option_2",
@@ -877,10 +981,12 @@
             "trust": 3,
             "metric_effects": {
               "elite_support": -1,
-              "economy": 0
+              "economy": 0,
+              "security": 1
             },
             "description": "Быстрый эффект для жителей; удалённые участки ждут.",
-            "legal_basis": "БК РФ, статьи 38 и 132; Лесной кодекс РФ, статья 62: лесовосстановление. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721"
+            "legal_basis": "БК РФ, статьи 38 и 132; Лесной кодекс РФ, статья 62: лесовосстановление. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
+            "calibration_reason": "Приоритет населённых пунктов защищает жителей."
           },
           {
             "key": "option_3",
@@ -888,10 +994,12 @@
             "trust": 0,
             "metric_effects": {
               "elite_support": 1,
-              "economy": 2
+              "economy": 2,
+              "security": 0
             },
             "description": "Снижаются расходы; наблюдение должно быть длительным.",
-            "legal_basis": "БК РФ, статьи 38 и 132; Лесной кодекс РФ, статья 62: лесовосстановление. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721"
+            "legal_basis": "БК РФ, статьи 38 и 132; Лесной кодекс РФ, статья 62: лесовосстановление. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
+            "calibration_reason": "Природное восстановление допустимо после обследования; текущая опасность не считается устранённой."
           },
           {
             "key": "option_4",
@@ -899,10 +1007,12 @@
             "trust": 1,
             "metric_effects": {
               "elite_support": 2,
-              "economy": -1
+              "economy": -1,
+              "security": 2
             },
             "description": "Защита усиливается; визуальный результат восстановления скромнее.",
-            "legal_basis": "БК РФ, статьи 38 и 132; Лесной кодекс РФ, статья 62: лесовосстановление. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721"
+            "legal_basis": "БК РФ, статьи 38 и 132; Лесной кодекс РФ, статья 62: лесовосстановление. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
+            "calibration_reason": "Подъезды и наблюдение уменьшают риск повторного происшествия после реализации."
           },
           {
             "key": "option_5",
@@ -910,10 +1020,12 @@
             "trust": 1,
             "metric_effects": {
               "elite_support": -1,
-              "economy": 2
+              "economy": 2,
+              "security": -1
             },
             "description": "Уменьшается дублирование; возрастает время согласования.",
-            "legal_basis": "БК РФ, статьи 38 и 132; Лесной кодекс РФ, статья 62: лесовосстановление. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721"
+            "legal_basis": "БК РФ, статьи 38 и 132; Лесной кодекс РФ, статья 62: лесовосстановление. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
+            "calibration_reason": "Дополнительные согласования задерживают профилактику; обязательная защита сохраняется."
           }
         ]
       },
@@ -944,6 +1056,13 @@
         "automatic_enterprise_delta": 0,
         "rule": "Исходное событие учитывается один раз по подтверждённому факту; выбранная рекомендация не создаёт платёж, долг, доход или предприятие. Влияние реализации требует отдельного подтверждённого решения и проверки реестров.",
         "legacy_effects_retained_for_review": true
+      },
+      "balance_review": {
+        "status": "draft_requires_final_calibration",
+        "additional_dimension": "security",
+        "dominated_before": 0,
+        "dominated_after": 0,
+        "note": "Шкала соответствует содержанию кейса. Величины условны. До релиза отделить политический сигнал принятия решения от подтверждённого факта исполнения."
       }
     },
     {
@@ -1076,10 +1195,12 @@
             "trust": 1,
             "metric_effects": {
               "elite_support": -1,
-              "economy": 3
+              "economy": 3,
+              "social_stability": 0
             },
             "description": "Растёт потенциал подключения; велик начальный объём вложений.",
-            "legal_basis": "БК РФ, статьи 37 и 132; Федеральный закон №35-ФЗ, статья 26: технологическое присоединение. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721"
+            "legal_basis": "БК РФ, статьи 37 и 132; Федеральный закон №35-ФЗ, статья 26: технологическое присоединение. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
+            "calibration_reason": "Общий узел ориентирован на будущий рост."
           },
           {
             "key": "option_2",
@@ -1087,10 +1208,12 @@
             "trust": 2,
             "metric_effects": {
               "elite_support": 1,
-              "economy": 1
+              "economy": 1,
+              "social_stability": 2
             },
             "description": "Снижается текущий риск; новые резиденты ждут.",
-            "legal_basis": "БК РФ, статьи 37 и 132; Федеральный закон №35-ФЗ, статья 26: технологическое присоединение. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721"
+            "legal_basis": "БК РФ, статьи 37 и 132; Федеральный закон №35-ФЗ, статья 26: технологическое присоединение. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
+            "calibration_reason": "Приоритет действующих предприятий защищает существующую занятость после подключения."
           },
           {
             "key": "option_3",
@@ -1098,10 +1221,12 @@
             "trust": 0,
             "metric_effects": {
               "elite_support": 2,
-              "economy": 2
+              "economy": 2,
+              "social_stability": -1
             },
             "description": "Сдерживаются расходы; запуск новых площадок медленнее.",
-            "legal_basis": "БК РФ, статьи 37 и 132; Федеральный закон №35-ФЗ, статья 26: технологическое присоединение. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721"
+            "legal_basis": "БК РФ, статьи 37 и 132; Федеральный закон №35-ФЗ, статья 26: технологическое присоединение. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
+            "calibration_reason": "Поэтапность сохраняет различие сроков доступа."
           },
           {
             "key": "option_4",
@@ -1109,10 +1234,12 @@
             "trust": 1,
             "metric_effects": {
               "elite_support": -1,
-              "economy": 2
+              "economy": 2,
+              "social_stability": 1
             },
             "description": "Улучшается логистика; электрическая мощность остаётся ограничением.",
-            "legal_basis": "БК РФ, статьи 37 и 132; Федеральный закон №35-ФЗ, статья 26: технологическое присоединение. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721"
+            "legal_basis": "БК РФ, статьи 37 и 132; Федеральный закон №35-ФЗ, статья 26: технологическое присоединение. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
+            "calibration_reason": "Подъезды снижают текущие конфликты доступности."
           },
           {
             "key": "option_5",
@@ -1120,10 +1247,12 @@
             "trust": -1,
             "metric_effects": {
               "elite_support": 1,
-              "economy": 2
+              "economy": 2,
+              "social_stability": 1
             },
             "description": "Снижается нагрузка бюджета; часть малых предприятий не готова к затратам.",
-            "legal_basis": "БК РФ, статьи 37 и 132; Федеральный закон №35-ФЗ, статья 26: технологическое присоединение. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721"
+            "legal_basis": "БК РФ, статьи 37 и 132; Федеральный закон №35-ФЗ, статья 26: технологическое присоединение. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
+            "calibration_reason": "Единые условия уменьшают спор о предпочтениях, но не все могут софинансировать."
           }
         ]
       },
@@ -1154,6 +1283,13 @@
         "automatic_enterprise_delta": 0,
         "rule": "Исходное событие учитывается один раз по подтверждённому факту; выбранная рекомендация не создаёт платёж, долг, доход или предприятие. Влияние реализации требует отдельного подтверждённого решения и проверки реестров.",
         "legacy_effects_retained_for_review": true
+      },
+      "balance_review": {
+        "status": "draft_requires_final_calibration",
+        "additional_dimension": "social_stability",
+        "dominated_before": 2,
+        "dominated_after": 0,
+        "note": "Шкала соответствует содержанию кейса. Величины условны. До релиза отделить политический сигнал принятия решения от подтверждённого факта исполнения."
       }
     },
     {
@@ -1181,10 +1317,12 @@
             "trust": 2,
             "metric_effects": {
               "elite_support": 1,
-              "economy": 2
+              "economy": 2,
+              "social_stability": 0
             },
             "description": "Быстрее возвращается занятость; выбор профессий сужается.",
-            "legal_basis": "БК РФ, статьи 38 и 132; Федеральный закон №565-ФЗ о занятости населения: меры поддержки занятости. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721"
+            "legal_basis": "БК РФ, статьи 38 и 132; Федеральный закон №565-ФЗ о занятости населения: меры поддержки занятости. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
+            "calibration_reason": "Короткий курс не охватывает работников, которым он не подходит."
           },
           {
             "key": "option_2",
@@ -1192,10 +1330,12 @@
             "trust": 3,
             "metric_effects": {
               "elite_support": -2,
-              "economy": 0
+              "economy": 0,
+              "social_stability": 1
             },
             "description": "У работников больше выбора; выше расходы и риск невостребованности.",
-            "legal_basis": "БК РФ, статьи 38 и 132; Федеральный закон №565-ФЗ о занятости населения: меры поддержки занятости. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721"
+            "legal_basis": "БК РФ, статьи 38 и 132; Федеральный закон №565-ФЗ о занятости населения: меры поддержки занятости. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
+            "calibration_reason": "Широкий выбор уменьшает конфликт предпочтений."
           },
           {
             "key": "option_3",
@@ -1203,10 +1343,12 @@
             "trust": 1,
             "metric_effects": {
               "elite_support": -1,
-              "economy": 3
+              "economy": 3,
+              "social_stability": 0
             },
             "description": "Растёт соответствие рабочим местам; требуется координация.",
-            "legal_basis": "БК РФ, статьи 38 и 132; Федеральный закон №565-ФЗ о занятости населения: меры поддержки занятости. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721"
+            "legal_basis": "БК РФ, статьи 38 и 132; Федеральный закон №565-ФЗ о занятости населения: меры поддержки занятости. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
+            "calibration_reason": "Практика улучшает соответствие вакансиям, но не гарантирует трудоустройство всех."
           },
           {
             "key": "option_4",
@@ -1214,10 +1356,12 @@
             "trust": 2,
             "metric_effects": {
               "elite_support": -1,
-              "economy": 1
+              "economy": 1,
+              "social_stability": 2
             },
             "description": "Помощь адресна; часть претендентов ждёт следующего набора.",
-            "legal_basis": "БК РФ, статьи 38 и 132; Федеральный закон №565-ФЗ о занятости населения: меры поддержки занятости. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721"
+            "legal_basis": "БК РФ, статьи 38 и 132; Федеральный закон №565-ФЗ о занятости населения: меры поддержки занятости. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
+            "calibration_reason": "Приоритет уязвимых групп непосредственно уменьшает риск напряжённости."
           },
           {
             "key": "option_5",
@@ -1225,10 +1369,12 @@
             "trust": -2,
             "metric_effects": {
               "elite_support": 2,
-              "economy": 1
+              "economy": 1,
+              "social_stability": -1
             },
             "description": "Экономятся средства; меньше возможностей сменить профессию.",
-            "legal_basis": "БК РФ, статьи 38 и 132; Федеральный закон №565-ФЗ о занятости населения: меры поддержки занятости. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721"
+            "legal_basis": "БК РФ, статьи 38 и 132; Федеральный закон №565-ФЗ о занятости населения: меры поддержки занятости. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
+            "calibration_reason": "Сокращение переобучения ограничивает смену профессии."
           }
         ]
       },
@@ -1260,6 +1406,13 @@
         "automatic_enterprise_delta": 0,
         "rule": "Исходное событие учитывается один раз по подтверждённому факту; выбранная рекомендация не создаёт платёж, долг, доход или предприятие. Влияние реализации требует отдельного подтверждённого решения и проверки реестров.",
         "legacy_effects_retained_for_review": true
+      },
+      "balance_review": {
+        "status": "draft_requires_final_calibration",
+        "additional_dimension": "social_stability",
+        "dominated_before": 1,
+        "dominated_after": 0,
+        "note": "Шкала соответствует содержанию кейса. Величины условны. До релиза отделить политический сигнал принятия решения от подтверждённого факта исполнения."
       }
     },
     {
@@ -1811,10 +1964,12 @@
             "trust": 3,
             "metric_effects": {
               "elite_support": -2,
-              "economy": 2
+              "economy": 2,
+              "security": 2
             },
             "description": "Снижается риск повторного ущерба; велика потребность в ресурсах.",
-            "legal_basis": "БК РФ, статьи 38 и 132; Федеральный закон №68-ФЗ, статья 11: предупреждение и ликвидация ЧС в пределах компетенции. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721"
+            "legal_basis": "БК РФ, статьи 38 и 132; Федеральный закон №68-ФЗ, статья 11: предупреждение и ликвидация ЧС в пределах компетенции. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
+            "calibration_reason": "Комплексная защита снижает повторный риск при реализации."
           },
           {
             "key": "option_2",
@@ -1822,10 +1977,12 @@
             "trust": 3,
             "metric_effects": {
               "elite_support": -1,
-              "economy": 0
+              "economy": 0,
+              "security": 1
             },
             "description": "Защита жителей ускоряется; промышленные участки ждут.",
-            "legal_basis": "БК РФ, статьи 38 и 132; Федеральный закон №68-ФЗ, статья 11: предупреждение и ликвидация ЧС в пределах компетенции. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721"
+            "legal_basis": "БК РФ, статьи 38 и 132; Федеральный закон №68-ФЗ, статья 11: предупреждение и ликвидация ЧС в пределах компетенции. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
+            "calibration_reason": "Приоритет жилых кварталов уменьшает риск людям, но не всем объектам."
           },
           {
             "key": "option_3",
@@ -1833,10 +1990,12 @@
             "trust": 1,
             "metric_effects": {
               "elite_support": 1,
-              "economy": 3
+              "economy": 3,
+              "security": 0
             },
             "description": "Быстрее возвращается активность; часть защитных объектов позже.",
-            "legal_basis": "БК РФ, статьи 38 и 132; Федеральный закон №68-ФЗ, статья 11: предупреждение и ликвидация ЧС в пределах компетенции. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721"
+            "legal_basis": "БК РФ, статьи 38 и 132; Федеральный закон №68-ФЗ, статья 11: предупреждение и ликвидация ЧС в пределах компетенции. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
+            "calibration_reason": "Экономический приоритет не охватывает все опасные участки."
           },
           {
             "key": "option_4",
@@ -1844,10 +2003,12 @@
             "trust": 1,
             "metric_effects": {
               "elite_support": 0,
-              "economy": -1
+              "economy": -1,
+              "security": 2
             },
             "description": "Риск снижается сейчас; временные меры требуют затрат.",
-            "legal_basis": "БК РФ, статьи 38 и 132; Федеральный закон №68-ФЗ, статья 11: предупреждение и ликвидация ЧС в пределах компетенции. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721"
+            "legal_basis": "БК РФ, статьи 38 и 132; Федеральный закон №68-ФЗ, статья 11: предупреждение и ликвидация ЧС в пределах компетенции. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
+            "calibration_reason": "Временные меры уменьшают непосредственный риск до реконструкции."
           },
           {
             "key": "option_5",
@@ -1855,10 +2016,12 @@
             "trust": 0,
             "metric_effects": {
               "elite_support": 2,
-              "economy": 1
+              "economy": 1,
+              "security": -1
             },
             "description": "Снижается риск неэффективной стройки; сроки увеличиваются.",
-            "legal_basis": "БК РФ, статьи 38 и 132; Федеральный закон №68-ФЗ, статья 11: предупреждение и ликвидация ЧС в пределах компетенции. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721"
+            "legal_basis": "БК РФ, статьи 38 и 132; Федеральный закон №68-ФЗ, статья 11: предупреждение и ликвидация ЧС в пределах компетенции. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
+            "calibration_reason": "Обследование откладывает капитальные улучшения; обязательные меры сохраняются."
           }
         ]
       },
@@ -1890,6 +2053,13 @@
         "automatic_enterprise_delta": 0,
         "rule": "Исходное событие учитывается один раз по подтверждённому факту; выбранная рекомендация не создаёт платёж, долг, доход или предприятие. Влияние реализации требует отдельного подтверждённого решения и проверки реестров.",
         "legacy_effects_retained_for_review": true
+      },
+      "balance_review": {
+        "status": "draft_requires_final_calibration",
+        "additional_dimension": "security",
+        "dominated_before": 1,
+        "dominated_after": 0,
+        "note": "Шкала соответствует содержанию кейса. Величины условны. До релиза отделить политический сигнал принятия решения от подтверждённого факта исполнения."
       }
     },
     {
