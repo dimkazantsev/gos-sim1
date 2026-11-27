@@ -4,9 +4,9 @@
   "summary": {
     "cases": 189,
     "options": 947,
-    "baseDominated": 228,
-    "expandedDominated": 126,
-    "expandedCases": 99
+    "baseDominated": 221,
+    "expandedDominated": 122,
+    "expandedCases": 95
   },
   "remaining": [
     {
@@ -305,26 +305,6 @@
       "dominated": 1
     },
     {
-      "case_key": "bank-legal-2026-092",
-      "title": "Закон без опубликования",
-      "dominated": 1
-    },
-    {
-      "case_key": "bank-legal-2026-096",
-      "title": "Проверка конституционности до подписи",
-      "dominated": 1
-    },
-    {
-      "case_key": "bank-legal-2026-098",
-      "title": "Устав без обязательных положений",
-      "dominated": 1
-    },
-    {
-      "case_key": "bank-legal-2026-099",
-      "title": "Отказ из-за политической позиции",
-      "dominated": 1
-    },
-    {
       "case_key": "bank-legal-2026-100",
       "title": "Неотмеченная агитация",
       "dominated": 1
@@ -504,5 +484,6 @@
       "title": "Вознаграждение за обязательную услугу",
       "dominated": 2
     }
-  ]
+  ],
+  "note": "090–099: отдельная редактура; оставшиеся значения вне изменённого диапазона перенесены из исходной диагностики. Полный пересчёт банка требуется перед выпуском."
 }
