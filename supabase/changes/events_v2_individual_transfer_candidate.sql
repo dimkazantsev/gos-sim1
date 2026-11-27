@@ -512,7 +512,7 @@ BEGIN
    FROM (SELECT id,case_id,inviter_id,recipient_id,status,transfer_stage_no FROM public.event_collaboration_invites
     WHERE game_id=p_game_id AND (v_full_view OR case_id=ANY(v_cases))) x),'[]'::jsonb),
   'authority',coalesce((SELECT jsonb_agg(to_jsonb(x) ORDER BY x.decision_id)
-   FROM (SELECT decision_id,case_id,actor_id,authority_ok,lawful,strategy_point,role_snapshot,legal_basis
+   FROM (SELECT decision_id,case_id,actor_id,authority_ok,lawful,strategy_point,role_snapshot,legal_basis,score_share
    FROM public.event_authority_evidence WHERE game_id=p_game_id AND (v_full_view OR case_id=ANY(v_cases))) x),'[]'::jsonb),
   'ready_case_count',CASE WHEN p_include_ready_count AND v_teacher THEN
    (SELECT count(*) FROM public.event_cases WHERE game_id=p_game_id AND status='ready')

@@ -21,7 +21,7 @@ import type {EventComicScene} from './types';
 type CaseRow={id:string;game_id:string;case_key:string;title:string;situation:string;category:string;seriousness:'serious'|'light';audience:'single'|'group'|'all';allowed_roles:string[];status:string;source_url:string|null;decision_options?:string[];effect_plan?:{best_option_key?:string;options?:{key:string;trust:number;description?:string;legal_basis?:string;fiscal_effect?:EventFiscalEffect}[]};comic_scene?:EventComicScene};
 type Assignment={id:string;case_id:string;game_id:string;recipient_id:string;status:string;created_at:string};
 type Decision={id:string;case_id:string;actor_id:string;choice:string;role_snapshot?:string};
-type Authority={decision_id:string;case_id:string;actor_id:string;authority_ok:boolean;lawful:boolean;strategy_point:boolean;role_snapshot:string;legal_basis:string};
+type Authority={decision_id:string;case_id:string;actor_id:string;authority_ok:boolean;lawful:boolean;strategy_point:boolean;role_snapshot:string;legal_basis:string;score_share?:number};
 type Outcome={case_id:string;winner:string;trust_delta:number;votes_count:number;assignments_count:number;media_post_id:string|null;requested_trust_delta?:number;resolution_kind?:string;winning_fiscal_effect?:EventFiscalEffect|null;winning_description?:string|null};
 type EventCompact={titles:{id:string;title:string}[];positive:number|null;negative:number|null};
 const EVENT_FEED_PAGE_SIZE=10;
@@ -98,7 +98,7 @@ export default function EventWorkspace({g,readOnly=false,mode='feed'}:{g:ReturnT
     supabase.from('event_decisions').select('id,case_id,actor_id,choice,role_snapshot').eq('game_id',game.id),
     supabase.from('event_case_outcomes').select('case_id,winner,trust_delta,votes_count,assignments_count,media_post_id,requested_trust_delta,resolution_kind').eq('game_id',game.id),
     supabase.from('event_collaboration_invites').select('id,case_id,inviter_id,recipient_id,status').eq('game_id',game.id),
-    supabase.from('event_authority_evidence').select('decision_id,case_id,actor_id,authority_ok,lawful,strategy_point,role_snapshot,legal_basis').eq('game_id',game.id)
+    supabase.from('event_authority_evidence').select('decision_id,case_id,actor_id,authority_ok,lawful,strategy_point,role_snapshot,legal_basis,score_share').eq('game_id',game.id)
    ]);
    if(!current())return;
    const error=[b,c,d,e,f].find(r=>r.error)?.error;
@@ -343,7 +343,9 @@ export default function EventWorkspace({g,readOnly=false,mode='feed'}:{g:ReturnT
    <div className="eventTileGrid" aria-label="Карточки ситуаций">{visibleCases.map(c=>{
     const assigned=assignments.filter(a=>a.case_id===c.id),responded=decisions.filter(d=>d.case_id===c.id);
     const closed=outcomes.some(o=>o.case_id===c.id),invited=invitations.some(i=>i.case_id===c.id&&i.recipient_id===me.user_id&&i.status==='pending');
-    return <EventCaseTile key={c.id} item={c} meta={invited?'Приглашение к решению':closed?'Решено · '+responded.length+' ответов':assigned.length?'Ожидает решения · '+responded.length+'/'+assigned.length:'Можно назначить'} onClick={()=>setExpanded(c.id)}/>;
+    const transferred=invitations.some(i=>i.case_id===c.id&&i.inviter_id===me.user_id&&i.transfer_stage_no!=null);
+    const transferMode=c.audience==='single'&&c.comic_scene?.event_rules_version===2;
+    return <EventCaseTile key={c.id} item={c} meta={invited?(transferMode?'Передача полномочий':'Приглашение к решению'):transferred?'Полномочия переданы · 0,5 балла':closed?'Решено · '+responded.length+' ответов':assigned.length?'Ожидает решения · '+responded.length+'/'+assigned.length:'Можно назначить'} onClick={()=>setExpanded(c.id)}/>;
    })}</div>}
    {caseLoading&&<p className="eventFeedLoading" role="status">Загрузка ситуаций…</p>}
    {caseError&&<p className="eventFeedLoading" role="alert">{caseError} <button type="button" onClick={()=>{failedCases.current.clear();setRetryPage(n=>n+1)}}>Повторить</button></p>}
@@ -368,7 +370,7 @@ export default function EventWorkspace({g,readOnly=false,mode='feed'}:{g:ReturnT
      <div className="eventStoryVisual"><EventComic silent title={c.title} category={gameValueLabel(c.category,'Ситуация')} caseKey={c.case_key} scene={c.comic_scene} compact/></div>
      <div className="eventStoryContent">
       {teacher&&<div className="eventCaseTop"><span>{gameValueLabel(c.category,'Ситуация')}</span><span>{c.seriousness==='serious'?'Серьёзная':'Повседневная'} · {!transferMode&&invites.some(i=>i.status==='accepted')?'Совместно':c.audience==='all'?'Все':c.audience==='group'?'Совместно':'Личная'}</span></div>}
-      <h4>{c.title}</h4>{caseRegions[c.id]&&<p className="eventRegionAssignmentNotice"><strong>Регион под контролем партии «{caseRegions[c.id].party}» — {caseRegions[c.id].name}.</strong> {me.kind==='student'?'В регионе, который контролирует ваша партия, возникла следующая ситуация.':'В регионе под контролем указанной партии возникла следующая ситуация.'} По правилам ГОС.ID контролирующая партия управляет региональными органами власти, включая губернатора. Решение по этой ситуации принимает назначенный участник контролирующей партии; при необходимости можно пригласить других участников.</p>}{expandedCase&&<><p>{c.situation.replace(/\\n/g,'\n')}</p>
+      <h4>{c.title}</h4>{caseRegions[c.id]&&<p className="eventRegionAssignmentNotice"><strong>Регион под контролем партии «{caseRegions[c.id].party}» — {caseRegions[c.id].name}.</strong> {me.kind==='student'?'В регионе, который контролирует ваша партия, возникла следующая ситуация.':'В регионе под контролем указанной партии возникла следующая ситуация.'} По правилам ГОС.ID контролирующая партия управляет региональными органами власти, включая губернатора. Решение по этой ситуации принимает назначенный участник контролирующей партии; при необходимости {transferMode?'передайте рассмотрение компетентному участнику.':'можно пригласить других участников.'}</p>}{expandedCase&&<><p>{c.situation.replace(/\\n/g,'\n')}</p>
       <div className="eventStoryRecipients">{assigned.map(a=><span key={a.id}>{members.find(m=>m.user_id===a.recipient_id)?.full_name||'Участник'} · {members.find(m=>m.user_id===a.recipient_id)?.role_title||'Без должности'}</span>)}</div>
       <div className="eventCaseFooter"><span><UsersRound size={15} aria-hidden="true"/>{assigned.length} назначено</span><span><CheckCircle2 size={15} aria-hidden="true"/>{responded.length} ответили · {pct(responded.length,assigned.length)}%</span>
       </div>
@@ -383,7 +385,7 @@ export default function EventWorkspace({g,readOnly=false,mode='feed'}:{g:ReturnT
        {outcome.winner!=='tie'&&<span>Региональные последствия: {describeEventFiscalEffect(chosenEffect?.fiscal_effect??outcome.winning_fiscal_effect).join('; ')||'прямое изменение экономических параметров для этого варианта не предусмотрено'}. Изменение доверия учитывается отдельно; фактический бюджет рассчитывается по действующей модели.</span>}
       </div>}
       {teacher&&responded.length>0&&!outcome&&<button type="button" disabled={!!busyId||readOnly} className="eventFinalize" onClick={()=>void finalize(c.id)}>Подвести итог по полученным голосам</button>}
-      {teacher&&authority.some(a=>a.case_id===c.id)&&<div className="eventAuthorityTable"><h4>Полномочия и баллы</h4>{authority.filter(a=>a.case_id===c.id).map(a=><article key={a.decision_id}><b>{g.names[a.actor_id]||'Участник'}</b><span>{a.role_snapshot||'Без должности'}</span><strong>{a.authority_ok&&a.lawful?'Правовой критерий: 1 балл':'Правовой критерий: 0 баллов'}</strong><small>{a.legal_basis}</small>{a.strategy_point&&<span>Защита интересов своей роли: учитывается в стратегии</span>}</article>)}</div>}
+      {teacher&&(authority.some(a=>a.case_id===c.id)||invites.some(i=>i.transfer_stage_no!=null))&&<div className="eventAuthorityTable"><h4>Полномочия и баллы</h4>{transferMode&&invites.filter(i=>i.transfer_stage_no!=null).map(i=><article key={i.id}><b>{g.names[i.inviter_id]||'Участник'}</b><span>Передача: {g.names[i.recipient_id]||'Участник'}</span><strong>Кредит кейса: 0,5 балла</strong></article>)}{authority.filter(a=>a.case_id===c.id).map(a=><article key={a.decision_id}><b>{g.names[a.actor_id]||'Участник'}</b><span>{a.role_snapshot||'Без должности'}</span><strong>{transferMode?'Кредит кейса: '+(a.score_share===undefined?'—':Number(a.score_share).toLocaleString('ru-RU')):a.authority_ok&&a.lawful?'Правовой критерий: 1 балл':'Правовой критерий: 0 баллов'}</strong><small>{a.legal_basis}</small>{a.strategy_point&&<span>Защита интересов своей роли: учитывается в стратегии</span>}</article>)}</div>}
       </>}
      </div>
     </article>
