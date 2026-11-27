@@ -756,12 +756,26 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "БК РФ, статьи 83 и 115–115.2; Федеральный закон №115-ФЗ о концессионных соглашениях: оформление долгосрочных публичных обязательств. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
+      "legal_basis": "115-ФЗ от 21.07.2005, ст. 10 и 10.1: условия соглашения и финансовое участие концедента; БК РФ, ст. 107 — применимые показатели долговой устойчивости. Государственная гарантия по ст. 115–115.2 БК РФ — иной правовой инструмент.",
       "legal_urls": [
-        "https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721"
+        "https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
+        "https://www.consultant.ru/document/cons_doc_LAW_54572/2d340398c3243ee82f5596dd3c46d550d6674df3/",
+        "https://www.consultant.ru/document/cons_doc_LAW_54572/6886719982ec257c9ee66e2f8cd6f423c1629371/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/7b5f77362fb1983215e0525ce8a2b08de83e1dbf/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_54572/2d340398c3243ee82f5596dd3c46d550d6674df3/",
+        "https://www.consultant.ru/document/cons_doc_LAW_54572/6886719982ec257c9ee66e2f8cd6f423c1629371/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/7b5f77362fb1983215e0525ce8a2b08de83e1dbf/"
+      ],
+      "review_date": "2026-11-28",
+      "targeted_option_review": {
+        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "option_count": 5,
+        "remaining": "Допустимый объект концессии, стадия соглашения, вид финансового участия, бюджетные обязательства и условия государственного обеспечения при его наличии."
+      }
     },
     {
       "case_key": "bank-legal-2026-008",
@@ -1145,10 +1159,22 @@
       "resolved_source_url": null,
       "legal_basis": "БК РФ, статья 78; Федеральный закон №260-ФЗ, статьи 3–4: условия государственной поддержки сельскохозяйственного страхования. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
       "legal_urls": [
-        "https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721"
+        "https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
+        "https://www.consultant.ru/document/cons_doc_LAW_117362/38beea0e5dacea218a450f5b74bfc65433157847/",
+        "https://www.consultant.ru/document/cons_doc_LAW_117362/397a3e3e172e7890dba9e6f628b3ac402e4b3f5f/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_117362/38beea0e5dacea218a450f5b74bfc65433157847/",
+        "https://www.consultant.ru/document/cons_doc_LAW_117362/397a3e3e172e7890dba9e6f628b3ac402e4b3f5f/"
+      ],
+      "review_date": "2026-11-28",
+      "targeted_option_review": {
+        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "option_count": 5,
+        "remaining": "Региональный порядок, план страхования, срок договора, страховой случай, документы и порядок перечисления средств."
+      }
     },
     {
       "case_key": "bank-legal-2026-023",
@@ -1193,10 +1219,22 @@
       "resolved_source_url": null,
       "legal_basis": "БК РФ, статьи 33 и 37: сбалансированность бюджета и достоверность показателей. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
       "legal_urls": [
-        "https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721"
+        "https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/bfe84bef16378ca35200b610fe85a50ee121673c/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/73147d61f1183d32e517768da079cfdf28cca0a9/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/bfe84bef16378ca35200b610fe85a50ee121673c/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/73147d61f1183d32e517768da079cfdf28cca0a9/"
+      ],
+      "review_date": "2026-11-28",
+      "targeted_option_review": {
+        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "option_count": 5,
+        "remaining": "Вид проданного имущества, классификация поступления, бюджетный прогноз и действующие зарплатные обязательства. Ст. 33 и 37 не запрещают вообще использовать разовый доход для зарплаты; проблема в необоснованном постоянном прогнозе."
+      }
     },
     {
       "case_key": "bank-legal-2026-025",
@@ -1207,10 +1245,22 @@
       "resolved_source_url": null,
       "legal_basis": "НК РФ, статьи 12 и 56: разграничение налоговых полномочий и установление льгот. Источники: https://www.nalog.gov.ru/rn77/taxation/tax_legislation/",
       "legal_urls": [
-        "https://www.nalog.gov.ru/rn77/taxation/tax_legislation/"
+        "https://www.nalog.gov.ru/rn77/taxation/tax_legislation/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19671/ab54b1f6e016638e006428e90971b05636b17cbf/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19671/4cada6c7ce0d8a4a287f0eeb6d5c1ed5f4d08045/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_19671/ab54b1f6e016638e006428e90971b05636b17cbf/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19671/4cada6c7ce0d8a4a287f0eeb6d5c1ed5f4d08045/"
+      ],
+      "review_date": "2026-11-28",
+      "targeted_option_review": {
+        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "option_count": 5,
+        "remaining": "Конкретные налоги, полномочия регионального законодательного органа по НК РФ, условия программы и наличие уже принятых обязательств."
+      }
     },
     {
       "case_key": "bank-legal-2026-026",
@@ -1221,10 +1271,22 @@
       "resolved_source_url": null,
       "legal_basis": "НК РФ, статья 418.4: налоговая база туристического налога и предусмотренные федеральным законом исключения. Источники: https://www.nalog.gov.ru/rn77/taxation/tax_legislation/",
       "legal_urls": [
-        "https://www.nalog.gov.ru/rn77/taxation/tax_legislation/"
+        "https://www.nalog.gov.ru/rn77/taxation/tax_legislation/",
+        "https://www.consultant.ru/document/cons_doc_LAW_28165/470b3df9e81deabdd0170e0a9f0fe7a5f2513a3d/",
+        "https://www.nalog.gov.ru/rn78/taxation/taxes/tourist_tax/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_28165/470b3df9e81deabdd0170e0a9f0fe7a5f2513a3d/",
+        "https://www.nalog.gov.ru/rn78/taxation/taxes/tourist_tax/"
+      ],
+      "review_date": "2026-11-28",
+      "targeted_option_review": {
+        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "option_count": 5,
+        "remaining": "Категория лица, договор и состав услуги, документы, налоговый и договорный порядок корректировки."
+      }
     },
     {
       "case_key": "bank-legal-2026-027",
@@ -1235,10 +1297,22 @@
       "resolved_source_url": null,
       "legal_basis": "БК РФ, глава 24.4: казначейское сопровождение в предусмотренных законом случаях и условиях финансирования. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
       "legal_urls": [
-        "https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721"
+        "https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/68f24d27edee7d0ca5315de64a951b15f0af209f/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/c4bad396d963c79cf5c4665d8fc50e017a94309f/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/68f24d27edee7d0ca5315de64a951b15f0af209f/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/c4bad396d963c79cf5c4665d8fc50e017a94309f/"
+      ],
+      "review_date": "2026-11-28",
+      "targeted_option_review": {
+        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "option_count": 5,
+        "remaining": "Источник средств, конкретный порядок казначейского сопровождения, контракт, лицевой счёт, применимые исключения и временный режим 2026 года."
+      }
     },
     {
       "case_key": "bank-legal-2026-028",
@@ -1276,7 +1350,8 @@
       "legal_basis": "БК РФ, статьи 6 и 107: границы бюджетных показателей и ограничения государственного долга субъекта РФ. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
       "legal_urls": [
         "https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
-        "https://www.consultant.ru/document/cons_doc_LAW_19702/055a71948dbf2a4fc2478437cd89cd864ee8e6e5/"
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/055a71948dbf2a4fc2478437cd89cd864ee8e6e5/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/7b5f77362fb1983215e0525ce8a2b08de83e1dbf/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
@@ -1288,7 +1363,17 @@
           "scope": "Различение бюджета и консолидированного бюджета, исключение внутренних межбюджетных трансфертов; проверить фактический состав агрегата.",
           "status": "targeted_text_or_official_explanation_read_not_full_case_verification"
         }
-      ]
+      ],
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/055a71948dbf2a4fc2478437cd89cd864ee8e6e5/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/7b5f77362fb1983215e0525ce8a2b08de83e1dbf/"
+      ],
+      "review_date": "2026-11-28",
+      "targeted_option_review": {
+        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "option_count": 5,
+        "remaining": "Состав конкретного бюджета, соглашения между субъектами при применимости, исключения из доходной базы ст. 107 и специальные правила 2026 года."
+      }
     },
     {
       "case_key": "bank-legal-2026-030",
@@ -1299,10 +1384,22 @@
       "resolved_source_url": null,
       "legal_basis": "НК РФ, глава 25.1, в частности статьи 333.2–333.5: объект, ставки и порядок расчёта сбора за пользование водными биоресурсами. Источники: https://www.nalog.gov.ru/rn77/taxation/tax_legislation/",
       "legal_urls": [
-        "https://www.nalog.gov.ru/rn77/taxation/tax_legislation/"
+        "https://www.nalog.gov.ru/rn77/taxation/tax_legislation/",
+        "https://www.consultant.ru/document/cons_doc_LAW_28165/642399c96c8ff576b9bf0f19c28c3d2032e52162/",
+        "https://www.consultant.ru/document/cons_doc_LAW_28165/1f0dacd612fe16cd877e5d8f31ff29790687daa4/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_28165/642399c96c8ff576b9bf0f19c28c3d2032e52162/",
+        "https://www.consultant.ru/document/cons_doc_LAW_28165/1f0dacd612fe16cd877e5d8f31ff29790687daa4/"
+      ],
+      "review_date": "2026-11-28",
+      "targeted_option_review": {
+        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "option_count": 5,
+        "remaining": "Вид биоресурса, разрешение, применимость ст. 333.2–333.5 и 333.4-1, изменение разрешения и законные вычеты."
+      }
     },
     {
       "case_key": "bank-legal-2026-031",
@@ -1621,12 +1718,26 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "БК РФ, статьи 98–101 и 103; Федеральный закон №136-ФЗ об особенностях эмиссии государственных и муниципальных ценных бумаг. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
+      "legal_basis": "БК РФ, ст. 121.1, 121.6, 121.9: обязательства эмитента определяются условиями выпуска, условия эмиссии и предусмотренные сведения раскрываются надлежащим образом. Утративший силу 136-ФЗ от 29.07.1998 не является действующим основанием.",
       "legal_urls": [
-        "https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721"
+        "https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/a05bb58c65660e5b36b73197b588a780bb67b45e/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/2f15c3a6fbc358c0851312de4c637a0f4e92e641/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/5738188fe035a45340bba9efa2c3fbd4359d31cd/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/a05bb58c65660e5b36b73197b588a780bb67b45e/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/2f15c3a6fbc358c0851312de4c637a0f4e92e641/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/5738188fe035a45340bba9efa2c3fbd4359d31cd/"
+      ],
+      "review_date": "2026-11-28",
+      "targeted_option_review": {
+        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "option_count": 5,
+        "remaining": "Стадия выпуска, действующий региональный бюджет, программа заимствований, зарегистрированные условия и применимые требования раскрытия."
+      }
     },
     {
       "case_key": "bank-legal-2026-044",
@@ -1637,10 +1748,24 @@
       "resolved_source_url": null,
       "legal_basis": "НК РФ, статьи 346.12 и 346.43: ограничения специальных налоговых режимов по видам деятельности и предусмотренные исключения. Источники: https://www.nalog.gov.ru/rn77/taxation/tax_legislation/",
       "legal_urls": [
-        "https://www.nalog.gov.ru/rn77/taxation/tax_legislation/"
+        "https://www.nalog.gov.ru/rn77/taxation/tax_legislation/",
+        "https://www.consultant.ru/document/cons_doc_LAW_28165/a1d86f7078e645869b02fde85e8c972193557dee/",
+        "https://www.consultant.ru/document/cons_doc_LAW_28165/dfe87d3a71d81daff6243d64c49ef41c5c3302eb/",
+        "https://www.nalog.gov.ru/rn77/about_fts/about_nalog/15563817/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_28165/a1d86f7078e645869b02fde85e8c972193557dee/",
+        "https://www.consultant.ru/document/cons_doc_LAW_28165/dfe87d3a71d81daff6243d64c49ef41c5c3302eb/",
+        "https://www.nalog.gov.ru/rn77/about_fts/about_nalog/15563817/"
+      ],
+      "review_date": "2026-11-28",
+      "targeted_option_review": {
+        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "option_count": 5,
+        "remaining": "Режим ИП, вид и пробообразующий металл товаров, дата начала запрещённой деятельности, порядок утраты права и допустимость иных режимов."
+      }
     },
     {
       "case_key": "bank-legal-2026-045",
