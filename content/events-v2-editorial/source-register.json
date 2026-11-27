@@ -3315,14 +3315,13 @@
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
       "legal_basis": "Статья 50 Закона №166-ФЗ предусматривает меры по сохранению водных биоресурсов при хозяйственной деятельности. Водный кодекс РФ регулирует охрану водных объектов. Изменение режима сброса требует применимого водохозяйственного и технического решения; наблюдение одной группы не заменяет исследования причин. Источники: https://fish.gov.ru/otraslevaya-deyatelnost/akvakultura/sohranenie-vodnyh-bioresursov/",
-      "legal_urls": [
-        "https://fish.gov.ru/otraslevaya-deyatelnost/akvakultura/sohranenie-vodnyh-bioresursov/"
-      ],
+      "legal_urls": [],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
       "option_analysis_status": "draft",
       "checked_norm_urls": [],
-      "source_scope": "inherited_basis_requires_current_verification"
+      "source_scope": "inherited_basis_requires_current_verification",
+      "review_date": "2026-11-27"
     },
     {
       "case_key": "bank-curated-serious-09",
@@ -3333,7 +3332,9 @@
       "resolved_source_url": null,
       "legal_basis": "Статья 11 Закона №135-ФЗ запрещает картельные соглашения, а статьи 23 и 25 определяют полномочия антимонопольного органа и предоставление информации. Статья 8 Закона №44-ФЗ закрепляет принцип обеспечения конкуренции. Совпадение цен является поводом исследовать доказательства, а не самостоятельным окончательным выводом о картеле. Источники: https://mintrud.gov.ru/docs/laws/116",
       "legal_urls": [
-        "https://mintrud.gov.ru/docs/laws/116"
+        "https://www.consultant.ru/document/cons_doc_LAW_61763/75fad2ba0bd186dad16ff04a2efe55ae3f9ff7e6/",
+        "https://www.consultant.ru/document/cons_doc_LAW_61763/dd1cb1470320c15ddb30d1033ae07c96f53aa1c3/",
+        "https://www.consultant.ru/document/cons_doc_LAW_61763/b9f9ac2e2e1424e9cd11b915828438b431f9009a/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
@@ -3342,7 +3343,8 @@
         "https://www.consultant.ru/document/cons_doc_LAW_61763/75fad2ba0bd186dad16ff04a2efe55ae3f9ff7e6/",
         "https://www.consultant.ru/document/cons_doc_LAW_61763/dd1cb1470320c15ddb30d1033ae07c96f53aa1c3/"
       ],
-      "source_scope": "specific_federal_norm_checked_partial"
+      "source_scope": "specific_norm_and_related_search_results_partial",
+      "review_date": "2026-11-27"
     },
     {
       "case_key": "bank-curated-serious-10",
@@ -3352,14 +3354,13 @@
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
       "legal_basis": "Статьи 219 и 264.1 БК РФ разграничивают исполнение расходов и бюджетную отчётность; статья 38 закрепляет адресность и целевой характер средств. Надлежащая проверка сопоставляет документы и реальное движение денег. Ошибочная строка отчёта сама по себе не доказывает хищение. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
-      "legal_urls": [
-        "https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721"
-      ],
+      "legal_urls": [],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
       "option_analysis_status": "draft",
       "checked_norm_urls": [],
-      "source_scope": "inherited_basis_requires_current_verification"
+      "source_scope": "inherited_basis_requires_current_verification",
+      "review_date": "2026-11-27"
     },
     {
       "case_key": "bank-curated-serious-11",
@@ -3370,13 +3371,14 @@
       "resolved_source_url": null,
       "legal_basis": "Статьи 26 и 34 Закона №273-ФЗ об образовании предусматривают участие обучающихся в управлении организацией в установленном уставом порядке и создание их советов для учёта мнения. Статья 28 закрепляет компетенцию образовательной организации. Представительство не означает передачи ученикам всех полномочий директора или педагогического совета. Источники: https://minobrnauki.gov.ru/open_ministry/gossluzhba/entry/files/Федеральный%20закон%20от%2029.12.2012%20N%20273-ФЗ%20(ред.%20от%2015.10.2025.pdf",
       "legal_urls": [
-        "https://minobrnauki.gov.ru/open_ministry/gossluzhba/entry/files/Федеральный%20закон%20от%2029.12.2012%20N%20273-ФЗ%20(ред.%20от%2015.10.2025.pdf"
+        "https://base.garant.ru/70291362/3ac805f6d87af32d44de92b042d51285/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
       "option_analysis_status": "draft",
       "checked_norm_urls": [],
-      "source_scope": "inherited_basis_requires_current_verification"
+      "source_scope": "specific_norm_and_related_search_results_partial",
+      "review_date": "2026-11-27"
     },
     {
       "case_key": "bank-curated-serious-12",
@@ -3386,15 +3388,13 @@
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
       "legal_basis": "Статья 71 Конституции РФ относит внешнюю политику и международные отношения Российской Федерации к федеральному ведению. Закон №68-ФЗ регулирует участие сил и средств в защите от чрезвычайных ситуаций в пределах компетенции. Региональное учреждение предоставляет сведения и ресурсы по надлежащему решению, а не самостоятельно определяет внешнюю политику. Источники: http://www.kremlin.ru/acts/constitution https://01.mchs.gov.ru/deyatelnost/napravleniya-deyatelnosti/grazhdanskaya-zashchita/preduprezhdenie-chrezvychaynyh-situaciy/1-1-normativnye-pravovye-akty/2-federalnye-zakony/federalnyy-zakon-ot-21-dekabrya-1994-g-n-68-fz-o-zashchite-naseleniya-i-territoriy-ot-chrezvychaynyh-situaciy-prirodnogo-i-tehnogennogo-haraktera",
-      "legal_urls": [
-        "http://www.kremlin.ru/acts/constitution",
-        "https://01.mchs.gov.ru/deyatelnost/napravleniya-deyatelnosti/grazhdanskaya-zashchita/preduprezhdenie-chrezvychaynyh-situaciy/1-1-normativnye-pravovye-akty/2-federalnye-zakony/federalnyy-zakon-ot-21-dekabrya-1994-g-n-68-fz-o-zashchite-naseleniya-i-territoriy-ot-chrezvychaynyh-situaciy-prirodnogo-i-tehnogennogo-haraktera"
-      ],
+      "legal_urls": [],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
       "option_analysis_status": "draft",
       "checked_norm_urls": [],
-      "source_scope": "inherited_basis_requires_current_verification"
+      "source_scope": "inherited_basis_requires_current_verification",
+      "review_date": "2026-11-27"
     },
     {
       "case_key": "bank-curated-serious-13",
@@ -3405,8 +3405,7 @@
       "resolved_source_url": null,
       "legal_basis": "Статья 21 Закона №442-ФЗ предусматривает срочные социальные услуги. Статья 11 Закона №323-ФЗ запрещает отказ в экстренной медицинской помощи. Дальнейшее зачисление в школу и предоставление плановых мер оформляются по их специальным правилам; срочность не означает отмены всех документов для любой услуги. Источники: https://mintrud.gov.ru/docs/laws/112 http://www.kremlin.ru/acts/constitution",
       "legal_urls": [
-        "https://mintrud.gov.ru/docs/laws/112",
-        "http://www.kremlin.ru/acts/constitution"
+        "https://www.consultant.ru/document/cons_doc_LAW_156558/f496bba45a6529882c567252bb9eef69357470c1/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
@@ -3414,7 +3413,8 @@
       "checked_norm_urls": [
         "https://www.consultant.ru/document/cons_doc_LAW_156558/f496bba45a6529882c567252bb9eef69357470c1/"
       ],
-      "source_scope": "specific_federal_norm_checked_partial"
+      "source_scope": "specific_norm_and_related_search_results_partial",
+      "review_date": "2026-11-27"
     },
     {
       "case_key": "bank-curated-serious-14",
@@ -3424,14 +3424,13 @@
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
       "legal_basis": "Закон №33-ФЗ об особо охраняемых природных территориях устанавливает специальный режим заповедников и охранных зон. Статья 32 Закона №7-ФЗ регулирует оценку воздействия; Закон №174-ФЗ определяет случаи государственной экологической экспертизы. Публичные обсуждения и разрешения проводятся по применимым к проекту правилам, а не заменяются обещанными рабочими местами. Источники: http://www.kremlin.ru/acts/constitution",
-      "legal_urls": [
-        "http://www.kremlin.ru/acts/constitution"
-      ],
+      "legal_urls": [],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
       "option_analysis_status": "draft",
       "checked_norm_urls": [],
-      "source_scope": "inherited_basis_requires_current_verification"
+      "source_scope": "inherited_basis_requires_current_verification",
+      "review_date": "2026-11-27"
     },
     {
       "case_key": "bank-curated-serious-15",
@@ -3441,14 +3440,13 @@
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
       "legal_basis": "Статья 12 Закона №67-ФЗ ограничивает предмет местного референдума вопросами местного значения, требует однозначности и исключает ряд тем, включая принятие или изменение бюджета и финансовых обязательств. Статьи 13–14 регулируют ограничения назначения и инициативу. Конкретные действия и сроки определяются также применимым региональным законом. Источники: https://www.ksrf.ru/about/legalbases/Guarantee/Chapter2.php",
-      "legal_urls": [
-        "https://www.ksrf.ru/about/legalbases/Guarantee/Chapter2.php"
-      ],
+      "legal_urls": [],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
       "option_analysis_status": "draft",
       "checked_norm_urls": [],
-      "source_scope": "inherited_basis_requires_current_verification"
+      "source_scope": "inherited_basis_requires_current_verification",
+      "review_date": "2026-11-27"
     },
     {
       "case_key": "bank-curated-serious-16",
@@ -3458,14 +3456,13 @@
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
       "legal_basis": "Статьи 5, 6 и 19 Закона №152-ФЗ требуют законной цели, соразмерного объёма и защиты персональных данных. Применимые авиационные ограничения и порядок использования воздушного пространства соблюдаются отдельно. Не каждая съёмка автоматически является биометрической, но различимые сведения о человеке нельзя использовать для любой цели подрядчика. Источники: https://mintrud.gov.ru/docs/laws/130",
-      "legal_urls": [
-        "https://mintrud.gov.ru/docs/laws/130"
-      ],
+      "legal_urls": [],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
       "option_analysis_status": "draft",
       "checked_norm_urls": [],
-      "source_scope": "inherited_basis_requires_current_verification"
+      "source_scope": "inherited_basis_requires_current_verification",
+      "review_date": "2026-11-27"
     },
     {
       "case_key": "bank-curated-serious-17",
@@ -3475,14 +3472,13 @@
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
       "legal_basis": "Статья 14 Закона №273-ФЗ регулирует язык образования и изучение родного языка в пределах возможностей системы; выбор оформляется в предусмотренном законом порядке. Статьи 16 и 28 регулируют электронное обучение и компетенцию организации. Добровольный факультатив не позволяет произвольно уменьшать обязательную программу или отбирать детей по происхождению. Источники: https://minobrnauki.gov.ru/open_ministry/gossluzhba/entry/files/Федеральный%20закон%20от%2029.12.2012%20N%20273-ФЗ%20(ред.%20от%2015.10.2025.pdf",
-      "legal_urls": [
-        "https://minobrnauki.gov.ru/open_ministry/gossluzhba/entry/files/Федеральный%20закон%20от%2029.12.2012%20N%20273-ФЗ%20(ред.%20от%2015.10.2025.pdf"
-      ],
+      "legal_urls": [],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
       "option_analysis_status": "draft",
       "checked_norm_urls": [],
-      "source_scope": "inherited_basis_requires_current_verification"
+      "source_scope": "inherited_basis_requires_current_verification",
+      "review_date": "2026-11-27"
     },
     {
       "case_key": "bank-curated-serious-18",
@@ -3492,15 +3488,13 @@
       "source_status": "official_search_index_core_episode_confirmed_full_text_unavailable",
       "resolved_source_url": null,
       "legal_basis": "Статья 17 Закона №257-ФЗ регулирует содержание автомобильных дорог; статья 12 Закона №196-ФЗ — безопасность при ремонте и содержании. Конкретные обязанности зависят от владельца дороги и её категории. Временная схема движения не заменяет устранение установленного дефекта. Источники: https://01.mchs.gov.ru/deyatelnost/napravleniya-deyatelnosti/grazhdanskaya-zashchita/preduprezhdenie-chrezvychaynyh-situaciy/1-1-normativnye-pravovye-akty/2-federalnye-zakony/federalnyy-zakon-ot-21-dekabrya-1994-g-n-68-fz-o-zashchite-naseleniya-i-territoriy-ot-chrezvychaynyh-situaciy-prirodnogo-i-tehnogennogo-haraktera https://mintrans.gov.ru/storage/app/media/epd/0811201.pdf",
-      "legal_urls": [
-        "https://01.mchs.gov.ru/deyatelnost/napravleniya-deyatelnosti/grazhdanskaya-zashchita/preduprezhdenie-chrezvychaynyh-situaciy/1-1-normativnye-pravovye-akty/2-federalnye-zakony/federalnyy-zakon-ot-21-dekabrya-1994-g-n-68-fz-o-zashchite-naseleniya-i-territoriy-ot-chrezvychaynyh-situaciy-prirodnogo-i-tehnogennogo-haraktera",
-        "https://mintrans.gov.ru/storage/app/media/epd/0811201.pdf"
-      ],
+      "legal_urls": [],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
       "option_analysis_status": "draft",
       "checked_norm_urls": [],
-      "source_scope": "inherited_basis_requires_current_verification"
+      "source_scope": "inherited_basis_requires_current_verification",
+      "review_date": "2026-11-27"
     },
     {
       "case_key": "bank-curated-serious-19",
@@ -3510,15 +3504,13 @@
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
       "legal_basis": "Статьи 92 и 99 ЖК РФ регулируют специализированный жилищный фонд и основания предоставления таких помещений. Иные выплаты и программы требуют собственного нормативного и бюджетного основания. Равные критерии и проверка нуждаемости не заменяют специальных условий конкретной формы поддержки. Источники: http://www.kremlin.ru/acts/constitution https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
-      "legal_urls": [
-        "http://www.kremlin.ru/acts/constitution",
-        "https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721"
-      ],
+      "legal_urls": [],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
       "option_analysis_status": "draft",
       "checked_norm_urls": [],
-      "source_scope": "inherited_basis_requires_current_verification"
+      "source_scope": "inherited_basis_requires_current_verification",
+      "review_date": "2026-11-27"
     },
     {
       "case_key": "bank-curated-serious-20",
@@ -3528,14 +3520,13 @@
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
       "legal_basis": "Статья 6 Закона №68-ФЗ предусматривает оперативное и достоверное информирование населения об угрозах и защитных мерах. Проверка сообщения и сохранение материалов относятся к компетенции соответствующих служб. Официальное опровержение должно отличать установленный статус от ещё проверяемых обстоятельств. Источники: https://01.mchs.gov.ru/deyatelnost/napravleniya-deyatelnosti/grazhdanskaya-zashchita/preduprezhdenie-chrezvychaynyh-situaciy/1-1-normativnye-pravovye-akty/2-federalnye-zakony/federalnyy-zakon-ot-21-dekabrya-1994-g-n-68-fz-o-zashchite-naseleniya-i-territoriy-ot-chrezvychaynyh-situaciy-prirodnogo-i-tehnogennogo-haraktera",
-      "legal_urls": [
-        "https://01.mchs.gov.ru/deyatelnost/napravleniya-deyatelnosti/grazhdanskaya-zashchita/preduprezhdenie-chrezvychaynyh-situaciy/1-1-normativnye-pravovye-akty/2-federalnye-zakony/federalnyy-zakon-ot-21-dekabrya-1994-g-n-68-fz-o-zashchite-naseleniya-i-territoriy-ot-chrezvychaynyh-situaciy-prirodnogo-i-tehnogennogo-haraktera"
-      ],
+      "legal_urls": [],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
       "option_analysis_status": "draft",
       "checked_norm_urls": [],
-      "source_scope": "inherited_basis_requires_current_verification"
+      "source_scope": "inherited_basis_requires_current_verification",
+      "review_date": "2026-11-27"
     },
     {
       "case_key": "bank-curated-serious-21",
@@ -3545,14 +3536,13 @@
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
       "legal_basis": "Закон №68-ФЗ, в том числе статья 11, регулирует защиту населения в пределах компетенции органов власти. Статья 6 Водного кодекса РФ предусматривает общедоступность водных объектов с установленными законом ограничениями. Конкретный режим пляжа определяется применимыми правилами безопасности: общедоступность не означает право игнорировать подтверждённую опасность. Источники: https://01.mchs.gov.ru/deyatelnost/napravleniya-deyatelnosti/grazhdanskaya-zashchita/preduprezhdenie-chrezvychaynyh-situaciy/1-1-normativnye-pravovye-akty/2-federalnye-zakony/federalnyy-zakon-ot-21-dekabrya-1994-g-n-68-fz-o-zashchite-naseleniya-i-territoriy-ot-chrezvychaynyh-situaciy-prirodnogo-i-tehnogennogo-haraktera",
-      "legal_urls": [
-        "https://01.mchs.gov.ru/deyatelnost/napravleniya-deyatelnosti/grazhdanskaya-zashchita/preduprezhdenie-chrezvychaynyh-situaciy/1-1-normativnye-pravovye-akty/2-federalnye-zakony/federalnyy-zakon-ot-21-dekabrya-1994-g-n-68-fz-o-zashchite-naseleniya-i-territoriy-ot-chrezvychaynyh-situaciy-prirodnogo-i-tehnogennogo-haraktera"
-      ],
+      "legal_urls": [],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
       "option_analysis_status": "draft",
       "checked_norm_urls": [],
-      "source_scope": "inherited_basis_requires_current_verification"
+      "source_scope": "inherited_basis_requires_current_verification",
+      "review_date": "2026-11-27"
     },
     {
       "case_key": "bank-curated-serious-22",
@@ -3563,7 +3553,7 @@
       "resolved_source_url": null,
       "legal_basis": "Статья 59 Закона №273-ФЗ регулирует государственную итоговую аттестацию; статьи 28 и 34 — обязанности организации и права обучающихся. Конкретные резервные материалы, перенос и последствия нарушений определяет специальный порядок аттестации. Подозрительный файл не доказывает вину каждого получившего его студента. Источники: https://minobrnauki.gov.ru/open_ministry/gossluzhba/entry/files/Федеральный%20закон%20от%2029.12.2012%20N%20273-ФЗ%20(ред.%20от%2015.10.2025.pdf",
       "legal_urls": [
-        "https://minobrnauki.gov.ru/open_ministry/gossluzhba/entry/files/Федеральный%20закон%20от%2029.12.2012%20N%20273-ФЗ%20(ред.%20от%2015.10.2025.pdf"
+        "https://www.consultant.ru/document/cons_doc_LAW_140174/95d9ecc180e13e58ff632723375f109b36986b8c/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
@@ -3571,7 +3561,8 @@
       "checked_norm_urls": [
         "https://www.consultant.ru/document/cons_doc_LAW_140174/95d9ecc180e13e58ff632723375f109b36986b8c/"
       ],
-      "source_scope": "specific_federal_norm_checked_partial"
+      "source_scope": "specific_federal_norm_checked_partial",
+      "review_date": "2026-11-27"
     },
     {
       "case_key": "bank-curated-serious-23",
@@ -3581,14 +3572,13 @@
       "source_status": "official_article_read_core_episode_confirmed",
       "resolved_source_url": null,
       "legal_basis": "Статьи 10 и 19 Закона №323-ФЗ регулируют доступность помощи и права пациента. Основания конкретного бесплатного лекарственного обеспечения определяются применимыми специальными и региональными нормами. Проверяется не только контракт или складской остаток, но и получение назначенного средства пациентом с сохранением медицинского контроля. Источники: http://www.kremlin.ru/acts/constitution",
-      "legal_urls": [
-        "http://www.kremlin.ru/acts/constitution"
-      ],
+      "legal_urls": [],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
       "option_analysis_status": "draft",
       "checked_norm_urls": [],
-      "source_scope": "inherited_basis_requires_current_verification"
+      "source_scope": "inherited_basis_requires_current_verification",
+      "review_date": "2026-11-27"
     },
     {
       "case_key": "bank-curated-serious-24",
@@ -3599,7 +3589,7 @@
       "resolved_source_url": null,
       "legal_basis": "Статья 36 Закона №73-ФЗ предусматривает меры сохранения при работах, в том числе действия при обнаружении объекта с признаками культурного наследия. Решение о дальнейшем исследовании и режиме работ принимается по установленной процедуре с участием органа охраны; подрядчик не определяет статус находки единолично. Источники: http://www.kremlin.ru/acts/constitution",
       "legal_urls": [
-        "http://www.kremlin.ru/acts/constitution"
+        "https://www.consultant.ru/document/cons_doc_LAW_37318/555d42c04d8e6d7d9874776c46e180043cc8cb0c/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
@@ -3607,7 +3597,8 @@
       "checked_norm_urls": [
         "https://www.consultant.ru/document/cons_doc_LAW_37318/555d42c04d8e6d7d9874776c46e180043cc8cb0c/"
       ],
-      "source_scope": "specific_federal_norm_checked_partial"
+      "source_scope": "specific_norm_and_related_search_results_partial",
+      "review_date": "2026-11-27"
     },
     {
       "case_key": "bank-curated-v2-02",
@@ -3617,14 +3608,13 @@
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
       "legal_basis": "Статья 58 Закона №61-ФЗ регулирует хранение лекарственных средств; применимые правила хранения и перевозки требуют соответствующих условий и контроля. Решение о пригодности партии принимает компетентный специалист по надлежащим данным. Неполная запись не должна ни скрываться при приёмке, ни автоматически превращаться в заключение о качестве. Источники: https://roszdravnadzor.gov.ru/faq/medicines",
-      "legal_urls": [
-        "https://roszdravnadzor.gov.ru/faq/medicines"
-      ],
+      "legal_urls": [],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
       "option_analysis_status": "draft",
       "checked_norm_urls": [],
-      "source_scope": "inherited_basis_requires_current_verification"
+      "source_scope": "inherited_basis_requires_current_verification",
+      "review_date": "2026-11-27"
     },
     {
       "case_key": "bank-curated-v2-03",
@@ -3635,7 +3625,8 @@
       "resolved_source_url": null,
       "legal_basis": "Статья 91 ТК РФ обязывает работодателя учитывать фактически отработанное время, статья 154 устанавливает повышенную оплату ночного труда, статья 136 регулирует сроки выплаты. Корректировка производится на подтверждённых данных с сохранением документов; единая выплата без сверки не заменяет исправления каждого начисления. Источники: https://git15.rostrud.gov.ru/upload/iblock/449/trudovoy-kodeks-rossiyskoy-federatsii-ot-30.12.2001-_-197_fz.pdf",
       "legal_urls": [
-        "https://git15.rostrud.gov.ru/upload/iblock/449/trudovoy-kodeks-rossiyskoy-federatsii-ot-30.12.2001-_-197_fz.pdf"
+        "https://www.consultant.ru/document/cons_doc_LAW_34683/bd14cccf0a1f074ef104e82522f7e2dea04d651f/",
+        "https://www.consultant.ru/document/cons_doc_LAW_34683/d11de7be54026a50672948edfb583e5f37bc48b6/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
@@ -3644,7 +3635,8 @@
         "https://www.consultant.ru/document/cons_doc_LAW_34683/bd14cccf0a1f074ef104e82522f7e2dea04d651f/",
         "https://www.consultant.ru/document/cons_doc_LAW_34683/d11de7be54026a50672948edfb583e5f37bc48b6/"
       ],
-      "source_scope": "specific_federal_norm_checked_partial"
+      "source_scope": "specific_federal_norm_checked_partial",
+      "review_date": "2026-11-27"
     },
     {
       "case_key": "bank-curated-v2-04",
@@ -3655,13 +3647,14 @@
       "resolved_source_url": null,
       "legal_basis": "Статья 11 Закона №59-ФЗ устанавливает особенности обращений без необходимых сведений о заявителе. Закон №8-ФЗ регулирует доступ к информации о деятельности органов власти. Анонимность не доказывает ни ложность сообщения, ни виновность собственника; публикация требует подтверждения фактов и соблюдения охраняемых законом тайн. Источники: http://www.kremlin.ru/acts/constitution",
       "legal_urls": [
-        "http://www.kremlin.ru/acts/constitution"
+        "https://www.consultant.ru/document/cons_doc_LAW_59999/1a1719408a99f43738c30a453a74ddaf6ccd7ae7/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
       "option_analysis_status": "draft",
       "checked_norm_urls": [],
-      "source_scope": "inherited_basis_requires_current_verification"
+      "source_scope": "specific_norm_and_related_search_results_partial",
+      "review_date": "2026-11-27"
     },
     {
       "case_key": "bank-curated-v2-05",
@@ -3671,14 +3664,13 @@
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
       "legal_basis": "Статья 20 Закона №190-ФЗ регулирует обеспечение готовности к отопительному периоду, а статья 15 — организацию теплоснабжения. Работы и ограничения выполняются по применимым техническим правилам. Медицинский объект требует согласованной непрерывности безопасных условий; административное решение не заменяет инженерное подтверждение. Источники: https://01.mchs.gov.ru/deyatelnost/napravleniya-deyatelnosti/grazhdanskaya-zashchita/preduprezhdenie-chrezvychaynyh-situaciy/1-1-normativnye-pravovye-akty/2-federalnye-zakony/federalnyy-zakon-ot-21-dekabrya-1994-g-n-68-fz-o-zashchite-naseleniya-i-territoriy-ot-chrezvychaynyh-situaciy-prirodnogo-i-tehnogennogo-haraktera",
-      "legal_urls": [
-        "https://01.mchs.gov.ru/deyatelnost/napravleniya-deyatelnosti/grazhdanskaya-zashchita/preduprezhdenie-chrezvychaynyh-situaciy/1-1-normativnye-pravovye-akty/2-federalnye-zakony/federalnyy-zakon-ot-21-dekabrya-1994-g-n-68-fz-o-zashchite-naseleniya-i-territoriy-ot-chrezvychaynyh-situaciy-prirodnogo-i-tehnogennogo-haraktera"
-      ],
+      "legal_urls": [],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
       "option_analysis_status": "draft",
       "checked_norm_urls": [],
-      "source_scope": "inherited_basis_requires_current_verification"
+      "source_scope": "inherited_basis_requires_current_verification",
+      "review_date": "2026-11-27"
     },
     {
       "case_key": "bank-curated-v2-06",
@@ -3688,14 +3680,13 @@
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
       "legal_basis": "Статьи 5 и 21 Закона №152-ФЗ предусматривают точность данных и уточнение недостоверных сведений. Право на конкретную выплату и ручной маршрут определяются применимым актом и регламентом. Исправление технической ошибки не означает предоставление новой льготы или отмену проверок для остальных заявителей. Источники: https://mintrud.gov.ru/docs/laws/130",
-      "legal_urls": [
-        "https://mintrud.gov.ru/docs/laws/130"
-      ],
+      "legal_urls": [],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
       "option_analysis_status": "draft",
       "checked_norm_urls": [],
-      "source_scope": "inherited_basis_requires_current_verification"
+      "source_scope": "inherited_basis_requires_current_verification",
+      "review_date": "2026-11-27"
     },
     {
       "case_key": "bank-curated-v2-07",
@@ -3706,8 +3697,7 @@
       "resolved_source_url": null,
       "legal_basis": "Статьи 5–7 Закона №152-ФЗ регулируют цель, основание и конфиденциальность обработки данных. Статьи 6 и 21 Закона №442-ФЗ предусматривают конфиденциальность и срочные услуги. Обязанность перевода и его форма зависят от конкретной процедуры; нельзя автоматически передавать полный набор документов внешнему сервису ради удобства. Источники: https://mintrud.gov.ru/docs/laws/130 https://mintrud.gov.ru/docs/laws/112",
       "legal_urls": [
-        "https://mintrud.gov.ru/docs/laws/130",
-        "https://mintrud.gov.ru/docs/laws/112"
+        "https://www.consultant.ru/document/cons_doc_LAW_156558/f496bba45a6529882c567252bb9eef69357470c1/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
@@ -3715,7 +3705,8 @@
       "checked_norm_urls": [
         "https://www.consultant.ru/document/cons_doc_LAW_156558/f496bba45a6529882c567252bb9eef69357470c1/"
       ],
-      "source_scope": "specific_federal_norm_checked_partial"
+      "source_scope": "specific_norm_and_related_search_results_partial",
+      "review_date": "2026-11-27"
     },
     {
       "case_key": "bank-curated-v2-08",
@@ -3726,7 +3717,7 @@
       "resolved_source_url": null,
       "legal_basis": "Статья 21 Закона №416-ФЗ регулирует случаи и порядок временного прекращения или ограничения водоснабжения. Техническое обследование устанавливает необходимость конкретных работ; применимые обязанности уведомления и обеспечения потребителей исполняются отдельно. Разница показаний сама по себе не определяет ни причину, ни виновного. Источники: https://epp.genproc.gov.ru/ru/proc_91/activity/legal-education/explain/e2075484/",
       "legal_urls": [
-        "https://epp.genproc.gov.ru/ru/proc_91/activity/legal-education/explain/e2075484/"
+        "https://www.consultant.ru/document/cons_doc_LAW_122867/018c76d39ac10ec567e2f9fbcfca7298f2e026ee/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
@@ -3734,7 +3725,8 @@
       "checked_norm_urls": [
         "https://www.consultant.ru/document/cons_doc_LAW_122867/018c76d39ac10ec567e2f9fbcfca7298f2e026ee/"
       ],
-      "source_scope": "specific_federal_norm_checked_partial"
+      "source_scope": "specific_norm_and_related_search_results_partial",
+      "review_date": "2026-11-27"
     },
     {
       "case_key": "bank-curated-v2-09",
