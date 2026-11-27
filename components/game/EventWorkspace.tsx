@@ -19,8 +19,8 @@ import EventCaseTile from './EventCaseTile';
 import EventCaseModal from './EventCaseModal';
 import type {EventComicScene} from './types';
 type CaseRow={id:string;game_id:string;case_key:string;title:string;situation:string;category:string;seriousness:'serious'|'light';audience:'single'|'group'|'all';allowed_roles:string[];status:string;source_url:string|null;decision_options?:string[];effect_plan?:{best_option_key?:string;options?:{key:string;trust:number;description?:string;legal_basis?:string;fiscal_effect?:EventFiscalEffect}[]};comic_scene?:EventComicScene};
-type Assignment={id:string;case_id:string;game_id:string;recipient_id:string;status:string;created_at:string};
-type Decision={id:string;case_id:string;actor_id:string;choice:string;role_snapshot?:string};
+type Assignment={id:string;case_id:string;game_id:string;recipient_id:string;status:string;created_at:string;vote_round?:number;runoff_options?:string[]|null};
+type Decision={id:string;case_id:string;actor_id:string;choice:string;role_snapshot?:string;vote_round?:number};
 type Authority={decision_id:string;case_id:string;actor_id:string;authority_ok:boolean;lawful:boolean;strategy_point:boolean;role_snapshot:string;legal_basis:string;score_share?:number};
 type Outcome={case_id:string;winner:string;trust_delta:number;votes_count:number;assignments_count:number;media_post_id:string|null;requested_trust_delta?:number;resolution_kind?:string;winning_fiscal_effect?:EventFiscalEffect|null;winning_description?:string|null};
 type EventCompact={titles:{id:string;title:string}[];positive:number|null;negative:number|null};
@@ -289,9 +289,9 @@ export default function EventWorkspace({g,readOnly=false,mode='feed'}:{g:ReturnT
  const noCount=teacher?(effectCounts?.negative??0):relevantDecisions.filter(d=>effect(d)<0).length;
  const neutralCount=relevantDecisions.length-yesCount-noCount;
  const ratio=(n:number,d:number)=>d?Math.round(100*n/d):0;
- async function finalize(id:string){
+ async function finalize(id:string,round?:number){
   if(!teacher||busyId||!window.confirm('Подвести итог по текущим ответам и завершить голосование досрочно?'))return;
-  setBusyId(id);const r=await supabase.rpc('finalize_event_case',{p_case_id:id});
+  setBusyId(id);const r=await (round?supabase.rpc('finalize_event_case_round',{p_case_id:id,p_round:round}):supabase.rpc('finalize_event_case',{p_case_id:id}));
   if(!scopeCurrent())return;
   setNotice(r.error?userError(r.error):r.data?.reason==='no_answers'?'Пока нет голосов.':'Итог зафиксирован.');
   if(!r.error)await Promise.all([reload(false),g.refreshEventEffects()]);if(scopeCurrent())setBusyId(null);
@@ -341,17 +341,18 @@ export default function EventWorkspace({g,readOnly=false,mode='feed'}:{g:ReturnT
    {teacher&&<StyledSelect label="Правовая оценка" value={legalFilter} onChange={setLegalFilter} options={[{value:'all',label:'Все решения'},{value:'valid',label:'В пределах полномочий'},{value:'invalid',label:'Нарушения полномочий или права'}]}/>}
    {orderedIds.length===0?<div className="journalEmpty">Назначенных ситуаций пока нет.</div>:
    <div className="eventTileGrid" aria-label="Карточки ситуаций">{visibleCases.map(c=>{
-    const assigned=assignments.filter(a=>a.case_id===c.id),responded=decisions.filter(d=>d.case_id===c.id);
+    const assigned=assignments.filter(a=>a.case_id===c.id),round=assigned[0]?.vote_round??1,responded=decisions.filter(d=>d.case_id===c.id&&(d.vote_round??1)===round);
     const closed=outcomes.some(o=>o.case_id===c.id),invited=invitations.some(i=>i.case_id===c.id&&i.recipient_id===me.user_id&&i.status==='pending');
     const transferred=invitations.some(i=>i.case_id===c.id&&i.inviter_id===me.user_id&&i.transfer_stage_no!=null);
     const transferMode=c.audience==='single'&&c.comic_scene?.event_rules_version===2;
-    return <EventCaseTile key={c.id} item={c} meta={invited?(transferMode?'Передача полномочий':'Приглашение к решению'):transferred?'Полномочия переданы · 0,5 балла':closed?'Решено · '+responded.length+' ответов':assigned.length?'Ожидает решения · '+responded.length+'/'+assigned.length:'Можно назначить'} onClick={()=>setExpanded(c.id)}/>;
+    const collectiveMode=c.audience!=='single'&&c.comic_scene?.event_rules_version===2;
+    return <EventCaseTile key={c.id} item={c} meta={collectiveMode&&round===2&&!closed?'Второй тур · '+responded.length+'/'+assigned.length:invited?(transferMode?'Передача полномочий':'Приглашение к решению'):transferred?'Полномочия переданы · 0,5 балла':closed?'Решено · '+responded.length+' ответов':assigned.length?'Ожидает решения · '+responded.length+'/'+assigned.length:'Можно назначить'} onClick={()=>setExpanded(c.id)}/>;
    })}</div>}
    {caseLoading&&<p className="eventFeedLoading" role="status">Загрузка ситуаций…</p>}
    {caseError&&<p className="eventFeedLoading" role="alert">{caseError} <button type="button" onClick={()=>{failedCases.current.clear();setRetryPage(n=>n+1)}}>Повторить</button></p>}
    {hasMore&&<div className="eventFeedMore"><span>Показано {visibleCases.length} из {orderedIds.length}</span><button type="button" className="eventBankShowMore" disabled={caseLoading||!!caseError} onClick={()=>setVisibleLimit(n=>n+EVENT_FEED_PAGE_SIZE)}>Показать ещё 10</button></div>}</div>}
   {expanded&&cases.filter(c=>c.id===expanded).map(c=>{
-    const assigned=assignments.filter(a=>a.case_id===c.id),responded=decisions.filter(d=>d.case_id===c.id);
+    const assigned=assignments.filter(a=>a.case_id===c.id),round=assigned[0]?.vote_round??1,responded=decisions.filter(d=>d.case_id===c.id&&(d.vote_round??1)===round);
     const my=assigned.find(a=>a.recipient_id===me.user_id);
     const outcome=outcomes.find(o=>o.case_id===c.id);
     const mineAnswer=responded.find(d=>d.actor_id===me.user_id);
@@ -365,6 +366,7 @@ export default function EventWorkspace({g,readOnly=false,mode='feed'}:{g:ReturnT
     const expandedCase=true;
     const invites=invitations.filter(i=>i.case_id===c.id);
     const transferMode=c.audience==='single'&&c.comic_scene?.event_rules_version===2;
+    const collectiveMode=c.audience!=='single'&&c.comic_scene?.event_rules_version===2;
     const pendingInvites=invites.some(i=>i.status==='pending');
     return <EventCaseModal key={c.id} title={c.title} onClose={()=>setExpanded('')}><div className="eventCaseBundle"><article className={'eventCaseCard eventStory '+(kind==='beneficial'?'eventStoryResolved ':kind==='harmful'?'eventStoryRejected ':outcome?'eventStoryNeutral ':'')}>
      <div className="eventStoryVisual"><EventComic silent title={c.title} category={gameValueLabel(c.category,'Ситуация')} caseKey={c.case_key} scene={c.comic_scene} compact/></div>
@@ -374,8 +376,9 @@ export default function EventWorkspace({g,readOnly=false,mode='feed'}:{g:ReturnT
       <div className="eventStoryRecipients">{assigned.map(a=><span key={a.id}>{members.find(m=>m.user_id===a.recipient_id)?.full_name||'Участник'} · {members.find(m=>m.user_id===a.recipient_id)?.role_title||'Без должности'}</span>)}</div>
       <div className="eventCaseFooter"><span><UsersRound size={15} aria-hidden="true"/>{assigned.length} назначено</span><span><CheckCircle2 size={15} aria-hidden="true"/>{responded.length} ответили · {pct(responded.length,assigned.length)}%</span>
       </div>
-      {expandedCase&&<EventCollaboration g={g} caseId={c.id} audience={c.audience} transferMode={transferMode} invitations={invites} assignedIds={assigned.map(a=>a.recipient_id)} closed={!!outcome} votingStarted={responded.length>0} onChanged={()=>reload(false)} readOnly={readOnly}/>}
-      <EventChoicePanel labels={labels} decisions={responded} members={members} profiles={g.profiles} currentChoice={mineAnswer?.choice} canAnswer={!!my&&my.status==='pending'&&me.kind==='student'&&!outcome&&!busyId&&!readOnly&&!pendingInvites} onAnswer={choice=>{if(my)void answer(my,choice)}} revealResults={teacher||!!outcome||!!mineAnswer} showCorrectExplanation={!!mineAnswer&&!!outcome&&me.kind==='student'} correctIndex={bestIndex} bestDescription={bestOption?.description} bestLegalBasis={bestOption?.legal_basis} shuffleSeed={c.id+':'+me.user_id} notice={pendingInvites?(transferMode?'Ожидаем подтверждения передачи полномочий.':'Ожидаем ответа на приглашения.'):undefined}/>
+      {expandedCase&&<EventCollaboration g={g} caseId={c.id} audience={c.audience} collectiveMode={collectiveMode} transferMode={transferMode} invitations={invites} assignedIds={assigned.map(a=>a.recipient_id)} closed={!!outcome} votingStarted={responded.length>0} onChanged={()=>reload(false)} readOnly={readOnly}/>}
+      {collectiveMode&&<p className="eventInviteExplanation"><strong>{round===2?'Второй тур голосования':'Первый тур голосования'}</strong> · У вариантов нет единственного правильного ответа. Выберите решение с приемлемыми последствиями.</p>}
+      <EventChoicePanel allowedKeys={collectiveMode&&round===2?assigned[0]?.runoff_options??[]:undefined} labels={labels} decisions={responded} members={members} profiles={g.profiles} currentChoice={mineAnswer?.choice} canAnswer={!!my&&my.status==='pending'&&me.kind==='student'&&!outcome&&!busyId&&!readOnly&&!pendingInvites} onAnswer={choice=>{if(my)void answer(my,collectiveMode&&round===2?'round2:'+choice:choice)}} revealResults={teacher||!!outcome||!!mineAnswer} showCorrectExplanation={!!mineAnswer&&!!outcome&&me.kind==='student'} correctIndex={collectiveMode?null:bestIndex} bestDescription={bestOption?.description} bestLegalBasis={bestOption?.legal_basis} shuffleSeed={c.id+':'+me.user_id} notice={pendingInvites?(transferMode?'Ожидаем подтверждения передачи полномочий.':'Ожидаем ответа на приглашения.'):undefined}/>
 
       {mineAnswer&&!teacher&&<div className="eventOutcomeNote">Ваш голос: {labels[mineAnswer.choice==='accept'?0:mineAnswer.choice==='reject'?1:Math.max(0,Number(mineAnswer.choice.replace('option_',''))-1)]||'Учтён'}</div>}
       {outcome&&<div className="eventOutcomeNote final"><strong>Итог голосования: {outcome.winner==='tie'?'Большинство участников не поддержало единый вариант — решение не принято':labels[winnerIndex]}</strong>
@@ -384,7 +387,7 @@ export default function EventWorkspace({g,readOnly=false,mode='feed'}:{g:ReturnT
        {outcome.requested_trust_delta!==undefined&&outcome.requested_trust_delta!==outcome.trust_delta&&<span>Расчётный эффект: {outcome.requested_trust_delta>0?'+':''}{outcome.requested_trust_delta} п.п. · Достигнута граница показателя.</span>}
        {outcome.winner!=='tie'&&<span>Региональные последствия: {describeEventFiscalEffect(chosenEffect?.fiscal_effect??outcome.winning_fiscal_effect).join('; ')||'прямое изменение экономических параметров для этого варианта не предусмотрено'}. Изменение доверия учитывается отдельно; фактический бюджет рассчитывается по действующей модели.</span>}
       </div>}
-      {teacher&&responded.length>0&&!outcome&&<button type="button" disabled={!!busyId||readOnly} className="eventFinalize" onClick={()=>void finalize(c.id)}>Подвести итог по полученным голосам</button>}
+      {teacher&&responded.length>0&&!outcome&&<button type="button" disabled={!!busyId||readOnly} className="eventFinalize" onClick={()=>void finalize(c.id,collectiveMode?round:undefined)}>Подвести итог по полученным голосам</button>}
       {teacher&&(authority.some(a=>a.case_id===c.id)||invites.some(i=>i.transfer_stage_no!=null))&&<div className="eventAuthorityTable"><h4>Полномочия и баллы</h4>{transferMode&&invites.filter(i=>i.transfer_stage_no!=null).map(i=><article key={i.id}><b>{g.names[i.inviter_id]||'Участник'}</b><span>Передача: {g.names[i.recipient_id]||'Участник'}</span><strong>Кредит кейса: 0,5 балла</strong></article>)}{authority.filter(a=>a.case_id===c.id).map(a=><article key={a.decision_id}><b>{g.names[a.actor_id]||'Участник'}</b><span>{a.role_snapshot||'Без должности'}</span><strong>{transferMode?'Кредит кейса: '+(a.score_share===undefined?'—':Number(a.score_share).toLocaleString('ru-RU')):a.authority_ok&&a.lawful?'Правовой критерий: 1 балл':'Правовой критерий: 0 баллов'}</strong><small>{a.legal_basis}</small>{a.strategy_point&&<span>Защита интересов своей роли: учитывается в стратегии</span>}</article>)}</div>}
       </>}
      </div>

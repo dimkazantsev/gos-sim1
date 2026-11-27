@@ -8,6 +8,7 @@ const [game,other,sender,expert,wrong,archived,outsider,teacher]=[1,2,10,11,12,1
  try{
  await db.exec(fs.readFileSync('scripts/events-v2-individual-fixture.sql','utf8'));
  await db.exec(fs.readFileSync('supabase/changes/events_v2_individual_transfer_candidate.sql','utf8'));
+ await db.exec(fs.readFileSync('supabase/changes/events_v2_collective_candidate.sql','utf8'));
  await db.exec("SET check_function_bodies=on; CREATE TRIGGER guard BEFORE INSERT OR UPDATE ON event_assignments FOR EACH ROW EXECUTE FUNCTION private.guard_event_assignment(); CREATE TRIGGER snapshot BEFORE INSERT ON event_decisions FOR EACH ROW EXECUTE FUNCTION private.snapshot_event_office(); CREATE TRIGGER authority AFTER INSERT ON event_case_outcomes FOR EACH ROW EXECUTE FUNCTION private.record_event_authority();");
  const query=(s,args=[])=>db.query(s,args), rows=async(s,args=[]) =>(await query(s,args)).rows;
  const auth=async u=>query("SELECT set_config('request.jwt.claim.sub',$1,false)",[u]);
@@ -15,7 +16,7 @@ const [game,other,sender,expert,wrong,archived,outsider,teacher]=[1,2,10,11,12,1
  await query("INSERT INTO game_stages(game_id,stage_no,status,deadline) VALUES($1,7,'open',now()+interval '1 day')",[game]);
  await query("INSERT INTO state_metrics(game_id,metric_key,value,min_value,max_value) VALUES($1,'lawfulness',50,0,100)",[game]);
  const plan={rules_version:2,best_option_key:'option_1',options:[{key:'option_1',lawful:true,public_interest:'beneficial',authorized_roles:['министр финансов']},{key:'option_2',lawful:true,public_interest:'neutral',authorized_roles:['министр финансов']}]};
- const create=async(n,u,legacy=false)=>{const c=uid(n);const p={...plan};if(legacy)delete p.rules_version;await query("INSERT INTO event_cases VALUES($1,$2,'single','ready',$3::jsonb,'[\"Первое\",\"Второе\"]','Кейс')",[c,game,JSON.stringify(p)]);await query('INSERT INTO event_assignments(case_id,game_id,recipient_id,stage_no) VALUES($1,$2,$3,7)',[c,game,u]);return c;};
+ const create=async(n,u,legacy=false)=>{const c=uid(n);const p={...plan};if(legacy)delete p.rules_version;await query("INSERT INTO event_cases(id,game_id,audience,status,effect_plan,decision_options,title) VALUES($1,$2,'single','ready',$3::jsonb,'[\"Первое\",\"Второе\"]','Кейс')",[c,game,JSON.stringify(p)]);await query('INSERT INTO event_assignments(case_id,game_id,recipient_id,stage_no) VALUES($1,$2,$3,7)',[c,game,u]);return c;};
  const assign=async c=>(await rows('SELECT id,recipient_id,stage_no,status FROM event_assignments WHERE case_id=$1',[c]));
  const offer=async(c,from,to)=>{await auth(from);await query('SELECT public.invite_event_collaborator($1,$2)',[c,to]);return (await rows('SELECT id FROM event_collaboration_invites WHERE case_id=$1 AND recipient_id=$2',[c,to]))[0].id};
  const respond=async(id,u,accept=true)=>{await auth(u);await query('SELECT public.respond_event_invitation($1,$2)',[id,accept])};
@@ -40,9 +41,29 @@ const [game,other,sender,expert,wrong,archived,outsider,teacher]=[1,2,10,11,12,1
  await vote(c,expert,'option_2');assert.equal(await score(sender),.5);assert.equal(await score(expert),0);
  const c2=await create(102,sender);await respond(await offer(c2,sender,expert),expert);await vote(c2,expert,'option_1');assert.equal(await score(sender),1);assert.equal(await score(expert),.5);
  const c3=await create(103,expert);await respond(await offer(c3,expert,sender),sender);assert.equal((await assign(c3))[0].recipient_id,expert);await vote(c3,expert,'option_1');assert.equal(await score(expert),1.5);
+ const limitCase=await create(105,sender);await respond(await offer(limitCase,sender,wrong),wrong);await respond(await offer(limitCase,sender,wrong),wrong,false);await assert.rejects(()=>offer(limitCase,sender,expert),/Две ошибочные передачи/);
  const legacy=await create(104,sender,true);await respond(await offer(legacy,sender,expert),expert);assert.equal((await assign(legacy)).length,2,'Legacy invitation is unchanged');
  assert.equal((await rows("SELECT count(*)::int n FROM event_collaboration_invites WHERE transfer_stage_no IS NOT NULL"))[0].n,2);
  assert.equal((await rows("SELECT has_function_privilege('authenticated','private.event_v2_competent(uuid,uuid)','EXECUTE') AS ok"))[0].ok,false);
+ await query("INSERT INTO games VALUES($1,$2)",[game,teacher]);await query("INSERT INTO state_metrics(game_id,metric_key,value,min_value,max_value) VALUES($1,'elite_support',50,0,100),($1,'social_tension',50,0,100)",[game]);
+ const cc=uid(110);const cp={rules_version:2,options:[{key:'option_1',lawful:true,trust:2,metric_effects:{elite_support:-2,social_tension:-1}},{key:'option_2',lawful:true,trust:-1,metric_effects:{elite_support:2,social_tension:1}},{key:'option_3',lawful:true,trust:0,metric_effects:{}}]};
+ await query("INSERT INTO event_cases(id,game_id,audience,status,effect_plan,decision_options,title) VALUES($1,$2,'all','ready',$3::jsonb,'[\"А\",\"Б\",\"В\"]','Дилемма')",[cc,game,JSON.stringify(cp)]);
+ for(const u of [sender,expert,wrong])await query("INSERT INTO event_assignments(case_id,game_id,recipient_id,stage_no) VALUES($1,$2,$3,7)",[cc,game,u]);
+ const ballot=async(u,key)=>{await auth(u);const a=(await rows('SELECT id FROM event_assignments WHERE case_id=$1 AND recipient_id=$2',[cc,u]))[0];await query('SELECT public.submit_event_decision($1,$2,NULL)',[a.id,key]);};
+ const law=Number((await rows("SELECT value FROM state_metrics WHERE game_id=$1 AND metric_key='lawfulness'",[game]))[0].value);
+ await ballot(sender,'option_1');await ballot(expert,'option_2');await ballot(wrong,'option_3');
+ assert.equal((await rows('SELECT count(*)::int n FROM event_case_outcomes WHERE case_id=$1',[cc]))[0].n,0);
+ assert.equal((await rows("SELECT (comic_scene->>'vote_round')::int n FROM event_cases WHERE id=$1",[cc]))[0].n,2);
+ assert.equal((await rows("SELECT count(*)::int n FROM event_trust_ledger WHERE action_key=$1",['choice-'+cc]))[0].n,0);
+ await assert.rejects(()=>ballot(sender,'option_1'),/второй тур/);
+ await ballot(sender,'round2:option_1');await ballot(expert,'round2:option_1');await ballot(wrong,'round2:option_2');
+ assert.equal((await rows('SELECT winner FROM event_case_outcomes WHERE case_id=$1',[cc]))[0].winner,'option_1');
+ assert.equal((await rows('SELECT count(*)::int n FROM event_decisions WHERE case_id=$1',[cc]))[0].n,6);
+ assert.equal((await rows('SELECT count(*)::int n FROM event_authority_evidence WHERE case_id=$1',[cc]))[0].n,0);
+ assert.equal(Number((await rows("SELECT value FROM state_metrics WHERE game_id=$1 AND metric_key='lawfulness'",[game]))[0].value),law);
+ assert.equal(Number((await rows("SELECT value FROM state_metrics WHERE game_id=$1 AND metric_key='elite_support'",[game]))[0].value),48);
+ await auth(teacher);await query('SELECT public.finalize_event_case_round($1,2)',[cc]);assert.equal(Number((await rows("SELECT value FROM state_metrics WHERE game_id=$1 AND metric_key='elite_support'",[game]))[0].value),48);
+ console.log('PASS collective: two rounds, no interim outcome, stale ballot rejected, final effects once, lawfulness unchanged');
  console.log('PASS actual individual transfer SQL: wrong/archived/cross-game, refusal, one assignment, unchanged stage, independent credit, wrong/right answer, no repeat, legacy');
  }finally{await db.close()}
 })().catch(e=>{console.error(e);process.exitCode=1});

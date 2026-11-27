@@ -4,7 +4,7 @@ CREATE TABLE public.event_cases(id uuid PRIMARY KEY,game_id uuid NOT NULL,audien
 CREATE TABLE public.game_members(game_id uuid,user_id uuid,kind text,roster_archived_at timestamptz,role_title text,PRIMARY KEY(game_id,user_id));
 CREATE TABLE public.event_assignments(id uuid PRIMARY KEY DEFAULT gen_random_uuid(),case_id uuid,game_id uuid,recipient_id uuid,status text DEFAULT 'pending',stage_no integer,created_by uuid,created_at timestamptz DEFAULT now(),UNIQUE(case_id,recipient_id));
 CREATE TABLE public.event_collaboration_invites(id uuid PRIMARY KEY DEFAULT gen_random_uuid(),case_id uuid,game_id uuid,inviter_id uuid,recipient_id uuid,status text DEFAULT 'pending',responded_at timestamptz,UNIQUE(case_id,recipient_id));
-CREATE TABLE public.event_decisions(id uuid PRIMARY KEY DEFAULT gen_random_uuid(),assignment_id uuid UNIQUE,case_id uuid,game_id uuid,actor_id uuid,choice text,role_snapshot text,created_at timestamptz DEFAULT now());
+CREATE TABLE public.event_decisions(id uuid PRIMARY KEY DEFAULT gen_random_uuid(),assignment_id uuid,case_id uuid,game_id uuid,actor_id uuid,choice text,role_snapshot text,created_at timestamptz DEFAULT now(),CONSTRAINT event_decisions_case_id_actor_id_key UNIQUE(case_id,actor_id));
 CREATE TABLE public.event_case_outcomes(case_id uuid PRIMARY KEY,game_id uuid,winner text,trust_delta numeric DEFAULT 0,requested_trust_delta numeric DEFAULT 0,media_post_id uuid);
 CREATE TABLE public.event_authority_evidence(decision_id uuid PRIMARY KEY,case_id uuid,game_id uuid,actor_id uuid,stage_no int,authority_ok boolean,lawful boolean,strategy_point boolean,role_snapshot text,legal_basis text,coalition_ids uuid[],delegated_ok boolean,best_option boolean,score_share numeric DEFAULT 0,created_at timestamptz DEFAULT now());
 CREATE TABLE public.state_metrics(id uuid PRIMARY KEY DEFAULT gen_random_uuid(),game_id uuid,metric_key text,value numeric,previous_value numeric,min_value numeric,max_value numeric);
@@ -25,3 +25,11 @@ AS $function$
  select exists(select 1 from jsonb_array_elements_text(coalesce(p_roles,'[]'::jsonb)) r where lower(coalesce(p_snapshot,'')) like '%'||lower(r)||'%');$function$;
 -- Functions unrelated to this test (e.g. full stage assessment) are compiled in full integration at step 5.
 SET check_function_bodies=off;
+
+ALTER TABLE event_cases ADD COLUMN comic_scene jsonb DEFAULT '{}',ADD COLUMN category text DEFAULT 'Экономика',ADD COLUMN seriousness text DEFAULT 'serious',ADD COLUMN case_key text DEFAULT 'fixture';
+ALTER TABLE event_decisions ADD COLUMN rationale text;
+ALTER TABLE event_case_outcomes ADD COLUMN yes_votes int,ADD COLUMN no_votes int,ADD COLUMN votes_count int,ADD COLUMN assignments_count int,ADD COLUMN resolution_kind text,ADD COLUMN option_tallies jsonb;
+ALTER TABLE political_posts ALTER COLUMN id SET DEFAULT gen_random_uuid(),ADD COLUMN game_id uuid,ADD COLUMN author_id uuid,ADD COLUMN process_type text,ADD COLUMN actor_key text,ADD COLUMN actor_label text,ADD COLUMN title text,ADD COLUMN tags text[],ADD COLUMN internal_view text,ADD COLUMN internal_ref_id text,ADD COLUMN status text,ADD COLUMN comic_scene jsonb,ADD COLUMN effects_applied boolean;
+CREATE TABLE games(id uuid PRIMARY KEY,owner_id uuid);
+CREATE TABLE event_auto_settings(game_id uuid,trust_per_20 numeric,backlog_penalty numeric);
+CREATE FUNCTION private.is_game_teacher(g uuid) RETURNS boolean LANGUAGE sql AS $$SELECT EXISTS(SELECT 1 FROM public.game_members WHERE game_id=g AND user_id=auth.uid() AND kind='teacher')$$;

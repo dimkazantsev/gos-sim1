@@ -1,6 +1,6 @@
 -- Candidate step 2 only. Never apply independently of the full Events V2 release.
 -- No existing cases are marked V2 here, no historical rows are changed.
-ALTER TABLE public.event_collaboration_invites ADD COLUMN transfer_stage_no integer CHECK (transfer_stage_no BETWEEN 1 AND 16);
+ALTER TABLE public.event_collaboration_invites ADD COLUMN transfer_stage_no integer CHECK (transfer_stage_no BETWEEN 1 AND 16), ADD COLUMN transfer_errors integer NOT NULL DEFAULT 0 CHECK (transfer_errors BETWEEN 0 AND 2);
 CREATE UNIQUE INDEX event_v2_one_accepted_transfer ON public.event_collaboration_invites(case_id) WHERE transfer_stage_no IS NOT NULL;
 CREATE INDEX event_v2_transfer_credit ON public.event_collaboration_invites(game_id,inviter_id,transfer_stage_no,responded_at) WHERE transfer_stage_no IS NOT NULL AND status='accepted';
 CREATE OR REPLACE FUNCTION private.event_v2_competent(p_case uuid,p_user uuid) RETURNS boolean
@@ -63,7 +63,9 @@ begin
  if c.id is null or not exists(select 1 from public.event_assignments where case_id=p_case and recipient_id=auth.uid()) or not exists(select 1 from public.game_members where game_id=c.game_id and user_id=auth.uid() and kind='student' and roster_archived_at is null) then raise exception 'Ситуация недоступна';end if;
  if exists(select 1 from public.event_decisions where case_id=p_case) or exists(select 1 from public.event_case_outcomes where case_id=p_case) then raise exception 'После начала голосования приглашения закрыты';end if;
  if p_recipient=auth.uid() or exists(select 1 from public.event_assignments where case_id=p_case and recipient_id=p_recipient) or not exists(select 1 from public.game_members where game_id=c.game_id and user_id=p_recipient and kind='student' and roster_archived_at is null) then raise exception 'Выберите другого участника текущей игры';end if;
- if (c.audience='single' AND c.effect_plan->>'rules_version'='2') then
+ if (c.audience IN ('group','all') AND c.effect_plan->>'rules_version'='2') then raise exception 'Состав коллективного голосования уже определён';
+ elsif (c.audience='single' AND c.effect_plan->>'rules_version'='2') then
+  if (select coalesce(sum(transfer_errors),0) from public.event_collaboration_invites where case_id=c.id and inviter_id=auth.uid())>=2 then raise exception 'Две ошибочные передачи: обратитесь к преподавателю';end if;
   if not exists(select 1 from public.event_assignments where case_id=c.id and recipient_id=auth.uid() and status='pending' and stage_no is not null)
    or (select count(*) from public.event_assignments where case_id=c.id)<>1
    or exists(select 1 from public.event_collaboration_invites where case_id=c.id and (status='pending' or transfer_stage_no is not null))
@@ -88,6 +90,11 @@ begin
  select * into i from public.event_collaboration_invites where id=p_id for update;
  if i.status<>'pending' or exists(select 1 from public.event_decisions where case_id=i.case_id)
  then raise exception 'Приглашение уже закрыто';end if;
+ if (c.audience IN ('group','all') AND c.effect_plan->>'rules_version'='2') then raise exception 'Коллективный состав не меняется';end if;
+ if (c.audience='single' AND c.effect_plan->>'rules_version'='2') AND NOT p_accept THEN
+  update public.event_collaboration_invites set status='declined',responded_at=now(),transfer_errors=transfer_errors+case when private.event_v2_competent(c.id,i.recipient_id) AND NOT private.event_v2_competent(c.id,i.inviter_id) then 0 else 1 end where id=p_id;
+  return;
+ end if;
  if p_accept then
   if not exists (select 1 from public.game_members where game_id=i.game_id and user_id=auth.uid() and kind='student' and roster_archived_at is null) then raise exception 'Приглашение доступно только действующему участнику'; end if;
   if (c.audience='single' AND c.effect_plan->>'rules_version'='2') then
@@ -99,7 +106,7 @@ begin
    if not exists(select 1 from public.game_members where game_id=c.game_id and user_id=i.inviter_id and kind='student' and roster_archived_at is null)
     or private.event_v2_competent(c.id,i.inviter_id)
     or not private.event_v2_competent(c.id,auth.uid()) then
-     update public.event_collaboration_invites set status='declined',responded_at=now() where id=p_id;
+     update public.event_collaboration_invites set status='declined',responded_at=now(),transfer_errors=transfer_errors+1 where id=p_id;
      return;
    end if;
    update public.event_collaboration_invites set status='accepted',responded_at=now(),transfer_stage_no=a.stage_no where id=p_id;
@@ -129,6 +136,9 @@ begin
  if not exists(select 1 from public.game_members where game_id=c.game_id and user_id=auth.uid() and kind='student' and (not coalesce((c.audience='single' AND c.effect_plan->>'rules_version'='2'),false) or roster_archived_at is null)) then raise exception 'Голосует только участник';end if;
  if exists(select 1 from public.event_case_outcomes where case_id=c.id) or exists(select 1 from public.event_collaboration_invites where case_id=c.id and status='pending') then raise exception 'Дождитесь ответа на приглашения';end if;
  if new.choice!~'^option_[1-6]$' or substring(new.choice from 8)::int>jsonb_array_length(c.decision_options) then raise exception 'Вариант недоступен';end if;
+ if (c.audience IN ('group','all') AND c.effect_plan->>'rules_version'='2') then
+  if new.vote_round<>coalesce((c.comic_scene->>'vote_round')::int,1) OR (new.vote_round=2 AND NOT coalesce((c.comic_scene->'runoff_options') ? new.choice,false)) then raise exception 'Вариант или тур недоступен';end if;
+ elsif new.vote_round<>1 then raise exception 'Второй тур недоступен';end if;
  select role_title into new.role_snapshot from public.game_members where game_id=c.game_id and user_id=new.actor_id;
  return new;
 end;$function$;
@@ -142,6 +152,7 @@ AS $function$
 declare c public.event_cases%rowtype;d record;o jsonb;qualified uuid[];ok boolean;lawful boolean;v_stage integer;violations int:=0;legal_delta numeric;v_authority_delta numeric;old_value numeric;new_value numeric;m public.state_metrics%rowtype;
 begin
  select * into c from public.event_cases where id=new.case_id;
+ if (c.audience IN ('group','all') AND c.effect_plan->>'rules_version'='2') then perform private.event_v2_apply_collective_metrics(c.id,new.winner);return new;end if;
  -- Each decision inherits its assignment's immutable stage. Parallel stages
  -- must never use the highest currently opened stage as attribution.
  for d in select * from public.event_decisions where case_id=c.id loop
@@ -497,10 +508,10 @@ BEGIN
  v_winning:=private.event_winning_outcomes_visible(p_game_id,v_cases);
  RETURN jsonb_build_object(
   'assignments',coalesce((SELECT jsonb_agg(to_jsonb(x) ORDER BY x.id)
-   FROM (SELECT id,case_id,game_id,recipient_id,status,created_at FROM public.event_assignments
+   FROM (SELECT id,case_id,game_id,recipient_id,status,created_at,(SELECT coalesce((c.comic_scene->>'vote_round')::int,1) FROM public.event_cases c WHERE c.id=event_assignments.case_id) AS vote_round,(SELECT c.comic_scene->'runoff_options' FROM public.event_cases c WHERE c.id=event_assignments.case_id) AS runoff_options FROM public.event_assignments
     WHERE game_id=p_game_id AND (v_full_view OR case_id=ANY(v_cases))) x),'[]'::jsonb),
   'decisions',coalesce((SELECT jsonb_agg(to_jsonb(x) ORDER BY x.id)
-   FROM (SELECT id,case_id,actor_id,choice,role_snapshot FROM public.event_decisions
+   FROM (SELECT id,case_id,actor_id,choice,role_snapshot,vote_round FROM public.event_decisions
     WHERE game_id=p_game_id AND (v_full_view OR case_id=ANY(v_cases))) x),'[]'::jsonb),
   'outcomes',coalesce((SELECT jsonb_agg(to_jsonb(x) ORDER BY x.case_id)
    FROM (SELECT o.case_id,o.winner,o.trust_delta,o.votes_count,o.assignments_count,o.media_post_id,o.requested_trust_delta,o.resolution_kind,
@@ -509,7 +520,7 @@ BEGIN
    FROM public.event_case_outcomes o
    WHERE o.game_id=p_game_id AND (v_full_view OR o.case_id=ANY(v_cases))) x),'[]'::jsonb),
   'invitations',coalesce((SELECT jsonb_agg(to_jsonb(x) ORDER BY x.id)
-   FROM (SELECT id,case_id,inviter_id,recipient_id,status,transfer_stage_no FROM public.event_collaboration_invites
+   FROM (SELECT id,case_id,inviter_id,recipient_id,status,transfer_stage_no,transfer_errors FROM public.event_collaboration_invites
     WHERE game_id=p_game_id AND (v_full_view OR case_id=ANY(v_cases))) x),'[]'::jsonb),
   'authority',coalesce((SELECT jsonb_agg(to_jsonb(x) ORDER BY x.decision_id)
    FROM (SELECT decision_id,case_id,actor_id,authority_ok,lawful,strategy_point,role_snapshot,legal_basis,score_share

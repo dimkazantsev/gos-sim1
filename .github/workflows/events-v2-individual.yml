@@ -4,6 +4,7 @@ on:
     branches: ["feat/events-v2-approved-20261127"]
     paths:
       - 'supabase/changes/events_v2_individual_transfer_candidate.sql'
+      - 'supabase/changes/events_v2_collective_candidate.sql'
       - 'scripts/events-v2-individual*'
       - 'components/game/Event*.tsx'
       - '.github/workflows/events-v2-individual.yml'
