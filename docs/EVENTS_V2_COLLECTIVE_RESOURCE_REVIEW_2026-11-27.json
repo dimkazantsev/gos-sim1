@@ -4,9 +4,9 @@
   "summary": {
     "cases": 189,
     "options": 947,
-    "baseDominated": 197,
-    "expandedDominated": 102,
-    "expandedCases": 80
+    "baseDominated": 181,
+    "expandedDominated": 87,
+    "expandedCases": 68
   },
   "remaining": [
     {
@@ -305,91 +305,6 @@
       "dominated": 1
     },
     {
-      "case_key": "bank-legal-2026-131",
-      "title": "Доступ к правосудию через начальника",
-      "dominated": 1
-    },
-    {
-      "case_key": "bank-legal-2026-132",
-      "title": "Доказательство из слухов",
-      "dominated": 1
-    },
-    {
-      "case_key": "bank-legal-2026-133",
-      "title": "Обязательное примирение без согласия",
-      "dominated": 1
-    },
-    {
-      "case_key": "bank-legal-2026-134",
-      "title": "Срок обращения и уважительная причина",
-      "dominated": 2
-    },
-    {
-      "case_key": "bank-legal-2026-135",
-      "title": "Банкротство и один любимый кредитор",
-      "dominated": 1
-    },
-    {
-      "case_key": "bank-legal-2026-137",
-      "title": "Договор с несовершеннолетним",
-      "dominated": 1
-    },
-    {
-      "case_key": "bank-legal-2026-138",
-      "title": "Благоустройство без слушаний",
-      "dominated": 1
-    },
-    {
-      "case_key": "bank-legal-2026-139",
-      "title": "Публичное обещание компенсации",
-      "dominated": 1
-    },
-    {
-      "case_key": "bank-legal-2026-140",
-      "title": "Национальность как основание отказа",
-      "dominated": 1
-    },
-    {
-      "case_key": "bank-legal-2026-141",
-      "title": "Личная переписка для служебного отчёта",
-      "dominated": 1
-    },
-    {
-      "case_key": "bank-legal-2026-142",
-      "title": "Чужое фото в партийной программе",
-      "dominated": 1
-    },
-    {
-      "case_key": "bank-legal-2026-143",
-      "title": "Лицензия управляющей организации и приказ инспекции",
-      "dominated": 1
-    },
-    {
-      "case_key": "bank-legal-2026-146",
-      "title": "Лишняя справка для услуги",
-      "dominated": 1
-    },
-    {
-      "case_key": "bank-legal-2026-147",
-      "title": "Реквизиция без компенсации",
-      "dominated": 2
-    },
-    {
-      "case_key": "bank-legal-2026-148",
-      "title": "Государственная помощь без контроля",
-      "dominated": 1
-    },
-    {
-      "case_key": "bank-legal-2026-149",
-      "title": "Ненормативный акт против закона",
-      "dominated": 1
-    },
-    {
-      "case_key": "bank-legal-2026-150",
-      "title": "Вознаграждение за обязательную услугу",
-      "dominated": 2
-    },
-    {
       "case_key": "bank-legal-2026-104",
       "title": "Техническое задание под марку",
       "dominated": 1
@@ -408,7 +323,32 @@
       "case_key": "bank-legal-2026-123",
       "title": "Протокол без извещения",
       "dominated": 1
+    },
+    {
+      "case_key": "bank-legal-2026-131",
+      "title": "Доступ к правосудию через начальника",
+      "dominated": 1
+    },
+    {
+      "case_key": "bank-legal-2026-132",
+      "title": "Доказательство из слухов",
+      "dominated": 1
+    },
+    {
+      "case_key": "bank-legal-2026-133",
+      "title": "Обязательное примирение без согласия",
+      "dominated": 1
+    },
+    {
+      "case_key": "bank-legal-2026-142",
+      "title": "Чужое фото в партийной программе",
+      "dominated": 1
+    },
+    {
+      "case_key": "bank-legal-2026-146",
+      "title": "Лишняя справка для услуги",
+      "dominated": 1
     }
   ],
-  "note": "090–130: адресная редактура; вне диапазона перенесены исходные диагностические значения. Полный пересчёт нужен перед выпуском."
+  "note": "090–150: адресная редактура; вне диапазона перенесены исходные диагностические значения. Полный пересчёт нужен перед выпуском."
 }

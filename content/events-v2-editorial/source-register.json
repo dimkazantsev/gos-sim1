@@ -2523,12 +2523,14 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "Конституция РФ, статьи 46–47: судебная защита и рассмотрение дела надлежащим судом. Приём и движение обращения определяются применимым процессуальным законом; согласие ответчика не может вводиться канцелярией как самостоятельное условие. Источники: http://www.kremlin.ru/acts/constitution",
+      "legal_basis": "Конституция РФ, ст. 46–47: согласие ответчика не может вводиться вместо установленных процессуальных требований. Вид судопроизводства не уточнён, поэтому конкретный процессуальный срок и способ реагирования не утверждаются.",
       "legal_urls": [
-        "http://www.kremlin.ru/acts/constitution"
+        "https://minjust.gov.ru/ru/documents/8011/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "review_date": "2026-11-27",
+      "source_scope": "previous_constitution_text_and_case_specific_reasoning"
     },
     {
       "case_key": "bank-legal-2026-132",
@@ -2537,12 +2539,15 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "КоАП РФ, статьи 25.1, 26.1, 26.2 и 26.11: участие в деле, установление обстоятельств, доказательства и их оценка. Сообщение может быть поводом проверки, но не освобождает от доказывания конкретного нарушения и не обладает заранее установленной силой. Источники: https://epp.genproc.gov.ru/ru/proc_77/activity/legal-education/about-law/e2011575/",
+      "legal_basis": "КоАП РФ, ст. 25.1, 26.2, 26.11: решение требует фактических данных о конкретном эпизоде и оценки доказательств; анонимный неконкретный пересказ не доказывает состав. Доступ к материалам и возможность объяснений обеспечиваются независимо от выбора дополнительных мер.",
       "legal_urls": [
-        "https://epp.genproc.gov.ru/ru/proc_77/activity/legal-education/about-law/e2011575/"
+        "https://www.consultant.ru/document/cons_doc_LAW_34661/747b7ded7acccf4fbd94a98fe212713ae1845601/",
+        "https://www.consultant.ru/document/cons_doc_LAW_34661/0147088a5497571bd1de83d7a7f6ce9ea7504a22/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "review_date": "2026-11-27",
+      "source_scope": "specific_norm_and_related_search_results_partial"
     },
     {
       "case_key": "bank-legal-2026-133",
@@ -2551,12 +2556,14 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "Федеральный закон №193-ФЗ, статьи 3, 7 и 12: добровольность медиации, соглашение о её проведении и согласованные сторонами условия медиативного соглашения. Посредник не получает права подписать обязательство за стороны без их воли и полномочий. Источники: https://epp.genproc.gov.ru/ru/proc_64/activity/legal-education/explain/e695649/",
+      "legal_basis": "193-ФЗ, ст. 3, 7, 12: медиативное соглашение требует согласованного волеизъявления сторон; документ, подписанный только посредником без полномочия и согласия, не подтверждает заключение соглашения. Судебная защита сохраняется.",
       "legal_urls": [
-        "https://epp.genproc.gov.ru/ru/proc_64/activity/legal-education/explain/e695649/"
+        "https://www.consultant.ru/document/cons_doc_LAW_103038/a9a3e8f69c495a46eb599330dc1581772c0e4104/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "review_date": "2026-11-27",
+      "source_scope": "specific_norm_and_related_search_results_partial"
     },
     {
       "case_key": "bank-legal-2026-134",
@@ -2565,12 +2572,14 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "ГПК РФ, статья 112: пропущенный процессуальный срок может быть восстановлен при признании причин уважительными; ходатайство сопровождается необходимым процессуальным действием. Решение принимает суд в установленном порядке, без заранее гарантированного восстановления. Источники: https://epp.genproc.gov.ru/ru/dvtp/activity/legal-education/explain/e8376024/",
+      "legal_basis": "ГПК РФ, ст. 112: пропущенный срок восстанавливает суд при признании причин уважительными. Заявление сопровождается соответствующим процессуальным действием. Для апелляционных, кассационных и надзорных жалоб предусмотрены специальные правила; болезнь не гарантирует восстановление.",
       "legal_urls": [
-        "https://epp.genproc.gov.ru/ru/dvtp/activity/legal-education/explain/e8376024/"
+        "https://www.consultant.ru/document/cons_doc_LAW_39570/abaac973fe4a701d09359875f02b25d806b40b80/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "review_date": "2026-11-27",
+      "source_scope": "specific_norm_and_related_search_results_partial"
     },
     {
       "case_key": "bank-legal-2026-135",
@@ -2579,12 +2588,14 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "Федеральный закон №127-ФЗ, статьи 61.3 и 134: оспаривание предпочтительного удовлетворения и очередность в установленной процедуре банкротства. Наличие оснований и период сделки оцениваются отдельно; правовой вывод не заменяется одним фактом аффилированности. Источники: https://epp.genproc.gov.ru/ru/proc_27/activity/legal-education/explain/e248721/",
+      "legal_basis": "127-ФЗ, ст. 61.3, 134: предпочтение кредитору может быть основанием оспаривания сделки при соблюдении установленных условий; очерёдность зависит от применимой процедуры. Стадия банкротства в истории ещё не установлена, поэтому нельзя автоматически применять правила конкурсного производства или объявлять сделку недействительной.",
       "legal_urls": [
-        "https://epp.genproc.gov.ru/ru/proc_27/activity/legal-education/explain/e248721/"
+        "https://www.consultant.ru/document/cons_doc_LAW_39331/22f46f165baa4e483d8a0c74fe52a2cea2f43d9e/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "review_date": "2026-11-27",
+      "source_scope": "specific_norm_and_related_search_results_partial"
     },
     {
       "case_key": "bank-legal-2026-136",
@@ -2593,12 +2604,14 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "ГК РФ, статьи 1118, 1124 и 1141: основания распоряжения имуществом на случай смерти, форма завещания и наследование по закону. Переписка о намерении сама по себе не заменяет предусмотренную законом форму и проверку прав других наследников. Источники: https://epp.genproc.gov.ru/ru/proc_48/activity/legal-education/explain/e465636/",
+      "legal_basis": "ГК РФ, ст. 1118, 1124, 1141: наследование и распоряжения на случай смерти имеют предусмотренные законом основания и форму. Обычная переписка о намерении не заменяет надлежащее распоряжение. Нотариус проверяет документы, основания и права других наследников; исключительные формы и споры оцениваются отдельно.",
       "legal_urls": [
-        "https://epp.genproc.gov.ru/ru/proc_48/activity/legal-education/explain/e465636/"
+        "https://www.consultant.ru/document/cons_doc_LAW_34154/2ad1d69cdff4393596b883329fe105f3da638c44/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "review_date": "2026-11-27",
+      "source_scope": "specific_norm_and_related_search_results_partial"
     },
     {
       "case_key": "bank-legal-2026-137",
@@ -2607,12 +2620,15 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "ГК РФ, статьи 26 и 175: пределы самостоятельных сделок несовершеннолетних 14–18 лет, требуемое письменное согласие и возможность оспаривания в предусмотренных случаях. Не всякая сделка этого возраста ничтожна; учитываются исключения, полная дееспособность и последующее одобрение. Источники: https://11.rosguard.gov.ru/uploads/2025/07/5_grazhdanskijj_kodeks_rossijjskojj_federacii_chast_pervaya.pdf",
+      "legal_basis": "ГК РФ, ст. 26, 175: для сделок несовершеннолетних 14–18 лет вне предусмотренных исключений требуется письменное согласие законного представителя или последующее письменное одобрение. При его отсутствии сделка может быть оспорена надлежащим лицом; она не автоматически ничтожна. Полная дееспособность по условию отсутствует.",
       "legal_urls": [
-        "https://11.rosguard.gov.ru/uploads/2025/07/5_grazhdanskijj_kodeks_rossijjskojj_federacii_chast_pervaya.pdf"
+        "https://www.consultant.ru/document/cons_doc_LAW_5142/7b6abd47219e2aa6081ac21b41e9e83d80fb45df/",
+        "https://www.consultant.ru/document/cons_doc_LAW_5142/a267c0e04062a2651ed5c2dcfc1b867cc03b6e51/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "review_date": "2026-11-27",
+      "source_scope": "specific_norm_and_related_search_results_partial"
     },
     {
       "case_key": "bank-legal-2026-138",
@@ -2621,12 +2637,14 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "ГрК РФ, статьи 5.1 и 28: общественные обсуждения или публичные слушания по генеральному плану и изменениям в предусмотренных случаях. Опрос подписчиков не тождественен установленной публичной процедуре; законные исключения проверяются отдельно. Источники: https://epp.genproc.gov.ru/ru/proc_12/activity/legal-education/explain/e161004/",
+      "legal_basis": "ГрК РФ, ст. 5.1, 28: публичная процедура проводится для предусмотренных проектов генеральных планов и изменений, с исключениями по федеральному и региональному законодательству. В истории исключения отсутствуют; неформальный опрос не заменяет обязательные процедуры. Дополнительные обсуждения не подменяют установленный порядок.",
       "legal_urls": [
-        "https://epp.genproc.gov.ru/ru/proc_12/activity/legal-education/explain/e161004/"
+        "https://www.consultant.ru/document/cons_doc_LAW_51040/40be0591480e0c82ab63b09e45359cbe40abc562/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "review_date": "2026-11-27",
+      "source_scope": "specific_norm_and_related_search_results_partial"
     },
     {
       "case_key": "bank-legal-2026-139",
@@ -2635,12 +2653,16 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "БК РФ, статьи 83 и 219: принятие новых расходных обязательств и исполнение расходов по надлежащим основаниям. Федеральный закон №59-ФЗ, статья 10: рассмотрение поступивших обращений по существу. Запись выступления не заменяет нормативного основания новой выплаты. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
+      "legal_basis": "БК РФ, ст. 83, 219; 59-ФЗ, ст. 10: новое расходное обязательство требует законного основания и соблюдения бюджетной процедуры; заявления рассматриваются по существу. 240 × 20 тыс. = 4,8 млн рублей только по уже поступившим заявлениям, не общая смета выплаты всем жителям. Публичное обещание не является основанием перечисления.",
       "legal_urls": [
-        "https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721"
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/15d7c58c01bf75dcd6cf84a008bfef761ba731eb/",
+        "https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
+        "https://www.consultant.ru/document/cons_doc_LAW_59999/ca24c3b3a2032a1f727146f988f406723bf9ea1a/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "review_date": "2026-11-27",
+      "source_scope": "specific_norm_and_related_search_results_partial"
     },
     {
       "case_key": "bank-legal-2026-140",
@@ -2649,12 +2671,15 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "Конституция РФ, статья 19; ГК РФ, статья 426: равенство и условия публичного договора, недопустимость необоснованного предпочтения одним потребителям перед другими. Применимость публичного договора и специальные законные основания отказа проверяются по виду услуги. Источники: http://www.kremlin.ru/acts/constitution",
+      "legal_basis": "Конституция РФ, ст. 19; ГК РФ, ст. 426: при заданном публичном договоре и возможности оказать услугу необоснованный отказ недопустим; национальность не является законным критерием отказа. Специальные условия иных услуг оцениваются отдельно.",
       "legal_urls": [
-        "http://www.kremlin.ru/acts/constitution"
+        "https://minjust.gov.ru/ru/documents/8011/",
+        "https://www.consultant.ru/document/cons_doc_LAW_5142/5b4886fd41d95bd272f7a06c75e26762630ac683/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "review_date": "2026-11-27",
+      "source_scope": "specific_norm_and_related_search_results_partial"
     },
     {
       "case_key": "bank-legal-2026-141",
@@ -2663,12 +2688,16 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "Конституция РФ, статьи 23–24; ГК РФ, статья 152.2; Федеральный закон №152-ФЗ, статьи 5–7: охрана частной жизни и законные основания обработки и раскрытия персональных данных. Интерес аудитории сам по себе не обосновывает публикацию личной переписки. Источники: http://www.kremlin.ru/acts/constitution",
+      "legal_basis": "Конституция РФ, ст. 23–24; ГК РФ, ст. 152.2; 152-ФЗ: сведения о частной жизни защищены. В истории нет основания для публикации семейной переписки. Доступ ограничивается и проверяется законность уже совершённой передачи; обязательные меры не заменяются редактурой отчёта.",
       "legal_urls": [
-        "http://www.kremlin.ru/acts/constitution"
+        "https://minjust.gov.ru/ru/documents/8011/",
+        "https://www.consultant.ru/document/cons_doc_LAW_5142/9c307a0f2164645c15ca4e3146ff5f6e56060b23/",
+        "https://www.consultant.ru/document/cons_doc_LAW_61801/d3fe43a7c415353b17faab255bc0de92bea127da/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "review_date": "2026-11-27",
+      "source_scope": "specific_norm_and_related_search_results_partial"
     },
     {
       "case_key": "bank-legal-2026-142",
@@ -2677,12 +2706,15 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "ГК РФ, статьи 1229, 1259, 1270, 1274 и 1286: исключительное право, способы использования, предусмотренные случаи свободного использования и лицензия. Одно указание автора не заменяет разрешения, когда законное исключение не установлено. Источники: https://rospatent.gov.ru/ru/documents/grazhdanskiy-kodeks-rossiyskoy-federacii-chast-chetvertaya",
+      "legal_basis": "ГК РФ, ст. 1229, 1259, 1270, 1274, 1286: охраняемая фотография используется по разрешению или предусмотренному исключению; имя автора само по себе не заменяет основание воспроизведения и размещения. В заданной декоративной обложке исключение не установлено. Лицензия проверяется по объёму прав, включая печать и сеть.",
       "legal_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_64629/98ad2641f95945c4b7956150260564c8b44028d9/",
         "https://rospatent.gov.ru/ru/documents/grazhdanskiy-kodeks-rossiyskoy-federacii-chast-chetvertaya"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "review_date": "2026-11-27",
+      "source_scope": "specific_norm_and_related_search_results_partial"
     },
     {
       "case_key": "bank-legal-2026-143",
@@ -2691,14 +2723,15 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "ЖК РФ, статья 199, части 1 и 3: аннулирование лицензии по решению суда и самостоятельные основания прекращения её действия. Федеральный закон от 15.10.2025 №375-ФЗ, статья 1, пункт 5, и статья 3: изменения действуют с 01.09.2026. Ссылка на решение лицензионной комиссии в этой истории не требуется; судебный порядок аннулирования сохранён. Источники: https://epp.genproc.gov.ru/ru/proc_65/activity/legal-education/explain/e702537/ https://base.garant.ru/412850169/ https://publication.pravo.gov.ru/document/0001202510150008",
+      "legal_basis": "ЖК РФ, ст. 199, ч. 1 и 3, в редакции с 01.09.2026: аннулирование лицензии производится по решению суда по заявлению органа жилищного надзора; основания прекращения действия лицензии самостоятельны. В истории они исключены. Основания судебного обращения проверяются отдельно, жалобы рассматриваются независимо. Не требуется прежнее решение лицензионной комиссии.",
       "legal_urls": [
-        "https://epp.genproc.gov.ru/ru/proc_65/activity/legal-education/explain/e702537/",
-        "https://base.garant.ru/412850169/",
+        "https://www.consultant.ru/document/cons_doc_LAW_51057/14db416f7441199d612af5491ddc1b45ed664a10/",
         "https://publication.pravo.gov.ru/document/0001202510150008"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "review_date": "2026-11-27",
+      "source_scope": "specific_norm_and_related_search_results_partial"
     },
     {
       "case_key": "bank-legal-2026-144",
@@ -2707,12 +2740,14 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "КоАП РФ, статья 4.1, часть 5; статья 24.5, часть 1, пункт 7: недопустимость двойной административной ответственности и значение существующего постановления по тому же факту. Устранение второго решения производится уполномоченным органом в установленном порядке. Источники: https://epp.genproc.gov.ru/ru/proc_27/activity/legal-education/explain/e251163/",
+      "legal_basis": "КоАП РФ, ст. 4.1, ч. 5 и 24.5, ч. 1 п. 7: повторное административное наказание за тот же эпизод недопустимо при заданном тождестве. Второе постановление устраняется уполномоченным органом в надлежащей процедуре, а не коллективным голосованием.",
       "legal_urls": [
-        "https://epp.genproc.gov.ru/ru/proc_27/activity/legal-education/explain/e251163/"
+        "https://www.consultant.ru/document/cons_doc_LAW_34661/7f47b148e60467b00c0f1705dac5c97386201451/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "review_date": "2026-11-27",
+      "source_scope": "specific_norm_and_related_search_results_partial"
     },
     {
       "case_key": "bank-legal-2026-145",
@@ -2721,12 +2756,14 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "Конституция РФ, статьи 46–47 и 118: судебная защита, законный суд и осуществление правосудия только судом. Подсудность и обязательный досудебный порядок устанавливаются законом, а не распоряжением руководителя органа-ответчика. Источники: http://www.kremlin.ru/acts/constitution",
+      "legal_basis": "Конституция РФ, ст. 46–47, 118: правосудие осуществляется судом. Внутриведомственная процедура возможна в пределах закона, но орган-ответчик не вправе своим распоряжением окончательно подменять судебную защиту. Конкретный процессуальный маршрут определяется видом спора.",
       "legal_urls": [
-        "http://www.kremlin.ru/acts/constitution"
+        "https://minjust.gov.ru/ru/documents/8011/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "review_date": "2026-11-27",
+      "source_scope": "previous_constitution_text_and_case_specific_reasoning"
     },
     {
       "case_key": "bank-legal-2026-146",
@@ -2735,12 +2772,14 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "Федеральный закон №210-ФЗ, статья 7, часть 1, пункт 2, и статья 7.1: запрет требовать находящиеся у органов документы с предусмотренными законом исключениями и межведомственное взаимодействие. Добровольное представление не равно обязательной дополнительной справке. Источники: https://epp.genproc.gov.ru/ru/proc_06/activity/legal-education/explain/e117513/",
+      "legal_basis": "210-ФЗ, ст. 7, ч. 1 п. 2, ст. 7.1: документы, находящиеся в распоряжении органов и подлежащие межведомственному получению, не требуются от заявителя, кроме предусмотренных законом исключений. В истории исключение отсутствует. Добровольное представление допустимо, но не является условием регистрации.",
       "legal_urls": [
-        "https://epp.genproc.gov.ru/ru/proc_06/activity/legal-education/explain/e117513/"
+        "https://www.consultant.ru/document/cons_doc_LAW_103023/a593eaab768d34bf2d7419322eac79481e73cf03/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "review_date": "2026-11-27",
+      "source_scope": "specific_norm_and_related_search_results_partial"
     },
     {
       "case_key": "bank-legal-2026-147",
@@ -2749,12 +2788,14 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "ГК РФ, статья 242: реквизиция в установленных чрезвычайных обстоятельствах с выплатой стоимости; возможность оспаривания оценки и требования через суд возврата сохранившегося имущества после прекращения обстоятельств. Специальные условия конкретного изъятия проверяются отдельно. Источники: https://11.rosguard.gov.ru/uploads/2025/07/5_grazhdanskijj_kodeks_rossijjskojj_federacii_chast_pervaya.pdf",
+      "legal_basis": "ГК РФ, ст. 242: реквизиция предполагает установленное чрезвычайное основание, решение государственного органа и выплату стоимости в законном порядке. Оценку можно оспорить в суде; после прекращения обстоятельств собственник может требовать судебного возврата сохранившегося имущества. Специальный режим и допустимость добровольного возврата проверяются отдельно.",
       "legal_urls": [
-        "https://11.rosguard.gov.ru/uploads/2025/07/5_grazhdanskijj_kodeks_rossijjskojj_federacii_chast_pervaya.pdf"
+        "https://www.consultant.ru/document/cons_doc_LAW_5142/4ad68a20a41c7429791e5942e898312c4569ef46/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "review_date": "2026-11-27",
+      "source_scope": "specific_norm_and_related_search_results_partial"
     },
     {
       "case_key": "bank-legal-2026-148",
@@ -2763,12 +2804,15 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "БК РФ, статья 78: условия предоставления субсидии, отчётность и предусмотренный контроль. Последствия нарушения устанавливаются применимыми актами и соглашением; отсутствие отчёта нельзя скрывать под видом полного подтверждения исполнения. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
+      "legal_basis": "БК РФ, ст. 78: правовые условия субсидии, отчётность и контроль зависят от вида получателя, применимого акта и соглашения. Факт ввода объекта не доказывает исполнение отчётности. Автоматическое требование вернуть всё без оценки условий не утверждается. Вид получателя необходимо уточнить для полной квалификации.",
       "legal_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/1b6959f23cc516d0e11ddc2e213ca2dca83560df/",
         "https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "review_date": "2026-11-27",
+      "source_scope": "prior_article_evidence_and_special_regime_unresolved"
     },
     {
       "case_key": "bank-legal-2026-149",
@@ -2777,12 +2821,14 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "Конституция РФ, статьи 15 и 46: подчинённость решений органов закону и судебная защита. Поздняя дата индивидуального приказа сама по себе не даёт ему силы отменить установленное законом право; учитываются компетенция и надлежащий порядок пересмотра. Источники: http://www.kremlin.ru/acts/constitution",
+      "legal_basis": "Конституция РФ, ст. 15, 46: индивидуальный приказ органа не отменяет право, установленное законом. По условию отсутствуют иные основания отказа. Отказ устраняется компетентным способом; вид правоотношения и процессуальный порядок не конкретизированы, поэтому универсальный способ отмены не утверждается.",
       "legal_urls": [
-        "http://www.kremlin.ru/acts/constitution"
+        "https://minjust.gov.ru/ru/documents/8011/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "review_date": "2026-11-27",
+      "source_scope": "previous_constitution_text_and_case_specific_reasoning"
     },
     {
       "case_key": "bank-legal-2026-150",
@@ -2791,12 +2837,15 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "Федеральный закон №79-ФЗ, статья 17; Федеральный закон №273-ФЗ, статья 9: запрет связанных с должностными обязанностями вознаграждений и уведомление о склонении к коррупционному правонарушению. Небольшая стоимость сама по себе не делает допустимой плату за ускорение услуги. Источники: https://epp.genproc.gov.ru/ru/proc_33/activity/legal-education/explain/e316356/",
+      "legal_basis": "79-ФЗ от 27.07.2004, ст. 17, ч. 1 п. 6; 273-ФЗ от 25.12.2008, ст. 9: вознаграждение, связанное с должностным действием, не допускается, обращение с целью склонения подлежит установленному уведомлению. Сумма карты не определяет законность; уголовная квалификация не устанавливается автоматически.",
       "legal_urls": [
-        "https://epp.genproc.gov.ru/ru/proc_33/activity/legal-education/explain/e316356/"
+        "https://www.consultant.ru/document/cons_doc_LAW_48601/e7b86a940bc71a71af7b9288590f1ca92a69d878/",
+        "https://www.consultant.ru/document/cons_doc_LAW_82959/168ac76599fb643077ad0b13c4f2dc2c6126333a/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "review_date": "2026-11-27",
+      "source_scope": "specific_norm_and_related_search_results_partial"
     },
     {
       "case_key": "bank-budget-bridge",
