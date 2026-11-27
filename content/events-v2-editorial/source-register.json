@@ -1837,7 +1837,8 @@
       "legal_basis": "Конституция РФ, статья 132, часть 2; БК РФ, статьи 65 и 86: полномочия и расходные обязательства муниципального образования. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
       "legal_urls": [
         "https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
-        "https://www.consultant.ru/document/cons_doc_LAW_19702/4ce55543bc62fa4c4587fa50514b56aa0121a671/"
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/4ce55543bc62fa4c4587fa50514b56aa0121a671/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/ca20da6e9e9d1116bbcf04288c9656fcd121ab94/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
@@ -1849,7 +1850,17 @@
           "scope": "Расходные обязательства муниципального образования; особые условия и действующий местный порядок требуют проверки.",
           "status": "targeted_text_or_official_explanation_read_not_full_case_verification"
         }
-      ]
+      ],
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/4ce55543bc62fa4c4587fa50514b56aa0121a671/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/ca20da6e9e9d1116bbcf04288c9656fcd121ab94/"
+      ],
+      "review_date": "2026-11-28",
+      "targeted_option_review": {
+        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "option_count": 5,
+        "remaining": "Право собственности, вид полномочия, действующий региональный закон и переходные положения законодательства о МСУ."
+      }
     },
     {
       "case_key": "bank-legal-2026-048",
@@ -1860,10 +1871,20 @@
       "resolved_source_url": null,
       "legal_basis": "БК РФ, статья 78: измеримые условия результата предоставления субсидии. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
       "legal_urls": [
-        "https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721"
+        "https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/1b6959f23cc516d0e11ddc2e213ca2dca83560df/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/1b6959f23cc516d0e11ddc2e213ca2dca83560df/"
+      ],
+      "review_date": "2026-11-28",
+      "targeted_option_review": {
+        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "option_count": 5,
+        "remaining": "Тип получателя, порядок предоставления субсидии, определение рабочего места, сроки и условия возврата."
+      }
     },
     {
       "case_key": "bank-legal-2026-049",
@@ -1887,7 +1908,16 @@
           "scope": "Реалистичность прогнозов, отсутствие гарантии поступления по невыданной лицензии; не регулирует само лицензирование.",
           "status": "targeted_text_or_official_explanation_read_not_full_case_verification"
         }
-      ]
+      ],
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/73147d61f1183d32e517768da079cfdf28cca0a9/"
+      ],
+      "review_date": "2026-11-28",
+      "targeted_option_review": {
+        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "option_count": 5,
+        "remaining": "Статус лицензии, налоги и нормативы зачисления, производственный прогноз; доходы от добычи не тождественны источникам финансирования дефицита."
+      }
     },
     {
       "case_key": "bank-legal-2026-050",
@@ -1898,10 +1928,26 @@
       "resolved_source_url": null,
       "legal_basis": "НК РФ, статьи 378.2 и 391; Федеральный закон №237-ФЗ, статьи 22 и 22.1: предусмотренные процедуры изменения кадастровой стоимости. Источники: https://www.nalog.gov.ru/rn77/taxation/tax_legislation/",
       "legal_urls": [
-        "https://www.nalog.gov.ru/rn77/taxation/tax_legislation/"
+        "https://www.nalog.gov.ru/rn77/taxation/tax_legislation/",
+        "https://www.consultant.ru/document/cons_doc_LAW_28165/f6758978b92339b7e996fde13e5104caec7531d2/",
+        "https://www.consultant.ru/document/cons_doc_LAW_28165/d36363d427eab17744e49ef6f68eae5481107a64/",
+        "https://www.consultant.ru/document/cons_doc_LAW_200504/135e0b9c50769c66cfa8e7e5fb71b918a70702e4/",
+        "https://www.consultant.ru/document/cons_doc_LAW_539371/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_28165/f6758978b92339b7e996fde13e5104caec7531d2/",
+        "https://www.consultant.ru/document/cons_doc_LAW_28165/d36363d427eab17744e49ef6f68eae5481107a64/",
+        "https://www.consultant.ru/document/cons_doc_LAW_200504/135e0b9c50769c66cfa8e7e5fb71b918a70702e4/",
+        "https://www.consultant.ru/document/cons_doc_LAW_539371/"
+      ],
+      "review_date": "2026-11-28",
+      "targeted_option_review": {
+        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "option_count": 5,
+        "remaining": "Вид имущества, налог, период, запись ЕГРН и применимость статьи 22.1. КС РФ 48-П от 14.07.2026 касается специальной ситуации физлица, не ИП; не переносить её автоматически на компанию."
+      }
     },
     {
       "case_key": "bank-legal-2026-051",
@@ -1912,10 +1958,20 @@
       "resolved_source_url": null,
       "legal_basis": "Федеральный закон №44-ФЗ, статья 95: изменение и расторжение контракта в установленных случаях. Источники: https://pravo.gov.ru/",
       "legal_urls": [
-        "https://pravo.gov.ru/"
+        "https://pravo.gov.ru/",
+        "https://www.consultant.ru/document/cons_doc_LAW_144624/f4823c3311874efd0ecdfa668c9705968edbc47c/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_144624/f4823c3311874efd0ecdfa668c9705968edbc47c/"
+      ],
+      "review_date": "2026-11-28",
+      "targeted_option_review": {
+        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "option_count": 5,
+        "remaining": "Предмет контракта, сроки, применимый пункт статьи 95 и временные нормы статьи 112, полномочия заказчика."
+      }
     },
     {
       "case_key": "bank-legal-2026-052",
@@ -1926,10 +1982,20 @@
       "resolved_source_url": null,
       "legal_basis": "БК РФ, статья 78: нормативные условия расчёта возмещения недополученных доходов. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
       "legal_urls": [
-        "https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721"
+        "https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/1b6959f23cc516d0e11ddc2e213ca2dca83560df/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/1b6959f23cc516d0e11ddc2e213ca2dca83560df/"
+      ],
+      "review_date": "2026-11-28",
+      "targeted_option_review": {
+        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "option_count": 5,
+        "remaining": "Правовая форма компенсации, тарифное и транспортное регулирование, порядок субсидии и отсутствие двойного возмещения."
+      }
     },
     {
       "case_key": "bank-legal-2026-053",
@@ -1974,10 +2040,22 @@
       "resolved_source_url": null,
       "legal_basis": "БК РФ, статья 78: сохранение целевого результата и допустимый порядок изменения условий субсидии. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
       "legal_urls": [
-        "https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721"
+        "https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/1b6959f23cc516d0e11ddc2e213ca2dca83560df/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/2a2fd8efeffb727e38658d8fcbfc12849b352733/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/1b6959f23cc516d0e11ddc2e213ca2dca83560df/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/2a2fd8efeffb727e38658d8fcbfc12849b352733/"
+      ],
+      "review_date": "2026-11-28",
+      "targeted_option_review": {
+        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "option_count": 5,
+        "remaining": "Организационно-правовая форма получателя (статья 78 либо 78.1), вид гранта, порядок изменения, срок и возврат."
+      }
     },
     {
       "case_key": "bank-legal-2026-055",
@@ -1989,7 +2067,9 @@
       "legal_basis": "Федеральный закон №115-ФЗ, статья 10: условия концессионного соглашения; БК РФ, статьи 34 и 38. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
       "legal_urls": [
         "https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
-        "https://www.consultant.ru/document/cons_doc_LAW_19702/9a0e8abcbe24837343cdcc599bccf0f09413968a/"
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/9a0e8abcbe24837343cdcc599bccf0f09413968a/",
+        "https://www.consultant.ru/document/cons_doc_LAW_54572/6886719982ec257c9ee66e2f8cd6f423c1629371/",
+        "https://www.consultant.ru/document/cons_doc_LAW_54572/2d340398c3243ee82f5596dd3c46d550d6674df3/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
@@ -2001,7 +2081,17 @@
           "scope": "Адресность и цель средств; не доказывает автоматически двойное финансирование, форму конкретной помощи или процедуру северного завоза.",
           "status": "targeted_text_or_official_explanation_read_not_full_case_verification"
         }
-      ]
+      ],
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_54572/6886719982ec257c9ee66e2f8cd6f423c1629371/",
+        "https://www.consultant.ru/document/cons_doc_LAW_54572/2d340398c3243ee82f5596dd3c46d550d6674df3/"
+      ],
+      "review_date": "2026-11-28",
+      "targeted_option_review": {
+        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "option_count": 5,
+        "remaining": "Форма финансового участия, условия обеих выплат, вид затрат, стадия соглашения; конкретные ограничения статьи 10.1 зависят от формы участия."
+      }
     },
     {
       "case_key": "bank-legal-2026-056",
@@ -2012,10 +2102,22 @@
       "resolved_source_url": null,
       "legal_basis": "НК РФ, глава 26, в частности статьи 342 и 342.4: ставки и коэффициенты НДПИ для соответствующих полезных ископаемых. Источники: https://www.nalog.gov.ru/rn77/taxation/tax_legislation/",
       "legal_urls": [
-        "https://www.nalog.gov.ru/rn77/taxation/tax_legislation/"
+        "https://www.nalog.gov.ru/rn77/taxation/tax_legislation/",
+        "https://www.consultant.ru/document/cons_doc_LAW_28165/9522f95c4165c757c0d4d4095f49cd1e62fad7f0/",
+        "https://www.consultant.ru/document/cons_doc_LAW_28165/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_28165/9522f95c4165c757c0d4d4095f49cd1e62fad7f0/",
+        "https://www.consultant.ru/document/cons_doc_LAW_28165/"
+      ],
+      "review_date": "2026-11-28",
+      "targeted_option_review": {
+        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "option_count": 5,
+        "remaining": "Вид ископаемого, налоговый период, характеристики залежи, точные применимые статьи и ставки; числовые коэффициенты не проверялись для конкретного участка."
+      }
     },
     {
       "case_key": "bank-legal-2026-057",
@@ -2026,10 +2128,22 @@
       "resolved_source_url": null,
       "legal_basis": "БК РФ, статья 78: опубликованные условия и процедура отбора получателей субсидии. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
       "legal_urls": [
-        "https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721"
+        "https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/1b6959f23cc516d0e11ddc2e213ca2dca83560df/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/cc1a194570930b60765fa0b326aae1fd5a41d5bc/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/1b6959f23cc516d0e11ddc2e213ca2dca83560df/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/cc1a194570930b60765fa0b326aae1fd5a41d5bc/"
+      ],
+      "review_date": "2026-11-28",
+      "targeted_option_review": {
+        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "option_count": 5,
+        "remaining": "Региональный порядок отбора, стадия процедуры, механизм исправления протокола или повторного отбора; конкретное средство защиты проверяется отдельно."
+      }
     },
     {
       "case_key": "bank-legal-2026-058",
@@ -2040,10 +2154,20 @@
       "resolved_source_url": null,
       "legal_basis": "БК РФ, статья 78: возмещение предусмотренных программой видов затрат. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
       "legal_urls": [
-        "https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721"
+        "https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/1b6959f23cc516d0e11ddc2e213ca2dca83560df/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/1b6959f23cc516d0e11ddc2e213ca2dca83560df/"
+      ],
+      "review_date": "2026-11-28",
+      "targeted_option_review": {
+        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "option_count": 5,
+        "remaining": "Договор лизинга, вид получателя, утверждённый перечень расходов и период, основания иных мер."
+      }
     },
     {
       "case_key": "bank-legal-2026-059",
@@ -2054,10 +2178,20 @@
       "resolved_source_url": null,
       "legal_basis": "НК РФ, статья 12: компетенция по установлению налогов и соответствующих элементов налогообложения. Источники: https://www.nalog.gov.ru/rn77/taxation/tax_legislation/",
       "legal_urls": [
-        "https://www.nalog.gov.ru/rn77/taxation/tax_legislation/"
+        "https://www.nalog.gov.ru/rn77/taxation/tax_legislation/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19671/ab54b1f6e016638e006428e90971b05636b17cbf/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_19671/ab54b1f6e016638e006428e90971b05636b17cbf/"
+      ],
+      "review_date": "2026-11-28",
+      "targeted_option_review": {
+        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "option_count": 5,
+        "remaining": "Муниципальный акт, специальный инвестиционный режим при наличии, содержание компенсационного обещания и компетенция подписанта."
+      }
     },
     {
       "case_key": "bank-legal-2026-060",
@@ -2068,10 +2202,22 @@
       "resolved_source_url": null,
       "legal_basis": "БК РФ, статьи 139, 140 и 139.1: формы межбюджетных трансфертов из бюджета субъекта РФ. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
       "legal_urls": [
-        "https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721"
+        "https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/8196c04ca89900439f387e81fad411d6965f41cf/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/0768764f9a71e5ee941a99e42ec40ceae905649e/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/8196c04ca89900439f387e81fad411d6965f41cf/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/0768764f9a71e5ee941a99e42ec40ceae905649e/"
+      ],
+      "review_date": "2026-11-28",
+      "targeted_option_review": {
+        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "option_count": 5,
+        "remaining": "Принадлежность моста, полномочие, конкретная форма трансферта; субвенция относится к переданному государственному полномочию, не к любому ремонту."
+      }
     },
     {
       "case_key": "bank-legal-2026-061",
@@ -2083,7 +2229,8 @@
       "legal_basis": "Федеральный закон №44-ФЗ, статьи 8 и 31; Федеральный закон №135-ФЗ, статья 17. Источники: https://pravo.gov.ru/",
       "legal_urls": [
         "https://pravo.gov.ru/",
-        "https://www.consultant.ru/document/cons_doc_LAW_144624/0c4ec341947f98654432292ddfd7066e3200d7fd/"
+        "https://www.consultant.ru/document/cons_doc_LAW_144624/0c4ec341947f98654432292ddfd7066e3200d7fd/",
+        "https://www.consultant.ru/document/cons_doc_LAW_144624/be7f337d9b35705ac035531878c8d15c2b09b36d/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
@@ -2095,7 +2242,16 @@
           "scope": "Равные условия конкуренции и запрет необоснованного ограничения; применимость 44-ФЗ к учреждению и специальным требованиям подлежит проверке.",
           "status": "targeted_text_or_official_explanation_read_not_full_case_verification"
         }
-      ]
+      ],
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_144624/be7f337d9b35705ac035531878c8d15c2b09b36d/"
+      ],
+      "review_date": "2026-11-28",
+      "targeted_option_review": {
+        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "option_count": 5,
+        "remaining": "Стадия закупки, основания исправления извещения, конкретные требования и критерии, применимость статьи 17 135-ФЗ; источник статьи 31 проверен, прочие нормы требуют адресной сверки."
+      }
     },
     {
       "case_key": "bank-legal-2026-062",
@@ -2106,10 +2262,20 @@
       "resolved_source_url": null,
       "legal_basis": "БК РФ, статьи 36 и 264.1: прозрачность бюджета и бюджетная отчётность. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
       "legal_urls": [
-        "https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721"
+        "https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/a822d521b7e939dc36b96b17da82719f28c22c59/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/a822d521b7e939dc36b96b17da82719f28c22c59/"
+      ],
+      "review_date": "2026-11-28",
+      "targeted_option_review": {
+        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "option_count": 5,
+        "remaining": "Вид отчётности, применимые формы и правила раскрытия, учётная дата и состав показателей."
+      }
     },
     {
       "case_key": "bank-legal-2026-063",
@@ -2176,7 +2342,16 @@
           "scope": "Контракты в пределах лимитов, специальные основания многолетних обязательств; не все долгосрочные контракты запрещены.",
           "status": "targeted_text_or_official_explanation_read_not_full_case_verification"
         }
-      ]
+      ],
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/aa129af3559dd1fc2b3201c05ced33582fe3d193/"
+      ],
+      "review_date": "2026-11-28",
+      "targeted_option_review": {
+        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "option_count": 5,
+        "remaining": "Тип заказчика, предмет договора, период лимитов, условия многолетнего решения, специальные основания."
+      }
     },
     {
       "case_key": "bank-legal-2026-065",
@@ -2187,10 +2362,22 @@
       "resolved_source_url": null,
       "legal_basis": "НК РФ, глава 26.4: налогообложение при выполнении соглашений о разделе продукции. Источники: https://www.nalog.gov.ru/rn77/taxation/tax_legislation/",
       "legal_urls": [
-        "https://www.nalog.gov.ru/rn77/taxation/tax_legislation/"
+        "https://www.nalog.gov.ru/rn77/taxation/tax_legislation/",
+        "https://www.consultant.ru/document/cons_doc_LAW_28165/9c76493a68e26450c7ea3652931850d0c0944084/",
+        "https://www.consultant.ru/document/cons_doc_LAW_28165/01ecaf4b9b3e38c6a79369856ac198257bb4f202/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_28165/9c76493a68e26450c7ea3652931850d0c0944084/",
+        "https://www.consultant.ru/document/cons_doc_LAW_28165/01ecaf4b9b3e38c6a79369856ac198257bb4f202/"
+      ],
+      "review_date": "2026-11-28",
+      "targeted_option_review": {
+        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "option_count": 5,
+        "remaining": "Дата заключения соглашения и переходный режим статьи 346.35, конкретные условия раздела, нормативы зачисления и фактические расчёты."
+      }
     },
     {
       "case_key": "bank-legal-2026-066",
