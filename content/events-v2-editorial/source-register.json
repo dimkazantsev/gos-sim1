@@ -729,7 +729,18 @@
           "scope": "Уведомление и урегулирование в применимом порядке, отвод в предусмотренных случаях; специальный порядок комиссии проверяется отдельно.",
           "status": "targeted_text_or_official_explanation_read_not_full_case_verification"
         }
-      ]
+      ],
+      "targeted_option_review": {
+        "date": "2026-11-27",
+        "norm": "273-ФЗ от 25.12.2008, ст. 10–11",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_82959/5d02242ebd04c398d2acf7c53dbc79659b85e8f3/",
+          "https://www.consultant.ru/document/cons_doc_LAW_82959/64ca591ea83268ee3d33f6e564cbcac0d3a073d9/"
+        ],
+        "options": 5,
+        "status": "specific_text_read_and_alternatives_reviewed_under_stated_conditions_not_full_case_acceptance",
+        "remaining": "Специальный акт комиссии и порядок повторной оценки остаются условиями исполнения; родство не доказывает преступление."
+      }
     },
     {
       "case_key": "bank-legal-2026-010",
@@ -935,7 +946,17 @@
           "scope": "Доступ к общедоступному водному объекту и бесплатное личное/бытовое использование с предусмотренными исключениями; отдельные услуги, статус участка и смета проверяются.",
           "status": "targeted_text_or_official_explanation_read_not_full_case_verification"
         }
-      ]
+      ],
+      "targeted_option_review": {
+        "date": "2026-11-27",
+        "norm": "ВК РФ, ст. 6, ч. 1–2, 6–8",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_60683/9a073f7358f63cc80f8bf4b9406df3978054e8dc/"
+        ],
+        "options": 5,
+        "status": "specific_text_read_and_alternatives_reviewed_under_stated_conditions_not_full_case_acceptance",
+        "remaining": "Проверка права на береговую полосу подтверждена условиями учебной истории; договор аренды, закупочный порядок и конкретный проект проверяются при исполнении."
+      }
     },
     {
       "case_key": "bank-legal-2026-024",
@@ -1277,7 +1298,17 @@
           "scope": "Возврат целевого остатка и последующее финансирование прежней цели при подтверждённой потребности; проверить источник, исключения и конкретный порядок.",
           "status": "targeted_text_or_official_explanation_read_not_full_case_verification"
         }
-      ]
+      ],
+      "targeted_option_review": {
+        "date": "2026-11-27",
+        "norm": "БК РФ, ст. 242, п. 5",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/200d8f9e0aed34b95bc6527693824cb356109b83/"
+        ],
+        "options": 5,
+        "status": "specific_text_read_and_alternatives_reviewed_under_stated_conditions_not_full_case_acceptance",
+        "remaining": "Порядок возврата федеральных субсидий в конкретном случае и контрактные обязательства требуют самостоятельной проверки; 30-дневный срок для отдельных решений главного администратора не перенесён автоматически на федеральную конструкцию."
+      }
     },
     {
       "case_key": "bank-legal-2026-047",
@@ -1405,7 +1436,17 @@
           "scope": "Функциональная независимость, уполномоченный аудитор и федеральные стандарты; не означает произвольного назначения внешнего эксперта.",
           "status": "targeted_text_or_official_explanation_read_not_full_case_verification"
         }
-      ]
+      ],
+      "targeted_option_review": {
+        "date": "2026-11-27",
+        "norm": "БК РФ, ст. 160.2-1, п. 3–5",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/6fdfc424277aebba215512c7a68a5077c68e1337/"
+        ],
+        "options": 5,
+        "status": "specific_text_read_and_alternatives_reviewed_under_stated_conditions_not_full_case_acceptance",
+        "remaining": "Сами федеральные стандарты, ведомственный акт, основания привлечения эксперта и объём проверки не проверены полностью."
+      }
     },
     {
       "case_key": "bank-legal-2026-054",
@@ -1583,7 +1624,18 @@
           "scope": "Договорные условия кредита и законное основание; конкретный заявитель и основания не подтверждены автоматически.",
           "status": "targeted_text_or_official_explanation_read_not_full_case_verification"
         }
-      ]
+      ],
+      "targeted_option_review": {
+        "date": "2026-11-27",
+        "norm": "НК РФ, ст. 66–67",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_19671/a89f6e27872ba595439ca2902f233cd969c41b56/",
+          "https://www.consultant.ru/document/cons_doc_LAW_19671/d742ffa792b4e20830fd93a2124bfcc027bd03d6/"
+        ],
+        "options": 5,
+        "status": "specific_text_read_and_alternatives_reviewed_under_stated_conditions_not_full_case_acceptance",
+        "remaining": "Проверены правовая природа и договорный режим кредита. Правила конкретной субсидии и основание модернизации не доказаны."
+      }
     },
     {
       "case_key": "bank-legal-2026-064",
@@ -1695,7 +1747,8 @@
       "legal_basis": "БК РФ, статьи 99 и 107: состав государственного долга субъекта РФ. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
       "legal_urls": [
         "https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
-        "https://www.consultant.ru/document/cons_doc_LAW_19702/95351b068ed8020a8891410884e60ecb81f26164/"
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/95351b068ed8020a8891410884e60ecb81f26164/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/7b5f77362fb1983215e0525ce8a2b08de83e1dbf/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
@@ -1707,7 +1760,18 @@
           "scope": "Обязательства из государственных гарантий включаются в долг; отдельная сверка пределов и бюджетного обеспечения по ст. 107.",
           "status": "targeted_text_or_official_explanation_read_not_full_case_verification"
         }
-      ]
+      ],
+      "targeted_option_review": {
+        "date": "2026-11-27",
+        "norm": "БК РФ, ст. 99, п. 2–3; ст. 107",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/95351b068ed8020a8891410884e60ecb81f26164/",
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/7b5f77362fb1983215e0525ce8a2b08de83e1dbf/"
+        ],
+        "options": 5,
+        "status": "specific_text_read_and_alternatives_reviewed_under_stated_conditions_not_full_case_acceptance",
+        "remaining": "Конкретный предел долга зависит от статуса субъекта и бюджетных данных; фактический размер и выплата гарантии не рассчитаны."
+      }
     },
     {
       "case_key": "bank-legal-2026-070",
@@ -1745,7 +1809,17 @@
           "scope": "Обязанность заказчика направить требование об уплате неустойки; основания освобождения, списания и взыскания не заменяются голосованием.",
           "status": "targeted_text_or_official_explanation_read_not_full_case_verification"
         }
-      ]
+      ],
+      "targeted_option_review": {
+        "date": "2026-11-27",
+        "norm": "44-ФЗ, ст. 34, ч. 6–9, 9.1, 14–15",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_144624/c5cbc4acc59ffed792a3921dbc18900d2d0f7eb1/"
+        ],
+        "options": 5,
+        "status": "specific_text_read_and_alternatives_reviewed_under_stated_conditions_not_full_case_acceptance",
+        "remaining": "Не определены цена контракта, объём исполнения и ставка на дату уплаты; сумму пени не выдумывать."
+      }
     },
     {
       "case_key": "bank-legal-2026-072",
@@ -1919,7 +1993,17 @@
           "scope": "Компетенция представительного органа муниципального района относительно поселений; не подменяет полномочие субъекта по ст. 58.",
           "status": "targeted_text_or_official_explanation_read_not_full_case_verification"
         }
-      ]
+      ],
+      "targeted_option_review": {
+        "date": "2026-11-27",
+        "norm": "БК РФ, ст. 58",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/1e231e90031b99643b29b6eb4579016c2a06533f/"
+        ],
+        "options": 5,
+        "status": "specific_text_read_and_alternatives_reviewed_under_stated_conditions_not_full_case_acceptance",
+        "remaining": "Конкретный вид регионального норматива, налог, муниципальная структура и действующий акт не определены; специальный режим не считается полностью проверенным."
+      }
     },
     {
       "case_key": "bank-legal-2026-081",
@@ -2009,7 +2093,17 @@
           "scope": "Безвозмездный пользователь не признаётся плательщиком по данному участку; исправление расчёта и статус иных прав требуют самостоятельной проверки.",
           "status": "targeted_text_or_official_explanation_read_not_full_case_verification"
         }
-      ]
+      ],
+      "targeted_option_review": {
+        "date": "2026-11-27",
+        "norm": "НК РФ, ст. 388, п. 1–2",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_28165/7266761567c503394be534d7d5d98b99a18b5816/"
+        ],
+        "options": 5,
+        "status": "specific_text_read_and_alternatives_reviewed_under_stated_conditions_not_full_case_acceptance",
+        "remaining": "Подтверждён вывод о плательщике по условиям истории; порядок исправления и местные ставки требуют самостоятельной проверки."
+      }
     },
     {
       "case_key": "bank-legal-2026-086",
@@ -2360,7 +2454,17 @@
           "scope": "Описание по требуемым характеристикам, ограничения товарных знаков и специальные исключения; конкретные тесты должны быть нейтральными.",
           "status": "targeted_text_or_official_explanation_read_not_full_case_verification"
         }
-      ]
+      ],
+      "targeted_option_review": {
+        "date": "2026-11-27",
+        "norm": "44-ФЗ, ст. 33, ч. 1",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_144624/d6aec91603ff628ea274b8552ce2849e06e0aa4c/"
+        ],
+        "options": 5,
+        "status": "specific_text_read_and_alternatives_reviewed_under_stated_conditions_not_full_case_acceptance",
+        "remaining": "Применимый национальный режим, стандарты, закупочная документация и правила обучения проверяются отдельно."
+      }
     },
     {
       "case_key": "bank-legal-2026-105",
