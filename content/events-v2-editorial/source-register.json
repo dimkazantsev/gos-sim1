@@ -841,10 +841,24 @@
       "resolved_source_url": null,
       "legal_basis": "БК РФ, статьи 51, 57 и 62: разграничение неналоговых доходов между бюджетами. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
       "legal_urls": [
-        "https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721"
+        "https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/ac6e608d6924dad3d4075fd52917825bccb9ddad/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/5eba06c97787dfb56cc9f9fba22be2f32cfc3762/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/92bc1a67988b0ea36092bfe138fe8eb9b6120ae5/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/ac6e608d6924dad3d4075fd52917825bccb9ddad/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/5eba06c97787dfb56cc9f9fba22be2f32cfc3762/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/92bc1a67988b0ea36092bfe138fe8eb9b6120ae5/"
+      ],
+      "review_date": "2026-11-28",
+      "targeted_option_review": {
+        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "option_count": 5,
+        "remaining": "Категория земель, собственник, вид платежа, нормативы передачи по статье 58 БК РФ и бюджетные решения."
+      }
     },
     {
       "case_key": "bank-legal-2026-011",
@@ -879,10 +893,20 @@
       "resolved_source_url": null,
       "legal_basis": "НК РФ, статья 374: объект налогообложения налогом на имущество организаций. Источники: https://www.nalog.gov.ru/rn77/taxation/tax_legislation/",
       "legal_urls": [
-        "https://www.nalog.gov.ru/rn77/taxation/tax_legislation/"
+        "https://www.nalog.gov.ru/rn77/taxation/tax_legislation/",
+        "https://www.consultant.ru/document/cons_doc_LAW_28165/d396a8e0699c51393ab5f6b8ad4c2ad8d408c553/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_28165/d396a8e0699c51393ab5f6b8ad4c2ad8d408c553/"
+      ],
+      "review_date": "2026-11-28",
+      "targeted_option_review": {
+        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "option_count": 5,
+        "remaining": "Вид собственности и базы для здания, налоговые регистры и порядок корректировки."
+      }
     },
     {
       "case_key": "bank-legal-2026-013",
@@ -945,10 +969,22 @@
       "resolved_source_url": null,
       "legal_basis": "БК РФ, статьи 115–115.2: предоставление государственных гарантий и проверка установленных условий. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
       "legal_urls": [
-        "https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721"
+        "https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/7d46af0943bb2f05af44295d8d77a6f0f385d33c/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/7e1a4f4bf9841bbbd435901656ba800818fe66af/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/7d46af0943bb2f05af44295d8d77a6f0f385d33c/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/7e1a4f4bf9841bbbd435901656ba800818fe66af/"
+      ],
+      "review_date": "2026-11-28",
+      "targeted_option_review": {
+        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "option_count": 5,
+        "remaining": "Статус и собственность принципала, программа гарантий, регресс, обеспечение и специальные исключения по статьям 115–115.3 БК РФ."
+      }
     },
     {
       "case_key": "bank-legal-2026-016",
@@ -983,10 +1019,22 @@
       "resolved_source_url": null,
       "legal_basis": "БК РФ, статьи 106–107: ограничения заимствований и государственного долга субъекта РФ. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
       "legal_urls": [
-        "https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721"
+        "https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/6e48b1d00db0df46678514c0f9d3dd364e9dacf9/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/7b5f77362fb1983215e0525ce8a2b08de83e1dbf/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/6e48b1d00db0df46678514c0f9d3dd364e9dacf9/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/7b5f77362fb1983215e0525ce8a2b08de83e1dbf/"
+      ],
+      "review_date": "2026-11-28",
+      "targeted_option_review": {
+        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "option_count": 5,
+        "remaining": "Действующий региональный бюджет, долговая книга, специальные исключения 2026 года и меры по ст. 130 БК РФ; не утверждается универсальный процент предела."
+      }
     },
     {
       "case_key": "bank-legal-2026-018",
@@ -997,10 +1045,20 @@
       "resolved_source_url": null,
       "legal_basis": "Федеральный закон №44-ФЗ, статья 24: способы определения поставщика и случаи закрытых конкурентных способов. Источники: https://pravo.gov.ru/",
       "legal_urls": [
-        "https://pravo.gov.ru/"
+        "https://pravo.gov.ru/",
+        "https://www.consultant.ru/document/cons_doc_LAW_144624/1a53d0d0a68bafedeba16e5a1d0b19e4ad8c2a76/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_144624/1a53d0d0a68bafedeba16e5a1d0b19e4ad8c2a76/"
+      ],
+      "review_date": "2026-11-28",
+      "targeted_option_review": {
+        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "option_count": 5,
+        "remaining": "Статус заказчика, правовой вид ограничений, наличие конкретного основания закрытого способа; отметка поставщика сама по себе не доказывает государственную тайну."
+      }
     },
     {
       "case_key": "bank-legal-2026-019",
@@ -1011,10 +1069,20 @@
       "resolved_source_url": null,
       "legal_basis": "НК РФ, статья 343.1: условия налогового вычета по НДПИ при добыче угля. Источники: https://www.nalog.gov.ru/rn77/taxation/tax_legislation/",
       "legal_urls": [
-        "https://www.nalog.gov.ru/rn77/taxation/tax_legislation/"
+        "https://www.nalog.gov.ru/rn77/taxation/tax_legislation/",
+        "https://klerk.systems/docs/nk_rf/article/343.1/date20261001/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "checked_norm_urls": [
+        "https://klerk.systems/docs/nk_rf/article/343.1/date20261001/"
+      ],
+      "review_date": "2026-11-28",
+      "targeted_option_review": {
+        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "option_count": 5,
+        "remaining": "Предел вычета, установленный перечень затрат, участок недр, налоговый период, выбранный режим признания расходов."
+      }
     },
     {
       "case_key": "bank-legal-2026-020",
@@ -1025,10 +1093,22 @@
       "resolved_source_url": null,
       "legal_basis": "БК РФ, статьи 6, 215.1 и 217.1: исполнение бюджета и кассовый план. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
       "legal_urls": [
-        "https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721"
+        "https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/24a94562b0b0557393897b9d9ef6f591ff1fb19b/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/c336c2a2d3276d558fe6d7c58d8bbe778908254d/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/24a94562b0b0557393897b9d9ef6f591ff1fb19b/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/c336c2a2d3276d558fe6d7c58d8bbe778908254d/"
+      ],
+      "review_date": "2026-11-28",
+      "targeted_option_review": {
+        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "option_count": 5,
+        "remaining": "Доступные остатки, условия краткосрочного финансирования, обязательные сроки платежей и порядок изменения кассового плана."
+      }
     },
     {
       "case_key": "bank-legal-2026-021",
@@ -1039,10 +1119,22 @@
       "resolved_source_url": null,
       "legal_basis": "НК РФ, статьи 164–165: нулевая ставка НДС по отдельным операциям и их подтверждение. Источники: https://www.nalog.gov.ru/rn77/taxation/tax_legislation/",
       "legal_urls": [
-        "https://www.nalog.gov.ru/rn77/taxation/tax_legislation/"
+        "https://www.nalog.gov.ru/rn77/taxation/tax_legislation/",
+        "https://www.consultant.ru/document/cons_doc_LAW_28165/e54dfbc2dc809d2678879853e2e9be6861fd24be/",
+        "https://www.nalog.gov.ru/rn77/taxation/taxes/nds/exporter/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_28165/e54dfbc2dc809d2678879853e2e9be6861fd24be/",
+        "https://www.nalog.gov.ru/rn77/taxation/taxes/nds/exporter/"
+      ],
+      "review_date": "2026-11-28",
+      "targeted_option_review": {
+        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "option_count": 5,
+        "remaining": "Вид экспорта (ЕАЭС или иной), дата реализации, состав реестров, срок подтверждения и применимая ставка внутренней операции."
+      }
     },
     {
       "case_key": "bank-legal-2026-022",
@@ -1299,10 +1391,22 @@
       "resolved_source_url": null,
       "legal_basis": "Федеральный закон от 08.05.2010 №83-ФЗ, статья 30, часть 20: исполнение исполнительных документов за счёт средств бюджетного учреждения; БК РФ, глава 24.1 — специальный режим бюджетных средств. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
       "legal_urls": [
-        "https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721"
+        "https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
+        "https://www.consultant.ru/document/cons_doc_LAW_100193/2a8b22eb61cb32d23209f230b22eef16b8002e78/",
+        "https://alania.roskazna.gov.ru/priem-obrascheniy/vzyskanie-na-sredstva/faq"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_100193/2a8b22eb61cb32d23209f230b22eef16b8002e78/",
+        "https://alania.roskazna.gov.ru/priem-obrascheniy/vzyskanie-na-sredstva/faq"
+      ],
+      "review_date": "2026-11-28",
+      "targeted_option_review": {
+        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "option_count": 5,
+        "remaining": "Вид исполнительного документа, надлежащий орган ведения лицевого счёта, сроки и специальные основания возврата/приостановления; не переносить автоматически главу 24.1 БК РФ с казённого учреждения."
+      }
     },
     {
       "case_key": "bank-legal-2026-035",
@@ -1313,10 +1417,20 @@
       "resolved_source_url": null,
       "legal_basis": "НК РФ, статья 378.2: особенности определения налоговой базы по кадастровой стоимости. Источники: https://www.nalog.gov.ru/rn77/taxation/tax_legislation/",
       "legal_urls": [
-        "https://www.nalog.gov.ru/rn77/taxation/tax_legislation/"
+        "https://www.nalog.gov.ru/rn77/taxation/tax_legislation/",
+        "https://www.consultant.ru/document/cons_doc_LAW_28165/f6758978b92339b7e996fde13e5104caec7531d2/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_28165/f6758978b92339b7e996fde13e5104caec7531d2/"
+      ],
+      "review_date": "2026-11-28",
+      "targeted_option_review": {
+        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "option_count": 5,
+        "remaining": "Региональный закон, тип объекта, перечень соответствующего периода, дата определения кадастровой стоимости и основания пересмотра."
+      }
     },
     {
       "case_key": "bank-legal-2026-036",
@@ -1327,10 +1441,22 @@
       "resolved_source_url": null,
       "legal_basis": "НК РФ, статья 394: дифференциация земельных ставок и условия применения пониженной ставки. Источники: https://www.nalog.gov.ru/rn77/taxation/tax_legislation/",
       "legal_urls": [
-        "https://www.nalog.gov.ru/rn77/taxation/tax_legislation/"
+        "https://www.nalog.gov.ru/rn77/taxation/tax_legislation/",
+        "https://www.consultant.ru/document/cons_doc_LAW_28165/fd2ac88b2311a6053a128cfa43aa07672e826213/",
+        "https://www.nalog.gov.ru/rn77/news/activities_fts/16639383/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_28165/fd2ac88b2311a6053a128cfa43aa07672e826213/",
+        "https://www.nalog.gov.ru/rn77/news/activities_fts/16639383/"
+      ],
+      "review_date": "2026-11-28",
+      "targeted_option_review": {
+        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "option_count": 5,
+        "remaining": "Категория, разрешённое и фактическое использование, муниципальный акт, кадастровая стоимость и отдельные ограничения статьи 394; КС 52-П касается ИЖС и не переносится автоматически."
+      }
     },
     {
       "case_key": "bank-legal-2026-037",
@@ -1341,10 +1467,22 @@
       "resolved_source_url": null,
       "legal_basis": "НК РФ, статьи 63–64: органы и условия изменения срока уплаты налога. Источники: https://www.nalog.gov.ru/rn77/taxation/tax_legislation/",
       "legal_urls": [
-        "https://www.nalog.gov.ru/rn77/taxation/tax_legislation/"
+        "https://www.nalog.gov.ru/rn77/taxation/tax_legislation/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19671/082f5502d0c3170dd6a91b3a71905e9282c8aa5b/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19671/b9ebbf37f9f90df9d4a294197b5f42b9e341af0d/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_19671/082f5502d0c3170dd6a91b3a71905e9282c8aa5b/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19671/b9ebbf37f9f90df9d4a294197b5f42b9e341af0d/"
+      ],
+      "review_date": "2026-11-28",
+      "targeted_option_review": {
+        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "option_count": 5,
+        "remaining": "Вид платежа, основания ст. 64, орган по ст. 63, требования к обеспечению и согласованию."
+      }
     },
     {
       "case_key": "bank-legal-2026-038",
@@ -1355,10 +1493,20 @@
       "resolved_source_url": null,
       "legal_basis": "НК РФ, статьи 8 и 252: налоговая обязанность и условия признания расходов для налога на прибыль. Источники: https://www.nalog.gov.ru/rn77/taxation/tax_legislation/",
       "legal_urls": [
-        "https://www.nalog.gov.ru/rn77/taxation/tax_legislation/"
+        "https://www.nalog.gov.ru/rn77/taxation/tax_legislation/",
+        "https://www.consultant.ru/document/cons_doc_LAW_28165/ef9b3e2f8e3046127b2ef57fccf5141b694e2138/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_28165/ef9b3e2f8e3046127b2ef57fccf5141b694e2138/"
+      ],
+      "review_date": "2026-11-28",
+      "targeted_option_review": {
+        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "option_count": 5,
+        "remaining": "Характер соглашения, связь расходов с деятельностью, нормы статьи 270 и специальные природоохранные платежи."
+      }
     },
     {
       "case_key": "bank-legal-2026-039",
@@ -1369,10 +1517,22 @@
       "resolved_source_url": null,
       "legal_basis": "Федеральный закон от 10.01.2006 №16-ФЗ об Особой экономической зоне в Калининградской области; НК РФ, статьи 288.1 и 385.1: специальные условия налогового режима. Источники: https://www.nalog.gov.ru/rn77/service/complaint_decision/10196747/",
       "legal_urls": [
-        "https://www.nalog.gov.ru/rn77/service/complaint_decision/10196747/"
+        "https://www.nalog.gov.ru/rn77/service/complaint_decision/10196747/",
+        "https://www.consultant.ru/document/cons_doc_LAW_28165/c437b81e783230c00b32042c001ed41726a92020/",
+        "https://www.consultant.ru/document/cons_doc_LAW_28165/8f57f0be0e210ea6e11ba916cccd7b2ccbcc542d/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_28165/c437b81e783230c00b32042c001ed41726a92020/",
+        "https://www.consultant.ru/document/cons_doc_LAW_28165/8f57f0be0e210ea6e11ba916cccd7b2ccbcc542d/"
+      ],
+      "review_date": "2026-11-28",
+      "targeted_option_review": {
+        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "option_count": 5,
+        "remaining": "Реестр, условия 16-ФЗ, инвестиционный проект, раздельный учёт, период и применимые ограничения налоговых преимуществ."
+      }
     },
     {
       "case_key": "bank-legal-2026-040",
