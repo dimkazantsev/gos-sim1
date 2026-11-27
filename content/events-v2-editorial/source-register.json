@@ -2489,7 +2489,7 @@
       ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
-      "review_date": "2026-11-27",
+      "review_date": "2026-11-28",
       "source_scope": "specific_norm_and_related_search_results_partial",
       "legal_evidence": [
         {
@@ -2506,7 +2506,16 @@
           "scope": "Уведомление и урегулирование в применимом порядке, отвод в предусмотренных случаях; специальный порядок комиссии проверяется отдельно.",
           "status": "targeted_text_or_official_explanation_read_not_full_case_verification"
         }
-      ]
+      ],
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_144624/b64e0c2e16f5016ebbfd89affc9ba333cc094b20/",
+        "https://www.consultant.ru/document/cons_doc_LAW_82959/5d02242ebd04c398d2acf7c53dbc79659b85e8f3/"
+      ],
+      "targeted_option_review": {
+        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "option_count": 5,
+        "remaining": "Кадровый резерв — организационный инструмент, не самостоятельное назначение; конкретные внутренние документы и состав комиссии проверяются отдельно."
+      }
     },
     {
       "case_key": "bank-legal-2026-103",
@@ -2518,12 +2527,24 @@
       "legal_basis": "44-ФЗ, ст. 8, 24, 93: конкурентный способ или закупка у единственного поставщика должны иметь законное основание. В истории прямо задана цель обхода конкуренции и единая потребность без самостоятельных причин разделения. Конкретный способ, пороги и исключения нужно проверять по обстоятельствам.",
       "legal_urls": [
         "https://www.consultant.ru/document/cons_doc_LAW_144624/0c4ec341947f98654432292ddfd7066e3200d7fd/",
-        "https://www.consultant.ru/document/cons_doc_LAW_144624/"
+        "https://www.consultant.ru/document/cons_doc_LAW_144624/",
+        "https://www.consultant.ru/document/cons_doc_LAW_144624/1a53d0d0a68bafedeba16e5a1d0b19e4ad8c2a76/",
+        "https://www.consultant.ru/document/cons_doc_LAW_144624/ab3273e757a9e718cbb3741596bc36eb8138e4f6/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
-      "review_date": "2026-11-27",
-      "source_scope": "specific_norm_and_related_search_results_partial"
+      "review_date": "2026-11-28",
+      "source_scope": "specific_norm_and_related_search_results_partial",
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_144624/0c4ec341947f98654432292ddfd7066e3200d7fd/",
+        "https://www.consultant.ru/document/cons_doc_LAW_144624/1a53d0d0a68bafedeba16e5a1d0b19e4ad8c2a76/",
+        "https://www.consultant.ru/document/cons_doc_LAW_144624/ab3273e757a9e718cbb3741596bc36eb8138e4f6/"
+      ],
+      "targeted_option_review": {
+        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "option_count": 5,
+        "remaining": "Заказчик определяет способ в пределах закона; цена, лимиты и специальные основания не заданы."
+      }
     },
     {
       "case_key": "bank-legal-2026-104",
@@ -2574,8 +2595,17 @@
       ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
-      "review_date": "2026-11-27",
-      "source_scope": "specific_norm_and_related_search_results_partial"
+      "review_date": "2026-11-28",
+      "source_scope": "specific_norm_and_related_search_results_partial",
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_144624/17c58c1903f7b6212924ba9ce701489655e9a8e0/",
+        "https://www.consultant.ru/document/cons_doc_LAW_144624/c5cbc4acc59ffed792a3921dbc18900d2d0f7eb1/"
+      ],
+      "targeted_option_review": {
+        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "option_count": 5,
+        "remaining": "Заказчик и уполномоченные лица обеспечивают приёмку; обязательные претензионные действия и допустимость изменения или прекращения контракта проверяются по конкретному договору."
+      }
     },
     {
       "case_key": "bank-legal-2026-106",
@@ -2591,8 +2621,17 @@
       ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
-      "review_date": "2026-11-27",
-      "source_scope": "specific_norm_and_related_search_results_partial"
+      "review_date": "2026-11-28",
+      "source_scope": "specific_norm_and_related_search_results_partial",
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_144624/e8d320a00429957ef17314fadbfcaf6d7537be39/",
+        "https://www.consultant.ru/document/cons_doc_LAW_144624/ac94bc0b90bc7c6c0376c2b9e3d5bf36a138ec1b/"
+      ],
+      "targeted_option_review": {
+        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "option_count": 5,
+        "remaining": "Судебный маршрут зависит от требования, подсудности и статуса заявителя; контрольное обращение не гарантирует отмену контракта."
+      }
     },
     {
       "case_key": "bank-legal-2026-107",
@@ -2603,12 +2642,22 @@
       "resolved_source_url": null,
       "legal_basis": "ГК РФ, ст. 182–183: учитываются источник полномочия, обстоятельства представительства и допустимость последующего одобрения. Бланк не доказывает полномочие. Для муниципальной закупки одобрение не может обходить обязательную закупочную или бюджетную процедуру; конкретные последствия требуют квалификации договора.",
       "legal_urls": [
-        "https://www.consultant.ru/document/cons_doc_LAW_5142/b76233cd456b40e2f35c7980c40e071767ffa16a/"
+        "https://www.consultant.ru/document/cons_doc_LAW_5142/b76233cd456b40e2f35c7980c40e071767ffa16a/",
+        "https://www.consultant.ru/document/cons_doc_LAW_5142/0cf4748cf87a798af8d1bcc2115eb1bcc4cede31/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
-      "review_date": "2026-11-27",
-      "source_scope": "specific_norm_and_related_search_results_partial"
+      "review_date": "2026-11-28",
+      "source_scope": "specific_norm_and_related_search_results_partial",
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_5142/0cf4748cf87a798af8d1bcc2115eb1bcc4cede31/",
+        "https://www.consultant.ru/document/cons_doc_LAW_5142/b76233cd456b40e2f35c7980c40e071767ffa16a/"
+      ],
+      "targeted_option_review": {
+        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "option_count": 5,
+        "remaining": "Конкретное закупочное и бюджетное основание не установлено; одобрение не должно обходить специальные правила. Не обещать автоматическую оплату полученного имущества."
+      }
     },
     {
       "case_key": "bank-legal-2026-108",
@@ -2619,12 +2668,22 @@
       "resolved_source_url": null,
       "legal_basis": "ГК РФ, ст. 621, п. 2: продолжение пользования после истечения договора без возражений арендодателя может возобновить аренду на неопределённый срок. Для публичного имущества действуют специальные требования; переход собственности требует отдельного основания. Специальные условия торгов и продления пока не проверены полностью.",
       "legal_urls": [
-        "https://www.consultant.ru/document/cons_doc_LAW_9027/c22a45bebe759e5aecca241ce6e591612a842eb2/"
+        "https://www.consultant.ru/document/cons_doc_LAW_9027/c22a45bebe759e5aecca241ce6e591612a842eb2/",
+        "https://www.consultant.ru/document/cons_doc_LAW_61763/eeb8f51df68fc096ecadf011932a85ef5e6a0ee1/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
-      "review_date": "2026-11-27",
-      "source_scope": "specific_norm_and_related_search_results_partial"
+      "review_date": "2026-11-28",
+      "source_scope": "specific_norm_and_related_search_results_partial",
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_9027/c22a45bebe759e5aecca241ce6e591612a842eb2/",
+        "https://www.consultant.ru/document/cons_doc_LAW_61763/eeb8f51df68fc096ecadf011932a85ef5e6a0ee1/"
+      ],
+      "targeted_option_review": {
+        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "option_count": 5,
+        "remaining": "Нужны исходный договор, режим имущества, правомочия арендодателя, основания предоставления, условия продления и исключения. Продажу регулирует отдельный режим."
+      }
     },
     {
       "case_key": "bank-legal-2026-109",
@@ -2640,8 +2699,17 @@
       ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
-      "review_date": "2026-11-27",
-      "source_scope": "specific_norm_and_related_search_results_partial"
+      "review_date": "2026-11-28",
+      "source_scope": "specific_norm_and_related_search_results_partial",
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_5142/b4e192e502ea85e2cf31e682d6dbd8ad395a5012/",
+        "https://www.consultant.ru/document/cons_doc_LAW_5142/b49c53f9ae2d68d36e5ccec52d23bb843468a91b/"
+      ],
+      "targeted_option_review": {
+        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "option_count": 5,
+        "remaining": "Точная сумма зависит от формулы, ответственности должника, возможного специального режима, сроков и условий договора."
+      }
     },
     {
       "case_key": "bank-legal-2026-110",
@@ -2657,8 +2725,16 @@
       ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
-      "review_date": "2026-11-27",
-      "source_scope": "specific_norm_and_related_search_results_partial"
+      "review_date": "2026-11-28",
+      "source_scope": "specific_norm_and_related_search_results_partial",
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_305/76ae101b731ecc22467fd9f1f14cb9e2b8799026/"
+      ],
+      "targeted_option_review": {
+        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "option_count": 5,
+        "remaining": "Конкретные сроки ремонта по ст. 20, результаты экспертизы и специальные правила технически сложного товара требуют отдельной проверки; возврат цены не обещается."
+      }
     },
     {
       "case_key": "bank-legal-2026-111",
@@ -2670,12 +2746,21 @@
       "legal_basis": "Закон №2300-1, ст. 16.1, п. 4.2 (с 01.03.2026): нельзя использовать сохранённые реквизиты для периодических платежей после отказа потребителя от их использования; электронный отказ должен быть доступен. Возврат именно спорных новых списаний оценивается по обстоятельствам. Блокирование повторных платежей обязательно, а не предмет голосования.",
       "legal_urls": [
         "https://44.rospotrebnadzor.ru/osnovnye_napravlenij/zacshita_prav_potreb/6948/",
-        "https://www.consultant.ru/document/cons_doc_LAW_305/"
+        "https://www.consultant.ru/document/cons_doc_LAW_305/",
+        "https://www.consultant.ru/document/cons_doc_LAW_305/287ba272fb77db736b18354d3eec00164e7fd104/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
-      "review_date": "2026-11-27",
-      "source_scope": "specific_norm_and_related_search_results_partial"
+      "review_date": "2026-11-28",
+      "source_scope": "specific_norm_and_related_search_results_partial",
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_305/287ba272fb77db736b18354d3eec00164e7fd104/"
+      ],
+      "targeted_option_review": {
+        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "option_count": 5,
+        "remaining": "Возврат спорных платежей и последствия прекращения договора определяются конкретными требованиями и обстоятельствами; не обещать возврат любых старых платежей."
+      }
     },
     {
       "case_key": "bank-legal-2026-112",
@@ -2938,12 +3023,22 @@
       "resolved_source_url": null,
       "legal_basis": "КоАП РФ, ст. 24.5, ч. 1 п. 2: отсутствие состава исключает производство; предположение о риске не заменяет установление признаков правонарушения. В случае неустранимой недоказанности применяется презумпция невиновности по ст. 1.5. Конкретное процессуальное основание решения устанавливается уполномоченным лицом по материалам дела, а не голосованием.",
       "legal_urls": [
-        "https://www.consultant.ru/document/cons_doc_LAW_34661/7f47b148e60467b00c0f1705dac5c97386201451/"
+        "https://www.consultant.ru/document/cons_doc_LAW_34661/7f47b148e60467b00c0f1705dac5c97386201451/",
+        "https://www.consultant.ru/document/cons_doc_LAW_34661/c4e643d138637f4eafb763d628fc44ef99c71a15/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
-      "review_date": "2026-11-27",
-      "source_scope": "specific_norm_and_related_search_results_partial"
+      "review_date": "2026-11-28",
+      "source_scope": "specific_norm_and_related_search_results_partial",
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_34661/7f47b148e60467b00c0f1705dac5c97386201451/",
+        "https://www.consultant.ru/document/cons_doc_LAW_34661/c4e643d138637f4eafb763d628fc44ef99c71a15/"
+      ],
+      "targeted_option_review": {
+        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "option_count": 5,
+        "remaining": "Конкретный состав и вид процессуального решения не названы; полномочный орган оценивает доказательства и применяет норму, а не голосующие."
+      }
     },
     {
       "case_key": "bank-legal-2026-123",
@@ -2958,8 +3053,16 @@
       ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
-      "review_date": "2026-11-27",
-      "source_scope": "specific_norm_and_related_search_results_partial"
+      "review_date": "2026-11-28",
+      "source_scope": "specific_norm_and_related_search_results_partial",
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_34661/0147088a5497571bd1de83d7a7f6ce9ea7504a22/"
+      ],
+      "targeted_option_review": {
+        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "option_count": 5,
+        "remaining": "Порядок пересмотра и правовые последствия определяются гл. 30 КоАП и обстоятельствами; новое решение не предрешено."
+      }
     },
     {
       "case_key": "bank-legal-2026-124",
@@ -3321,12 +3424,22 @@
       "resolved_source_url": null,
       "legal_basis": "КоАП РФ, ст. 4.1, ч. 5 и 24.5, ч. 1 п. 7: повторное административное наказание за тот же эпизод недопустимо при заданном тождестве. Второе постановление устраняется уполномоченным органом в надлежащей процедуре, а не коллективным голосованием.",
       "legal_urls": [
-        "https://www.consultant.ru/document/cons_doc_LAW_34661/7f47b148e60467b00c0f1705dac5c97386201451/"
+        "https://www.consultant.ru/document/cons_doc_LAW_34661/7f47b148e60467b00c0f1705dac5c97386201451/",
+        "https://www.consultant.ru/document/cons_doc_LAW_34661/93fe5340f4a47211790c8cfa5ba3ac94e3766a3c/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
-      "review_date": "2026-11-27",
-      "source_scope": "specific_norm_and_related_search_results_partial"
+      "review_date": "2026-11-28",
+      "source_scope": "specific_norm_and_related_search_results_partial",
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_34661/93fe5340f4a47211790c8cfa5ba3ac94e3766a3c/",
+        "https://www.consultant.ru/document/cons_doc_LAW_34661/7f47b148e60467b00c0f1705dac5c97386201451/"
+      ],
+      "targeted_option_review": {
+        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "option_count": 5,
+        "remaining": "Учебное условие задаёт тождество и вступившее в силу решение. Отмена второго постановления и возврат уплаченного — компетентная процедура, не итог голосования."
+      }
     },
     {
       "case_key": "bank-legal-2026-145",
