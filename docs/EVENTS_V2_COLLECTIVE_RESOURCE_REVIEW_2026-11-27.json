@@ -4,226 +4,56 @@
   "summary": {
     "cases": 189,
     "options": 947,
+    "baseDominated": 128,
+    "baseDominatedCases": 96,
+    "expandedDominated": 0,
+    "expandedCases": 0
+  },
+  "remaining": [],
+  "note": "Переработаны оставшиеся группы 046–089, 001–045 и 090–150, с конкретными основаниями предлагаемых изменений и явными условиями учебных историй. Оценки ресурсов/сроков остаются порядковыми, не действующими метриками; отсутствие расширенного доминирования не доказывает экономическую сбалансированность или правовую допустимость. Прямое доминирование и юридическая приемка остаются блокерами. Никаких автоматических бюджетных проводок и изменений истории.",
+  "previous_summary": {
+    "cases": 189,
+    "options": 947,
     "baseDominated": 156,
     "expandedDominated": 58,
     "expandedCases": 43
   },
-  "remaining": [
-    {
-      "case_key": "bank-legal-2026-046",
-      "title": "Неиспользованный остаток",
-      "dominated": 2
-    },
-    {
-      "case_key": "bank-legal-2026-047",
-      "title": "Склад агломерации",
-      "dominated": 1
-    },
-    {
-      "case_key": "bank-legal-2026-048",
-      "title": "Инвестор без прибыли",
-      "dominated": 2
-    },
-    {
-      "case_key": "bank-legal-2026-049",
-      "title": "Золотой резерв",
-      "dominated": 1
-    },
-    {
-      "case_key": "bank-legal-2026-050",
-      "title": "Кадастровое возражение",
-      "dominated": 1
-    },
-    {
-      "case_key": "bank-legal-2026-053",
-      "title": "Новгородский аудит",
-      "dominated": 1
-    },
-    {
-      "case_key": "bank-legal-2026-054",
-      "title": "Научный аванс",
-      "dominated": 2
-    },
-    {
-      "case_key": "bank-legal-2026-055",
-      "title": "Омская концессия",
-      "dominated": 3
-    },
-    {
-      "case_key": "bank-legal-2026-056",
-      "title": "Газовый расчёт",
-      "dominated": 2
-    },
-    {
-      "case_key": "bank-legal-2026-057",
-      "title": "Орловский отбор",
-      "dominated": 2
-    },
-    {
-      "case_key": "bank-legal-2026-059",
-      "title": "Пермское соглашение",
-      "dominated": 1
-    },
-    {
-      "case_key": "bank-legal-2026-060",
-      "title": "Псковский мост",
-      "dominated": 1
-    },
-    {
-      "case_key": "bank-legal-2026-061",
-      "title": "Ростовская закупка",
-      "dominated": 2
-    },
-    {
-      "case_key": "bank-legal-2026-062",
-      "title": "Рязанская отчётность",
-      "dominated": 1
-    },
-    {
-      "case_key": "bank-legal-2026-065",
-      "title": "Сахалинская доля",
-      "dominated": 2
-    },
-    {
-      "case_key": "bank-legal-2026-066",
-      "title": "Уральский залог",
-      "dominated": 1
-    },
-    {
-      "case_key": "bank-legal-2026-067",
-      "title": "Смоленское пожертвование",
-      "dominated": 2
-    },
-    {
-      "case_key": "bank-legal-2026-069",
-      "title": "Тверская гарантия",
-      "dominated": 1
-    },
-    {
-      "case_key": "bank-legal-2026-071",
-      "title": "Тульская неустойка",
-      "dominated": 2
-    },
-    {
-      "case_key": "bank-legal-2026-072",
-      "title": "Тюменский знаменатель",
-      "dominated": 2
-    },
-    {
-      "case_key": "bank-legal-2026-073",
-      "title": "Ульяновский самолёт",
-      "dominated": 1
-    },
-    {
-      "case_key": "bank-legal-2026-075",
-      "title": "Забайкальский ваучер",
-      "dominated": 1
-    },
-    {
-      "case_key": "bank-legal-2026-076",
-      "title": "Ярославская территория",
-      "dominated": 1
-    },
-    {
-      "case_key": "bank-legal-2026-077",
-      "title": "Московский торговый объект",
-      "dominated": 2
-    },
-    {
-      "case_key": "bank-legal-2026-079",
-      "title": "Биробиджанское исполнение",
-      "dominated": 2
-    },
-    {
-      "case_key": "bank-legal-2026-080",
-      "title": "Ненецкий норматив",
-      "dominated": 1
-    },
-    {
-      "case_key": "bank-legal-2026-081",
-      "title": "Югорское соглашение",
-      "dominated": 1
-    },
-    {
-      "case_key": "bank-legal-2026-082",
-      "title": "Чукотский северный завоз",
-      "dominated": 2
-    },
-    {
-      "case_key": "bank-legal-2026-083",
-      "title": "Ямальский платёж",
-      "dominated": 1
-    },
-    {
-      "case_key": "bank-legal-2026-085",
-      "title": "Севастопольская земля",
-      "dominated": 1
-    },
-    {
-      "case_key": "bank-legal-2026-086",
-      "title": "Донецкая восстановительная смета",
-      "dominated": 1
-    },
-    {
-      "case_key": "bank-legal-2026-087",
-      "title": "Луганский переходный учёт",
-      "dominated": 1
-    },
-    {
-      "case_key": "bank-legal-2026-104",
-      "title": "Техническое задание под марку",
-      "dominated": 1
-    },
-    {
-      "case_key": "bank-legal-2026-105",
-      "title": "Приёмка того, чего нет",
-      "dominated": 1
-    },
-    {
-      "case_key": "bank-legal-2026-116",
-      "title": "Публичный список диагнозов",
-      "dominated": 1
-    },
-    {
-      "case_key": "bank-legal-2026-123",
-      "title": "Протокол без извещения",
-      "dominated": 1
-    },
-    {
-      "case_key": "bank-legal-2026-131",
-      "title": "Доступ к правосудию через начальника",
-      "dominated": 1
-    },
-    {
-      "case_key": "bank-legal-2026-132",
-      "title": "Доказательство из слухов",
-      "dominated": 1
-    },
-    {
-      "case_key": "bank-legal-2026-133",
-      "title": "Обязательное примирение без согласия",
-      "dominated": 1
-    },
-    {
-      "case_key": "bank-legal-2026-142",
-      "title": "Чужое фото в партийной программе",
-      "dominated": 1
-    },
-    {
-      "case_key": "bank-legal-2026-146",
-      "title": "Лишняя справка для услуги",
-      "dominated": 1
-    },
-    {
-      "case_key": "bank-legal-2026-009",
-      "title": "Грант родственнику",
-      "dominated": 1
-    },
-    {
-      "case_key": "bank-legal-2026-023",
-      "title": "Пляжная плата",
-      "dominated": 1
+  "check": {
+    "method": "Read-only calculation across all seven JSON catalog files at branch head; same structure, keys, option ranges and Pareto direction as events-v2-editorial-check.cjs; not execution of Node or release gate.",
+    "problems": [],
+    "individualCases": 141,
+    "individualOptions": 713,
+    "unknownIndividualLawfulness": 0,
+    "activationBlocked": 330,
+    "ranges": {
+      "trust": [
+        -2,
+        4
+      ],
+      "elite_support": [
+        -2,
+        3
+      ],
+      "economy": [
+        -2,
+        3
+      ],
+      "media_climate": [
+        -1,
+        2
+      ],
+      "social_stability": [
+        -2,
+        3
+      ],
+      "security": [
+        -1,
+        2
+      ],
+      "international_standing": [
+        0,
+        2
+      ]
     }
-  ],
-  "note": "Переоценка первой группы: 39 кейсов, 11 вариантов с содержательным обоснованием изменений; 7 прямых доминирований имеют явно описанное преимущество по ресурсу или сроку, которое ещё не отражено в игровых баллах. Параметры черновые, не утверждены и не активированы. Остальные группы требуют проверки. Группа 001–045: 19 предложений содержательной калибровки и 2 явных нерешённых вопроса (масштаб дополнительной проверки комиссии и подтверждённая потребность в финансировании уборки). Прямые и расширенные проверки повторены; все изменения остаются черновыми."
+  }
 }
