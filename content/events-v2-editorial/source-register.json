@@ -594,12 +594,24 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "БК РФ, статья 78: условия и порядок предоставления субсидий производителям товаров, работ и услуг. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
+      "legal_basis": "БК РФ, ст. 78, 78.5: предоставление субсидий и предусмотренный порядок отбора. В условии предполагается конкурсная программа, а не безусловное право фирмы на грант.",
       "legal_urls": [
-        "https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721"
+        "https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/1b6959f23cc516d0e11ddc2e213ca2dca83560df/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/cc1a194570930b60765fa0b326aae1fd5a41d5bc/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "review_date": "2026-11-28",
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/1b6959f23cc516d0e11ddc2e213ca2dca83560df/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/cc1a194570930b60765fa0b326aae1fd5a41d5bc/"
+      ],
+      "targeted_option_review": {
+        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "option_count": 5,
+        "remaining": "Конкретный порядок гранта, природоохранные ограничения, бюджет и календарь отбора."
+      }
     },
     {
       "case_key": "bank-legal-2026-002",
@@ -608,12 +620,28 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "НК РФ, статьи 12 и 56: налоговые полномочия и недопустимость индивидуальных налоговых льгот. Источники: https://www.nalog.gov.ru/rn77/taxation/tax_legislation/",
+      "legal_basis": "НК РФ, ст. 12, 56, 284: региональные полномочия ограничены НК РФ; индивидуальная льгота недопустима. Снижение ставки по региональной части налога на прибыль возможно лишь в предусмотренных НК РФ случаях.",
       "legal_urls": [
-        "https://www.nalog.gov.ru/rn77/taxation/tax_legislation/"
+        "https://www.nalog.gov.ru/rn77/taxation/tax_legislation/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19671/ab54b1f6e016638e006428e90971b05636b17cbf/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19671/4cada6c7ce0d8a4a287f0eeb6d5c1ed5f4d08045/",
+        "https://www.consultant.ru/document/cons_doc_LAW_28165/eb9180fc785448d58fe76ef323fb67d1832b9363/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/1b6959f23cc516d0e11ddc2e213ca2dca83560df/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "review_date": "2026-11-28",
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_19671/ab54b1f6e016638e006428e90971b05636b17cbf/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19671/4cada6c7ce0d8a4a287f0eeb6d5c1ed5f4d08045/",
+        "https://www.consultant.ru/document/cons_doc_LAW_28165/eb9180fc785448d58fe76ef323fb67d1832b9363/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/1b6959f23cc516d0e11ddc2e213ca2dca83560df/"
+      ],
+      "targeted_option_review": {
+        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "option_count": 5,
+        "remaining": "Конкретная категория, региональный закон, пределы ставки, условия и бюджетный расчёт; письмо губернатора льготу не создаёт."
+      }
     },
     {
       "case_key": "bank-legal-2026-003",
@@ -833,12 +861,22 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "БК РФ, статья 78: возмещение только затрат, соответствующих условиям субсидии. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
+      "legal_basis": "БК РФ, ст. 78: условия, цель и контроль субсидии определяются применимым порядком и соглашением. Повторное возмещение одного расхода вопреки условиям исключается.",
       "legal_urls": [
-        "https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721"
+        "https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/1b6959f23cc516d0e11ddc2e213ca2dca83560df/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "review_date": "2026-11-28",
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/1b6959f23cc516d0e11ddc2e213ca2dca83560df/"
+      ],
+      "targeted_option_review": {
+        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "option_count": 5,
+        "remaining": "Сверить условия обеих программ, допустимое софинансирование и последствия выявленного нарушения."
+      }
     },
     {
       "case_key": "bank-legal-2026-017",
@@ -1021,12 +1059,24 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "БК РФ, статья 78: нормативное основание, условия и соглашение о предоставлении субсидии. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
+      "legal_basis": "БК РФ, ст. 78, 78.5: правовое основание, порядок предоставления субсидии, отбор при его применимости и условия финансирования. Устное обещание не создаёт основания для выплаты.",
       "legal_urls": [
-        "https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721"
+        "https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/1b6959f23cc516d0e11ddc2e213ca2dca83560df/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/cc1a194570930b60765fa0b326aae1fd5a41d5bc/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "review_date": "2026-11-28",
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/1b6959f23cc516d0e11ddc2e213ca2dca83560df/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/cc1a194570930b60765fa0b326aae1fd5a41d5bc/"
+      ],
+      "targeted_option_review": {
+        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "option_count": 5,
+        "remaining": "Установить вид получателя, правила конкретной программы, допустимость возмещения ранее понесённых расходов и форму соглашения."
+      }
     },
     {
       "case_key": "bank-legal-2026-029",
@@ -1073,12 +1123,24 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "БК РФ, статьи 38 и 78: целевое назначение и условия предоставления субсидии. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
+      "legal_basis": "БК РФ, ст. 78: соблюдение условий предоставления, контроль и предусмотренные последствия нарушения; ст. 38 — целевое назначение бюджетных ассигнований и лимитов. Конкретный расход оценивается по условиям субсидии.",
       "legal_urls": [
-        "https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721"
+        "https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/1b6959f23cc516d0e11ddc2e213ca2dca83560df/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/9a0e8abcbe24837343cdcc599bccf0f09413968a/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "review_date": "2026-11-28",
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/1b6959f23cc516d0e11ddc2e213ca2dca83560df/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/9a0e8abcbe24837343cdcc599bccf0f09413968a/"
+      ],
+      "targeted_option_review": {
+        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "option_count": 5,
+        "remaining": "Установить сумму нарушения, порядок возврата, полномочия контролёра и основания нового финансирования; обязательные меры выполняются независимо от голосования."
+      }
     },
     {
       "case_key": "bank-legal-2026-032",
@@ -1087,12 +1149,22 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "БК РФ, статья 78: условия возмещения недополученных доходов и затрат. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
+      "legal_basis": "БК РФ, ст. 78: возмещение затрат или недополученных доходов по установленным условиям. В учебном случае основанием являются фактически выполненные рейсы.",
       "legal_urls": [
-        "https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721"
+        "https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/1b6959f23cc516d0e11ddc2e213ca2dca83560df/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "review_date": "2026-11-28",
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/1b6959f23cc516d0e11ddc2e213ca2dca83560df/"
+      ],
+      "targeted_option_review": {
+        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "option_count": 5,
+        "remaining": "Условия соглашения, порядок расчёта и изменения маршрутов, транспортные полномочия и финансовые лимиты."
+      }
     },
     {
       "case_key": "bank-legal-2026-033",
@@ -1199,12 +1271,26 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "БК РФ, статья 78; Федеральный закон №135-ФЗ, статья 15: обоснованные условия поддержки и запрет ограничивающих конкуренцию актов органов власти. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
+      "legal_basis": "БК РФ, ст. 78, 78.5; 135-ФЗ, ст. 15: условия предоставления и отбора, запрет необоснованного ограничения конкуренции органами власти.",
       "legal_urls": [
-        "https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721"
+        "https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/1b6959f23cc516d0e11ddc2e213ca2dca83560df/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/cc1a194570930b60765fa0b326aae1fd5a41d5bc/",
+        "https://www.consultant.ru/document/cons_doc_LAW_61763/871fb1003dab1dd3ef350f8f7f0f0d10ea20b5c6/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "review_date": "2026-11-28",
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/1b6959f23cc516d0e11ddc2e213ca2dca83560df/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/cc1a194570930b60765fa0b326aae1fd5a41d5bc/",
+        "https://www.consultant.ru/document/cons_doc_LAW_61763/871fb1003dab1dd3ef350f8f7f0f0d10ea20b5c6/"
+      ],
+      "targeted_option_review": {
+        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "option_count": 5,
+        "remaining": "Установить порядок исправления или повторного отбора, критерии программы и допустимость каждой меры поддержки."
+      }
     },
     {
       "case_key": "bank-legal-2026-041",
@@ -1213,12 +1299,22 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "БК РФ, статья 78: целевые условия и подтверждение возмещаемых затрат. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
+      "legal_basis": "БК РФ, ст. 78: возмещаются затраты по установленной цели и условиям. В учебном случае коммерческие туристические рейсы не относятся к доставке продуктов.",
       "legal_urls": [
-        "https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721"
+        "https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/1b6959f23cc516d0e11ddc2e213ca2dca83560df/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "review_date": "2026-11-28",
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/1b6959f23cc516d0e11ddc2e213ca2dca83560df/"
+      ],
+      "targeted_option_review": {
+        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "option_count": 5,
+        "remaining": "Правила распределения общих затрат, подтверждающие документы и договоры перевозки."
+      }
     },
     {
       "case_key": "bank-legal-2026-042",
@@ -1227,12 +1323,26 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "БК РФ, статья 78; ТК РФ, статьи 22, 136 и 140: условия публичной поддержки и обязанности работодателя по выплатам. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
+      "legal_basis": "БК РФ, ст. 78; ТК РФ, ст. 136, 140: сроки оплаты труда и расчёта при увольнении. Обязательства работодателя не зависят от новой субсидии.",
       "legal_urls": [
-        "https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721"
+        "https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/1b6959f23cc516d0e11ddc2e213ca2dca83560df/",
+        "https://www.consultant.ru/document/cons_doc_LAW_34683/a0a891ee650687026ef53d5d1194983419be6793/",
+        "https://www.consultant.ru/document/cons_doc_LAW_34683/274f022222909efcef192f7615b143e34309164f/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "review_date": "2026-11-28",
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/1b6959f23cc516d0e11ddc2e213ca2dca83560df/",
+        "https://www.consultant.ru/document/cons_doc_LAW_34683/a0a891ee650687026ef53d5d1194983419be6793/",
+        "https://www.consultant.ru/document/cons_doc_LAW_34683/274f022222909efcef192f7615b143e34309164f/"
+      ],
+      "targeted_option_review": {
+        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "option_count": 5,
+        "remaining": "Правила программы занятости, основания поддержки предприятия, полномочия трудового контроля и фактическая задолженность."
+      }
     },
     {
       "case_key": "bank-legal-2026-043",
@@ -1269,12 +1379,24 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "БК РФ, статьи 38 и 78: целевое назначение помощи и проверка условий её предоставления. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
+      "legal_basis": "68-ФЗ, ст. 18: права граждан при ЧС, включая возмещение ущерба в установленном порядке. В учебном случае предполагается действующая программа компенсации имущественного ущерба гражданам; не применяется автоматически режим субсидий коммерческим получателям по ст. 78 БК РФ.",
       "legal_urls": [
-        "https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721"
+        "https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
+        "https://www.consultant.ru/document/cons_doc_LAW_5295/89a47e3902762347b06bc7a5d7c25f74c86fbda0/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/9a0e8abcbe24837343cdcc599bccf0f09413968a/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "review_date": "2026-11-28",
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_5295/89a47e3902762347b06bc7a5d7c25f74c86fbda0/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/9a0e8abcbe24837343cdcc599bccf0f09413968a/"
+      ],
+      "targeted_option_review": {
+        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "option_count": 5,
+        "remaining": "Конкретная региональная программа, категории получателей, критерии и сроки компенсации; отдельные меры экстренной помощи не зависят от данного отбора."
+      }
     },
     {
       "case_key": "bank-legal-2026-046",
