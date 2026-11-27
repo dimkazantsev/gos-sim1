@@ -4869,13 +4869,12 @@
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
       "legal_basis": "Федеральный закон №257-ФЗ, статьи 17 и 30: содержание дорог и временные ограничения или прекращение движения в предусмотренных случаях. Конкретные ограничения оформляются компетентным субъектом с учётом применимого порядка, а не произвольным сообщением подрядчика. Источники: https://mintrans.gov.ru/storage/app/media/epd/0811201.pdf",
-      "legal_urls": [
-        "https://mintrans.gov.ru/storage/app/media/epd/0811201.pdf"
-      ],
+      "legal_urls": [],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
       "option_analysis_status": "draft",
-      "source_scope": "inherited_basis_requires_current_verification"
+      "source_scope": "inherited_basis_requires_current_verification",
+      "review_date": "2026-11-27"
     },
     {
       "case_key": "bank-expanded-serious-14-01",
@@ -4885,14 +4884,12 @@
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
       "legal_basis": "Федеральный закон №68-ФЗ, статьи 6 и 14: информирование и обязанности организаций по защите от ЧС; Федеральный закон №7-ФЗ, статья 11: достоверная экологическая информация. Отсутствие окончательных замеров нельзя скрывать или превращать в установленное отсутствие риска. Источники: https://mchs.gov.ru/dokumenty/bazovye-normativnye-pravovye-akty/federalnye-zakony/5788 https://epp.genproc.gov.ru/upload/iblock/0d0/hghg8nrmg2v25zrox7cvk28868b3fr21.pdf",
-      "legal_urls": [
-        "https://mchs.gov.ru/dokumenty/bazovye-normativnye-pravovye-akty/federalnye-zakony/5788",
-        "https://epp.genproc.gov.ru/upload/iblock/0d0/hghg8nrmg2v25zrox7cvk28868b3fr21.pdf"
-      ],
+      "legal_urls": [],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
       "option_analysis_status": "draft",
-      "source_scope": "inherited_basis_requires_current_verification"
+      "source_scope": "inherited_basis_requires_current_verification",
+      "review_date": "2026-11-27"
     },
     {
       "case_key": "bank-expanded-serious-15-01",
@@ -4902,13 +4899,12 @@
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
       "legal_basis": "БК РФ, статьи 33, 37 и 83: сбалансированность, достоверность показателей и финансовое обеспечение новых расходных обязательств; изменение бюджета проходит установленную процедуру. Сокращение плановой строки само по себе не прекращает договорные обязательства. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
-      "legal_urls": [
-        "https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721"
-      ],
+      "legal_urls": [],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
       "option_analysis_status": "draft",
-      "source_scope": "inherited_basis_requires_current_verification"
+      "source_scope": "inherited_basis_requires_current_verification",
+      "review_date": "2026-11-27"
     },
     {
       "case_key": "bank-expanded-serious-16-01",
@@ -4918,14 +4914,12 @@
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
       "legal_basis": "Федеральный закон от 25.12.2008 №273-ФЗ, статьи 10–11: личная заинтересованность и её урегулирование; Федеральный закон №44-ФЗ, статья 31: требования, относящиеся к конфликту интересов в закупке. Конкретные последствия определяются по установленным фактам и компетенции. Источники: https://epp.genproc.gov.ru/ru/proc_35/activity/combating-corruption/zakon/federal/e345084/ https://mintrud.gov.ru/docs/laws/116",
-      "legal_urls": [
-        "https://epp.genproc.gov.ru/ru/proc_35/activity/combating-corruption/zakon/federal/e345084/",
-        "https://mintrud.gov.ru/docs/laws/116"
-      ],
+      "legal_urls": [],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
       "option_analysis_status": "draft",
-      "source_scope": "inherited_basis_requires_current_verification"
+      "source_scope": "inherited_basis_requires_current_verification",
+      "review_date": "2026-11-27"
     },
     {
       "case_key": "bank-expanded-serious-17-01",
@@ -4936,13 +4930,13 @@
       "resolved_source_url": null,
       "legal_basis": "Федеральный закон №8-ФЗ, статьи 8 и 11: достоверность информации; Федеральный закон №273-ФЗ от 29.12.2012, статьи 28 и 41: ответственность образовательной организации за условия и охрану здоровья. Пресс-служба не заменяет компетентное техническое подтверждение безопасности. Источники: https://mintrud.gov.ru/docs/laws/129 http://www.kremlin.ru/acts/bank/36698",
       "legal_urls": [
-        "https://mintrud.gov.ru/docs/laws/129",
-        "http://www.kremlin.ru/acts/bank/36698"
+        "https://www.consultant.ru/document/cons_doc_LAW_84602/e4fb380d53822434913f8449aa9b9e6bdf9f67a4/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
       "option_analysis_status": "draft",
-      "source_scope": "inherited_basis_requires_current_verification"
+      "source_scope": "specific_norm_and_related_search_results_partial",
+      "review_date": "2026-11-27"
     },
     {
       "case_key": "bank-expanded-serious-18-01",
@@ -4953,13 +4947,13 @@
       "resolved_source_url": null,
       "legal_basis": "Федеральный закон №220-ФЗ, статья 14: организация перевозок по регулируемым тарифам; БК РФ, статья 78: условия субсидии, если компенсация оформляется этим механизмом. Компетентный тарифный орган и методика устанавливаются применимым регулированием, а не выбираются участником произвольно. Источники: https://mintrans.gov.ru/activities/214/169 https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
       "legal_urls": [
-        "https://mintrans.gov.ru/activities/214/169",
-        "https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721"
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/1b6959f23cc516d0e11ddc2e213ca2dca83560df/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
       "option_analysis_status": "draft",
-      "source_scope": "inherited_basis_requires_current_verification"
+      "source_scope": "specific_norm_and_related_search_results_partial",
+      "review_date": "2026-11-27"
     },
     {
       "case_key": "bank-expanded-serious-19-01",
@@ -4969,14 +4963,12 @@
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
       "legal_basis": "ГК РФ, статьи 209–210: полномочия собственника и содержание помещений; Конституция РФ, статья 44, часть 2: право на участие в культурной жизни и доступ к культурным ценностям. Конкретные решения по библиотечной сети принимаются учредителем с соблюдением применимого законодательства и процедур. Источники: https://11.rosguard.gov.ru/uploads/2025/07/5_grazhdanskijj_kodeks_rossijjskojj_federacii_chast_pervaya.pdf https://minjust.gov.ru/ru/documents/8011/",
-      "legal_urls": [
-        "https://11.rosguard.gov.ru/uploads/2025/07/5_grazhdanskijj_kodeks_rossijjskojj_federacii_chast_pervaya.pdf",
-        "https://minjust.gov.ru/ru/documents/8011/"
-      ],
+      "legal_urls": [],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
       "option_analysis_status": "draft",
-      "source_scope": "inherited_basis_requires_current_verification"
+      "source_scope": "inherited_basis_requires_current_verification",
+      "review_date": "2026-11-27"
     },
     {
       "case_key": "bank-expanded-serious-20-01",
@@ -4986,14 +4978,12 @@
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
       "legal_basis": "БК РФ, статьи 36 и 83: прозрачность бюджета и финансовое обеспечение новых обязательств; ГК РФ, статья 309: надлежащее исполнение договоров. Слушания обеспечивают участие, но их популярный итог сам по себе не изменяет договор и бюджет. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721 https://11.rosguard.gov.ru/uploads/2025/07/5_grazhdanskijj_kodeks_rossijjskojj_federacii_chast_pervaya.pdf",
-      "legal_urls": [
-        "https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
-        "https://11.rosguard.gov.ru/uploads/2025/07/5_grazhdanskijj_kodeks_rossijjskojj_federacii_chast_pervaya.pdf"
-      ],
+      "legal_urls": [],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
       "option_analysis_status": "draft",
-      "source_scope": "inherited_basis_requires_current_verification"
+      "source_scope": "inherited_basis_requires_current_verification",
+      "review_date": "2026-11-27"
     },
     {
       "case_key": "bank-expanded-serious-21-01",
@@ -5004,12 +4994,13 @@
       "resolved_source_url": null,
       "legal_basis": "Федеральный закон №323-ФЗ, статьи 10, 13 и 19: доступность помощи, врачебная тайна и права пациентов. Перемещение лекарств требует применимого законного порядка, контроля качества и учёта; решение администрации само по себе не заменяет эти условия. Источники: https://minzdrav.gov.ru/en/documents/7025-federalnyy-zakon-ot-21-noyabrya-2011-g-323-fz-ob-osnovah-ohrany-zdorovya-grazhdan-v-rossiyskoy-federatsii",
       "legal_urls": [
-        "https://minzdrav.gov.ru/en/documents/7025-federalnyy-zakon-ot-21-noyabrya-2011-g-323-fz-ob-osnovah-ohrany-zdorovya-grazhdan-v-rossiyskoy-federatsii"
+        "https://www.consultant.ru/document/cons_doc_LAW_121895/e63d3344841b2f5636a73710e906a23ebaf9ab82/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
       "option_analysis_status": "draft",
-      "source_scope": "inherited_basis_requires_current_verification"
+      "source_scope": "specific_norm_and_related_search_results_partial",
+      "review_date": "2026-11-27"
     },
     {
       "case_key": "bank-expanded-serious-22-01",
@@ -5019,15 +5010,12 @@
       "source_status": "official_article_read_core_episode_confirmed",
       "resolved_source_url": null,
       "legal_basis": "Федеральный закон от 29.12.2012 №273-ФЗ, статья 37: организация питания обучающихся; Федеральный закон №52-ФЗ, статья 17: санитарные требования к питанию. Необходимые меры определяются компетентной проверкой; сообщение о жалобе не позволяет объявить доказанным любой продукт или диагноз. Источники: http://www.kremlin.ru/acts/bank/36698 https://39.rospotrebnadzor.ru/content/federalnyy-zakon-ot-30031999-no-52-fz-o-sanitarno-epidemiologicheskom-blagopoluchii https://epp.genproc.gov.ru/ru/proc_75/mass-media/news/main/e8245653/",
-      "legal_urls": [
-        "http://www.kremlin.ru/acts/bank/36698",
-        "https://39.rospotrebnadzor.ru/content/federalnyy-zakon-ot-30031999-no-52-fz-o-sanitarno-epidemiologicheskom-blagopoluchii",
-        "https://epp.genproc.gov.ru/ru/proc_75/mass-media/news/main/e8245653/"
-      ],
+      "legal_urls": [],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
       "option_analysis_status": "draft",
-      "source_scope": "inherited_basis_requires_current_verification"
+      "source_scope": "inherited_basis_requires_current_verification",
+      "review_date": "2026-11-27"
     },
     {
       "case_key": "bank-expanded-serious-23-01",
@@ -5037,14 +5025,12 @@
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
       "legal_basis": "Федеральный закон №273-ФЗ от 29.12.2012, статья 56: целевое обучение и условия соответствующего договора; Конституция РФ, статья 37: свобода труда. Конкретные обязательства и последствия проверяются по действующему режиму договора и не возникают из одного лозунга программы. Источники: http://www.kremlin.ru/acts/bank/36698 https://minjust.gov.ru/ru/documents/8011/",
-      "legal_urls": [
-        "http://www.kremlin.ru/acts/bank/36698",
-        "https://minjust.gov.ru/ru/documents/8011/"
-      ],
+      "legal_urls": [],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
       "option_analysis_status": "draft",
-      "source_scope": "inherited_basis_requires_current_verification"
+      "source_scope": "inherited_basis_requires_current_verification",
+      "review_date": "2026-11-27"
     },
     {
       "case_key": "bank-expanded-serious-24-01",
@@ -5054,13 +5040,12 @@
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
       "legal_basis": "Федеральный закон №117-ФЗ, статьи 8–9: общие требования безопасности и обязанности собственника и эксплуатирующей организации. Региональное финансирование не снимает эксплуатационные обязанности, а временный режим должен иметь техническое основание. Источники: https://01.mchs.gov.ru/deyatelnost/napravleniya-deyatelnosti/grazhdanskaya-zashchita/preduprezhdenie-chrezvychaynyh-situaciy/1-1-normativnye-pravovye-akty/2-federalnye-zakony/federalnyy-zakon-ot-21-iyulya-1997-g-n-117-fz-o-bezopasnosti-gidrotehnicheskih-sooruzheniy",
-      "legal_urls": [
-        "https://01.mchs.gov.ru/deyatelnost/napravleniya-deyatelnosti/grazhdanskaya-zashchita/preduprezhdenie-chrezvychaynyh-situaciy/1-1-normativnye-pravovye-akty/2-federalnye-zakony/federalnyy-zakon-ot-21-iyulya-1997-g-n-117-fz-o-bezopasnosti-gidrotehnicheskih-sooruzheniy"
-      ],
+      "legal_urls": [],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
       "option_analysis_status": "draft",
-      "source_scope": "inherited_basis_requires_current_verification"
+      "source_scope": "inherited_basis_requires_current_verification",
+      "review_date": "2026-11-27"
     },
     {
       "case_key": "bank-expanded-serious-25-01",
@@ -5070,14 +5055,12 @@
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
       "legal_basis": "Федеральный закон №25-ФЗ, статья 14, часть 1, пункт 5: запрет вознаграждений в связи с должностными обязанностями; Федеральный закон от 25.12.2008 №273-ФЗ, статьи 10–11: конфликт интересов. Передача на служебный учёт не означает автоматического признания любого такого подарка допустимым протокольным. Источники: https://epp.genproc.gov.ru/ru/proc_17/activity/legal-education/explain/e186999/ https://epp.genproc.gov.ru/ru/proc_35/activity/combating-corruption/zakon/federal/e345084/",
-      "legal_urls": [
-        "https://epp.genproc.gov.ru/ru/proc_17/activity/legal-education/explain/e186999/",
-        "https://epp.genproc.gov.ru/ru/proc_35/activity/combating-corruption/zakon/federal/e345084/"
-      ],
+      "legal_urls": [],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
       "option_analysis_status": "draft",
-      "source_scope": "inherited_basis_requires_current_verification"
+      "source_scope": "inherited_basis_requires_current_verification",
+      "review_date": "2026-11-27"
     },
     {
       "case_key": "bank-expanded-serious-26-01",
@@ -5087,13 +5070,12 @@
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
       "legal_basis": "БК РФ, статьи 38 и 139: целевой характер и субсидии местным бюджетам; статья 81: резерв для предусмотренных непредвиденных расходов. Наличие аварии не означает автоматического применения любого резерва: основание и компетенция проверяются отдельно. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
-      "legal_urls": [
-        "https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721"
-      ],
+      "legal_urls": [],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
       "option_analysis_status": "draft",
-      "source_scope": "inherited_basis_requires_current_verification"
+      "source_scope": "inherited_basis_requires_current_verification",
+      "review_date": "2026-11-27"
     },
     {
       "case_key": "bank-expanded-serious-27-01",
@@ -5103,14 +5085,12 @@
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
       "legal_basis": "Конституция РФ, статья 42; Федеральный закон №7-ФЗ, статья 11: благоприятная среда и достоверная информация. Применимые нормативы и защитные меры устанавливаются компетентно; условное контрольное значение задачи не выдаётся за реальный санитарный норматив. Источники: https://minjust.gov.ru/ru/documents/8011/ https://epp.genproc.gov.ru/upload/iblock/0d0/hghg8nrmg2v25zrox7cvk28868b3fr21.pdf",
-      "legal_urls": [
-        "https://minjust.gov.ru/ru/documents/8011/",
-        "https://epp.genproc.gov.ru/upload/iblock/0d0/hghg8nrmg2v25zrox7cvk28868b3fr21.pdf"
-      ],
+      "legal_urls": [],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
       "option_analysis_status": "draft",
-      "source_scope": "inherited_basis_requires_current_verification"
+      "source_scope": "inherited_basis_requires_current_verification",
+      "review_date": "2026-11-27"
     },
     {
       "case_key": "bank-expanded-serious-28-01",
@@ -5120,13 +5100,12 @@
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
       "legal_basis": "Федеральный закон №68-ФЗ, статьи 6, 11 и 14: информирование и организация мер защиты в пределах компетенции. Ответственный канал, техническое подключение и подтверждение получения являются различными действиями; сам закон не объявляет любую отправку сообщения успешным оповещением. Источники: https://mchs.gov.ru/dokumenty/bazovye-normativnye-pravovye-akty/federalnye-zakony/5788",
-      "legal_urls": [
-        "https://mchs.gov.ru/dokumenty/bazovye-normativnye-pravovye-akty/federalnye-zakony/5788"
-      ],
+      "legal_urls": [],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
       "option_analysis_status": "draft",
-      "source_scope": "inherited_basis_requires_current_verification"
+      "source_scope": "inherited_basis_requires_current_verification",
+      "review_date": "2026-11-27"
     },
     {
       "case_key": "bank-expanded-serious-29-01",
@@ -5137,13 +5116,13 @@
       "resolved_source_url": null,
       "legal_basis": "Федеральный закон №323-ФЗ, статьи 10 и 33: доступность и первичная помощь; статья 36.2: особенности помощи с телемедицинскими технологиями. Допустимость конкретной дистанционной консультации определяют медицинские специалисты по действующему порядку и ограничениям, включая применимые специальные режимы. Источники: https://minzdrav.gov.ru/en/documents/7025-federalnyy-zakon-ot-21-noyabrya-2011-g-323-fz-ob-osnovah-ohrany-zdorovya-grazhdan-v-rossiyskoy-federatsii https://fcmk.minzdrav.gov.ru/wp-content/uploads/2025/09/ob-osnovah-ohrany-zdorovya-grazhdan-v-rossijskoj-federaczii.pdf",
       "legal_urls": [
-        "https://minzdrav.gov.ru/en/documents/7025-federalnyy-zakon-ot-21-noyabrya-2011-g-323-fz-ob-osnovah-ohrany-zdorovya-grazhdan-v-rossiyskoy-federatsii",
-        "https://fcmk.minzdrav.gov.ru/wp-content/uploads/2025/09/ob-osnovah-ohrany-zdorovya-grazhdan-v-rossijskoj-federaczii.pdf"
+        "https://www.consultant.ru/document/cons_doc_LAW_121895/e63d3344841b2f5636a73710e906a23ebaf9ab82/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
       "option_analysis_status": "draft",
-      "source_scope": "inherited_basis_requires_current_verification"
+      "source_scope": "specific_norm_and_related_search_results_partial",
+      "review_date": "2026-11-27"
     },
     {
       "case_key": "bank-expanded-serious-30-01",
@@ -5154,13 +5133,13 @@
       "resolved_source_url": null,
       "legal_basis": "Федеральный закон №69-ФЗ, статья 37: обязанности организации по пожарной безопасности; Федеральный закон №273-ФЗ от 29.12.2012, статья 39; ЖК РФ, статьи 94 и 100: предоставление и договорный режим общежития. Ограничение опасного помещения и прекращение жилищных прав не являются одним действием. Источники: https://18.mchs.gov.ru/uploads/resource/2026-01-27/teksty-normativnyh-pravovyh-aktov-reguliruyushchih-osushchestvlenie-federalnogo-gosudarstvennogo-pozharnogo-nadzora_1769497965271437721.pdf https://epp.genproc.gov.ru/ru/proc_26/activity/legal-education/explain/e239070/",
       "legal_urls": [
-        "https://18.mchs.gov.ru/uploads/resource/2026-01-27/teksty-normativnyh-pravovyh-aktov-reguliruyushchih-osushchestvlenie-federalnogo-gosudarstvennogo-pozharnogo-nadzora_1769497965271437721.pdf",
-        "https://epp.genproc.gov.ru/ru/proc_26/activity/legal-education/explain/e239070/"
+        "https://www.consultant.ru/document/cons_doc_LAW_5438/6edfbcbbcead156edf25d16814bb6778153fb2d1/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
       "option_analysis_status": "draft",
-      "source_scope": "inherited_basis_requires_current_verification"
+      "source_scope": "specific_norm_and_related_search_results_partial",
+      "review_date": "2026-11-27"
     },
     {
       "case_key": "bank-library",
@@ -5170,14 +5149,12 @@
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
       "legal_basis": "ГК РФ, статьи 209–210: полномочия собственника и содержание имущества; статья 689: безвозмездное пользование, если выбран такой договорный механизм. Добровольный координатор не становится работником или получателем муниципального имущества по одному приглашению. Источники: https://11.rosguard.gov.ru/uploads/2025/07/5_grazhdanskijj_kodeks_rossijjskojj_federacii_chast_pervaya.pdf https://minjust.gov.ru/ru/pages/grazhdanskij-kodeks/",
-      "legal_urls": [
-        "https://11.rosguard.gov.ru/uploads/2025/07/5_grazhdanskijj_kodeks_rossijjskojj_federacii_chast_pervaya.pdf",
-        "https://minjust.gov.ru/ru/pages/grazhdanskij-kodeks/"
-      ],
+      "legal_urls": [],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
       "option_analysis_status": "draft",
-      "source_scope": "inherited_basis_requires_current_verification"
+      "source_scope": "inherited_basis_requires_current_verification",
+      "review_date": "2026-11-27"
     },
     {
       "case_key": "bank-media-rumour",
@@ -5188,13 +5165,13 @@
       "resolved_source_url": null,
       "legal_basis": "Федеральный закон №8-ФЗ, статьи 8 и 11: достоверность информации о деятельности органа; Закон РФ №2124-1, статьи 39–40: предоставление сведений по редакционному запросу. Фактическое отсутствие решения сегодня не является гарантией неизменности всех будущих планов. Источники: https://mintrud.gov.ru/docs/laws/129 https://epp.genproc.gov.ru/ru/proc_72/activity/legal-education/explain/e1331886/",
       "legal_urls": [
-        "https://mintrud.gov.ru/docs/laws/129",
-        "https://epp.genproc.gov.ru/ru/proc_72/activity/legal-education/explain/e1331886/"
+        "https://www.consultant.ru/document/cons_doc_LAW_84602/e4fb380d53822434913f8449aa9b9e6bdf9f67a4/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
       "option_analysis_status": "draft",
-      "source_scope": "inherited_basis_requires_current_verification"
+      "source_scope": "specific_norm_and_related_search_results_partial",
+      "review_date": "2026-11-27"
     },
     {
       "case_key": "bank-meeting",
@@ -5204,13 +5181,12 @@
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
       "legal_basis": "ГК РФ, статьи 125 и 209: действия от имени публичного собственника и распоряжение имуществом требуют надлежащей компетенции. Порядок рабочей встречи определяется применимым внутренним регламентом; обсуждение не становится нормативным или имущественным актом само по себе. Источники: https://11.rosguard.gov.ru/uploads/2025/07/5_grazhdanskijj_kodeks_rossijjskojj_federacii_chast_pervaya.pdf",
-      "legal_urls": [
-        "https://11.rosguard.gov.ru/uploads/2025/07/5_grazhdanskijj_kodeks_rossijjskojj_federacii_chast_pervaya.pdf"
-      ],
+      "legal_urls": [],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
       "option_analysis_status": "draft",
-      "source_scope": "inherited_basis_requires_current_verification"
+      "source_scope": "inherited_basis_requires_current_verification",
+      "review_date": "2026-11-27"
     },
     {
       "case_key": "bank-public-hearing",
@@ -5220,15 +5196,12 @@
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
       "legal_basis": "ГрК РФ, статья 5.1: этапы обсуждений или слушаний, протокол и заключение о результатах; статьи 31–33: подготовка и изменение ПЗЗ с учётом применимых исключений. Заключение отражает предложения и мотивы их учёта или отклонения; обсуждение не является всеобщим правом вето на любой проект. Источники: https://epp.genproc.gov.ru/ru/proc_53/activity/legal-education/explain/e525537/ https://epp.genproc.gov.ru/ru/proc_53/activity/legal-education/explain/e525501/ https://okn.alania.gov.ru/documents/819",
-      "legal_urls": [
-        "https://epp.genproc.gov.ru/ru/proc_53/activity/legal-education/explain/e525537/",
-        "https://epp.genproc.gov.ru/ru/proc_53/activity/legal-education/explain/e525501/",
-        "https://okn.alania.gov.ru/documents/819"
-      ],
+      "legal_urls": [],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
       "option_analysis_status": "draft",
-      "source_scope": "inherited_basis_requires_current_verification"
+      "source_scope": "inherited_basis_requires_current_verification",
+      "review_date": "2026-11-27"
     },
     {
       "case_key": "bank-records",
@@ -5239,13 +5212,14 @@
       "resolved_source_url": null,
       "legal_basis": "Федеральный закон №125-ФЗ, статья 17: обеспечение сохранности архивных документов; Федеральный закон №8-ФЗ, статья 11: достоверность опубликованной информации. Допуск к рассмотрению и необходимые материалы определяются применимым регламентом; неподтверждённую запись нельзя выдавать за восстановленный подлинник. Источники: https://archives.gov.ru/documents/methodics/OAD/data/attachments/FZ.pdf https://mintrud.gov.ru/docs/laws/129",
       "legal_urls": [
-        "https://archives.gov.ru/documents/methodics/OAD/data/attachments/FZ.pdf",
-        "https://mintrud.gov.ru/docs/laws/129"
+        "https://www.consultant.ru/document/cons_doc_LAW_1406/853f5f9b88a8631659f20438281fdf2e323c1429/",
+        "https://www.consultant.ru/document/cons_doc_LAW_84602/e4fb380d53822434913f8449aa9b9e6bdf9f67a4/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
       "option_analysis_status": "draft",
-      "source_scope": "inherited_basis_requires_current_verification"
+      "source_scope": "specific_norm_and_related_search_results_partial",
+      "review_date": "2026-11-27"
     }
   ]
 }
