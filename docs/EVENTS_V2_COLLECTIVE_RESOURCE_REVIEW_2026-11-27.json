@@ -4,56 +4,11 @@
   "summary": {
     "cases": 189,
     "options": 947,
-    "baseDominated": 180,
-    "expandedDominated": 87,
-    "expandedCases": 68
+    "baseDominated": 169,
+    "expandedDominated": 77,
+    "expandedCases": 59
   },
   "remaining": [
-    {
-      "case_key": "budget-region-2026-63-technical-college",
-      "title": "Новые предприятия и нехватка специалистов",
-      "dominated": 1
-    },
-    {
-      "case_key": "budget-region-2026-72-temporary-family-housing",
-      "title": "Временное размещение семей после аварии",
-      "dominated": 1
-    },
-    {
-      "case_key": "bank-curated-serious-01",
-      "title": "Кибератака на реестр",
-      "dominated": 1
-    },
-    {
-      "case_key": "bank-curated-serious-02",
-      "title": "Сочи: оползень повредил коллектор и создал угрозу жилому дому",
-      "dominated": 1
-    },
-    {
-      "case_key": "bank-curated-v2-14",
-      "title": "Голосование без связи",
-      "dominated": 2
-    },
-    {
-      "case_key": "bank-curated-v2-27",
-      "title": "Два вопроса в одной клетке",
-      "dominated": 1
-    },
-    {
-      "case_key": "bank-expanded-serious-01-01",
-      "title": "Челябинск: аварийный дом на улице Якутской и затянувшееся расселение",
-      "dominated": 1
-    },
-    {
-      "case_key": "bank-expanded-serious-02-01",
-      "title": "Водозабор на реке",
-      "dominated": 1
-    },
-    {
-      "case_key": "bank-expanded-serious-03-01",
-      "title": "Отопительный сезон",
-      "dominated": 1
-    },
     {
       "case_key": "bank-legal-2026-004",
       "title": "Курортные дни",
@@ -350,5 +305,5 @@
       "dominated": 1
     }
   ],
-  "note": "Полный пересчёт всего банка на e39f6a7: 180 прямых, 87 расширенных перекосов, 68 коллективных ситуаций с расширенными перекосами. 330/1660, структурных нарушений не выявлено. Изменение индивидуальной группы не затрагивает эти показатели."
+  "note": "Переоценка первой группы: 39 кейсов, 11 вариантов с содержательным обоснованием изменений; 7 прямых доминирований имеют явно описанное преимущество по ресурсу или сроку, которое ещё не отражено в игровых баллах. Параметры черновые, не утверждены и не активированы. Остальные группы требуют проверки."
 }
