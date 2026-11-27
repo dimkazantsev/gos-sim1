@@ -708,10 +708,28 @@
       "resolved_source_url": null,
       "legal_basis": "Федеральный закон от 25.12.2008 №273-ФЗ, статьи 10–11: выявление и урегулирование конфликта интересов. Источники: https://pravo.gov.ru/",
       "legal_urls": [
-        "https://pravo.gov.ru/"
+        "https://pravo.gov.ru/",
+        "https://www.consultant.ru/document/cons_doc_LAW_82959/5d02242ebd04c398d2acf7c53dbc79659b85e8f3/",
+        "https://www.consultant.ru/document/cons_doc_LAW_82959/64ca591ea83268ee3d33f6e564cbcac0d3a073d9/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "legal_evidence": [
+        {
+          "norm": "273-ФЗ от 25.12.2008, ст. 10",
+          "url": "https://www.consultant.ru/document/cons_doc_LAW_82959/5d02242ebd04c398d2acf7c53dbc79659b85e8f3/",
+          "checked_on": "2026-11-27",
+          "scope": "Личная заинтересованность и круг должностей; членство в комиссии само по себе не доказывает применимость всех обязанностей.",
+          "status": "targeted_text_or_official_explanation_read_not_full_case_verification"
+        },
+        {
+          "norm": "273-ФЗ от 25.12.2008, ст. 11",
+          "url": "https://www.consultant.ru/document/cons_doc_LAW_82959/64ca591ea83268ee3d33f6e564cbcac0d3a073d9/",
+          "checked_on": "2026-11-27",
+          "scope": "Уведомление и урегулирование в применимом порядке, отвод в предусмотренных случаях; специальный порядок комиссии проверяется отдельно.",
+          "status": "targeted_text_or_official_explanation_read_not_full_case_verification"
+        }
+      ]
     },
     {
       "case_key": "bank-legal-2026-010",
@@ -904,10 +922,20 @@
       "resolved_source_url": null,
       "legal_basis": "Водный кодекс РФ, статья 6: доступ к водным объектам общего пользования и береговой полосе. Источники: https://pravo.gov.ru/",
       "legal_urls": [
-        "https://pravo.gov.ru/"
+        "https://pravo.gov.ru/",
+        "https://www.consultant.ru/document/cons_doc_LAW_60683/9a073f7358f63cc80f8bf4b9406df3978054e8dc/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "legal_evidence": [
+        {
+          "norm": "ВК РФ, ч. 1–2 ст. 6",
+          "url": "https://www.consultant.ru/document/cons_doc_LAW_60683/9a073f7358f63cc80f8bf4b9406df3978054e8dc/",
+          "checked_on": "2026-11-27",
+          "scope": "Доступ к общедоступному водному объекту и бесплатное личное/бытовое использование с предусмотренными исключениями; отдельные услуги, статус участка и смета проверяются.",
+          "status": "targeted_text_or_official_explanation_read_not_full_case_verification"
+        }
+      ]
     },
     {
       "case_key": "bank-legal-2026-024",
@@ -988,10 +1016,20 @@
       "resolved_source_url": null,
       "legal_basis": "БК РФ, статьи 6 и 107: границы бюджетных показателей и ограничения государственного долга субъекта РФ. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
       "legal_urls": [
-        "https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721"
+        "https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/055a71948dbf2a4fc2478437cd89cd864ee8e6e5/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "legal_evidence": [
+        {
+          "norm": "БК РФ, ст. 6",
+          "url": "https://www.consultant.ru/document/cons_doc_LAW_19702/055a71948dbf2a4fc2478437cd89cd864ee8e6e5/",
+          "checked_on": "2026-11-27",
+          "scope": "Различение бюджета и консолидированного бюджета, исключение внутренних межбюджетных трансфертов; проверить фактический состав агрегата.",
+          "status": "targeted_text_or_official_explanation_read_not_full_case_verification"
+        }
+      ]
     },
     {
       "case_key": "bank-legal-2026-030",
@@ -1226,10 +1264,20 @@
       "resolved_source_url": null,
       "legal_basis": "БК РФ, статья 242, пункт 5: завершение финансового года и режим неиспользованных остатков целевых трансфертов. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
       "legal_urls": [
-        "https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721"
+        "https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/200d8f9e0aed34b95bc6527693824cb356109b83/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "legal_evidence": [
+        {
+          "norm": "БК РФ, п. 5 ст. 242",
+          "url": "https://www.consultant.ru/document/cons_doc_LAW_19702/200d8f9e0aed34b95bc6527693824cb356109b83/",
+          "checked_on": "2026-11-27",
+          "scope": "Возврат целевого остатка и последующее финансирование прежней цели при подтверждённой потребности; проверить источник, исключения и конкретный порядок.",
+          "status": "targeted_text_or_official_explanation_read_not_full_case_verification"
+        }
+      ]
     },
     {
       "case_key": "bank-legal-2026-047",
@@ -1240,10 +1288,20 @@
       "resolved_source_url": null,
       "legal_basis": "Конституция РФ, статья 132, часть 2; БК РФ, статьи 65 и 86: полномочия и расходные обязательства муниципального образования. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
       "legal_urls": [
-        "https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721"
+        "https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/4ce55543bc62fa4c4587fa50514b56aa0121a671/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "legal_evidence": [
+        {
+          "norm": "БК РФ, ст. 86",
+          "url": "https://www.consultant.ru/document/cons_doc_LAW_19702/4ce55543bc62fa4c4587fa50514b56aa0121a671/",
+          "checked_on": "2026-11-27",
+          "scope": "Расходные обязательства муниципального образования; особые условия и действующий местный порядок требуют проверки.",
+          "status": "targeted_text_or_official_explanation_read_not_full_case_verification"
+        }
+      ]
     },
     {
       "case_key": "bank-legal-2026-048",
@@ -1268,10 +1326,20 @@
       "resolved_source_url": null,
       "legal_basis": "БК РФ, статья 37: достоверность прогнозирования доходов и расходов бюджета. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
       "legal_urls": [
-        "https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721"
+        "https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/73147d61f1183d32e517768da079cfdf28cca0a9/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "legal_evidence": [
+        {
+          "norm": "БК РФ, ст. 37",
+          "url": "https://www.consultant.ru/document/cons_doc_LAW_19702/73147d61f1183d32e517768da079cfdf28cca0a9/",
+          "checked_on": "2026-11-27",
+          "scope": "Реалистичность прогнозов, отсутствие гарантии поступления по невыданной лицензии; не регулирует само лицензирование.",
+          "status": "targeted_text_or_official_explanation_read_not_full_case_verification"
+        }
+      ]
     },
     {
       "case_key": "bank-legal-2026-050",
@@ -1324,10 +1392,20 @@
       "resolved_source_url": null,
       "legal_basis": "БК РФ, статья 160.2-1; федеральные стандарты внутреннего финансового аудита: функциональная независимость аудита. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
       "legal_urls": [
-        "https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721"
+        "https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/6fdfc424277aebba215512c7a68a5077c68e1337/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "legal_evidence": [
+        {
+          "norm": "БК РФ, п. 3–5 ст. 160.2-1",
+          "url": "https://www.consultant.ru/document/cons_doc_LAW_19702/6fdfc424277aebba215512c7a68a5077c68e1337/",
+          "checked_on": "2026-11-27",
+          "scope": "Функциональная независимость, уполномоченный аудитор и федеральные стандарты; не означает произвольного назначения внешнего эксперта.",
+          "status": "targeted_text_or_official_explanation_read_not_full_case_verification"
+        }
+      ]
     },
     {
       "case_key": "bank-legal-2026-054",
@@ -1352,10 +1430,20 @@
       "resolved_source_url": null,
       "legal_basis": "Федеральный закон №115-ФЗ, статья 10: условия концессионного соглашения; БК РФ, статьи 34 и 38. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
       "legal_urls": [
-        "https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721"
+        "https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/9a0e8abcbe24837343cdcc599bccf0f09413968a/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "legal_evidence": [
+        {
+          "norm": "БК РФ, ст. 38",
+          "url": "https://www.consultant.ru/document/cons_doc_LAW_19702/9a0e8abcbe24837343cdcc599bccf0f09413968a/",
+          "checked_on": "2026-11-27",
+          "scope": "Адресность и цель средств; не доказывает автоматически двойное финансирование, форму конкретной помощи или процедуру северного завоза.",
+          "status": "targeted_text_or_official_explanation_read_not_full_case_verification"
+        }
+      ]
     },
     {
       "case_key": "bank-legal-2026-056",
@@ -1436,10 +1524,20 @@
       "resolved_source_url": null,
       "legal_basis": "Федеральный закон №44-ФЗ, статьи 8 и 31; Федеральный закон №135-ФЗ, статья 17. Источники: https://pravo.gov.ru/",
       "legal_urls": [
-        "https://pravo.gov.ru/"
+        "https://pravo.gov.ru/",
+        "https://www.consultant.ru/document/cons_doc_LAW_144624/0c4ec341947f98654432292ddfd7066e3200d7fd/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "legal_evidence": [
+        {
+          "norm": "44-ФЗ, ст. 8",
+          "url": "https://www.consultant.ru/document/cons_doc_LAW_144624/0c4ec341947f98654432292ddfd7066e3200d7fd/",
+          "checked_on": "2026-11-27",
+          "scope": "Равные условия конкуренции и запрет необоснованного ограничения; применимость 44-ФЗ к учреждению и специальным требованиям подлежит проверке.",
+          "status": "targeted_text_or_official_explanation_read_not_full_case_verification"
+        }
+      ]
     },
     {
       "case_key": "bank-legal-2026-062",
@@ -1464,10 +1562,28 @@
       "resolved_source_url": null,
       "legal_basis": "НК РФ, статьи 66–68: инвестиционный налоговый кредит. Источники: https://www.nalog.gov.ru/rn77/taxation/tax_legislation/",
       "legal_urls": [
-        "https://www.nalog.gov.ru/rn77/taxation/tax_legislation/"
+        "https://www.nalog.gov.ru/rn77/taxation/tax_legislation/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19671/a89f6e27872ba595439ca2902f233cd969c41b56/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19671/d742ffa792b4e20830fd93a2124bfcc027bd03d6/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "legal_evidence": [
+        {
+          "norm": "НК РФ, ст. 66",
+          "url": "https://www.consultant.ru/document/cons_doc_LAW_19671/a89f6e27872ba595439ca2902f233cd969c41b56/",
+          "checked_on": "2026-11-27",
+          "scope": "Инвестиционный налоговый кредит — изменение срока уплаты с последующим погашением и процентами, не безвозвратная выплата.",
+          "status": "targeted_text_or_official_explanation_read_not_full_case_verification"
+        },
+        {
+          "norm": "НК РФ, ст. 67",
+          "url": "https://www.consultant.ru/document/cons_doc_LAW_19671/d742ffa792b4e20830fd93a2124bfcc027bd03d6/",
+          "checked_on": "2026-11-27",
+          "scope": "Договорные условия кредита и законное основание; конкретный заявитель и основания не подтверждены автоматически.",
+          "status": "targeted_text_or_official_explanation_read_not_full_case_verification"
+        }
+      ]
     },
     {
       "case_key": "bank-legal-2026-064",
@@ -1478,10 +1594,20 @@
       "resolved_source_url": null,
       "legal_basis": "БК РФ, статья 72: государственные контракты и многолетние обязательства. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
       "legal_urls": [
-        "https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721"
+        "https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/aa129af3559dd1fc2b3201c05ced33582fe3d193/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "legal_evidence": [
+        {
+          "norm": "БК РФ, п. 2–3 ст. 72",
+          "url": "https://www.consultant.ru/document/cons_doc_LAW_19702/aa129af3559dd1fc2b3201c05ced33582fe3d193/",
+          "checked_on": "2026-11-27",
+          "scope": "Контракты в пределах лимитов, специальные основания многолетних обязательств; не все долгосрочные контракты запрещены.",
+          "status": "targeted_text_or_official_explanation_read_not_full_case_verification"
+        }
+      ]
     },
     {
       "case_key": "bank-legal-2026-065",
@@ -1520,10 +1646,20 @@
       "resolved_source_url": null,
       "legal_basis": "ГК РФ, статья 582; Федеральный закон №44-ФЗ, статьи 8 и 34. Источники: https://pravo.gov.ru/",
       "legal_urls": [
-        "https://pravo.gov.ru/"
+        "https://pravo.gov.ru/",
+        "https://www.consultant.ru/document/cons_doc_LAW_144624/0c4ec341947f98654432292ddfd7066e3200d7fd/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "legal_evidence": [
+        {
+          "norm": "44-ФЗ, ст. 8",
+          "url": "https://www.consultant.ru/document/cons_doc_LAW_144624/0c4ec341947f98654432292ddfd7066e3200d7fd/",
+          "checked_on": "2026-11-27",
+          "scope": "Равные условия конкуренции и запрет необоснованного ограничения; применимость 44-ФЗ к учреждению и специальным требованиям подлежит проверке.",
+          "status": "targeted_text_or_official_explanation_read_not_full_case_verification"
+        }
+      ]
     },
     {
       "case_key": "bank-legal-2026-068",
@@ -1534,10 +1670,20 @@
       "resolved_source_url": null,
       "legal_basis": "Конституция РФ, статья 130; БК РФ, статья 86; установленный муниципальный порядок инициативных проектов. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
       "legal_urls": [
-        "https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721"
+        "https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/4ce55543bc62fa4c4587fa50514b56aa0121a671/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "legal_evidence": [
+        {
+          "norm": "БК РФ, ст. 86",
+          "url": "https://www.consultant.ru/document/cons_doc_LAW_19702/4ce55543bc62fa4c4587fa50514b56aa0121a671/",
+          "checked_on": "2026-11-27",
+          "scope": "Расходные обязательства муниципального образования; особые условия и действующий местный порядок требуют проверки.",
+          "status": "targeted_text_or_official_explanation_read_not_full_case_verification"
+        }
+      ]
     },
     {
       "case_key": "bank-legal-2026-069",
@@ -1548,10 +1694,20 @@
       "resolved_source_url": null,
       "legal_basis": "БК РФ, статьи 99 и 107: состав государственного долга субъекта РФ. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
       "legal_urls": [
-        "https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721"
+        "https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/95351b068ed8020a8891410884e60ecb81f26164/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "legal_evidence": [
+        {
+          "norm": "БК РФ, п. 2–3 ст. 99",
+          "url": "https://www.consultant.ru/document/cons_doc_LAW_19702/95351b068ed8020a8891410884e60ecb81f26164/",
+          "checked_on": "2026-11-27",
+          "scope": "Обязательства из государственных гарантий включаются в долг; отдельная сверка пределов и бюджетного обеспечения по ст. 107.",
+          "status": "targeted_text_or_official_explanation_read_not_full_case_verification"
+        }
+      ]
     },
     {
       "case_key": "bank-legal-2026-070",
@@ -1576,10 +1732,20 @@
       "resolved_source_url": null,
       "legal_basis": "Федеральный закон №44-ФЗ, статья 34, части 6 и 9: ответственность поставщика. Источники: https://pravo.gov.ru/",
       "legal_urls": [
-        "https://pravo.gov.ru/"
+        "https://pravo.gov.ru/",
+        "https://www.consultant.ru/document/cons_doc_LAW_144624/c5cbc4acc59ffed792a3921dbc18900d2d0f7eb1/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "legal_evidence": [
+        {
+          "norm": "44-ФЗ, ч. 6 ст. 34",
+          "url": "https://www.consultant.ru/document/cons_doc_LAW_144624/c5cbc4acc59ffed792a3921dbc18900d2d0f7eb1/",
+          "checked_on": "2026-11-27",
+          "scope": "Обязанность заказчика направить требование об уплате неустойки; основания освобождения, списания и взыскания не заменяются голосованием.",
+          "status": "targeted_text_or_official_explanation_read_not_full_case_verification"
+        }
+      ]
     },
     {
       "case_key": "bank-legal-2026-072",
@@ -1590,10 +1756,20 @@
       "resolved_source_url": null,
       "legal_basis": "БК РФ, статья 6: бюджет субъекта РФ и консолидированный бюджет. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
       "legal_urls": [
-        "https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721"
+        "https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/055a71948dbf2a4fc2478437cd89cd864ee8e6e5/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "legal_evidence": [
+        {
+          "norm": "БК РФ, ст. 6",
+          "url": "https://www.consultant.ru/document/cons_doc_LAW_19702/055a71948dbf2a4fc2478437cd89cd864ee8e6e5/",
+          "checked_on": "2026-11-27",
+          "scope": "Различение бюджета и консолидированного бюджета, исключение внутренних межбюджетных трансфертов; проверить фактический состав агрегата.",
+          "status": "targeted_text_or_official_explanation_read_not_full_case_verification"
+        }
+      ]
     },
     {
       "case_key": "bank-legal-2026-073",
@@ -1618,10 +1794,20 @@
       "resolved_source_url": null,
       "legal_basis": "БК РФ, статья 79: решения о бюджетных инвестициях. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
       "legal_urls": [
-        "https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721"
+        "https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/ac6c532ee1f365c6e1ff222f22b3f10587918494/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "legal_evidence": [
+        {
+          "norm": "БК РФ, ст. 79",
+          "url": "https://www.consultant.ru/document/cons_doc_LAW_19702/ac6c532ee1f365c6e1ff222f22b3f10587918494/",
+          "checked_on": "2026-11-27",
+          "scope": "Бюджетные инвестиции в публичную собственность; применимость зависит от собственника, получателя и решения.",
+          "status": "targeted_text_or_official_explanation_read_not_full_case_verification"
+        }
+      ]
     },
     {
       "case_key": "bank-legal-2026-075",
@@ -1660,10 +1846,20 @@
       "resolved_source_url": null,
       "legal_basis": "НК РФ, статьи 412–415: объект и ставки торгового сбора. Источники: https://www.nalog.gov.ru/rn77/taxation/tax_legislation/",
       "legal_urls": [
-        "https://www.nalog.gov.ru/rn77/taxation/tax_legislation/"
+        "https://www.nalog.gov.ru/rn77/taxation/tax_legislation/",
+        "https://www.nalog.gov.ru/rn77/taxation/shopcoll/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "legal_evidence": [
+        {
+          "norm": "ФНС России, торговый сбор, ст. 411–417 НК РФ",
+          "url": "https://www.nalog.gov.ru/rn77/taxation/shopcoll/",
+          "checked_on": "2026-11-27",
+          "scope": "Официальное разъяснение по объектам торговли и расчёту по фактическому физическому показателю объекта; ставка и категория проверяются отдельно.",
+          "status": "targeted_text_or_official_explanation_read_not_full_case_verification"
+        }
+      ]
     },
     {
       "case_key": "bank-legal-2026-078",
@@ -1702,10 +1898,28 @@
       "resolved_source_url": null,
       "legal_basis": "БК РФ, статьи 58 и 63: нормативы отчислений в местные бюджеты. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
       "legal_urls": [
-        "https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721"
+        "https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/1e231e90031b99643b29b6eb4579016c2a06533f/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/3cedc4b0d2eb9a888fea5ee932ae8694bfcf931a/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "legal_evidence": [
+        {
+          "norm": "БК РФ, ст. 58",
+          "url": "https://www.consultant.ru/document/cons_doc_LAW_19702/1e231e90031b99643b29b6eb4579016c2a06533f/",
+          "checked_on": "2026-11-27",
+          "scope": "Нормативы устанавливаются на основании предусмотренного законом акта субъекта; определить уровень бюджета и вид норматива.",
+          "status": "targeted_text_or_official_explanation_read_not_full_case_verification"
+        },
+        {
+          "norm": "БК РФ, ст. 63",
+          "url": "https://www.consultant.ru/document/cons_doc_LAW_19702/3cedc4b0d2eb9a888fea5ee932ae8694bfcf931a/",
+          "checked_on": "2026-11-27",
+          "scope": "Компетенция представительного органа муниципального района относительно поселений; не подменяет полномочие субъекта по ст. 58.",
+          "status": "targeted_text_or_official_explanation_read_not_full_case_verification"
+        }
+      ]
     },
     {
       "case_key": "bank-legal-2026-081",
@@ -1730,10 +1944,20 @@
       "resolved_source_url": null,
       "legal_basis": "Федеральный закон от 04.08.2023 №411-ФЗ о северном завозе; БК РФ, статьи 38 и 78. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
       "legal_urls": [
-        "https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721"
+        "https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/9a0e8abcbe24837343cdcc599bccf0f09413968a/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "legal_evidence": [
+        {
+          "norm": "БК РФ, ст. 38",
+          "url": "https://www.consultant.ru/document/cons_doc_LAW_19702/9a0e8abcbe24837343cdcc599bccf0f09413968a/",
+          "checked_on": "2026-11-27",
+          "scope": "Адресность и цель средств; не доказывает автоматически двойное финансирование, форму конкретной помощи или процедуру северного завоза.",
+          "status": "targeted_text_or_official_explanation_read_not_full_case_verification"
+        }
+      ]
     },
     {
       "case_key": "bank-legal-2026-083",
@@ -1772,10 +1996,20 @@
       "resolved_source_url": null,
       "legal_basis": "НК РФ, статья 388: плательщики земельного налога и предусмотренные виды прав. Источники: https://www.nalog.gov.ru/rn77/taxation/tax_legislation/",
       "legal_urls": [
-        "https://www.nalog.gov.ru/rn77/taxation/tax_legislation/"
+        "https://www.nalog.gov.ru/rn77/taxation/tax_legislation/",
+        "https://www.consultant.ru/document/cons_doc_LAW_28165/7266761567c503394be534d7d5d98b99a18b5816/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "legal_evidence": [
+        {
+          "norm": "НК РФ, п. 2 ст. 388",
+          "url": "https://www.consultant.ru/document/cons_doc_LAW_28165/7266761567c503394be534d7d5d98b99a18b5816/",
+          "checked_on": "2026-11-27",
+          "scope": "Безвозмездный пользователь не признаётся плательщиком по данному участку; исправление расчёта и статус иных прав требуют самостоятельной проверки.",
+          "status": "targeted_text_or_official_explanation_read_not_full_case_verification"
+        }
+      ]
     },
     {
       "case_key": "bank-legal-2026-086",
@@ -1786,10 +2020,20 @@
       "resolved_source_url": null,
       "legal_basis": "БК РФ, статья 38: адресность и целевой характер бюджетных средств. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
       "legal_urls": [
-        "https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721"
+        "https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/9a0e8abcbe24837343cdcc599bccf0f09413968a/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "legal_evidence": [
+        {
+          "norm": "БК РФ, ст. 38",
+          "url": "https://www.consultant.ru/document/cons_doc_LAW_19702/9a0e8abcbe24837343cdcc599bccf0f09413968a/",
+          "checked_on": "2026-11-27",
+          "scope": "Адресность и цель средств; не доказывает автоматически двойное финансирование, форму конкретной помощи или процедуру северного завоза.",
+          "status": "targeted_text_or_official_explanation_read_not_full_case_verification"
+        }
+      ]
     },
     {
       "case_key": "bank-legal-2026-087",
@@ -1828,10 +2072,20 @@
       "resolved_source_url": null,
       "legal_basis": "БК РФ, статьи 79–80; ГК РФ, статья 125: формы бюджетных инвестиций и полномочия публичного собственника. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
       "legal_urls": [
-        "https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721"
+        "https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/ac6c532ee1f365c6e1ff222f22b3f10587918494/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "legal_evidence": [
+        {
+          "norm": "БК РФ, ст. 79",
+          "url": "https://www.consultant.ru/document/cons_doc_LAW_19702/ac6c532ee1f365c6e1ff222f22b3f10587918494/",
+          "checked_on": "2026-11-27",
+          "scope": "Бюджетные инвестиции в публичную собственность; применимость зависит от собственника, получателя и решения.",
+          "status": "targeted_text_or_official_explanation_read_not_full_case_verification"
+        }
+      ]
     },
     {
       "case_key": "bank-legal-2026-090",
@@ -2042,12 +2296,29 @@
       "legal_basis": "44-ФЗ, ст. 39, ч. 6 п. 2, ч. 7; 273-ФЗ от 25.12.2008, ст. 10. При установленной личной заинтересованности член комиссии незамедлительно сообщает заказчику, который обязан заменить его. Резерв не является самостоятельным правовым институтом: замена оформляется решением заказчика, соответствующий состав и кворум сохраняются.",
       "legal_urls": [
         "https://www.consultant.ru/document/cons_doc_LAW_144624/b64e0c2e16f5016ebbfd89affc9ba333cc094b20/",
-        "https://www.consultant.ru/document/cons_doc_LAW_82959/5d02242ebd04c398d2acf7c53dbc79659b85e8f3/"
+        "https://www.consultant.ru/document/cons_doc_LAW_82959/5d02242ebd04c398d2acf7c53dbc79659b85e8f3/",
+        "https://www.consultant.ru/document/cons_doc_LAW_82959/64ca591ea83268ee3d33f6e564cbcac0d3a073d9/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
       "review_date": "2026-11-27",
-      "source_scope": "specific_norm_and_related_search_results_partial"
+      "source_scope": "specific_norm_and_related_search_results_partial",
+      "legal_evidence": [
+        {
+          "norm": "273-ФЗ от 25.12.2008, ст. 10",
+          "url": "https://www.consultant.ru/document/cons_doc_LAW_82959/5d02242ebd04c398d2acf7c53dbc79659b85e8f3/",
+          "checked_on": "2026-11-27",
+          "scope": "Личная заинтересованность и круг должностей; членство в комиссии само по себе не доказывает применимость всех обязанностей.",
+          "status": "targeted_text_or_official_explanation_read_not_full_case_verification"
+        },
+        {
+          "norm": "273-ФЗ от 25.12.2008, ст. 11",
+          "url": "https://www.consultant.ru/document/cons_doc_LAW_82959/64ca591ea83268ee3d33f6e564cbcac0d3a073d9/",
+          "checked_on": "2026-11-27",
+          "scope": "Уведомление и урегулирование в применимом порядке, отвод в предусмотренных случаях; специальный порядок комиссии проверяется отдельно.",
+          "status": "targeted_text_or_official_explanation_read_not_full_case_verification"
+        }
+      ]
     },
     {
       "case_key": "bank-legal-2026-103",
@@ -2080,7 +2351,16 @@
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
       "review_date": "2026-11-27",
-      "source_scope": "specific_norm_and_related_search_results_partial"
+      "source_scope": "specific_norm_and_related_search_results_partial",
+      "legal_evidence": [
+        {
+          "norm": "44-ФЗ, п. 1 ч. 1 ст. 33",
+          "url": "https://www.consultant.ru/document/cons_doc_LAW_144624/d6aec91603ff628ea274b8552ce2849e06e0aa4c/",
+          "checked_on": "2026-11-27",
+          "scope": "Описание по требуемым характеристикам, ограничения товарных знаков и специальные исключения; конкретные тесты должны быть нейтральными.",
+          "status": "targeted_text_or_official_explanation_read_not_full_case_verification"
+        }
+      ]
     },
     {
       "case_key": "bank-legal-2026-105",
