@@ -1,0 +1,48 @@
+'use strict';
+const assert=require('node:assert/strict'),fs=require('node:fs');
+const {PGlite}=require('@electric-sql/pglite');
+const uid=n=>'22000000-0000-4000-8000-'+String(n).padStart(12,'0');
+const [game,other,sender,expert,wrong,archived,outsider,teacher]=[1,2,10,11,12,13,14,15].map(uid);
+(async()=>{
+ const db=new PGlite();
+ try{
+ await db.exec(fs.readFileSync('scripts/events-v2-individual-fixture.sql','utf8'));
+ await db.exec(fs.readFileSync('supabase/changes/events_v2_individual_transfer_candidate.sql','utf8'));
+ await db.exec("SET check_function_bodies=on; CREATE TRIGGER guard BEFORE INSERT OR UPDATE ON event_assignments FOR EACH ROW EXECUTE FUNCTION private.guard_event_assignment(); CREATE TRIGGER snapshot BEFORE INSERT ON event_decisions FOR EACH ROW EXECUTE FUNCTION private.snapshot_event_office(); CREATE TRIGGER authority AFTER INSERT ON event_case_outcomes FOR EACH ROW EXECUTE FUNCTION private.record_event_authority();");
+ const query=(s,args=[])=>db.query(s,args), rows=async(s,args=[]) =>(await query(s,args)).rows;
+ const auth=async u=>query("SELECT set_config('request.jwt.claim.sub',$1,false)",[u]);
+ for(const [g,u,k,r,a] of [[game,sender,'student','Министр культуры',null],[game,expert,'student','Министр финансов',null],[game,wrong,'student','Депутат',null],[game,archived,'student','Министр финансов',new Date().toISOString()],[other,outsider,'student','Министр финансов',null],[game,teacher,'teacher','Преподаватель',null]])await query('INSERT INTO game_members VALUES($1,$2,$3,$4,$5)',[g,u,k,a,r]);
+ await query("INSERT INTO game_stages(game_id,stage_no,status,deadline) VALUES($1,7,'open',now()+interval '1 day')",[game]);
+ await query("INSERT INTO state_metrics(game_id,metric_key,value,min_value,max_value) VALUES($1,'lawfulness',50,0,100)",[game]);
+ const plan={rules_version:2,best_option_key:'option_1',options:[{key:'option_1',lawful:true,public_interest:'beneficial',authorized_roles:['министр финансов']},{key:'option_2',lawful:true,public_interest:'neutral',authorized_roles:['министр финансов']}]};
+ const create=async(n,u,legacy=false)=>{const c=uid(n);const p={...plan};if(legacy)delete p.rules_version;await query("INSERT INTO event_cases VALUES($1,$2,'single','ready',$3::jsonb,'[\"Первое\",\"Второе\"]','Кейс')",[c,game,JSON.stringify(p)]);await query('INSERT INTO event_assignments(case_id,game_id,recipient_id,stage_no) VALUES($1,$2,$3,7)',[c,game,u]);return c;};
+ const assign=async c=>(await rows('SELECT id,recipient_id,stage_no,status FROM event_assignments WHERE case_id=$1',[c]));
+ const offer=async(c,from,to)=>{await auth(from);await query('SELECT public.invite_event_collaborator($1,$2)',[c,to]);return (await rows('SELECT id FROM event_collaboration_invites WHERE case_id=$1 AND recipient_id=$2',[c,to]))[0].id};
+ const respond=async(id,u,accept=true)=>{await auth(u);await query('SELECT public.respond_event_invitation($1,$2)',[id,accept])};
+ const score=async u=>Number((await rows("SELECT private.blitz_vsn_components($1,$2,7)->>'cases_right' AS n",[game,u]))[0].n);
+ const vote=async(c,u,choice)=>{await auth(u);const a=(await assign(c))[0];await query('INSERT INTO event_decisions(assignment_id,case_id,game_id,actor_id,choice) VALUES($1,$2,$3,$4,$5)',[a.id,c,game,u,choice]);await query('UPDATE event_assignments SET status=$2 WHERE id=$1',[a.id,'resolved']);await query('INSERT INTO event_case_outcomes(case_id,game_id,winner) VALUES($1,$2,$3)',[c,game,choice]);};
+ const c=await create(101,sender), original=(await assign(c))[0];
+ await assert.rejects(()=>offer(c,sender,outsider),/другого участника/);
+ await assert.rejects(()=>offer(c,sender,archived),/другого участника/);
+ const bad=await offer(c,sender,wrong);await respond(bad,wrong);
+ assert.equal((await assign(c))[0].recipient_id,sender);assert.equal(await score(sender),0);
+ assert.equal((await rows('SELECT status FROM event_collaboration_invites WHERE id=$1',[bad]))[0].status,'declined');
+ const invitation=await offer(c,sender,expert);
+ await assert.rejects(()=>offer(c,sender,wrong),/Передача ситуации недоступна/);
+ await assert.rejects(()=>respond(invitation,wrong),/Приглашение недоступно/);
+ await respond(invitation,expert,false);assert.equal((await assign(c))[0].recipient_id,sender);assert.equal(await score(sender),0);
+ const second=await offer(c,sender,expert);await respond(second,expert);
+ const after=await assign(c);assert.equal(after.length,1);assert.equal(after[0].id,original.id);assert.equal(after[0].stage_no,7);assert.equal(after[0].recipient_id,expert);
+ assert.equal(await score(sender),.5);assert.equal(await score(expert),0);
+ await assert.rejects(()=>respond(second,expert),/уже закрыто/);
+ await assert.rejects(()=>offer(c,expert,wrong),/Передача ситуации недоступна/);
+ await auth(sender);await assert.rejects(()=>query('INSERT INTO event_decisions(assignment_id,case_id,game_id,actor_id,choice) VALUES($1,$2,$3,$4,$5)',[original.id,c,game,sender,'option_1']),/Некорректное назначение/);
+ await vote(c,expert,'option_2');assert.equal(await score(sender),.5);assert.equal(await score(expert),0);
+ const c2=await create(102,sender);await respond(await offer(c2,sender,expert),expert);await vote(c2,expert,'option_1');assert.equal(await score(sender),1);assert.equal(await score(expert),.5);
+ const c3=await create(103,expert);await respond(await offer(c3,expert,sender),sender);assert.equal((await assign(c3))[0].recipient_id,expert);await vote(c3,expert,'option_1');assert.equal(await score(expert),1.5);
+ const legacy=await create(104,sender,true);await respond(await offer(legacy,sender,expert),expert);assert.equal((await assign(legacy)).length,2,'Legacy invitation is unchanged');
+ assert.equal((await rows("SELECT count(*)::int n FROM event_collaboration_invites WHERE transfer_stage_no IS NOT NULL"))[0].n,2);
+ assert.equal((await rows("SELECT has_function_privilege('authenticated','private.event_v2_competent(uuid,uuid)','EXECUTE') AS ok"))[0].ok,false);
+ console.log('PASS actual individual transfer SQL: wrong/archived/cross-game, refusal, one assignment, unchanged stage, independent credit, wrong/right answer, no repeat, legacy');
+ }finally{await db.close()}
+})().catch(e=>{console.error(e);process.exitCode=1});

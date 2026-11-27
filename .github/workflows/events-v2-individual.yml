@@ -1,0 +1,27 @@
+name: Events V2 individual transfer
+on:
+  push:
+    branches: ["feat/events-v2-approved-20261127"]
+    paths:
+      - 'supabase/changes/events_v2_individual_transfer_candidate.sql'
+      - 'scripts/events-v2-individual*'
+      - 'components/game/Event*.tsx'
+      - '.github/workflows/events-v2-individual.yml'
+permissions:
+  contents: read
+concurrency:
+  group: events-v2-individual-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci --no-audit --no-fund
+      - run: npm run typecheck
+      - run: node scripts/events-v2-individual-check.cjs
