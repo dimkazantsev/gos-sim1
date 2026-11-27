@@ -4078,7 +4078,49 @@
       "history_protected": false,
       "legal_review": {
         "basis": "ГК РФ, статьи 125, 209 и 335: публичный собственник и залог. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
-        "status": "requires_case_specific_current_law_review"
+        "status": "requires_case_specific_current_law_review",
+        "checked_norm_urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_5142/53408843126f2204aba45a6195da864ff0319198/",
+          "https://www.consultant.ru/document/cons_doc_LAW_5142/6c9806513efd7fe1af7ed7137faa52abdf43f06a/"
+        ],
+        "collective_option_analysis": {
+          "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+          "date": "2026-11-28",
+          "norm": "ГК РФ, статьи 125, 209 и 335: публичный собственник и залог. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
+          "urls": [
+            "https://www.consultant.ru/document/cons_doc_LAW_5142/53408843126f2204aba45a6195da864ff0319198/",
+            "https://www.consultant.ru/document/cons_doc_LAW_5142/6c9806513efd7fe1af7ed7137faa52abdf43f06a/"
+          ],
+          "source_scope": "Адресные справочные тексты и официальные разъяснения/поисковые выдержки; специальный порядок и цепочка поправок требуют окончательной проверки.",
+          "options": [
+            {
+              "key": "option_1",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Допустимость залога проверяется по режиму конкретного имущества и полномочиям собственника; оценка риска сама не разрешает сделку."
+            },
+            {
+              "key": "option_2",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Рыночное обеспечение предприятия не обременяет казну и определяется сторонами кредита."
+            },
+            {
+              "key": "option_3",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Отдельная поддержка возможна по установленной программе, с бюджетным и антимонопольным основанием."
+            },
+            {
+              "key": "option_4",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Оценка риска учитывает возможность обращения взыскания и утраты публичной функции, но не заменяет решение собственника."
+            },
+            {
+              "key": "option_5",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Сохранение склада для публичных задач допустимо, если нет действующего обязательства предоставить обеспечение."
+            }
+          ],
+          "remaining": "Региональные правила распоряжения казной, оборотоспособность объекта, полномочия, оценка и условия предоставления поддержки."
+        }
       },
       "implementation_review": {
         "status": "case_specific_calibration_draft",
@@ -4090,7 +4132,7 @@
       "title": "Смоленское пожертвование",
       "audience": "all",
       "category": "Региональные финансы",
-      "original_situation": "В Смоленской области учреждению предлагают пожертвование с условием закупать товар только у жертвователя по завышенной цене. Условие противоречит цели и процедуре расходования.\n\nДоговор пожертвования предусматривает 2 млн ₽, но связывает использование денег с покупкой по указанной цене. Аналогичный товар другого поставщика стоит существенно дешевле. Учреждение считает, что без бюджетного источника закупочные требования не применяются. Участник изучает условия дара, режим учреждения и предложения рынка до принятия денег и обязательств по их расходованию.",
+      "original_situation": "В Смоленской области учреждению предлагают пожертвование с условием закупать товар только у жертвователя по завышенной цене. Условие противоречит цели и процедуре расходования.\n\nДоговор пожертвования предусматривает 2 млн ₽, но связывает использование денег с покупкой по указанной цене. Аналогичный товар другого поставщика стоит существенно дешевле. Учреждение считает, что без бюджетного источника закупочные требования не применяются. Участник изучает условия дара, режим учреждения и предложения рынка до принятия денег и обязательств по их расходованию.\n\nУчебное условие: получатель — бюджетное учреждение; заблаговременно размещённого положения о закупке, позволяющего применить 223-ФЗ к дарам, нет.",
       "mandatory_boundary": "Пожертвование не отменяет закупочные требования; недопустимое условие не принимается.",
       "decision_options": [
         "Предложить пожертвование без привязки к выбору поставщика",
@@ -4110,7 +4152,7 @@
               "elite_support": -1,
               "economy": 1
             },
-            "legal_basis": "ГК РФ, статья 582; Федеральный закон №44-ФЗ, статьи 8 и 34. Источники: https://pravo.gov.ru/",
+            "legal_basis": "ГК РФ, ст. 582; 44-ФЗ, ст. 15, 8 и 34: целевое пожертвование не отменяет применимого закупочного режима; в условии исключено основание перехода на 223-ФЗ.",
             "description": "Организационный приоритет: Предложить пожертвование без привязки к выбору поставщика. Последствия — условные параметры учебной модели; не фактическое выделение средств.",
             "implementation_review": {
               "additional_resource_level": 1,
@@ -4130,7 +4172,7 @@
               "elite_support": -2,
               "economy": 1
             },
-            "legal_basis": "ГК РФ, статья 582; Федеральный закон №44-ФЗ, статьи 8 и 34. Источники: https://pravo.gov.ru/",
+            "legal_basis": "ГК РФ, ст. 582; 44-ФЗ, ст. 15, 8 и 34: целевое пожертвование не отменяет применимого закупочного режима; в условии исключено основание перехода на 223-ФЗ.",
             "description": "Открытый отдельный сбор без обязательства закупать у конкретного жертвователя снижает зависимость от единственного донора; кампания требует усилий и не гарантирует сумму. Числовые последствия — предварительная редакционная оценка, не подтверждённый экономический эффект.",
             "implementation_review": {
               "additional_resource_level": 2,
@@ -4163,7 +4205,7 @@
               "elite_support": 2,
               "economy": 1
             },
-            "legal_basis": "ГК РФ, статья 582; Федеральный закон №44-ФЗ, статьи 8 и 34. Источники: https://pravo.gov.ru/",
+            "legal_basis": "ГК РФ, ст. 582; 44-ФЗ, ст. 15, 8 и 34: целевое пожертвование не отменяет применимого закупочного режима; в условии исключено основание перехода на 223-ФЗ.",
             "description": "Организационный приоритет: Сохранить закупку по доступным ассигнованиям без спорного пожертвования. Последствия — условные параметры учебной модели; не фактическое выделение средств.",
             "implementation_review": {
               "additional_resource_level": 0,
@@ -4183,7 +4225,7 @@
               "elite_support": 2,
               "economy": 2
             },
-            "legal_basis": "ГК РФ, статья 582; Федеральный закон №44-ФЗ, статьи 8 и 34. Источники: https://pravo.gov.ru/",
+            "legal_basis": "ГК РФ, ст. 582; 44-ФЗ, ст. 15, 8 и 34: целевое пожертвование не отменяет применимого закупочного режима; в условии исключено основание перехода на 223-ФЗ.",
             "description": "Исключение необязательных покупок при неизменном объёме обязательных услуг сохраняет доступные средства для будущего оснащения; часть удобств откладывается. Числовые последствия — предварительная редакционная оценка, не подтверждённый экономический эффект.",
             "implementation_review": {
               "additional_resource_level": 0,
@@ -4216,7 +4258,7 @@
               "elite_support": -2,
               "economy": 0
             },
-            "legal_basis": "ГК РФ, статья 582; Федеральный закон №44-ФЗ, статьи 8 и 34. Источники: https://pravo.gov.ru/",
+            "legal_basis": "ГК РФ, ст. 582; 44-ФЗ, ст. 15, 8 и 34: целевое пожертвование не отменяет применимого закупочного режима; в условии исключено основание перехода на 223-ФЗ.",
             "description": "Организационный приоритет: Организовать прозрачное обсуждение условий допустимой поддержки учреждения. Последствия — условные параметры учебной модели; не фактическое выделение средств.",
             "implementation_review": {
               "additional_resource_level": 2,
@@ -4238,7 +4280,7 @@
       "verified": false,
       "history_protected": true,
       "legal_review": {
-        "basis": "ГК РФ, статья 582; Федеральный закон №44-ФЗ, статьи 8 и 34. Источники: https://pravo.gov.ru/",
+        "basis": "ГК РФ, ст. 582; 44-ФЗ, ст. 15, 8 и 34: целевое пожертвование не отменяет применимого закупочного режима; в условии исключено основание перехода на 223-ФЗ.",
         "status": "requires_case_specific_current_law_review",
         "article_evidence": [
           {
@@ -4248,7 +4290,49 @@
             "scope": "Равные условия конкуренции и запрет необоснованного ограничения; применимость 44-ФЗ к учреждению и специальным требованиям подлежит проверке.",
             "status": "targeted_text_or_official_explanation_read_not_full_case_verification"
           }
-        ]
+        ],
+        "checked_norm_urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_9027/a0e91c7e19fe89bcaec22682e719eebc0777ba59/",
+          "https://www.consultant.ru/document/cons_doc_LAW_144624/df3ace0ea577a92ea8b71c0d4363fbbe79da7160/"
+        ],
+        "collective_option_analysis": {
+          "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+          "date": "2026-11-28",
+          "norm": "ГК РФ, ст. 582; 44-ФЗ, ст. 15, 8 и 34: целевое пожертвование не отменяет применимого закупочного режима; в условии исключено основание перехода на 223-ФЗ.",
+          "urls": [
+            "https://www.consultant.ru/document/cons_doc_LAW_9027/a0e91c7e19fe89bcaec22682e719eebc0777ba59/",
+            "https://www.consultant.ru/document/cons_doc_LAW_144624/df3ace0ea577a92ea8b71c0d4363fbbe79da7160/"
+          ],
+          "source_scope": "Адресные справочные тексты и официальные разъяснения/поисковые выдержки; специальный порядок и цепочка поправок требуют окончательной проверки.",
+          "options": [
+            {
+              "key": "option_1",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Целевой дар без навязанного поставщика допустим при надлежащем оформлении и использовании по назначению."
+            },
+            {
+              "key": "option_2",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Отдельный добровольный сбор оформляется законно, без обязательного взноса или навязанного контрагента."
+            },
+            {
+              "key": "option_3",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Закупка из имеющихся ассигнований возможна по применимой процедуре и в пределах финансового обеспечения."
+            },
+            {
+              "key": "option_4",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Сократить необязательное оснащение можно без нарушения обязательных требований и уже принятых обязательств."
+            },
+            {
+              "key": "option_5",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Открытое обсуждение условий не заменяет решение учреждения и закупочную процедуру; даритель не получает необоснованного преимущества."
+            }
+          ],
+          "remaining": "Тип учреждения, условия дара, применимость 44-ФЗ или 223-ФЗ, полномочия и правила закупки; целевое назначение дара само по себе разрешено."
+        }
       },
       "implementation_review": {
         "status": "case_specific_calibration_draft",
@@ -4392,7 +4476,49 @@
             "scope": "Расходные обязательства муниципального образования; особые условия и действующий местный порядок требуют проверки.",
             "status": "targeted_text_or_official_explanation_read_not_full_case_verification"
           }
-        ]
+        ],
+        "checked_norm_urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_501319/07d01c5cc986e77d47e5b098e7a80cb185dde940/",
+          "https://www.consultant.ru/document/cons_doc_LAW_501319/cdbe6b2b737a57e9534c5dcb9cd1b89a66837956/"
+        ],
+        "collective_option_analysis": {
+          "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+          "date": "2026-11-28",
+          "norm": "Конституция РФ, статья 130; БК РФ, статья 86; установленный муниципальный порядок инициативных проектов. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
+          "urls": [
+            "https://www.consultant.ru/document/cons_doc_LAW_501319/07d01c5cc986e77d47e5b098e7a80cb185dde940/",
+            "https://www.consultant.ru/document/cons_doc_LAW_501319/cdbe6b2b737a57e9534c5dcb9cd1b89a66837956/"
+          ],
+          "source_scope": "Адресные справочные тексты и официальные разъяснения/поисковые выдержки; специальный порядок и цепочка поправок требуют окончательной проверки.",
+          "options": [
+            {
+              "key": "option_1",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Освещение сохраняет цель поддержанного проекта; дополнительные скамейки требуют согласования и отдельного законного финансового основания."
+            },
+            {
+              "key": "option_2",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Изменить необязательные элементы можно только по действующему муниципальному порядку с учётом позиции инициаторов."
+            },
+            {
+              "key": "option_3",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Поэтапность допустима при сохранении согласованного результата и надлежащем изменении графика и финансирования."
+            },
+            {
+              "key": "option_4",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Новая смета и обсуждение помогают выбрать допустимую редакцию; замена объекта не проводится без требуемого решения."
+            },
+            {
+              "key": "option_5",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Перенос согласованной части требует надлежащего бюджетного решения и соблюдения правил инициативных платежей."
+            }
+          ],
+          "remaining": "Местный порядок, стадия отбора, наличие инициативных платежей и правила возврата; применимость статей 49 и 70 33-ФЗ с учётом переходных норм."
+        }
       },
       "implementation_review": {
         "status": "draft",
@@ -4603,7 +4729,7 @@
       "title": "Томская интеллектуальная собственность",
       "audience": "all",
       "category": "Региональные финансы",
-      "original_situation": "В Томской области университетский стартап просит бюджетную инвестицию. Организация не определила собственника прав на технологию и основания участия региона.\n\nПрототип создан преподавателями университета и сотрудниками компании по разным соглашениям. В заявке на участие региона указано будущее владение долей, но договоры об интеллектуальных правах не представлены. Оценка стоимости технологии основана на ожиданиях продаж. Участник изучает состав участников и документы прав; необходимо определить подтверждения для решения о бюджетном вложении.",
+      "original_situation": "В Томской области университетский стартап просит бюджетную инвестицию. Организация не определила собственника прав на технологию и основания участия региона.\n\nПрототип создан преподавателями университета и сотрудниками компании по разным соглашениям. В заявке на участие региона указано будущее владение долей, но договоры об интеллектуальных правах не представлены. Оценка стоимости технологии основана на ожиданиях продаж. Участник изучает состав участников и документы прав; необходимо определить подтверждения для решения о бюджетном вложении.\n\nУчебное условие: предполагаемый получатель инвестиции — коммерческое общество, а не сам университет как учреждение.",
       "mandatory_boundary": "Права на технологию и законная форма участия публичного образования подтверждаются до вложения.",
       "decision_options": [
         "Предложить лицензирование технологии после проверки принадлежности прав",
@@ -4726,7 +4852,51 @@
       "history_protected": false,
       "legal_review": {
         "basis": "БК РФ, статья 80; ГК РФ, статьи 1229 и 1234: бюджетные инвестиции и исключительные права. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
-        "status": "requires_case_specific_current_law_review"
+        "status": "requires_case_specific_current_law_review",
+        "checked_norm_urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/7ebbdc1002901f697dff4bd07218cb6623bc131c/",
+          "https://www.consultant.ru/document/cons_doc_LAW_64629/98ad2641f95945c4b7956150260564c8b44028d9/",
+          "https://www.consultant.ru/document/cons_doc_LAW_64629/2ef636aadd9bee02a47d69d5393d32dbd576797d/"
+        ],
+        "collective_option_analysis": {
+          "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+          "date": "2026-11-28",
+          "norm": "БК РФ, статья 80; ГК РФ, статьи 1229 и 1234: бюджетные инвестиции и исключительные права. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
+          "urls": [
+            "https://www.consultant.ru/document/cons_doc_LAW_19702/7ebbdc1002901f697dff4bd07218cb6623bc131c/",
+            "https://www.consultant.ru/document/cons_doc_LAW_64629/98ad2641f95945c4b7956150260564c8b44028d9/",
+            "https://www.consultant.ru/document/cons_doc_LAW_64629/2ef636aadd9bee02a47d69d5393d32dbd576797d/"
+          ],
+          "source_scope": "Адресные справочные тексты и официальные разъяснения/поисковые выдержки; специальный порядок и цепочка поправок требуют окончательной проверки.",
+          "options": [
+            {
+              "key": "option_1",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Лицензию предоставляет правообладатель в согласованных пределах; проверяются служебные результаты и совместные права."
+            },
+            {
+              "key": "option_2",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Вложение по статье 80 требует надлежащего бюджетного решения и оформления эквивалентного публичного участия в капитале."
+            },
+            {
+              "key": "option_3",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Конкурс научной поддержки является иной правовой формой и требует самостоятельных условий, не заменяет инвестицию."
+            },
+            {
+              "key": "option_4",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Этапное финансирование допустимо при подтверждённом основании каждого этапа, правах и контроле результата."
+            },
+            {
+              "key": "option_5",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Независимая оценка помогает определить стоимость и риски, но не удостоверяет принадлежность исключительного права."
+            }
+          ],
+          "remaining": "Вид юридического лица, права на конкретный результат, форма бюджетной поддержки, оценка капитала и решение о публичном участии."
+        }
       },
       "implementation_review": {
         "status": "draft",
@@ -5106,7 +5276,47 @@
             "scope": "Различение бюджета и консолидированного бюджета, исключение внутренних межбюджетных трансфертов; проверить фактический состав агрегата.",
             "status": "targeted_text_or_official_explanation_read_not_full_case_verification"
           }
-        ]
+        ],
+        "checked_norm_urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/055a71948dbf2a4fc2478437cd89cd864ee8e6e5/"
+        ],
+        "collective_option_analysis": {
+          "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+          "date": "2026-11-28",
+          "norm": "БК РФ, статья 6: бюджет субъекта РФ и консолидированный бюджет. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
+          "urls": [
+            "https://www.consultant.ru/document/cons_doc_LAW_19702/055a71948dbf2a4fc2478437cd89cd864ee8e6e5/"
+          ],
+          "source_scope": "Адресные справочные тексты и официальные разъяснения/поисковые выдержки; специальный порядок и цепочка поправок требуют окончательной проверки.",
+          "options": [
+            {
+              "key": "option_1",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Раздельные таблицы обозначают границы каждого бюджета и не выдают сводный показатель за доход областного бюджета."
+            },
+            {
+              "key": "option_2",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Единый формат допустим при сохранении самостоятельности бюджетов и одинаковых определений строк."
+            },
+            {
+              "key": "option_3",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Независимая сверка подтверждает периметр и устранение двойного учёта, не заменяет утверждение официального отчёта."
+            },
+            {
+              "key": "option_4",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Сопоставление трансфертов и собственных поступлений раскрывает различие показателей, не смешивая уровни."
+            },
+            {
+              "key": "option_5",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "В своде исключаются трансферты между включёнными бюджетами; конкретный периметр должен быть установлен заранее."
+            }
+          ],
+          "remaining": "Состав свода, межрегиональные соглашения при применимости, отчётный период и источник данных; отдельные субъекты не объединять автоматически."
+        }
       },
       "implementation_review": {
         "status": "case_specific_calibration_draft",
@@ -5254,7 +5464,47 @@
       "history_protected": true,
       "legal_review": {
         "basis": "БК РФ, статья 78: получатель и подтверждённые возмещаемые затраты. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
-        "status": "requires_case_specific_current_law_review"
+        "status": "requires_case_specific_current_law_review",
+        "checked_norm_urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/1b6959f23cc516d0e11ddc2e213ca2dca83560df/"
+        ],
+        "collective_option_analysis": {
+          "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+          "date": "2026-11-28",
+          "norm": "БК РФ, статья 78: получатель и подтверждённые возмещаемые затраты. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
+          "urls": [
+            "https://www.consultant.ru/document/cons_doc_LAW_19702/1b6959f23cc516d0e11ddc2e213ca2dca83560df/"
+          ],
+          "source_scope": "Адресные справочные тексты и официальные разъяснения/поисковые выдержки; специальный порядок и цепочка поправок требуют окончательной проверки.",
+          "options": [
+            {
+              "key": "option_1",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Проверка связывает затраты с юридическим лицом, имеющим право на субсидию по условиям программы."
+            },
+            {
+              "key": "option_2",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Раздельный учёт не приравнивает группу компаний к одному получателю и помогает исключить повторное возмещение."
+            },
+            {
+              "key": "option_3",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Надлежащий получатель подаёт собственную заявку при соблюдении критериев и сроков; чужие затраты не переносятся автоматически."
+            },
+            {
+              "key": "option_4",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Будущая совместная программа возможна при нормативно определённых получателях и распределении допустимых затрат."
+            },
+            {
+              "key": "option_5",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Контроль повторного возмещения проводится по первичным документам и условиям всех связанных мер поддержки."
+            }
+          ],
+          "remaining": "Получатель, право на оборудование, фактический плательщик, условия программы и возможность совместных проектов."
+        }
       },
       "implementation_review": {
         "status": "case_specific_calibration_draft",
@@ -5398,7 +5648,49 @@
             "scope": "Бюджетные инвестиции в публичную собственность; применимость зависит от собственника, получателя и решения.",
             "status": "targeted_text_or_official_explanation_read_not_full_case_verification"
           }
-        ]
+        ],
+        "checked_norm_urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/ac6c532ee1f365c6e1ff222f22b3f10587918494/",
+          "https://www.consultant.ru/document/cons_doc_LAW_144624/f4823c3311874efd0ecdfa668c9705968edbc47c/"
+        ],
+        "collective_option_analysis": {
+          "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+          "date": "2026-11-28",
+          "norm": "БК РФ, статья 79: решения о бюджетных инвестициях. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
+          "urls": [
+            "https://www.consultant.ru/document/cons_doc_LAW_19702/ac6c532ee1f365c6e1ff222f22b3f10587918494/",
+            "https://www.consultant.ru/document/cons_doc_LAW_144624/f4823c3311874efd0ecdfa668c9705968edbc47c/"
+          ],
+          "source_scope": "Адресные справочные тексты и официальные разъяснения/поисковые выдержки; специальный порядок и цепочка поправок требуют окончательной проверки.",
+          "options": [
+            {
+              "key": "option_1",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Сохранение исходного объёма допустимо, если он технически реализуем и соответствует утверждённому проекту и контракту."
+            },
+            {
+              "key": "option_2",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Дополнительное финансирование требует изменения инвестиционного решения, ассигнований и допустимого основания изменения контракта."
+            },
+            {
+              "key": "option_3",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Самостоятельные этапы требуют проектной и финансовой проверки, не служат обходом закупки или экспертизы."
+            },
+            {
+              "key": "option_4",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Независимая оценка сметы обосновывает необходимость расширения, но не разрешает выплату превышения."
+            },
+            {
+              "key": "option_5",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Альтернативный проект требует надлежащей документации и решения, соблюдения уже возникших обязательств."
+            }
+          ],
+          "remaining": "Собственник, вид объекта, экспертиза, изменение инвестиционного решения, лимиты и законное изменение контракта."
+        }
       },
       "implementation_review": {
         "status": "draft",
@@ -5546,7 +5838,47 @@
       "history_protected": false,
       "legal_review": {
         "basis": "НК РФ, статья 217: освобождения доходов от НДФЛ. Источники: https://www.nalog.gov.ru/rn77/taxation/tax_legislation/",
-        "status": "requires_case_specific_current_law_review"
+        "status": "requires_case_specific_current_law_review",
+        "checked_norm_urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_28165/625f7f7ad302ab285fe87457521eb265c7dbee3c/"
+        ],
+        "collective_option_analysis": {
+          "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+          "date": "2026-11-28",
+          "norm": "НК РФ, статья 217: освобождения доходов от НДФЛ. Источники: https://www.nalog.gov.ru/rn77/taxation/tax_legislation/",
+          "urls": [
+            "https://www.consultant.ru/document/cons_doc_LAW_28165/625f7f7ad302ab285fe87457521eb265c7dbee3c/"
+          ],
+          "source_scope": "Адресные справочные тексты и официальные разъяснения/поисковые выдержки; специальный порядок и цепочка поправок требуют окончательной проверки.",
+          "options": [
+            {
+              "key": "option_1",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Сверка определяет, является ли выплата предусмотренной законом компенсацией переезда либо самостоятельной оплатой проживания."
+            },
+            {
+              "key": "option_2",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Консультация разъясняет условия освобождения и не обещает льготу всем работникам, получающим жильё."
+            },
+            {
+              "key": "option_3",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Единые договоры допустимы при отражении реальных оснований выплаты; название не меняет налоговую квалификацию."
+            },
+            {
+              "key": "option_4",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Проверка прошлого периода проводится по действовавшей редакции, исправление — по установленным правилам."
+            },
+            {
+              "key": "option_5",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Будущая программа может предусматривать прозрачные выплаты, но освобождение от НДФЛ возникает только по закону."
+            }
+          ],
+          "remaining": "Конкретный вид переезда, трудовое основание, нормы компенсации, документы и дата выплаты; освобождение длительной оплаты жилья не предполагается."
+        }
       },
       "implementation_review": {
         "status": "case_specific_calibration_draft",
@@ -5694,7 +6026,49 @@
       "history_protected": false,
       "legal_review": {
         "basis": "НК РФ, статьи 12–15: система налогов и полномочия по их установлению. Источники: https://www.nalog.gov.ru/rn77/taxation/tax_legislation/",
-        "status": "requires_case_specific_current_law_review"
+        "status": "requires_case_specific_current_law_review",
+        "checked_norm_urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_19671/ab54b1f6e016638e006428e90971b05636b17cbf/",
+          "https://www.consultant.ru/document/cons_doc_LAW_19671/a96566c217a4dcd2d92872193965c95256f42062/"
+        ],
+        "collective_option_analysis": {
+          "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+          "date": "2026-11-28",
+          "norm": "НК РФ, статьи 12–15: система налогов и полномочия по их установлению. Источники: https://www.nalog.gov.ru/rn77/taxation/tax_legislation/",
+          "urls": [
+            "https://www.consultant.ru/document/cons_doc_LAW_19671/ab54b1f6e016638e006428e90971b05636b17cbf/",
+            "https://www.consultant.ru/document/cons_doc_LAW_19671/a96566c217a4dcd2d92872193965c95256f42062/"
+          ],
+          "source_scope": "Адресные справочные тексты и официальные разъяснения/поисковые выдержки; специальный порядок и цепочка поправок требуют окончательной проверки.",
+          "options": [
+            {
+              "key": "option_1",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Обслуживание улиц финансируется из законных ассигнований, не из самовольно введённого налога."
+            },
+            {
+              "key": "option_2",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Правила размещения вывесок устанавливаются в пределах компетенции и не обусловливают согласование незаконным платежом."
+            },
+            {
+              "key": "option_3",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Дополнительная услуга возможна по добровольному договору с реальным предметом; скрытый обязательный сбор исключён."
+            },
+            {
+              "key": "option_4",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Контроль безопасности ведётся по существующим нормам и не становится основанием произвольного платежа."
+            },
+            {
+              "key": "option_5",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Обсуждение благоустройства допустимо, но не создаёт налогового обязательства без НК РФ и надлежащего акта."
+            }
+          ],
+          "remaining": "Местный порядок вывесок, отличие налога от неналоговой платы и реальной услуги, процедура отмены спорного требования."
+        }
       },
       "implementation_review": {
         "status": "case_specific_calibration_draft",
@@ -5864,7 +6238,49 @@
             "scope": "Официальное разъяснение по объектам торговли и расчёту по фактическому физическому показателю объекта; ставка и категория проверяются отдельно.",
             "status": "targeted_text_or_official_explanation_read_not_full_case_verification"
           }
-        ]
+        ],
+        "checked_norm_urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_28165/5205eca70db07766f5c2f740e4a9b04b7e80ae15/",
+          "https://www.nalog.gov.ru/rn77/taxation/shopcoll/"
+        ],
+        "collective_option_analysis": {
+          "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+          "date": "2026-11-28",
+          "norm": "НК РФ, статьи 412–415: объект и ставки торгового сбора. Источники: https://www.nalog.gov.ru/rn77/taxation/tax_legislation/",
+          "urls": [
+            "https://www.consultant.ru/document/cons_doc_LAW_28165/5205eca70db07766f5c2f740e4a9b04b7e80ae15/",
+            "https://www.nalog.gov.ru/rn77/taxation/shopcoll/"
+          ],
+          "source_scope": "Адресные справочные тексты и официальные разъяснения/поисковые выдержки; специальный порядок и цепочка поправок требуют окончательной проверки.",
+          "options": [
+            {
+              "key": "option_1",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Сверка устанавливает фактический объект, вид торговли и применимый физический показатель; 900 м² здания не автоматически база объекта."
+            },
+            {
+              "key": "option_2",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Консультация различает торговый зал и помещения, не используемые для обслуживания покупателей, по действующему определению."
+            },
+            {
+              "key": "option_3",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Прогноз учитывает исправленный показатель и действующую ставку Москвы, не является индивидуальным начислением."
+            },
+            {
+              "key": "option_4",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Оспаривание классификации производится по предусмотренной процедуре с документами, не самовольным выбором меньшей базы."
+            },
+            {
+              "key": "option_5",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Контроль изменений помогает своевременно исполнить обязанность уведомления при применимости, без дублирующего учёта."
+            }
+          ],
+          "remaining": "Категория и адрес объекта, площадь по применимому определению, редакция московского закона, льготы и период; ставка не рассчитывалась."
+        }
       },
       "implementation_review": {
         "status": "case_specific_calibration_draft",
@@ -5999,7 +6415,51 @@
       "history_protected": false,
       "legal_review": {
         "basis": "Федеральный закон №73-ФЗ, статьи 45 и 47.3; БК РФ, статья 78. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
-        "status": "requires_case_specific_current_law_review"
+        "status": "requires_case_specific_current_law_review",
+        "checked_norm_urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_37318/774d929a1d0aa7f267ba8d331134193b354f8137/",
+          "https://www.consultant.ru/document/cons_doc_LAW_37318/7e5263508065701505bcdcd34b82459f32e36228/",
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/1b6959f23cc516d0e11ddc2e213ca2dca83560df/"
+        ],
+        "collective_option_analysis": {
+          "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+          "date": "2026-11-28",
+          "norm": "Федеральный закон №73-ФЗ, статьи 45 и 47.3; БК РФ, статья 78. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
+          "urls": [
+            "https://www.consultant.ru/document/cons_doc_LAW_37318/774d929a1d0aa7f267ba8d331134193b354f8137/",
+            "https://www.consultant.ru/document/cons_doc_LAW_37318/7e5263508065701505bcdcd34b82459f32e36228/",
+            "https://www.consultant.ru/document/cons_doc_LAW_19702/1b6959f23cc516d0e11ddc2e213ca2dca83560df/"
+          ],
+          "source_scope": "Адресные справочные тексты и официальные разъяснения/поисковые выдержки; специальный порядок и цепочка поправок требуют окончательной проверки.",
+          "options": [
+            {
+              "key": "option_1",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Реставрация выполняется по предусмотренным заданию, разрешению и согласованному проекту с надзором и контролем."
+            },
+            {
+              "key": "option_2",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Противоаварийные меры приоритизируются по подтверждённому состоянию и применимому охранному порядку, не самовольно."
+            },
+            {
+              "key": "option_3",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Транши привязываются к проверяемым результатам допустимых работ и установленным условиям субсидии."
+            },
+            {
+              "key": "option_4",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Софинансирование допустимо при оформлении источников и исключении повторного возмещения одних затрат."
+            },
+            {
+              "key": "option_5",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Дополнительное экспертное наблюдение дополняет обязательные виды надзора, но не заменяет разрешение или лицензию."
+            }
+          ],
+          "remaining": "Предмет охраны, вид работ (содержание или сохранение), уполномоченный орган, разрешения, статус подрядчика и порядок субсидии."
+        }
       },
       "implementation_review": {
         "status": "draft",
@@ -6011,7 +6471,7 @@
       "title": "Биробиджанское исполнение",
       "audience": "all",
       "category": "Региональные финансы",
-      "original_situation": "В Еврейской автономной области платёж оформляют на основании неподписанного акта выполненных работ. Получатель уверяет, что подпись появится после перечисления.\n\nПодрядчик приложил неподписанный акт и фотографии, часть которых относится к другому помещению. Ответственный за приёмку ещё не осмотрел выполненные работы. Бухгалтер готовит платёж, чтобы успеть до конца месяца. Участник получает контракт, акт и материалы осмотра; необходимо определить подтверждённость исполнения и дальнейшие документы до перечисления средств.\n\nПо условию учебной истории учреждение уже использует защищённую систему с готовым маршрутом согласования документов; расширение системы и закупка не нужны.",
+      "original_situation": "В Еврейской автономной области платёж оформляют на основании неподписанного акта выполненных работ. Получатель уверяет, что подпись появится после перечисления.\n\nПодрядчик приложил неподписанный акт и фотографии, часть которых относится к другому помещению. Ответственный за приёмку ещё не осмотрел выполненные работы. Бухгалтер готовит платёж, чтобы успеть до конца месяца. Участник получает контракт, акт и материалы осмотра; необходимо определить подтверждённость исполнения и дальнейшие документы до перечисления средств.\n\nПо условию учебной истории учреждение уже использует защищённую систему с готовым маршрутом согласования документов; расширение системы и закупка не нужны.\n\nУчебное условие: заказчик — казённое учреждение, контракт заключён по 44-ФЗ.",
       "mandatory_boundary": "Оплата производится при надлежащем подтверждении денежного обязательства; фотография не заменяет обязательный документ.",
       "decision_options": [
         "Организовать ускоренную проверку и оформление фактически выполненных работ",
@@ -6186,7 +6646,49 @@
       "history_protected": false,
       "legal_review": {
         "basis": "БК РФ, статья 219: подтверждение денежного обязательства и санкционирование оплаты. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
-        "status": "requires_case_specific_current_law_review"
+        "status": "requires_case_specific_current_law_review",
+        "checked_norm_urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/15d7c58c01bf75dcd6cf84a008bfef761ba731eb/",
+          "https://www.consultant.ru/document/cons_doc_LAW_144624/17c58c1903f7b6212924ba9ce701489655e9a8e0/"
+        ],
+        "collective_option_analysis": {
+          "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+          "date": "2026-11-28",
+          "norm": "БК РФ, статья 219: подтверждение денежного обязательства и санкционирование оплаты. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
+          "urls": [
+            "https://www.consultant.ru/document/cons_doc_LAW_19702/15d7c58c01bf75dcd6cf84a008bfef761ba731eb/",
+            "https://www.consultant.ru/document/cons_doc_LAW_144624/17c58c1903f7b6212924ba9ce701489655e9a8e0/"
+          ],
+          "source_scope": "Адресные справочные тексты и официальные разъяснения/поисковые выдержки; специальный порядок и цепочка поправок требуют окончательной проверки.",
+          "options": [
+            {
+              "key": "option_1",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Ускорение оформления возможно без исключения фактической проверки, экспертизы и надлежащей подписи либо мотивированного отказа."
+            },
+            {
+              "key": "option_2",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Дополнительная проверка качества допустима в пределах срока приёмки и не заменяет обязательную экспертизу."
+            },
+            {
+              "key": "option_3",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Частичная приёмка и оплата возможны для предусмотренного отдельного этапа при надлежащем документировании."
+            },
+            {
+              "key": "option_4",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "График устранения недостатков соответствует контракту и не даёт основания оплатить неподтверждённый результат."
+            },
+            {
+              "key": "option_5",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Имеющийся документооборот применяется в пределах обязательных требований к электронной приёмке, без подмены ЕИС там, где она обязательна."
+            }
+          ],
+          "remaining": "Предмет и стадия контракта, порядок приёмки, документы денежного обязательства, сроки и обязательность ЕИС."
+        }
       },
       "implementation_review": {
         "status": "case_specific_calibration_draft",
@@ -6538,7 +7040,47 @@
       "history_protected": false,
       "legal_review": {
         "basis": "БК РФ, статья 78: условия предоставления субсидии и соглашение. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
-        "status": "requires_case_specific_current_law_review"
+        "status": "requires_case_specific_current_law_review",
+        "checked_norm_urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/1b6959f23cc516d0e11ddc2e213ca2dca83560df/"
+        ],
+        "collective_option_analysis": {
+          "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+          "date": "2026-11-28",
+          "norm": "БК РФ, статья 78: условия предоставления субсидии и соглашение. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
+          "urls": [
+            "https://www.consultant.ru/document/cons_doc_LAW_19702/1b6959f23cc516d0e11ddc2e213ca2dca83560df/"
+          ],
+          "source_scope": "Адресные справочные тексты и официальные разъяснения/поисковые выдержки; специальный порядок и цепочка поправок требуют окончательной проверки.",
+          "options": [
+            {
+              "key": "option_1",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Добровольное изменение допустимо при наличии нормативного основания и надлежащего соглашения, не под давлением угрозы незаконной остановки выплаты."
+            },
+            {
+              "key": "option_2",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Действующие условия сохраняются; новые критерии будущих отборов вводятся заранее по предусмотренной процедуре."
+            },
+            {
+              "key": "option_3",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Консультация помогает выяснить возможность изменения, не создавая новых обязательств без оформления."
+            },
+            {
+              "key": "option_4",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Новый результат может финансироваться по самостоятельной программе, без дублирования и нарушения текущего соглашения."
+            },
+            {
+              "key": "option_5",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Оценка проверяет первоначальные показатели по действующим условиям, не по добавленным задним числом требованиям."
+            }
+          ],
+          "remaining": "Вид получателя, действующий порядок, основания изменения или приостановления выплаты, условия соглашения."
+        }
       },
       "implementation_review": {
         "status": "case_specific_calibration_draft",
@@ -6708,7 +7250,51 @@
             "scope": "Адресность и цель средств; не доказывает автоматически двойное финансирование, форму конкретной помощи или процедуру северного завоза.",
             "status": "targeted_text_or_official_explanation_read_not_full_case_verification"
           }
-        ]
+        ],
+        "checked_norm_urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_453883/be77c0da5cae1ad8f0982641fac42b0aa00a5757/",
+          "https://www.consultant.ru/document/cons_doc_LAW_453883/d6d19db3e0347bb6ad6a7a9b57e3a7f0ba70089e/",
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/9a0e8abcbe24837343cdcc599bccf0f09413968a/"
+        ],
+        "collective_option_analysis": {
+          "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+          "date": "2026-11-28",
+          "norm": "Федеральный закон от 04.08.2023 №411-ФЗ о северном завозе; БК РФ, статьи 38 и 78. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
+          "urls": [
+            "https://www.consultant.ru/document/cons_doc_LAW_453883/be77c0da5cae1ad8f0982641fac42b0aa00a5757/",
+            "https://www.consultant.ru/document/cons_doc_LAW_453883/d6d19db3e0347bb6ad6a7a9b57e3a7f0ba70089e/",
+            "https://www.consultant.ru/document/cons_doc_LAW_19702/9a0e8abcbe24837343cdcc599bccf0f09413968a/"
+          ],
+          "source_scope": "Адресные справочные тексты и официальные разъяснения/поисковые выдержки; специальный порядок и цепочка поправок требуют окончательной проверки.",
+          "options": [
+            {
+              "key": "option_1",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Приоритет определяется законной категорией грузов и согласованным планом, не произвольным перераспределением."
+            },
+            {
+              "key": "option_2",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Этапность допустима при соблюдении утверждённых сроков, условий перевозки и оплаты подтверждённого объёма."
+            },
+            {
+              "key": "option_3",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Контроль накладных устанавливает фактическую поставку и отделяет коммерческий груз от целевого финансирования."
+            },
+            {
+              "key": "option_4",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Совмещение совместимых грузов возможно при соблюдении категорий, маршрута, сроков и раздельного учёта расходов."
+            },
+            {
+              "key": "option_5",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Резервный маршрут допустим после проверки компетентным органом и надлежащего изменения плана или договора при необходимости."
+            }
+          ],
+          "remaining": "Категория груза, действующий план, участник завоза, вид субсидии, условия оплаты и подтверждения; аванс не всегда запрещён."
+        }
       },
       "implementation_review": {
         "status": "case_specific_calibration_draft",
@@ -6856,7 +7442,47 @@
       "history_protected": false,
       "legal_review": {
         "basis": "БК РФ, статья 78: получатель, целевые условия и перечисление субсидии. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
-        "status": "requires_case_specific_current_law_review"
+        "status": "requires_case_specific_current_law_review",
+        "checked_norm_urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/1b6959f23cc516d0e11ddc2e213ca2dca83560df/"
+        ],
+        "collective_option_analysis": {
+          "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+          "date": "2026-11-28",
+          "norm": "БК РФ, статья 78: получатель, целевые условия и перечисление субсидии. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
+          "urls": [
+            "https://www.consultant.ru/document/cons_doc_LAW_19702/1b6959f23cc516d0e11ddc2e213ca2dca83560df/"
+          ],
+          "source_scope": "Адресные справочные тексты и официальные разъяснения/поисковые выдержки; специальный порядок и цепочка поправок требуют окончательной проверки.",
+          "options": [
+            {
+              "key": "option_1",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Консультация уточняет вид ареста и законные способы исполнения, не предлагает обход исполнительного ограничения."
+            },
+            {
+              "key": "option_2",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Замена получателя возможна только по конкретному нормативному основанию и оформленному правопреемству или иной допустимой процедуре."
+            },
+            {
+              "key": "option_3",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Защита цели субсидии не допускает перечисления непричастной фирме с целью обхода ареста."
+            },
+            {
+              "key": "option_4",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Компетентный орган проверяет исполнение и условия возврата; сам арест не автоматически доказывает нарушение соглашения."
+            },
+            {
+              "key": "option_5",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Новый отбор допустим на самостоятельном законном основании, без передачи прежнего обязательства и двойного финансирования."
+            }
+          ],
+          "remaining": "Вид и объём ареста, применимый порядок субсидии, правопреемство, возможные меры исполнения или возврата."
+        }
       },
       "implementation_review": {
         "status": "case_specific_calibration_draft",
@@ -6868,8 +7494,8 @@
       "title": "Крымский гостиничный реестр",
       "audience": "all",
       "category": "Региональные финансы",
-      "original_situation": "В Республике Крым объект размещения не внесён в надлежащий реестр. Муниципалитет автоматически считает отсутствие записи освобождением от любого налогового обязательства.\n\nГостиница фактически размещает гостей и отражает доходы, а заявка на включение в реестр находится на рассмотрении. В служебной записке смешаны условия конкретного налога и отсутствие любых обязанностей бизнеса. Администратор просит отменить все расчёты. Участник получает документы объекта, период деятельности и налоговые регистры; необходимо отдельно проверить применимость каждого обязательства.",
-      "mandatory_boundary": "Отсутствие записи в реестре не означает освобождения от всех налогов; применимые правила и переходные условия проверяются отдельно.",
+      "original_situation": "В Республике Крым объект размещения не внесён в надлежащий реестр. Муниципалитет автоматически считает отсутствие записи освобождением от любого налогового обязательства.\n\nГостиница фактически размещает гостей и отражает доходы, а заявка на включение в реестр находится на рассмотрении. В служебной записке смешаны условия конкретного налога и отсутствие любых обязанностей бизнеса. Администратор просит отменить все расчёты. Участник получает документы объекта, период деятельности и налоговые регистры; необходимо отдельно проверить применимость каждого обязательства.\n\nДействие учебной истории — 2026 год. По информации УФНС на этот период туристический налог на территории Республики Крым не введён. Спор относится к ошибочному выводу об отсутствии всех прочих налоговых обязанностей.",
+      "mandatory_boundary": "Отсутствие введённого туристического налога не освобождает гостиницу от иных применимых налогов. Статус и реестр проверяются для соответствующей обязанности.",
       "decision_options": [
         "Предложить консультации владельцам объектов о порядке подтверждения статуса",
         "Организовать проверку фактической деятельности и применимых налоговых обязанностей",
@@ -6888,7 +7514,7 @@
               "elite_support": -1,
               "economy": -1
             },
-            "legal_basis": "НК РФ, статьи 418.2–418.4; Федеральный закон от 12.07.2024 №176-ФЗ, переходные положения о туристическом налоге. Источники: https://www.nalog.gov.ru/rn77/taxation/tax_legislation/",
+            "legal_basis": "НК РФ, ст. 12, 418.2–418.4; информация ФНС о невведении туристического налога в Республике Крым в 2026 году. Пункт 3 ст. 418.3 предусматривает особый порядок сведений в 2025–2026 годах там, где налог введён.",
             "description": "Организационный приоритет: Предложить консультации владельцам объектов о порядке подтверждения статуса. Последствия — условные параметры учебной модели; не фактическое выделение средств.",
             "implementation_review": {
               "additional_resource_level": 2,
@@ -6908,7 +7534,7 @@
               "elite_support": 2,
               "economy": 1
             },
-            "legal_basis": "НК РФ, статьи 418.2–418.4; Федеральный закон от 12.07.2024 №176-ФЗ, переходные положения о туристическом налоге. Источники: https://www.nalog.gov.ru/rn77/taxation/tax_legislation/",
+            "legal_basis": "НК РФ, ст. 12, 418.2–418.4; информация ФНС о невведении туристического налога в Республике Крым в 2026 году. Пункт 3 ст. 418.3 предусматривает особый порядок сведений в 2025–2026 годах там, где налог введён.",
             "description": "Организационный приоритет: Организовать проверку фактической деятельности и применимых налоговых обязанностей. Последствия — условные параметры учебной модели; не фактическое выделение средств.",
             "implementation_review": {
               "additional_resource_level": 2,
@@ -6928,7 +7554,7 @@
               "elite_support": 2,
               "economy": 1
             },
-            "legal_basis": "НК РФ, статьи 418.2–418.4; Федеральный закон от 12.07.2024 №176-ФЗ, переходные положения о туристическом налоге. Источники: https://www.nalog.gov.ru/rn77/taxation/tax_legislation/",
+            "legal_basis": "НК РФ, ст. 12, 418.2–418.4; информация ФНС о невведении туристического налога в Республике Крым в 2026 году. Пункт 3 ст. 418.3 предусматривает особый порядок сведений в 2025–2026 годах там, где налог введён.",
             "description": "Организационный приоритет: Подготовить прогноз поступлений с учётом подтверждённых объектов. Последствия — условные параметры учебной модели; не фактическое выделение средств.",
             "implementation_review": {
               "additional_resource_level": 1,
@@ -6948,7 +7574,7 @@
               "elite_support": -2,
               "economy": 2
             },
-            "legal_basis": "НК РФ, статьи 418.2–418.4; Федеральный закон от 12.07.2024 №176-ФЗ, переходные положения о туристическом налоге. Источники: https://www.nalog.gov.ru/rn77/taxation/tax_legislation/",
+            "legal_basis": "НК РФ, ст. 12, 418.2–418.4; информация ФНС о невведении туристического налога в Республике Крым в 2026 году. Пункт 3 ст. 418.3 предусматривает особый порядок сведений в 2025–2026 годах там, где налог введён.",
             "description": "Организационный приоритет: Предложить допустимую поддержку соблюдения требований к размещению. Последствия — условные параметры учебной модели; не фактическое выделение средств.",
             "implementation_review": {
               "additional_resource_level": 3,
@@ -6968,7 +7594,7 @@
               "elite_support": 1,
               "economy": 2
             },
-            "legal_basis": "НК РФ, статьи 418.2–418.4; Федеральный закон от 12.07.2024 №176-ФЗ, переходные положения о туристическом налоге. Источники: https://www.nalog.gov.ru/rn77/taxation/tax_legislation/",
+            "legal_basis": "НК РФ, ст. 12, 418.2–418.4; информация ФНС о невведении туристического налога в Республике Крым в 2026 году. Пункт 3 ст. 418.3 предусматривает особый порядок сведений в 2025–2026 годах там, где налог введён.",
             "description": "Организационный приоритет: Согласовать обновление межведомственного обмена сведениями об объектах. Последствия — условные параметры учебной модели; не фактическое выделение средств.",
             "implementation_review": {
               "additional_resource_level": 2,
@@ -6990,8 +7616,50 @@
       "verified": false,
       "history_protected": true,
       "legal_review": {
-        "basis": "НК РФ, статьи 418.2–418.4; Федеральный закон от 12.07.2024 №176-ФЗ, переходные положения о туристическом налоге. Источники: https://www.nalog.gov.ru/rn77/taxation/tax_legislation/",
-        "status": "requires_case_specific_current_law_review"
+        "basis": "НК РФ, ст. 12, 418.2–418.4; информация ФНС о невведении туристического налога в Республике Крым в 2026 году. Пункт 3 ст. 418.3 предусматривает особый порядок сведений в 2025–2026 годах там, где налог введён.",
+        "status": "requires_case_specific_current_law_review",
+        "checked_norm_urls": [
+          "https://www.nalog.gov.ru/rn91/taxation/taxes/tourist_tax/",
+          "https://www.consultant.ru/document/cons_doc_LAW_28165/82271d8942a9fac4206809bca98ddcbb584a4803/"
+        ],
+        "collective_option_analysis": {
+          "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+          "date": "2026-11-28",
+          "norm": "НК РФ, ст. 12, 418.2–418.4; информация ФНС о невведении туристического налога в Республике Крым в 2026 году. Пункт 3 ст. 418.3 предусматривает особый порядок сведений в 2025–2026 годах там, где налог введён.",
+          "urls": [
+            "https://www.nalog.gov.ru/rn91/taxation/taxes/tourist_tax/",
+            "https://www.consultant.ru/document/cons_doc_LAW_28165/82271d8942a9fac4206809bca98ddcbb584a4803/"
+          ],
+          "source_scope": "Адресные справочные тексты и официальные разъяснения/поисковые выдержки; специальный порядок и цепочка поправок требуют окончательной проверки.",
+          "options": [
+            {
+              "key": "option_1",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Консультации по статусу размещения помогают исполнить требования классификации и раздельно проверить налоговые обязанности."
+            },
+            {
+              "key": "option_2",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Фактическая деятельность проверяется компетентным органом по каждому применимому налогу, не по одному факту отсутствия реестра."
+            },
+            {
+              "key": "option_3",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Прогноз включает только действующие налоговые основания; туристический налог в указанном месте и периоде не прогнозируется как поступление."
+            },
+            {
+              "key": "option_4",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Поддержка соблюдения требований размещения возможна по отдельной законной программе без предоставления несуществующей налоговой льготы."
+            },
+            {
+              "key": "option_5",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Обмен сведениями допустим в пределах полномочий и защиты данных, не вводит налог без нормативного акта."
+            }
+          ],
+          "remaining": "Подтверждение места и периода, виды иных налогов, статус и режим плательщика; специальный порядок ст. 418.3 не заменяет введение налога."
+        }
       },
       "implementation_review": {
         "status": "draft",
@@ -7350,7 +8018,47 @@
             "scope": "Адресность и цель средств; не доказывает автоматически двойное финансирование, форму конкретной помощи или процедуру северного завоза.",
             "status": "targeted_text_or_official_explanation_read_not_full_case_verification"
           }
-        ]
+        ],
+        "checked_norm_urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/9a0e8abcbe24837343cdcc599bccf0f09413968a/"
+        ],
+        "collective_option_analysis": {
+          "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+          "date": "2026-11-28",
+          "norm": "БК РФ, статья 38: адресность и целевой характер бюджетных средств. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
+          "urls": [
+            "https://www.consultant.ru/document/cons_doc_LAW_19702/9a0e8abcbe24837343cdcc599bccf0f09413968a/"
+          ],
+          "source_scope": "Адресные справочные тексты и официальные разъяснения/поисковые выдержки; специальный порядок и цепочка поправок требуют окончательной проверки.",
+          "options": [
+            {
+              "key": "option_1",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Критические узлы финансируются при соответствии цели, смете и установленной процедуре, без включения посторонней мебели."
+            },
+            {
+              "key": "option_2",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Этапность допустима с проверяемыми результатами и условиями трансферта, изменяемыми только надлежащим образом."
+            },
+            {
+              "key": "option_3",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Приоритет населённых пунктов обосновывается фактической потребностью и согласованной целью, не произвольным изменением объекта."
+            },
+            {
+              "key": "option_4",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Независимый контроль сверяет смету и результаты; расход на мебель не становится целевым только из-за проверки."
+            },
+            {
+              "key": "option_5",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Имеющееся оснащение или отдельный источник могут использоваться при самостоятельном законном основании без расходования целевых средств."
+            }
+          ],
+          "remaining": "Конкретный вид трансферта, соглашение, получатель, допустимые затраты и изменение сметы."
+        }
       },
       "implementation_review": {
         "status": "case_specific_calibration_draft",
@@ -7362,8 +8070,8 @@
       "title": "Луганский переходный учёт",
       "audience": "all",
       "category": "Региональные финансы",
-      "original_situation": "В Луганской Народной Республике организация применяет обычную налоговую норму, не проверив предусмотренное переходное регулирование по периоду и статусу.\n\nВ досье отражены дата регистрации организации, период операции и начало применения отдельных норм. Бухгалтер скопировал расчёт компании из другого субъекта, не учитывая эти даты. Документы о статусе получены до сдачи отчётности. Участник сопоставляет период, территориальные правила и конкретную операцию; выбор должен опираться на действующее для этого случая регулирование.",
-      "mandatory_boundary": "Налоговый режим определяется статусом организации, периодом и применимыми переходными нормами.",
+      "original_situation": "В Луганской Народной Республике организация применяет обычную налоговую норму, не проверив предусмотренное переходное регулирование по периоду и статусу.\n\nВ досье отражены дата регистрации организации, период операции и начало применения отдельных норм. Бухгалтер скопировал расчёт компании из другого субъекта, не учитывая эти даты. Документы о статусе получены до сдачи отчётности. Участник сопоставляет период, территориальные правила и конкретную операцию; выбор должен опираться на действующее для этого случая регулирование.\n\nЭто ретроспективная учебная ситуация: рассматривается отчётный период, начавшийся 1 января 2023 года; организация соответствует условию места нахождения по статье 11 443-ФЗ. Бухгалтер ошибочно считает допустимым только электронный способ подачи декларации. Норма разрешала бумажную форму для указанного периода; она не устанавливает такую возможность для 2026 года.",
+      "mandatory_boundary": "Форма представления отчётности проверяется по периоду и статусу: в указанном историческом случае допустимы бумажная и электронная формы. Сумма налога от формы не меняется.",
       "decision_options": [
         "Предложить сверку регистрационных сведений и периода возникновения обязанности",
         "Организовать консультации о применимом переходном регулировании",
@@ -7382,7 +8090,7 @@
               "elite_support": 2,
               "economy": 1
             },
-            "legal_basis": "НК РФ, статья 5; Федеральный закон от 21.11.2022 №443-ФЗ: действие налоговых норм и переходные положения. Источники: https://www.nalog.gov.ru/rn77/taxation/tax_legislation/",
+            "legal_basis": "НК РФ, ст. 5; 443-ФЗ от 21.11.2022, ст. 11: специальная возможность бумажной или электронной подачи для указанных плательщиков и периодов с началом до 31.12.2023 включительно.",
             "description": "Организационный приоритет: Предложить сверку регистрационных сведений и периода возникновения обязанности. Последствия — условные параметры учебной модели; не фактическое выделение средств.",
             "implementation_review": {
               "additional_resource_level": 2,
@@ -7402,7 +8110,7 @@
               "elite_support": -1,
               "economy": -1
             },
-            "legal_basis": "НК РФ, статья 5; Федеральный закон от 21.11.2022 №443-ФЗ: действие налоговых норм и переходные положения. Источники: https://www.nalog.gov.ru/rn77/taxation/tax_legislation/",
+            "legal_basis": "НК РФ, ст. 5; 443-ФЗ от 21.11.2022, ст. 11: специальная возможность бумажной или электронной подачи для указанных плательщиков и периодов с началом до 31.12.2023 включительно.",
             "description": "Организационный приоритет: Организовать консультации о применимом переходном регулировании. Последствия — условные параметры учебной модели; не фактическое выделение средств.",
             "implementation_review": {
               "additional_resource_level": 2,
@@ -7422,7 +8130,7 @@
               "elite_support": 2,
               "economy": 1
             },
-            "legal_basis": "НК РФ, статья 5; Федеральный закон от 21.11.2022 №443-ФЗ: действие налоговых норм и переходные положения. Источники: https://www.nalog.gov.ru/rn77/taxation/tax_legislation/",
+            "legal_basis": "НК РФ, ст. 5; 443-ФЗ от 21.11.2022, ст. 11: специальная возможность бумажной или электронной подачи для указанных плательщиков и периодов с началом до 31.12.2023 включительно.",
             "description": "Организационный приоритет: Подготовить отдельные сценарии поступлений после подтверждения режима. Последствия — условные параметры учебной модели; не фактическое выделение средств.",
             "implementation_review": {
               "additional_resource_level": 1,
@@ -7442,7 +8150,7 @@
               "elite_support": -2,
               "economy": 2
             },
-            "legal_basis": "НК РФ, статья 5; Федеральный закон от 21.11.2022 №443-ФЗ: действие налоговых норм и переходные положения. Источники: https://www.nalog.gov.ru/rn77/taxation/tax_legislation/",
+            "legal_basis": "НК РФ, ст. 5; 443-ФЗ от 21.11.2022, ст. 11: специальная возможность бумажной или электронной подачи для указанных плательщиков и периодов с началом до 31.12.2023 включительно.",
             "description": "Проверка периода, статуса и операции позволяет подготовить исправление конкретного спорного расчёта; общая консультация не устраняет уже возникшую ошибку. Числовые последствия — предварительная редакционная оценка, не подтверждённый экономический эффект.",
             "implementation_review": {
               "additional_resource_level": 3,
@@ -7475,7 +8183,7 @@
               "elite_support": 1,
               "economy": 2
             },
-            "legal_basis": "НК РФ, статья 5; Федеральный закон от 21.11.2022 №443-ФЗ: действие налоговых норм и переходные положения. Источники: https://www.nalog.gov.ru/rn77/taxation/tax_legislation/",
+            "legal_basis": "НК РФ, ст. 5; 443-ФЗ от 21.11.2022, ст. 11: специальная возможность бумажной или электронной подачи для указанных плательщиков и периодов с началом до 31.12.2023 включительно.",
             "description": "Организационный приоритет: Настроить контроль дат действия норм для будущих расчётов. Последствия — условные параметры учебной модели; не фактическое выделение средств.",
             "implementation_review": {
               "additional_resource_level": 2,
@@ -7497,8 +8205,50 @@
       "verified": false,
       "history_protected": false,
       "legal_review": {
-        "basis": "НК РФ, статья 5; Федеральный закон от 21.11.2022 №443-ФЗ: действие налоговых норм и переходные положения. Источники: https://www.nalog.gov.ru/rn77/taxation/tax_legislation/",
-        "status": "requires_case_specific_current_law_review"
+        "basis": "НК РФ, ст. 5; 443-ФЗ от 21.11.2022, ст. 11: специальная возможность бумажной или электронной подачи для указанных плательщиков и периодов с началом до 31.12.2023 включительно.",
+        "status": "requires_case_specific_current_law_review",
+        "checked_norm_urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_431755/3eeafbd3bdb64673818bd5cba64081209bddc7a4/",
+          "https://www.consultant.ru/document/cons_doc_LAW_19671/431ac8ed77136ef53561af7f6977bc09ec0595a7/"
+        ],
+        "collective_option_analysis": {
+          "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+          "date": "2026-11-28",
+          "norm": "НК РФ, ст. 5; 443-ФЗ от 21.11.2022, ст. 11: специальная возможность бумажной или электронной подачи для указанных плательщиков и периодов с началом до 31.12.2023 включительно.",
+          "urls": [
+            "https://www.consultant.ru/document/cons_doc_LAW_431755/3eeafbd3bdb64673818bd5cba64081209bddc7a4/",
+            "https://www.consultant.ru/document/cons_doc_LAW_19671/431ac8ed77136ef53561af7f6977bc09ec0595a7/"
+          ],
+          "source_scope": "Адресные справочные тексты и официальные разъяснения/поисковые выдержки; специальный порядок и цепочка поправок требуют окончательной проверки.",
+          "options": [
+            {
+              "key": "option_1",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Сверка места нахождения на предусмотренную дату и начала отчётного периода подтверждает применимость исторической нормы."
+            },
+            {
+              "key": "option_2",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Консультация объясняет обе допустимые формы и отличие исторического порядка от действующего в иных периодах."
+            },
+            {
+              "key": "option_3",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Сценарии поступлений учитывают отдельно налоговый режим; форма подачи не меняет налоговую базу или ставку."
+            },
+            {
+              "key": "option_4",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Проверка спорного расчёта применяется по нормам нужного периода; способ подачи не подтверждает правильность суммы."
+            },
+            {
+              "key": "option_5",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Контроль дат предотвращает перенос исторической процедуры на будущие периоды и не ограничивает законную форму подачи."
+            }
+          ],
+          "remaining": "Конкретная декларация, статус на предусмотренную законом дату, начало периода, историческая редакция и отдельный расчёт налогового обязательства."
+        }
       },
       "implementation_review": {
         "status": "case_specific_calibration_draft",
@@ -7633,7 +8383,49 @@
       "history_protected": false,
       "legal_review": {
         "basis": "Конституция РФ, статья 132, часть 2; БК РФ, статья 140: обеспечение переданных муниципалитету полномочий. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
-        "status": "requires_case_specific_current_law_review"
+        "status": "requires_case_specific_current_law_review",
+        "checked_norm_urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/aba5757994f1d3d2f17a4f4262fb9519d2de5238/",
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/4ce55543bc62fa4c4587fa50514b56aa0121a671/"
+        ],
+        "collective_option_analysis": {
+          "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+          "date": "2026-11-28",
+          "norm": "Конституция РФ, статья 132, часть 2; БК РФ, статья 140: обеспечение переданных муниципалитету полномочий. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
+          "urls": [
+            "https://www.consultant.ru/document/cons_doc_LAW_19702/aba5757994f1d3d2f17a4f4262fb9519d2de5238/",
+            "https://www.consultant.ru/document/cons_doc_LAW_19702/4ce55543bc62fa4c4587fa50514b56aa0121a671/"
+          ],
+          "source_scope": "Адресные справочные тексты и официальные разъяснения/поисковые выдержки; специальный порядок и цепочка поправок требуют окончательной проверки.",
+          "options": [
+            {
+              "key": "option_1",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Уточнение субвенции требует расчёта по установленной методике и решения компетентного органа, не обещания произвольной суммы."
+            },
+            {
+              "key": "option_2",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Распределение работы допустимо между реально уполномоченными подразделениями без передачи функций некомпетентным лицам."
+            },
+            {
+              "key": "option_3",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Проверка объёма услуг и нормативов обосновывает финансовое обеспечение, не заменяет бюджетную процедуру."
+            },
+            {
+              "key": "option_4",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Обучение сотрудников допустимо при законном источнике и сохранении обязательного обслуживания."
+            },
+            {
+              "key": "option_5",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Временное решение сохраняет исполнение обязательных услуг и не создаёт неоформленного расходного обязательства."
+            }
+          ],
+          "remaining": "Закон о передаче полномочия, методика распределения субвенций, изменённый объём функций и компетенция органов."
+        }
       },
       "implementation_review": {
         "status": "draft",
@@ -7777,7 +8569,53 @@
             "scope": "Бюджетные инвестиции в публичную собственность; применимость зависит от собственника, получателя и решения.",
             "status": "targeted_text_or_official_explanation_read_not_full_case_verification"
           }
-        ]
+        ],
+        "checked_norm_urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/ac6c532ee1f365c6e1ff222f22b3f10587918494/",
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/7ebbdc1002901f697dff4bd07218cb6623bc131c/",
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/ca20da6e9e9d1116bbcf04288c9656fcd121ab94/",
+          "https://www.consultant.ru/document/cons_doc_LAW_5142/53408843126f2204aba45a6195da864ff0319198/"
+        ],
+        "collective_option_analysis": {
+          "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+          "date": "2026-11-28",
+          "norm": "БК РФ, статьи 79–80; ГК РФ, статья 125: формы бюджетных инвестиций и полномочия публичного собственника. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
+          "urls": [
+            "https://www.consultant.ru/document/cons_doc_LAW_19702/ac6c532ee1f365c6e1ff222f22b3f10587918494/",
+            "https://www.consultant.ru/document/cons_doc_LAW_19702/7ebbdc1002901f697dff4bd07218cb6623bc131c/",
+            "https://www.consultant.ru/document/cons_doc_LAW_19702/ca20da6e9e9d1116bbcf04288c9656fcd121ab94/",
+            "https://www.consultant.ru/document/cons_doc_LAW_5142/53408843126f2204aba45a6195da864ff0319198/"
+          ],
+          "source_scope": "Адресные справочные тексты и официальные разъяснения/поисковые выдержки; специальный порядок и цепочка поправок требуют окончательной проверки.",
+          "options": [
+            {
+              "key": "option_1",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Комплексное восстановление требует подтверждения публичной собственности и инвестиционного решения либо иной применимой формы."
+            },
+            {
+              "key": "option_2",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Самостоятельный этап допустим при установленном объекте, праве получателя, подтверждённых лимитах и процедуре."
+            },
+            {
+              "key": "option_3",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Сверка реестров и оценка потребности предшествуют финансированию, не создают права будущего оператора."
+            },
+            {
+              "key": "option_4",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Альтернативный объект допустим после проверки принадлежности и надлежащего изменения инвестиционного решения."
+            },
+            {
+              "key": "option_5",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Открытый график финансирования и контроля не заменяет установление собственника и законного получателя."
+            }
+          ],
+          "remaining": "Правовой статус имущества, вид получателя, форма по ст. 79, 79.1 или 80, бюджетное решение и полномочия публичного собственника."
+        }
       },
       "implementation_review": {
         "status": "draft",
