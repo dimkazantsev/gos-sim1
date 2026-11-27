@@ -5562,14 +5562,42 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "Статьи 209 и 210 ГК РФ определяют осуществление прав собственника и содержание имущества, а статья 44 Конституции РФ защищает творчество. Временный характер выставки не отменяет прав владельца вещей и обязанности обеспечить безопасное использование площадки. Источники: https://11.rosguard.gov.ru/uploads/2025/07/5_grazhdanskijj_kodeks_rossijjskojj_federacii_chast_pervaya.pdf https://minjust.gov.ru/ru/documents/8011/",
-      "legal_urls": [],
+      "legal_basis": "ГК РФ, ст. 209–210, 296, 298: правомочия собственника и пределы распоряжения имуществом учреждения зависят от вида учреждения и имущества. Ст. 44 Конституции защищает творчество, не отменяя имущественный режим и безопасность.",
+      "legal_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_5142/9bc79ae09d078798e7a4ee4647ac9ea495da9fa0/",
+        "https://www.consultant.ru/document/cons_doc_LAW_5142/c63c967d22055f1df0fcfecca564826dedb3b8c7/",
+        "https://www.consultant.ru/document/cons_doc_LAW_5142/e842f7d159aa68f9ccac4fbdedf7f01dad5fbf04/",
+        "https://www.consultant.ru/document/cons_doc_LAW_5142/3b8eaaf84b59c73761e963046f96813d55b45d9b/",
+        "https://minjust.gov.ru/ru/documents/8011/"
+      ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
-      "checked_norm_urls": [],
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_5142/9bc79ae09d078798e7a4ee4647ac9ea495da9fa0/",
+        "https://www.consultant.ru/document/cons_doc_LAW_5142/c63c967d22055f1df0fcfecca564826dedb3b8c7/",
+        "https://www.consultant.ru/document/cons_doc_LAW_5142/e842f7d159aa68f9ccac4fbdedf7f01dad5fbf04/",
+        "https://www.consultant.ru/document/cons_doc_LAW_5142/3b8eaaf84b59c73761e963046f96813d55b45d9b/",
+        "https://minjust.gov.ru/ru/documents/8011/"
+      ],
       "option_analysis_status": "draft",
-      "source_scope": "inherited_basis_requires_current_verification",
-      "review_date": "2026-11-27"
+      "source_scope": "specific_norm_and_related_search_results_partial",
+      "review_date": "2026-11-28",
+      "norm_recheck_2026_11_28": {
+        "status": "targeted_norm_and_individual_alternatives_reviewed_not_full_acceptance",
+        "limitation": "Тип учреждения и состав имущества не заданы; требуется разрешение уполномоченного лица по применимому порядку, а не всегда одинаковое согласие собственника.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_5142/9bc79ae09d078798e7a4ee4647ac9ea495da9fa0/",
+          "https://www.consultant.ru/document/cons_doc_LAW_5142/c63c967d22055f1df0fcfecca564826dedb3b8c7/",
+          "https://www.consultant.ru/document/cons_doc_LAW_5142/e842f7d159aa68f9ccac4fbdedf7f01dad5fbf04/",
+          "https://www.consultant.ru/document/cons_doc_LAW_5142/3b8eaaf84b59c73761e963046f96813d55b45d9b/",
+          "https://minjust.gov.ru/ru/documents/8011/"
+        ]
+      },
+      "targeted_individual_review": {
+        "status": "targeted_norm_and_individual_alternatives_reviewed_not_full_acceptance",
+        "option_count": 5,
+        "remaining": "Тип учреждения и состав имущества не заданы; требуется разрешение уполномоченного лица по применимому порядку, а не всегда одинаковое согласие собственника."
+      }
     },
     {
       "case_key": "bank-curated-light-09",
@@ -5616,14 +5644,36 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "Статья 44 Конституции РФ защищает художественное творчество; часть 3 статьи 17 требует уважать права других лиц. Статья 209 ГК РФ определяет полномочия собственника площадки. Конкретная процедура зависит от характера мероприятия и местных правил; культурное выступление не объявляется митингом автоматически. Источники: https://minjust.gov.ru/ru/documents/8011/ https://11.rosguard.gov.ru/uploads/2025/07/5_grazhdanskijj_kodeks_rossijjskojj_federacii_chast_pervaya.pdf",
-      "legal_urls": [],
+      "legal_basis": "Конституция РФ, ст. 17 ч. 3, 44; ГК РФ, ст. 209; 54-ФЗ, ст. 2: правовая квалификация мероприятия зависит от фактической цели и формы, а не только от наличия политических требований. Культурное выступление само по себе не является митингом.",
+      "legal_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_5142/9bc79ae09d078798e7a4ee4647ac9ea495da9fa0/",
+        "https://minjust.gov.ru/ru/documents/8011/",
+        "https://www.consultant.ru/document/cons_doc_LAW_48103/4ceedc6beeab98acfcffe6b042e41a8319e1c922/"
+      ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
-      "checked_norm_urls": [],
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_5142/9bc79ae09d078798e7a4ee4647ac9ea495da9fa0/",
+        "https://minjust.gov.ru/ru/documents/8011/",
+        "https://www.consultant.ru/document/cons_doc_LAW_48103/4ceedc6beeab98acfcffe6b042e41a8319e1c922/"
+      ],
       "option_analysis_status": "draft",
-      "source_scope": "inherited_basis_requires_current_verification",
-      "review_date": "2026-11-27"
+      "source_scope": "specific_norm_and_related_search_results_partial",
+      "review_date": "2026-11-28",
+      "norm_recheck_2026_11_28": {
+        "status": "targeted_norm_and_individual_alternatives_reviewed_not_full_acceptance",
+        "limitation": "Местный порядок использования остановок, земельный режим и согласование с перевозчиком отдельно не подтверждены.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_5142/9bc79ae09d078798e7a4ee4647ac9ea495da9fa0/",
+          "https://minjust.gov.ru/ru/documents/8011/",
+          "https://www.consultant.ru/document/cons_doc_LAW_48103/4ceedc6beeab98acfcffe6b042e41a8319e1c922/"
+        ]
+      },
+      "targeted_individual_review": {
+        "status": "targeted_norm_and_individual_alternatives_reviewed_not_full_acceptance",
+        "option_count": 5,
+        "remaining": "Местный порядок использования остановок, земельный режим и согласование с перевозчиком отдельно не подтверждены."
+      }
     },
     {
       "case_key": "bank-curated-light-12",
@@ -6724,13 +6774,39 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "ГК РФ, статьи 209 и 210: собственник определяет использование имущества и несёт бремя его содержания; статья 1064 закрепляет общие основания возмещения причинённого вреда. Эти нормы не устанавливают универсальную освещённость в люксах. Источники: https://11.rosguard.gov.ru/uploads/2025/07/5_grazhdanskijj_kodeks_rossijjskojj_federacii_chast_pervaya.pdf https://minjust.gov.ru/ru/pages/grazhdanskij-kodeks/",
-      "legal_urls": [],
+      "legal_basis": "ГК РФ, ст. 209–210, 309, 1064: режим имущества и исполнение договора, общие условия возмещения вреда. Нормы не задают универсальную освещённость и не заменяют согласованную техническую проверку.",
+      "legal_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_5142/9bc79ae09d078798e7a4ee4647ac9ea495da9fa0/",
+        "https://www.consultant.ru/document/cons_doc_LAW_5142/c63c967d22055f1df0fcfecca564826dedb3b8c7/",
+        "https://www.consultant.ru/document/cons_doc_LAW_9027/c511835e25e63740cf185038b1ad056526f814e9/",
+        "https://www.consultant.ru/document/cons_doc_LAW_5142/1cd43e51fbd4129343b325971a466ec5cd32a425/"
+      ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
       "option_analysis_status": "draft",
-      "source_scope": "inherited_basis_requires_current_verification",
-      "review_date": "2026-11-27"
+      "source_scope": "specific_norm_and_related_search_results_partial",
+      "review_date": "2026-11-28",
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_5142/9bc79ae09d078798e7a4ee4647ac9ea495da9fa0/",
+        "https://www.consultant.ru/document/cons_doc_LAW_5142/c63c967d22055f1df0fcfecca564826dedb3b8c7/",
+        "https://www.consultant.ru/document/cons_doc_LAW_9027/c511835e25e63740cf185038b1ad056526f814e9/",
+        "https://www.consultant.ru/document/cons_doc_LAW_5142/1cd43e51fbd4129343b325971a466ec5cd32a425/"
+      ],
+      "norm_recheck_2026_11_28": {
+        "status": "targeted_norm_and_individual_alternatives_reviewed_not_full_acceptance",
+        "limitation": "Технические нормы и условия аренды не заданы; допустимость переноса времени предполагает согласование.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_5142/9bc79ae09d078798e7a4ee4647ac9ea495da9fa0/",
+          "https://www.consultant.ru/document/cons_doc_LAW_5142/c63c967d22055f1df0fcfecca564826dedb3b8c7/",
+          "https://www.consultant.ru/document/cons_doc_LAW_9027/c511835e25e63740cf185038b1ad056526f814e9/",
+          "https://www.consultant.ru/document/cons_doc_LAW_5142/1cd43e51fbd4129343b325971a466ec5cd32a425/"
+        ]
+      },
+      "targeted_individual_review": {
+        "status": "targeted_norm_and_individual_alternatives_reviewed_not_full_acceptance",
+        "option_count": 5,
+        "remaining": "Технические нормы и условия аренды не заданы; допустимость переноса времени предполагает согласование."
+      }
     },
     {
       "case_key": "bank-curated-v2-37",
@@ -6884,13 +6960,36 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "ГК РФ, статьи 209 и 210: собственник определяет допустимое использование и обеспечивает содержание имущества; статья 1064 — общие основания ответственности за вред. Снятие замков требует продуманного порядка учёта и хранения. Источники: https://11.rosguard.gov.ru/uploads/2025/07/5_grazhdanskijj_kodeks_rossijjskojj_federacii_chast_pervaya.pdf https://minjust.gov.ru/ru/pages/grazhdanskij-kodeks/",
-      "legal_urls": [],
+      "legal_basis": "ГК РФ, ст. 209–210, 1064: содержание ограждения и общие основания ответственности за вред. Принадлежность моста не означает перехода права собственности на прикреплённые вещи; снятие и хранение должны иметь отдельное основание.",
+      "legal_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_5142/9bc79ae09d078798e7a4ee4647ac9ea495da9fa0/",
+        "https://www.consultant.ru/document/cons_doc_LAW_5142/c63c967d22055f1df0fcfecca564826dedb3b8c7/",
+        "https://www.consultant.ru/document/cons_doc_LAW_9027/c511835e25e63740cf185038b1ad056526f814e9/"
+      ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
       "option_analysis_status": "draft",
-      "source_scope": "inherited_basis_requires_current_verification",
-      "review_date": "2026-11-27"
+      "source_scope": "specific_norm_and_related_search_results_partial",
+      "review_date": "2026-11-28",
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_5142/9bc79ae09d078798e7a4ee4647ac9ea495da9fa0/",
+        "https://www.consultant.ru/document/cons_doc_LAW_5142/c63c967d22055f1df0fcfecca564826dedb3b8c7/",
+        "https://www.consultant.ru/document/cons_doc_LAW_9027/c511835e25e63740cf185038b1ad056526f814e9/"
+      ],
+      "norm_recheck_2026_11_28": {
+        "status": "targeted_norm_and_individual_alternatives_reviewed_not_full_acceptance",
+        "limitation": "Правовой статус оставленных замков, местные правила и порядок уведомления владельцев не установлены. Ст. 1064 не устанавливает автоматическую ответственность без условий.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_5142/9bc79ae09d078798e7a4ee4647ac9ea495da9fa0/",
+          "https://www.consultant.ru/document/cons_doc_LAW_5142/c63c967d22055f1df0fcfecca564826dedb3b8c7/",
+          "https://www.consultant.ru/document/cons_doc_LAW_9027/c511835e25e63740cf185038b1ad056526f814e9/"
+        ]
+      },
+      "targeted_individual_review": {
+        "status": "targeted_norm_and_individual_alternatives_reviewed_not_full_acceptance",
+        "option_count": 5,
+        "remaining": "Правовой статус оставленных замков, местные правила и порядок уведомления владельцев не установлены. Ст. 1064 не устанавливает автоматическую ответственность без условий."
+      }
     },
     {
       "case_key": "bank-curated-v2-47",
@@ -7014,13 +7113,33 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "ГК РФ, статьи 309 и 421: содержание обязательства определяется законом и договором; дополнительная услуга требует самостоятельного основания. Нормы не устанавливают обязательного разрезания ленты перед использованием принятого парка. Источники: https://11.rosguard.gov.ru/uploads/2025/07/5_grazhdanskijj_kodeks_rossijjskojj_federacii_chast_pervaya.pdf",
-      "legal_urls": [],
+      "legal_basis": "ГК РФ, ст. 309, 421: согласованные обязательства исполняются надлежащим образом; дополнительная услуга требует законного договорного основания. Эти статьи не предусматривают обязательного разрезания декоративной ленты.",
+      "legal_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_5142/1cd43e51fbd4129343b325971a466ec5cd32a425/",
+        "https://www.consultant.ru/document/cons_doc_LAW_5142/ad08909251f4d26ebc935648e4e708a31e160348/"
+      ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
       "option_analysis_status": "draft",
-      "source_scope": "inherited_basis_requires_current_verification",
-      "review_date": "2026-11-27"
+      "source_scope": "specific_norm_and_related_search_results_partial",
+      "review_date": "2026-11-28",
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_5142/1cd43e51fbd4129343b325971a466ec5cd32a425/",
+        "https://www.consultant.ru/document/cons_doc_LAW_5142/ad08909251f4d26ebc935648e4e708a31e160348/"
+      ],
+      "norm_recheck_2026_11_28": {
+        "status": "targeted_norm_and_individual_alternatives_reviewed_not_full_acceptance",
+        "limitation": "При изменении оплаченных услуг необходимо соблюдать применимые договорные и закупочные условия; самостоятельной закупки не предлагается.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_5142/1cd43e51fbd4129343b325971a466ec5cd32a425/",
+          "https://www.consultant.ru/document/cons_doc_LAW_5142/ad08909251f4d26ebc935648e4e708a31e160348/"
+        ]
+      },
+      "targeted_individual_review": {
+        "status": "targeted_norm_and_individual_alternatives_reviewed_not_full_acceptance",
+        "option_count": 5,
+        "remaining": "При изменении оплаченных услуг необходимо соблюдать применимые договорные и закупочные условия; самостоятельной закупки не предлагается."
+      }
     },
     {
       "case_key": "bank-expanded-light-04-01",
@@ -7080,13 +7199,39 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "ГК РФ, статьи 209 и 210: полномочия собственника и бремя содержания имущества; статья 309: исполнение договора обслуживания. Статус объекта культурного наследия нельзя предполагать только из слова «памятник». Источники: https://11.rosguard.gov.ru/uploads/2025/07/5_grazhdanskijj_kodeks_rossijjskojj_federacii_chast_pervaya.pdf",
-      "legal_urls": [],
+      "legal_basis": "ГК РФ, ст. 209–210, 309: содержание имущества и договор обслуживания. 73-ФЗ, ст. 33: государственная охрана распространяется также на выявленные объекты культурного наследия. В учебном условии специальный охранный статус исключён.",
+      "legal_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_5142/9bc79ae09d078798e7a4ee4647ac9ea495da9fa0/",
+        "https://www.consultant.ru/document/cons_doc_LAW_5142/c63c967d22055f1df0fcfecca564826dedb3b8c7/",
+        "https://www.consultant.ru/document/cons_doc_LAW_5142/1cd43e51fbd4129343b325971a466ec5cd32a425/",
+        "https://www.consultant.ru/document/cons_doc_LAW_37318/6cbd5e15a0d9f4b2f2600d4efdec0b662288fcd5/"
+      ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
       "option_analysis_status": "draft",
-      "source_scope": "inherited_basis_requires_current_verification",
-      "review_date": "2026-11-27"
+      "source_scope": "specific_norm_and_related_search_results_partial",
+      "review_date": "2026-11-28",
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_5142/9bc79ae09d078798e7a4ee4647ac9ea495da9fa0/",
+        "https://www.consultant.ru/document/cons_doc_LAW_5142/c63c967d22055f1df0fcfecca564826dedb3b8c7/",
+        "https://www.consultant.ru/document/cons_doc_LAW_5142/1cd43e51fbd4129343b325971a466ec5cd32a425/",
+        "https://www.consultant.ru/document/cons_doc_LAW_37318/6cbd5e15a0d9f4b2f2600d4efdec0b662288fcd5/"
+      ],
+      "norm_recheck_2026_11_28": {
+        "status": "targeted_norm_and_individual_alternatives_reviewed_not_full_acceptance",
+        "limitation": "Местные правила содержания и кормления птиц, фактический договор и состав очищающего средства отдельно не проверены.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_5142/9bc79ae09d078798e7a4ee4647ac9ea495da9fa0/",
+          "https://www.consultant.ru/document/cons_doc_LAW_5142/c63c967d22055f1df0fcfecca564826dedb3b8c7/",
+          "https://www.consultant.ru/document/cons_doc_LAW_5142/1cd43e51fbd4129343b325971a466ec5cd32a425/",
+          "https://www.consultant.ru/document/cons_doc_LAW_37318/6cbd5e15a0d9f4b2f2600d4efdec0b662288fcd5/"
+        ]
+      },
+      "targeted_individual_review": {
+        "status": "targeted_norm_and_individual_alternatives_reviewed_not_full_acceptance",
+        "option_count": 5,
+        "remaining": "Местные правила содержания и кормления птиц, фактический договор и состав очищающего средства отдельно не проверены."
+      }
     },
     {
       "case_key": "bank-expanded-light-08-01",
@@ -7147,13 +7292,36 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "Конституция РФ, статья 130: самостоятельное решение населением вопросов местного значения; ГК РФ, статья 209: полномочия собственника объекта. Конкретная компетенция и порядок в этой истории заданы муниципальным положением; федеральная норма не объявляет любое понравившееся название официальным. Источники: https://minjust.gov.ru/ru/documents/8011/ https://11.rosguard.gov.ru/uploads/2025/07/5_grazhdanskijj_kodeks_rossijjskojj_federacii_chast_pervaya.pdf",
-      "legal_urls": [],
+      "legal_basis": "Конституция РФ, ст. 130; ГК РФ, ст. 125, 209: муниципальная компетенция определяется применимыми актами. Наименование мостика осуществляется по указанному в учебной задаче муниципальному положению, а не автоматически по мнению собственника.",
+      "legal_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_5142/9bc79ae09d078798e7a4ee4647ac9ea495da9fa0/",
+        "https://www.consultant.ru/document/cons_doc_LAW_5142/53408843126f2204aba45a6195da864ff0319198/",
+        "https://minjust.gov.ru/ru/documents/8011/"
+      ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
       "option_analysis_status": "draft",
-      "source_scope": "inherited_basis_requires_current_verification",
-      "review_date": "2026-11-27"
+      "source_scope": "specific_norm_and_related_search_results_partial",
+      "review_date": "2026-11-28",
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_5142/9bc79ae09d078798e7a4ee4647ac9ea495da9fa0/",
+        "https://www.consultant.ru/document/cons_doc_LAW_5142/53408843126f2204aba45a6195da864ff0319198/",
+        "https://minjust.gov.ru/ru/documents/8011/"
+      ],
+      "norm_recheck_2026_11_28": {
+        "status": "targeted_norm_and_individual_alternatives_reviewed_not_full_acceptance",
+        "limitation": "Не установлено фактическое муниципальное образование и реальный порядок наименований; положение является учебным условием.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_5142/9bc79ae09d078798e7a4ee4647ac9ea495da9fa0/",
+          "https://www.consultant.ru/document/cons_doc_LAW_5142/53408843126f2204aba45a6195da864ff0319198/",
+          "https://minjust.gov.ru/ru/documents/8011/"
+        ]
+      },
+      "targeted_individual_review": {
+        "status": "targeted_norm_and_individual_alternatives_reviewed_not_full_acceptance",
+        "option_count": 5,
+        "remaining": "Не установлено фактическое муниципальное образование и реальный порядок наименований; положение является учебным условием."
+      }
     },
     {
       "case_key": "bank-expanded-light-12-01",
@@ -7280,13 +7448,45 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "ГК РФ, статьи 209–210 и 689: правомочия собственника, содержание имущества и безвозмездное пользование. Поддержка библиотекой не означает автоматического перехода павильона или всех обязанностей по уходу. Источники: https://11.rosguard.gov.ru/uploads/2025/07/5_grazhdanskijj_kodeks_rossijjskojj_federacii_chast_pervaya.pdf https://minjust.gov.ru/ru/pages/grazhdanskij-kodeks/",
-      "legal_urls": [],
+      "legal_basis": "ГК РФ, ст. 209–210, 421, 689: пользование имуществом согласуется надлежащим лицом; ст. 17.1 135-ФЗ от 26.07.2006 при применимости регулирует передачу публичного имущества. 135-ФЗ от 11.08.1995, ст. 17.1: добровольчество не предполагает принудительного дежурства.",
+      "legal_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_5142/9bc79ae09d078798e7a4ee4647ac9ea495da9fa0/",
+        "https://www.consultant.ru/document/cons_doc_LAW_5142/c63c967d22055f1df0fcfecca564826dedb3b8c7/",
+        "https://www.consultant.ru/document/cons_doc_LAW_9027/98878eb82821832299a1963e05b19d12737e8984/",
+        "https://www.consultant.ru/document/cons_doc_LAW_5142/ad08909251f4d26ebc935648e4e708a31e160348/",
+        "https://www.consultant.ru/document/cons_doc_LAW_7495/d12634a3b32eea709b2c4fc1b24c6533c88154e6/",
+        "https://www.consultant.ru/document/cons_doc_LAW_61763/eeb8f51df68fc096ecadf011932a85ef5e6a0ee1/"
+      ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
       "option_analysis_status": "draft",
-      "source_scope": "inherited_basis_requires_current_verification",
-      "review_date": "2026-11-27"
+      "source_scope": "specific_norm_and_related_search_results_partial",
+      "review_date": "2026-11-28",
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_5142/9bc79ae09d078798e7a4ee4647ac9ea495da9fa0/",
+        "https://www.consultant.ru/document/cons_doc_LAW_5142/c63c967d22055f1df0fcfecca564826dedb3b8c7/",
+        "https://www.consultant.ru/document/cons_doc_LAW_9027/98878eb82821832299a1963e05b19d12737e8984/",
+        "https://www.consultant.ru/document/cons_doc_LAW_5142/ad08909251f4d26ebc935648e4e708a31e160348/",
+        "https://www.consultant.ru/document/cons_doc_LAW_7495/d12634a3b32eea709b2c4fc1b24c6533c88154e6/",
+        "https://www.consultant.ru/document/cons_doc_LAW_61763/eeb8f51df68fc096ecadf011932a85ef5e6a0ee1/"
+      ],
+      "norm_recheck_2026_11_28": {
+        "status": "targeted_norm_and_individual_alternatives_reviewed_not_full_acceptance",
+        "limitation": "Собственник и правовой режим будки не конкретизированы. Не предполагается автоматическое право на передачу публичного имущества без торгов.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_5142/9bc79ae09d078798e7a4ee4647ac9ea495da9fa0/",
+          "https://www.consultant.ru/document/cons_doc_LAW_5142/c63c967d22055f1df0fcfecca564826dedb3b8c7/",
+          "https://www.consultant.ru/document/cons_doc_LAW_9027/98878eb82821832299a1963e05b19d12737e8984/",
+          "https://www.consultant.ru/document/cons_doc_LAW_5142/ad08909251f4d26ebc935648e4e708a31e160348/",
+          "https://www.consultant.ru/document/cons_doc_LAW_7495/d12634a3b32eea709b2c4fc1b24c6533c88154e6/",
+          "https://www.consultant.ru/document/cons_doc_LAW_61763/eeb8f51df68fc096ecadf011932a85ef5e6a0ee1/"
+        ]
+      },
+      "targeted_individual_review": {
+        "status": "targeted_norm_and_individual_alternatives_reviewed_not_full_acceptance",
+        "option_count": 5,
+        "remaining": "Собственник и правовой режим будки не конкретизированы. Не предполагается автоматическое право на передачу публичного имущества без торгов."
+      }
     },
     {
       "case_key": "bank-expanded-light-20-01",
@@ -7862,13 +8062,45 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "ГК РФ, статьи 209–210: полномочия собственника и содержание имущества; статья 689: безвозмездное пользование, если выбран такой договорный механизм. Добровольный координатор не становится работником или получателем муниципального имущества по одному приглашению. Источники: https://11.rosguard.gov.ru/uploads/2025/07/5_grazhdanskijj_kodeks_rossijjskojj_federacii_chast_pervaya.pdf https://minjust.gov.ru/ru/pages/grazhdanskij-kodeks/",
-      "legal_urls": [],
+      "legal_basis": "ГК РФ, ст. 209–210, 296, 298, 689; 135-ФЗ от 26.07.2006, ст. 17.1: следует различать пробное мероприятие под управлением центра и отдельную передачу прав пользования помещением, для которой проверяется специальный порядок и исключения.",
+      "legal_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_5142/9bc79ae09d078798e7a4ee4647ac9ea495da9fa0/",
+        "https://www.consultant.ru/document/cons_doc_LAW_5142/c63c967d22055f1df0fcfecca564826dedb3b8c7/",
+        "https://www.consultant.ru/document/cons_doc_LAW_5142/e842f7d159aa68f9ccac4fbdedf7f01dad5fbf04/",
+        "https://www.consultant.ru/document/cons_doc_LAW_5142/3b8eaaf84b59c73761e963046f96813d55b45d9b/",
+        "https://www.consultant.ru/document/cons_doc_LAW_9027/98878eb82821832299a1963e05b19d12737e8984/",
+        "https://www.consultant.ru/document/cons_doc_LAW_61763/eeb8f51df68fc096ecadf011932a85ef5e6a0ee1/"
+      ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
       "option_analysis_status": "draft",
-      "source_scope": "inherited_basis_requires_current_verification",
-      "review_date": "2026-11-27"
+      "source_scope": "specific_norm_and_related_search_results_partial",
+      "review_date": "2026-11-28",
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_5142/9bc79ae09d078798e7a4ee4647ac9ea495da9fa0/",
+        "https://www.consultant.ru/document/cons_doc_LAW_5142/c63c967d22055f1df0fcfecca564826dedb3b8c7/",
+        "https://www.consultant.ru/document/cons_doc_LAW_5142/e842f7d159aa68f9ccac4fbdedf7f01dad5fbf04/",
+        "https://www.consultant.ru/document/cons_doc_LAW_5142/3b8eaaf84b59c73761e963046f96813d55b45d9b/",
+        "https://www.consultant.ru/document/cons_doc_LAW_9027/98878eb82821832299a1963e05b19d12737e8984/",
+        "https://www.consultant.ru/document/cons_doc_LAW_61763/eeb8f51df68fc096ecadf011932a85ef5e6a0ee1/"
+      ],
+      "norm_recheck_2026_11_28": {
+        "status": "targeted_norm_and_individual_alternatives_reviewed_not_full_acceptance",
+        "limitation": "При отдельном договоре аренды или ссуды потребуется проверка компетенции, правового режима и применимости торгов. Штатное предложение не равнозначно назначению.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_5142/9bc79ae09d078798e7a4ee4647ac9ea495da9fa0/",
+          "https://www.consultant.ru/document/cons_doc_LAW_5142/c63c967d22055f1df0fcfecca564826dedb3b8c7/",
+          "https://www.consultant.ru/document/cons_doc_LAW_5142/e842f7d159aa68f9ccac4fbdedf7f01dad5fbf04/",
+          "https://www.consultant.ru/document/cons_doc_LAW_5142/3b8eaaf84b59c73761e963046f96813d55b45d9b/",
+          "https://www.consultant.ru/document/cons_doc_LAW_9027/98878eb82821832299a1963e05b19d12737e8984/",
+          "https://www.consultant.ru/document/cons_doc_LAW_61763/eeb8f51df68fc096ecadf011932a85ef5e6a0ee1/"
+        ]
+      },
+      "targeted_individual_review": {
+        "status": "targeted_norm_and_individual_alternatives_reviewed_not_full_acceptance",
+        "option_count": 5,
+        "remaining": "При отдельном договоре аренды или ссуды потребуется проверка компетенции, правового режима и применимости торгов. Штатное предложение не равнозначно назначению."
+      }
     },
     {
       "case_key": "bank-media-rumour",
@@ -7894,13 +8126,33 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "ГК РФ, статьи 125 и 209: действия от имени публичного собственника и распоряжение имуществом требуют надлежащей компетенции. Порядок рабочей встречи определяется применимым внутренним регламентом; обсуждение не становится нормативным или имущественным актом само по себе. Источники: https://11.rosguard.gov.ru/uploads/2025/07/5_grazhdanskijj_kodeks_rossijjskojj_federacii_chast_pervaya.pdf",
-      "legal_urls": [],
+      "legal_basis": "ГК РФ, ст. 125 и 209: имущественные действия от имени муниципального образования совершают компетентные органы. Рабочий протокол фиксирует реальные решения и не является сам по себе правоустанавливающим актом.",
+      "legal_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_5142/53408843126f2204aba45a6195da864ff0319198/",
+        "https://www.consultant.ru/document/cons_doc_LAW_5142/9bc79ae09d078798e7a4ee4647ac9ea495da9fa0/"
+      ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
       "option_analysis_status": "draft",
-      "source_scope": "inherited_basis_requires_current_verification",
-      "review_date": "2026-11-27"
+      "source_scope": "specific_norm_and_related_search_results_partial",
+      "review_date": "2026-11-28",
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_5142/53408843126f2204aba45a6195da864ff0319198/",
+        "https://www.consultant.ru/document/cons_doc_LAW_5142/9bc79ae09d078798e7a4ee4647ac9ea495da9fa0/"
+      ],
+      "norm_recheck_2026_11_28": {
+        "status": "targeted_norm_and_individual_alternatives_reviewed_not_full_acceptance",
+        "limitation": "Конкретный регламент встречи не установлен; квалификация заведомо недостоверной записи не приравнивается автоматически к уголовному составу.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_5142/53408843126f2204aba45a6195da864ff0319198/",
+          "https://www.consultant.ru/document/cons_doc_LAW_5142/9bc79ae09d078798e7a4ee4647ac9ea495da9fa0/"
+        ]
+      },
+      "targeted_individual_review": {
+        "status": "targeted_norm_and_individual_alternatives_reviewed_not_full_acceptance",
+        "option_count": 5,
+        "remaining": "Конкретный регламент встречи не установлен; квалификация заведомо недостоверной записи не приравнивается автоматически к уголовному составу."
+      }
     },
     {
       "case_key": "bank-public-hearing",
