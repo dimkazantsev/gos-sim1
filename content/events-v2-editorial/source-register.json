@@ -1773,17 +1773,19 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "НК РФ, статья 418.4: налоговая база туристического налога и предусмотренные федеральным законом исключения. Источники: https://www.nalog.gov.ru/rn77/taxation/tax_legislation/",
+      "legal_basis": "НК РФ, статья 418.4, пункты 2–3: федеральные исключения при подтверждении статуса действуют независимо от местного перечня; муниципалитет может установить дополнительные категории. Налогоплательщик — гостиница; изменение договорной цены отдельно.",
       "legal_urls": [
         "https://www.nalog.gov.ru/rn77/taxation/tax_legislation/",
         "https://www.consultant.ru/document/cons_doc_LAW_28165/470b3df9e81deabdd0170e0a9f0fe7a5f2513a3d/",
-        "https://www.nalog.gov.ru/rn78/taxation/taxes/tourist_tax/"
+        "https://www.nalog.gov.ru/rn78/taxation/taxes/tourist_tax/",
+        "https://www.nalog.gov.ru/rn26/news/activities_fts/15352094/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
       "checked_norm_urls": [
         "https://www.consultant.ru/document/cons_doc_LAW_28165/470b3df9e81deabdd0170e0a9f0fe7a5f2513a3d/",
-        "https://www.nalog.gov.ru/rn78/taxation/taxes/tourist_tax/"
+        "https://www.nalog.gov.ru/rn78/taxation/taxes/tourist_tax/",
+        "https://www.nalog.gov.ru/rn26/news/activities_fts/15352094/"
       ],
       "review_date": "2026-11-28",
       "targeted_option_review": {
@@ -3444,11 +3446,13 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "НК РФ, ст. 12, 418.2–418.4; информация ФНС о невведении туристического налога в Республике Крым в 2026 году. Пункт 3 ст. 418.3 предусматривает особый порядок сведений в 2025–2026 годах там, где налог введён.",
+      "legal_basis": "НК РФ, статьи 418.1–418.4: введение туристического налога зависит от действующего муниципального акта; пункт 3 статьи 418.3 регулирует особый порядок сведений в 2025–2026 годах. Отсутствие налога в данном муниципалитете задано как учебное условие, не утверждение обо всём регионе. Иные налоги проверяются отдельно.",
       "legal_urls": [
         "https://www.nalog.gov.ru/rn77/taxation/tax_legislation/",
         "https://www.nalog.gov.ru/rn91/taxation/taxes/tourist_tax/",
-        "https://www.consultant.ru/document/cons_doc_LAW_28165/82271d8942a9fac4206809bca98ddcbb584a4803/"
+        "https://www.consultant.ru/document/cons_doc_LAW_28165/82271d8942a9fac4206809bca98ddcbb584a4803/",
+        "https://voikovosovet.ru/resheniya-soveta-deputatov/",
+        "https://its.1c.ru/db/content/taxtour/src/stavk26/reg91.htm"
       ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
@@ -3460,7 +3464,16 @@
       "targeted_option_review": {
         "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
         "option_count": 5,
-        "remaining": "Подтверждение места и периода, виды иных налогов, статус и режим плательщика; специальный порядок ст. 418.3 не заменяет введение налога."
+        "remaining": "Учебное отсутствие налога задано явно. Для документального утверждения необходимо проверить действующий акт конкретного муниципалитета и период; для иных налогов — статус и режим плательщика. ФНС и муниципальный перечень требуют сверки."
+      },
+      "source_conflict_2026_11_28": {
+        "status": "unresolved_not_release",
+        "finding": "ФНС на региональной странице сообщает о невведении налога в 2026 году; официальный перечень Войковского сельского совета содержит решение № 2-3/3 от 25.10.2024 о введении налога, а таблица 1С на 2026 год указывает ставку. Действие муниципального решения в 2026 году отдельно не установлено; противоречие не разрешено.",
+        "urls": [
+          "https://voikovosovet.ru/resheniya-soveta-deputatov/",
+          "https://its.1c.ru/db/content/taxtour/src/stavk26/reg91.htm",
+          "https://www.nalog.gov.ru/rn91/taxation/taxes/tourist_tax/"
+        ]
       }
     },
     {
