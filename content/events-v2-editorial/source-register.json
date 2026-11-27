@@ -2455,8 +2455,16 @@
       ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
-      "review_date": "2026-11-27",
-      "source_scope": "specific_norm_and_related_search_results_partial"
+      "review_date": "2026-11-28",
+      "source_scope": "specific_norm_and_related_search_results_partial",
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_37119/98350fd66c4cbf9004bed8bb8e5a02926f98f246/"
+      ],
+      "targeted_option_review": {
+        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "option_count": 5,
+        "remaining": "Вид выборов, специальный закон, условия договора и решение комиссии проверяются отдельно; не переносить правила печати на любые форматы СМИ."
+      }
     },
     {
       "case_key": "bank-legal-2026-101",
@@ -2471,8 +2479,16 @@
       ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
-      "review_date": "2026-11-27",
-      "source_scope": "specific_norm_and_related_search_results_partial"
+      "review_date": "2026-11-28",
+      "source_scope": "specific_norm_and_related_search_results_partial",
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_37119/22a78fa701a7800e0ecb87a4097c4de1a1f4e3eb/"
+      ],
+      "targeted_option_review": {
+        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "option_count": 5,
+        "remaining": "Иные способы голосования, допустимая помощь при заполнении и специальные процедуры регулируются отдельно; в учебных условиях они не применяются."
+      }
     },
     {
       "case_key": "bank-legal-2026-102",
@@ -3020,8 +3036,16 @@
       ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
-      "review_date": "2026-11-27",
-      "source_scope": "specific_norm_and_related_search_results_partial"
+      "review_date": "2026-11-28",
+      "source_scope": "specific_norm_and_related_search_results_partial",
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_48103/cfdb57568397a35cd74ece39f294e3c2d80337ce/"
+      ],
+      "targeted_option_review": {
+        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "option_count": 5,
+        "remaining": "Специальный режим, вид мероприятия, региональный порядок, сроки и законность конкретных предложений проверяются отдельно."
+      }
     },
     {
       "case_key": "bank-legal-2026-122",
@@ -3217,8 +3241,16 @@
       ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
-      "review_date": "2026-11-27",
-      "source_scope": "specific_norm_and_related_search_results_partial"
+      "review_date": "2026-11-28",
+      "source_scope": "specific_norm_and_related_search_results_partial",
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_37318/f8f2eca6ba8522da15e1e300e16c09439c9eb45c/"
+      ],
+      "targeted_option_review": {
+        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "option_count": 5,
+        "remaining": "Необходимы данные реестра, границы зоны, статус объекта и правомерность конкретных восстановительных мер; прекращение работ исполняет компетентный орган."
+      }
     },
     {
       "case_key": "bank-legal-2026-130",
@@ -3229,12 +3261,23 @@
       "resolved_source_url": null,
       "legal_basis": "7-ФЗ, ст. 16, 34: плата за негативное воздействие не отменяет самостоятельные природоохранные обязанности и соблюдение применимых разрешительных условий. Выявленное нарушение рассматривается компетентным органом. Вид разрешения и специальный порядок воздействия в задаче не конкретизированы; голосование не может разрешить продолжение незаконных выбросов.",
       "legal_urls": [
-        "https://epp.genproc.gov.ru/ru/proc_27/activity/legal-education/explain/e260271/"
+        "https://epp.genproc.gov.ru/ru/proc_27/activity/legal-education/explain/e260271/",
+        "https://www.consultant.ru/document/cons_doc_LAW_34823/4d2f994d3199b20f35934603e85132412705d121/",
+        "https://www.consultant.ru/document/cons_doc_LAW_34823/ddc0e897eb549460b7ccb5f47c2558ae829611bf/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
-      "review_date": "2026-11-27",
-      "source_scope": "prior_official_explanation_not_reopened"
+      "review_date": "2026-11-28",
+      "source_scope": "prior_official_explanation_not_reopened",
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_34823/4d2f994d3199b20f35934603e85132412705d121/",
+        "https://www.consultant.ru/document/cons_doc_LAW_34823/ddc0e897eb549460b7ccb5f47c2558ae829611bf/"
+      ],
+      "targeted_option_review": {
+        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "option_count": 5,
+        "remaining": "Вид разрешительного документа, категория объекта, конкретный норматив и меры реагирования не определены; специальный порядок не проверен."
+      }
     },
     {
       "case_key": "bank-legal-2026-131",
@@ -3270,12 +3313,23 @@
       "legal_basis": "КоАП РФ, ст. 25.1, 26.2, 26.11: решение требует фактических данных о конкретном эпизоде и оценки доказательств; анонимный неконкретный пересказ не доказывает состав. Доступ к материалам и возможность объяснений обеспечиваются независимо от выбора дополнительных мер.",
       "legal_urls": [
         "https://www.consultant.ru/document/cons_doc_LAW_34661/747b7ded7acccf4fbd94a98fe212713ae1845601/",
-        "https://www.consultant.ru/document/cons_doc_LAW_34661/0147088a5497571bd1de83d7a7f6ce9ea7504a22/"
+        "https://www.consultant.ru/document/cons_doc_LAW_34661/0147088a5497571bd1de83d7a7f6ce9ea7504a22/",
+        "https://www.consultant.ru/document/cons_doc_LAW_34661/46a9b456fc041022585b2d13cda9d666fc11ffd4/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
-      "review_date": "2026-11-27",
-      "source_scope": "specific_norm_and_related_search_results_partial"
+      "review_date": "2026-11-28",
+      "source_scope": "specific_norm_and_related_search_results_partial",
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_34661/747b7ded7acccf4fbd94a98fe212713ae1845601/",
+        "https://www.consultant.ru/document/cons_doc_LAW_34661/46a9b456fc041022585b2d13cda9d666fc11ffd4/",
+        "https://www.consultant.ru/document/cons_doc_LAW_34661/0147088a5497571bd1de83d7a7f6ce9ea7504a22/"
+      ],
+      "targeted_option_review": {
+        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "option_count": 5,
+        "remaining": "Сроки, процессуальный статус материалов и полномочия конкретной комиссии требуют отдельной проверки; не возобновлять прекращённое дело произвольно."
+      }
     },
     {
       "case_key": "bank-legal-2026-133",
@@ -3290,8 +3344,16 @@
       ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
-      "review_date": "2026-11-27",
-      "source_scope": "specific_norm_and_related_search_results_partial"
+      "review_date": "2026-11-28",
+      "source_scope": "specific_norm_and_related_search_results_partial",
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_103038/a9a3e8f69c495a46eb599330dc1581772c0e4104/"
+      ],
+      "targeted_option_review": {
+        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "option_count": 5,
+        "remaining": "Вид спора, допустимость медиации и полномочия представителей требуют проверки; судебный и внесудебный статус соглашений различаются."
+      }
     },
     {
       "case_key": "bank-legal-2026-134",
@@ -3306,8 +3368,16 @@
       ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
-      "review_date": "2026-11-27",
-      "source_scope": "specific_norm_and_related_search_results_partial"
+      "review_date": "2026-11-28",
+      "source_scope": "specific_norm_and_related_search_results_partial",
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_39570/abaac973fe4a701d09359875f02b25d806b40b80/"
+      ],
+      "targeted_option_review": {
+        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "option_count": 5,
+        "remaining": "Конкретный пропущенный срок и специальные правила обжалования требуют уточнения; только суд решает вопрос восстановления."
+      }
     },
     {
       "case_key": "bank-legal-2026-135",
@@ -3322,8 +3392,16 @@
       ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
-      "review_date": "2026-11-27",
-      "source_scope": "specific_norm_and_related_search_results_partial"
+      "review_date": "2026-11-28",
+      "source_scope": "specific_norm_and_related_search_results_partial",
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_39331/22f46f165baa4e483d8a0c74fe52a2cea2f43d9e/"
+      ],
+      "targeted_option_review": {
+        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "option_count": 5,
+        "remaining": "Не установлены стадия дела, даты сделок и требования, основания оспаривания, признаки обязанности подать заявление о банкротстве и конкретная очерёдность."
+      }
     },
     {
       "case_key": "bank-legal-2026-136",
@@ -3338,8 +3416,16 @@
       ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
-      "review_date": "2026-11-27",
-      "source_scope": "specific_norm_and_related_search_results_partial"
+      "review_date": "2026-11-28",
+      "source_scope": "specific_norm_and_related_search_results_partial",
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_34154/2ad1d69cdff4393596b883329fe105f3da638c44/"
+      ],
+      "targeted_option_review": {
+        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "option_count": 5,
+        "remaining": "Проверяются все основания наследования, состав имущества, наследники, сроки и специальные формы; не определять доли без документов."
+      }
     },
     {
       "case_key": "bank-legal-2026-137",
@@ -3355,8 +3441,17 @@
       ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
-      "review_date": "2026-11-27",
-      "source_scope": "specific_norm_and_related_search_results_partial"
+      "review_date": "2026-11-28",
+      "source_scope": "specific_norm_and_related_search_results_partial",
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_5142/7b6abd47219e2aa6081ac21b41e9e83d80fb45df/",
+        "https://www.consultant.ru/document/cons_doc_LAW_5142/a267c0e04062a2651ed5c2dcfc1b867cc03b6e51/"
+      ],
+      "targeted_option_review": {
+        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "option_count": 5,
+        "remaining": "Конкретный договор рассрочки и последствия недействительности, потребительские требования и полномочия представителя проверяются отдельно."
+      }
     },
     {
       "case_key": "bank-legal-2026-138",
@@ -3367,12 +3462,22 @@
       "resolved_source_url": null,
       "legal_basis": "ГрК РФ, ст. 5.1, 28: публичная процедура проводится для предусмотренных проектов генеральных планов и изменений, с исключениями по федеральному и региональному законодательству. В истории исключения отсутствуют; неформальный опрос не заменяет обязательные процедуры. Дополнительные обсуждения не подменяют установленный порядок.",
       "legal_urls": [
-        "https://www.consultant.ru/document/cons_doc_LAW_51040/40be0591480e0c82ab63b09e45359cbe40abc562/"
+        "https://www.consultant.ru/document/cons_doc_LAW_51040/40be0591480e0c82ab63b09e45359cbe40abc562/",
+        "https://www.consultant.ru/document/cons_doc_LAW_51040/fc77c7117187684ab0cb02c7ee53952df0de55be/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
-      "review_date": "2026-11-27",
-      "source_scope": "specific_norm_and_related_search_results_partial"
+      "review_date": "2026-11-28",
+      "source_scope": "specific_norm_and_related_search_results_partial",
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_51040/40be0591480e0c82ab63b09e45359cbe40abc562/",
+        "https://www.consultant.ru/document/cons_doc_LAW_51040/fc77c7117187684ab0cb02c7ee53952df0de55be/"
+      ],
+      "targeted_option_review": {
+        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "option_count": 5,
+        "remaining": "Местный порядок, границы обсуждения, обязательные стадии, состав документов и конкретные исключения проверяются отдельно."
+      }
     },
     {
       "case_key": "bank-legal-2026-139",
@@ -3385,12 +3490,23 @@
       "legal_urls": [
         "https://www.consultant.ru/document/cons_doc_LAW_19702/15d7c58c01bf75dcd6cf84a008bfef761ba731eb/",
         "https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
-        "https://www.consultant.ru/document/cons_doc_LAW_59999/ca24c3b3a2032a1f727146f988f406723bf9ea1a/"
+        "https://www.consultant.ru/document/cons_doc_LAW_59999/ca24c3b3a2032a1f727146f988f406723bf9ea1a/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/deb860cae9c5187f73ff9e422a7e77ade2c35946/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
-      "review_date": "2026-11-27",
-      "source_scope": "specific_norm_and_related_search_results_partial"
+      "review_date": "2026-11-28",
+      "source_scope": "specific_norm_and_related_search_results_partial",
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/deb860cae9c5187f73ff9e422a7e77ade2c35946/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/15d7c58c01bf75dcd6cf84a008bfef761ba731eb/",
+        "https://www.consultant.ru/document/cons_doc_LAW_59999/ca24c3b3a2032a1f727146f988f406723bf9ea1a/"
+      ],
+      "targeted_option_review": {
+        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "option_count": 5,
+        "remaining": "Нужны уполномоченный орган, правовой акт, круг получателей, общий объём, источники и лимиты; не делать автоматических проводок по обещанию."
+      }
     },
     {
       "case_key": "bank-legal-2026-140",
@@ -3433,8 +3549,16 @@
       ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
-      "review_date": "2026-11-27",
-      "source_scope": "specific_norm_and_related_search_results_partial"
+      "review_date": "2026-11-28",
+      "source_scope": "specific_norm_and_related_search_results_partial",
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_5142/9c307a0f2164645c15ca4e3146ff5f6e56060b23/"
+      ],
+      "targeted_option_review": {
+        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "option_count": 5,
+        "remaining": "Нужно проверить статус оператора и факт неправомерной передачи по 152-ФЗ, конкретные меры реагирования и исключения; не утверждать публичную утечку, пока отчёт не опубликован."
+      }
     },
     {
       "case_key": "bank-legal-2026-142",
@@ -3446,12 +3570,22 @@
       "legal_basis": "ГК РФ, ст. 1229, 1259, 1270, 1274, 1286: охраняемая фотография используется по разрешению или предусмотренному исключению; имя автора само по себе не заменяет основание воспроизведения и размещения. В заданной декоративной обложке исключение не установлено. Лицензия проверяется по объёму прав, включая печать и сеть.",
       "legal_urls": [
         "https://www.consultant.ru/document/cons_doc_LAW_64629/98ad2641f95945c4b7956150260564c8b44028d9/",
-        "https://rospatent.gov.ru/ru/documents/grazhdanskiy-kodeks-rossiyskoy-federacii-chast-chetvertaya"
+        "https://rospatent.gov.ru/ru/documents/grazhdanskiy-kodeks-rossiyskoy-federacii-chast-chetvertaya",
+        "https://www.consultant.ru/document/cons_doc_LAW_64629/dffcf0b87b80ff38f430dc822a0074e76ccd41a0/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
-      "review_date": "2026-11-27",
-      "source_scope": "specific_norm_and_related_search_results_partial"
+      "review_date": "2026-11-28",
+      "source_scope": "specific_norm_and_related_search_results_partial",
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_64629/98ad2641f95945c4b7956150260564c8b44028d9/",
+        "https://www.consultant.ru/document/cons_doc_LAW_64629/dffcf0b87b80ff38f430dc822a0074e76ccd41a0/"
+      ],
+      "targeted_option_review": {
+        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "option_count": 5,
+        "remaining": "Проверить правообладателя, объём лицензии, срок, территорию, тираж, сетевое использование, права на изображение людей и условия конкретных исключений."
+      }
     },
     {
       "case_key": "bank-legal-2026-143",
@@ -3467,8 +3601,16 @@
       ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
-      "review_date": "2026-11-27",
-      "source_scope": "specific_norm_and_related_search_results_partial"
+      "review_date": "2026-11-28",
+      "source_scope": "specific_norm_and_related_search_results_partial",
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_51057/14db416f7441199d612af5491ddc1b45ed664a10/"
+      ],
+      "targeted_option_review": {
+        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "option_count": 5,
+        "remaining": "Необходимо проверить реестр, основания ст. 198, последствия законного прекращения управления и специальный порядок жилищного контроля; жалобы не заменяют судебную процедуру."
+      }
     },
     {
       "case_key": "bank-legal-2026-144",
