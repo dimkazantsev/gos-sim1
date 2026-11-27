@@ -6,6 +6,8 @@ on:
       - 'supabase/changes/events_v2_individual_transfer_candidate.sql'
       - 'supabase/changes/events_v2_collective_candidate.sql'
       - 'scripts/events-v2-individual*'
+      - 'scripts/events-v2-editorial*'
+      - 'content/events-v2-editorial/**'
       - 'components/game/Event*.tsx'
       - '.github/workflows/events-v2-individual.yml'
 permissions:
@@ -26,3 +28,4 @@ jobs:
       - run: npm ci --no-audit --no-fund
       - run: npm run typecheck
       - run: node scripts/events-v2-individual-check.cjs
+      - run: node scripts/events-v2-editorial-check.cjs

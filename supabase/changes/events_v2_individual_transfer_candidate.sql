@@ -214,6 +214,19 @@ begin
  return jsonb_build_object('score',round(c+a+b+completion,2),'cases',round(c,2),'actions',round(a,2),'blitz',round(b,2),'completion',round(completion,2),'cases_total',cases_n,'cases_right',correct_cases,'actions_right',acts,'quiz_total',total_q,'quiz_right',correct_q,'quiz_answered',answered_q);
 end $function$;
 
+-- Collective participation is a strategy signal, not legal knowledge.
+CREATE OR REPLACE FUNCTION private.event_v2_collective_participation(p_game uuid,p_user uuid,p_stage integer,p_start timestamptz,p_end timestamptz)
+RETURNS integer LANGUAGE sql STABLE SECURITY DEFINER SET search_path TO '' AS $f$
+ SELECT count(DISTINCT d.case_id)::integer
+ FROM public.event_assignments a
+ JOIN public.event_decisions d ON d.assignment_id=a.id AND d.game_id=a.game_id AND d.case_id=a.case_id AND d.actor_id=a.recipient_id
+ JOIN public.event_cases c ON c.id=a.case_id AND c.game_id=a.game_id
+ WHERE a.game_id=p_game AND a.recipient_id=p_user AND a.stage_no=p_stage
+ AND d.created_at>=p_start AND d.created_at<=p_end
+ AND c.audience IN ('group','all') AND c.effect_plan->>'rules_version'='2';
+$f$;
+REVOKE ALL ON FUNCTION private.event_v2_collective_participation(uuid,uuid,integer,timestamptz,timestamptz) FROM PUBLIC,anon,authenticated;
+
 CREATE OR REPLACE FUNCTION private.compute_vsn_assessment(p_game uuid, p_user uuid, p_stage integer, p_run_type text DEFAULT 'hourly'::text)
  RETURNS uuid
  LANGUAGE plpgsql
@@ -237,7 +250,7 @@ declare
   adjusted_score numeric;
   score numeric:=0; rationale text; summary jsonb;
   blitz_start integer; blitz_active boolean:=false; blitz_details jsonb:='{}'::jsonb; legal_component numeric:=0;
- event_law int:=0;event_invalid int:=0;event_strategy int:=0;
+ event_law int:=0;event_invalid int:=0;event_strategy int:=0;collective_count int:=0;
 begin
   if p_stage<1 or p_stage>16 then raise exception 'Only stages 1-16 are assessed'; end if;
 
@@ -390,7 +403,9 @@ begin
   select count(*) filter(where authority_ok and lawful),count(*) filter(where not authority_ok or not lawful),count(*) filter(where strategy_point)
   into event_law,event_invalid,event_strategy from public.event_authority_evidence where game_id=p_game and actor_id=p_user and stage_no=p_stage and created_at>=v_start and created_at<=v_end;
   event_law:=event_law+(select count(*)::int from public.event_collaboration_invites i where i.game_id=p_game and i.inviter_id=p_user and i.transfer_stage_no=p_stage and i.status='accepted' and i.responded_at>=v_start and i.responded_at<=v_end);
-  participation:=participation+event_law+event_invalid;
+  collective_count:=private.event_v2_collective_participation(p_game,p_user,p_stage,v_start,v_end);
+  participation:=participation+event_law+event_invalid+collective_count;
+  strategy_signal:=strategy_signal+least(collective_count,4)*0.5;
   c1:=(law_signal>=2 or event_law>0) and event_invalid=0;
   c2:=strategy_signal>=2 or event_strategy>0;
   c3:=(length(trim(debrief_text))>=80 and debrief_categories>=3) or analysis_chat_hits>=2;
@@ -419,7 +434,7 @@ begin
     'Критерий 2 · стратегия и интересы: '||(case when c2 then 'зачтён' else 'пока не подтверждён' end)||
     '. Публикаций '||post_count||', голосований '||ballot_count||
     ', действий/решений '||(player_action_count+decision_count)||', партийных инициатив '||party_action_count||
-    ', ответов на партийные приглашения '||party_response_count||'. '||
+    ', ответов на партийные приглашения '||party_response_count||', коллективных кейсов '||collective_count||'. '||
     'Критерий 3 · итоговый разбор: '||(case when c3 then 'зачтён' else 'пока не подтверждён' end)||
     '. Разбор '||(case when debrief_count>0 then 'представлен' else 'не представлен' end)||
     ', аналитических связок в обсуждении '||analysis_chat_hits||'. '||
@@ -436,7 +451,7 @@ begin
       'player_actions',player_action_count,'party_invitations_sent',party_action_count,
       'party_invitation_responses',party_response_count,'party_documents',party_document_count,
       'game_documents',game_document_count,'accepted_decisions',decision_count,
-      'meaningful_activity',activity_count,'debriefs',debrief_count
+      'meaningful_activity',activity_count,'debriefs',debrief_count,'collective_cases',collective_count
     ),
     'signals',jsonb_build_object(
       'law',law_signal,'strategy',strategy_signal,'legal_keyword_hits',legal_hits,

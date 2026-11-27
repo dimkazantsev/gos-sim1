@@ -78,6 +78,11 @@ const [game,other,sender,expert,wrong,archived,outsider,teacher]=[1,2,10,11,12,1
  const invalid=await makeCollective(113,{...cp,best_option_key:'option_1'});
  await assert.rejects(()=>cast(invalid,sender,'option_1'),/Коллективная разметка недопустима/);
  await assert.rejects(()=>query("SELECT private.event_v2_validate_collective($1::jsonb,$2::jsonb,'{}')",[JSON.stringify({...cp,options:[{...cp.options[0],metric_effects:{lawfulness:-3}},...cp.options.slice(1)]}),JSON.stringify(['А','Б','В'])]),/Недопустимый или двойной эффект/);
+ const collectiveCount=async(u,stage=7,g=game)=>Number((await rows("SELECT private.event_v2_collective_participation($1,$2,$3,now()-interval '1 day',now()+interval '1 day') AS n",[g,u,stage]))[0].n);
+ for(const u of [sender,expert,wrong])assert.equal(await collectiveCount(u),3,'All participants receive one signal per distinct case, independent of majority and round');
+ assert.equal(await collectiveCount(teacher),0);assert.equal(await collectiveCount(sender,8),0);assert.equal(await collectiveCount(sender,7,other),0);
+ assert.equal((await rows("SELECT has_function_privilege('authenticated','private.event_v2_collective_participation(uuid,uuid,integer,timestamptz,timestamptz)','EXECUTE') AS ok"))[0].ok,false);
+ console.log('PASS collective participation: no duplicate rounds, minority and tie counted equally, stage and game isolated');
  console.log('PASS collective: two rounds, no interim outcome, stale ballot rejected, final effects once, lawfulness unchanged');
  console.log('PASS actual individual transfer SQL: wrong/archived/cross-game, refusal, one assignment, unchanged stage, independent credit, wrong/right answer, no repeat, legacy');
  }finally{await db.close()}
