@@ -11,7 +11,7 @@
       "decision_options": [
         "Подготовить мотивированное подтверждение потребности для завершения проекта",
         "Предложить уменьшенный допустимый этап после согласования условий",
-        "Возвратить остаток и подготовить новую обоснованную заявку",
+        "После обязательного возврата остатка подготовить новую обоснованную заявку вместо восстановления прежнего финансирования",
         "Организовать независимую сверку причин неиспользования средств",
         "Предложить улучшить календарь будущих закупок и контроль исполнения"
       ],
@@ -84,7 +84,7 @@
             "implementation_review": {
               "additional_resource_level": 1,
               "result_time_level": 3,
-              "action": "Возвратить остаток и подготовить новую обоснованную заявку",
+              "action": "После обязательного возврата остатка подготовить новую обоснованную заявку вместо восстановления прежнего финансирования",
               "cost_basis": "Выполнение преимущественно действующими подразделениями, требуется рабочее время.",
               "time_basis": "Отложенный результат: следующий цикл, строительство или долгосрочная мера.",
               "financial_posting": "none_until_authorized_and_confirmed",
@@ -160,7 +160,16 @@
           "date": "2026-11-27",
           "source": "https://www.consultant.ru/document/cons_doc_LAW_19702/200d8f9e0aed34b95bc6527693824cb356109b83/",
           "scope": "Справочная сверка п. 5 ст. 242; конкретный вид трансферта, исключения, акт главного администратора и сроки требуют проверки."
-        }
+        },
+        "article_evidence": [
+          {
+            "norm": "БК РФ, п. 5 ст. 242",
+            "url": "https://www.consultant.ru/document/cons_doc_LAW_19702/200d8f9e0aed34b95bc6527693824cb356109b83/",
+            "checked_on": "2026-11-27",
+            "scope": "Возврат целевого остатка и последующее финансирование прежней цели при подтверждённой потребности; проверить источник, исключения и конкретный порядок.",
+            "status": "targeted_text_or_official_explanation_read_not_full_case_verification"
+          }
+        ]
       },
       "implementation_review": {
         "status": "case_specific_calibration_draft",
@@ -173,7 +182,7 @@
       "audience": "all",
       "category": "Региональные финансы",
       "original_situation": "В Ленинградской области муниципалитет хочет перенести чужую региональную стройку в свой бюджет, не получив передачи полномочий и источника финансирования.\n\nОбъект находится на территории муниципалитета, но заказчиком и носителем полномочия указан региональный орган. Местный совет готов включить стройку в свой перечень расходов уже сегодня. Регион не передал ни обязательство, ни финансовое обеспечение. Участник изучает договоры, реестр полномочий и проект бюджета; необходимо установить надлежащую процедуру взаимодействия уровней власти до появления нового расхода.",
-      "mandatory_boundary": "Передача стройки требует компетенции, правовой формы и финансового обеспечения.",
+      "mandatory_boundary": "Муниципалитет не принимает чужое расходное обязательство без надлежащего основания. Разграничить собственные местные полномочия и переданные государственные полномочия; передача последних требует надлежащей формы и финансового обеспечения.",
       "decision_options": [
         "Предложить сохранить регионального заказчика и усилить местную координацию",
         "Подготовить допустимую передачу полномочий с обеспечением расходов",
@@ -308,7 +317,16 @@
       "history_protected": false,
       "legal_review": {
         "basis": "Конституция РФ, статья 132, часть 2; БК РФ, статьи 65 и 86: полномочия и расходные обязательства муниципального образования. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
-        "status": "requires_case_specific_current_law_review"
+        "status": "requires_case_specific_current_law_review",
+        "article_evidence": [
+          {
+            "norm": "БК РФ, ст. 86",
+            "url": "https://www.consultant.ru/document/cons_doc_LAW_19702/4ce55543bc62fa4c4587fa50514b56aa0121a671/",
+            "checked_on": "2026-11-27",
+            "scope": "Расходные обязательства муниципального образования; особые условия и действующий местный порядок требуют проверки.",
+            "status": "targeted_text_or_official_explanation_read_not_full_case_verification"
+          }
+        ]
       },
       "implementation_review": {
         "status": "case_specific_calibration_draft",
@@ -482,7 +500,7 @@
       "audience": "all",
       "category": "Региональные финансы",
       "original_situation": "Магаданская область хочет покрыть дефицит прогнозом добычи по лицензии, которую компания ещё не получила. Доход включён как гарантированный.\n\nПрогноз доходов рассчитывается по мощности будущего участка и максимальной цене металла. Компания ещё проходит процедуру получения права пользования недрами и не утвердила график добычи. В расходном плане уже назначены обязательства под весь прогнозируемый поток. Участник получает лицензирующее досье и несколько ценовых сценариев; нужно оценить подтверждённость предпосылок до утверждения источника покрытия дефицита.",
-      "mandatory_boundary": "Доход от невыданной лицензии не считается гарантированным; неопределённость отражается отдельно.",
+      "mandatory_boundary": "Доход по невыданной лицензии не считается гарантированным; прогноз содержит проверяемые предпосылки и сценарии. Обязательные расходы не отменяются произвольно.",
       "decision_options": [
         "Предложить консервативный бюджетный сценарий без неподтверждённого дохода",
         "Подготовить несколько прогнозов с прозрачными условиями реализации",
@@ -617,7 +635,16 @@
       "history_protected": false,
       "legal_review": {
         "basis": "БК РФ, статья 37: достоверность прогнозирования доходов и расходов бюджета. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
-        "status": "requires_case_specific_current_law_review"
+        "status": "requires_case_specific_current_law_review",
+        "article_evidence": [
+          {
+            "norm": "БК РФ, ст. 37",
+            "url": "https://www.consultant.ru/document/cons_doc_LAW_19702/73147d61f1183d32e517768da079cfdf28cca0a9/",
+            "checked_on": "2026-11-27",
+            "scope": "Реалистичность прогнозов, отсутствие гарантии поступления по невыданной лицензии; не регулирует само лицензирование.",
+            "status": "targeted_text_or_official_explanation_read_not_full_case_verification"
+          }
+        ]
       },
       "implementation_review": {
         "status": "case_specific_calibration_draft",
@@ -1201,7 +1228,16 @@
           "date": "2026-11-27",
           "source": "https://www.consultant.ru/document/cons_doc_LAW_19702/6fdfc424277aebba215512c7a68a5077c68e1337/",
           "scope": "Справочная сверка принципа функциональной независимости; конкретное назначение и стандарты ещё не проверены."
-        }
+        },
+        "article_evidence": [
+          {
+            "norm": "БК РФ, п. 3–5 ст. 160.2-1",
+            "url": "https://www.consultant.ru/document/cons_doc_LAW_19702/6fdfc424277aebba215512c7a68a5077c68e1337/",
+            "checked_on": "2026-11-27",
+            "scope": "Функциональная независимость, уполномоченный аудитор и федеральные стандарты; не означает произвольного назначения внешнего эксперта.",
+            "status": "targeted_text_or_official_explanation_read_not_full_case_verification"
+          }
+        ]
       },
       "implementation_review": {
         "status": "case_specific_calibration_draft",
@@ -1536,7 +1572,16 @@
       "history_protected": false,
       "legal_review": {
         "basis": "Федеральный закон №115-ФЗ, статья 10: условия концессионного соглашения; БК РФ, статьи 34 и 38. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
-        "status": "requires_case_specific_current_law_review"
+        "status": "requires_case_specific_current_law_review",
+        "article_evidence": [
+          {
+            "norm": "БК РФ, ст. 38",
+            "url": "https://www.consultant.ru/document/cons_doc_LAW_19702/9a0e8abcbe24837343cdcc599bccf0f09413968a/",
+            "checked_on": "2026-11-27",
+            "scope": "Адресность и цель средств; не доказывает автоматически двойное финансирование, форму конкретной помощи или процедуру северного завоза.",
+            "status": "targeted_text_or_official_explanation_read_not_full_case_verification"
+          }
+        ]
       },
       "implementation_review": {
         "status": "case_specific_calibration_draft",
@@ -2450,7 +2495,16 @@
       "history_protected": false,
       "legal_review": {
         "basis": "Федеральный закон №44-ФЗ, статьи 8 и 31; Федеральный закон №135-ФЗ, статья 17. Источники: https://pravo.gov.ru/",
-        "status": "requires_case_specific_current_law_review"
+        "status": "requires_case_specific_current_law_review",
+        "article_evidence": [
+          {
+            "norm": "44-ФЗ, ст. 8",
+            "url": "https://www.consultant.ru/document/cons_doc_LAW_144624/0c4ec341947f98654432292ddfd7066e3200d7fd/",
+            "checked_on": "2026-11-27",
+            "scope": "Равные условия конкуренции и запрет необоснованного ограничения; применимость 44-ФЗ к учреждению и специальным требованиям подлежит проверке.",
+            "status": "targeted_text_or_official_explanation_read_not_full_case_verification"
+          }
+        ]
       },
       "implementation_review": {
         "status": "case_specific_calibration_draft",
@@ -2611,7 +2665,7 @@
       "audience": "all",
       "category": "Региональные финансы",
       "original_situation": "В Самарской области организация просит инвестиционный налоговый кредит. Ей предлагают обычную беспроцентную субсидию, называя обе меры одинаковыми.\n\nЗаявитель предлагает модернизировать производство и приложил расчёт будущих платежей. Проект налогового кредита предусматривает срок, проценты и порядок возврата; проект субсидии предусматривает бюджетное перечисление с иными условиями. В служебной записке оба инструмента записаны одной суммой «помощи». Участнику нужно определить различия правовых последствий до выбора механизма и подготовки документов.",
-      "mandatory_boundary": "Инвестиционный налоговый кредит и субсидия имеют разные основания и последствия.",
+      "mandatory_boundary": "Инвестиционный налоговый кредит означает изменение срока уплаты с последующим погашением и процентами, а не безвозвратную субсидию. Конкретное основание, компетентное решение и договор обязательны.",
       "decision_options": [
         "Предложить подготовить обращение о налоговом кредите при подтверждении условий",
         "Подготовить отдельный конкурс субсидий для модернизации при наличии основания",
@@ -2733,7 +2787,23 @@
       "history_protected": false,
       "legal_review": {
         "basis": "НК РФ, статьи 66–68: инвестиционный налоговый кредит. Источники: https://www.nalog.gov.ru/rn77/taxation/tax_legislation/",
-        "status": "requires_case_specific_current_law_review"
+        "status": "requires_case_specific_current_law_review",
+        "article_evidence": [
+          {
+            "norm": "НК РФ, ст. 66",
+            "url": "https://www.consultant.ru/document/cons_doc_LAW_19671/a89f6e27872ba595439ca2902f233cd969c41b56/",
+            "checked_on": "2026-11-27",
+            "scope": "Инвестиционный налоговый кредит — изменение срока уплаты с последующим погашением и процентами, не безвозвратная выплата.",
+            "status": "targeted_text_or_official_explanation_read_not_full_case_verification"
+          },
+          {
+            "norm": "НК РФ, ст. 67",
+            "url": "https://www.consultant.ru/document/cons_doc_LAW_19671/d742ffa792b4e20830fd93a2124bfcc027bd03d6/",
+            "checked_on": "2026-11-27",
+            "scope": "Договорные условия кредита и законное основание; конкретный заявитель и основания не подтверждены автоматически.",
+            "status": "targeted_text_or_official_explanation_read_not_full_case_verification"
+          }
+        ]
       },
       "implementation_review": {
         "status": "draft",
@@ -2868,7 +2938,16 @@
       "history_protected": false,
       "legal_review": {
         "basis": "БК РФ, статья 72: государственные контракты и многолетние обязательства. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
-        "status": "requires_case_specific_current_law_review"
+        "status": "requires_case_specific_current_law_review",
+        "article_evidence": [
+          {
+            "norm": "БК РФ, п. 2–3 ст. 72",
+            "url": "https://www.consultant.ru/document/cons_doc_LAW_19702/aa129af3559dd1fc2b3201c05ced33582fe3d193/",
+            "checked_on": "2026-11-27",
+            "scope": "Контракты в пределах лимитов, специальные основания многолетних обязательств; не все долгосрочные контракты запрещены.",
+            "status": "targeted_text_or_official_explanation_read_not_full_case_verification"
+          }
+        ]
       },
       "implementation_review": {
         "status": "draft",
@@ -3338,7 +3417,16 @@
       "history_protected": true,
       "legal_review": {
         "basis": "ГК РФ, статья 582; Федеральный закон №44-ФЗ, статьи 8 и 34. Источники: https://pravo.gov.ru/",
-        "status": "requires_case_specific_current_law_review"
+        "status": "requires_case_specific_current_law_review",
+        "article_evidence": [
+          {
+            "norm": "44-ФЗ, ст. 8",
+            "url": "https://www.consultant.ru/document/cons_doc_LAW_144624/0c4ec341947f98654432292ddfd7066e3200d7fd/",
+            "checked_on": "2026-11-27",
+            "scope": "Равные условия конкуренции и запрет необоснованного ограничения; применимость 44-ФЗ к учреждению и специальным требованиям подлежит проверке.",
+            "status": "targeted_text_or_official_explanation_read_not_full_case_verification"
+          }
+        ]
       },
       "implementation_review": {
         "status": "case_specific_calibration_draft",
@@ -3473,7 +3561,16 @@
       "history_protected": false,
       "legal_review": {
         "basis": "Конституция РФ, статья 130; БК РФ, статья 86; установленный муниципальный порядок инициативных проектов. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
-        "status": "requires_case_specific_current_law_review"
+        "status": "requires_case_specific_current_law_review",
+        "article_evidence": [
+          {
+            "norm": "БК РФ, ст. 86",
+            "url": "https://www.consultant.ru/document/cons_doc_LAW_19702/4ce55543bc62fa4c4587fa50514b56aa0121a671/",
+            "checked_on": "2026-11-27",
+            "scope": "Расходные обязательства муниципального образования; особые условия и действующий местный порядок требуют проверки.",
+            "status": "targeted_text_or_official_explanation_read_not_full_case_verification"
+          }
+        ]
       },
       "implementation_review": {
         "status": "draft",
@@ -3486,7 +3583,7 @@
       "audience": "all",
       "category": "Региональные финансы",
       "original_situation": "В Тверской области гарантия уже выдана и учтена, но при расчёте долговых обязательств её исключают, потому что кредитор ещё не предъявил требование.\n\nГарантия содержит определённый объём ответственности и действует до погашения кредита. Предприятие пока исправно вносит платежи, поэтому финансист предлагает не учитывать риск в долговой книге. Новый заём рассчитывается по уменьшенному показателю нагрузки. Участник получает гарантию и расчёт предельного долга; нужно установить, как учитывать существующее обязательство до решения о заимствовании.",
-      "mandatory_boundary": "Выданная гарантия учитывается по своему правовому режиму независимо от предъявления требования.",
+      "mandatory_boundary": "Обязательства из действующей государственной гарантии субъекта учитываются в его долге до предъявления требования кредитором; выбор дополнительной меры не отменяет надлежащий долговой учёт и не означает автоматическую выплату.",
       "decision_options": [
         "Предложить резерв на возможное исполнение гарантии после оценки риска",
         "Усилить контроль финансового состояния принципала в пределах соглашения",
@@ -3621,7 +3718,16 @@
       "history_protected": false,
       "legal_review": {
         "basis": "БК РФ, статьи 99 и 107: состав государственного долга субъекта РФ. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
-        "status": "requires_case_specific_current_law_review"
+        "status": "requires_case_specific_current_law_review",
+        "article_evidence": [
+          {
+            "norm": "БК РФ, п. 2–3 ст. 99",
+            "url": "https://www.consultant.ru/document/cons_doc_LAW_19702/95351b068ed8020a8891410884e60ecb81f26164/",
+            "checked_on": "2026-11-27",
+            "scope": "Обязательства из государственных гарантий включаются в долг; отдельная сверка пределов и бюджетного обеспечения по ст. 107.",
+            "status": "targeted_text_or_official_explanation_read_not_full_case_verification"
+          }
+        ]
       },
       "implementation_review": {
         "status": "case_specific_calibration_draft",
@@ -3769,10 +3875,10 @@
       "audience": "all",
       "category": "Региональные финансы",
       "original_situation": "В Тульской области поставщик сорвал поставку оборудования. Заказчик прощает неустойку только из-за дружеского письма без предусмотренного законом основания.\n\nОборудование поступило на три недели позже срока, что подтверждается складским журналом. Поставщик сослался на давнее знакомство с руководителем и попросил закрыть вопрос письмом. Юрист не нашёл документов о законном освобождении или списании. Участник получает контракт и даты исполнения; решение касается надлежащего рассмотрения ответственности и фиксации основания выбранного действия.",
-      "mandatory_boundary": "Неустойка определяется законом и контрактом; дружеское письмо не является основанием освобождения.",
+      "mandatory_boundary": "Заказчик направляет подтверждённое требование об уплате неустойки при установленной просрочке; основания освобождения или списания проверяются отдельно. Голосование касается дополнительных мер после обязательного требования, а не отказа от него.",
       "decision_options": [
         "Предложить добровольное исполнение подтверждённого требования о неустойке",
-        "При отказе поставщика от добровольной уплаты подготовить предусмотренное взыскание",
+        "Подготовить предусмотренное взыскание на случай отказа поставщика исполнить направленное требование",
         "Организовать независимую сверку периода просрочки и расчёта",
         "Предложить улучшить контроль будущих сроков поставки и уведомлений",
         "Согласовать допустимые меры уменьшения последствий задержки оборудования"
@@ -3813,7 +3919,7 @@
             "implementation_review": {
               "additional_resource_level": 2,
               "result_time_level": 2,
-              "action": "При отказе поставщика от добровольной уплаты подготовить предусмотренное взыскание",
+              "action": "Подготовить предусмотренное взыскание на случай отказа поставщика исполнить направленное требование",
               "cost_basis": "Дополнительная организационная работа, контроль, временная услуга или согласование; наличие ресурса требует подтверждения.",
               "time_basis": "Дополнительная процедура, согласование или несколько этапов.",
               "financial_posting": "none_until_authorized_and_confirmed",
@@ -3917,7 +4023,16 @@
       "history_protected": false,
       "legal_review": {
         "basis": "Федеральный закон №44-ФЗ, статья 34, части 6 и 9: ответственность поставщика. Источники: https://pravo.gov.ru/",
-        "status": "requires_case_specific_current_law_review"
+        "status": "requires_case_specific_current_law_review",
+        "article_evidence": [
+          {
+            "norm": "44-ФЗ, ч. 6 ст. 34",
+            "url": "https://www.consultant.ru/document/cons_doc_LAW_144624/c5cbc4acc59ffed792a3921dbc18900d2d0f7eb1/",
+            "checked_on": "2026-11-27",
+            "scope": "Обязанность заказчика направить требование об уплате неустойки; основания освобождения, списания и взыскания не заменяются голосованием.",
+            "status": "targeted_text_or_official_explanation_read_not_full_case_verification"
+          }
+        ]
       },
       "implementation_review": {
         "status": "case_specific_calibration_draft",
@@ -4078,7 +4193,16 @@
       "history_protected": false,
       "legal_review": {
         "basis": "БК РФ, статья 6: бюджет субъекта РФ и консолидированный бюджет. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
-        "status": "requires_case_specific_current_law_review"
+        "status": "requires_case_specific_current_law_review",
+        "article_evidence": [
+          {
+            "norm": "БК РФ, ст. 6",
+            "url": "https://www.consultant.ru/document/cons_doc_LAW_19702/055a71948dbf2a4fc2478437cd89cd864ee8e6e5/",
+            "checked_on": "2026-11-27",
+            "scope": "Различение бюджета и консолидированного бюджета, исключение внутренних межбюджетных трансфертов; проверить фактический состав агрегата.",
+            "status": "targeted_text_or_official_explanation_read_not_full_case_verification"
+          }
+        ]
       },
       "implementation_review": {
         "status": "case_specific_calibration_draft",
@@ -4361,7 +4485,16 @@
       "history_protected": true,
       "legal_review": {
         "basis": "БК РФ, статья 79: решения о бюджетных инвестициях. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
-        "status": "requires_case_specific_current_law_review"
+        "status": "requires_case_specific_current_law_review",
+        "article_evidence": [
+          {
+            "norm": "БК РФ, ст. 79",
+            "url": "https://www.consultant.ru/document/cons_doc_LAW_19702/ac6c532ee1f365c6e1ff222f22b3f10587918494/",
+            "checked_on": "2026-11-27",
+            "scope": "Бюджетные инвестиции в публичную собственность; применимость зависит от собственника, получателя и решения.",
+            "status": "targeted_text_or_official_explanation_read_not_full_case_verification"
+          }
+        ]
       },
       "implementation_review": {
         "status": "draft",
@@ -4670,7 +4803,7 @@
       "audience": "all",
       "category": "Региональные финансы",
       "original_situation": "В Москве предприниматель рассчитывает торговый сбор по площади всего здания, хотя использует отдельный объект торговли и должен учитывать конкретную категорию.\n\nТорговый зал занимает 80 м² в здании площадью 900 м², где есть офисы и склад другого арендатора. В расчёт перенесена площадь всей недвижимости из общей выписки. Вид и расположение торгового объекта подтверждены договором. Участник получает план помещений и сведения об использовании; требуется проверить выбранную категорию и соответствующие параметры расчёта сбора.",
-      "mandatory_boundary": "Торговый сбор рассчитывается по конкретному объекту и применимой категории.",
+      "mandatory_boundary": "Торговый сбор определяется для каждого объекта по ставке соответствующего вида торговли и его фактическому физическому показателю. Площадь всего здания не подставляется вместо показателя отдельного объекта; вид торговли, ставка и льготы проверяются отдельно.",
       "decision_options": [
         "Предложить сверку характеристик торговых объектов до расчётов",
         "Организовать консультацию предпринимателям о различии площади объекта и здания",
@@ -4818,7 +4951,16 @@
       "history_protected": false,
       "legal_review": {
         "basis": "НК РФ, статьи 412–415: объект и ставки торгового сбора. Источники: https://www.nalog.gov.ru/rn77/taxation/tax_legislation/",
-        "status": "requires_case_specific_current_law_review"
+        "status": "requires_case_specific_current_law_review",
+        "article_evidence": [
+          {
+            "norm": "ФНС России, торговый сбор, ст. 411–417 НК РФ",
+            "url": "https://www.nalog.gov.ru/rn77/taxation/shopcoll/",
+            "checked_on": "2026-11-27",
+            "scope": "Официальное разъяснение по объектам торговли и расчёту по фактическому физическому показателю объекта; ставка и категория проверяются отдельно.",
+            "status": "targeted_text_or_official_explanation_read_not_full_case_verification"
+          }
+        ]
       },
       "implementation_review": {
         "status": "case_specific_calibration_draft",
@@ -5152,8 +5294,8 @@
       "title": "Ненецкий норматив",
       "audience": "all",
       "category": "Региональные финансы",
-      "original_situation": "В Ненецком автономном округе местному бюджету обещают определённую долю дохода, но не оформляют предусмотренный акт о дополнительном нормативе отчисления.\n\nВ бюджетном проекте поселения доля налога включена как уже действующий норматив. Региональный представитель обсуждал её на совещании, но акт не опубликован. Объём расходов сформирован под ожидаемый доход. Участник изучает действующие нормативы и протокол совещания; нужно определить правовое основание изменения и корректный момент отражения поступления в плане.",
-      "mandatory_boundary": "Дополнительный норматив отчислений закрепляется компетентным органом в надлежащем акте.",
+      "original_situation": "В Ненецком автономном округе местному бюджету обещают определённую долю дохода, но не оформляют предусмотренный акт о дополнительном нормативе отчисления.\n\nВ бюджетном проекте поселения доля налога включена как уже действующий норматив. Региональный представитель обсуждал её на совещании, но акт не опубликован. Объём расходов сформирован под ожидаемый доход. Участник изучает действующие нормативы и протокол совещания; нужно определить правовое основание изменения и корректный момент отражения поступления в плане.\n\nПо условию учебной истории обсуждается норматив отчислений, который должен быть установлен законом субъекта Российской Федерации; муниципальный район не устанавливает этот региональный норматив самостоятельно.",
+      "mandatory_boundary": "Обещание не заменяет предусмотренный БК РФ акт компетентного органа. Региональный норматив устанавливается в порядке статьи 58; полномочия муниципального района по статье 63 относятся к другой правовой конструкции.",
       "decision_options": [
         "Предложить устойчивый норматив в пределах допустимого режима с расчётом доходов",
         "Подготовить несколько вариантов распределения после оценки потребностей поселений",
@@ -5288,7 +5430,23 @@
       "history_protected": false,
       "legal_review": {
         "basis": "БК РФ, статьи 58 и 63: нормативы отчислений в местные бюджеты. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
-        "status": "requires_case_specific_current_law_review"
+        "status": "requires_case_specific_current_law_review",
+        "article_evidence": [
+          {
+            "norm": "БК РФ, ст. 58",
+            "url": "https://www.consultant.ru/document/cons_doc_LAW_19702/1e231e90031b99643b29b6eb4579016c2a06533f/",
+            "checked_on": "2026-11-27",
+            "scope": "Нормативы устанавливаются на основании предусмотренного законом акта субъекта; определить уровень бюджета и вид норматива.",
+            "status": "targeted_text_or_official_explanation_read_not_full_case_verification"
+          },
+          {
+            "norm": "БК РФ, ст. 63",
+            "url": "https://www.consultant.ru/document/cons_doc_LAW_19702/3cedc4b0d2eb9a888fea5ee932ae8694bfcf931a/",
+            "checked_on": "2026-11-27",
+            "scope": "Компетенция представительного органа муниципального района относительно поселений; не подменяет полномочие субъекта по ст. 58.",
+            "status": "targeted_text_or_official_explanation_read_not_full_case_verification"
+          }
+        ]
       },
       "implementation_review": {
         "status": "case_specific_calibration_draft",
@@ -5597,7 +5755,16 @@
       "history_protected": false,
       "legal_review": {
         "basis": "Федеральный закон от 04.08.2023 №411-ФЗ о северном завозе; БК РФ, статьи 38 и 78. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
-        "status": "requires_case_specific_current_law_review"
+        "status": "requires_case_specific_current_law_review",
+        "article_evidence": [
+          {
+            "norm": "БК РФ, ст. 38",
+            "url": "https://www.consultant.ru/document/cons_doc_LAW_19702/9a0e8abcbe24837343cdcc599bccf0f09413968a/",
+            "checked_on": "2026-11-27",
+            "scope": "Адресность и цель средств; не доказывает автоматически двойное финансирование, форму конкретной помощи или процедуру северного завоза.",
+            "status": "targeted_text_or_official_explanation_read_not_full_case_verification"
+          }
+        ]
       },
       "implementation_review": {
         "status": "case_specific_calibration_draft",
@@ -6033,7 +6200,16 @@
           "date": "2026-11-27",
           "source": "https://www.consultant.ru/document/cons_doc_LAW_28165/7266761567c503394be534d7d5d98b99a18b5816/",
           "scope": "Справочная сверка п. 2 ст. 388; полная проверка применимого местного акта и каждого ответа не завершена."
-        }
+        },
+        "article_evidence": [
+          {
+            "norm": "НК РФ, п. 2 ст. 388",
+            "url": "https://www.consultant.ru/document/cons_doc_LAW_28165/7266761567c503394be534d7d5d98b99a18b5816/",
+            "checked_on": "2026-11-27",
+            "scope": "Безвозмездный пользователь не признаётся плательщиком по данному участку; исправление расчёта и статус иных прав требуют самостоятельной проверки.",
+            "status": "targeted_text_or_official_explanation_read_not_full_case_verification"
+          }
+        ]
       },
       "implementation_review": {
         "status": "case_specific_calibration_draft",
@@ -6181,7 +6357,16 @@
       "history_protected": false,
       "legal_review": {
         "basis": "БК РФ, статья 38: адресность и целевой характер бюджетных средств. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
-        "status": "requires_case_specific_current_law_review"
+        "status": "requires_case_specific_current_law_review",
+        "article_evidence": [
+          {
+            "norm": "БК РФ, ст. 38",
+            "url": "https://www.consultant.ru/document/cons_doc_LAW_19702/9a0e8abcbe24837343cdcc599bccf0f09413968a/",
+            "checked_on": "2026-11-27",
+            "scope": "Адресность и цель средств; не доказывает автоматически двойное финансирование, форму конкретной помощи или процедуру северного завоза.",
+            "status": "targeted_text_or_official_explanation_read_not_full_case_verification"
+          }
+        ]
       },
       "implementation_review": {
         "status": "case_specific_calibration_draft",
@@ -6599,7 +6784,16 @@
       "history_protected": true,
       "legal_review": {
         "basis": "БК РФ, статьи 79–80; ГК РФ, статья 125: формы бюджетных инвестиций и полномочия публичного собственника. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
-        "status": "requires_case_specific_current_law_review"
+        "status": "requires_case_specific_current_law_review",
+        "article_evidence": [
+          {
+            "norm": "БК РФ, ст. 79",
+            "url": "https://www.consultant.ru/document/cons_doc_LAW_19702/ac6c532ee1f365c6e1ff222f22b3f10587918494/",
+            "checked_on": "2026-11-27",
+            "scope": "Бюджетные инвестиции в публичную собственность; применимость зависит от собственника, получателя и решения.",
+            "status": "targeted_text_or_official_explanation_read_not_full_case_verification"
+          }
+        ]
       },
       "implementation_review": {
         "status": "draft",
