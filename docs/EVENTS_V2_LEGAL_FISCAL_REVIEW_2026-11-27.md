@@ -132,3 +132,228 @@
 Проверены ключи, число вариантов, отсутствие best_option_key, границы ±4, статус черновика и конечные числа только в изменённых 10 кейсах. Полная CI и нагрузочная проверка не запускались; рабочая БД и интерфейс не изменяются.
 
 Повторная адресная проверка 090–099: устранены остаточные перекосы 093 и 094 после конкретизации компромиссов времени и финансового риска. В 10 кейсах / 50 вариантах: 0 доминируемых по текущим прямым шкалам и 0 по расширенным. В сравнении с 6e9bcc1: прямые 7 → 0, расширенные 4 → 0. Синхронизирован реестр источников; статус допуска не изменён. Остаточная диагностика банка: {"cases":189,"options":947,"baseDominated":221,"expandedDominated":122,"expandedCases":95}. Остаток не является завершённой правовой проверкой. Ни один исторический экземпляр не изменён; history_protected сохранён, редактура только будущих копий.
+
+## Дополнительная редактура 100–115
+16 коллективных кейсов / 80 вариантов. Конкретизирована правовая рамка, предмет голосования и отдельное описание компромисса каждого действия. Новые ссылки на статьи и официальный материал Роспотребнадзора просмотрены в пределах доступных текстов и поисковых фрагментов; проверка всех специальных условий и полной действующей редакции не заявляется. История и идентификаторы сохранены. Коэффициенты условные, кандидатные, без рублёвых начислений. Не активировать. Проверки только изменённых кейсов, результат:
+```json
+{
+  "sums": {
+    "baseBefore": 20,
+    "baseAfter": 6,
+    "extBefore": 14,
+    "extAfter": 2
+  },
+  "results": [
+    {
+      "case_key": "bank-legal-2026-100",
+      "before": [
+        5
+      ],
+      "after": [
+        3
+      ],
+      "extBefore": [
+        5
+      ],
+      "extAfter": [],
+      "history_protected": true
+    },
+    {
+      "case_key": "bank-legal-2026-101",
+      "before": [
+        4
+      ],
+      "after": [],
+      "extBefore": [
+        4
+      ],
+      "extAfter": [],
+      "history_protected": false
+    },
+    {
+      "case_key": "bank-legal-2026-102",
+      "before": [
+        5
+      ],
+      "after": [
+        2
+      ],
+      "extBefore": [
+        5
+      ],
+      "extAfter": [],
+      "history_protected": false
+    },
+    {
+      "case_key": "bank-legal-2026-103",
+      "before": [
+        2,
+        5
+      ],
+      "after": [],
+      "extBefore": [],
+      "extAfter": [],
+      "history_protected": false
+    },
+    {
+      "case_key": "bank-legal-2026-104",
+      "before": [
+        2,
+        3
+      ],
+      "after": [
+        5
+      ],
+      "extBefore": [
+        3
+      ],
+      "extAfter": [
+        5
+      ],
+      "history_protected": false
+    },
+    {
+      "case_key": "bank-legal-2026-105",
+      "before": [
+        3,
+        5
+      ],
+      "after": [
+        2,
+        4
+      ],
+      "extBefore": [],
+      "extAfter": [
+        4
+      ],
+      "history_protected": false
+    },
+    {
+      "case_key": "bank-legal-2026-106",
+      "before": [
+        2
+      ],
+      "after": [],
+      "extBefore": [
+        2
+      ],
+      "extAfter": [],
+      "history_protected": true
+    },
+    {
+      "case_key": "bank-legal-2026-107",
+      "before": [
+        5
+      ],
+      "after": [],
+      "extBefore": [
+        5
+      ],
+      "extAfter": [],
+      "history_protected": true
+    },
+    {
+      "case_key": "bank-legal-2026-108",
+      "before": [
+        5
+      ],
+      "after": [],
+      "extBefore": [],
+      "extAfter": [],
+      "history_protected": false
+    },
+    {
+      "case_key": "bank-legal-2026-109",
+      "before": [
+        2,
+        5
+      ],
+      "after": [],
+      "extBefore": [
+        2,
+        5
+      ],
+      "extAfter": [],
+      "history_protected": true
+    },
+    {
+      "case_key": "bank-legal-2026-110",
+      "before": [
+        1,
+        4
+      ],
+      "after": [],
+      "extBefore": [
+        1
+      ],
+      "extAfter": [],
+      "history_protected": false
+    },
+    {
+      "case_key": "bank-legal-2026-111",
+      "before": [
+        3
+      ],
+      "after": [],
+      "extBefore": [
+        3
+      ],
+      "extAfter": [],
+      "history_protected": false
+    },
+    {
+      "case_key": "bank-legal-2026-112",
+      "before": [
+        1,
+        4
+      ],
+      "after": [],
+      "extBefore": [
+        4
+      ],
+      "extAfter": [],
+      "history_protected": false
+    },
+    {
+      "case_key": "bank-legal-2026-113",
+      "before": [],
+      "after": [
+        1
+      ],
+      "extBefore": [
+        3
+      ],
+      "extAfter": [],
+      "history_protected": false
+    },
+    {
+      "case_key": "bank-legal-2026-114",
+      "before": [],
+      "after": [],
+      "extBefore": [],
+      "extAfter": [],
+      "history_protected": false
+    },
+    {
+      "case_key": "bank-legal-2026-115",
+      "before": [
+        3
+      ],
+      "after": [],
+      "extBefore": [
+        1,
+        3
+      ],
+      "extAfter": [],
+      "history_protected": true
+    }
+  ],
+  "bank": {
+    "cases": 189,
+    "options": 947,
+    "baseDominated": 207,
+    "expandedDominated": 110,
+    "expandedCases": 85
+  }
+}
+```

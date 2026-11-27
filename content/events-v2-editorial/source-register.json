@@ -2007,12 +2007,14 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "67-ФЗ, статья 52, пункт6: агитационная публикация в периодическом печатном издании содержит сведения об оплате из соответствующего избирательного фонда. Название «новость» не меняет характера материала. Источники: https://www.ksrf.ru/about/legalbases/Guarantee/Article52.php",
+      "legal_basis": "67-ФЗ, ст. 52, п. 6: оплаченная агитация в периодической печати сопровождается сведениями об источнике оплаты; редакция обязана обеспечить соблюдение требования, независимо от заголовка. Голосование не отменяет обязанности и не заменяет проверку комиссии.",
       "legal_urls": [
-        "https://www.ksrf.ru/about/legalbases/Guarantee/Article52.php"
+        "https://www.consultant.ru/document/cons_doc_LAW_37119/98350fd66c4cbf9004bed8bb8e5a02926f98f246/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "review_date": "2026-11-27",
+      "source_scope": "specific_norm_and_related_search_results_partial"
     },
     {
       "case_key": "bank-legal-2026-101",
@@ -2021,12 +2023,14 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "67-ФЗ, статья 64: бюллетень выдаётся надлежащему избирателю по установленной процедуре; голосование лично, за других лиц не допускается. Фото документа и частное поручение её не заменяют. Источники: https://www.ksrf.ru/about/legalbases/Guarantee/Article64.php",
+      "legal_basis": "67-ФЗ, ст. 64, п. 4–5: голосование за другое лицо недопустимо; выдача производится включённому в список гражданину по установленному документу. Голосование вне помещения и помощь при заполнении регулируются отдельно, но здесь отсутствуют основания для выдачи второго бюллетеня.",
       "legal_urls": [
-        "https://www.ksrf.ru/about/legalbases/Guarantee/Article64.php"
+        "https://www.consultant.ru/document/cons_doc_LAW_37119/22a78fa701a7800e0ecb87a4097c4de1a1f4e3eb/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "review_date": "2026-11-27",
+      "source_scope": "specific_norm_and_related_search_results_partial"
     },
     {
       "case_key": "bank-legal-2026-102",
@@ -2035,13 +2039,15 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "273-ФЗ, статьи 10–11, и44-ФЗ, статья 39: заинтересованность требует уведомления и предусмотренного урегулирования, включая недопущение участия заинтересованного члена комиссии. Молчание не устраняет голос и влияние. Источники: https://epp.genproc.gov.ru/ru/proc_35/activity/combating-corruption/zakon/federal/e345084/ https://mintrud.gov.ru/docs/laws/116",
+      "legal_basis": "44-ФЗ, ст. 39, ч. 6 п. 2, ч. 7; 273-ФЗ от 25.12.2008, ст. 10. При установленной личной заинтересованности член комиссии незамедлительно сообщает заказчику, который обязан заменить его. Резерв не является самостоятельным правовым институтом: замена оформляется решением заказчика, соответствующий состав и кворум сохраняются.",
       "legal_urls": [
-        "https://epp.genproc.gov.ru/ru/proc_35/activity/combating-corruption/zakon/federal/e345084/",
-        "https://mintrud.gov.ru/docs/laws/116"
+        "https://www.consultant.ru/document/cons_doc_LAW_144624/b64e0c2e16f5016ebbfd89affc9ba333cc094b20/",
+        "https://www.consultant.ru/document/cons_doc_LAW_82959/5d02242ebd04c398d2acf7c53dbc79659b85e8f3/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "review_date": "2026-11-27",
+      "source_scope": "specific_norm_and_related_search_results_partial"
     },
     {
       "case_key": "bank-legal-2026-103",
@@ -2050,12 +2056,15 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "44-ФЗ, статьи 8,24,93: способ закупки выбирается по законным основаниям; самостоятельные закупки отличают от доказанного искусственного обхода конкуренции. Низкая цена каждого договора не исключает оценки совокупности обстоятельств. Источники: https://mintrud.gov.ru/docs/laws/116",
+      "legal_basis": "44-ФЗ, ст. 8, 24, 93: конкурентный способ или закупка у единственного поставщика должны иметь законное основание. В истории прямо задана цель обхода конкуренции и единая потребность без самостоятельных причин разделения. Конкретный способ, пороги и исключения нужно проверять по обстоятельствам.",
       "legal_urls": [
-        "https://mintrud.gov.ru/docs/laws/116"
+        "https://www.consultant.ru/document/cons_doc_LAW_144624/0c4ec341947f98654432292ddfd7066e3200d7fd/",
+        "https://www.consultant.ru/document/cons_doc_LAW_144624/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "review_date": "2026-11-27",
+      "source_scope": "specific_norm_and_related_search_results_partial"
     },
     {
       "case_key": "bank-legal-2026-104",
@@ -2064,12 +2073,14 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "44-ФЗ, статья 33: описание строится на необходимых характеристиках; требования, ограничивающие участников, и указание марки допустимы лишь в установленных случаях. В истории исключение не обосновано. Источники: https://mintrud.gov.ru/docs/laws/116",
+      "legal_basis": "44-ФЗ, ст. 33, ч. 1: описание связано с объективными характеристиками потребности; ограничения и товарные знаки допустимы только по предусмотренным правилам. Для данных сканеров условие исключает обоснование запрета эквивалентов. Испытания образцов и консультации — подготовка требований, а не дополнительный барьер для заявок.",
       "legal_urls": [
-        "https://mintrud.gov.ru/docs/laws/116"
+        "https://www.consultant.ru/document/cons_doc_LAW_144624/d6aec91603ff628ea274b8552ce2849e06e0aa4c/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "review_date": "2026-11-27",
+      "source_scope": "specific_norm_and_related_search_results_partial"
     },
     {
       "case_key": "bank-legal-2026-105",
@@ -2078,12 +2089,15 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "44-ФЗ, статья 94: приёмка и проверка относятся к фактически поставленным товарам и результатам исполнения. Плановая будущая поставка не является уже исполненным обязательством. Источники: https://mintrud.gov.ru/docs/laws/116",
+      "legal_basis": "44-ФЗ, ст. 94: приёмка относится к фактическому исполнению; отсутствие товара нельзя подтвердить актом поставки. Возможность дальнейшего исполнения и меры ответственности устанавливаются отдельно по договору и применимым нормам, включая ст. 34.",
       "legal_urls": [
-        "https://mintrud.gov.ru/docs/laws/116"
+        "https://www.consultant.ru/document/cons_doc_LAW_144624/17c58c1903f7b6212924ba9ce701489655e9a8e0/",
+        "https://www.consultant.ru/document/cons_doc_LAW_144624/c5cbc4acc59ffed792a3921dbc18900d2d0f7eb1/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "review_date": "2026-11-27",
+      "source_scope": "specific_norm_and_related_search_results_partial"
     },
     {
       "case_key": "bank-legal-2026-106",
@@ -2092,13 +2106,15 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "44-ФЗ, статья 105, разграничивает сроки и предмет административного обжалования; Конституция РФ, статья 46, гарантирует судебную защиту. Истечение срока жалобы не означает отмены договора письмом. Источники: https://mintrud.gov.ru/docs/laws/116 https://minjust.gov.ru/ru/documents/8011/",
+      "legal_basis": "44-ФЗ, ст. 105–106: административное обжалование имеет специальные сроки и порядок; после их истечения обычное письмо не прекращает контракт. Судебная защита сохраняется в применимом процессе. Подача обращения не равна обеспечительной мере или установленному решению.",
       "legal_urls": [
-        "https://mintrud.gov.ru/docs/laws/116",
-        "https://minjust.gov.ru/ru/documents/8011/"
+        "https://www.consultant.ru/document/cons_doc_LAW_144624/e8d320a00429957ef17314fadbfcaf6d7537be39/",
+        "https://www.consultant.ru/document/cons_doc_LAW_144624/ac94bc0b90bc7c6c0376c2b9e3d5bf36a138ec1b/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "review_date": "2026-11-27",
+      "source_scope": "specific_norm_and_related_search_results_partial"
     },
     {
       "case_key": "bank-legal-2026-107",
@@ -2107,12 +2123,14 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "ГК РФ, статьи 182–183: важны источник полномочия и последующее одобрение; отсутствие полномочия имеет самостоятельные последствия. Бланк и корпоративная почта не заменяют проверку представительства. Источники: https://11.rosguard.gov.ru/uploads/2025/07/5_grazhdanskijj_kodeks_rossijjskojj_federacii_chast_pervaya.pdf",
+      "legal_basis": "ГК РФ, ст. 182–183: учитываются источник полномочия, обстоятельства представительства и допустимость последующего одобрения. Бланк не доказывает полномочие. Для муниципальной закупки одобрение не может обходить обязательную закупочную или бюджетную процедуру; конкретные последствия требуют квалификации договора.",
       "legal_urls": [
-        "https://11.rosguard.gov.ru/uploads/2025/07/5_grazhdanskijj_kodeks_rossijjskojj_federacii_chast_pervaya.pdf"
+        "https://www.consultant.ru/document/cons_doc_LAW_5142/b76233cd456b40e2f35c7980c40e071767ffa16a/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "review_date": "2026-11-27",
+      "source_scope": "specific_norm_and_related_search_results_partial"
     },
     {
       "case_key": "bank-legal-2026-108",
@@ -2121,13 +2139,14 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "ГК РФ, статья 621(2), регулирует возможное возобновление аренды при продолжении пользования без возражений с учётом специальных правил. Основания приобретения собственности иные; молчание само по себе продажу не создаёт. Источники: https://rpn.gov.ru/upload/iblock/7e2/dltvhfiz6jyobrjkq1411klvnuh9jyk2/Grazhdanskiy-kodeks-Rossiyskoy-Federatsii-_chast-vtoraya_-ot-26.01.1996-N-14_FZ.pdf https://11.rosguard.gov.ru/uploads/2025/07/5_grazhdanskijj_kodeks_rossijjskojj_federacii_chast_pervaya.pdf",
+      "legal_basis": "ГК РФ, ст. 621, п. 2: продолжение пользования после истечения договора без возражений арендодателя может возобновить аренду на неопределённый срок. Для публичного имущества действуют специальные требования; переход собственности требует отдельного основания. Специальные условия торгов и продления пока не проверены полностью.",
       "legal_urls": [
-        "https://rpn.gov.ru/upload/iblock/7e2/dltvhfiz6jyobrjkq1411klvnuh9jyk2/Grazhdanskiy-kodeks-Rossiyskoy-Federatsii-_chast-vtoraya_-ot-26.01.1996-N-14_FZ.pdf",
-        "https://11.rosguard.gov.ru/uploads/2025/07/5_grazhdanskijj_kodeks_rossijjskojj_federacii_chast_pervaya.pdf"
+        "https://www.consultant.ru/document/cons_doc_LAW_9027/c22a45bebe759e5aecca241ce6e591612a842eb2/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "review_date": "2026-11-27",
+      "source_scope": "specific_norm_and_related_search_results_partial"
     },
     {
       "case_key": "bank-legal-2026-109",
@@ -2136,12 +2155,15 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "ГК РФ, статьи 330 и408: неустойка связана с нарушением обязательства; надлежащее исполнение прекращает его. Период пени определяется условиями договора и фактической просрочкой, а не внутренним согласованием претензии. Источники: https://11.rosguard.gov.ru/uploads/2025/07/5_grazhdanskijj_kodeks_rossijjskojj_federacii_chast_pervaya.pdf",
+      "legal_basis": "ГК РФ, ст. 330, 408: пеня связана с просрочкой конкретного обязательства, прекращаемого надлежащим исполнением. Претензионное согласование не продлевает уже прекратившуюся просрочку; применимая формула, договор и специальные правила проверяются отдельно.",
       "legal_urls": [
-        "https://11.rosguard.gov.ru/uploads/2025/07/5_grazhdanskijj_kodeks_rossijjskojj_federacii_chast_pervaya.pdf"
+        "https://www.consultant.ru/document/cons_doc_LAW_5142/b4e192e502ea85e2cf31e682d6dbd8ad395a5012/",
+        "https://www.consultant.ru/document/cons_doc_LAW_5142/b49c53f9ae2d68d36e5ccec52d23bb843468a91b/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "review_date": "2026-11-27",
+      "source_scope": "specific_norm_and_related_search_results_partial"
     },
     {
       "case_key": "bank-legal-2026-110",
@@ -2150,12 +2172,15 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "Закон РФ №2300-1, статья 18, пункты 5–6: продавец принимает товар ненадлежащего качества; при споре о причинах недостатка экспертиза проводится за его счёт. Возможное последующее возмещение расходов потребителем зависит от установленной причины. Требование заводской упаковки не заменяет рассмотрение гарантийной претензии. Источники: https://zpp.rospotrebnadzor.ru/news/federal/576544",
+      "legal_basis": "Закон №2300-1, ст. 18, п. 5–6: товар принимается, при необходимости проверяется качество; при споре о причинах проводится экспертиза первоначально за счёт продавца. Возмещение расходов потребителем зависит от результата. Сроки связаны с выбранным требованием; в задаче заявлен ремонт.",
       "legal_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_305/76ae101b731ecc22467fd9f1f14cb9e2b8799026/",
         "https://zpp.rospotrebnadzor.ru/news/federal/576544"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "review_date": "2026-11-27",
+      "source_scope": "specific_norm_and_related_search_results_partial"
     },
     {
       "case_key": "bank-legal-2026-111",
@@ -2164,12 +2189,15 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "Закон РФ №2300-1, статья 16.1, пункт 4.2, действует с 01.03.2026: исполнитель не вправе использовать для периодических платежей реквизиты, от использования которых потребитель отказался, и обязан обеспечить возможность электронного отказа. Возврат конкретных сумм оценивается по обстоятельствам списаний. Источники: https://zpp.rospotrebnadzor.ru/news/federal/572344",
+      "legal_basis": "Закон №2300-1, ст. 16.1, п. 4.2 (с 01.03.2026): нельзя использовать сохранённые реквизиты для периодических платежей после отказа потребителя от их использования; электронный отказ должен быть доступен. Возврат именно спорных новых списаний оценивается по обстоятельствам. Блокирование повторных платежей обязательно, а не предмет голосования.",
       "legal_urls": [
-        "https://zpp.rospotrebnadzor.ru/news/federal/572344"
+        "https://44.rospotrebnadzor.ru/osnovnye_napravlenij/zacshita_prav_potreb/6948/",
+        "https://www.consultant.ru/document/cons_doc_LAW_305/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "review_date": "2026-11-27",
+      "source_scope": "specific_norm_and_related_search_results_partial"
     },
     {
       "case_key": "bank-legal-2026-112",
@@ -2178,12 +2206,14 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "ТК РФ, статья 81, часть 6: увольнение по инициативе работодателя в период временной нетрудоспособности не допускается, кроме ликвидации организации либо прекращения деятельности ИП. Соблюдение этой гарантии не заменяет остальных требований процедуры сокращения. Источники: https://git61.rostrud.gov.ru/upload/iblock/15e/tk-rf.pdf",
+      "legal_basis": "ТК РФ, ст. 81, ч. 6: увольнение по сокращению во время болезни недопустимо при заданных обстоятельствах. Наличие подходящих вакансий и соблюдение прочих гарантий проверяются отдельно. Голосованием нельзя разрешить запрещённое увольнение.",
       "legal_urls": [
-        "https://git61.rostrud.gov.ru/upload/iblock/15e/tk-rf.pdf"
+        "https://www.consultant.ru/document/cons_doc_LAW_34683/6a7ba42d8fda3a1ba186a9eb5c806921998ae7d1/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "review_date": "2026-11-27",
+      "source_scope": "specific_norm_and_related_search_results_partial"
     },
     {
       "case_key": "bank-legal-2026-113",
@@ -2192,12 +2222,15 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "ТК РФ, статьи 70 и 261: беременным женщинам испытание при приёме не устанавливается; прекращение договора по инициативе работодателя ограничено специальными гарантиями. Подпись под типовым договором не устраняет запрет испытания. Источники: https://git61.rostrud.gov.ru/upload/iblock/15e/tk-rf.pdf",
+      "legal_basis": "ТК РФ, ст. 70 и 261: испытание беременной не устанавливается, даже если договор подписан. Новая редакция ст. 70 также охватывает женщин с детьми до трёх лет; изменение не требуется для фактов данной истории. Увольнение из-за результата запрещённого испытания не допускается.",
       "legal_urls": [
-        "https://git61.rostrud.gov.ru/upload/iblock/15e/tk-rf.pdf"
+        "https://www.consultant.ru/document/cons_doc_LAW_34683/cc065f088bd92d312b5fae714377b25f557ac44a/",
+        "https://www.consultant.ru/document/cons_doc_LAW_34683/ede188a86ee930ba7b9e1163bc567d7897a43921/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "review_date": "2026-11-27",
+      "source_scope": "specific_norm_and_related_search_results_partial"
     },
     {
       "case_key": "bank-legal-2026-114",
@@ -2206,12 +2239,15 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "ТК РФ, статьи 114, 136 и 236: оплачиваемый отпуск и выплата заработной платы — самостоятельные обязанности; задержка зарплаты влечёт предусмотренную денежную компенсацию. Задним числом оформленный неоплаченный отдых не заменяет погашение задолженности. Источники: https://git61.rostrud.gov.ru/upload/iblock/15e/tk-rf.pdf",
+      "legal_basis": "ТК РФ, ст. 114, 136, 236: отпуск не заменяет заработную плату. При установленной задолженности компенсация за задержку рассчитывается по действующей норме, включая период до фактического расчёта. Необходимо погасить долг и компенсацию независимо от выбранной дополнительной меры. Конкретный расчёт невозможен без дат и динамики ставки.",
       "legal_urls": [
-        "https://git61.rostrud.gov.ru/upload/iblock/15e/tk-rf.pdf"
+        "https://www.consultant.ru/document/cons_doc_LAW_34683/7c8d2fe49f0c8b8d13723803f2e82228f99b6d7e/",
+        "https://www.consultant.ru/document/cons_doc_LAW_34683/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "review_date": "2026-11-27",
+      "source_scope": "specific_norm_and_related_search_results_partial"
     },
     {
       "case_key": "bank-legal-2026-115",
@@ -2220,12 +2256,14 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "ТК РФ, статьи 99 и 259: для женщины с ребёнком до трёх лет сверхурочная работа допускается с письменного согласия и при отсутствии медицинского запрета; её письменно знакомят с правом отказаться. Гарантия в этой истории связана с прямо указанным статусом работницы, а не с любым родительством вообще. Источники: https://git61.rostrud.gov.ru/upload/iblock/15e/tk-rf.pdf",
+      "legal_basis": "ТК РФ, ст. 99, 259: для матери ребёнка двух лет нужны письменное согласие, отсутствие медицинского запрета и письменное ознакомление с правом отказа. В заданной неаварийной ситуации принуждение недопустимо. Остальные работники также привлекаются только с соблюдением применимых норм и ограничений.",
       "legal_urls": [
-        "https://git61.rostrud.gov.ru/upload/iblock/15e/tk-rf.pdf"
+        "https://www.consultant.ru/document/cons_doc_LAW_34683/b3b98c8b54f919c352560aadad5f95df943fd9fe/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
-      "activation_allowed": false
+      "activation_allowed": false,
+      "review_date": "2026-11-27",
+      "source_scope": "specific_norm_and_related_search_results_partial"
     },
     {
       "case_key": "bank-legal-2026-116",

@@ -4,9 +4,9 @@
   "summary": {
     "cases": 189,
     "options": 947,
-    "baseDominated": 221,
-    "expandedDominated": 122,
-    "expandedCases": 95
+    "baseDominated": 207,
+    "expandedDominated": 110,
+    "expandedCases": 85
   },
   "remaining": [
     {
@@ -305,66 +305,6 @@
       "dominated": 1
     },
     {
-      "case_key": "bank-legal-2026-100",
-      "title": "Неотмеченная агитация",
-      "dominated": 1
-    },
-    {
-      "case_key": "bank-legal-2026-101",
-      "title": "Один бюллетень за соседа",
-      "dominated": 1
-    },
-    {
-      "case_key": "bank-legal-2026-102",
-      "title": "Победитель с конфликтом интересов",
-      "dominated": 1
-    },
-    {
-      "case_key": "bank-legal-2026-104",
-      "title": "Техническое задание под марку",
-      "dominated": 1
-    },
-    {
-      "case_key": "bank-legal-2026-106",
-      "title": "Жалоба на закупку после договора",
-      "dominated": 1
-    },
-    {
-      "case_key": "bank-legal-2026-107",
-      "title": "Подпись под чужим полномочием",
-      "dominated": 1
-    },
-    {
-      "case_key": "bank-legal-2026-109",
-      "title": "Неустойка за каждый день",
-      "dominated": 2
-    },
-    {
-      "case_key": "bank-legal-2026-110",
-      "title": "Отказ от гарантийного ремонта",
-      "dominated": 1
-    },
-    {
-      "case_key": "bank-legal-2026-111",
-      "title": "Цифровая подписка после отказа",
-      "dominated": 1
-    },
-    {
-      "case_key": "bank-legal-2026-112",
-      "title": "Больничный и увольнение",
-      "dominated": 1
-    },
-    {
-      "case_key": "bank-legal-2026-113",
-      "title": "Испытание для беременной",
-      "dominated": 1
-    },
-    {
-      "case_key": "bank-legal-2026-115",
-      "title": "Обязательная сверхурочная смена",
-      "dominated": 2
-    },
-    {
       "case_key": "bank-legal-2026-116",
       "title": "Публичный список диагнозов",
       "dominated": 2
@@ -483,7 +423,17 @@
       "case_key": "bank-legal-2026-150",
       "title": "Вознаграждение за обязательную услугу",
       "dominated": 2
+    },
+    {
+      "case_key": "bank-legal-2026-104",
+      "title": "Техническое задание под марку",
+      "dominated": 1
+    },
+    {
+      "case_key": "bank-legal-2026-105",
+      "title": "Приёмка того, чего нет",
+      "dominated": 1
     }
   ],
-  "note": "090–099: отдельная редактура; оставшиеся значения вне изменённого диапазона перенесены из исходной диагностики. Полный пересчёт банка требуется перед выпуском."
+  "note": "090–115: адресная редактура; вне диапазона перенесены исходные диагностические значения. Полный пересчёт нужен перед выпуском."
 }
