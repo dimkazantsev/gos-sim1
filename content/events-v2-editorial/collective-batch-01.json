@@ -146,7 +146,49 @@
         "basis": "БК РФ, статья 131: дотации на выравнивание бюджетной обеспеченности субъектов РФ. Источники: https://www.consultant.ru/document/cons_doc_LAW_19702/",
         "status": "requires_case_specific_current_law_review",
         "source_status": "fictional_or_unverified_source",
-        "note": "Обязательные нормы вынесены в исходные условия. Параметры учебной модели предложены, не являются реальными суммами или статистикой. Не применять до юридической и бюджетной приёмки."
+        "note": "Обязательные нормы вынесены в исходные условия. Параметры учебной модели предложены, не являются реальными суммами или статистикой. Не применять до юридической и бюджетной приёмки.",
+        "checked_norm_urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/42df670934cd2c8f62a9ef153b2826b4d39b3ff4/",
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/73147d61f1183d32e517768da079cfdf28cca0a9/"
+        ],
+        "collective_option_analysis": {
+          "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+          "date": "2026-11-28",
+          "norm": "БК РФ, статья 131: дотации на выравнивание бюджетной обеспеченности субъектов РФ. Источники: https://www.consultant.ru/document/cons_doc_LAW_19702/",
+          "urls": [
+            "https://www.consultant.ru/document/cons_doc_LAW_19702/42df670934cd2c8f62a9ef153b2826b4d39b3ff4/",
+            "https://www.consultant.ru/document/cons_doc_LAW_19702/73147d61f1183d32e517768da079cfdf28cca0a9/"
+          ],
+          "source_scope": "Адресные справочные тексты и официальные разъяснения/поисковые выдержки; полный комплект действующих отраслевых, местных и специальных актов не установлен.",
+          "options": [
+            {
+              "key": "option_1",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Усиление команды допустимо в рамках полномочий и лимитов; методику расчёта не меняет."
+            },
+            {
+              "key": "option_2",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Муниципальные данные сверяются по одинаковым расходным факторам и подтверждённым источникам."
+            },
+            {
+              "key": "option_3",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Публикация исправленного расчёта обеспечивает прозрачность без произвольного изменения формулы."
+            },
+            {
+              "key": "option_4",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Пересмотр необязательных проектов возможен после уточнения прогноза и бюджетного решения; обязательства сохраняются."
+            },
+            {
+              "key": "option_5",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Развитие налоговой базы планируется на будущее, не заменяет расчёт дотации по утверждённой методике."
+            }
+          ],
+          "remaining": "Действующая методика выравнивания, исходные данные и бюджетное решение; размер дотации не определяется голосованием."
+        }
       },
       "financial_review": {
         "status": "draft_requires_integration",
@@ -321,7 +363,51 @@
         "basis": "БК РФ, статьи 37, 131 и 184.2: достоверный прогноз, дотации и обоснование бюджетных показателей. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
         "status": "requires_case_specific_current_law_review",
         "source_status": "fictional_or_unverified_source",
-        "note": "Обязательные нормы вынесены в исходные условия. Параметры учебной модели предложены, не являются реальными суммами или статистикой. Не применять до юридической и бюджетной приёмки."
+        "note": "Обязательные нормы вынесены в исходные условия. Параметры учебной модели предложены, не являются реальными суммами или статистикой. Не применять до юридической и бюджетной приёмки.",
+        "checked_norm_urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/73147d61f1183d32e517768da079cfdf28cca0a9/",
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/42df670934cd2c8f62a9ef153b2826b4d39b3ff4/",
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/24a94562b0b0557393897b9d9ef6f591ff1fb19b/"
+        ],
+        "collective_option_analysis": {
+          "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+          "date": "2026-11-28",
+          "norm": "БК РФ, статьи 37, 131 и 184.2: достоверный прогноз, дотации и обоснование бюджетных показателей. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
+          "urls": [
+            "https://www.consultant.ru/document/cons_doc_LAW_19702/73147d61f1183d32e517768da079cfdf28cca0a9/",
+            "https://www.consultant.ru/document/cons_doc_LAW_19702/42df670934cd2c8f62a9ef153b2826b4d39b3ff4/",
+            "https://www.consultant.ru/document/cons_doc_LAW_19702/24a94562b0b0557393897b9d9ef6f591ff1fb19b/"
+          ],
+          "source_scope": "Адресные справочные тексты и официальные разъяснения/поисковые выдержки; полный комплект действующих отраслевых, местных и специальных актов не установлен.",
+          "options": [
+            {
+              "key": "option_1",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Запрос общей дотации допустим как обращение за поддержкой, а не как уже выделенный доход."
+            },
+            {
+              "key": "option_2",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Частичный запрос и перераспределение свободных лимитов требуют соответствующих бюджетных решений."
+            },
+            {
+              "key": "option_3",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Кассовый план и временное финансирование уточняются по разрешённым источникам без списания обязательств."
+            },
+            {
+              "key": "option_4",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Перенос незаконтрактованных мероприятий допустим, если не нарушает обязательные сроки и услуги."
+            },
+            {
+              "key": "option_5",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "План восстановления заказов дополняет запрос общей поддержки, но не подтверждает будущие поступления."
+            }
+          ],
+          "remaining": "Вид дотации, полномочия предоставляющего органа, порядок распределения и конкретный кассовый источник."
+        }
       },
       "financial_review": {
         "status": "draft_requires_integration",
@@ -492,7 +578,53 @@
         "basis": "БК РФ, статьи 38 и 132; Федеральный закон №323-ФЗ, статья 10: доступность медицинской помощи. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
         "status": "requires_case_specific_current_law_review",
         "source_status": "fictional_or_unverified_source",
-        "note": "Обязательные нормы вынесены в исходные условия. Параметры учебной модели предложены, не являются реальными суммами или статистикой. Не применять до юридической и бюджетной приёмки."
+        "note": "Обязательные нормы вынесены в исходные условия. Параметры учебной модели предложены, не являются реальными суммами или статистикой. Не применять до юридической и бюджетной приёмки.",
+        "checked_norm_urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/0859896f05c16d5719eafdf624507adf8887f0c7/",
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/9a0e8abcbe24837343cdcc599bccf0f09413968a/",
+          "https://www.consultant.ru/document/cons_doc_LAW_121895/e63d3344841b2f5636a73710e906a23ebaf9ab82/",
+          "https://www.consultant.ru/document/cons_doc_LAW_121895/8e8caa29efb42dd54e3924ee7441f06d469f4a80/"
+        ],
+        "collective_option_analysis": {
+          "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+          "date": "2026-11-28",
+          "norm": "БК РФ, статьи 38 и 132; Федеральный закон №323-ФЗ, статья 10: доступность медицинской помощи. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
+          "urls": [
+            "https://www.consultant.ru/document/cons_doc_LAW_19702/0859896f05c16d5719eafdf624507adf8887f0c7/",
+            "https://www.consultant.ru/document/cons_doc_LAW_19702/9a0e8abcbe24837343cdcc599bccf0f09413968a/",
+            "https://www.consultant.ru/document/cons_doc_LAW_121895/e63d3344841b2f5636a73710e906a23ebaf9ab82/",
+            "https://www.consultant.ru/document/cons_doc_LAW_121895/8e8caa29efb42dd54e3924ee7441f06d469f4a80/"
+          ],
+          "source_scope": "Адресные справочные тексты и официальные разъяснения/поисковые выдержки; полный комплект действующих отраслевых, местных и специальных актов не установлен.",
+          "options": [
+            {
+              "key": "option_1",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Полный блок с выездной службой требует утверждённого проекта, финансирования и соблюдения медицинских требований."
+            },
+            {
+              "key": "option_2",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Аренда исправного оборудования и выездная помощь допустимы при законной закупке и медицинской организации процесса."
+            },
+            {
+              "key": "option_3",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Отдельный кабинет возможен как самостоятельный этап при подтверждённой безопасности и доступности обследований."
+            },
+            {
+              "key": "option_4",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Межрайонное направление и перевозка организуются компетентными медицинскими службами с законным финансированием."
+            },
+            {
+              "key": "option_5",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Этапная закупка и обучение допустимы без эксплуатации неисправной техники и ухудшения обязательной помощи."
+            }
+          ],
+          "remaining": "Порядок оказания помощи, медицинские лицензии, требования к оборудованию и соглашение о финансировании."
+        }
       },
       "financial_review": {
         "status": "draft_requires_integration",
@@ -663,7 +795,51 @@
         "basis": "БК РФ, статьи 93.2 и 99: бюджетный кредит и государственный долг субъекта РФ. Источники: https://www.consultant.ru/document/cons_doc_LAW_19702/",
         "status": "requires_case_specific_current_law_review",
         "source_status": "fictional_or_unverified_source",
-        "note": "Обязательные нормы вынесены в исходные условия. Параметры учебной модели предложены, не являются реальными суммами или статистикой. Не применять до юридической и бюджетной приёмки."
+        "note": "Обязательные нормы вынесены в исходные условия. Параметры учебной модели предложены, не являются реальными суммами или статистикой. Не применять до юридической и бюджетной приёмки.",
+        "checked_norm_urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/3df1962f79c7c1487977d639be47afd95e63ab95/",
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/26f470b8b8e93e7284195c937ffcde9bc5836719/",
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/24a94562b0b0557393897b9d9ef6f591ff1fb19b/"
+        ],
+        "collective_option_analysis": {
+          "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+          "date": "2026-11-28",
+          "norm": "БК РФ, статьи 93.2 и 99: бюджетный кредит и государственный долг субъекта РФ. Источники: https://www.consultant.ru/document/cons_doc_LAW_19702/",
+          "urls": [
+            "https://www.consultant.ru/document/cons_doc_LAW_19702/3df1962f79c7c1487977d639be47afd95e63ab95/",
+            "https://www.consultant.ru/document/cons_doc_LAW_19702/26f470b8b8e93e7284195c937ffcde9bc5836719/",
+            "https://www.consultant.ru/document/cons_doc_LAW_19702/24a94562b0b0557393897b9d9ef6f591ff1fb19b/"
+          ],
+          "source_scope": "Адресные справочные тексты и официальные разъяснения/поисковые выдержки; полный комплект действующих отраслевых, местных и специальных актов не установлен.",
+          "options": [
+            {
+              "key": "option_1",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Полный кредит возможен по решению кредитора, договору и долговым ограничениям; возврат отражается в графике."
+            },
+            {
+              "key": "option_2",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Меньший кредит и свободный остаток допустимы после проверки ограничений на остаток и реальной ликвидности."
+            },
+            {
+              "key": "option_3",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Этапность новых поставок согласуется с контрагентом в пределах договора и законных оснований изменения."
+            },
+            {
+              "key": "option_4",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Дополнительный источник проверяется по допустимому виду заимствования и предельным показателям."
+            },
+            {
+              "key": "option_5",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Перенос свободных расходов не отменяет уже принятые обязательства и обязательные поставки."
+            }
+          ],
+          "remaining": "Конкретная программа бюджетного кредита, долговые ограничения и условия договоров северного завоза."
+        }
       },
       "financial_review": {
         "status": "draft_requires_integration",
@@ -834,7 +1010,51 @@
         "basis": "БК РФ, статьи 38 и 132; Федеральный закон №264-ФЗ, статья 7: направления государственной поддержки сельского хозяйства. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
         "status": "requires_case_specific_current_law_review",
         "source_status": "fictional_or_unverified_source",
-        "note": "Обязательные нормы вынесены в исходные условия. Параметры учебной модели предложены, не являются реальными суммами или статистикой. Не применять до юридической и бюджетной приёмки."
+        "note": "Обязательные нормы вынесены в исходные условия. Параметры учебной модели предложены, не являются реальными суммами или статистикой. Не применять до юридической и бюджетной приёмки.",
+        "checked_norm_urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/0859896f05c16d5719eafdf624507adf8887f0c7/",
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/1b6959f23cc516d0e11ddc2e213ca2dca83560df/",
+          "https://www.consultant.ru/document/cons_doc_LAW_64930/3f2552a1d0ba81ad56b0016ccd19feb14afbb9dd/"
+        ],
+        "collective_option_analysis": {
+          "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+          "date": "2026-11-28",
+          "norm": "БК РФ, статьи 38 и 132; Федеральный закон №264-ФЗ, статья 7: направления государственной поддержки сельского хозяйства. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
+          "urls": [
+            "https://www.consultant.ru/document/cons_doc_LAW_19702/0859896f05c16d5719eafdf624507adf8887f0c7/",
+            "https://www.consultant.ru/document/cons_doc_LAW_19702/1b6959f23cc516d0e11ddc2e213ca2dca83560df/",
+            "https://www.consultant.ru/document/cons_doc_LAW_64930/3f2552a1d0ba81ad56b0016ccd19feb14afbb9dd/"
+          ],
+          "source_scope": "Адресные справочные тексты и официальные разъяснения/поисковые выдержки; полный комплект действующих отраслевых, местных и специальных актов не установлен.",
+          "options": [
+            {
+              "key": "option_1",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Общая оросительная инфраструктура финансируется по утверждённому проекту и правам на объекты."
+            },
+            {
+              "key": "option_2",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Повторный посев и временная вода требуют отдельного основания и подтверждения потерь хозяйств."
+            },
+            {
+              "key": "option_3",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Этапное восстановление допускается при самостоятельности этапов и соблюдении условий программы."
+            },
+            {
+              "key": "option_4",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Открытый отбор по объективным потерям допустим в установленной процедуре без изменения обязательных критериев."
+            },
+            {
+              "key": "option_5",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Меньшая заявка и региональные средства возможны после бюджетного решения, не означают автоматическую выплату."
+            }
+          ],
+          "remaining": "Отраслевой порядок господдержки, права на водные объекты, критерии получателей и соглашение."
+        }
       },
       "financial_review": {
         "status": "draft_requires_integration",
@@ -1005,7 +1225,51 @@
         "basis": "БК РФ, статьи 38 и 132; Федеральный закон №257-ФЗ, статьи 17 и 30: содержание дороги и ограничения движения. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
         "status": "requires_case_specific_current_law_review",
         "source_status": "fictional_or_unverified_source",
-        "note": "Обязательные нормы вынесены в исходные условия. Параметры учебной модели предложены, не являются реальными суммами или статистикой. Не применять до юридической и бюджетной приёмки."
+        "note": "Обязательные нормы вынесены в исходные условия. Параметры учебной модели предложены, не являются реальными суммами или статистикой. Не применять до юридической и бюджетной приёмки.",
+        "checked_norm_urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/0859896f05c16d5719eafdf624507adf8887f0c7/",
+          "https://www.consultant.ru/document/cons_doc_LAW_72386/1692e755d61192abb296c96e101a443f4b701edf/",
+          "https://www.consultant.ru/document/cons_doc_LAW_72386/d815e149e72342151144533709e7ebcf7aa60b8c/"
+        ],
+        "collective_option_analysis": {
+          "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+          "date": "2026-11-28",
+          "norm": "БК РФ, статьи 38 и 132; Федеральный закон №257-ФЗ, статьи 17 и 30: содержание дороги и ограничения движения. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
+          "urls": [
+            "https://www.consultant.ru/document/cons_doc_LAW_19702/0859896f05c16d5719eafdf624507adf8887f0c7/",
+            "https://www.consultant.ru/document/cons_doc_LAW_72386/1692e755d61192abb296c96e101a443f4b701edf/",
+            "https://www.consultant.ru/document/cons_doc_LAW_72386/d815e149e72342151144533709e7ebcf7aa60b8c/"
+          ],
+          "source_scope": "Адресные справочные тексты и официальные разъяснения/поисковые выдержки; полный комплект действующих отраслевых, местных и специальных актов не установлен.",
+          "options": [
+            {
+              "key": "option_1",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Восстановление моста требует обследования, разрешённого проекта и финансирования; независимый контроль дополняет обязательные процедуры."
+            },
+            {
+              "key": "option_2",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Этапность допустима при безопасности; поддержка перевозчиков требует самостоятельного законного основания."
+            },
+            {
+              "key": "option_3",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Временный маршрут согласуется с дорожным органом; подрядчик выбирается по применимой процедуре."
+            },
+            {
+              "key": "option_4",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Приоритет несущих опор обосновывается обследованием, не разрешает отложить обязательные меры безопасности."
+            },
+            {
+              "key": "option_5",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Совместное финансирование возможно при раздельном учёте источников и отсутствии двойного покрытия затрат."
+            }
+          ],
+          "remaining": "Собственник дороги, технический допуск, ограничения движения, вид закупки и условия субсидии."
+        }
       },
       "financial_review": {
         "status": "draft_requires_integration",
@@ -1176,7 +1440,49 @@
         "basis": "БК РФ, статья 133: субвенции из федерального бюджета бюджетам субъектов РФ. Источники: https://www.consultant.ru/document/cons_doc_LAW_19702/",
         "status": "requires_case_specific_current_law_review",
         "source_status": "fictional_or_unverified_source",
-        "note": "Обязательные нормы вынесены в исходные условия. Параметры учебной модели предложены, не являются реальными суммами или статистикой. Не применять до юридической и бюджетной приёмки."
+        "note": "Обязательные нормы вынесены в исходные условия. Параметры учебной модели предложены, не являются реальными суммами или статистикой. Не применять до юридической и бюджетной приёмки.",
+        "checked_norm_urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/6288b672abcacbdfce848217bd5f3b6dcfa76913/",
+          "https://www.consultant.ru/document/cons_doc_LAW_15234/"
+        ],
+        "collective_option_analysis": {
+          "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+          "date": "2026-11-28",
+          "norm": "БК РФ, статья 133: субвенции из федерального бюджета бюджетам субъектов РФ. Источники: https://www.consultant.ru/document/cons_doc_LAW_19702/",
+          "urls": [
+            "https://www.consultant.ru/document/cons_doc_LAW_19702/6288b672abcacbdfce848217bd5f3b6dcfa76913/",
+            "https://www.consultant.ru/document/cons_doc_LAW_15234/"
+          ],
+          "source_scope": "Адресные справочные тексты и официальные разъяснения/поисковые выдержки; полный комплект действующих отраслевых, местных и специальных актов не установлен.",
+          "options": [
+            {
+              "key": "option_1",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Централизованная сверка и обучение помогают применять единую методику без изменения норматива."
+            },
+            {
+              "key": "option_2",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Периодическая сверка дополняет обязательное исправление реестра и не заменяет предусмотренный контроль."
+            },
+            {
+              "key": "option_3",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Адресная помощь муниципалитетам распределяется по установленным потребностям, не меняет права получателей."
+            },
+            {
+              "key": "option_4",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Канал уточнения данных должен обеспечивать законную идентификацию и защиту сведений."
+            },
+            {
+              "key": "option_5",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Межведомственный обмен допустим при предусмотренном доступе, минимизации данных и разграничении полномочий."
+            }
+          ],
+          "remaining": "Конкретное переданное полномочие, методика субвенции, правовое основание доступа к персональным данным."
+        }
       },
       "financial_review": {
         "status": "draft_requires_integration",
@@ -1209,7 +1515,7 @@
       "category": "Региональные финансы",
       "source_url": null,
       "source_note": "Учебная история. Участники и обстоятельства вымышлены; правовые основания приведены в разборе решения. Игровые эффекты являются условными.",
-      "original_situation": "В Иркутской области паводок повредил коммунальную инфраструктуру. Регион запросил 600 млн ₽ на подтвержденные неотложные восстановительные работы с актами обследования. Одновременно в заявку добавили строительство нового туристического центра, который не пострадал и отсутствует в аварийных актах. Министерство располагает ограниченным резервом, а перечень работ нужно утвердить до оплаты. Команда должна отделить чрезвычайные расходы от обычного инвестиционного проекта, проверить основания использования резервного фонда и оформить необходимые изменения. Восстановление сетей возвращает действующие предприятия к работе.",
+      "original_situation": "В Иркутской области паводок повредил коммунальную инфраструктуру. Регион запросил 600 млн ₽ на подтвержденные неотложные восстановительные работы с актами обследования. Одновременно в заявку добавили строительство нового туристического центра, который не пострадал и отсутствует в аварийных актах. Министерство располагает ограниченным резервом, а перечень работ нужно утвердить до оплаты. Команда должна отделить чрезвычайные расходы от обычного инвестиционного проекта, проверить основания использования резервного фонда и оформить необходимые изменения. Восстановление сетей возвращает действующие предприятия к работе.\n\nУчебное условие: действующий порядок использования соответствующего резервного фонда не предусматривает финансирование указанного нового туристического центра по иному основанию.",
       "mandatory_boundary": "Резерв допускается только на подтверждённые непредвиденные работы; туристический центр вынесен в обычный инвестплан. Как распределить доступные законные восстановительные ресурсы?",
       "decision_options": [
         "Ускорить восстановление наиболее пострадавших сетей с резервом на непредвиденные работы",
@@ -1348,7 +1654,49 @@
         "basis": "БК РФ, статьи 38 и 81: целевое назначение и непредвиденные расходы резервного фонда. Источники: https://www.consultant.ru/document/cons_doc_LAW_19702/",
         "status": "requires_case_specific_current_law_review",
         "source_status": "fictional_or_unverified_source",
-        "note": "Обязательные нормы вынесены в исходные условия. Параметры учебной модели предложены, не являются реальными суммами или статистикой. Не применять до юридической и бюджетной приёмки."
+        "note": "Обязательные нормы вынесены в исходные условия. Параметры учебной модели предложены, не являются реальными суммами или статистикой. Не применять до юридической и бюджетной приёмки.",
+        "checked_norm_urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/55d68b8b11dce341557f8bc5b72a4a20c5c8e00c/",
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/9a0e8abcbe24837343cdcc599bccf0f09413968a/"
+        ],
+        "collective_option_analysis": {
+          "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+          "date": "2026-11-28",
+          "norm": "БК РФ, статьи 38 и 81: целевое назначение и непредвиденные расходы резервного фонда. Источники: https://www.consultant.ru/document/cons_doc_LAW_19702/",
+          "urls": [
+            "https://www.consultant.ru/document/cons_doc_LAW_19702/55d68b8b11dce341557f8bc5b72a4a20c5c8e00c/",
+            "https://www.consultant.ru/document/cons_doc_LAW_19702/9a0e8abcbe24837343cdcc599bccf0f09413968a/"
+          ],
+          "source_scope": "Адресные справочные тексты и официальные разъяснения/поисковые выдержки; полный комплект действующих отраслевых, местных и специальных актов не установлен.",
+          "options": [
+            {
+              "key": "option_1",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Ускорение восстановления подтверждённых сетей допустимо по порядку фонда и утверждённым расходам."
+            },
+            {
+              "key": "option_2",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Критические узлы выделяются по обследованию; прочие работы включаются в надлежащий план."
+            },
+            {
+              "key": "option_3",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Временные решения для бизнеса требуют самостоятельной проверки связи с аварией и законного основания."
+            },
+            {
+              "key": "option_4",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Очередность по подтверждённому риску допустима при сохранении обязательных неотложных мер."
+            },
+            {
+              "key": "option_5",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Дополнительная помощь запрашивается отдельно; обычная стройка не покрывается резервом в заданных условиях."
+            }
+          ],
+          "remaining": "Порядок конкретного резервного фонда: ст. 81 допускает и иные мероприятия по установленным правилам; в условии отсутствует такое основание для туристического центра."
+        }
       },
       "financial_review": {
         "status": "draft_requires_integration",
@@ -1519,7 +1867,49 @@
         "basis": "БК РФ, статьи 38 и 132; Лесной кодекс РФ, статья 62: лесовосстановление. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
         "status": "requires_case_specific_current_law_review",
         "source_status": "fictional_or_unverified_source",
-        "note": "Обязательные нормы вынесены в исходные условия. Параметры учебной модели предложены, не являются реальными суммами или статистикой. Не применять до юридической и бюджетной приёмки."
+        "note": "Обязательные нормы вынесены в исходные условия. Параметры учебной модели предложены, не являются реальными суммами или статистикой. Не применять до юридической и бюджетной приёмки.",
+        "checked_norm_urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/0859896f05c16d5719eafdf624507adf8887f0c7/",
+          "https://www.consultant.ru/document/cons_doc_LAW_64299/56f9e828981c7d5b4c1c60e99d31cca204c0f39b/"
+        ],
+        "collective_option_analysis": {
+          "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+          "date": "2026-11-28",
+          "norm": "БК РФ, статьи 38 и 132; Лесной кодекс РФ, статья 62: лесовосстановление. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
+          "urls": [
+            "https://www.consultant.ru/document/cons_doc_LAW_19702/0859896f05c16d5719eafdf624507adf8887f0c7/",
+            "https://www.consultant.ru/document/cons_doc_LAW_64299/56f9e828981c7d5b4c1c60e99d31cca204c0f39b/"
+          ],
+          "source_scope": "Адресные справочные тексты и официальные разъяснения/поисковые выдержки; полный комплект действующих отраслевых, местных и специальных актов не установлен.",
+          "options": [
+            {
+              "key": "option_1",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Комплекс работ требует установленной категории земель, обследования и допустимого проекта лесовосстановления."
+            },
+            {
+              "key": "option_2",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Приоритет участков у поселений допустим по подтверждённому риску без отмены иных обязательных мероприятий."
+            },
+            {
+              "key": "option_3",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Естественное или искусственное восстановление выбирается по лесоводственным требованиям и обследованию, не произвольно."
+            },
+            {
+              "key": "option_4",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Подъезды и профилактический мониторинг возможны в компетенции органов и не заменяют обязательное лесовосстановление."
+            },
+            {
+              "key": "option_5",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Распределение работ допускается между компетентными исполнителями по законным договорам и полномочиям."
+            }
+          ],
+          "remaining": "Категория земель, ответственный лесопользователь, действующие правила лесовосстановления, проект и финансирование."
+        }
       },
       "financial_review": {
         "status": "draft_requires_integration",
@@ -1690,7 +2080,49 @@
         "basis": "БК РФ, статья 93.2: условия возврата бюджетного кредита. Источники: https://www.consultant.ru/document/cons_doc_LAW_19702/",
         "status": "requires_case_specific_current_law_review",
         "source_status": "fictional_or_unverified_source",
-        "note": "Обязательные нормы вынесены в исходные условия. Параметры учебной модели предложены, не являются реальными суммами или статистикой. Не применять до юридической и бюджетной приёмки."
+        "note": "Обязательные нормы вынесены в исходные условия. Параметры учебной модели предложены, не являются реальными суммами или статистикой. Не применять до юридической и бюджетной приёмки.",
+        "checked_norm_urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/3df1962f79c7c1487977d639be47afd95e63ab95/",
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/24a94562b0b0557393897b9d9ef6f591ff1fb19b/"
+        ],
+        "collective_option_analysis": {
+          "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+          "date": "2026-11-28",
+          "norm": "БК РФ, статья 93.2: условия возврата бюджетного кредита. Источники: https://www.consultant.ru/document/cons_doc_LAW_19702/",
+          "urls": [
+            "https://www.consultant.ru/document/cons_doc_LAW_19702/3df1962f79c7c1487977d639be47afd95e63ab95/",
+            "https://www.consultant.ru/document/cons_doc_LAW_19702/24a94562b0b0557393897b9d9ef6f591ff1fb19b/"
+          ],
+          "source_scope": "Адресные справочные тексты и официальные разъяснения/поисковые выдержки; полный комплект действующих отраслевых, местных и специальных актов не установлен.",
+          "options": [
+            {
+              "key": "option_1",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Резервирование суммы и перенос новых закупок допустимы при сохранении действующего графика."
+            },
+            {
+              "key": "option_2",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Погашение по договору и отдельный запрос реструктуризации не создают просрочку или обещание изменения."
+            },
+            {
+              "key": "option_3",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Перераспределение свободных лимитов производится уполномоченным органом по бюджетным правилам."
+            },
+            {
+              "key": "option_4",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Рефинансирование возможно лишь по разрешённому источнику и долговым ограничениям; старый платёж сохраняется."
+            },
+            {
+              "key": "option_5",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Запас будущих платежей и уточнённый прогноз не меняют действующие условия кредита."
+            }
+          ],
+          "remaining": "Договор, дата платежа, компетенция кредитора, допустимость реструктуризации и источников."
+        }
       },
       "financial_review": {
         "status": "draft_requires_integration",
@@ -1861,7 +2293,49 @@
         "basis": "БК РФ, статьи 37 и 132; Федеральный закон №35-ФЗ, статья 26: технологическое присоединение. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
         "status": "requires_case_specific_current_law_review",
         "source_status": "fictional_or_unverified_source",
-        "note": "Обязательные нормы вынесены в исходные условия. Параметры учебной модели предложены, не являются реальными суммами или статистикой. Не применять до юридической и бюджетной приёмки."
+        "note": "Обязательные нормы вынесены в исходные условия. Параметры учебной модели предложены, не являются реальными суммами или статистикой. Не применять до юридической и бюджетной приёмки.",
+        "checked_norm_urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/0859896f05c16d5719eafdf624507adf8887f0c7/",
+          "https://www.consultant.ru/document/cons_doc_LAW_41502/92a43bd83245832566eae50e27dd8634813c6cf9/"
+        ],
+        "collective_option_analysis": {
+          "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+          "date": "2026-11-28",
+          "norm": "БК РФ, статьи 37 и 132; Федеральный закон №35-ФЗ, статья 26: технологическое присоединение. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
+          "urls": [
+            "https://www.consultant.ru/document/cons_doc_LAW_19702/0859896f05c16d5719eafdf624507adf8887f0c7/",
+            "https://www.consultant.ru/document/cons_doc_LAW_41502/92a43bd83245832566eae50e27dd8634813c6cf9/"
+          ],
+          "source_scope": "Адресные справочные тексты и официальные разъяснения/поисковые выдержки; полный комплект действующих отраслевых, местных и специальных актов не установлен.",
+          "options": [
+            {
+              "key": "option_1",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Общий узел допустим по техническим условиям, проекту и подтверждённой потребности всех участков."
+            },
+            {
+              "key": "option_2",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Приоритет действующих предприятий обосновывается потребностью и условиями доступа, не отменяет очередь других заявителей."
+            },
+            {
+              "key": "option_3",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Этапность сети согласуется с сетевой организацией и технической самостоятельностью этапов."
+            },
+            {
+              "key": "option_4",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Общая дорога финансируется по публичному проекту; внутренние сети резидентов и договоры подключения проверяются отдельно."
+            },
+            {
+              "key": "option_5",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Софинансирование допустимо при утверждённых равных условиях, распределении затрат и отсутствии необоснованных преимуществ."
+            }
+          ],
+          "remaining": "Технические условия, границы ответственности, тарифные решения и порядок софинансирования публичной инфраструктуры."
+        }
       },
       "financial_review": {
         "status": "draft_requires_integration",
@@ -2033,7 +2507,49 @@
         "basis": "БК РФ, статьи 38 и 132; Федеральный закон №565-ФЗ о занятости населения: меры поддержки занятости. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
         "status": "requires_case_specific_current_law_review",
         "source_status": "fictional_or_unverified_source",
-        "note": "Обязательные нормы вынесены в исходные условия. Параметры учебной модели предложены, не являются реальными суммами или статистикой. Не применять до юридической и бюджетной приёмки."
+        "note": "Обязательные нормы вынесены в исходные условия. Параметры учебной модели предложены, не являются реальными суммами или статистикой. Не применять до юридической и бюджетной приёмки.",
+        "checked_norm_urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/0859896f05c16d5719eafdf624507adf8887f0c7/",
+          "https://www.consultant.ru/document/cons_doc_LAW_464093/6a5cdcfae3020b422c6853a80844ded33a0db563/"
+        ],
+        "collective_option_analysis": {
+          "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+          "date": "2026-11-28",
+          "norm": "БК РФ, статьи 38 и 132; Федеральный закон №565-ФЗ о занятости населения: меры поддержки занятости. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
+          "urls": [
+            "https://www.consultant.ru/document/cons_doc_LAW_19702/0859896f05c16d5719eafdf624507adf8887f0c7/",
+            "https://www.consultant.ru/document/cons_doc_LAW_464093/6a5cdcfae3020b422c6853a80844ded33a0db563/"
+          ],
+          "source_scope": "Адресные справочные тексты и официальные разъяснения/поисковые выдержки; полный комплект действующих отраслевых, местных и специальных актов не установлен.",
+          "options": [
+            {
+              "key": "option_1",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Ориентация на вакансии допустима по утверждённым критериям и проверенным потребностям рынка."
+            },
+            {
+              "key": "option_2",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Разнообразие курсов и независимая оценка допустимы при соблюдении требований к обучению и участникам."
+            },
+            {
+              "key": "option_3",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Практика у работодателей требует надлежащего оформления и безопасных условий."
+            },
+            {
+              "key": "option_4",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Первая очередь уязвимых групп определяется объективными предусмотренными критериями, не произвольным предпочтением."
+            },
+            {
+              "key": "option_5",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Усиление службы трудоустройства допустимо в её компетенции при отдельном законном обеспечении расходов."
+            }
+          ],
+          "remaining": "Статус участников программы, конкретная мера 565-ФЗ, образовательные требования и порядок финансирования; статья 30 не распространяется автоматически на всех."
+        }
       },
       "financial_review": {
         "status": "draft_requires_integration",
@@ -2204,7 +2720,51 @@
         "basis": "БК РФ, статьи 38 и 132; Основы законодательства РФ о культуре, статья 12: доступ к культурным ценностям. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
         "status": "requires_case_specific_current_law_review",
         "source_status": "fictional_or_unverified_source",
-        "note": "Обязательные нормы вынесены в исходные условия. Параметры учебной модели предложены, не являются реальными суммами или статистикой. Не применять до юридической и бюджетной приёмки."
+        "note": "Обязательные нормы вынесены в исходные условия. Параметры учебной модели предложены, не являются реальными суммами или статистикой. Не применять до юридической и бюджетной приёмки.",
+        "checked_norm_urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/0859896f05c16d5719eafdf624507adf8887f0c7/",
+          "https://www.consultant.ru/document/cons_doc_LAW_1870/f18fa3cd8e9c9b349763c5de87dea7404f81a968/",
+          "https://www.consultant.ru/document/cons_doc_LAW_8559/1f3d91284a26982ce51392b5fd178e392fe53404/"
+        ],
+        "collective_option_analysis": {
+          "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+          "date": "2026-11-28",
+          "norm": "БК РФ, статьи 38 и 132; Основы законодательства РФ о культуре, статья 12: доступ к культурным ценностям. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
+          "urls": [
+            "https://www.consultant.ru/document/cons_doc_LAW_19702/0859896f05c16d5719eafdf624507adf8887f0c7/",
+            "https://www.consultant.ru/document/cons_doc_LAW_1870/f18fa3cd8e9c9b349763c5de87dea7404f81a968/",
+            "https://www.consultant.ru/document/cons_doc_LAW_8559/1f3d91284a26982ce51392b5fd178e392fe53404/"
+          ],
+          "source_scope": "Адресные справочные тексты и официальные разъяснения/поисковые выдержки; полный комплект действующих отраслевых, местных и специальных актов не установлен.",
+          "options": [
+            {
+              "key": "option_1",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Ремонт всех объектов допустим после обследования, проектирования и обеспечения доступности."
+            },
+            {
+              "key": "option_2",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Приоритет посещаемых объектов обосновывается потребностью при сохранении безопасной альтернативы для остальных."
+            },
+            {
+              "key": "option_3",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Отсутствие иной культурной услуги является допустимым объективным фактором при установленном порядке отбора."
+            },
+            {
+              "key": "option_4",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Выездные услуги сохраняют доступ в период ремонта при безопасной и законной организации."
+            },
+            {
+              "key": "option_5",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Раздельные этапы ремонта и оснащения допустимы при технической совместимости и полном финансировании обязательных работ."
+            }
+          ],
+          "remaining": "Правовой статус объектов, техническое обследование, требования доступности, утверждённый порядок субсидии."
+        }
       },
       "financial_review": {
         "status": "draft_requires_integration",
@@ -2374,7 +2934,49 @@
         "basis": "БК РФ, статьи 38 и 132; Федеральный закон №126-ФЗ, статья 57: универсальные услуги связи. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
         "status": "requires_case_specific_current_law_review",
         "source_status": "fictional_or_unverified_source",
-        "note": "Обязательные нормы вынесены в исходные условия. Параметры учебной модели предложены, не являются реальными суммами или статистикой. Не применять до юридической и бюджетной приёмки."
+        "note": "Обязательные нормы вынесены в исходные условия. Параметры учебной модели предложены, не являются реальными суммами или статистикой. Не применять до юридической и бюджетной приёмки.",
+        "checked_norm_urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/0859896f05c16d5719eafdf624507adf8887f0c7/",
+          "https://www.consultant.ru/document/cons_doc_LAW_43224/e1082a01e7df1d6eda71c18df888193a8dadcd12/"
+        ],
+        "collective_option_analysis": {
+          "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+          "date": "2026-11-28",
+          "norm": "БК РФ, статьи 38 и 132; Федеральный закон №126-ФЗ, статья 57: универсальные услуги связи. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
+          "urls": [
+            "https://www.consultant.ru/document/cons_doc_LAW_19702/0859896f05c16d5719eafdf624507adf8887f0c7/",
+            "https://www.consultant.ru/document/cons_doc_LAW_43224/e1082a01e7df1d6eda71c18df888193a8dadcd12/"
+          ],
+          "source_scope": "Адресные справочные тексты и официальные разъяснения/поисковые выдержки; полный комплект действующих отраслевых, местных и специальных актов не установлен.",
+          "options": [
+            {
+              "key": "option_1",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Сплошная сеть требует технической проверки, утверждённой заявки и надлежащих договоров."
+            },
+            {
+              "key": "option_2",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Приоритет учреждений и удалённых поселений обосновывается критериями проекта без необоснованного исключения остальных."
+            },
+            {
+              "key": "option_3",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Предпринимательский спрос может учитываться в публичном проекте при равных условиях доступа."
+            },
+            {
+              "key": "option_4",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Временные технологии применяются при соблюдении требований связи и безопасности, не подменяют утверждённый результат."
+            },
+            {
+              "key": "option_5",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Этапное софинансирование требует согласованной сметы, правил доступа и отдельных обязательств по каждому этапу."
+            }
+          ],
+          "remaining": "Критерии универсальных услуг, оператор, лицензии и конкретная программа; не все 18 поселений автоматически подпадают под ст. 57."
+        }
       },
       "financial_review": {
         "status": "draft_requires_integration",
@@ -2545,7 +3147,49 @@
         "basis": "БК РФ, статьи 38 и 132: целевая субсидия на софинансирование расходного обязательства субъекта РФ. Федеральный закон №135-ФЗ, статья 15: недопустимость ограничивающих конкуренцию актов и действий органов власти. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
         "status": "requires_case_specific_current_law_review",
         "source_status": "fictional_or_unverified_source",
-        "note": "Обязательные нормы вынесены в исходные условия. Параметры учебной модели предложены, не являются реальными суммами или статистикой. Не применять до юридической и бюджетной приёмки."
+        "note": "Обязательные нормы вынесены в исходные условия. Параметры учебной модели предложены, не являются реальными суммами или статистикой. Не применять до юридической и бюджетной приёмки.",
+        "checked_norm_urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/0859896f05c16d5719eafdf624507adf8887f0c7/",
+          "https://www.consultant.ru/document/cons_doc_LAW_61763/871fb1003dab1dd3ef350f8f7f0f0d10ea20b5c6/"
+        ],
+        "collective_option_analysis": {
+          "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+          "date": "2026-11-28",
+          "norm": "БК РФ, статьи 38 и 132: целевая субсидия на софинансирование расходного обязательства субъекта РФ. Федеральный закон №135-ФЗ, статья 15: недопустимость ограничивающих конкуренцию актов и действий органов власти. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
+          "urls": [
+            "https://www.consultant.ru/document/cons_doc_LAW_19702/0859896f05c16d5719eafdf624507adf8887f0c7/",
+            "https://www.consultant.ru/document/cons_doc_LAW_61763/871fb1003dab1dd3ef350f8f7f0f0d10ea20b5c6/"
+          ],
+          "source_scope": "Адресные справочные тексты и официальные разъяснения/поисковые выдержки; полный комплект действующих отраслевых, местных и специальных актов не установлен.",
+          "options": [
+            {
+              "key": "option_1",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Общий узел с резервом мощности допустим по утверждённому проекту и прозрачному порядку доступа."
+            },
+            {
+              "key": "option_2",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Распределённые склады допустимы при подтверждённой потребности и сопоставлении затрат."
+            },
+            {
+              "key": "option_3",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Аренда и бронирование возможны по надлежащим договорам без исключительного преимущества поставщику."
+            },
+            {
+              "key": "option_4",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Кооперативное участие допустимо при самостоятельном правовом основании и недискриминационных условиях."
+            },
+            {
+              "key": "option_5",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Этапность постоянного узла привязывается к проверенной загрузке и утверждённым условиям субсидии."
+            }
+          ],
+          "remaining": "Форма публичного объекта, режим предоставления имущества и доступа, антимонопольные требования."
+        }
       },
       "financial_review": {
         "status": "draft_requires_integration",
@@ -2722,7 +3366,51 @@
         "basis": "БК РФ, статьи 38 и 132: цель и условия федеральной субсидии бюджету субъекта РФ. Источники: https://www.consultant.ru/document/cons_doc_LAW_19702/",
         "status": "requires_case_specific_current_law_review",
         "source_status": "fictional_or_unverified_source",
-        "note": "Обязательные нормы вынесены в исходные условия. Параметры учебной модели предложены, не являются реальными суммами или статистикой. Не применять до юридической и бюджетной приёмки."
+        "note": "Обязательные нормы вынесены в исходные условия. Параметры учебной модели предложены, не являются реальными суммами или статистикой. Не применять до юридической и бюджетной приёмки.",
+        "checked_norm_urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/0859896f05c16d5719eafdf624507adf8887f0c7/",
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/1b6959f23cc516d0e11ddc2e213ca2dca83560df/",
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/ac6c532ee1f365c6e1ff222f22b3f10587918494/"
+        ],
+        "collective_option_analysis": {
+          "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+          "date": "2026-11-28",
+          "norm": "БК РФ, статьи 38 и 132: цель и условия федеральной субсидии бюджету субъекта РФ. Источники: https://www.consultant.ru/document/cons_doc_LAW_19702/",
+          "urls": [
+            "https://www.consultant.ru/document/cons_doc_LAW_19702/0859896f05c16d5719eafdf624507adf8887f0c7/",
+            "https://www.consultant.ru/document/cons_doc_LAW_19702/1b6959f23cc516d0e11ddc2e213ca2dca83560df/",
+            "https://www.consultant.ru/document/cons_doc_LAW_19702/ac6c532ee1f365c6e1ff222f22b3f10587918494/"
+          ],
+          "source_scope": "Адресные справочные тексты и официальные разъяснения/поисковые выдержки; полный комплект действующих отраслевых, местных и специальных актов не установлен.",
+          "options": [
+            {
+              "key": "option_1",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Общие сети соответствуют публичной цели при подтверждённом бюджетном решении и равных условиях."
+            },
+            {
+              "key": "option_2",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Готовность подключения допустима как объективный критерий этапности, если предусмотрена проектом."
+            },
+            {
+              "key": "option_3",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Отдельная поддержка компаний требует самостоятельного основания и отбора; межбюджетная субсидия не перечисляется резиденту напрямую."
+            },
+            {
+              "key": "option_4",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Общие транспортные подходы финансируются при соответствии цели и установленной компетенции."
+            },
+            {
+              "key": "option_5",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Уменьшенный этап возможен после согласования показателей и сохранения технической самостоятельности."
+            }
+          ],
+          "remaining": "Соглашение федеральной субсидии, собственник сети, форма поддержки резидентов и правила отбора."
+        }
       },
       "financial_review": {
         "status": "draft_requires_integration",
@@ -2892,7 +3580,49 @@
         "basis": "БК РФ, статьи 38 и 132; Федеральный закон №273-ФЗ, статьи 9 и 28: организация образования и условия его осуществления. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
         "status": "requires_case_specific_current_law_review",
         "source_status": "fictional_or_unverified_source",
-        "note": "Обязательные нормы вынесены в исходные условия. Параметры учебной модели предложены, не являются реальными суммами или статистикой. Не применять до юридической и бюджетной приёмки."
+        "note": "Обязательные нормы вынесены в исходные условия. Параметры учебной модели предложены, не являются реальными суммами или статистикой. Не применять до юридической и бюджетной приёмки.",
+        "checked_norm_urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/0859896f05c16d5719eafdf624507adf8887f0c7/",
+          "https://www.consultant.ru/document/cons_doc_LAW_140174/552097cad5942f36c9484dbde7ebf92db1f783f3/"
+        ],
+        "collective_option_analysis": {
+          "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+          "date": "2026-11-28",
+          "norm": "БК РФ, статьи 38 и 132; Федеральный закон №273-ФЗ, статьи 9 и 28: организация образования и условия его осуществления. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
+          "urls": [
+            "https://www.consultant.ru/document/cons_doc_LAW_19702/0859896f05c16d5719eafdf624507adf8887f0c7/",
+            "https://www.consultant.ru/document/cons_doc_LAW_140174/552097cad5942f36c9484dbde7ebf92db1f783f3/"
+          ],
+          "source_scope": "Адресные справочные тексты и официальные разъяснения/поисковые выдержки; полный комплект действующих отраслевых, местных и специальных актов не установлен.",
+          "options": [
+            {
+              "key": "option_1",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Полная заявка на школу возможна при утверждённом участке, проекте и финансовом обеспечении."
+            },
+            {
+              "key": "option_2",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Временное распределение мест и подвоз допустимы при доступности обучения и безопасности детей."
+            },
+            {
+              "key": "option_3",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Этапность строительства допустима при самостоятельности этапов и соблюдении санитарных и проектных требований."
+            },
+            {
+              "key": "option_4",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Подготовка подключения и документации предшествует стройке, не создаёт автоматически право на федеральные деньги."
+            },
+            {
+              "key": "option_5",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Очередность объектов определяется подтверждённой потребностью и предусмотренным порядком, без отмены права на образование."
+            }
+          ],
+          "remaining": "Полномочия собственника и учредителя, строительные и санитарные требования, соглашение о субсидии."
+        }
       },
       "financial_review": {
         "status": "draft_requires_integration",
@@ -3064,7 +3794,49 @@
         "basis": "БК РФ, статьи 38 и 132; Федеральный закон №68-ФЗ, статья 11: предупреждение и ликвидация ЧС в пределах компетенции. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
         "status": "requires_case_specific_current_law_review",
         "source_status": "fictional_or_unverified_source",
-        "note": "Обязательные нормы вынесены в исходные условия. Параметры учебной модели предложены, не являются реальными суммами или статистикой. Не применять до юридической и бюджетной приёмки."
+        "note": "Обязательные нормы вынесены в исходные условия. Параметры учебной модели предложены, не являются реальными суммами или статистикой. Не применять до юридической и бюджетной приёмки.",
+        "checked_norm_urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/0859896f05c16d5719eafdf624507adf8887f0c7/",
+          "https://www.consultant.ru/document/cons_doc_LAW_5295/cf148e8662eafdb9539fb6f19024dfdb5c33aaa2/"
+        ],
+        "collective_option_analysis": {
+          "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+          "date": "2026-11-28",
+          "norm": "БК РФ, статьи 38 и 132; Федеральный закон №68-ФЗ, статья 11: предупреждение и ликвидация ЧС в пределах компетенции. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
+          "urls": [
+            "https://www.consultant.ru/document/cons_doc_LAW_19702/0859896f05c16d5719eafdf624507adf8887f0c7/",
+            "https://www.consultant.ru/document/cons_doc_LAW_5295/cf148e8662eafdb9539fb6f19024dfdb5c33aaa2/"
+          ],
+          "source_scope": "Адресные справочные тексты и официальные разъяснения/поисковые выдержки; полный комплект действующих отраслевых, местных и специальных актов не установлен.",
+          "options": [
+            {
+              "key": "option_1",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Комплекс водоотводов и укрепления требует обследования, разрешений и утверждённого финансирования."
+            },
+            {
+              "key": "option_2",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Приоритет жилых кварталов обосновывается картой риска и не отменяет обязательные защитные меры других зон."
+            },
+            {
+              "key": "option_3",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Защита жилья и предприятий допустима в пределах цели и подтверждённых рисков."
+            },
+            {
+              "key": "option_4",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Временная защита и этапная реконструкция допустимы при компетентной организации и безопасности."
+            },
+            {
+              "key": "option_5",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Гидрологическое обследование определяет этапы и сметы; само по себе не разрешает строительство."
+            }
+          ],
+          "remaining": "Режим реагирования, полномочия, водохозяйственные и строительные разрешения, источник финансирования."
+        }
       },
       "financial_review": {
         "status": "draft_requires_integration",
@@ -3234,7 +4006,49 @@
         "basis": "БК РФ, статьи 6 и 21: консолидированный бюджет и классификация расходов. Источники: https://www.consultant.ru/document/cons_doc_LAW_19702/",
         "status": "requires_case_specific_current_law_review",
         "source_status": "fictional_or_unverified_source",
-        "note": "Обязательные нормы вынесены в исходные условия. Параметры учебной модели предложены, не являются реальными суммами или статистикой. Не применять до юридической и бюджетной приёмки."
+        "note": "Обязательные нормы вынесены в исходные условия. Параметры учебной модели предложены, не являются реальными суммами или статистикой. Не применять до юридической и бюджетной приёмки.",
+        "checked_norm_urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/055a71948dbf2a4fc2478437cd89cd864ee8e6e5/",
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/8d384913e40ef9a5709117de01aa1f44f7cab76f/"
+        ],
+        "collective_option_analysis": {
+          "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+          "date": "2026-11-28",
+          "norm": "БК РФ, статьи 6 и 21: консолидированный бюджет и классификация расходов. Источники: https://www.consultant.ru/document/cons_doc_LAW_19702/",
+          "urls": [
+            "https://www.consultant.ru/document/cons_doc_LAW_19702/055a71948dbf2a4fc2478437cd89cd864ee8e6e5/",
+            "https://www.consultant.ru/document/cons_doc_LAW_19702/8d384913e40ef9a5709117de01aa1f44f7cab76f/"
+          ],
+          "source_scope": "Адресные справочные тексты и официальные разъяснения/поисковые выдержки; полный комплект действующих отраслевых, местных и специальных актов не установлен.",
+          "options": [
+            {
+              "key": "option_1",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Исправленная сводка раскрывает переход от исходных данных к консолидированным без повторного учёта трансферта."
+            },
+            {
+              "key": "option_2",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Раздельные таблицы сохраняют показатели каждого бюджета и поясняют исключение внутренних потоков."
+            },
+            {
+              "key": "option_3",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Контрольное сопоставление идентификаторов потоков предотвращает дубли, не меняет утверждённые данные."
+            },
+            {
+              "key": "option_4",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Выборочный аудит дополняет обязательные контрольные процедуры по крупным потокам."
+            },
+            {
+              "key": "option_5",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Обсуждение структуры допустимо после исправления свода и пояснения границ консолидации."
+            }
+          ],
+          "remaining": "Действующая бюджетная классификация конкретного расхода и периметр свода; отраслевой раздел не универсален для всех трансфертов."
+        }
       },
       "financial_review": {
         "status": "draft_requires_integration",
@@ -3410,7 +4224,49 @@
         "basis": "БК РФ, статьи 38 и 132; Федеральный закон №190-ФЗ, статья 6: организация теплоснабжения в пределах компетенции. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
         "status": "requires_case_specific_current_law_review",
         "source_status": "fictional_or_unverified_source",
-        "note": "Обязательные нормы вынесены в исходные условия. Параметры учебной модели предложены, не являются реальными суммами или статистикой. Не применять до юридической и бюджетной приёмки."
+        "note": "Обязательные нормы вынесены в исходные условия. Параметры учебной модели предложены, не являются реальными суммами или статистикой. Не применять до юридической и бюджетной приёмки.",
+        "checked_norm_urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/0859896f05c16d5719eafdf624507adf8887f0c7/",
+          "https://www.consultant.ru/document/cons_doc_LAW_102975/be6d489749f7a2f04c6f391b8d89cc8f3bfe1638/"
+        ],
+        "collective_option_analysis": {
+          "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+          "date": "2026-11-28",
+          "norm": "БК РФ, статьи 38 и 132; Федеральный закон №190-ФЗ, статья 6: организация теплоснабжения в пределах компетенции. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
+          "urls": [
+            "https://www.consultant.ru/document/cons_doc_LAW_19702/0859896f05c16d5719eafdf624507adf8887f0c7/",
+            "https://www.consultant.ru/document/cons_doc_LAW_102975/be6d489749f7a2f04c6f391b8d89cc8f3bfe1638/"
+          ],
+          "source_scope": "Адресные справочные тексты и официальные разъяснения/поисковые выдержки; полный комплект действующих отраслевых, местных и специальных актов не установлен.",
+          "options": [
+            {
+              "key": "option_1",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Одновременная замена допустима при безопасном временном теплоснабжении и обеспеченном проекте."
+            },
+            {
+              "key": "option_2",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Приоритет школ и уязвимых домов обосновывается риском без прекращения обязательной подачи другим потребителям."
+            },
+            {
+              "key": "option_3",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Потери тепла оцениваются обследованием; экономический критерий не отменяет требования безопасности."
+            },
+            {
+              "key": "option_4",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Этапность и сезонные переключения согласуются с ответственной теплоснабжающей организацией."
+            },
+            {
+              "key": "option_5",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Ограниченная замена допустима лишь при подтверждённой безопасности остальных участков и действующем контроле."
+            }
+          ],
+          "remaining": "Собственник сети, схема теплоснабжения, технические правила, аварийные обязательства, соглашение."
+        }
       },
       "financial_review": {
         "status": "draft_requires_integration",
@@ -3586,7 +4442,51 @@
         "basis": "БК РФ, статьи 38 и 132; Федеральный закон №273-ФЗ, статьи 13 и 68: организация практической подготовки и среднего профессионального образования. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
         "status": "requires_case_specific_current_law_review",
         "source_status": "fictional_or_unverified_source",
-        "note": "Обязательные нормы вынесены в исходные условия. Параметры учебной модели предложены, не являются реальными суммами или статистикой. Не применять до юридической и бюджетной приёмки."
+        "note": "Обязательные нормы вынесены в исходные условия. Параметры учебной модели предложены, не являются реальными суммами или статистикой. Не применять до юридической и бюджетной приёмки.",
+        "checked_norm_urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/0859896f05c16d5719eafdf624507adf8887f0c7/",
+          "https://www.consultant.ru/document/cons_doc_LAW_140174/552097cad5942f36c9484dbde7ebf92db1f783f3/",
+          "https://www.consultant.ru/document/cons_doc_LAW_140174/96a55e6276d23fa2609de2846df744c4feecd927/"
+        ],
+        "collective_option_analysis": {
+          "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+          "date": "2026-11-28",
+          "norm": "БК РФ, статьи 38 и 132; Федеральный закон №273-ФЗ, статьи 13 и 68: организация практической подготовки и среднего профессионального образования. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
+          "urls": [
+            "https://www.consultant.ru/document/cons_doc_LAW_19702/0859896f05c16d5719eafdf624507adf8887f0c7/",
+            "https://www.consultant.ru/document/cons_doc_LAW_140174/552097cad5942f36c9484dbde7ebf92db1f783f3/",
+            "https://www.consultant.ru/document/cons_doc_LAW_140174/96a55e6276d23fa2609de2846df744c4feecd927/"
+          ],
+          "source_scope": "Адресные справочные тексты и официальные разъяснения/поисковые выдержки; полный комплект действующих отраслевых, местных и специальных актов не установлен.",
+          "options": [
+            {
+              "key": "option_1",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Полная учебная линия допустима при утверждённых образовательных программах, оснащении и финансировании."
+            },
+            {
+              "key": "option_2",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Краткие программы соответствуют квалификационным требованиям и подтверждённым вакансиям, не заменяют обязательную квалификацию."
+            },
+            {
+              "key": "option_3",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Практическая подготовка оформляется с работодателем с распределением ответственности и безопасными условиями."
+            },
+            {
+              "key": "option_4",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Совместное использование оборудования допускается при договорном основании, соответствии программам и безопасности."
+            },
+            {
+              "key": "option_5",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Расширение по результатам первой группы допустимо при сохранении утверждённых обязательств и правил приёма."
+            }
+          ],
+          "remaining": "Вид программы, лицензия, договор практической подготовки, безопасность, принадлежность оборудования и субсидия."
+        }
       },
       "financial_review": {
         "status": "draft_requires_integration",
@@ -3757,7 +4657,51 @@
         "basis": "БК РФ, статьи 38 и 132; Федеральный закон №7-ФЗ, статья 16.3: плата за негативное воздействие; Водный кодекс РФ, статья 56: охрана водных объектов. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
         "status": "requires_case_specific_current_law_review",
         "source_status": "fictional_or_unverified_source",
-        "note": "Обязательные нормы вынесены в исходные условия. Параметры учебной модели предложены, не являются реальными суммами или статистикой. Не применять до юридической и бюджетной приёмки."
+        "note": "Обязательные нормы вынесены в исходные условия. Параметры учебной модели предложены, не являются реальными суммами или статистикой. Не применять до юридической и бюджетной приёмки.",
+        "checked_norm_urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/0859896f05c16d5719eafdf624507adf8887f0c7/",
+          "https://www.consultant.ru/document/cons_doc_LAW_60683/f9f2aefbfb341d1e774e5fd353663e089a92ecd1/",
+          "https://www.consultant.ru/document/cons_doc_LAW_34823/2b668f71b04cd6b6239a4827ec1430801c9da45b/"
+        ],
+        "collective_option_analysis": {
+          "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+          "date": "2026-11-28",
+          "norm": "БК РФ, статьи 38 и 132; Федеральный закон №7-ФЗ, статья 16.3: плата за негативное воздействие; Водный кодекс РФ, статья 56: охрана водных объектов. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
+          "urls": [
+            "https://www.consultant.ru/document/cons_doc_LAW_19702/0859896f05c16d5719eafdf624507adf8887f0c7/",
+            "https://www.consultant.ru/document/cons_doc_LAW_60683/f9f2aefbfb341d1e774e5fd353663e089a92ecd1/",
+            "https://www.consultant.ru/document/cons_doc_LAW_34823/2b668f71b04cd6b6239a4827ec1430801c9da45b/"
+          ],
+          "source_scope": "Адресные справочные тексты и официальные разъяснения/поисковые выдержки; полный комплект действующих отраслевых, местных и специальных актов не установлен.",
+          "options": [
+            {
+              "key": "option_1",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Полное обновление требует проекта, испытаний и законного финансирования при соблюдении нормативов сброса."
+            },
+            {
+              "key": "option_2",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Приоритет узких мест допустим по измеренному эффекту без эксплуатации сверх безопасной мощности."
+            },
+            {
+              "key": "option_3",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Работы по линиям допускаются при подтверждённом безопасном режиме и непрерывности обязательных услуг."
+            },
+            {
+              "key": "option_4",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Лабораторный контроль и обучение дополняют технологическую модернизацию, не заменяют соблюдение нормативов."
+            },
+            {
+              "key": "option_5",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Вклад подключаемых предприятий возможен только по предусмотренным правилам и договорам; не произвольный сбор."
+            }
+          ],
+          "remaining": "Разрешения на сброс, категория объекта, технологические нормативы, правила подключения и применимость платы за НВОС."
+        }
       },
       "financial_review": {
         "status": "draft_requires_integration",
@@ -3938,7 +4882,55 @@
         "basis": "БК РФ, статьи 38 и 132; ЖК РФ, статьи 32 и 86: жилищные последствия зависят от правового статуса помещения и проживающих. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
         "status": "requires_case_specific_current_law_review",
         "source_status": "fictional_or_unverified_source",
-        "note": "Обязательные нормы вынесены в исходные условия. Параметры учебной модели предложены, не являются реальными суммами или статистикой. Не применять до юридической и бюджетной приёмки."
+        "note": "Обязательные нормы вынесены в исходные условия. Параметры учебной модели предложены, не являются реальными суммами или статистикой. Не применять до юридической и бюджетной приёмки.",
+        "checked_norm_urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/0859896f05c16d5719eafdf624507adf8887f0c7/",
+          "https://www.consultant.ru/document/cons_doc_LAW_51057/1316f00500eba499bc062df16fbbfe1afa8d7f01/",
+          "https://www.consultant.ru/document/cons_doc_LAW_51057/db6957c34b618b3d8395eebc308ed9aff7ccbbf2/",
+          "https://www.consultant.ru/document/cons_doc_LAW_51057/6bb98a3aca78fe3be73eed83a583b163da0a6c01/",
+          "https://www.consultant.ru/document/cons_doc_LAW_51057/"
+        ],
+        "collective_option_analysis": {
+          "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+          "date": "2026-11-28",
+          "norm": "БК РФ, статьи 38 и 132; ЖК РФ, статьи 32 и 86: жилищные последствия зависят от правового статуса помещения и проживающих. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
+          "urls": [
+            "https://www.consultant.ru/document/cons_doc_LAW_19702/0859896f05c16d5719eafdf624507adf8887f0c7/",
+            "https://www.consultant.ru/document/cons_doc_LAW_51057/1316f00500eba499bc062df16fbbfe1afa8d7f01/",
+            "https://www.consultant.ru/document/cons_doc_LAW_51057/db6957c34b618b3d8395eebc308ed9aff7ccbbf2/",
+            "https://www.consultant.ru/document/cons_doc_LAW_51057/6bb98a3aca78fe3be73eed83a583b163da0a6c01/",
+            "https://www.consultant.ru/document/cons_doc_LAW_51057/"
+          ],
+          "source_scope": "Адресные справочные тексты и официальные разъяснения/поисковые выдержки; полный комплект действующих отраслевых, местных и специальных актов не установлен.",
+          "options": [
+            {
+              "key": "option_1",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Полная заявка учитывает индивидуальные права каждой семьи, а не одинаковую выплату всем."
+            },
+            {
+              "key": "option_2",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Этапность постоянного обеспечения допустима при надлежащем временном размещении и соблюдении сроков обязательств."
+            },
+            {
+              "key": "option_3",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Срочность определяется установленными основаниями и фактической опасностью, не произвольной очередью."
+            },
+            {
+              "key": "option_4",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Формы обеспечения различаются для собственников и нанимателей, учитываются согласие и законные условия."
+            },
+            {
+              "key": "option_5",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Межведомственный поиск фонда помогает исполнить обязательства без замены индивидуальных решений."
+            }
+          ],
+          "remaining": "Ст. 32 — права собственника при применимом изъятии; ст. 86 — снос, ст. 87 — непригодное помещение по соцнайму; основание временного фонда и индивидуальные сроки подлежат установлению."
+        }
       },
       "financial_review": {
         "status": "draft_requires_integration",
@@ -4109,7 +5101,51 @@
         "basis": "БК РФ, статья 78; Федеральный закон №127-ФЗ, статьи 63, 126 и 142: требования в процедурах банкротства. Источники: https://www.consultant.ru/document/cons_doc_LAW_19702/",
         "status": "requires_case_specific_current_law_review",
         "source_status": "fictional_or_unverified_source",
-        "note": "Обязательные нормы вынесены в исходные условия. Параметры учебной модели предложены, не являются реальными суммами или статистикой. Не применять до юридической и бюджетной приёмки."
+        "note": "Обязательные нормы вынесены в исходные условия. Параметры учебной модели предложены, не являются реальными суммами или статистикой. Не применять до юридической и бюджетной приёмки.",
+        "checked_norm_urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/1b6959f23cc516d0e11ddc2e213ca2dca83560df/",
+          "https://www.consultant.ru/document/cons_doc_LAW_39331/f798792c6aa0df6ed8fb092e8fcac4b97c42b6d9/",
+          "https://www.consultant.ru/document/cons_doc_LAW_39331/9f7dd5ffc46b7e05caec5829696c1917d6c76de6/"
+        ],
+        "collective_option_analysis": {
+          "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+          "date": "2026-11-28",
+          "norm": "БК РФ, статья 78; Федеральный закон №127-ФЗ, статьи 63, 126 и 142: требования в процедурах банкротства. Источники: https://www.consultant.ru/document/cons_doc_LAW_19702/",
+          "urls": [
+            "https://www.consultant.ru/document/cons_doc_LAW_19702/1b6959f23cc516d0e11ddc2e213ca2dca83560df/",
+            "https://www.consultant.ru/document/cons_doc_LAW_39331/f798792c6aa0df6ed8fb092e8fcac4b97c42b6d9/",
+            "https://www.consultant.ru/document/cons_doc_LAW_39331/9f7dd5ffc46b7e05caec5829696c1917d6c76de6/"
+          ],
+          "source_scope": "Адресные справочные тексты и официальные разъяснения/поисковые выдержки; полный комплект действующих отраслевых, местных и специальных актов не установлен.",
+          "options": [
+            {
+              "key": "option_1",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Оценка обеспечения и участие в деле допустимы через предусмотренные процедуры, не самовольное изъятие."
+            },
+            {
+              "key": "option_2",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Подача документов и контроль очередности учитывают вид требования и процессуальные сроки."
+            },
+            {
+              "key": "option_3",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Соглашение возможно только в применимой процедуре с необходимыми согласованиями и оценкой интересов кредиторов."
+            },
+            {
+              "key": "option_4",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Иные основания ответственности проверяются отдельно; взыскание допускается только по надлежащему основанию."
+            },
+            {
+              "key": "option_5",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Профилактика будущих рисков не меняет очередность или объём уже возникших требований."
+            }
+          ],
+          "remaining": "Момент возникновения требования, текущий или реестровый характер, обеспечение, судебные акты и стадия дела."
+        }
       },
       "financial_review": {
         "status": "draft_requires_integration",
@@ -4279,7 +5315,47 @@
         "basis": "ГК РФ, статьи 309, 384 и 819: исполнение кредитного обязательства и возможный переход требования. Источники: https://www.cbr.ru/faq/bank_s/otzyv_licenzii/",
         "status": "requires_case_specific_current_law_review",
         "source_status": "fictional_or_unverified_source",
-        "note": "Обязательные нормы вынесены в исходные условия. Параметры учебной модели предложены, не являются реальными суммами или статистикой. Не применять до юридической и бюджетной приёмки."
+        "note": "Обязательные нормы вынесены в исходные условия. Параметры учебной модели предложены, не являются реальными суммами или статистикой. Не применять до юридической и бюджетной приёмки.",
+        "checked_norm_urls": [
+          "https://www.cbr.ru/faq/bank_s/otzyv_licenzii/"
+        ],
+        "collective_option_analysis": {
+          "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+          "date": "2026-11-28",
+          "norm": "ГК РФ, статьи 309, 384 и 819: исполнение кредитного обязательства и возможный переход требования. Источники: https://www.cbr.ru/faq/bank_s/otzyv_licenzii/",
+          "urls": [
+            "https://www.cbr.ru/faq/bank_s/otzyv_licenzii/"
+          ],
+          "source_scope": "Адресные справочные тексты и официальные разъяснения/поисковые выдержки; полный комплект действующих отраслевых, местных и специальных актов не установлен.",
+          "options": [
+            {
+              "key": "option_1",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Резервирование платежа и проверка официальных уведомлений сохраняют исполнение обязательства."
+            },
+            {
+              "key": "option_2",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Переговоры допустимы только с уполномоченным представителем; график не меняется устно."
+            },
+            {
+              "key": "option_3",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Рефинансирование оценивается после установления действительного кредитора и разрешённого источника."
+            },
+            {
+              "key": "option_4",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Публичное пояснение допустимо без разглашения охраняемой информации; отзыв лицензии не прекращает долг."
+            },
+            {
+              "key": "option_5",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Перенос свободных расходов создаёт запас без нарушения принятых обязательств."
+            }
+          ],
+          "remaining": "Договор, стадия ликвидации банка, официальный получатель платежа и применимые долговые ограничения."
+        }
       },
       "financial_review": {
         "status": "draft_requires_integration",
@@ -4455,7 +5531,49 @@
         "basis": "ГК РФ, статья 317: валюта денежных обязательств; БК РФ, статьи 37 и 94: достоверность расчётов и финансирование дефицита. Источники: https://www.consultant.ru/document/cons_doc_LAW_19702/",
         "status": "requires_case_specific_current_law_review",
         "source_status": "fictional_or_unverified_source",
-        "note": "Обязательные нормы вынесены в исходные условия. Параметры учебной модели предложены, не являются реальными суммами или статистикой. Не применять до юридической и бюджетной приёмки."
+        "note": "Обязательные нормы вынесены в исходные условия. Параметры учебной модели предложены, не являются реальными суммами или статистикой. Не применять до юридической и бюджетной приёмки.",
+        "checked_norm_urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_5142/e3486eaf77188af09dba91511fe249434289d331/",
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/efeadd1a3c202eaac852c823492cf391119f12be/"
+        ],
+        "collective_option_analysis": {
+          "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+          "date": "2026-11-28",
+          "norm": "ГК РФ, статья 317: валюта денежных обязательств; БК РФ, статьи 37 и 94: достоверность расчётов и финансирование дефицита. Источники: https://www.consultant.ru/document/cons_doc_LAW_19702/",
+          "urls": [
+            "https://www.consultant.ru/document/cons_doc_LAW_5142/e3486eaf77188af09dba91511fe249434289d331/",
+            "https://www.consultant.ru/document/cons_doc_LAW_19702/efeadd1a3c202eaac852c823492cf391119f12be/"
+          ],
+          "source_scope": "Адресные справочные тексты и официальные разъяснения/поисковые выдержки; полный комплект действующих отраслевых, местных и специальных актов не установлен.",
+          "options": [
+            {
+              "key": "option_1",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Рублёвый запас учитывает валютный риск без изменения договорного номинала."
+            },
+            {
+              "key": "option_2",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Альтернативный агент возможен по договору и применимым обязательным ограничениям, не в обход запретов."
+            },
+            {
+              "key": "option_3",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Изменение будущего графика требует согласия и правового основания; текущий платёж сохраняется."
+            },
+            {
+              "key": "option_4",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Перенос необязательных расходов допустим по бюджетной процедуре с сохранением обязательств."
+            },
+            {
+              "key": "option_5",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Сценарный прогноз отражает возможную переоценку отдельно от фактического платежа."
+            }
+          ],
+          "remaining": "Валюта и условия договора, применимый курс, валютные и иные обязательные ограничения, полномочия платёжного агента."
+        }
       },
       "financial_review": {
         "status": "draft_requires_integration",
@@ -4625,7 +5743,51 @@
         "basis": "БК РФ, статьи 37, 94 и 103; условия соответствующего выпуска государственных ценных бумаг. Источники: https://www.consultant.ru/document/cons_doc_LAW_19702/",
         "status": "requires_case_specific_current_law_review",
         "source_status": "fictional_or_unverified_source",
-        "note": "Обязательные нормы вынесены в исходные условия. Параметры учебной модели предложены, не являются реальными суммами или статистикой. Не применять до юридической и бюджетной приёмки."
+        "note": "Обязательные нормы вынесены в исходные условия. Параметры учебной модели предложены, не являются реальными суммами или статистикой. Не применять до юридической и бюджетной приёмки.",
+        "checked_norm_urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/efeadd1a3c202eaac852c823492cf391119f12be/",
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/26f470b8b8e93e7284195c937ffcde9bc5836719/",
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/2f15c3a6fbc358c0851312de4c637a0f4e92e641/"
+        ],
+        "collective_option_analysis": {
+          "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+          "date": "2026-11-28",
+          "norm": "БК РФ, статьи 37, 94 и 103; условия соответствующего выпуска государственных ценных бумаг. Источники: https://www.consultant.ru/document/cons_doc_LAW_19702/",
+          "urls": [
+            "https://www.consultant.ru/document/cons_doc_LAW_19702/efeadd1a3c202eaac852c823492cf391119f12be/",
+            "https://www.consultant.ru/document/cons_doc_LAW_19702/26f470b8b8e93e7284195c937ffcde9bc5836719/",
+            "https://www.consultant.ru/document/cons_doc_LAW_19702/2f15c3a6fbc358c0851312de4c637a0f4e92e641/"
+          ],
+          "source_scope": "Адресные справочные тексты и официальные разъяснения/поисковые выдержки; полный комплект действующих отраслевых, местных и специальных актов не установлен.",
+          "options": [
+            {
+              "key": "option_1",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Повторное размещение возможно в рамках утверждённой программы и условий выпуска; фактические поступления учитываются отдельно."
+            },
+            {
+              "key": "option_2",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Доступный остаток используется при законном основании, не приравнивается к новому заимствованию."
+            },
+            {
+              "key": "option_3",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Альтернативный источник допустим в пределах программы финансирования и долговых ограничений."
+            },
+            {
+              "key": "option_4",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Перенос новых необязательных расходов возможен без нарушения принятых обязательств."
+            },
+            {
+              "key": "option_5",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Меньшие последующие размещения допустимы при соблюдении условий эмиссии и кассового плана."
+            }
+          ],
+          "remaining": "Программа заимствований, условия выпуска, полномочия эмитента, фактические поступления и сроки платежей."
+        }
       },
       "financial_review": {
         "status": "draft_requires_integration",
@@ -4800,7 +5962,49 @@
         "basis": "ГК РФ, статья 309; БК РФ, статья 103; условия конкретного выпуска государственных облигаций. Источники: https://www.consultant.ru/document/cons_doc_LAW_19702/",
         "status": "requires_case_specific_current_law_review",
         "source_status": "fictional_or_unverified_source",
-        "note": "Обязательные нормы вынесены в исходные условия. Параметры учебной модели предложены, не являются реальными суммами или статистикой. Не применять до юридической и бюджетной приёмки."
+        "note": "Обязательные нормы вынесены в исходные условия. Параметры учебной модели предложены, не являются реальными суммами или статистикой. Не применять до юридической и бюджетной приёмки.",
+        "checked_norm_urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/26f470b8b8e93e7284195c937ffcde9bc5836719/",
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/2f15c3a6fbc358c0851312de4c637a0f4e92e641/"
+        ],
+        "collective_option_analysis": {
+          "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+          "date": "2026-11-28",
+          "norm": "ГК РФ, статья 309; БК РФ, статья 103; условия конкретного выпуска государственных облигаций. Источники: https://www.consultant.ru/document/cons_doc_LAW_19702/",
+          "urls": [
+            "https://www.consultant.ru/document/cons_doc_LAW_19702/26f470b8b8e93e7284195c937ffcde9bc5836719/",
+            "https://www.consultant.ru/document/cons_doc_LAW_19702/2f15c3a6fbc358c0851312de4c637a0f4e92e641/"
+          ],
+          "source_scope": "Адресные справочные тексты и официальные разъяснения/поисковые выдержки; полный комплект действующих отраслевых, местных и специальных актов не установлен.",
+          "options": [
+            {
+              "key": "option_1",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Запас под будущий купон допустим по прогнозу и бюджетной процедуре, не включает неподтверждённую надбавку."
+            },
+            {
+              "key": "option_2",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Фиксированный купон будущих выпусков возможен по условиям эмиссии, не меняет уже выпущенную бумагу."
+            },
+            {
+              "key": "option_3",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Смешанная структура и стресс-расчёт допустимы как планирование будущего долга."
+            },
+            {
+              "key": "option_4",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Сверка ведомостей проверяет договорную формулу и раскрытие, не вводит новую комиссию."
+            },
+            {
+              "key": "option_5",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Сокращение будущих заимствований допустимо через бюджетное решение без отказа от текущего купона."
+            }
+          ],
+          "remaining": "Формула купона в задаче условная, не утверждается как формула конкретной реальной ОФЗ; проверяются условия выпуска."
+        }
       },
       "financial_review": {
         "status": "draft_requires_integration",
@@ -4970,7 +6174,49 @@
         "basis": "БК РФ, статьи 41–42 и 94; Федеральный закон №208-ФЗ, статья 42: источники финансирования и право на дивиденды. Источники: https://www.consultant.ru/document/cons_doc_LAW_19702/",
         "status": "requires_case_specific_current_law_review",
         "source_status": "fictional_or_unverified_source",
-        "note": "Обязательные нормы вынесены в исходные условия. Параметры учебной модели предложены, не являются реальными суммами или статистикой. Не применять до юридической и бюджетной приёмки."
+        "note": "Обязательные нормы вынесены в исходные условия. Параметры учебной модели предложены, не являются реальными суммами или статистикой. Не применять до юридической и бюджетной приёмки.",
+        "checked_norm_urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/efeadd1a3c202eaac852c823492cf391119f12be/",
+          "https://www.consultant.ru/document/cons_doc_LAW_8743/9f4fbb73c39e25049b6c7c98bbbec1b66f83a9f2/"
+        ],
+        "collective_option_analysis": {
+          "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+          "date": "2026-11-28",
+          "norm": "БК РФ, статьи 41–42 и 94; Федеральный закон №208-ФЗ, статья 42: источники финансирования и право на дивиденды. Источники: https://www.consultant.ru/document/cons_doc_LAW_19702/",
+          "urls": [
+            "https://www.consultant.ru/document/cons_doc_LAW_19702/efeadd1a3c202eaac852c823492cf391119f12be/",
+            "https://www.consultant.ru/document/cons_doc_LAW_8743/9f4fbb73c39e25049b6c7c98bbbec1b66f83a9f2/"
+          ],
+          "source_scope": "Адресные справочные тексты и официальные разъяснения/поисковые выдержки; полный комплект действующих отраслевых, местных и специальных актов не установлен.",
+          "options": [
+            {
+              "key": "option_1",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Пересмотр свободных расходов проводится после корректировки прогноза, обязательства сохраняются."
+            },
+            {
+              "key": "option_2",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Доходность оставшихся активов повышается законными корпоративными и имущественными решениями без гарантии дивидендов."
+            },
+            {
+              "key": "option_3",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Изменение структуры финансирования требует утверждённого основания и учёта ограничений."
+            },
+            {
+              "key": "option_4",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Резерв под отклонения создаётся в предусмотренной бюджетом форме, не как фиктивный доход."
+            },
+            {
+              "key": "option_5",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Публикация корректировки разделяет доходы от дивидендов и источник финансирования от продажи пакета."
+            }
+          ],
+          "remaining": "Дата определения получателей дивидендов, условия сделки и применимая бюджетная классификация."
+        }
       },
       "financial_review": {
         "status": "draft_requires_integration",
@@ -5141,7 +6387,51 @@
         "basis": "БК РФ, статьи 96.10–96.11 и 217.1: ФНБ и кассовое планирование. Источники: https://www.consultant.ru/document/cons_doc_LAW_19702/",
         "status": "requires_case_specific_current_law_review",
         "source_status": "fictional_or_unverified_source",
-        "note": "Обязательные нормы вынесены в исходные условия. Параметры учебной модели предложены, не являются реальными суммами или статистикой. Не применять до юридической и бюджетной приёмки."
+        "note": "Обязательные нормы вынесены в исходные условия. Параметры учебной модели предложены, не являются реальными суммами или статистикой. Не применять до юридической и бюджетной приёмки.",
+        "checked_norm_urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/9fff755b03e35b60f8c039c2f86ec67a34865819/",
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/c2fa38ce04d04504285b486e01f7c0bcc9a56d5b/",
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/24a94562b0b0557393897b9d9ef6f591ff1fb19b/"
+        ],
+        "collective_option_analysis": {
+          "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+          "date": "2026-11-28",
+          "norm": "БК РФ, статьи 96.10–96.11 и 217.1: ФНБ и кассовое планирование. Источники: https://www.consultant.ru/document/cons_doc_LAW_19702/",
+          "urls": [
+            "https://www.consultant.ru/document/cons_doc_LAW_19702/9fff755b03e35b60f8c039c2f86ec67a34865819/",
+            "https://www.consultant.ru/document/cons_doc_LAW_19702/c2fa38ce04d04504285b486e01f7c0bcc9a56d5b/",
+            "https://www.consultant.ru/document/cons_doc_LAW_19702/24a94562b0b0557393897b9d9ef6f591ff1fb19b/"
+          ],
+          "source_scope": "Адресные справочные тексты и официальные разъяснения/поисковые выдержки; полный комплект действующих отраслевых, местных и специальных актов не установлен.",
+          "options": [
+            {
+              "key": "option_1",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Замещение заимствованием допустимо по программе и ограничениям, не превращает неликвидные активы в деньги."
+            },
+            {
+              "key": "option_2",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Использование ликвидной части требует законного разрешения; свободные расходы переносятся надлежащим решением."
+            },
+            {
+              "key": "option_3",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Кассовый график учитывает реальные сроки поступления каждого разрешённого источника."
+            },
+            {
+              "key": "option_4",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Запас под ближайшие обязательства формируется из подтверждённой ликвидности, новые инициативы ограничиваются законно."
+            },
+            {
+              "key": "option_5",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Раскрытие структуры активов и план ликвидности не означают автоматического разрешения расходовать ФНБ."
+            }
+          ],
+          "remaining": "Применимые временные бюджетные нормы, разрешённая цель использования ФНБ, сроки ликвидации активов и кассовый план."
+        }
       },
       "financial_review": {
         "status": "draft_requires_integration",
@@ -5304,7 +6594,49 @@
         "basis": "Статьи 19 и 21 Закона №152-ФЗ предусматривают защиту данных и действия при выявлении нарушений; статья 16 Закона №149-ФЗ — защиту информации. Статьи 8 и 10 Закона №59-ФЗ регулируют регистрацию и рассмотрение обращений. При установленном инциденте уведомления направляются в предусмотренном законом порядке; факт утечки нужно установить, а не предполагать. Источники: https://mintrud.gov.ru/docs/laws/130",
         "status": "requires_case_specific_current_law_review",
         "source_status": "fictional_or_unverified_source",
-        "note": "Обязательные нормы вынесены в исходные условия. Параметры учебной модели предложены, не являются реальными суммами или статистикой. Не применять до юридической и бюджетной приёмки."
+        "note": "Обязательные нормы вынесены в исходные условия. Параметры учебной модели предложены, не являются реальными суммами или статистикой. Не применять до юридической и бюджетной приёмки.",
+        "checked_norm_urls": [
+          "https://mintrud.gov.ru/docs/laws/130",
+          "https://www.consultant.ru/document/cons_doc_LAW_61798/0e9ec16b786dcbdaaa7f44abfc4a15e601d5be22/"
+        ],
+        "collective_option_analysis": {
+          "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+          "date": "2026-11-28",
+          "norm": "Статьи 19 и 21 Закона №152-ФЗ предусматривают защиту данных и действия при выявлении нарушений; статья 16 Закона №149-ФЗ — защиту информации. Статьи 8 и 10 Закона №59-ФЗ регулируют регистрацию и рассмотрение обращений. При установленном инциденте уведомления направляются в предусмотренном законом порядке; факт утечки нужно установить, а не предполагать. Источники: https://mintrud.gov.ru/docs/laws/130",
+          "urls": [
+            "https://mintrud.gov.ru/docs/laws/130",
+            "https://www.consultant.ru/document/cons_doc_LAW_61798/0e9ec16b786dcbdaaa7f44abfc4a15e601d5be22/"
+          ],
+          "source_scope": "Адресные справочные тексты и официальные разъяснения/поисковые выдержки; полный комплект действующих отраслевых, местных и специальных актов не установлен.",
+          "options": [
+            {
+              "key": "option_1",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Восстановление проверенной копии допустимо после проверки безопасности; очный приём сохраняет законную регистрацию."
+            },
+            {
+              "key": "option_2",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Поэтапное восстановление допускается с приоритетом срочных обращений и соблюдением обязательных сроков."
+            },
+            {
+              "key": "option_3",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Временная система должна иметь законный доступ и защиту данных, перенос проверенных записей исключает дубли."
+            },
+            {
+              "key": "option_4",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Очный приём и доступное разъяснение сохраняют услуги без публичного раскрытия персональных сведений."
+            },
+            {
+              "key": "option_5",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Независимая проверка копии дополняет обязательное реагирование; не откладывает уведомления или срочные услуги."
+            }
+          ],
+          "remaining": "Установленный характер инцидента, обязательные уведомления, применимый режим информационной системы, 59-ФЗ и защита данных."
+        }
       },
       "implementation_review": {
         "status": "draft",
@@ -5469,7 +6801,54 @@
         "basis": "Статья 11 Закона №68-ФЗ регулирует полномочия органов публичной власти по предупреждению и ликвидации чрезвычайных ситуаций. Статья 161 ЖК РФ предусматривает обеспечение безопасных условий проживания и надлежащее содержание общего имущества. Режим использования дома и защитные меры определяют компетентные лица на основе обследования, а не по внешнему виду отремонтированной трубы. Источники: https://01.mchs.gov.ru/deyatelnost/napravleniya-deyatelnosti/grazhdanskaya-zashchita/preduprezhdenie-chrezvychaynyh-situaciy/1-1-normativnye-pravovye-akty/2-federalnye-zakony/federalnyy-zakon-ot-21-dekabrya-1994-g-n-68-fz-o-zashchite-naseleniya-i-territoriy-ot-chrezvychaynyh-situaciy-prirodnogo-i-tehnogennogo-haraktera",
         "status": "requires_case_specific_current_law_review",
         "source_status": "existing_official_source",
-        "note": "Обязательные нормы вынесены в исходные условия. Параметры учебной модели предложены, не являются реальными суммами или статистикой. Не применять до юридической и бюджетной приёмки."
+        "note": "Обязательные нормы вынесены в исходные условия. Параметры учебной модели предложены, не являются реальными суммами или статистикой. Не применять до юридической и бюджетной приёмки.",
+        "checked_norm_urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_5295/cf148e8662eafdb9539fb6f19024dfdb5c33aaa2/",
+          "https://www.consultant.ru/document/cons_doc_LAW_51057/71c7149b7b2a7693ca3f88b93580da0a5376e041/"
+        ],
+        "collective_option_analysis": {
+          "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+          "date": "2026-11-28",
+          "norm": "Статья 11 Закона №68-ФЗ регулирует полномочия органов публичной власти по предупреждению и ликвидации чрезвычайных ситуаций. Статья 161 ЖК РФ предусматривает обеспечение безопасных условий проживания и надлежащее содержание общего имущества. Режим использования дома и защитные меры определяют компетентные лица на основе обследования, а не по внешнему виду отремонтированной трубы. Источники: https://01.mchs.gov.ru/deyatelnost/napravleniya-deyatelnosti/grazhdanskaya-zashchita/preduprezhdenie-chrezvychaynyh-situaciy/1-1-normativnye-pravovye-akty/2-federalnye-zakony/federalnyy-zakon-ot-21-dekabrya-1994-g-n-68-fz-o-zashchite-naseleniya-i-territoriy-ot-chrezvychaynyh-situaciy-prirodnogo-i-tehnogennogo-haraktera",
+          "urls": [
+            "https://www.consultant.ru/document/cons_doc_LAW_5295/cf148e8662eafdb9539fb6f19024dfdb5c33aaa2/",
+            "https://www.consultant.ru/document/cons_doc_LAW_51057/71c7149b7b2a7693ca3f88b93580da0a5376e041/"
+          ],
+          "source_scope": "Адресные справочные тексты и официальные разъяснения/поисковые выдержки; полный комплект действующих отраслевых, местных и специальных актов не установлен.",
+          "options": [
+            {
+              "key": "option_1",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Комплекс укрепления и ремонта допустим после инженерного обследования и утверждённого проекта."
+            },
+            {
+              "key": "option_2",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Приоритет опасных узлов и мониторинг определяются специалистами без снятия защитных мер."
+            },
+            {
+              "key": "option_3",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Временное размещение организуется компетентными органами по установленным основаниям, ремонт не подменяет обследование дома."
+            },
+            {
+              "key": "option_4",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Очередность работ и контрольное обследование допустимы при сохранении ограничений до подтверждения безопасности."
+            },
+            {
+              "key": "option_5",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Совместный контроль осуществляется в пределах обязанностей служб и управляющей организации."
+            },
+            {
+              "key": "option_6",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Профилактика соседних сетей требует отдельного обследования и финансового основания."
+            }
+          ],
+          "remaining": "Право собственности, инженерное заключение, компетенция служб, режим защиты жителей. Документальный эпизод отдельно не перепроверялся."
+        }
       },
       "implementation_review": {
         "status": "draft",
@@ -5618,7 +6997,47 @@
         "basis": "Статья 15 Закона №181-ФЗ предусматривает условия беспрепятственного доступа и меры, позволяющие получать услуги. Способ обеспечения доступа учитывает назначение и техническое состояние объекта; знак или сопровождающий не заменяет проверку всего маршрута. Источники: https://mintrud.gov.ru/docs/laws/75",
         "status": "requires_case_specific_current_law_review",
         "source_status": "existing_official_source",
-        "note": "Обязательные нормы вынесены в исходные условия. Параметры учебной модели предложены, не являются реальными суммами или статистикой. Не применять до юридической и бюджетной приёмки."
+        "note": "Обязательные нормы вынесены в исходные условия. Параметры учебной модели предложены, не являются реальными суммами или статистикой. Не применять до юридической и бюджетной приёмки.",
+        "checked_norm_urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_8559/1f3d91284a26982ce51392b5fd178e392fe53404/"
+        ],
+        "collective_option_analysis": {
+          "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+          "date": "2026-11-28",
+          "norm": "Статья 15 Закона №181-ФЗ предусматривает условия беспрепятственного доступа и меры, позволяющие получать услуги. Способ обеспечения доступа учитывает назначение и техническое состояние объекта; знак или сопровождающий не заменяет проверку всего маршрута. Источники: https://mintrud.gov.ru/docs/laws/75",
+          "urls": [
+            "https://www.consultant.ru/document/cons_doc_LAW_8559/1f3d91284a26982ce51392b5fd178e392fe53404/"
+          ],
+          "source_scope": "Адресные справочные тексты и официальные разъяснения/поисковые выдержки; полный комплект действующих отраслевых, местных и специальных актов не установлен.",
+          "options": [
+            {
+              "key": "option_1",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Полное обновление маршрута требует технического проекта и соблюдения обязательных требований доступности."
+            },
+            {
+              "key": "option_2",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Модернизация платформы допустима с проверкой безопасности и регламентом обслуживания."
+            },
+            {
+              "key": "option_3",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Альтернативный наземный маршрут допустим после проверки безопасности и доступности всего пути."
+            },
+            {
+              "key": "option_4",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Сопровождение по запросу и навигация являются дополнительными мерами, не заменяют обязательный доступ."
+            },
+            {
+              "key": "option_5",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Поэтапное устранение препятствий допустимо при сохранении доступной услуги и участии пользователей."
+            }
+          ],
+          "remaining": "Правовой статус перехода, ответственный собственник, технические требования и сроки устранения препятствий."
+        }
       },
       "implementation_review": {
         "status": "draft",
@@ -5757,7 +7176,51 @@
         "basis": "Статьи 10–11 Закона №323-ФЗ регулируют доступность и недопустимость отказа в экстренной помощи; Закон №68-ФЗ — действия сил защиты населения. Медицинскую срочность устанавливает специалист. Организация перевозки требует безопасного средства и компетентного исполнения, а не одной административной команды открыть непроверенный понтон. Источники: https://01.mchs.gov.ru/deyatelnost/napravleniya-deyatelnosti/grazhdanskaya-zashchita/preduprezhdenie-chrezvychaynyh-situaciy/1-1-normativnye-pravovye-akty/2-federalnye-zakony/federalnyy-zakon-ot-21-dekabrya-1994-g-n-68-fz-o-zashchite-naseleniya-i-territoriy-ot-chrezvychaynyh-situaciy-prirodnogo-i-tehnogennogo-haraktera http://www.kremlin.ru/acts/constitution",
         "status": "requires_case_specific_current_law_review",
         "source_status": "fictional_or_unverified_source",
-        "note": "Обязательные нормы вынесены в исходные условия. Параметры учебной модели предложены, не являются реальными суммами или статистикой. Не применять до юридической и бюджетной приёмки."
+        "note": "Обязательные нормы вынесены в исходные условия. Параметры учебной модели предложены, не являются реальными суммами или статистикой. Не применять до юридической и бюджетной приёмки.",
+        "checked_norm_urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_121895/e63d3344841b2f5636a73710e906a23ebaf9ab82/",
+          "https://www.consultant.ru/document/cons_doc_LAW_121895/8e8caa29efb42dd54e3924ee7441f06d469f4a80/",
+          "https://www.consultant.ru/document/cons_doc_LAW_5295/cf148e8662eafdb9539fb6f19024dfdb5c33aaa2/"
+        ],
+        "collective_option_analysis": {
+          "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+          "date": "2026-11-28",
+          "norm": "Статьи 10–11 Закона №323-ФЗ регулируют доступность и недопустимость отказа в экстренной помощи; Закон №68-ФЗ — действия сил защиты населения. Медицинскую срочность устанавливает специалист. Организация перевозки требует безопасного средства и компетентного исполнения, а не одной административной команды открыть непроверенный понтон. Источники: https://01.mchs.gov.ru/deyatelnost/napravleniya-deyatelnosti/grazhdanskaya-zashchita/preduprezhdenie-chrezvychaynyh-situaciy/1-1-normativnye-pravovye-akty/2-federalnye-zakony/federalnyy-zakon-ot-21-dekabrya-1994-g-n-68-fz-o-zashchite-naseleniya-i-territoriy-ot-chrezvychaynyh-situaciy-prirodnogo-i-tehnogennogo-haraktera http://www.kremlin.ru/acts/constitution",
+          "urls": [
+            "https://www.consultant.ru/document/cons_doc_LAW_121895/e63d3344841b2f5636a73710e906a23ebaf9ab82/",
+            "https://www.consultant.ru/document/cons_doc_LAW_121895/8e8caa29efb42dd54e3924ee7441f06d469f4a80/",
+            "https://www.consultant.ru/document/cons_doc_LAW_5295/cf148e8662eafdb9539fb6f19024dfdb5c33aaa2/"
+          ],
+          "source_scope": "Адресные справочные тексты и официальные разъяснения/поисковые выдержки; полный комплект действующих отраслевых, местных и специальных актов не установлен.",
+          "options": [
+            {
+              "key": "option_1",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Усиление временной перевозки допускается после подтверждения безопасности и ресурса судна компетентным исполнителем."
+            },
+            {
+              "key": "option_2",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Расписание может учитывать объективные социальные нужды, не задерживая обязательные экстренные рейсы."
+            },
+            {
+              "key": "option_3",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Автобусный объезд допустим при безопасном маршруте, доступности и законной организации перевозки."
+            },
+            {
+              "key": "option_4",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Понтон допускается только после полного технического допуска и необходимых решений."
+            },
+            {
+              "key": "option_5",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Совмещённый план объезда и ремонта требует самостоятельного финансирования и сохранения безопасного сообщения."
+            }
+          ],
+          "remaining": "Медицинские решения принимают специалисты; полномочия транспортных служб, допуск плавсредств и переправы."
+        }
       },
       "implementation_review": {
         "status": "draft",
@@ -5906,7 +7369,49 @@
         "basis": "Статьи 19 и 130 Конституции РФ закрепляют равенство и участие в местном самоуправлении. Конкретный порядок консультации определяется её применимым актом. Процедуру нельзя без основания приравнивать к выборам по Закону №67-ФЗ; равноценные каналы и исключение повторов должны соответствовать заранее объявленным правилам. Источники: http://www.kremlin.ru/acts/constitution",
         "status": "requires_case_specific_current_law_review",
         "source_status": "fictional_or_unverified_source",
-        "note": "Обязательные нормы вынесены в исходные условия. Параметры учебной модели предложены, не являются реальными суммами или статистикой. Не применять до юридической и бюджетной приёмки."
+        "note": "Обязательные нормы вынесены в исходные условия. Параметры учебной модели предложены, не являются реальными суммами или статистикой. Не применять до юридической и бюджетной приёмки.",
+        "checked_norm_urls": [
+          "https://minjust.gov.ru/ru/documents/8011/",
+          "https://www.consultant.ru/document/cons_doc_LAW_501319/"
+        ],
+        "collective_option_analysis": {
+          "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+          "date": "2026-11-28",
+          "norm": "Статьи 19 и 130 Конституции РФ закрепляют равенство и участие в местном самоуправлении. Конкретный порядок консультации определяется её применимым актом. Процедуру нельзя без основания приравнивать к выборам по Закону №67-ФЗ; равноценные каналы и исключение повторов должны соответствовать заранее объявленным правилам. Источники: http://www.kremlin.ru/acts/constitution",
+          "urls": [
+            "https://minjust.gov.ru/ru/documents/8011/",
+            "https://www.consultant.ru/document/cons_doc_LAW_501319/"
+          ],
+          "source_scope": "Адресные справочные тексты и официальные разъяснения/поисковые выдержки; полный комплект действующих отраслевых, местных и специальных актов не установлен.",
+          "options": [
+            {
+              "key": "option_1",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Продление допускается по местному порядку с одинаковыми условиями для всех участников."
+            },
+            {
+              "key": "option_2",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Восстановление портала и бумажный канал возможны при сопоставимых сроках и правилах учёта."
+            },
+            {
+              "key": "option_3",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Дополнительные пункты в библиотеках допустимы при равном доступе и общей процедуре консультации."
+            },
+            {
+              "key": "option_4",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Передача бумажных предложений требует проверяемого учёта и соблюдения защиты данных."
+            },
+            {
+              "key": "option_5",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Перенос итогов возможен в предусмотренном порядке до устранения нарушений равенства каналов."
+            }
+          ],
+          "remaining": "Именно местная консультация, не выборы и не референдум; необходим действующий местный акт, переходные нормы 33-ФЗ."
+        }
       },
       "implementation_review": {
         "status": "draft",
@@ -6050,7 +7555,49 @@
         "basis": "Статьи 19 и 130 Конституции РФ закрепляют равенство и участие в местном самоуправлении. Консультация проводится по применимому акту и не заменяет бюджетного или тарифного решения. Требование статьи 12 Закона №67-ФЗ об однозначности относится к референдуму; его нельзя автоматически выдавать за универсальный режим любого опроса. Источники: http://www.kremlin.ru/acts/constitution",
         "status": "requires_case_specific_current_law_review",
         "source_status": "fictional_or_unverified_source",
-        "note": "Обязательные нормы вынесены в исходные условия. Параметры учебной модели предложены, не являются реальными суммами или статистикой. Не применять до юридической и бюджетной приёмки."
+        "note": "Обязательные нормы вынесены в исходные условия. Параметры учебной модели предложены, не являются реальными суммами или статистикой. Не применять до юридической и бюджетной приёмки.",
+        "checked_norm_urls": [
+          "https://minjust.gov.ru/ru/documents/8011/",
+          "https://www.consultant.ru/document/cons_doc_LAW_501319/"
+        ],
+        "collective_option_analysis": {
+          "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+          "date": "2026-11-28",
+          "norm": "Статьи 19 и 130 Конституции РФ закрепляют равенство и участие в местном самоуправлении. Консультация проводится по применимому акту и не заменяет бюджетного или тарифного решения. Требование статьи 12 Закона №67-ФЗ об однозначности относится к референдуму; его нельзя автоматически выдавать за универсальный режим любого опроса. Источники: http://www.kremlin.ru/acts/constitution",
+          "urls": [
+            "https://minjust.gov.ru/ru/documents/8011/",
+            "https://www.consultant.ru/document/cons_doc_LAW_501319/"
+          ],
+          "source_scope": "Адресные справочные тексты и официальные разъяснения/поисковые выдержки; полный комплект действующих отраслевых, местных и специальных актов не установлен.",
+          "options": [
+            {
+              "key": "option_1",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Раздельные вопросы позволяют выразить независимые предпочтения, не устанавливают плату или бюджет сами по себе."
+            },
+            {
+              "key": "option_2",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Сравнение финансовых комбинаций допустимо при прозрачных расчётах и законных источниках."
+            },
+            {
+              "key": "option_3",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Отдельные встречи обеспечивают самостоятельное обсуждение каждого вопроса при равных правилах участия."
+            },
+            {
+              "key": "option_4",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Последовательность обсуждений допустима без связывания ответа о парке с обязательным согласием на плату."
+            },
+            {
+              "key": "option_5",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Сравнительная таблица и повторная консультация допустимы по местному порядку и одинаковым условиям."
+            }
+          ],
+          "remaining": "Местная необязательная консультация; полномочия по парковочной плате, бюджету и действующая процедура устанавливаются отдельно."
+        }
       },
       "implementation_review": {
         "status": "draft",
@@ -6215,7 +7762,58 @@
         "basis": "ЖК РФ, статьи 32, 86 и 95: разные основания обеспечения прав собственников и нанимателей, а также временное размещение в маневренном фонде. Нельзя обещать одинаковый имущественный результат всем жителям без установления их правового статуса. Документальное сообщение прокуратуры подтверждает описанный эпизод, а не любой из предлагаемых учебных вариантов. Источники: https://epp.genproc.gov.ru/ru/proc_11/activity/legal-education/explain/e145467/ https://epp.genproc.gov.ru/ru/proc_urfo/mass-media/news/main/e8451438/",
         "status": "requires_case_specific_current_law_review",
         "source_status": "existing_official_source",
-        "note": "Обязательные нормы вынесены в исходные условия. Параметры учебной модели предложены, не являются реальными суммами или статистикой. Не применять до юридической и бюджетной приёмки."
+        "note": "Обязательные нормы вынесены в исходные условия. Параметры учебной модели предложены, не являются реальными суммами или статистикой. Не применять до юридической и бюджетной приёмки.",
+        "checked_norm_urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_51057/1316f00500eba499bc062df16fbbfe1afa8d7f01/",
+          "https://www.consultant.ru/document/cons_doc_LAW_51057/db6957c34b618b3d8395eebc308ed9aff7ccbbf2/",
+          "https://www.consultant.ru/document/cons_doc_LAW_51057/6bb98a3aca78fe3be73eed83a583b163da0a6c01/",
+          "https://www.consultant.ru/document/cons_doc_LAW_51057/"
+        ],
+        "collective_option_analysis": {
+          "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+          "date": "2026-11-28",
+          "norm": "ЖК РФ, статьи 32, 86 и 95: разные основания обеспечения прав собственников и нанимателей, а также временное размещение в маневренном фонде. Нельзя обещать одинаковый имущественный результат всем жителям без установления их правового статуса. Документальное сообщение прокуратуры подтверждает описанный эпизод, а не любой из предлагаемых учебных вариантов. Источники: https://epp.genproc.gov.ru/ru/proc_11/activity/legal-education/explain/e145467/ https://epp.genproc.gov.ru/ru/proc_urfo/mass-media/news/main/e8451438/",
+          "urls": [
+            "https://www.consultant.ru/document/cons_doc_LAW_51057/1316f00500eba499bc062df16fbbfe1afa8d7f01/",
+            "https://www.consultant.ru/document/cons_doc_LAW_51057/db6957c34b618b3d8395eebc308ed9aff7ccbbf2/",
+            "https://www.consultant.ru/document/cons_doc_LAW_51057/6bb98a3aca78fe3be73eed83a583b163da0a6c01/",
+            "https://www.consultant.ru/document/cons_doc_LAW_51057/"
+          ],
+          "source_scope": "Адресные справочные тексты и официальные разъяснения/поисковые выдержки; полный комплект действующих отраслевых, местных и специальных актов не установлен.",
+          "options": [
+            {
+              "key": "option_1",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Индивидуальное сопровождение помогает исполнить судебное решение без изменения прав семей."
+            },
+            {
+              "key": "option_2",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Ускоренный подбор жилья допустим с учётом конкретного правового статуса и требований к помещению."
+            },
+            {
+              "key": "option_3",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Временное размещение и график постоянного обеспечения не отменяют сроки исполнения решения суда."
+            },
+            {
+              "key": "option_4",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Межведомственная сверка документов и сроков ведётся в компетенции органов и не заменяет судебное исполнение."
+            },
+            {
+              "key": "option_5",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Отчёт о ходе работ допустим в обезличенном виде без раскрытия защищённых данных."
+            },
+            {
+              "key": "option_6",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Профилактический план по другим домам требует отдельных обследований и финансирования."
+            }
+          ],
+          "remaining": "Судебный акт, права собственников и нанимателей, основания маневренного фонда, сроки. Документальный эпизод заново не перепроверялся."
+        }
       },
       "implementation_review": {
         "status": "draft",
@@ -6359,7 +7957,49 @@
         "basis": "Федеральный закон №416-ФЗ, статьи 6 и 23: полномочия в сфере водоснабжения и обеспечение качества питьевой воды; Федеральный закон №323-ФЗ, статья 10: доступность помощи, зависящей от работы инфраструктуры. Технические и санитарные решения принимаются компетентными исполнителями. Источники: https://epp.genproc.gov.ru/ru/proc_33/activity/legal-education/explain/e317820/ https://minzdrav.gov.ru/en/documents/7025-federalnyy-zakon-ot-21-noyabrya-2011-g-323-fz-ob-osnovah-ohrany-zdorovya-grazhdan-v-rossiyskoy-federatsii",
         "status": "requires_case_specific_current_law_review",
         "source_status": "fictional_or_unverified_source",
-        "note": "Обязательные нормы вынесены в исходные условия. Параметры учебной модели предложены, не являются реальными суммами или статистикой. Не применять до юридической и бюджетной приёмки."
+        "note": "Обязательные нормы вынесены в исходные условия. Параметры учебной модели предложены, не являются реальными суммами или статистикой. Не применять до юридической и бюджетной приёмки.",
+        "checked_norm_urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_122867/e18ad8420748aabbec02a69ac175732730eb3cb2/",
+          "https://www.consultant.ru/document/cons_doc_LAW_122867/b7bcb8b539d9bd4892de760d103ccf944aa7455b/"
+        ],
+        "collective_option_analysis": {
+          "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+          "date": "2026-11-28",
+          "norm": "Федеральный закон №416-ФЗ, статьи 6 и 23: полномочия в сфере водоснабжения и обеспечение качества питьевой воды; Федеральный закон №323-ФЗ, статья 10: доступность помощи, зависящей от работы инфраструктуры. Технические и санитарные решения принимаются компетентными исполнителями. Источники: https://epp.genproc.gov.ru/ru/proc_33/activity/legal-education/explain/e317820/ https://minzdrav.gov.ru/en/documents/7025-federalnyy-zakon-ot-21-noyabrya-2011-g-323-fz-ob-osnovah-ohrany-zdorovya-grazhdan-v-rossiyskoy-federatsii",
+          "urls": [
+            "https://www.consultant.ru/document/cons_doc_LAW_122867/e18ad8420748aabbec02a69ac175732730eb3cb2/",
+            "https://www.consultant.ru/document/cons_doc_LAW_122867/b7bcb8b539d9bd4892de760d103ccf944aa7455b/"
+          ],
+          "source_scope": "Адресные справочные тексты и официальные разъяснения/поисковые выдержки; полный комплект действующих отраслевых, местных и специальных актов не установлен.",
+          "options": [
+            {
+              "key": "option_1",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Реконструкция магистрали требует обследования, проекта, полномочий и финансирования."
+            },
+            {
+              "key": "option_2",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Устранение утечек и контроль давления допустимы при соблюдении требований качества воды."
+            },
+            {
+              "key": "option_3",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Совместный водозабор возможен после установленных согласований, прав и санитарных проверок."
+            },
+            {
+              "key": "option_4",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Безопасный подвоз дополняется добровольной экономией без отказа в обязательном обеспечении водой."
+            },
+            {
+              "key": "option_5",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Поэтапное обновление допускается по подтверждённым потерям при сохранении безопасного водоснабжения."
+            }
+          ],
+          "remaining": "Компетенция собственника и водоснабжающей организации, санитарные требования и разрешения на водопользование."
+        }
       },
       "implementation_review": {
         "status": "draft",
@@ -6503,7 +8143,51 @@
         "basis": "ГК РФ, статьи 210 и 309: содержание имущества и исполнение обязательств; Федеральный закон №68-ФЗ, статья 14: обязанности организаций по предупреждению ЧС в пределах компетенции. Эти нормы не заменяют техническое заключение и не позволяют объявить неиспытанный резерв работоспособным. Источники: https://11.rosguard.gov.ru/uploads/2025/07/5_grazhdanskijj_kodeks_rossijjskojj_federacii_chast_pervaya.pdf https://mchs.gov.ru/dokumenty/bazovye-normativnye-pravovye-akty/federalnye-zakony/5788",
         "status": "requires_case_specific_current_law_review",
         "source_status": "fictional_or_unverified_source",
-        "note": "Обязательные нормы вынесены в исходные условия. Параметры учебной модели предложены, не являются реальными суммами или статистикой. Не применять до юридической и бюджетной приёмки."
+        "note": "Обязательные нормы вынесены в исходные условия. Параметры учебной модели предложены, не являются реальными суммами или статистикой. Не применять до юридической и бюджетной приёмки.",
+        "checked_norm_urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_102975/be6d489749f7a2f04c6f391b8d89cc8f3bfe1638/",
+          "https://www.consultant.ru/document/cons_doc_LAW_5295/a053d1a23c215d14941f99fd381dba6f90ce4969/",
+          "https://www.consultant.ru/document/cons_doc_LAW_5142/64eaa3de6c1b6aae75186f3f96cd308c1ed38e11/"
+        ],
+        "collective_option_analysis": {
+          "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+          "date": "2026-11-28",
+          "norm": "ГК РФ, статьи 210 и 309: содержание имущества и исполнение обязательств; Федеральный закон №68-ФЗ, статья 14: обязанности организаций по предупреждению ЧС в пределах компетенции. Эти нормы не заменяют техническое заключение и не позволяют объявить неиспытанный резерв работоспособным. Источники: https://11.rosguard.gov.ru/uploads/2025/07/5_grazhdanskijj_kodeks_rossijjskojj_federacii_chast_pervaya.pdf https://mchs.gov.ru/dokumenty/bazovye-normativnye-pravovye-akty/federalnye-zakony/5788",
+          "urls": [
+            "https://www.consultant.ru/document/cons_doc_LAW_102975/be6d489749f7a2f04c6f391b8d89cc8f3bfe1638/",
+            "https://www.consultant.ru/document/cons_doc_LAW_5295/a053d1a23c215d14941f99fd381dba6f90ce4969/",
+            "https://www.consultant.ru/document/cons_doc_LAW_5142/64eaa3de6c1b6aae75186f3f96cd308c1ed38e11/"
+          ],
+          "source_scope": "Адресные справочные тексты и официальные разъяснения/поисковые выдержки; полный комплект действующих отраслевых, местных и специальных актов не установлен.",
+          "options": [
+            {
+              "key": "option_1",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Ремонт основного насоса допустим при подтверждённой работоспособности временного резерва."
+            },
+            {
+              "key": "option_2",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Замена обоих агрегатов требует утверждённого финансирования, проверки смет и безопасного графика."
+            },
+            {
+              "key": "option_3",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Этапность допускается при контроле нагрузки и сохранении необходимого теплоснабжения."
+            },
+            {
+              "key": "option_4",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Временное резервное оборудование привлекается на законном договорном основании после технической проверки."
+            },
+            {
+              "key": "option_5",
+              "assessment": "additional_measure_permitted_under_stated_conditions",
+              "reason": "Ремонт и будущая закупка резервного агрегата разделяются по срокам и финансовым основаниям."
+            }
+          ],
+          "remaining": "Ответственный собственник, технический допуск, договорные обязательства, безопасность стационара и закупочная процедура."
+        }
       },
       "implementation_review": {
         "status": "draft",
