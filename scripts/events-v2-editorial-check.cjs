@@ -28,6 +28,23 @@ assert.ok(long/individual<=.30,'Longest answer remains too predictive');
 assert.ok(short/individual<=.30,'Shortest answer remains too predictive');
 assert.ok(ratio/individual>=.95&&ratio/individual<=1.05,'Mean answer length imbalance');
 const reg=JSON.parse(fs.readFileSync(dir+'/source-register.json','utf8'));assert.equal(reg.cases.length,330);assert.deepEqual(reg.cases.map(c=>c.case_key).sort(),cases.map(c=>c.case_key).sort());
+// The register has two historical names for the number of explicitly reviewed alternatives.
+// Accept both without rewriting older evidence; the review itself is still not legal certification.
+const registerByKey=new Map(reg.cases.map(c=>[c.case_key,c]));
+let collectiveReviewCount=0,collectiveReviewOptions=0;
+for(const c of cases){
+ const review=c.legal_review.collective_option_analysis;
+ if(!review)continue;
+ assert.ok(c.audience!=='single',c.case_key);
+ const source=registerByKey.get(c.case_key)?.targeted_option_review;
+ assert.ok(source,c.case_key+' missing targeted source review');
+ assert.equal(source.option_count??source.options,c.effect_plan.options.length,c.case_key);
+ assert.equal(review.options.length,c.effect_plan.options.length,c.case_key);
+ assert.ok(review.options.every((o,i)=>o.key===c.effect_plan.options[i].key&&typeof o.reason==='string'&&o.reason.trim()),c.case_key);
+ assert.ok(review.urls.length>0,c.case_key+' missing norm source');
+ collectiveReviewCount++;collectiveReviewOptions+=review.options.length;
+}
+console.log(JSON.stringify({collectiveReviewCount,collectiveReviewOptions},null,2));
 const blocked=cases.filter(c=>c.verified!==true||c.editorial_status!=='approved'||c.legal_review.status!=='verified_current'||c.effect_plan.options.some(o=>typeof o.lawful!=='boolean')).length;
 console.log(JSON.stringify({cases:cases.length,options:count,individual,collective,longestCorrect:long,shortestCorrect:short,meanCorrectToOtherLength:ratio/individual,positions,unknownIndividualLawfulness:unknown,dominatedOptions:dominated,dominatedCases,activationBlocked:blocked,documentaryFull:reg.cases.filter(c=>c.source_status==='official_article_read_core_episode_confirmed').length,documentaryIndexed:reg.cases.filter(c=>c.source_status==='official_search_index_core_episode_confirmed_full_text_unavailable').length},null,2));
 if(process.argv.includes('--release')){assert.equal(blocked,0,'Legal/editorial release gate: unverified cases must never be activated');assert.equal(dominatedCases,0,'Collective consequences require final economic balance review');}
