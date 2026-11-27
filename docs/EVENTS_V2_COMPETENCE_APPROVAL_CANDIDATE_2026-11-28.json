@@ -1,0 +1,3491 @@
+{
+  "status": "owner_decision_candidate_not_for_import",
+  "source_commit": "f0ea95dd39bcb1b928c647f56306762562e0091d",
+  "source": "Существующие матрицы EVENTS_V2_COMPETENCE_SOURCE_REVIEW_2026-11-28 и EVENTS_V2_INDIVIDUAL_COMPETENCE_MATRIX_2026-11-27; исходный авторский перечень пяти министерств, зафиксированный ранее в источниковой матрице.",
+  "summary": {
+    "cases": 141,
+    "proposed_primary": 141,
+    "explicit_sector": 84,
+    "inferred_or_cross_sector": 45,
+    "previously_unallocated_now_proposed": 12,
+    "legacy_best_no_exact_match": 98,
+    "activation_allowed": 0
+  },
+  "principles": [
+    "Профиль означает предлагаемого адресата рассмотрения, не юридическое полномочие на совершение действия.",
+    "12 новых маршрутов являются предложением автора редакционной матрицы, а не прямым содержанием правил владельца.",
+    "При пересечении компетенций допускаются только отдельно подтверждённые должности и территория; роль исполнителя из законодательства не заменяется игровым портфелем.",
+    "Не удалять широкие или несовпадающие исторические authorized_roles автоматически; сначала определить законный игровой маршрут, затем отдельная миграция и проверка.",
+    "Никакого изменения прав, начислений, каталога или базы в данном документе."
+  ],
+  "cases": [
+    {
+      "case_key": "bank-budget-bridge",
+      "title": "Обрушение путепровода в Вязьме: транспорт и безопасность",
+      "best_option": "option_5",
+      "grounding": "cross_sector_or_inferred",
+      "primary": {
+        "office_key": "ministry_internal",
+        "office_title": "Министерство по внутренней политике и государству"
+      },
+      "secondary": [
+        {
+          "office_key": "ministry_economic",
+          "office_title": "Министерство по экономической политике"
+        }
+      ],
+      "reason": "Спасательные меры и объезд разделены; МЧС прямо относится к внутренней политике, транспорт — к экономической. Нужен критерий главного предмета и допуск нескольких компетентных адресатов.",
+      "real_executor": "Владелец дороги и уполномоченные органы — ограничения движения; спасательные службы — аварийные работы; депутат вправе инициировать обращение/контроль, но не заменять руководителя спасательных работ. Точная привязка игрового получателя к дорожной компетенции ещё проверяется.",
+      "legacy_best_roles": [
+        "депутат",
+        "муницип",
+        "глава города",
+        "администрац"
+      ],
+      "matched_recorded_office_titles": [
+        "Депутат Государственной Думы"
+      ],
+      "legacy_no_match": false,
+      "review_requirement": "verify_scope_active_office_and_territory",
+      "activation_allowed": false
+    },
+    {
+      "case_key": "bank-budget-health",
+      "title": "Томск: доступность записи к детскому стоматологу",
+      "best_option": "option_2",
+      "grounding": "explicit_named_sector",
+      "primary": {
+        "office_key": "ministry_social",
+        "office_title": "Министерство по социальной политике"
+      },
+      "secondary": [],
+      "reason": "Предмет лучшего решения относится к прямо названной в исходных правилах сфере: здравоохранение. Это профиль рассмотрения, не исключительная компетенция или право исполнять решение.",
+      "real_executor": "Медицинская организация организует приём; профильный региональный орган — координацию и кадровые решения в пределах полномочий; депутат — контроль или запрос, не клиническое направление.",
+      "legacy_best_roles": [
+        "министр",
+        "правительств",
+        "депутат"
+      ],
+      "matched_recorded_office_titles": [
+        "Депутат Государственной Думы",
+        "Заместитель Председателя Правительства РФ — Министерство по социальной политике",
+        "Председатель Правительства Российской Федерации"
+      ],
+      "legacy_no_match": false,
+      "review_requirement": "verify_scope_active_office_and_territory",
+      "activation_allowed": false
+    },
+    {
+      "case_key": "bank-budget-school",
+      "title": "Самара: протечки кровли школы № 37",
+      "best_option": "option_4",
+      "grounding": "explicit_named_sector",
+      "primary": {
+        "office_key": "ministry_social",
+        "office_title": "Министерство по социальной политике"
+      },
+      "secondary": [],
+      "reason": "Предмет лучшего решения относится к прямо названной в исходных правилах сфере: образование. Это профиль рассмотрения, не исключительная компетенция или право исполнять решение.",
+      "real_executor": "Руководство школы обеспечивает безопасные условия и организацию занятий; учредитель — финансирование в пределах компетенции; прокуратура и суд — надзор и судебная защита, не исполнители ремонта.",
+      "legacy_best_roles": [
+        "министр",
+        "депутат",
+        "муницип"
+      ],
+      "matched_recorded_office_titles": [
+        "Депутат Государственной Думы"
+      ],
+      "legacy_no_match": false,
+      "review_requirement": "verify_scope_active_office_and_territory",
+      "activation_allowed": false
+    },
+    {
+      "case_key": "bank-bus",
+      "title": "Омская область: восстановление регулярных автобусных маршрутов",
+      "best_option": "option_1",
+      "grounding": "explicit_named_sector",
+      "primary": {
+        "office_key": "ministry_economic",
+        "office_title": "Министерство по экономической политике"
+      },
+      "secondary": [],
+      "reason": "Предмет лучшего решения относится к прямо названной в исходных правилах сфере: транспорт. Это профиль рассмотрения, не исключительная компетенция или право исполнять решение.",
+      "real_executor": "Уполномоченный транспортный орган или заказчик оформляет изменения по установленной процедуре; перевозчик выполняет условия; представитель жителей или депутат может направить обращение.",
+      "legacy_best_roles": [
+        "муницип",
+        "губернатор",
+        "министр культуры"
+      ],
+      "matched_recorded_office_titles": [],
+      "legacy_no_match": true,
+      "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
+      "activation_allowed": false
+    },
+    {
+      "case_key": "bank-cat-mayor",
+      "title": "Кот в приёмной",
+      "best_option": "option_3",
+      "grounding": "explicit_named_sector",
+      "primary": {
+        "office_key": "ministry_internal",
+        "office_title": "Министерство по внутренней политике и государству"
+      },
+      "secondary": [],
+      "reason": "Предмет лучшего решения относится к прямо названной в исходных правилах сфере: ОГВ / ОМС. Это профиль рассмотрения, не исключительная компетенция или право исполнять решение.",
+      "real_executor": "Ответственный за обработку данных ограничивает доступ; уполномоченная пресс-служба готовит обезличенный материал; сторонний автор записи не предоставляет разрешение за заявительницу.",
+      "legacy_best_roles": [
+        "муницип",
+        "губернатор",
+        "министр культуры"
+      ],
+      "matched_recorded_office_titles": [],
+      "legacy_no_match": true,
+      "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
+      "activation_allowed": false
+    },
+    {
+      "case_key": "bank-ceremony",
+      "title": "Лента не разрезается",
+      "best_option": "option_5",
+      "grounding": "cross_sector_or_inferred",
+      "primary": {
+        "office_key": "ministry_social",
+        "office_title": "Министерство по социальной политике"
+      },
+      "secondary": [
+        {
+          "office_key": "ministry_internal",
+          "office_title": "Министерство по внутренней политике и государству"
+        }
+      ],
+      "reason": "Открытие сквера и концерт: культурная программа и муниципальный организатор; отдельной сферы церемоний в перечне нет.",
+      "real_executor": "Уполномоченный организатор меняет символический жест в пределах договора; заказчик оформляет закупки в установленном порядке. Ведущая не обладает самостоятельными бюджетными полномочиями.",
+      "legacy_best_roles": [
+        "министр культуры",
+        "муницип",
+        "губернатор"
+      ],
+      "matched_recorded_office_titles": [],
+      "legacy_no_match": true,
+      "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
+      "activation_allowed": false
+    },
+    {
+      "case_key": "bank-curated-light-01",
+      "title": "Талисман-аксолотль",
+      "best_option": "option_2",
+      "grounding": "explicit_named_sector",
+      "primary": {
+        "office_key": "ministry_social",
+        "office_title": "Министерство по социальной политике"
+      },
+      "secondary": [],
+      "reason": "Предмет лучшего решения относится к прямо названной в исходных правилах сфере: образование. Это профиль рассмотрения, не исключительная компетенция или право исполнять решение.",
+      "real_executor": "Организатор устанавливает условия конкурса; правообладатель или надлежащий представитель распоряжается правами в предусмотренном законом порядке; руководитель кружка не заменяет правообладателя.",
+      "legacy_best_roles": [
+        "министр культуры",
+        "муницип",
+        "губернатор"
+      ],
+      "matched_recorded_office_titles": [],
+      "legacy_no_match": true,
+      "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
+      "activation_allowed": false
+    },
+    {
+      "case_key": "bank-curated-light-02",
+      "title": "Музей бюрократии",
+      "best_option": "option_4",
+      "grounding": "explicit_named_sector",
+      "primary": {
+        "office_key": "ministry_social",
+        "office_title": "Министерство по социальной политике"
+      },
+      "secondary": [],
+      "reason": "Предмет лучшего решения относится к прямо названной в исходных правилах сфере: культура. Это профиль рассмотрения, не исключительная компетенция или право исполнять решение.",
+      "real_executor": "Куратор организует экспозицию; оператор данных отвечает за законное использование материалов; руководитель учреждения не может разрешить раскрытие личных сведений без основания.",
+      "legacy_best_roles": [
+        "министр культуры",
+        "муницип",
+        "губернатор"
+      ],
+      "matched_recorded_office_titles": [],
+      "legacy_no_match": true,
+      "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
+      "activation_allowed": false
+    },
+    {
+      "case_key": "bank-curated-light-03",
+      "title": "Парк для собак",
+      "best_option": "option_1",
+      "grounding": "explicit_named_sector",
+      "primary": {
+        "office_key": "ministry_internal",
+        "office_title": "Министерство по внутренней политике и государству"
+      },
+      "secondary": [],
+      "reason": "Предмет лучшего решения относится к прямо названной в исходных правилах сфере: ОГВ / ОМС. Это профиль рассмотрения, не исключительная компетенция или право исполнять решение.",
+      "real_executor": "Земельный орган и уполномоченный орган благоустройства проверяют режим и определяют допустимую территорию; школа отвечает за безопасность в пределах своей компетенции; подрядчик не определяет границы сам.",
+      "legacy_best_roles": [
+        "министр культуры",
+        "муницип",
+        "губернатор"
+      ],
+      "matched_recorded_office_titles": [],
+      "legacy_no_match": true,
+      "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
+      "activation_allowed": false
+    },
+    {
+      "case_key": "bank-curated-light-04",
+      "title": "Поэзия на остановках",
+      "best_option": "option_3",
+      "grounding": "cross_sector_or_inferred",
+      "primary": {
+        "office_key": "ministry_social",
+        "office_title": "Министерство по социальной политике"
+      },
+      "secondary": [
+        {
+          "office_key": "ministry_economic",
+          "office_title": "Министерство по экономической политике"
+        }
+      ],
+      "reason": "Запись стихов — культура, обязательные транспортные объявления и посадка — транспорт.",
+      "real_executor": "Перевозчик обеспечивает информирование и доступность; организатор программы получает права на запись; правообладатель предоставляет необходимое разрешение.",
+      "legacy_best_roles": [
+        "министр культуры",
+        "муницип",
+        "губернатор"
+      ],
+      "matched_recorded_office_titles": [],
+      "legacy_no_match": true,
+      "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
+      "activation_allowed": false
+    },
+    {
+      "case_key": "bank-curated-light-05",
+      "title": "Самая длинная скамейка",
+      "best_option": "option_5",
+      "grounding": "explicit_named_sector",
+      "primary": {
+        "office_key": "ministry_internal",
+        "office_title": "Министерство по внутренней политике и государству"
+      },
+      "secondary": [],
+      "reason": "Предмет лучшего решения относится к прямо названной в исходных правилах сфере: ОГВ / ОМС. Это профиль рассмотрения, не исключительная компетенция или право исполнять решение.",
+      "real_executor": "Заказчик определяет обоснованную потребность и требования закупки; служба благоустройства проверяет эксплуатацию; проектировщик предлагает техническое решение; подрядчик не утверждает сам требования.",
+      "legacy_best_roles": [
+        "министр культуры",
+        "муницип",
+        "губернатор"
+      ],
+      "matched_recorded_office_titles": [],
+      "legacy_no_match": true,
+      "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
+      "activation_allowed": false
+    },
+    {
+      "case_key": "bank-curated-light-06",
+      "title": "Настолка для чиновников",
+      "best_option": "option_2",
+      "grounding": "explicit_named_sector",
+      "primary": {
+        "office_key": "ministry_internal",
+        "office_title": "Министерство по внутренней политике и государству"
+      },
+      "secondary": [],
+      "reason": "Предмет лучшего решения относится к прямо названной в исходных правилах сфере: ОГВ / ОМС. Это профиль рассмотрения, не исключительная компетенция или право исполнять решение.",
+      "real_executor": "Организатор отвечает за учебное содержание; уполномоченный орган регистрирует надлежащие обращения; молодёжный совет не заменяет орган рассмотрения.",
+      "legacy_best_roles": [
+        "министр культуры",
+        "муницип",
+        "губернатор"
+      ],
+      "matched_recorded_office_titles": [],
+      "legacy_no_match": true,
+      "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
+      "activation_allowed": false
+    },
+    {
+      "case_key": "bank-curated-light-07",
+      "title": "Гриб-рекордсмен",
+      "best_option": "option_4",
+      "grounding": "cross_sector_or_inferred",
+      "primary": {
+        "office_key": "ministry_internal",
+        "office_title": "Министерство по внутренней политике и государству"
+      },
+      "secondary": [],
+      "reason": "Главный вопрос — организация наблюдения в городском парке. Природоохранные полномочия не расписаны по министерствам.",
+      "real_executor": "Управляющий парком организует использование территории в рамках полномочий; биолог определяет вид, уполномоченный природоохранный орган устанавливает режим охраны. Платная услуга требует отдельного основания.",
+      "legacy_best_roles": [
+        "министр культуры",
+        "муницип",
+        "губернатор"
+      ],
+      "matched_recorded_office_titles": [],
+      "legacy_no_match": true,
+      "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
+      "activation_allowed": false
+    },
+    {
+      "case_key": "bank-curated-light-08",
+      "title": "Фестиваль потерянных стульев",
+      "best_option": "option_1",
+      "grounding": "explicit_named_sector",
+      "primary": {
+        "office_key": "ministry_social",
+        "office_title": "Министерство по социальной политике"
+      },
+      "secondary": [],
+      "reason": "Предмет лучшего решения относится к прямо названной в исходных правилах сфере: культура. Это профиль рассмотрения, не исключительная компетенция или право исполнять решение.",
+      "real_executor": "Руководитель учреждения и собственник в пределах своих полномочий согласуют использование имущества; материально ответственное лицо оформляет учёт; специалист оценивает безопасность.",
+      "legacy_best_roles": [
+        "министр культуры",
+        "муницип",
+        "губернатор"
+      ],
+      "matched_recorded_office_titles": [],
+      "legacy_no_match": true,
+      "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
+      "activation_allowed": false
+    },
+    {
+      "case_key": "bank-curated-light-09",
+      "title": "Очередь как спектакль",
+      "best_option": "option_3",
+      "grounding": "explicit_named_sector",
+      "primary": {
+        "office_key": "ministry_internal",
+        "office_title": "Министерство по внутренней политике и государству"
+      },
+      "secondary": [],
+      "reason": "Предмет лучшего решения относится к прямо названной в исходных правилах сфере: ОГВ / ОМС. Это профиль рассмотрения, не исключительная компетенция или право исполнять решение.",
+      "real_executor": "Руководитель центра отвечает за доступ к услугам и организацию помещения; студия — за добровольность участия и законное использование изображений; жалобы принимаются уполномоченными лицами.",
+      "legacy_best_roles": [
+        "министр культуры",
+        "муницип",
+        "губернатор"
+      ],
+      "matched_recorded_office_titles": [],
+      "legacy_no_match": true,
+      "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
+      "activation_allowed": false
+    },
+    {
+      "case_key": "bank-curated-light-10",
+      "title": "Печать наоборот",
+      "best_option": "option_5",
+      "grounding": "cross_sector_or_inferred",
+      "primary": {
+        "office_key": "ministry_economic",
+        "office_title": "Министерство по экономической политике"
+      },
+      "secondary": [
+        {
+          "office_key": "ministry_internal",
+          "office_title": "Министерство по внутренней политике и государству"
+        }
+      ],
+      "reason": "Предмет — претензия по поставке и учёт, а не самостоятельная отраслевая компетенция финансового министра.",
+      "real_executor": "Заказчик оформляет несоответствие и требования к поставщику; дальнейшее распоряжение кружками зависит от условий контракта, прав на товар и местного режима символики.",
+      "legacy_best_roles": [
+        "министр культуры",
+        "муницип",
+        "губернатор"
+      ],
+      "matched_recorded_office_titles": [],
+      "legacy_no_match": true,
+      "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
+      "activation_allowed": false
+    },
+    {
+      "case_key": "bank-curated-light-11",
+      "title": "Театр на остановке",
+      "best_option": "option_2",
+      "grounding": "cross_sector_or_inferred",
+      "primary": {
+        "office_key": "ministry_social",
+        "office_title": "Министерство по социальной политике"
+      },
+      "secondary": [
+        {
+          "office_key": "ministry_economic",
+          "office_title": "Министерство по экономической политике"
+        }
+      ],
+      "reason": "Театральное мероприятие и безопасный режим остановки относятся к двум сферам.",
+      "real_executor": "Уполномоченный владелец или управляющий площадкой согласует использование; перевозчик отвечает за посадку; орган культуры определяет применимую процедуру без автоматической квалификации как митинга.",
+      "legacy_best_roles": [
+        "министр культуры",
+        "муницип",
+        "губернатор"
+      ],
+      "matched_recorded_office_titles": [],
+      "legacy_no_match": true,
+      "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
+      "activation_allowed": false
+    },
+    {
+      "case_key": "bank-curated-light-12",
+      "title": "Соседский хор",
+      "best_option": "option_4",
+      "grounding": "explicit_named_sector",
+      "primary": {
+        "office_key": "ministry_social",
+        "office_title": "Министерство по социальной политике"
+      },
+      "secondary": [],
+      "reason": "Предмет лучшего решения относится к прямо названной в исходных правилах сфере: культура. Это профиль рассмотрения, не исключительная компетенция или право исполнять решение.",
+      "real_executor": "Организатор хора соблюдает применимый региональный режим тишины; управляющая организация не отменяет закон; библиотека согласует помещение; компетентный орган рассматривает нарушения.",
+      "legacy_best_roles": [
+        "министр культуры",
+        "муницип",
+        "губернатор"
+      ],
+      "matched_recorded_office_titles": [],
+      "legacy_no_match": true,
+      "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
+      "activation_allowed": false
+    },
+    {
+      "case_key": "bank-curated-light-13",
+      "title": "Цвет нового моста",
+      "best_option": "option_1",
+      "grounding": "explicit_named_sector",
+      "primary": {
+        "office_key": "ministry_economic",
+        "office_title": "Министерство по экономической политике"
+      },
+      "secondary": [],
+      "reason": "Предмет лучшего решения относится к прямо названной в исходных правилах сфере: транспорт. Это профиль рассмотрения, не исключительная компетенция или право исполнять решение.",
+      "real_executor": "Заказчик выбирает допустимый оттенок в пределах контракта; проектировщик проверяет техническую совместимость; подрядчик не меняет систему покрытия по результатам опроса.",
+      "legacy_best_roles": [
+        "министр культуры",
+        "муницип",
+        "губернатор"
+      ],
+      "matched_recorded_office_titles": [],
+      "legacy_no_match": true,
+      "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
+      "activation_allowed": false
+    },
+    {
+      "case_key": "bank-curated-light-14",
+      "title": "Капсула времени",
+      "best_option": "option_3",
+      "grounding": "explicit_named_sector",
+      "primary": {
+        "office_key": "ministry_social",
+        "office_title": "Министерство по социальной политике"
+      },
+      "secondary": [],
+      "reason": "Предмет лучшего решения относится к прямо названной в исходных правилах сфере: культура. Это профиль рассмотрения, не исключительная компетенция или право исполнять решение.",
+      "real_executor": "Школа и организатор согласуют передачу; музей оформляет хранение и доступ; вмешательство в благоустройство требует решения уполномоченного лица. Публикация персональных сведений требует самостоятельного основания.",
+      "legacy_best_roles": [
+        "министр культуры",
+        "муницип",
+        "губернатор"
+      ],
+      "matched_recorded_office_titles": [],
+      "legacy_no_match": true,
+      "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
+      "activation_allowed": false
+    },
+    {
+      "case_key": "bank-curated-serious-04",
+      "title": "Приют после домашнего насилия",
+      "best_option": "option_5",
+      "grounding": "cross_sector_or_inferred",
+      "primary": {
+        "office_key": "ministry_social",
+        "office_title": "Министерство по социальной политике"
+      },
+      "secondary": [
+        {
+          "office_key": "ministry_internal",
+          "office_title": "Министерство по внутренней политике и государству"
+        }
+      ],
+      "reason": "Размещение и помощь матери и ребёнку; полиция прямо отнесена к внутренней политике, социальная помощь не перечислена отдельно от общего названия социальной политики.",
+      "real_executor": "Поставщик социальных услуг оказывает срочную помощь; уполномоченные органы обеспечивают профильные меры безопасности; полиция и медицинские организации действуют в своей компетенции.",
+      "legacy_best_roles": [
+        "министр труда",
+        "министр образования",
+        "муницип",
+        "губернатор"
+      ],
+      "matched_recorded_office_titles": [],
+      "legacy_no_match": true,
+      "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
+      "activation_allowed": false
+    },
+    {
+      "case_key": "bank-curated-serious-05",
+      "title": "Ветеринарная эпидемия",
+      "best_option": "option_2",
+      "grounding": "not_explicitly_allocated",
+      "primary": {
+        "office_key": "ministry_economic",
+        "office_title": "Министерство по экономической политике"
+      },
+      "secondary": [
+        {
+          "office_key": "ministry_internal",
+          "office_title": "Министерство по внутренней политике и государству"
+        }
+      ],
+      "reason": "Сельскохозяйственная деятельность и последствия для производителей — экономический профиль; санитарный и ветеринарный надзор — компетенция специального органа.",
+      "real_executor": "Компетентный орган устанавливает карантин по статье 17, ветеринарные специалисты устанавливают основания; владельцы выполняют законные меры; администрация не подменяет ветеринарные полномочия.",
+      "legacy_best_roles": [
+        "министр природных ресурсов",
+        "министр экологии",
+        "муницип",
+        "губернатор"
+      ],
+      "matched_recorded_office_titles": [],
+      "legacy_no_match": true,
+      "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
+      "activation_allowed": false
+    },
+    {
+      "case_key": "bank-curated-serious-06",
+      "title": "Владивосток: отключение электроэнергии после аварии на подстанции",
+      "best_option": "option_6",
+      "grounding": "explicit_named_sector",
+      "primary": {
+        "office_key": "ministry_economic",
+        "office_title": "Министерство по экономической политике"
+      },
+      "secondary": [],
+      "reason": "Предмет лучшего решения относится к прямо названной в исходных правилах сфере: энергетика. Это профиль рассмотрения, не исключительная компетенция или право исполнять решение.",
+      "real_executor": "Энергетические организации выполняют технические работы; органы власти координируют помощь и информирование в пределах компетенции; учреждения действуют по безопасным режимам, согласованным с ответственными специалистами.",
+      "legacy_best_roles": [
+        "министр чрезвычайных ситуаций",
+        "министр здравоохранения",
+        "муницип",
+        "губернатор"
+      ],
+      "matched_recorded_office_titles": [],
+      "legacy_no_match": true,
+      "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
+      "activation_allowed": false
+    },
+    {
+      "case_key": "bank-curated-serious-07",
+      "title": "Архив под угрозой",
+      "best_option": "option_1",
+      "grounding": "not_explicitly_allocated",
+      "primary": {
+        "office_key": "ministry_internal",
+        "office_title": "Министерство по внутренней политике и государству"
+      },
+      "secondary": [
+        {
+          "office_key": "ministry_social",
+          "office_title": "Министерство по социальной политике"
+        }
+      ],
+      "reason": "Документы органа власти — профиль внутренней политики и управления; культурное хранение и архивное наследие — смежный социальный профиль.",
+      "real_executor": "Руководитель архива организует сохранность, архивисты и реставраторы определяют порядок стабилизации; подрядчик выполняет строительные работы и не принимает решение об отборе фонда.",
+      "legacy_best_roles": [
+        "министр строительства",
+        "министр транспорта",
+        "муницип",
+        "губернатор"
+      ],
+      "matched_recorded_office_titles": [],
+      "legacy_no_match": true,
+      "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
+      "activation_allowed": false
+    },
+    {
+      "case_key": "bank-curated-serious-08",
+      "title": "Рыба у дамбы",
+      "best_option": "option_3",
+      "grounding": "cross_sector_or_inferred",
+      "primary": {
+        "office_key": "ministry_economic",
+        "office_title": "Министерство по экономической политике"
+      },
+      "secondary": [],
+      "reason": "Режим дамбы затрагивает энергетический объект; охрана биоресурсов прямо не распределена.",
+      "real_executor": "Эксплуатирующая организация отвечает за режим гидросооружения; профильные специалисты оценивают биоресурсы; уполномоченные органы согласуют изменение режима.",
+      "legacy_best_roles": [
+        "министр природных ресурсов",
+        "министр экологии",
+        "муницип",
+        "губернатор"
+      ],
+      "matched_recorded_office_titles": [],
+      "legacy_no_match": true,
+      "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
+      "activation_allowed": false
+    },
+    {
+      "case_key": "bank-curated-serious-09",
+      "title": "Подозрение на картель",
+      "best_option": "option_5",
+      "grounding": "cross_sector_or_inferred",
+      "primary": {
+        "office_key": "ministry_economic",
+        "office_title": "Министерство по экономической политике"
+      },
+      "secondary": [],
+      "reason": "Антимонопольная деятельность прямо не названа; экономический профиль — редакционная интерпретация.",
+      "real_executor": "Заказчик действует по основаниям закупочного законодательства; антимонопольный орган проверяет признаки картеля и принимает решения в установленном порядке.",
+      "legacy_best_roles": [
+        "министр финансов",
+        "муницип",
+        "губернатор"
+      ],
+      "matched_recorded_office_titles": [],
+      "legacy_no_match": true,
+      "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
+      "activation_allowed": false
+    },
+    {
+      "case_key": "bank-curated-serious-10",
+      "title": "Пропавший спортивный грант",
+      "best_option": "option_2",
+      "grounding": "explicit_named_sector",
+      "primary": {
+        "office_key": "ministry_economic",
+        "office_title": "Министерство по экономической политике"
+      },
+      "secondary": [],
+      "reason": "Предмет лучшего решения относится к прямо названной в исходных правилах сфере: финансы. Это профиль рассмотрения, не исключительная компетенция или право исполнять решение.",
+      "real_executor": "Главный распорядитель, получатель гранта и финансовый орган проверяют документы в пределах своих полномочий; вывод о правонарушении относится к компетентной контрольной процедуре.",
+      "legacy_best_roles": [
+        "министр финансов",
+        "председатель правительства",
+        "муницип",
+        "губернатор"
+      ],
+      "matched_recorded_office_titles": [
+        "Председатель Правительства Российской Федерации"
+      ],
+      "legacy_no_match": false,
+      "review_requirement": "verify_scope_active_office_and_territory",
+      "activation_allowed": false
+    },
+    {
+      "case_key": "bank-curated-serious-11",
+      "title": "Совет школьников",
+      "best_option": "option_4",
+      "grounding": "explicit_named_sector",
+      "primary": {
+        "office_key": "ministry_social",
+        "office_title": "Министерство по социальной политике"
+      },
+      "secondary": [],
+      "reason": "Предмет лучшего решения относится к прямо названной в исходных правилах сфере: образование. Это профиль рассмотрения, не исключительная компетенция или право исполнять решение.",
+      "real_executor": "Совет обучающихся выражает мнение в предусмотренном законом и уставом порядке; образовательная организация и её компетентные органы принимают решения.",
+      "legacy_best_roles": [
+        "министр юстиции",
+        "депутат",
+        "муницип",
+        "губернатор"
+      ],
+      "matched_recorded_office_titles": [
+        "Депутат Государственной Думы"
+      ],
+      "legacy_no_match": false,
+      "review_requirement": "verify_scope_active_office_and_territory",
+      "activation_allowed": false
+    },
+    {
+      "case_key": "bank-curated-serious-12",
+      "title": "Международная гуманитарная помощь",
+      "best_option": "option_6",
+      "grounding": "explicit_named_sector",
+      "primary": {
+        "office_key": "ministry_foreign",
+        "office_title": "Министерство по внешней политике"
+      },
+      "secondary": [],
+      "reason": "Предмет лучшего решения относится к прямо названной в исходных правилах сфере: МИД. Это профиль рассмотрения, не исключительная компетенция или право исполнять решение.",
+      "real_executor": "Международная отправка согласуется по федеральному каналу; регион и медицинская организация определяют реально доступные ресурсы и непрерывность местной помощи.",
+      "legacy_best_roles": [
+        "министр чрезвычайных ситуаций",
+        "министр здравоохранения",
+        "муницип",
+        "губернатор",
+        "министр иностранных",
+        "председатель правительства"
+      ],
+      "matched_recorded_office_titles": [
+        "Председатель Правительства Российской Федерации"
+      ],
+      "legacy_no_match": false,
+      "review_requirement": "verify_scope_active_office_and_territory",
+      "activation_allowed": false
+    },
+    {
+      "case_key": "bank-curated-serious-13",
+      "title": "Временное размещение семей",
+      "best_option": "option_3",
+      "grounding": "cross_sector_or_inferred",
+      "primary": {
+        "office_key": "ministry_social",
+        "office_title": "Министерство по социальной политике"
+      },
+      "secondary": [
+        {
+          "office_key": "ministry_internal",
+          "office_title": "Министерство по внутренней политике и государству"
+        }
+      ],
+      "reason": "Помощь семьям относится к социальной политике по смыслу, оформление документов — к публичным органам.",
+      "real_executor": "Поставщик социальных услуг организует срочную помощь; медработники определяют медицинскую срочность; уполномоченные учреждения восстанавливают документы и оформляют последующие услуги.",
+      "legacy_best_roles": [
+        "министр труда",
+        "министр образования",
+        "муницип",
+        "губернатор"
+      ],
+      "matched_recorded_office_titles": [],
+      "legacy_no_match": true,
+      "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
+      "activation_allowed": false
+    },
+    {
+      "case_key": "bank-curated-serious-14",
+      "title": "Карьер у заповедника",
+      "best_option": "option_5",
+      "grounding": "not_explicitly_allocated",
+      "primary": {
+        "office_key": "ministry_economic",
+        "office_title": "Министерство по экономической политике"
+      },
+      "secondary": [
+        {
+          "office_key": "ministry_internal",
+          "office_title": "Министерство по внутренней политике и государству"
+        }
+      ],
+      "reason": "Недропользование и хозяйственный проект — экономический профиль, правовой режим охраняемой территории — отдельное согласование с уполномоченным природоохранным органом.",
+      "real_executor": "Инвестор предоставляет материалы; орган охраны и природоохранные органы определяют режим и применимые процедуры; уполномоченный орган выдаёт разрешения при соблюдении условий.",
+      "legacy_best_roles": [
+        "министр природных ресурсов",
+        "министр экологии",
+        "муницип",
+        "губернатор"
+      ],
+      "matched_recorded_office_titles": [],
+      "legacy_no_match": true,
+      "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
+      "activation_allowed": false
+    },
+    {
+      "case_key": "bank-curated-serious-15",
+      "title": "Инициатива о местном референдуме",
+      "best_option": "option_2",
+      "grounding": "cross_sector_or_inferred",
+      "primary": {
+        "office_key": "ministry_internal",
+        "office_title": "Министерство по внутренней политике и государству"
+      },
+      "secondary": [],
+      "reason": "МСУ прямо названо; избирательная комиссия сохраняет самостоятельную компетенцию, поэтому министерство — лишь возможный адресат консультации.",
+      "real_executor": "Инициативная группа и компетентные органы действуют по 67-ФЗ и региональному закону; рабочая группа не заменяет установленную процедуру проверки и изменения инициативы.",
+      "legacy_best_roles": [
+        "министр юстиции",
+        "депутат",
+        "муницип",
+        "губернатор"
+      ],
+      "matched_recorded_office_titles": [
+        "Депутат Государственной Думы"
+      ],
+      "legacy_no_match": false,
+      "review_requirement": "verify_scope_active_office_and_territory",
+      "activation_allowed": false
+    },
+    {
+      "case_key": "bank-curated-serious-16",
+      "title": "Дроны лесной охраны",
+      "best_option": "option_4",
+      "grounding": "cross_sector_or_inferred",
+      "primary": {
+        "office_key": "ministry_internal",
+        "office_title": "Министерство по внутренней политике и государству"
+      },
+      "secondary": [],
+      "reason": "Обнаружение пожара связано с МЧС; лесная охрана, воздушные разрешения и персональные данные не распределены однозначно.",
+      "real_executor": "Лесная служба определяет законную цель; эксплуатант согласует воздушное пространство; оператор персональных данных устанавливает объём обработки, сроки и доступ.",
+      "legacy_best_roles": [
+        "министр цифрового развития",
+        "муницип",
+        "губернатор"
+      ],
+      "matched_recorded_office_titles": [],
+      "legacy_no_match": true,
+      "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
+      "activation_allowed": false
+    },
+    {
+      "case_key": "bank-curated-serious-17",
+      "title": "Школа и местные языки",
+      "best_option": "option_1",
+      "grounding": "explicit_named_sector",
+      "primary": {
+        "office_key": "ministry_social",
+        "office_title": "Министерство по социальной политике"
+      },
+      "secondary": [],
+      "reason": "Предмет лучшего решения относится к прямо названной в исходных правилах сфере: образование. Это профиль рассмотрения, не исключительная компетенция или право исполнять решение.",
+      "real_executor": "Образовательная организация проверяет заявления и образовательную программу, кадровую обеспеченность и условия добровольной группы; родители и обучающиеся участвуют в установленном порядке.",
+      "legacy_best_roles": [
+        "министр труда",
+        "министр образования",
+        "муницип",
+        "губернатор"
+      ],
+      "matched_recorded_office_titles": [],
+      "legacy_no_match": true,
+      "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
+      "activation_allowed": false
+    },
+    {
+      "case_key": "bank-curated-serious-18",
+      "title": "Благовещенск: плохая дорога затрудняет проезд скорой помощи",
+      "best_option": "option_3",
+      "grounding": "explicit_named_sector",
+      "primary": {
+        "office_key": "ministry_economic",
+        "office_title": "Министерство по экономической политике"
+      },
+      "secondary": [],
+      "reason": "Предмет лучшего решения относится к прямо названной в исходных правилах сфере: транспорт. Это профиль рассмотрения, не исключительная компетенция или право исполнять решение.",
+      "real_executor": "Владелец дороги и уполномоченный заказчик организуют работы; ответственные за безопасность и спецслужбы согласуют временный проезд по своей компетенции.",
+      "legacy_best_roles": [
+        "министр здравоохранения",
+        "губернатор"
+      ],
+      "matched_recorded_office_titles": [],
+      "legacy_no_match": true,
+      "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
+      "activation_allowed": false
+    },
+    {
+      "case_key": "bank-curated-serious-19",
+      "title": "Аренда для молодых специалистов",
+      "best_option": "option_5",
+      "grounding": "cross_sector_or_inferred",
+      "primary": {
+        "office_key": "ministry_social",
+        "office_title": "Министерство по социальной политике"
+      },
+      "secondary": [
+        {
+          "office_key": "ministry_internal",
+          "office_title": "Министерство по внутренней политике и государству"
+        },
+        {
+          "office_key": "ministry_economic",
+          "office_title": "Министерство по экономической политике"
+        }
+      ],
+      "reason": "Труд, здравоохранение и образование названы; жилищный фонд и бюджет требуют самостоятельного решения.",
+      "real_executor": "Уполномоченный жилищный орган принимает решения по применимым основаниям; кадровая служба предоставляет сведения, но не устанавливает самостоятельное право на жильё.",
+      "legacy_best_roles": [
+        "министр труда",
+        "министр образования",
+        "муницип",
+        "губернатор"
+      ],
+      "matched_recorded_office_titles": [],
+      "legacy_no_match": true,
+      "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
+      "activation_allowed": false
+    },
+    {
+      "case_key": "bank-curated-serious-20",
+      "title": "Фейковая эвакуация",
+      "best_option": "option_2",
+      "grounding": "explicit_named_sector",
+      "primary": {
+        "office_key": "ministry_internal",
+        "office_title": "Министерство по внутренней политике и государству"
+      },
+      "secondary": [],
+      "reason": "Предмет лучшего решения относится к прямо названной в исходных правилах сфере: МЧС / ГО. Это профиль рассмотрения, не исключительная компетенция или право исполнять решение.",
+      "real_executor": "Дежурные службы подтверждают обстановку; уполномоченный орган информирует население по официальным каналам; компетентные службы проверяют происхождение сообщения.",
+      "legacy_best_roles": [
+        "муницип",
+        "губернатор",
+        "министр культуры"
+      ],
+      "matched_recorded_office_titles": [],
+      "legacy_no_match": true,
+      "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
+      "activation_allowed": false
+    },
+    {
+      "case_key": "bank-curated-serious-21",
+      "title": "Пляж без спасателей",
+      "best_option": "option_3",
+      "grounding": "cross_sector_or_inferred",
+      "primary": {
+        "office_key": "ministry_internal",
+        "office_title": "Министерство по внутренней политике и государству"
+      },
+      "secondary": [
+        {
+          "office_key": "ministry_defence",
+          "office_title": "Министерство по обороне и внутренней безопасности"
+        }
+      ],
+      "reason": "Спасение ближе к МЧС по исходному перечню; точная граница внутренней безопасности и МЧС не определена.",
+      "real_executor": "Ответственный за пляж организует безопасный режим по применимым правилам; спасательная служба оценивает условия; компетентные органы принимают предусмотренные ограничения.",
+      "legacy_best_roles": [
+        "министр чрезвычайных ситуаций",
+        "министр здравоохранения",
+        "муницип",
+        "губернатор"
+      ],
+      "matched_recorded_office_titles": [],
+      "legacy_no_match": true,
+      "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
+      "activation_allowed": false
+    },
+    {
+      "case_key": "bank-curated-serious-22",
+      "title": "Экзаменационная утечка",
+      "best_option": "option_1",
+      "grounding": "explicit_named_sector",
+      "primary": {
+        "office_key": "ministry_social",
+        "office_title": "Министерство по социальной политике"
+      },
+      "secondary": [],
+      "reason": "Предмет лучшего решения относится к прямо названной в исходных правилах сфере: образование. Это профиль рассмотрения, не исключительная компетенция или право исполнять решение.",
+      "real_executor": "Организатор аттестации проверяет инцидент и применяет специальный порядок; преподаватели сохраняют материалы и сообщают сведения, но не заменяют установленную процедуру.",
+      "legacy_best_roles": [
+        "министр цифрового развития",
+        "муницип",
+        "губернатор"
+      ],
+      "matched_recorded_office_titles": [],
+      "legacy_no_match": true,
+      "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
+      "activation_allowed": false
+    },
+    {
+      "case_key": "bank-curated-serious-23",
+      "title": "Дагестан: перебои с инсулином для ребёнка",
+      "best_option": "option_3",
+      "grounding": "explicit_named_sector",
+      "primary": {
+        "office_key": "ministry_social",
+        "office_title": "Министерство по социальной политике"
+      },
+      "secondary": [],
+      "reason": "Предмет лучшего решения относится к прямо названной в исходных правилах сфере: здравоохранение. Это профиль рассмотрения, не исключительная компетенция или право исполнять решение.",
+      "real_executor": "Медицинская организация подтверждает назначение; уполномоченный орган и поставщик организуют законное лекарственное обеспечение; компенсация зависит от отдельного основания.",
+      "legacy_best_roles": [
+        "министр здравоохранения",
+        "губернатор"
+      ],
+      "matched_recorded_office_titles": [],
+      "legacy_no_match": true,
+      "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
+      "activation_allowed": false
+    },
+    {
+      "case_key": "bank-curated-serious-24",
+      "title": "Археологическая находка",
+      "best_option": "option_5",
+      "grounding": "explicit_named_sector",
+      "primary": {
+        "office_key": "ministry_social",
+        "office_title": "Министерство по социальной политике"
+      },
+      "secondary": [],
+      "reason": "Предмет лучшего решения относится к прямо названной в исходных правилах сфере: культура. Это профиль рассмотрения, не исключительная компетенция или право исполнять решение.",
+      "real_executor": "Заказчик и исполнитель приостанавливают затрагивающие находку работы и уведомляют орган охраны по специальному порядку; дальнейшие меры определяются по компетенции.",
+      "legacy_best_roles": [
+        "министр юстиции",
+        "депутат",
+        "муницип",
+        "губернатор"
+      ],
+      "matched_recorded_office_titles": [
+        "Депутат Государственной Думы"
+      ],
+      "legacy_no_match": false,
+      "review_requirement": "verify_scope_active_office_and_territory",
+      "activation_allowed": false
+    },
+    {
+      "case_key": "bank-curated-v2-02",
+      "title": "Ключ от холодильной камеры",
+      "best_option": "option_2",
+      "grounding": "explicit_named_sector",
+      "primary": {
+        "office_key": "ministry_social",
+        "office_title": "Министерство по социальной политике"
+      },
+      "secondary": [],
+      "reason": "Предмет лучшего решения относится к прямо названной в исходных правилах сфере: здравоохранение. Это профиль рассмотрения, не исключительная компетенция или право исполнять решение.",
+      "real_executor": "Ответственный за приёмку и качество проверяет температурную историю по применимым правилам; решение о пригодности не подменяется текущим замером или внешним видом.",
+      "legacy_best_roles": [
+        "министр здравоохранения"
+      ],
+      "matched_recorded_office_titles": [],
+      "legacy_no_match": true,
+      "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
+      "activation_allowed": false
+    },
+    {
+      "case_key": "bank-curated-v2-03",
+      "title": "Табель для невидимой смены",
+      "best_option": "option_4",
+      "grounding": "explicit_named_sector",
+      "primary": {
+        "office_key": "ministry_social",
+        "office_title": "Министерство по социальной политике"
+      },
+      "secondary": [],
+      "reason": "Предмет лучшего решения относится к прямо названной в исходных правилах сфере: труд. Это профиль рассмотрения, не исключительная компетенция или право исполнять решение.",
+      "real_executor": "Работодатель обеспечивает учёт фактического времени и начисления; кадровая и бухгалтерская службы сверяют документы; работник получает информацию о корректировке.",
+      "legacy_best_roles": [
+        "глава",
+        "министр труда"
+      ],
+      "matched_recorded_office_titles": [],
+      "legacy_no_match": true,
+      "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
+      "activation_allowed": false
+    },
+    {
+      "case_key": "bank-curated-v2-04",
+      "title": "Письмо без обратного адреса",
+      "best_option": "option_1",
+      "grounding": "explicit_named_sector",
+      "primary": {
+        "office_key": "ministry_internal",
+        "office_title": "Министерство по внутренней политике и государству"
+      },
+      "secondary": [],
+      "reason": "Предмет лучшего решения относится к прямо названной в исходных правилах сфере: ОГВ / ОМС. Это профиль рассмотрения, не исключительная компетенция или право исполнять решение.",
+      "real_executor": "Уполномоченный орган учитывает содержание сообщения и требования статьи 11; сведения о противоправном деянии при наличии предусмотренных условий направляются по компетенции; правовой статус проверяется по надлежащим данным.",
+      "legacy_best_roles": [
+        "депутат",
+        "глава"
+      ],
+      "matched_recorded_office_titles": [
+        "Депутат Государственной Думы"
+      ],
+      "legacy_no_match": false,
+      "review_requirement": "verify_scope_active_office_and_territory",
+      "activation_allowed": false
+    },
+    {
+      "case_key": "bank-curated-v2-05",
+      "title": "Котельная просит выходной",
+      "best_option": "option_3",
+      "grounding": "explicit_named_sector",
+      "primary": {
+        "office_key": "ministry_economic",
+        "office_title": "Министерство по экономической политике"
+      },
+      "secondary": [],
+      "reason": "Предмет лучшего решения относится к прямо названной в исходных правилах сфере: энергетика. Это профиль рассмотрения, не исключительная компетенция или право исполнять решение.",
+      "real_executor": "Теплоснабжающая организация и ответственные инженеры определяют технические меры; стационар и уполномоченные органы координируют безопасную непрерывность работы и информирование.",
+      "legacy_best_roles": [
+        "глава",
+        "министр энергетики"
+      ],
+      "matched_recorded_office_titles": [],
+      "legacy_no_match": true,
+      "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
+      "activation_allowed": false
+    },
+    {
+      "case_key": "bank-curated-v2-06",
+      "title": "Алгоритм потерял бабушку",
+      "best_option": "option_5",
+      "grounding": "cross_sector_or_inferred",
+      "primary": {
+        "office_key": "ministry_social",
+        "office_title": "Министерство по социальной политике"
+      },
+      "secondary": [
+        {
+          "office_key": "ministry_internal",
+          "office_title": "Министерство по внутренней политике и государству"
+        }
+      ],
+      "reason": "Основной предмет — подтверждённая социальная компенсация, но выплаты и цифровой реестр не названы отдельно.",
+      "real_executor": "Оператор данных уточняет недостоверные сведения; уполномоченный орган выплаты применяет предусмотренный регламент и не заменяет правоустанавливающее решение ошибкой алгоритма.",
+      "legacy_best_roles": [
+        "министр цифров",
+        "министр труда",
+        "глава"
+      ],
+      "matched_recorded_office_titles": [],
+      "legacy_no_match": true,
+      "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
+      "activation_allowed": false
+    },
+    {
+      "case_key": "bank-curated-v2-07",
+      "title": "Последняя смена переводчика",
+      "best_option": "option_2",
+      "grounding": "cross_sector_or_inferred",
+      "primary": {
+        "office_key": "ministry_social",
+        "office_title": "Министерство по социальной политике"
+      },
+      "secondary": [
+        {
+          "office_key": "ministry_internal",
+          "office_title": "Министерство по внутренней политике и государству"
+        }
+      ],
+      "reason": "Внутренний центр помощи, не международные отношения; прежнее отнесение к МИД не следует из условия.",
+      "real_executor": "Поставщик услуг оказывает срочную помощь; ответственный оператор определяет законный объём доступа переводчика; дальнейшее сопровождение оформляется по применимой процедуре.",
+      "legacy_best_roles": [
+        "министр иностранных",
+        "глава"
+      ],
+      "matched_recorded_office_titles": [],
+      "legacy_no_match": true,
+      "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
+      "activation_allowed": false
+    },
+    {
+      "case_key": "bank-curated-v2-08",
+      "title": "Тихая утечка в водоканале",
+      "best_option": "option_4",
+      "grounding": "not_explicitly_allocated",
+      "primary": {
+        "office_key": "ministry_internal",
+        "office_title": "Министерство по внутренней политике и государству"
+      },
+      "secondary": [
+        {
+          "office_key": "ministry_economic",
+          "office_title": "Министерство по экономической политике"
+        }
+      ],
+      "reason": "Коммунальная организация и ОМС — внутренний профиль; инженерное и финансовое обеспечение — экономический.",
+      "real_executor": "Водоснабжающая организация устанавливает причину и применимое основание ограничения; уведомление и меры для потребителей выполняются по статье 21 и специальным правилам.",
+      "legacy_best_roles": [
+        "глава",
+        "министр строительства"
+      ],
+      "matched_recorded_office_titles": [],
+      "legacy_no_match": true,
+      "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
+      "activation_allowed": false
+    },
+    {
+      "case_key": "bank-curated-v2-09",
+      "title": "Один участок — две очереди",
+      "best_option": "option_1",
+      "grounding": "explicit_named_sector",
+      "primary": {
+        "office_key": "ministry_internal",
+        "office_title": "Министерство по внутренней политике и государству"
+      },
+      "secondary": [],
+      "reason": "Предмет лучшего решения относится к прямо названной в исходных правилах сфере: ОГВ / ОМС. Это профиль рассмотрения, не исключительная компетенция или право исполнять решение.",
+      "real_executor": "Земельный орган проверяет основания и режим предоставления; обсуждение жителей выявляет потребности, но не заменяет правоустанавливающее решение.",
+      "legacy_best_roles": [
+        "глава",
+        "депутат"
+      ],
+      "matched_recorded_office_titles": [
+        "Депутат Государственной Думы"
+      ],
+      "legacy_no_match": false,
+      "review_requirement": "verify_scope_active_office_and_territory",
+      "activation_allowed": false
+    },
+    {
+      "case_key": "bank-curated-v2-10",
+      "title": "Звук сирены не дошёл",
+      "best_option": "option_3",
+      "grounding": "explicit_named_sector",
+      "primary": {
+        "office_key": "ministry_internal",
+        "office_title": "Министерство по внутренней политике и государству"
+      },
+      "secondary": [],
+      "reason": "Предмет лучшего решения относится к прямо названной в исходных правилах сфере: МЧС / ГО. Это профиль рассмотрения, не исключительная компетенция или право исполнять решение.",
+      "real_executor": "Уполномоченные органы и операторы системы оповещения проверяют техническое состояние и фактическую доступность предупреждения.",
+      "legacy_best_roles": [
+        "глава",
+        "министр внутренних",
+        "министр чрезвычай"
+      ],
+      "matched_recorded_office_titles": [],
+      "legacy_no_match": true,
+      "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
+      "activation_allowed": false
+    },
+    {
+      "case_key": "bank-curated-v2-11",
+      "title": "Зал на два проекта",
+      "best_option": "option_5",
+      "grounding": "cross_sector_or_inferred",
+      "primary": {
+        "office_key": "ministry_social",
+        "office_title": "Министерство по социальной политике"
+      },
+      "secondary": [
+        {
+          "office_key": "ministry_internal",
+          "office_title": "Министерство по внутренней политике и государству"
+        }
+      ],
+      "reason": "Кинотеатр, клуб и мастерская; использование публичного здания требует владельца.",
+      "real_executor": "Собственник и уполномоченное учреждение проверяют режим имущества, правила доступа и финансирование.",
+      "legacy_best_roles": [
+        "глава",
+        "министр культуры"
+      ],
+      "matched_recorded_office_titles": [],
+      "legacy_no_match": true,
+      "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
+      "activation_allowed": false
+    },
+    {
+      "case_key": "bank-curated-v2-12",
+      "title": "Рейс после шестой смены",
+      "best_option": "option_2",
+      "grounding": "explicit_named_sector",
+      "primary": {
+        "office_key": "ministry_economic",
+        "office_title": "Министерство по экономической политике"
+      },
+      "secondary": [],
+      "reason": "Предмет лучшего решения относится к прямо названной в исходных правилах сфере: транспорт. Это профиль рассмотрения, не исключительная компетенция или право исполнять решение.",
+      "real_executor": "Перевозчик обеспечивает безопасность, техническое состояние и режим труда водителей; диспетчер информирует пассажиров и организует законную подмену.",
+      "legacy_best_roles": [
+        "глава",
+        "министр транспорта"
+      ],
+      "matched_recorded_office_titles": [],
+      "legacy_no_match": true,
+      "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
+      "activation_allowed": false
+    },
+    {
+      "case_key": "bank-curated-v2-13",
+      "title": "Датчик у школьного окна",
+      "best_option": "option_4",
+      "grounding": "not_explicitly_allocated",
+      "primary": {
+        "office_key": "ministry_social",
+        "office_title": "Министерство по социальной политике"
+      },
+      "secondary": [
+        {
+          "office_key": "ministry_internal",
+          "office_title": "Министерство по внутренней политике и государству"
+        }
+      ],
+      "reason": "Безопасность школы и здоровье детей — социальный профиль; проверка выбросов передаётся компетентному органу, а не министру.",
+      "real_executor": "Уполномоченные органы и лаборатории проверяют экологические показатели; школа принимает допустимые меры охраны здоровья.",
+      "legacy_best_roles": [
+        "глава",
+        "министр природ",
+        "министр экологии"
+      ],
+      "matched_recorded_office_titles": [],
+      "legacy_no_match": true,
+      "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
+      "activation_allowed": false
+    },
+    {
+      "case_key": "bank-curated-v2-15",
+      "title": "Слушания за снежной стеной",
+      "best_option": "option_1",
+      "grounding": "explicit_named_sector",
+      "primary": {
+        "office_key": "ministry_internal",
+        "office_title": "Министерство по внутренней политике и государству"
+      },
+      "secondary": [],
+      "reason": "Предмет лучшего решения относится к прямо названной в исходных правилах сфере: ОГВ / ОМС. Это профиль рассмотрения, не исключительная компетенция или право исполнять решение.",
+      "real_executor": "Организатор и компетентный орган оформляют изменение обсуждения, извещение и учёт замечаний по применимым правилам.",
+      "legacy_best_roles": [
+        "глава",
+        "депутат"
+      ],
+      "matched_recorded_office_titles": [
+        "Депутат Государственной Думы"
+      ],
+      "legacy_no_match": false,
+      "review_requirement": "verify_scope_active_office_and_territory",
+      "activation_allowed": false
+    },
+    {
+      "case_key": "bank-curated-v2-16",
+      "title": "Резерв с истёкшим сроком",
+      "best_option": "option_3",
+      "grounding": "explicit_named_sector",
+      "primary": {
+        "office_key": "ministry_internal",
+        "office_title": "Министерство по внутренней политике и государству"
+      },
+      "secondary": [],
+      "reason": "Предмет лучшего решения относится к прямо названной в исходных правилах сфере: МЧС / ГО. Это профиль рассмотрения, не исключительная компетенция или право исполнять решение.",
+      "real_executor": "Ответственный за резерв исключает непригодные продукты и отражает фактический остаток; обмен оформляется отдельно.",
+      "legacy_best_roles": [
+        "глава",
+        "министр чрезвычай"
+      ],
+      "matched_recorded_office_titles": [],
+      "legacy_no_match": true,
+      "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
+      "activation_allowed": false
+    },
+    {
+      "case_key": "bank-curated-v2-17",
+      "title": "Серверы хотят пить",
+      "best_option": "option_5",
+      "grounding": "not_explicitly_allocated",
+      "primary": {
+        "office_key": "ministry_economic",
+        "office_title": "Министерство по экономической политике"
+      },
+      "secondary": [
+        {
+          "office_key": "ministry_internal",
+          "office_title": "Министерство по внутренней политике и государству"
+        }
+      ],
+      "reason": "Проект инфраструктуры и ресурсоёмкость — экономический профиль; разрешительный режим водопользования проверяет реальный уполномоченный орган.",
+      "real_executor": "Водохозяйственные и разрешительные органы проверяют основание водопользования; инвестор предоставляет проектные сведения.",
+      "legacy_best_roles": [
+        "глава",
+        "министр цифров",
+        "министр природ"
+      ],
+      "matched_recorded_office_titles": [],
+      "legacy_no_match": true,
+      "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
+      "activation_allowed": false
+    },
+    {
+      "case_key": "bank-curated-v2-18",
+      "title": "Пекарня на коротком договоре",
+      "best_option": "option_2",
+      "grounding": "cross_sector_or_inferred",
+      "primary": {
+        "office_key": "ministry_economic",
+        "office_title": "Министерство по экономической политике"
+      },
+      "secondary": [
+        {
+          "office_key": "ministry_internal",
+          "office_title": "Министерство по внутренней политике и государству"
+        },
+        {
+          "office_key": "ministry_social",
+          "office_title": "Министерство по социальной политике"
+        }
+      ],
+      "reason": "Муниципальное имущество и социальное обучение требуют отдельных компетенций.",
+      "real_executor": "Уполномоченный собственник проверяет порядок предоставления имущества и исключения статьи 17.1.",
+      "legacy_best_roles": [
+        "глава",
+        "депутат"
+      ],
+      "matched_recorded_office_titles": [
+        "Депутат Государственной Думы"
+      ],
+      "legacy_no_match": false,
+      "review_requirement": "verify_scope_active_office_and_territory",
+      "activation_allowed": false
+    },
+    {
+      "case_key": "bank-curated-v2-19",
+      "title": "Антенна на последнем холме",
+      "best_option": "option_4",
+      "grounding": "not_explicitly_allocated",
+      "primary": {
+        "office_key": "ministry_economic",
+        "office_title": "Министерство по экономической политике"
+      },
+      "secondary": [
+        {
+          "office_key": "ministry_internal",
+          "office_title": "Министерство по внутренней политике и государству"
+        }
+      ],
+      "reason": "Инфраструктурный проект и приёмка — экономический профиль, связь с муниципальными потребностями — внутренний профиль.",
+      "real_executor": "Заказчик проверяет фактический охват и этапы контракта; оператор устраняет подтверждённые недостатки.",
+      "legacy_best_roles": [
+        "глава",
+        "министр цифров"
+      ],
+      "matched_recorded_office_titles": [],
+      "legacy_no_match": true,
+      "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
+      "activation_allowed": false
+    },
+    {
+      "case_key": "bank-curated-v2-20",
+      "title": "Подарок с дорогой батареей",
+      "best_option": "option_1",
+      "grounding": "cross_sector_or_inferred",
+      "primary": {
+        "office_key": "ministry_economic",
+        "office_title": "Министерство по экономической политике"
+      },
+      "secondary": [
+        {
+          "office_key": "ministry_foreign",
+          "office_title": "Министерство по внешней политике"
+        },
+        {
+          "office_key": "ministry_internal",
+          "office_title": "Министерство по внутренней политике и государству"
+        }
+      ],
+      "reason": "Основной предмет — приём автобуса и расходы; МИД только при установленном международном характере, статус города-побратима сам по себе его не подтверждает.",
+      "real_executor": "Уполномоченный собственник или учреждение проверяет условия передачи автобуса и расходы; перевозчик отвечает за безопасность.",
+      "legacy_best_roles": [
+        "глава",
+        "министр иностранных"
+      ],
+      "matched_recorded_office_titles": [],
+      "legacy_no_match": true,
+      "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
+      "activation_allowed": false
+    },
+    {
+      "case_key": "bank-curated-v2-21",
+      "title": "План по штрафам",
+      "best_option": "option_3",
+      "grounding": "cross_sector_or_inferred",
+      "primary": {
+        "office_key": "ministry_internal",
+        "office_title": "Министерство по внутренней политике и государству"
+      },
+      "secondary": [
+        {
+          "office_key": "ministry_economic",
+          "office_title": "Министерство по экономической политике"
+        }
+      ],
+      "reason": "Инспектор и владелец дороги различаются, дорожное движение затрагивает транспорт.",
+      "real_executor": "Владелец дороги и орган дорожного надзора проверяют знак и опасность; должностные лица применяют ответственность по законным основаниям.",
+      "legacy_best_roles": [
+        "министр внутренних",
+        "глава"
+      ],
+      "matched_recorded_office_titles": [],
+      "legacy_no_match": true,
+      "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
+      "activation_allowed": false
+    },
+    {
+      "case_key": "bank-curated-v2-22",
+      "title": "Стипендия с чужим адресом",
+      "best_option": "option_5",
+      "grounding": "explicit_named_sector",
+      "primary": {
+        "office_key": "ministry_social",
+        "office_title": "Министерство по социальной политике"
+      },
+      "secondary": [],
+      "reason": "Предмет лучшего решения относится к прямо названной в исходных правилах сфере: образование. Это профиль рассмотрения, не исключительная компетенция или право исполнять решение.",
+      "real_executor": "Оператор уточняет неточные данные; комиссия и уполномоченный орган применяют правила стипендии.",
+      "legacy_best_roles": [
+        "министр образования",
+        "министр науки"
+      ],
+      "matched_recorded_office_titles": [],
+      "legacy_no_match": true,
+      "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
+      "activation_allowed": false
+    },
+    {
+      "case_key": "bank-curated-v2-23",
+      "title": "Улица вне карты уборки",
+      "best_option": "option_2",
+      "grounding": "explicit_named_sector",
+      "primary": {
+        "office_key": "ministry_internal",
+        "office_title": "Министерство по внутренней политике и государству"
+      },
+      "secondary": [],
+      "reason": "Предмет лучшего решения относится к прямо названной в исходных правилах сфере: ОГВ / ОМС. Это профиль рассмотрения, не исключительная компетенция или право исполнять решение.",
+      "real_executor": "Владелец дороги определяет защитные меры; заказчик оформляет дополнительные работы по допустимому основанию.",
+      "legacy_best_roles": [
+        "глава"
+      ],
+      "matched_recorded_office_titles": [],
+      "legacy_no_match": true,
+      "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
+      "activation_allowed": false
+    },
+    {
+      "case_key": "bank-curated-v2-24",
+      "title": "Книги приехали без автобуса",
+      "best_option": "option_4",
+      "grounding": "cross_sector_or_inferred",
+      "primary": {
+        "office_key": "ministry_social",
+        "office_title": "Министерство по социальной политике"
+      },
+      "secondary": [
+        {
+          "office_key": "ministry_economic",
+          "office_title": "Министерство по экономической политике"
+        }
+      ],
+      "reason": "Библиотечная услуга — культура; временный выезд и автобус — транспорт.",
+      "real_executor": "Заказчик фиксирует недопоставку; библиотека согласует обслуживание; перевозчик проверяет транспорт и водителей.",
+      "legacy_best_roles": [
+        "глава",
+        "министр культуры"
+      ],
+      "matched_recorded_office_titles": [],
+      "legacy_no_match": true,
+      "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
+      "activation_allowed": false
+    },
+    {
+      "case_key": "bank-curated-v2-25",
+      "title": "Очередь с двумя экранами",
+      "best_option": "option_1",
+      "grounding": "explicit_named_sector",
+      "primary": {
+        "office_key": "ministry_internal",
+        "office_title": "Министерство по внутренней политике и государству"
+      },
+      "secondary": [],
+      "reason": "Предмет лучшего решения относится к прямо названной в исходных правилах сфере: ОГВ / ОМС. Это профиль рассмотрения, не исключительная компетенция или право исполнять решение.",
+      "real_executor": "Организатор услуги восстанавливает очередь по подтверждённым записям и законным приоритетам; оператор исправляет отображение.",
+      "legacy_best_roles": [
+        "глава",
+        "министр цифров"
+      ],
+      "matched_recorded_office_titles": [],
+      "legacy_no_match": true,
+      "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
+      "activation_allowed": false
+    },
+    {
+      "case_key": "bank-curated-v2-26",
+      "title": "Курс после закрытия цеха",
+      "best_option": "option_3",
+      "grounding": "explicit_named_sector",
+      "primary": {
+        "office_key": "ministry_social",
+        "office_title": "Министерство по социальной политике"
+      },
+      "secondary": [],
+      "reason": "Предмет лучшего решения относится к прямо названной в исходных правилах сфере: труд. Это профиль рассмотрения, не исключительная компетенция или право исполнять решение.",
+      "real_executor": "Служба занятости и образовательная организация проверяют основания обучения, потребности и соответствие практики.",
+      "legacy_best_roles": [
+        "глава",
+        "министр труда"
+      ],
+      "matched_recorded_office_titles": [],
+      "legacy_no_match": true,
+      "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
+      "activation_allowed": false
+    },
+    {
+      "case_key": "bank-curated-v2-28",
+      "title": "Добровольцы без координатора",
+      "best_option": "option_5",
+      "grounding": "explicit_named_sector",
+      "primary": {
+        "office_key": "ministry_internal",
+        "office_title": "Министерство по внутренней политике и государству"
+      },
+      "secondary": [],
+      "reason": "Предмет лучшего решения относится к прямо названной в исходных правилах сфере: НКО / ГО. Это профиль рассмотрения, не исключительная компетенция или право исполнять решение.",
+      "real_executor": "Координатор распределяет допустимые задачи по подготовке добровольцев; специальные работы выполняют допущенные лица.",
+      "legacy_best_roles": [
+        "глава"
+      ],
+      "matched_recorded_office_titles": [],
+      "legacy_no_match": true,
+      "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
+      "activation_allowed": false
+    },
+    {
+      "case_key": "bank-curated-v2-29",
+      "title": "Тепло за историческим фасадом",
+      "best_option": "option_2",
+      "grounding": "cross_sector_or_inferred",
+      "primary": {
+        "office_key": "ministry_social",
+        "office_title": "Министерство по социальной политике"
+      },
+      "secondary": [
+        {
+          "office_key": "ministry_economic",
+          "office_title": "Министерство по экономической политике"
+        },
+        {
+          "office_key": "ministry_internal",
+          "office_title": "Министерство по внутренней политике и государству"
+        }
+      ],
+      "reason": "Наследие и сеть отопления требуют разных компетенций; жилищный режим не определён отдельно.",
+      "real_executor": "Управляющая организация отвечает за внутреннюю сеть; орган охраны определяет допустимый фасадный проект.",
+      "legacy_best_roles": [
+        "глава",
+        "министр культуры"
+      ],
+      "matched_recorded_office_titles": [],
+      "legacy_no_match": true,
+      "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
+      "activation_allowed": false
+    },
+    {
+      "case_key": "bank-curated-v2-30",
+      "title": "Общежитие между строк",
+      "best_option": "option_4",
+      "grounding": "explicit_named_sector",
+      "primary": {
+        "office_key": "ministry_economic",
+        "office_title": "Министерство по экономической политике"
+      },
+      "secondary": [],
+      "reason": "Предмет лучшего решения относится к прямо названной в исходных правилах сфере: транспорт. Это профиль рассмотрения, не исключительная компетенция или право исполнять решение.",
+      "real_executor": "Заказчик перевозок проверяет фактический спрос; оператор ограничивает сведения необходимым объёмом.",
+      "legacy_best_roles": [
+        "глава",
+        "министр науки"
+      ],
+      "matched_recorded_office_titles": [],
+      "legacy_no_match": true,
+      "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
+      "activation_allowed": false
+    },
+    {
+      "case_key": "bank-curated-v2-31",
+      "title": "Костюм уехал в соседний город",
+      "best_option": "option_1",
+      "grounding": "explicit_named_sector",
+      "primary": {
+        "office_key": "ministry_social",
+        "office_title": "Министерство по социальной политике"
+      },
+      "secondary": [],
+      "reason": "Предмет лучшего решения относится к прямо названной в исходных правилах сфере: культура. Это профиль рассмотрения, не исключительная компетенция или право исполнять решение.",
+      "real_executor": "Организатор согласует безопасную замену номера и соблюдает условия продажи билетов; закупка оформляется по надлежащему основанию.",
+      "legacy_best_roles": [
+        "глава",
+        "министр культуры"
+      ],
+      "matched_recorded_office_titles": [],
+      "legacy_no_match": true,
+      "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
+      "activation_allowed": false
+    },
+    {
+      "case_key": "bank-curated-v2-32",
+      "title": "Гуси выбрали переход",
+      "best_option": "option_3",
+      "grounding": "cross_sector_or_inferred",
+      "primary": {
+        "office_key": "ministry_internal",
+        "office_title": "Министерство по внутренней политике и государству"
+      },
+      "secondary": [
+        {
+          "office_key": "ministry_economic",
+          "office_title": "Министерство по экономической политике"
+        }
+      ],
+      "reason": "Инспектор организует дорожный режим, владелец дороги — транспорт; ветеринария не распределена прямо.",
+      "real_executor": "Владелец птиц организует безопасное перемещение; дорожное регулирование осуществляют уполномоченные лица; школа сообщает о риске.",
+      "legacy_best_roles": [
+        "глава",
+        "министр культуры"
+      ],
+      "matched_recorded_office_titles": [],
+      "legacy_no_match": true,
+      "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
+      "activation_allowed": false
+    },
+    {
+      "case_key": "bank-curated-v2-33",
+      "title": "Часы спешат на праздник",
+      "best_option": "option_5",
+      "grounding": "cross_sector_or_inferred",
+      "primary": {
+        "office_key": "ministry_internal",
+        "office_title": "Министерство по внутренней политике и государству"
+      },
+      "secondary": [
+        {
+          "office_key": "ministry_social",
+          "office_title": "Министерство по социальной политике"
+        }
+      ],
+      "reason": "Предмет — муниципальная инфраструктура и гарантийное требование, культурная программа вторична.",
+      "real_executor": "Организатор обеспечивает расписание; заказчик фиксирует недостаток и предъявляет гарантийное требование.",
+      "legacy_best_roles": [
+        "глава",
+        "министр культуры"
+      ],
+      "matched_recorded_office_titles": [],
+      "legacy_no_match": true,
+      "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
+      "activation_allowed": false
+    },
+    {
+      "case_key": "bank-curated-v2-34",
+      "title": "Пакет семян без имени",
+      "best_option": "option_2",
+      "grounding": "cross_sector_or_inferred",
+      "primary": {
+        "office_key": "ministry_social",
+        "office_title": "Министерство по социальной политике"
+      },
+      "secondary": [],
+      "reason": "Библиотека — культура, но семеноводство не названо отдельно и не относится к её полномочиям.",
+      "real_executor": "Организатор обмена устанавливает единые допустимые условия; владельцы передают семена на согласованных условиях.",
+      "legacy_best_roles": [
+        "глава",
+        "министр культуры"
+      ],
+      "matched_recorded_office_titles": [],
+      "legacy_no_match": true,
+      "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
+      "activation_allowed": false
+    },
+    {
+      "case_key": "bank-curated-v2-35",
+      "title": "Трамвай помнит голоса",
+      "best_option": "option_4",
+      "grounding": "explicit_named_sector",
+      "primary": {
+        "office_key": "ministry_social",
+        "office_title": "Министерство по социальной политике"
+      },
+      "secondary": [],
+      "reason": "Предмет лучшего решения относится к прямо названной в исходных правилах сфере: культура. Это профиль рассмотрения, не исключительная компетенция или право исполнять решение.",
+      "real_executor": "Организатор согласует участие и объём использования; правообладатели разрешают использование, а редактор сверяет исторические сведения.",
+      "legacy_best_roles": [
+        "глава",
+        "министр культуры"
+      ],
+      "matched_recorded_office_titles": [],
+      "legacy_no_match": true,
+      "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
+      "activation_allowed": false
+    },
+    {
+      "case_key": "bank-curated-v2-36",
+      "title": "Ночь для телескопов",
+      "best_option": "option_1",
+      "grounding": "cross_sector_or_inferred",
+      "primary": {
+        "office_key": "ministry_social",
+        "office_title": "Министерство по социальной политике"
+      },
+      "secondary": [
+        {
+          "office_key": "ministry_internal",
+          "office_title": "Министерство по внутренней политике и государству"
+        }
+      ],
+      "reason": "Публичное научно-просветительское мероприятие; точные полномочия по освещению муниципальной территории отдельно.",
+      "real_executor": "Владелец площадки согласует освещение, технический специалист проверяет оба маршрута, организаторы обеспечивают безопасное посещение.",
+      "legacy_best_roles": [
+        "глава",
+        "министр культуры"
+      ],
+      "matched_recorded_office_titles": [],
+      "legacy_no_match": true,
+      "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
+      "activation_allowed": false
+    },
+    {
+      "case_key": "bank-curated-v2-37",
+      "title": "Левша у гончарного круга",
+      "best_option": "option_3",
+      "grounding": "explicit_named_sector",
+      "primary": {
+        "office_key": "ministry_social",
+        "office_title": "Министерство по социальной политике"
+      },
+      "secondary": [],
+      "reason": "Предмет лучшего решения относится к прямо названной в исходных правилах сфере: образование. Это профиль рассмотрения, не исключительная компетенция или право исполнять решение.",
+      "real_executor": "Исполнитель услуги и техник отвечают за устойчивость оборудования и безопасный проход; посетитель оценивает удобство испытанного места.",
+      "legacy_best_roles": [
+        "глава",
+        "министр культуры"
+      ],
+      "matched_recorded_office_titles": [],
+      "legacy_no_match": true,
+      "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
+      "activation_allowed": false
+    },
+    {
+      "case_key": "bank-curated-v2-38",
+      "title": "Шахматы после заката",
+      "best_option": "option_5",
+      "grounding": "cross_sector_or_inferred",
+      "primary": {
+        "office_key": "ministry_internal",
+        "office_title": "Министерство по внутренней политике и государству"
+      },
+      "secondary": [
+        {
+          "office_key": "ministry_social",
+          "office_title": "Министерство по социальной политике"
+        }
+      ],
+      "reason": "Режим сквера и светильника — ОМС; спорт и досуг не перечислены отдельно.",
+      "real_executor": "Владелец территории согласует режим и размещение освещения; применимый местный режим шума и порядок рекламной конструкции проверяются отдельно.",
+      "legacy_best_roles": [
+        "глава",
+        "министр культуры"
+      ],
+      "matched_recorded_office_titles": [],
+      "legacy_no_match": true,
+      "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
+      "activation_allowed": false
+    },
+    {
+      "case_key": "bank-curated-v2-39",
+      "title": "Яблоки из общего сада",
+      "best_option": "option_2",
+      "grounding": "cross_sector_or_inferred",
+      "primary": {
+        "office_key": "ministry_internal",
+        "office_title": "Министерство по внутренней политике и государству"
+      },
+      "secondary": [
+        {
+          "office_key": "ministry_social",
+          "office_title": "Министерство по социальной политике"
+        }
+      ],
+      "reason": "Право распоряжения урожаем у владельца; благотворительное распределение не делает социальный орган собственником.",
+      "real_executor": "Собственник или уполномоченный владелец принимает решение об урожае; добровольцы участвуют по согласованным условиям.",
+      "legacy_best_roles": [
+        "глава",
+        "министр культуры"
+      ],
+      "matched_recorded_office_titles": [],
+      "legacy_no_match": true,
+      "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
+      "activation_allowed": false
+    },
+    {
+      "case_key": "bank-curated-v2-40",
+      "title": "Робот застрял на бордюре",
+      "best_option": "option_4",
+      "grounding": "cross_sector_or_inferred",
+      "primary": {
+        "office_key": "ministry_internal",
+        "office_title": "Министерство по внутренней политике и государству"
+      },
+      "secondary": [
+        {
+          "office_key": "ministry_social",
+          "office_title": "Министерство по социальной политике"
+        }
+      ],
+      "reason": "Обследование муниципального маршрута и доступность для жителей; исполнитель определяется владельцем.",
+      "real_executor": "Владелец площади и компетентный орган проверяют доступность и допустимость изменения объекта; оператор испытания обеспечивает безопасный маршрут.",
+      "legacy_best_roles": [
+        "глава",
+        "министр культуры"
+      ],
+      "matched_recorded_office_titles": [],
+      "legacy_no_match": true,
+      "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
+      "activation_allowed": false
+    },
+    {
+      "case_key": "bank-curated-v2-41",
+      "title": "Скамейка заряжает в тени",
+      "best_option": "option_1",
+      "grounding": "explicit_named_sector",
+      "primary": {
+        "office_key": "ministry_economic",
+        "office_title": "Министерство по экономической политике"
+      },
+      "secondary": [],
+      "reason": "Предмет лучшего решения относится к прямо названной в исходных правилах сфере: энергетика. Это профиль рассмотрения, не исключительная компетенция или право исполнять решение.",
+      "real_executor": "Заказчик предъявляет требования к результату; подрядчик предлагает исправление; владелец согласует благоустройство и допустимые работы с деревом.",
+      "legacy_best_roles": [
+        "глава",
+        "министр культуры"
+      ],
+      "matched_recorded_office_titles": [],
+      "legacy_no_match": true,
+      "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
+      "activation_allowed": false
+    },
+    {
+      "case_key": "bank-curated-v2-42",
+      "title": "Карта говорит не так",
+      "best_option": "option_3",
+      "grounding": "explicit_named_sector",
+      "primary": {
+        "office_key": "ministry_social",
+        "office_title": "Министерство по социальной политике"
+      },
+      "secondary": [],
+      "reason": "Предмет лучшего решения относится к прямо названной в исходных правилах сфере: культура. Это профиль рассмотрения, не исключительная компетенция или право исполнять решение.",
+      "real_executor": "Исполнитель проверяет достоверность произношения и исправляет содержание услуги; официальное наименование проверяется по компетентному источнику.",
+      "legacy_best_roles": [
+        "глава",
+        "министр культуры"
+      ],
+      "matched_recorded_office_titles": [],
+      "legacy_no_match": true,
+      "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
+      "activation_allowed": false
+    },
+    {
+      "case_key": "bank-curated-v2-43",
+      "title": "Варенье без этикетки",
+      "best_option": "option_5",
+      "grounding": "cross_sector_or_inferred",
+      "primary": {
+        "office_key": "ministry_social",
+        "office_title": "Министерство по социальной политике"
+      },
+      "secondary": [],
+      "reason": "Детская группа в библиотеке, безопасность продуктов; пищевой надзор не расписан.",
+      "real_executor": "Организатор питания исключает непроверенные продукты из выдачи; сведения дарителя оцениваются ответственным за безопасность лицом.",
+      "legacy_best_roles": [
+        "глава",
+        "министр культуры"
+      ],
+      "matched_recorded_office_titles": [],
+      "legacy_no_match": true,
+      "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
+      "activation_allowed": false
+    },
+    {
+      "case_key": "bank-curated-v2-44",
+      "title": "Пианино ждёт последний поезд",
+      "best_option": "option_2",
+      "grounding": "cross_sector_or_inferred",
+      "primary": {
+        "office_key": "ministry_social",
+        "office_title": "Министерство по социальной политике"
+      },
+      "secondary": [
+        {
+          "office_key": "ministry_economic",
+          "office_title": "Министерство по экономической политике"
+        }
+      ],
+      "reason": "Музыкальная программа на вокзале не должна препятствовать транспортным объявлениям.",
+      "real_executor": "Владелец вокзала и перевозчик согласуют размещение инструмента, обязательные сообщения и доступность; музыканты соблюдают утверждённый режим.",
+      "legacy_best_roles": [
+        "глава",
+        "министр культуры"
+      ],
+      "matched_recorded_office_titles": [],
+      "legacy_no_match": true,
+      "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
+      "activation_allowed": false
+    },
+    {
+      "case_key": "bank-curated-v2-45",
+      "title": "Дождь смыл маршрут",
+      "best_option": "option_4",
+      "grounding": "cross_sector_or_inferred",
+      "primary": {
+        "office_key": "ministry_social",
+        "office_title": "Министерство по социальной политике"
+      },
+      "secondary": [
+        {
+          "office_key": "ministry_internal",
+          "office_title": "Министерство по внутренней политике и государству"
+        }
+      ],
+      "reason": "Спорт прямо не назван; организация забега и безопасной трассы требуют отдельного распределения.",
+      "real_executor": "Организатор обеспечивает безопасный согласованный маршрут; изменение трассы требует предусмотренной проверки и согласования.",
+      "legacy_best_roles": [
+        "глава",
+        "министр культуры"
+      ],
+      "matched_recorded_office_titles": [],
+      "legacy_no_match": true,
+      "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
+      "activation_allowed": false
+    },
+    {
+      "case_key": "bank-curated-v2-46",
+      "title": "Замки на старом ограждении",
+      "best_option": "option_1",
+      "grounding": "cross_sector_or_inferred",
+      "primary": {
+        "office_key": "ministry_internal",
+        "office_title": "Министерство по внутренней политике и государству"
+      },
+      "secondary": [
+        {
+          "office_key": "ministry_economic",
+          "office_title": "Министерство по экономической политике"
+        }
+      ],
+      "reason": "Основной предмет — техническое состояние мостика; прежняя социальная маршрутизация не следует из задачи.",
+      "real_executor": "Владелец ограждения обеспечивает защиту и обследование; снятие предметов выполняется по согласованной процедуре с учётом прав владельцев.",
+      "legacy_best_roles": [
+        "глава",
+        "министр культуры"
+      ],
+      "matched_recorded_office_titles": [],
+      "legacy_no_match": true,
+      "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
+      "activation_allowed": false
+    },
+    {
+      "case_key": "bank-curated-v2-47",
+      "title": "Талисман похож на чужого",
+      "best_option": "option_3",
+      "grounding": "explicit_named_sector",
+      "primary": {
+        "office_key": "ministry_social",
+        "office_title": "Министерство по социальной политике"
+      },
+      "secondary": [],
+      "reason": "Предмет лучшего решения относится к прямо названной в исходных правилах сфере: культура. Это профиль рассмотрения, не исключительная компетенция или право исполнять решение.",
+      "real_executor": "Организатор конкурса проверяет правовые основания; дизайнер разрабатывает самостоятельный макет; правообладатель разрешает предусмотренное использование.",
+      "legacy_best_roles": [
+        "глава",
+        "министр культуры"
+      ],
+      "matched_recorded_office_titles": [],
+      "legacy_no_match": true,
+      "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
+      "activation_allowed": false
+    },
+    {
+      "case_key": "bank-curated-v2-48",
+      "title": "Солнечные часы под клёном",
+      "best_option": "option_5",
+      "grounding": "cross_sector_or_inferred",
+      "primary": {
+        "office_key": "ministry_internal",
+        "office_title": "Министерство по внутренней политике и государству"
+      },
+      "secondary": [],
+      "reason": "Работы с деревом и размещением объекта; полномочия владельца и природоохранная процедура отдельно.",
+      "real_executor": "Владелец объекта и компетентная служба благоустройства согласуют перенос; специалист оценивает состояние дерева и допустимость работ.",
+      "legacy_best_roles": [
+        "глава",
+        "министр культуры"
+      ],
+      "matched_recorded_office_titles": [],
+      "legacy_no_match": true,
+      "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
+      "activation_allowed": false
+    },
+    {
+      "case_key": "bank-curated-v2-49",
+      "title": "Санки без снега",
+      "best_option": "option_2",
+      "grounding": "cross_sector_or_inferred",
+      "primary": {
+        "office_key": "ministry_social",
+        "office_title": "Министерство по социальной политике"
+      },
+      "secondary": [
+        {
+          "office_key": "ministry_internal",
+          "office_title": "Министерство по внутренней политике и государству"
+        }
+      ],
+      "reason": "Спорт и досуг не перечислены отдельно; организатор сохраняет договорные обязанности.",
+      "real_executor": "Организатор отменяет опасные заезды и оформляет предусмотренные права потребителей; перенос согласуется по применимым условиям.",
+      "legacy_best_roles": [
+        "глава",
+        "министр культуры"
+      ],
+      "matched_recorded_office_titles": [],
+      "legacy_no_match": true,
+      "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
+      "activation_allowed": false
+    },
+    {
+      "case_key": "bank-curated-v2-50",
+      "title": "Фонтан выучил чужой гимн",
+      "best_option": "option_4",
+      "grounding": "explicit_named_sector",
+      "primary": {
+        "office_key": "ministry_social",
+        "office_title": "Министерство по социальной политике"
+      },
+      "secondary": [],
+      "reason": "Предмет лучшего решения относится к прямо названной в исходных правилах сфере: культура. Это профиль рассмотрения, не исключительная компетенция или право исполнять решение.",
+      "real_executor": "Организатор проверяет основания публичного использования произведения, исполнения и фонограммы; разрешение должно исходить от надлежащего правообладателя.",
+      "legacy_best_roles": [
+        "глава",
+        "министр культуры"
+      ],
+      "matched_recorded_office_titles": [],
+      "legacy_no_match": true,
+      "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
+      "activation_allowed": false
+    },
+    {
+      "case_key": "bank-environment",
+      "title": "Загрязнение реки",
+      "best_option": "option_1",
+      "grounding": "not_explicitly_allocated",
+      "primary": {
+        "office_key": "ministry_internal",
+        "office_title": "Министерство по внутренней политике и государству"
+      },
+      "secondary": [
+        {
+          "office_key": "ministry_economic",
+          "office_title": "Министерство по экономической политике"
+        }
+      ],
+      "reason": "Организация действий органов управления и защита населения при загрязнении — внутренний профиль; восстановительные и хозяйственные меры — экономический.",
+      "real_executor": "Компетентный природоохранный орган организует контроль; лаборатории берут сопоставимые пробы; водозабор получает подтверждённые предупреждения.",
+      "legacy_best_roles": [
+        "депутат",
+        "муницип",
+        "министр"
+      ],
+      "matched_recorded_office_titles": [
+        "Депутат Государственной Думы"
+      ],
+      "legacy_no_match": false,
+      "review_requirement": "verify_scope_active_office_and_territory",
+      "activation_allowed": false
+    },
+    {
+      "case_key": "bank-expanded-light-01-01",
+      "title": "Опечатка на городской вывеске",
+      "best_option": "option_3",
+      "grounding": "explicit_named_sector",
+      "primary": {
+        "office_key": "ministry_internal",
+        "office_title": "Министерство по внутренней политике и государству"
+      },
+      "secondary": [],
+      "reason": "Предмет лучшего решения относится к прямо названной в исходных правилах сфере: ОГВ / ОМС. Это профиль рассмотрения, не исключительная компетенция или право исполнять решение.",
+      "real_executor": "Заказчик сверяет результат и предъявляет требования подрядчику; коммунальная служба выполняет только согласованные временные меры.",
+      "legacy_best_roles": [
+        "муницип",
+        "губернатор",
+        "министр культуры"
+      ],
+      "matched_recorded_office_titles": [],
+      "legacy_no_match": true,
+      "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
+      "activation_allowed": false
+    },
+    {
+      "case_key": "bank-expanded-light-02-01",
+      "title": "Кот на заседании",
+      "best_option": "option_5",
+      "grounding": "explicit_named_sector",
+      "primary": {
+        "office_key": "ministry_internal",
+        "office_title": "Министерство по внутренней политике и государству"
+      },
+      "secondary": [],
+      "reason": "Предмет лучшего решения относится к прямо названной в исходных правилах сфере: ОГВ / ОМС. Это профиль рассмотрения, не исключительная компетенция или право исполнять решение.",
+      "real_executor": "Аппарат заседания подтверждает протокол; пресс-служба сообщает достоверные сведения; сувенирное решение требует отдельного основания.",
+      "legacy_best_roles": [
+        "муницип",
+        "губернатор",
+        "министр культуры"
+      ],
+      "matched_recorded_office_titles": [],
+      "legacy_no_match": true,
+      "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
+      "activation_allowed": false
+    },
+    {
+      "case_key": "bank-expanded-light-03-01",
+      "title": "Непослушная лента",
+      "best_option": "option_2",
+      "grounding": "cross_sector_or_inferred",
+      "primary": {
+        "office_key": "ministry_social",
+        "office_title": "Министерство по социальной политике"
+      },
+      "secondary": [
+        {
+          "office_key": "ministry_internal",
+          "office_title": "Министерство по внутренней политике и государству"
+        }
+      ],
+      "reason": "Церемония как организационная задача; заказчик и организатор остаются отдельными исполнителями.",
+      "real_executor": "Организатор изменяет символический жест в рамках программы; заказчик оформляет дополнительные расходы только по основанию.",
+      "legacy_best_roles": [
+        "министр культуры",
+        "муницип",
+        "губернатор"
+      ],
+      "matched_recorded_office_titles": [],
+      "legacy_no_match": true,
+      "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
+      "activation_allowed": false
+    },
+    {
+      "case_key": "bank-expanded-light-04-01",
+      "title": "Пропал звук микрофона",
+      "best_option": "option_4",
+      "grounding": "explicit_named_sector",
+      "primary": {
+        "office_key": "ministry_internal",
+        "office_title": "Министерство по внутренней политике и государству"
+      },
+      "secondary": [],
+      "reason": "Предмет лучшего решения относится к прямо названной в исходных правилах сфере: ОГВ / ОМС. Это профиль рассмотрения, не исключительная компетенция или право исполнять решение.",
+      "real_executor": "Организатор обеспечивает доступность выступления; технический специалист проверяет резерв; обратная связь подтверждает слышимость.",
+      "legacy_best_roles": [
+        "министр культуры",
+        "муницип",
+        "губернатор"
+      ],
+      "matched_recorded_office_titles": [],
+      "legacy_no_match": true,
+      "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
+      "activation_allowed": false
+    },
+    {
+      "case_key": "bank-expanded-light-05-01",
+      "title": "Конкурс городского талисмана",
+      "best_option": "option_1",
+      "grounding": "explicit_named_sector",
+      "primary": {
+        "office_key": "ministry_social",
+        "office_title": "Министерство по социальной политике"
+      },
+      "secondary": [],
+      "reason": "Предмет лучшего решения относится к прямо названной в исходных правилах сфере: культура. Это профиль рассмотрения, не исключительная компетенция или право исполнять решение.",
+      "real_executor": "Организатор применяет объявленные условия и предусмотренный порядок изменений; техническая комиссия оценивает допустимость; правообладатели оформляют использование.",
+      "legacy_best_roles": [
+        "министр культуры",
+        "муницип",
+        "губернатор"
+      ],
+      "matched_recorded_office_titles": [],
+      "legacy_no_match": true,
+      "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
+      "activation_allowed": false
+    },
+    {
+      "case_key": "bank-expanded-light-06-01",
+      "title": "Кофе в приёмной",
+      "best_option": "option_3",
+      "grounding": "explicit_named_sector",
+      "primary": {
+        "office_key": "ministry_internal",
+        "office_title": "Министерство по внутренней политике и государству"
+      },
+      "secondary": [],
+      "reason": "Предмет лучшего решения относится к прямо названной в исходных правилах сфере: ОГВ / ОМС. Это профиль рассмотрения, не исключительная компетенция или право исполнять решение.",
+      "real_executor": "Пресс-служба проверяет факты и допустимость раскрытия; редакционный запрос рассматривается по специальным правилам; внутренние сведения не раскрываются автоматически.",
+      "legacy_best_roles": [
+        "муницип",
+        "губернатор",
+        "министр культуры"
+      ],
+      "matched_recorded_office_titles": [],
+      "legacy_no_match": true,
+      "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
+      "activation_allowed": false
+    },
+    {
+      "case_key": "bank-expanded-light-07-01",
+      "title": "Голуби и памятник",
+      "best_option": "option_5",
+      "grounding": "explicit_named_sector",
+      "primary": {
+        "office_key": "ministry_social",
+        "office_title": "Министерство по социальной политике"
+      },
+      "secondary": [],
+      "reason": "Предмет лучшего решения относится к прямо названной в исходных правилах сфере: культура. Это профиль рассмотрения, не исключительная компетенция или право исполнять решение.",
+      "real_executor": "Владелец памятника и обслуживающая организация определяют допустимый уход; охранный статус и специальный режим проверяются отдельно.",
+      "legacy_best_roles": [
+        "министр культуры",
+        "муницип",
+        "губернатор"
+      ],
+      "matched_recorded_office_titles": [],
+      "legacy_no_match": true,
+      "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
+      "activation_allowed": false
+    },
+    {
+      "case_key": "bank-expanded-light-08-01",
+      "title": "Музыкальный день района",
+      "best_option": "option_2",
+      "grounding": "explicit_named_sector",
+      "primary": {
+        "office_key": "ministry_social",
+        "office_title": "Министерство по социальной политике"
+      },
+      "secondary": [],
+      "reason": "Предмет лучшего решения относится к прямо названной в исходных правилах сфере: культура. Это профиль рассмотрения, не исключительная компетенция или право исполнять решение.",
+      "real_executor": "Организатор проверяет право на публичное исполнение; работодатель не подменяет добровольность обязанностями вне трудовой функции.",
+      "legacy_best_roles": [
+        "министр культуры",
+        "муницип",
+        "губернатор"
+      ],
+      "matched_recorded_office_titles": [],
+      "legacy_no_match": true,
+      "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
+      "activation_allowed": false
+    },
+    {
+      "case_key": "bank-expanded-light-09-01",
+      "title": "Фонтан сюрпризов",
+      "best_option": "option_4",
+      "grounding": "explicit_named_sector",
+      "primary": {
+        "office_key": "ministry_internal",
+        "office_title": "Министерство по внутренней политике и государству"
+      },
+      "secondary": [],
+      "reason": "Предмет лучшего решения относится к прямо названной в исходных правилах сфере: ОГВ / ОМС. Это профиль рассмотрения, не исключительная компетенция или право исполнять решение.",
+      "real_executor": "Ответственный владелец и подрядчик восстанавливают согласованный режим; пресс-служба сообщает проверенный график; изменение режима требует отдельной проверки.",
+      "legacy_best_roles": [
+        "министр культуры",
+        "муницип",
+        "губернатор"
+      ],
+      "matched_recorded_office_titles": [],
+      "legacy_no_match": true,
+      "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
+      "activation_allowed": false
+    },
+    {
+      "case_key": "bank-expanded-light-10-01",
+      "title": "Очередь на фестивале",
+      "best_option": "option_1",
+      "grounding": "cross_sector_or_inferred",
+      "primary": {
+        "office_key": "ministry_social",
+        "office_title": "Министерство по социальной политике"
+      },
+      "secondary": [
+        {
+          "office_key": "ministry_internal",
+          "office_title": "Министерство по внутренней политике и государству"
+        }
+      ],
+      "reason": "Фестиваль и пожарная безопасность относятся к разным сферам.",
+      "real_executor": "Организатор отвечает за безопасное размещение потоков, владелец площадки и профильный специалист проверяют вместимость, проходы и пожарный проезд.",
+      "legacy_best_roles": [
+        "министр культуры",
+        "муницип",
+        "губернатор"
+      ],
+      "matched_recorded_office_titles": [],
+      "legacy_no_match": true,
+      "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
+      "activation_allowed": false
+    },
+    {
+      "case_key": "bank-expanded-light-11-01",
+      "title": "Название нового мостика",
+      "best_option": "option_3",
+      "grounding": "explicit_named_sector",
+      "primary": {
+        "office_key": "ministry_internal",
+        "office_title": "Министерство по внутренней политике и государству"
+      },
+      "secondary": [],
+      "reason": "Предмет лучшего решения относится к прямо названной в исходных правилах сфере: ОГВ / ОМС. Это профиль рассмотрения, не исключительная компетенция или право исполнять решение.",
+      "real_executor": "Компетентный муниципальный орган утверждает название по заданной процедуре; историк проверяет сведения, подрядчик исполняет заказ.",
+      "legacy_best_roles": [
+        "министр культуры",
+        "муницип",
+        "губернатор"
+      ],
+      "matched_recorded_office_titles": [],
+      "legacy_no_match": true,
+      "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
+      "activation_allowed": false
+    },
+    {
+      "case_key": "bank-expanded-light-12-01",
+      "title": "Соревнование школьных огородов",
+      "best_option": "option_5",
+      "grounding": "explicit_named_sector",
+      "primary": {
+        "office_key": "ministry_social",
+        "office_title": "Министерство по социальной политике"
+      },
+      "secondary": [],
+      "reason": "Предмет лучшего решения относится к прямо названной в исходных правилах сфере: образование. Это профиль рассмотрения, не исключительная компетенция или право исполнять решение.",
+      "real_executor": "Владелец участка оформляет использование; школы и учредитель согласуют безопасные занятия и расходы; победитель конкурса не получает права на землю автоматически.",
+      "legacy_best_roles": [
+        "министр культуры",
+        "муницип",
+        "губернатор"
+      ],
+      "matched_recorded_office_titles": [],
+      "legacy_no_match": true,
+      "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
+      "activation_allowed": false
+    },
+    {
+      "case_key": "bank-expanded-light-13-01",
+      "title": "Ошибка в городском календаре",
+      "best_option": "option_2",
+      "grounding": "cross_sector_or_inferred",
+      "primary": {
+        "office_key": "ministry_social",
+        "office_title": "Министерство по социальной политике"
+      },
+      "secondary": [
+        {
+          "office_key": "ministry_internal",
+          "office_title": "Министерство по внутренней политике и государству"
+        }
+      ],
+      "reason": "Предмет — уточнение даты концерта; муниципальный информационный канал — ОМС.",
+      "real_executor": "Организатор и пресс-служба исправляют распространённые сведения, сохраняя подтверждённую дату.",
+      "legacy_best_roles": [
+        "муницип",
+        "губернатор",
+        "министр культуры"
+      ],
+      "matched_recorded_office_titles": [],
+      "legacy_no_match": true,
+      "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
+      "activation_allowed": false
+    },
+    {
+      "case_key": "bank-expanded-light-14-01",
+      "title": "Необычная скульптура",
+      "best_option": "option_4",
+      "grounding": "explicit_named_sector",
+      "primary": {
+        "office_key": "ministry_social",
+        "office_title": "Министерство по социальной политике"
+      },
+      "secondary": [],
+      "reason": "Предмет лучшего решения относится к прямо названной в исходных правилах сфере: культура. Это профиль рассмотрения, не исключительная компетенция или право исполнять решение.",
+      "real_executor": "Владелец площадки согласует размещение и содержание; специалист проверяет конструкцию и проход; правообладатель оформляет использование.",
+      "legacy_best_roles": [
+        "министр культуры",
+        "муницип",
+        "губернатор"
+      ],
+      "matched_recorded_office_titles": [],
+      "legacy_no_match": true,
+      "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
+      "activation_allowed": false
+    },
+    {
+      "case_key": "bank-expanded-light-15-01",
+      "title": "Перевёрнутый флажок",
+      "best_option": "option_1",
+      "grounding": "cross_sector_or_inferred",
+      "primary": {
+        "office_key": "ministry_social",
+        "office_title": "Министерство по социальной политике"
+      },
+      "secondary": [
+        {
+          "office_key": "ministry_internal",
+          "office_title": "Министерство по внутренней политике и государству"
+        }
+      ],
+      "reason": "Декоративная эмблема местной ярмарки, не государственный символ и не международные отношения; прежний МИД не обоснован.",
+      "real_executor": "Ответственный оформитель исправляет крепление безопасным способом; организатор подтверждает статус эмблемы.",
+      "legacy_best_roles": [
+        "министр культуры",
+        "муницип",
+        "губернатор"
+      ],
+      "matched_recorded_office_titles": [],
+      "legacy_no_match": true,
+      "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
+      "activation_allowed": false
+    },
+    {
+      "case_key": "bank-expanded-light-16-01",
+      "title": "Прогноз погоды от мэра",
+      "best_option": "option_3",
+      "grounding": "cross_sector_or_inferred",
+      "primary": {
+        "office_key": "ministry_internal",
+        "office_title": "Министерство по внутренней политике и государству"
+      },
+      "secondary": [
+        {
+          "office_key": "ministry_social",
+          "office_title": "Министерство по социальной политике"
+        }
+      ],
+      "reason": "Перенос программы с учётом официальных предупреждений, ОМС и безопасность; культурная составляющая вторична.",
+      "real_executor": "Организатор и уполномоченные службы сверяют угрозу, допустимую вместимость и запасной план; пресс-служба сообщает подтверждённое решение.",
+      "legacy_best_roles": [
+        "муницип",
+        "губернатор",
+        "министр культуры"
+      ],
+      "matched_recorded_office_titles": [],
+      "legacy_no_match": true,
+      "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
+      "activation_allowed": false
+    },
+    {
+      "case_key": "bank-expanded-light-17-01",
+      "title": "Фестиваль огромных тыкв",
+      "best_option": "option_5",
+      "grounding": "cross_sector_or_inferred",
+      "primary": {
+        "office_key": "ministry_social",
+        "office_title": "Министерство по социальной политике"
+      },
+      "secondary": [
+        {
+          "office_key": "ministry_economic",
+          "office_title": "Министерство по экономической политике"
+        },
+        {
+          "office_key": "ministry_internal",
+          "office_title": "Министерство по внутренней политике и государству"
+        }
+      ],
+      "reason": "Фестиваль, торговые условия и проезды; пищевой контроль прямо не распределён.",
+      "real_executor": "Организатор согласует площадку; продавцы соблюдают пищевые требования; уполномоченные лица определяют проезды и расходы.",
+      "legacy_best_roles": [
+        "министр культуры",
+        "муницип",
+        "губернатор"
+      ],
+      "matched_recorded_office_titles": [],
+      "legacy_no_match": true,
+      "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
+      "activation_allowed": false
+    },
+    {
+      "case_key": "bank-expanded-light-18-01",
+      "title": "Арт-объект из вторсырья",
+      "best_option": "option_2",
+      "grounding": "cross_sector_or_inferred",
+      "primary": {
+        "office_key": "ministry_social",
+        "office_title": "Министерство по социальной политике"
+      },
+      "secondary": [
+        {
+          "office_key": "ministry_internal",
+          "office_title": "Министерство по внутренней политике и государству"
+        }
+      ],
+      "reason": "Школьная скульптура у библиотеки, а не промышленная переработка отходов; собственник согласует размещение.",
+      "real_executor": "Владелец площадки согласует место и срок; автор оформляет использование; технический специалист испытывает крепление и устанавливает порядок осмотра.",
+      "legacy_best_roles": [
+        "министр культуры",
+        "муницип",
+        "губернатор"
+      ],
+      "matched_recorded_office_titles": [],
+      "legacy_no_match": true,
+      "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
+      "activation_allowed": false
+    },
+    {
+      "case_key": "bank-expanded-light-19-01",
+      "title": "Уличный обмен книгами",
+      "best_option": "option_4",
+      "grounding": "explicit_named_sector",
+      "primary": {
+        "office_key": "ministry_social",
+        "office_title": "Министерство по социальной политике"
+      },
+      "secondary": [],
+      "reason": "Предмет лучшего решения относится к прямо названной в исходных правилах сфере: культура. Это профиль рассмотрения, не исключительная компетенция или право исполнять решение.",
+      "real_executor": "Владелец будки определяет условия пользования и доступ к оборудованию; библиотека и добровольцы принимают обязанности только по оформленному соглашению.",
+      "legacy_best_roles": [
+        "министр культуры",
+        "муницип",
+        "губернатор"
+      ],
+      "matched_recorded_office_titles": [],
+      "legacy_no_match": true,
+      "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
+      "activation_allowed": false
+    },
+    {
+      "case_key": "bank-expanded-light-20-01",
+      "title": "Марафон против бумажной волокиты",
+      "best_option": "option_1",
+      "grounding": "explicit_named_sector",
+      "primary": {
+        "office_key": "ministry_internal",
+        "office_title": "Министерство по внутренней политике и государству"
+      },
+      "secondary": [],
+      "reason": "Предмет лучшего решения относится к прямо названной в исходных правилах сфере: ОГВ / ОМС. Это профиль рассмотрения, не исключительная компетенция или право исполнять решение.",
+      "real_executor": "Уполномоченный орган меняет внутренние формы после проверки регламентов; обязательная регистрация и архивная сохранность сохраняются.",
+      "legacy_best_roles": [
+        "министр юстиции",
+        "депутат",
+        "муницип",
+        "губернатор"
+      ],
+      "matched_recorded_office_titles": [
+        "Депутат Государственной Думы"
+      ],
+      "legacy_no_match": false,
+      "review_requirement": "verify_scope_active_office_and_territory",
+      "activation_allowed": false
+    },
+    {
+      "case_key": "bank-expanded-serious-04-01",
+      "title": "Поликлиника без терапевтов",
+      "best_option": "option_3",
+      "grounding": "explicit_named_sector",
+      "primary": {
+        "office_key": "ministry_social",
+        "office_title": "Министерство по социальной политике"
+      },
+      "secondary": [],
+      "reason": "Предмет лучшего решения относится к прямо названной в исходных правилах сфере: здравоохранение. Это профиль рассмотрения, не исключительная компетенция или право исполнять решение.",
+      "real_executor": "Медицинская организация распределяет запись и направления с учётом медицинской срочности; работодатель соблюдает режим труда.",
+      "legacy_best_roles": [
+        "министр",
+        "депутат",
+        "правительств"
+      ],
+      "matched_recorded_office_titles": [
+        "Депутат Государственной Думы",
+        "Заместитель Председателя Правительства РФ — Министерство по социальной политике",
+        "Председатель Правительства Российской Федерации"
+      ],
+      "legacy_no_match": false,
+      "review_requirement": "verify_scope_active_office_and_territory",
+      "activation_allowed": false
+    },
+    {
+      "case_key": "bank-expanded-serious-05-01",
+      "title": "Челябинская область: 224 школьника без подвоза из-за неисправных автобусов",
+      "best_option": "option_5",
+      "grounding": "cross_sector_or_inferred",
+      "primary": {
+        "office_key": "ministry_social",
+        "office_title": "Министерство по социальной политике"
+      },
+      "secondary": [
+        {
+          "office_key": "ministry_economic",
+          "office_title": "Министерство по экономической политике"
+        }
+      ],
+      "reason": "Подвоз учащихся относится к образованию, безопасность транспорта — самостоятельный профиль.",
+      "real_executor": "Учредитель и образовательная организация организуют подвоз в пределах статьи 40; перевозчик отвечает за исправность и допуск транспорта.",
+      "legacy_best_roles": [
+        "министр",
+        "муницип",
+        "депутат"
+      ],
+      "matched_recorded_office_titles": [
+        "Депутат Государственной Думы"
+      ],
+      "legacy_no_match": false,
+      "review_requirement": "verify_scope_active_office_and_territory",
+      "activation_allowed": false
+    },
+    {
+      "case_key": "bank-expanded-serious-06-01",
+      "title": "Лесной пожар у посёлка",
+      "best_option": "option_3",
+      "grounding": "explicit_named_sector",
+      "primary": {
+        "office_key": "ministry_internal",
+        "office_title": "Министерство по внутренней политике и государству"
+      },
+      "secondary": [],
+      "reason": "Предмет лучшего решения относится к прямо названной в исходных правилах сфере: МЧС / ГО. Это профиль рассмотрения, не исключительная компетенция или право исполнять решение.",
+      "real_executor": "Оперативный штаб и компетентные органы определяют меры по фактической обстановке; перевозчики готовят транспорт по согласованным маршрутам.",
+      "legacy_best_roles": [
+        "министр",
+        "глава города",
+        "администрац"
+      ],
+      "matched_recorded_office_titles": [],
+      "legacy_no_match": true,
+      "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
+      "activation_allowed": false
+    },
+    {
+      "case_key": "bank-expanded-serious-07-01",
+      "title": "Орск: защита эвакуированных жителей при паводке 2024 года",
+      "best_option": "option_6",
+      "grounding": "cross_sector_or_inferred",
+      "primary": {
+        "office_key": "ministry_internal",
+        "office_title": "Министерство по внутренней политике и государству"
+      },
+      "secondary": [
+        {
+          "office_key": "ministry_social",
+          "office_title": "Министерство по социальной политике"
+        }
+      ],
+      "reason": "Паводок, ПВР, охрана и социальные услуги; разделение задач между службами, не монопольное полномочие одного министра.",
+      "real_executor": "Штаб координирует ПВР; социальные, медицинские и охранные функции исполняют компетентные организации; выплаты требуют проверки оснований.",
+      "legacy_best_roles": [
+        "муницип",
+        "министр",
+        "правительств"
+      ],
+      "matched_recorded_office_titles": [
+        "Заместитель Председателя Правительства РФ — Министерство по социальной политике",
+        "Председатель Правительства Российской Федерации"
+      ],
+      "legacy_no_match": false,
+      "review_requirement": "verify_scope_active_office_and_territory",
+      "activation_allowed": false
+    },
+    {
+      "case_key": "bank-expanded-serious-08-01",
+      "title": "Контракт на переработку отходов",
+      "best_option": "option_1",
+      "grounding": "not_explicitly_allocated",
+      "primary": {
+        "office_key": "ministry_economic",
+        "office_title": "Министерство по экономической политике"
+      },
+      "secondary": [
+        {
+          "office_key": "ministry_internal",
+          "office_title": "Министерство по внутренней политике и государству"
+        }
+      ],
+      "reason": "Контракт и хозяйственный результат — экономический профиль; природоохранный надзор и разрешения остаются у компетентных органов.",
+      "real_executor": "Заказчик проверяет требования к операции и документации; исполнитель подтверждает применимые лицензии; компетентные органы определяют допустимость площадок.",
+      "legacy_best_roles": [
+        "муницип",
+        "депутат",
+        "министр"
+      ],
+      "matched_recorded_office_titles": [
+        "Депутат Государственной Думы"
+      ],
+      "legacy_no_match": false,
+      "review_requirement": "verify_scope_active_office_and_territory",
+      "activation_allowed": false
+    },
+    {
+      "case_key": "bank-expanded-serious-09-01",
+      "title": "Интернет для отдалённых сёл",
+      "best_option": "option_3",
+      "grounding": "not_explicitly_allocated",
+      "primary": {
+        "office_key": "ministry_economic",
+        "office_title": "Министерство по экономической политике"
+      },
+      "secondary": [
+        {
+          "office_key": "ministry_social",
+          "office_title": "Министерство по социальной политике"
+        }
+      ],
+      "reason": "Связь как инфраструктура — предложенный экономический профиль; доступ школ к обучению — прямо предусмотренный социальный.",
+      "real_executor": "Уполномоченный распорядитель определяет финансовый механизм; оператор подтверждает собственность и условия сети; школа формулирует нужную услугу.",
+      "legacy_best_roles": [
+        "министр",
+        "депутат",
+        "правительств"
+      ],
+      "matched_recorded_office_titles": [
+        "Депутат Государственной Думы",
+        "Заместитель Председателя Правительства РФ — Министерство по социальной политике",
+        "Председатель Правительства Российской Федерации"
+      ],
+      "legacy_no_match": false,
+      "review_requirement": "verify_scope_active_office_and_territory",
+      "activation_allowed": false
+    },
+    {
+      "case_key": "bank-expanded-serious-10-01",
+      "title": "Доступность городской администрации",
+      "best_option": "option_5",
+      "grounding": "cross_sector_or_inferred",
+      "primary": {
+        "office_key": "ministry_internal",
+        "office_title": "Министерство по внутренней политике и государству"
+      },
+      "secondary": [
+        {
+          "office_key": "ministry_social",
+          "office_title": "Министерство по социальной политике"
+        }
+      ],
+      "reason": "Муниципальные здания и доступ к услугам; социальная доступность — дополнительный профиль.",
+      "real_executor": "Владелец здания и уполномоченный орган обеспечивают доступность и допустимые временные меры; технические специалисты восстанавливают подъёмник.",
+      "legacy_best_roles": [
+        "муницип",
+        "депутат",
+        "министр"
+      ],
+      "matched_recorded_office_titles": [
+        "Депутат Государственной Думы"
+      ],
+      "legacy_no_match": false,
+      "review_requirement": "verify_scope_active_office_and_territory",
+      "activation_allowed": false
+    },
+    {
+      "case_key": "bank-expanded-serious-11-01",
+      "title": "Закрытие градообразующего предприятия",
+      "best_option": "option_2",
+      "grounding": "explicit_named_sector",
+      "primary": {
+        "office_key": "ministry_social",
+        "office_title": "Министерство по социальной политике"
+      },
+      "secondary": [],
+      "reason": "Предмет лучшего решения относится к прямо названной в исходных правилах сфере: труд. Это профиль рассмотрения, не исключительная компетенция или право исполнять решение.",
+      "real_executor": "Работодатель исполняет трудовые гарантии; служба занятости проверяет вакансии и основания обучения; администрация оформляет обеспеченную программу.",
+      "legacy_best_roles": [
+        "министр",
+        "правительств",
+        "депутат"
+      ],
+      "matched_recorded_office_titles": [
+        "Депутат Государственной Думы",
+        "Заместитель Председателя Правительства РФ — Министерство по социальной политике",
+        "Председатель Правительства Российской Федерации"
+      ],
+      "legacy_no_match": false,
+      "review_requirement": "verify_scope_active_office_and_territory",
+      "activation_allowed": false
+    },
+    {
+      "case_key": "bank-expanded-serious-12-01",
+      "title": "Оплата труда педагогов",
+      "best_option": "option_4",
+      "grounding": "explicit_named_sector",
+      "primary": {
+        "office_key": "ministry_social",
+        "office_title": "Министерство по социальной политике"
+      },
+      "secondary": [],
+      "reason": "Предмет лучшего решения относится к прямо названной в исходных правилах сфере: труд. Это профиль рассмотрения, не исключительная компетенция или право исполнять решение.",
+      "real_executor": "Работодатель обеспечивает обязательные выплаты; компетентный орган утверждает новую компенсацию и источник по бюджетной процедуре.",
+      "legacy_best_roles": [
+        "министр",
+        "депутат",
+        "правительств"
+      ],
+      "matched_recorded_office_titles": [
+        "Депутат Государственной Думы",
+        "Заместитель Председателя Правительства РФ — Министерство по социальной политике",
+        "Председатель Правительства Российской Федерации"
+      ],
+      "legacy_no_match": false,
+      "review_requirement": "verify_scope_active_office_and_territory",
+      "activation_allowed": false
+    },
+    {
+      "case_key": "bank-expanded-serious-13-01",
+      "title": "Содержание районных дорог",
+      "best_option": "option_1",
+      "grounding": "explicit_named_sector",
+      "primary": {
+        "office_key": "ministry_economic",
+        "office_title": "Министерство по экономической политике"
+      },
+      "secondary": [],
+      "reason": "Предмет лучшего решения относится к прямо названной в исходных правилах сфере: транспорт. Это профиль рассмотрения, не исключительная компетенция или право исполнять решение.",
+      "real_executor": "Владелец дороги оформляет меры и работы в пределах компетенции; дорожные службы проверяют безопасный доступ к больнице.",
+      "legacy_best_roles": [
+        "муницип",
+        "депутат",
+        "правительств"
+      ],
+      "matched_recorded_office_titles": [
+        "Депутат Государственной Думы",
+        "Заместитель Председателя Правительства РФ — Министерство по социальной политике",
+        "Председатель Правительства Российской Федерации"
+      ],
+      "legacy_no_match": false,
+      "review_requirement": "verify_scope_active_office_and_territory",
+      "activation_allowed": false
+    },
+    {
+      "case_key": "bank-expanded-serious-14-01",
+      "title": "Утечка на промышленной площадке",
+      "best_option": "option_3",
+      "grounding": "explicit_named_sector",
+      "primary": {
+        "office_key": "ministry_internal",
+        "office_title": "Министерство по внутренней политике и государству"
+      },
+      "secondary": [],
+      "reason": "Предмет лучшего решения относится к прямо названной в исходных правилах сфере: МЧС / ГО. Это профиль рассмотрения, не исключительная компетенция или право исполнять решение.",
+      "real_executor": "Оперативные службы определяют защитные меры; лаборатории выполняют контроль; орган власти сообщает проверенные сведения.",
+      "legacy_best_roles": [
+        "министр",
+        "муницип",
+        "правительств"
+      ],
+      "matched_recorded_office_titles": [
+        "Заместитель Председателя Правительства РФ — Министерство по социальной политике",
+        "Председатель Правительства Российской Федерации"
+      ],
+      "legacy_no_match": false,
+      "review_requirement": "verify_scope_active_office_and_territory",
+      "activation_allowed": false
+    },
+    {
+      "case_key": "bank-expanded-serious-15-01",
+      "title": "Дефицит бюджета",
+      "best_option": "option_5",
+      "grounding": "explicit_named_sector",
+      "primary": {
+        "office_key": "ministry_economic",
+        "office_title": "Министерство по экономической политике"
+      },
+      "secondary": [],
+      "reason": "Предмет лучшего решения относится к прямо названной в исходных правилах сфере: финансы. Это профиль рассмотрения, не исключительная компетенция или право исполнять решение.",
+      "real_executor": "Финансовый орган готовит расчёт; уполномоченные органы принимают корректировку бюджета; заём требует самостоятельного законного основания.",
+      "legacy_best_roles": [
+        "правительств",
+        "министр",
+        "депутат"
+      ],
+      "matched_recorded_office_titles": [
+        "Депутат Государственной Думы",
+        "Заместитель Председателя Правительства РФ — Министерство по социальной политике",
+        "Председатель Правительства Российской Федерации"
+      ],
+      "legacy_no_match": false,
+      "review_requirement": "verify_scope_active_office_and_territory",
+      "activation_allowed": false
+    },
+    {
+      "case_key": "bank-expanded-serious-16-01",
+      "title": "Конфликт интересов в закупке",
+      "best_option": "option_2",
+      "grounding": "explicit_named_sector",
+      "primary": {
+        "office_key": "ministry_internal",
+        "office_title": "Министерство по внутренней политике и государству"
+      },
+      "secondary": [],
+      "reason": "Предмет лучшего решения относится к прямо названной в исходных правилах сфере: ОГВ / ОМС. Это профиль рассмотрения, не исключительная компетенция или право исполнять решение.",
+      "real_executor": "Заказчик и антикоррупционное подразделение проверяют установленные основания конфликта; последствия применяет уполномоченное лицо по процедуре.",
+      "legacy_best_roles": [
+        "депутат",
+        "муницип",
+        "министр"
+      ],
+      "matched_recorded_office_titles": [
+        "Депутат Государственной Думы"
+      ],
+      "legacy_no_match": false,
+      "review_requirement": "verify_scope_active_office_and_territory",
+      "activation_allowed": false
+    },
+    {
+      "case_key": "bank-expanded-serious-17-01",
+      "title": "Недостоверные сведения о ремонте",
+      "best_option": "option_4",
+      "grounding": "explicit_named_sector",
+      "primary": {
+        "office_key": "ministry_social",
+        "office_title": "Министерство по социальной политике"
+      },
+      "secondary": [],
+      "reason": "Предмет лучшего решения относится к прямо названной в исходных правилах сфере: образование. Это профиль рассмотрения, не исключительная компетенция или право исполнять решение.",
+      "real_executor": "Руководитель школы и технические специалисты подтверждают безопасный режим помещений; пресс-служба сообщает достоверное расписание.",
+      "legacy_best_roles": [
+        "министр",
+        "муницип",
+        "депутат"
+      ],
+      "matched_recorded_office_titles": [
+        "Депутат Государственной Думы"
+      ],
+      "legacy_no_match": false,
+      "review_requirement": "verify_scope_active_office_and_territory",
+      "activation_allowed": false
+    },
+    {
+      "case_key": "bank-expanded-serious-18-01",
+      "title": "Транспортный тариф",
+      "best_option": "option_1",
+      "grounding": "explicit_named_sector",
+      "primary": {
+        "office_key": "ministry_economic",
+        "office_title": "Министерство по экономической политике"
+      },
+      "secondary": [],
+      "reason": "Предмет лучшего решения относится к прямо названной в исходных правилах сфере: транспорт. Это профиль рассмотрения, не исключительная компетенция или право исполнять решение.",
+      "real_executor": "Компетентный тарифный орган принимает решение по применимой методике; распорядитель проверяет основания возможной субсидии.",
+      "legacy_best_roles": [
+        "депутат",
+        "муницип",
+        "правительств"
+      ],
+      "matched_recorded_office_titles": [
+        "Депутат Государственной Думы",
+        "Заместитель Председателя Правительства РФ — Министерство по социальной политике",
+        "Председатель Правительства Российской Федерации"
+      ],
+      "legacy_no_match": false,
+      "review_requirement": "verify_scope_active_office_and_territory",
+      "activation_allowed": false
+    },
+    {
+      "case_key": "bank-expanded-serious-19-01",
+      "title": "Сеть библиотек",
+      "best_option": "option_3",
+      "grounding": "explicit_named_sector",
+      "primary": {
+        "office_key": "ministry_social",
+        "office_title": "Министерство по социальной политике"
+      },
+      "secondary": [],
+      "reason": "Предмет лучшего решения относится к прямо названной в исходных правилах сфере: культура. Это профиль рассмотрения, не исключительная компетенция или право исполнять решение.",
+      "real_executor": "Учредитель и владельцы помещений определяют безопасное обслуживание, ремонт и предусмотренный порядок изменения сети.",
+      "legacy_best_roles": [
+        "муницип",
+        "депутат",
+        "министр"
+      ],
+      "matched_recorded_office_titles": [
+        "Депутат Государственной Думы"
+      ],
+      "legacy_no_match": false,
+      "review_requirement": "verify_scope_active_office_and_territory",
+      "activation_allowed": false
+    },
+    {
+      "case_key": "bank-expanded-serious-20-01",
+      "title": "Бюджетные слушания",
+      "best_option": "option_5",
+      "grounding": "explicit_named_sector",
+      "primary": {
+        "office_key": "ministry_economic",
+        "office_title": "Министерство по экономической политике"
+      },
+      "secondary": [],
+      "reason": "Предмет лучшего решения относится к прямо названной в исходных правилах сфере: финансы. Это профиль рассмотрения, не исключительная компетенция или право исполнять решение.",
+      "real_executor": "Финансовый орган проверяет обязательства и ресурс; компетентный орган рассматривает предложения и оформляет ответ в применимом порядке.",
+      "legacy_best_roles": [
+        "депутат",
+        "правительств",
+        "муницип"
+      ],
+      "matched_recorded_office_titles": [
+        "Депутат Государственной Думы",
+        "Заместитель Председателя Правительства РФ — Министерство по социальной политике",
+        "Председатель Правительства Российской Федерации"
+      ],
+      "legacy_no_match": false,
+      "review_requirement": "verify_scope_active_office_and_territory",
+      "activation_allowed": false
+    },
+    {
+      "case_key": "bank-expanded-serious-21-01",
+      "title": "Перебои с лекарствами",
+      "best_option": "option_2",
+      "grounding": "explicit_named_sector",
+      "primary": {
+        "office_key": "ministry_social",
+        "office_title": "Министерство по социальной политике"
+      },
+      "secondary": [],
+      "reason": "Предмет лучшего решения относится к прямо названной в исходных правилах сфере: здравоохранение. Это профиль рассмотрения, не исключительная компетенция или право исполнять решение.",
+      "real_executor": "Медицинские специалисты оценивают назначение и потребности; ответственные организации согласуют перемещение, качество и учёт запаса.",
+      "legacy_best_roles": [
+        "министр",
+        "правительств",
+        "депутат"
+      ],
+      "matched_recorded_office_titles": [
+        "Депутат Государственной Думы",
+        "Заместитель Председателя Правительства РФ — Министерство по социальной политике",
+        "Председатель Правительства Российской Федерации"
+      ],
+      "legacy_no_match": false,
+      "review_requirement": "verify_scope_active_office_and_territory",
+      "activation_allowed": false
+    },
+    {
+      "case_key": "bank-expanded-serious-22-01",
+      "title": "Забайкалье: жалобы на плесень в школьной столовой и проверка питания",
+      "best_option": "option_4",
+      "grounding": "explicit_named_sector",
+      "primary": {
+        "office_key": "ministry_social",
+        "office_title": "Министерство по социальной политике"
+      },
+      "secondary": [],
+      "reason": "Предмет лучшего решения относится к прямо названной в исходных правилах сфере: образование. Это профиль рассмотрения, не исключительная компетенция или право исполнять решение.",
+      "real_executor": "Школа и организатор питания прекращают подтверждённую опасную практику; санитарные специалисты проверяют условия; временное питание организуется по применимым требованиям.",
+      "legacy_best_roles": [
+        "министр",
+        "муницип",
+        "депутат"
+      ],
+      "matched_recorded_office_titles": [
+        "Депутат Государственной Думы"
+      ],
+      "legacy_no_match": false,
+      "review_requirement": "verify_scope_active_office_and_territory",
+      "activation_allowed": false
+    },
+    {
+      "case_key": "bank-expanded-serious-23-01",
+      "title": "Молодёжная миграция",
+      "best_option": "option_1",
+      "grounding": "explicit_named_sector",
+      "primary": {
+        "office_key": "ministry_social",
+        "office_title": "Министерство по социальной политике"
+      },
+      "secondary": [],
+      "reason": "Предмет лучшего решения относится к прямо названной в исходных правилах сфере: труд. Это профиль рассмотрения, не исключительная компетенция или право исполнять решение.",
+      "real_executor": "Работодатели и обучающиеся заключают добровольные договоры по действующему режиму; администрация не создаёт обязанность трудоустройства лозунгом.",
+      "legacy_best_roles": [
+        "депутат",
+        "министр",
+        "правительств"
+      ],
+      "matched_recorded_office_titles": [
+        "Депутат Государственной Думы",
+        "Заместитель Председателя Правительства РФ — Министерство по социальной политике",
+        "Председатель Правительства Российской Федерации"
+      ],
+      "legacy_no_match": false,
+      "review_requirement": "verify_scope_active_office_and_territory",
+      "activation_allowed": false
+    },
+    {
+      "case_key": "bank-expanded-serious-24-01",
+      "title": "Контроль гидротехнических сооружений",
+      "best_option": "option_3",
+      "grounding": "not_explicitly_allocated",
+      "primary": {
+        "office_key": "ministry_internal",
+        "office_title": "Министерство по внутренней политике и государству"
+      },
+      "secondary": [
+        {
+          "office_key": "ministry_economic",
+          "office_title": "Министерство по экономической политике"
+        }
+      ],
+      "reason": "Безопасность и организация межведомственного реагирования — внутренний профиль; инженерные работы — экономический. Это не определяет надзорную компетенцию по типу ГТС.",
+      "real_executor": "Собственник и эксплуатирующая организация обеспечивают безопасный режим по технической оценке; реконструкция требует отдельного проектного и финансового решения.",
+      "legacy_best_roles": [
+        "министр",
+        "муницип",
+        "правительств"
+      ],
+      "matched_recorded_office_titles": [
+        "Заместитель Председателя Правительства РФ — Министерство по социальной политике",
+        "Председатель Правительства Российской Федерации"
+      ],
+      "legacy_no_match": false,
+      "review_requirement": "verify_scope_active_office_and_territory",
+      "activation_allowed": false
+    },
+    {
+      "case_key": "bank-expanded-serious-25-01",
+      "title": "Подарок чиновнику",
+      "best_option": "option_5",
+      "grounding": "explicit_named_sector",
+      "primary": {
+        "office_key": "ministry_internal",
+        "office_title": "Министерство по внутренней политике и государству"
+      },
+      "secondary": [],
+      "reason": "Предмет лучшего решения относится к прямо названной в исходных правилах сфере: ОГВ / ОМС. Это профиль рассмотрения, не исключительная компетенция или право исполнять решение.",
+      "real_executor": "Служащий исполняет запрет вознаграждения и установленный порядок уведомления; уполномоченное подразделение квалифицирует передачу и определяет дальнейшие действия.",
+      "legacy_best_roles": [
+        "министр",
+        "депутат",
+        "муницип"
+      ],
+      "matched_recorded_office_titles": [
+        "Депутат Государственной Думы"
+      ],
+      "legacy_no_match": false,
+      "review_requirement": "verify_scope_active_office_and_territory",
+      "activation_allowed": false
+    },
+    {
+      "case_key": "bank-expanded-serious-26-01",
+      "title": "Межбюджетные трансферты",
+      "best_option": "option_2",
+      "grounding": "explicit_named_sector",
+      "primary": {
+        "office_key": "ministry_economic",
+        "office_title": "Министерство по экономической политике"
+      },
+      "secondary": [],
+      "reason": "Предмет лучшего решения относится к прямо названной в исходных правилах сфере: финансы. Это профиль рассмотрения, не исключительная компетенция или право исполнять решение.",
+      "real_executor": "Финансовый орган и распорядитель проверяют вид трансферта, критерии, полномочия и бюджетные основания; резерв применяется только по предусмотренным правилам.",
+      "legacy_best_roles": [
+        "депутат",
+        "правительств",
+        "министр"
+      ],
+      "matched_recorded_office_titles": [
+        "Депутат Государственной Думы",
+        "Заместитель Председателя Правительства РФ — Министерство по социальной политике",
+        "Председатель Правительства Российской Федерации"
+      ],
+      "legacy_no_match": false,
+      "review_requirement": "verify_scope_active_office_and_territory",
+      "activation_allowed": false
+    },
+    {
+      "case_key": "bank-expanded-serious-27-01",
+      "title": "Качество городского воздуха",
+      "best_option": "option_4",
+      "grounding": "not_explicitly_allocated",
+      "primary": {
+        "office_key": "ministry_social",
+        "office_title": "Министерство по социальной политике"
+      },
+      "secondary": [
+        {
+          "office_key": "ministry_internal",
+          "office_title": "Министерство по внутренней политике и государству"
+        }
+      ],
+      "reason": "Защита здоровья населения и учащихся — социальный профиль; измерения и надзор требуют компетентного природоохранного органа.",
+      "real_executor": "Компетентный орган и лаборатории проверяют протокол и сопоставимость замеров; ответственные органы определяют допустимые меры.",
+      "legacy_best_roles": [
+        "министр",
+        "муницип",
+        "правительств"
+      ],
+      "matched_recorded_office_titles": [
+        "Заместитель Председателя Правительства РФ — Министерство по социальной политике",
+        "Председатель Правительства Российской Федерации"
+      ],
+      "legacy_no_match": false,
+      "review_requirement": "verify_scope_active_office_and_territory",
+      "activation_allowed": false
+    },
+    {
+      "case_key": "bank-expanded-serious-28-01",
+      "title": "Резервная связь на случай ЧС",
+      "best_option": "option_3",
+      "grounding": "explicit_named_sector",
+      "primary": {
+        "office_key": "ministry_internal",
+        "office_title": "Министерство по внутренней политике и государству"
+      },
+      "secondary": [],
+      "reason": "Предмет лучшего решения относится к прямо названной в исходных правилах сфере: МЧС / ГО. Это профиль рассмотрения, не исключительная компетенция или право исполнять решение.",
+      "real_executor": "Уполномоченный штаб организует резервное оповещение; технический оператор проверяет двустороннюю связь и подтверждение получения.",
+      "legacy_best_roles": [
+        "министр",
+        "муницип",
+        "правительств"
+      ],
+      "matched_recorded_office_titles": [
+        "Заместитель Председателя Правительства РФ — Министерство по социальной политике",
+        "Председатель Правительства Российской Федерации"
+      ],
+      "legacy_no_match": false,
+      "review_requirement": "verify_scope_active_office_and_territory",
+      "activation_allowed": false
+    },
+    {
+      "case_key": "bank-expanded-serious-29-01",
+      "title": "Сельская амбулатория",
+      "best_option": "option_3",
+      "grounding": "explicit_named_sector",
+      "primary": {
+        "office_key": "ministry_social",
+        "office_title": "Министерство по социальной политике"
+      },
+      "secondary": [],
+      "reason": "Предмет лучшего решения относится к прямо названной в исходных правилах сфере: здравоохранение. Это профиль рассмотрения, не исключительная компетенция или право исполнять решение.",
+      "real_executor": "Учредитель и медицинская организация оценивают доступность и маршрутизацию; врачи определяют допустимость дистанционной помощи.",
+      "legacy_best_roles": [
+        "министр",
+        "депутат",
+        "правительств"
+      ],
+      "matched_recorded_office_titles": [
+        "Депутат Государственной Думы",
+        "Заместитель Председателя Правительства РФ — Министерство по социальной политике",
+        "Председатель Правительства Российской Федерации"
+      ],
+      "legacy_no_match": false,
+      "review_requirement": "verify_scope_active_office_and_territory",
+      "activation_allowed": false
+    },
+    {
+      "case_key": "bank-expanded-serious-30-01",
+      "title": "Ремонт общежития",
+      "best_option": "option_3",
+      "grounding": "explicit_named_sector",
+      "primary": {
+        "office_key": "ministry_social",
+        "office_title": "Министерство по социальной политике"
+      },
+      "secondary": [],
+      "reason": "Предмет лучшего решения относится к прямо названной в исходных правилах сфере: образование. Это профиль рассмотрения, не исключительная компетенция или право исполнять решение.",
+      "real_executor": "Образовательная организация и владелец общежития обеспечивают безопасный режим и временное размещение; допуск после ремонта подтверждают компетентные специалисты.",
+      "legacy_best_roles": [
+        "министр",
+        "депутат",
+        "муницип"
+      ],
+      "matched_recorded_office_titles": [
+        "Депутат Государственной Думы"
+      ],
+      "legacy_no_match": false,
+      "review_requirement": "verify_scope_active_office_and_territory",
+      "activation_allowed": false
+    },
+    {
+      "case_key": "bank-library",
+      "title": "Книжный клуб",
+      "best_option": "option_2",
+      "grounding": "explicit_named_sector",
+      "primary": {
+        "office_key": "ministry_social",
+        "office_title": "Министерство по социальной политике"
+      },
+      "secondary": [],
+      "reason": "Предмет лучшего решения относится к прямо названной в исходных правилах сфере: культура. Это профиль рассмотрения, не исключительная компетенция или право исполнять решение.",
+      "real_executor": "Владелец помещения согласует пользование и доступ; библиотека организует программу; добровольцы принимают только оформленные обязанности.",
+      "legacy_best_roles": [
+        "министр культуры",
+        "муницип",
+        "губернатор"
+      ],
+      "matched_recorded_office_titles": [],
+      "legacy_no_match": true,
+      "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
+      "activation_allowed": false
+    },
+    {
+      "case_key": "bank-media-rumour",
+      "title": "Слухи о бюджете",
+      "best_option": "option_4",
+      "grounding": "explicit_named_sector",
+      "primary": {
+        "office_key": "ministry_internal",
+        "office_title": "Министерство по внутренней политике и государству"
+      },
+      "secondary": [],
+      "reason": "Предмет лучшего решения относится к прямо названной в исходных правилах сфере: ОГВ / ОМС. Это профиль рассмотрения, не исключительная компетенция или право исполнять решение.",
+      "real_executor": "Уполномоченный орган подтверждает бюджетный статус; пресс-служба отвечает редакции по применимому порядку.",
+      "legacy_best_roles": [
+        "муницип",
+        "губернатор",
+        "министр культуры"
+      ],
+      "matched_recorded_office_titles": [],
+      "legacy_no_match": true,
+      "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
+      "activation_allowed": false
+    },
+    {
+      "case_key": "bank-meeting",
+      "title": "Совещание без повестки",
+      "best_option": "option_1",
+      "grounding": "explicit_named_sector",
+      "primary": {
+        "office_key": "ministry_internal",
+        "office_title": "Министерство по внутренней политике и государству"
+      },
+      "secondary": [],
+      "reason": "Предмет лучшего решения относится к прямо названной в исходных правилах сфере: ОГВ / ОМС. Это профиль рассмотрения, не исключительная компетенция или право исполнять решение.",
+      "real_executor": "Председатель встречи действует по внутреннему регламенту; уполномоченный собственник принимает имущественные решения по надлежащей процедуре.",
+      "legacy_best_roles": [
+        "министр юстиции",
+        "депутат",
+        "муницип",
+        "губернатор"
+      ],
+      "matched_recorded_office_titles": [
+        "Депутат Государственной Думы"
+      ],
+      "legacy_no_match": false,
+      "review_requirement": "verify_scope_active_office_and_territory",
+      "activation_allowed": false
+    },
+    {
+      "case_key": "bank-public-hearing",
+      "title": "Общественные слушания",
+      "best_option": "option_3",
+      "grounding": "explicit_named_sector",
+      "primary": {
+        "office_key": "ministry_internal",
+        "office_title": "Министерство по внутренней политике и государству"
+      },
+      "secondary": [],
+      "reason": "Предмет лучшего решения относится к прямо названной в исходных правилах сфере: ОГВ / ОМС. Это профиль рассмотрения, не исключительная компетенция или право исполнять решение.",
+      "real_executor": "Организатор и компетентный орган проводят установленную процедуру слушаний; заключение фиксирует и мотивирует рассмотрение замечаний.",
+      "legacy_best_roles": [
+        "муницип",
+        "депутат",
+        "глава города"
+      ],
+      "matched_recorded_office_titles": [
+        "Депутат Государственной Думы"
+      ],
+      "legacy_no_match": false,
+      "review_requirement": "verify_scope_active_office_and_territory",
+      "activation_allowed": false
+    },
+    {
+      "case_key": "bank-records",
+      "title": "Пропали протоколы",
+      "best_option": "option_5",
+      "grounding": "explicit_named_sector",
+      "primary": {
+        "office_key": "ministry_internal",
+        "office_title": "Министерство по внутренней политике и государству"
+      },
+      "secondary": [],
+      "reason": "Предмет лучшего решения относится к прямо названной в исходных правилах сфере: ОГВ / ОМС. Это профиль рассмотрения, не исключительная компетенция или право исполнять решение.",
+      "real_executor": "Ответственный за документы восстанавливает копии по подлинникам с отметками; орган рассматривает зависимый вопрос по применимому регламенту.",
+      "legacy_best_roles": [
+        "депутат",
+        "председател",
+        "правительств"
+      ],
+      "matched_recorded_office_titles": [
+        "Депутат Государственной Думы",
+        "Заместитель Председателя Государственной Думы №1",
+        "Заместитель Председателя Государственной Думы №2",
+        "Заместитель Председателя Правительства РФ — Министерство по социальной политике",
+        "Председатель · Комитет по внешней политике",
+        "Председатель · Комитет по внутренней политике и государству",
+        "Председатель · Комитет по обороне и безопасности",
+        "Председатель · Комитет по социальной политике",
+        "Председатель · Комитет по экономической политике",
+        "Председатель Государственной Думы",
+        "Председатель Правительства Российской Федерации",
+        "Председатель Центрального банка Российской Федерации",
+        "Председатель политической партии"
+      ],
+      "legacy_no_match": false,
+      "review_requirement": "verify_scope_active_office_and_territory",
+      "activation_allowed": false
+    }
+  ]
+}
