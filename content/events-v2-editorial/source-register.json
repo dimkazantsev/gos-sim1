@@ -3099,15 +3099,13 @@
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
       "legal_basis": "Статьи 42 и 58 Конституции РФ связывают право на экологическую информацию с обязанностью беречь природу. Статья 210 ГК РФ относит содержание имущества к бремени собственника. Специальный охранный статус вида устанавливается по применимому перечню, а не по популярности фотографии. Источники: https://minjust.gov.ru/ru/documents/8011/ https://11.rosguard.gov.ru/uploads/2025/07/5_grazhdanskijj_kodeks_rossijjskojj_federacii_chast_pervaya.pdf",
-      "legal_urls": [
-        "https://minjust.gov.ru/ru/documents/8011/",
-        "https://11.rosguard.gov.ru/uploads/2025/07/5_grazhdanskijj_kodeks_rossijjskojj_federacii_chast_pervaya.pdf"
-      ],
+      "legal_urls": [],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
       "checked_norm_urls": [],
       "option_analysis_status": "draft",
-      "source_scope": "inherited_basis_requires_current_verification"
+      "source_scope": "inherited_basis_requires_current_verification",
+      "review_date": "2026-11-27"
     },
     {
       "case_key": "bank-curated-light-08",
@@ -3117,15 +3115,13 @@
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
       "legal_basis": "Статьи 209 и 210 ГК РФ определяют осуществление прав собственника и содержание имущества, а статья 44 Конституции РФ защищает творчество. Временный характер выставки не отменяет прав владельца вещей и обязанности обеспечить безопасное использование площадки. Источники: https://11.rosguard.gov.ru/uploads/2025/07/5_grazhdanskijj_kodeks_rossijjskojj_federacii_chast_pervaya.pdf https://minjust.gov.ru/ru/documents/8011/",
-      "legal_urls": [
-        "https://11.rosguard.gov.ru/uploads/2025/07/5_grazhdanskijj_kodeks_rossijjskojj_federacii_chast_pervaya.pdf",
-        "https://minjust.gov.ru/ru/documents/8011/"
-      ],
+      "legal_urls": [],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
       "checked_norm_urls": [],
       "option_analysis_status": "draft",
-      "source_scope": "inherited_basis_requires_current_verification"
+      "source_scope": "inherited_basis_requires_current_verification",
+      "review_date": "2026-11-27"
     },
     {
       "case_key": "bank-curated-light-09",
@@ -3136,14 +3132,14 @@
       "resolved_source_url": null,
       "legal_basis": "Статья 5 Закона от 27.07.2010 № 210-ФЗ закрепляет права заявителя при получении государственных и муниципальных услуг. Статья 44 Конституции РФ гарантирует участие в культурной жизни, но не превращает спектакль в обязательный этап административной процедуры. Источники: https://ivo.garant.ru/document/redirect/12177515/7001 https://minjust.gov.ru/ru/documents/8011/",
       "legal_urls": [
-        "https://ivo.garant.ru/document/redirect/12177515/7001",
-        "https://minjust.gov.ru/ru/documents/8011/"
+        "https://www.consultant.ru/document/cons_doc_LAW_103023/ec44362ff44a1158aa5b56cf5c77285e3c470b4e/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
       "checked_norm_urls": [],
       "option_analysis_status": "draft",
-      "source_scope": "inherited_basis_requires_current_verification"
+      "source_scope": "specific_norm_and_related_search_results_partial",
+      "review_date": "2026-11-27"
     },
     {
       "case_key": "bank-curated-light-10",
@@ -3154,8 +3150,7 @@
       "resolved_source_url": null,
       "legal_basis": "Статья 94 Закона № 44-ФЗ требует проверки результата на соответствие контракту и оформления приёмки либо мотивированного отказа. Пункт 6 статьи 1259 ГК РФ исключает официальные символы из объектов авторского права, но это не отменяет иных правил их использования. Источники: https://mintrud.gov.ru/docs/laws/116 https://www.consultant.ru/document/cons_doc_LAW_64629/",
       "legal_urls": [
-        "https://mintrud.gov.ru/docs/laws/116",
-        "https://www.consultant.ru/document/cons_doc_LAW_64629/"
+        "https://www.consultant.ru/document/cons_doc_LAW_144624/17c58c1903f7b6212924ba9ce701489655e9a8e0/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
@@ -3163,7 +3158,8 @@
         "https://www.consultant.ru/document/cons_doc_LAW_144624/17c58c1903f7b6212924ba9ce701489655e9a8e0/"
       ],
       "option_analysis_status": "draft",
-      "source_scope": "specific_federal_norm_checked_partial"
+      "source_scope": "specific_norm_and_related_search_results_partial",
+      "review_date": "2026-11-27"
     },
     {
       "case_key": "bank-curated-light-11",
@@ -3173,15 +3169,13 @@
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
       "legal_basis": "Статья 44 Конституции РФ защищает художественное творчество; часть 3 статьи 17 требует уважать права других лиц. Статья 209 ГК РФ определяет полномочия собственника площадки. Конкретная процедура зависит от характера мероприятия и местных правил; культурное выступление не объявляется митингом автоматически. Источники: https://minjust.gov.ru/ru/documents/8011/ https://11.rosguard.gov.ru/uploads/2025/07/5_grazhdanskijj_kodeks_rossijjskojj_federacii_chast_pervaya.pdf",
-      "legal_urls": [
-        "https://minjust.gov.ru/ru/documents/8011/",
-        "https://11.rosguard.gov.ru/uploads/2025/07/5_grazhdanskijj_kodeks_rossijjskojj_federacii_chast_pervaya.pdf"
-      ],
+      "legal_urls": [],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
       "checked_norm_urls": [],
       "option_analysis_status": "draft",
-      "source_scope": "inherited_basis_requires_current_verification"
+      "source_scope": "inherited_basis_requires_current_verification",
+      "review_date": "2026-11-27"
     },
     {
       "case_key": "bank-curated-light-12",
@@ -3191,14 +3185,13 @@
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
       "legal_basis": "Часть 3 статьи 17 Конституции РФ запрещает осуществлять права в ущерб правам других лиц; статья 44 защищает творчество. Конкретные часы и состав нарушения определяются применимым региональным законом, а не вымышленным единым федеральным расписанием тишины. Источники: https://minjust.gov.ru/ru/documents/8011/",
-      "legal_urls": [
-        "https://minjust.gov.ru/ru/documents/8011/"
-      ],
+      "legal_urls": [],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
       "checked_norm_urls": [],
       "option_analysis_status": "draft",
-      "source_scope": "inherited_basis_requires_current_verification"
+      "source_scope": "inherited_basis_requires_current_verification",
+      "review_date": "2026-11-27"
     },
     {
       "case_key": "bank-curated-light-13",
@@ -3209,7 +3202,7 @@
       "resolved_source_url": null,
       "legal_basis": "Статьи 33 и 94 Закона № 44-ФЗ связывают описание и приёмку объекта с установленными требованиями контракта. Консультационный опрос не подменяет технические требования, полномочия заказчика или процедуру изменения контракта. Источники: https://mintrud.gov.ru/docs/laws/116",
       "legal_urls": [
-        "https://mintrud.gov.ru/docs/laws/116"
+        "https://www.consultant.ru/document/cons_doc_LAW_144624/17c58c1903f7b6212924ba9ce701489655e9a8e0/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
@@ -3217,7 +3210,8 @@
         "https://www.consultant.ru/document/cons_doc_LAW_144624/17c58c1903f7b6212924ba9ce701489655e9a8e0/"
       ],
       "option_analysis_status": "draft",
-      "source_scope": "specific_federal_norm_checked_partial"
+      "source_scope": "specific_norm_and_related_search_results_partial",
+      "review_date": "2026-11-27"
     },
     {
       "case_key": "bank-curated-light-14",
@@ -3228,8 +3222,7 @@
       "resolved_source_url": null,
       "legal_basis": "Статьи 886 и 891 ГК РФ регулируют договор хранения и меры по сохранности вещи. Статьи 5 и 7 Закона № 152-ФЗ требуют учитывать цель обработки и конфиденциальность персональных сведений. Передача музею не означает согласия авторов на немедленную публикацию писем. Источники: https://www.consultant.ru/document/cons_doc_LAW_9027/ https://mintrud.gov.ru/docs/laws/130",
       "legal_urls": [
-        "https://www.consultant.ru/document/cons_doc_LAW_9027/",
-        "https://mintrud.gov.ru/docs/laws/130"
+        "https://www.consultant.ru/document/cons_doc_LAW_61801/a15bab6050028753706f22c32fe60627a7be79f9/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
@@ -3237,7 +3230,8 @@
         "https://www.consultant.ru/document/cons_doc_LAW_61801/a15bab6050028753706f22c32fe60627a7be79f9/"
       ],
       "option_analysis_status": "draft",
-      "source_scope": "specific_federal_norm_checked_partial"
+      "source_scope": "specific_norm_and_related_search_results_partial",
+      "review_date": "2026-11-27"
     },
     {
       "case_key": "bank-curated-serious-04",
@@ -3248,7 +3242,7 @@
       "resolved_source_url": null,
       "legal_basis": "Статья 15 Закона №442-ФЗ называет насилие в семье среди обстоятельств нуждаемости; статья 21 регулирует срочные социальные услуги без индивидуальной программы и договора. Статья 6 защищает конфиденциальность сведений. Эти меры не заменяют полномочия полиции и суда и не создают автоматического права на постоянное жильё. Источники: https://mintrud.gov.ru/docs/laws/112",
       "legal_urls": [
-        "https://mintrud.gov.ru/docs/laws/112"
+        "https://www.consultant.ru/document/cons_doc_LAW_156558/f496bba45a6529882c567252bb9eef69357470c1/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
@@ -3256,7 +3250,8 @@
       "checked_norm_urls": [
         "https://www.consultant.ru/document/cons_doc_LAW_156558/f496bba45a6529882c567252bb9eef69357470c1/"
       ],
-      "source_scope": "specific_federal_norm_checked_partial"
+      "source_scope": "specific_norm_and_related_search_results_partial",
+      "review_date": "2026-11-27"
     },
     {
       "case_key": "bank-curated-serious-05",
@@ -3267,13 +3262,14 @@
       "resolved_source_url": null,
       "legal_basis": "Закон РФ №4979-1 «О ветеринарии» регулирует обязательные ветеринарные меры, карантин и обязанности владельцев, в том числе статьи 17–19. Конкретные ограничения устанавливаются компетентным органом по применимым ветеринарным правилам. Возмещение при предусмотренном законом изъятии требует самостоятельной проверки оснований и процедуры; его нельзя гарантировать всем пострадавшим в произвольном размере. Источники: https://checklist.fsvps.gov.ru/checks/forms/index?formId=3",
       "legal_urls": [
-        "https://checklist.fsvps.gov.ru/checks/forms/index?formId=3"
+        "https://www.consultant.ru/document/cons_doc_LAW_4438/c36dc50cd93048048618fbce118d49304ab28f17/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
       "option_analysis_status": "draft",
       "checked_norm_urls": [],
-      "source_scope": "inherited_basis_requires_current_verification"
+      "source_scope": "specific_norm_and_related_search_results_partial",
+      "review_date": "2026-11-27"
     },
     {
       "case_key": "bank-curated-serious-06",
@@ -3284,13 +3280,14 @@
       "resolved_source_url": null,
       "legal_basis": "Статья 38 Закона №35-ФЗ «Об электроэнергетике» регулирует гарантии надёжного обеспечения потребителей электрической энергией. При аварии технические переключения и восстановление выполняют уполномоченные специалисты; органы власти координируют защиту населения и информирование в пределах компетенции. Источники: https://01.mchs.gov.ru/deyatelnost/napravleniya-deyatelnosti/grazhdanskaya-zashchita/preduprezhdenie-chrezvychaynyh-situaciy/1-1-normativnye-pravovye-akty/2-federalnye-zakony/federalnyy-zakon-ot-21-dekabrya-1994-g-n-68-fz-o-zashchite-naseleniya-i-territoriy-ot-chrezvychaynyh-situaciy-prirodnogo-i-tehnogennogo-haraktera",
       "legal_urls": [
-        "https://01.mchs.gov.ru/deyatelnost/napravleniya-deyatelnosti/grazhdanskaya-zashchita/preduprezhdenie-chrezvychaynyh-situaciy/1-1-normativnye-pravovye-akty/2-federalnye-zakony/federalnyy-zakon-ot-21-dekabrya-1994-g-n-68-fz-o-zashchite-naseleniya-i-territoriy-ot-chrezvychaynyh-situaciy-prirodnogo-i-tehnogennogo-haraktera"
+        "https://www.consultant.ru/document/cons_doc_LAW_41502/71ca306c624a4f313cf976323f4f5930a5124b0d/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
       "option_analysis_status": "draft",
       "checked_norm_urls": [],
-      "source_scope": "inherited_basis_requires_current_verification"
+      "source_scope": "specific_norm_and_related_search_results_partial",
+      "review_date": "2026-11-27"
     },
     {
       "case_key": "bank-curated-serious-07",
@@ -3301,13 +3298,14 @@
       "resolved_source_url": null,
       "legal_basis": "Статья 17 Закона №125-ФЗ об архивном деле предусматривает обеспечение сохранности архивных документов. Правила Росархива регулируют хранение, учёт и использование фонда. Аварийное перемещение требует документирования и профессиональной обработки; оно не отменяет ограничения доступа к документам с охраняемой информацией. Источники: https://archives.gov.ru/documents/rules/pravila-2020.shtml",
       "legal_urls": [
-        "https://archives.gov.ru/documents/rules/pravila-2020.shtml"
+        "https://www.consultant.ru/document/cons_doc_LAW_1406/853f5f9b88a8631659f20438281fdf2e323c1429/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
       "option_analysis_status": "draft",
       "checked_norm_urls": [],
-      "source_scope": "inherited_basis_requires_current_verification"
+      "source_scope": "specific_norm_and_related_search_results_partial",
+      "review_date": "2026-11-27"
     },
     {
       "case_key": "bank-curated-serious-08",
