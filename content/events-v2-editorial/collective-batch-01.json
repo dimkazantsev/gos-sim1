@@ -1443,7 +1443,8 @@
         "note": "Обязательные нормы вынесены в исходные условия. Параметры учебной модели предложены, не являются реальными суммами или статистикой. Не применять до юридической и бюджетной приёмки.",
         "checked_norm_urls": [
           "https://www.consultant.ru/document/cons_doc_LAW_19702/6288b672abcacbdfce848217bd5f3b6dcfa76913/",
-          "https://www.consultant.ru/document/cons_doc_LAW_15234/"
+          "https://www.consultant.ru/document/cons_doc_LAW_61801/96fbc469f91f57235cc842a85e0516a99f23dc85/",
+          "https://www.consultant.ru/document/cons_doc_LAW_61801/ca9e5658710519f09ab2fdb8196fcb3eb024a051/"
         ],
         "collective_option_analysis": {
           "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
@@ -1451,7 +1452,8 @@
           "norm": "БК РФ, статья 133: субвенции из федерального бюджета бюджетам субъектов РФ. Источники: https://www.consultant.ru/document/cons_doc_LAW_19702/",
           "urls": [
             "https://www.consultant.ru/document/cons_doc_LAW_19702/6288b672abcacbdfce848217bd5f3b6dcfa76913/",
-            "https://www.consultant.ru/document/cons_doc_LAW_15234/"
+            "https://www.consultant.ru/document/cons_doc_LAW_61801/96fbc469f91f57235cc842a85e0516a99f23dc85/",
+            "https://www.consultant.ru/document/cons_doc_LAW_61801/ca9e5658710519f09ab2fdb8196fcb3eb024a051/"
           ],
           "source_scope": "Адресные справочные тексты и официальные разъяснения/поисковые выдержки; полный комплект действующих отраслевых, местных и специальных актов не установлен.",
           "options": [
