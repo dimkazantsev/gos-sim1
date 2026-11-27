@@ -5546,14 +5546,33 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "Статьи 42 и 58 Конституции РФ связывают право на экологическую информацию с обязанностью беречь природу. Статья 210 ГК РФ относит содержание имущества к бремени собственника. Специальный охранный статус вида устанавливается по применимому перечню, а не по популярности фотографии. Источники: https://minjust.gov.ru/ru/documents/8011/ https://11.rosguard.gov.ru/uploads/2025/07/5_grazhdanskijj_kodeks_rossijjskojj_federacii_chast_pervaya.pdf",
-      "legal_urls": [],
+      "legal_basis": "7-ФЗ, ст. 11 и 60: достоверная экологическая информация и особая охрана видов из федеральной и региональных Красных книг. Фотография не устанавливает вид или охранный статус.",
+      "legal_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_34823/bad9c1c3e40e37bf7db698fc53537fd78d0b8c10/",
+        "https://www.consultant.ru/document/cons_doc_LAW_34823/bff976b2d5a0e4eaf44a1ffbfcefdff8a779515f/"
+      ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
-      "checked_norm_urls": [],
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_34823/bad9c1c3e40e37bf7db698fc53537fd78d0b8c10/",
+        "https://www.consultant.ru/document/cons_doc_LAW_34823/bff976b2d5a0e4eaf44a1ffbfcefdff8a779515f/"
+      ],
       "option_analysis_status": "draft",
-      "source_scope": "inherited_basis_requires_current_verification",
-      "review_date": "2026-11-27"
+      "source_scope": "specific_norm_and_related_search_results_partial",
+      "review_date": "2026-11-28",
+      "norm_recheck_2026_11_28": {
+        "status": "targeted_norm_and_individual_alternatives_reviewed_not_full_acceptance",
+        "limitation": "Конкретный вид и применимый перечень не установлены; не утверждать охранный статус.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_34823/bad9c1c3e40e37bf7db698fc53537fd78d0b8c10/",
+          "https://www.consultant.ru/document/cons_doc_LAW_34823/bff976b2d5a0e4eaf44a1ffbfcefdff8a779515f/"
+        ]
+      },
+      "targeted_individual_review": {
+        "status": "targeted_norm_and_individual_alternatives_reviewed_not_full_acceptance",
+        "option_count": 5,
+        "remaining": "Конкретный вид и применимый перечень не установлены; не утверждать охранный статус."
+      }
     },
     {
       "case_key": "bank-curated-light-08",
@@ -5820,14 +5839,30 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "Статья 50 Закона №166-ФЗ предусматривает меры по сохранению водных биоресурсов при хозяйственной деятельности. Водный кодекс РФ регулирует охрану водных объектов. Изменение режима сброса требует применимого водохозяйственного и технического решения; наблюдение одной группы не заменяет исследования причин. Источники: https://fish.gov.ru/otraslevaya-deyatelnost/akvakultura/sohranenie-vodnyh-bioresursov/",
-      "legal_urls": [],
+      "legal_basis": "166-ФЗ, ст. 50: при хозяйственной деятельности необходимы меры сохранения водных биоресурсов и их среды обитания. Изменение эксплуатации сооружения требует установленного технического и водохозяйственного основания.",
+      "legal_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_50799/452d8b47ce995ec88cbe6c083b610721243b71e6/"
+      ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
       "option_analysis_status": "draft",
-      "checked_norm_urls": [],
-      "source_scope": "inherited_basis_requires_current_verification",
-      "review_date": "2026-11-27"
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_50799/452d8b47ce995ec88cbe6c083b610721243b71e6/"
+      ],
+      "source_scope": "specific_norm_and_related_search_results_partial",
+      "review_date": "2026-11-28",
+      "norm_recheck_2026_11_28": {
+        "status": "targeted_norm_and_individual_alternatives_reviewed_not_full_acceptance",
+        "limitation": "Конкретный режим водопользования, проект дамбы, нормы для рыбохозяйственного водоёма и согласование мер не подтверждены.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_50799/452d8b47ce995ec88cbe6c083b610721243b71e6/"
+        ]
+      },
+      "targeted_individual_review": {
+        "status": "targeted_norm_and_individual_alternatives_reviewed_not_full_acceptance",
+        "option_count": 5,
+        "remaining": "Конкретный режим водопользования, проект дамбы, нормы для рыбохозяйственного водоёма и согласование мер не подтверждены."
+      }
     },
     {
       "case_key": "bank-curated-serious-09",
@@ -5951,14 +5986,42 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "Закон №33-ФЗ об особо охраняемых природных территориях устанавливает специальный режим заповедников и охранных зон. Статья 32 Закона №7-ФЗ регулирует оценку воздействия; Закон №174-ФЗ определяет случаи государственной экологической экспертизы. Публичные обсуждения и разрешения проводятся по применимым к проекту правилам, а не заменяются обещанными рабочими местами. Источники: http://www.kremlin.ru/acts/constitution",
-      "legal_urls": [],
+      "legal_basis": "33-ФЗ от 14.03.1995, ст. 2, 9: режим заповедника и охранной зоны; 7-ФЗ, ст. 32 и постановление Правительства РФ №1644 от 28.11.2024: оценка воздействия и общественные обсуждения; 174-ФЗ, ст. 11: экспертиза в установленных случаях.",
+      "legal_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_6072/ce98ed9bc2fc35acee2232585948a2b4bc927850/",
+        "https://www.consultant.ru/document/cons_doc_LAW_6072/d7724d45358b666bede0185fd63feef5454e0bba/",
+        "https://www.consultant.ru/document/cons_doc_LAW_34823/22ff5ed049c33d6e71c1aff212b36a0cba0def9a/",
+        "https://www.consultant.ru/document/cons_doc_LAW_8515/269db2bc04cca9aba562fc2ff02d0b99376478c0/",
+        "https://www.consultant.ru/document/cons_doc_LAW_491757/d15585a8985d2c0ebf0202107cd8ce6373a6e2e1/"
+      ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
       "option_analysis_status": "draft",
-      "checked_norm_urls": [],
-      "source_scope": "inherited_basis_requires_current_verification",
-      "review_date": "2026-11-27"
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_6072/ce98ed9bc2fc35acee2232585948a2b4bc927850/",
+        "https://www.consultant.ru/document/cons_doc_LAW_6072/d7724d45358b666bede0185fd63feef5454e0bba/",
+        "https://www.consultant.ru/document/cons_doc_LAW_34823/22ff5ed049c33d6e71c1aff212b36a0cba0def9a/",
+        "https://www.consultant.ru/document/cons_doc_LAW_8515/269db2bc04cca9aba562fc2ff02d0b99376478c0/",
+        "https://www.consultant.ru/document/cons_doc_LAW_491757/d15585a8985d2c0ebf0202107cd8ce6373a6e2e1/"
+      ],
+      "source_scope": "specific_norm_and_related_search_results_partial",
+      "review_date": "2026-11-28",
+      "norm_recheck_2026_11_28": {
+        "status": "targeted_norm_and_individual_alternatives_reviewed_not_full_acceptance",
+        "limitation": "Категория проекта, фактические границы зоны, конкретные разрешения и основания экспертизы не установлены.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_6072/ce98ed9bc2fc35acee2232585948a2b4bc927850/",
+          "https://www.consultant.ru/document/cons_doc_LAW_6072/d7724d45358b666bede0185fd63feef5454e0bba/",
+          "https://www.consultant.ru/document/cons_doc_LAW_34823/22ff5ed049c33d6e71c1aff212b36a0cba0def9a/",
+          "https://www.consultant.ru/document/cons_doc_LAW_8515/269db2bc04cca9aba562fc2ff02d0b99376478c0/",
+          "https://www.consultant.ru/document/cons_doc_LAW_491757/d15585a8985d2c0ebf0202107cd8ce6373a6e2e1/"
+        ]
+      },
+      "targeted_individual_review": {
+        "status": "targeted_norm_and_individual_alternatives_reviewed_not_full_acceptance",
+        "option_count": 5,
+        "remaining": "Категория проекта, фактические границы зоны, конкретные разрешения и основания экспертизы не установлены."
+      }
     },
     {
       "case_key": "bank-curated-serious-15",
@@ -6059,19 +6122,24 @@
       "source_url": "https://epp.genproc.gov.ru/ru/proc_28/mass-media/news/regional/e5664303/",
       "source_status": "official_article_read_core_episode_confirmed",
       "resolved_source_url": "https://epp.genproc.gov.ru/ru/proc_28/mass-media/news/regional/e5664303/",
-      "legal_basis": "Статья 17 Закона №257-ФЗ регулирует содержание автомобильных дорог; статья 12 Закона №196-ФЗ — безопасность при ремонте и содержании. Конкретные обязанности зависят от владельца дороги и её категории. Временная схема движения не заменяет устранение установленного дефекта. Источники: https://01.mchs.gov.ru/deyatelnost/napravleniya-deyatelnosti/grazhdanskaya-zashchita/preduprezhdenie-chrezvychaynyh-situaciy/1-1-normativnye-pravovye-akty/2-federalnye-zakony/federalnyy-zakon-ot-21-dekabrya-1994-g-n-68-fz-o-zashchite-naseleniya-i-territoriy-ot-chrezvychaynyh-situaciy-prirodnogo-i-tehnogennogo-haraktera https://mintrans.gov.ru/storage/app/media/epd/0811201.pdf",
+      "legal_basis": "257-ФЗ, ст. 17 и 30: содержание дороги, компетентное временное ограничение и информирование о возможном объезде; 196-ФЗ, ст. 12: ответственность лиц, осуществляющих содержание. Публикация прокуратуры от 20.03.2025 подтверждает судебное требование ремонта.",
       "legal_urls": [
-        "https://www.consultant.ru/document/cons_doc_LAW_72386/1692e755d61192abb296c96e101a443f4b701edf/"
+        "https://www.consultant.ru/document/cons_doc_LAW_72386/1692e755d61192abb296c96e101a443f4b701edf/",
+        "https://www.consultant.ru/document/cons_doc_LAW_72386/d815e149e72342151144533709e7ebcf7aa60b8c/",
+        "https://www.consultant.ru/document/cons_doc_LAW_8585/8b0fbe781750ca08f5bd5ce672747890f8878fb7/",
+        "https://epp.genproc.gov.ru/ru/proc_28/mass-media/news/regional/e5664303/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
       "option_analysis_status": "draft",
       "checked_norm_urls": [
         "https://www.consultant.ru/document/cons_doc_LAW_72386/1692e755d61192abb296c96e101a443f4b701edf/",
-        "https://www.consultant.ru/document/cons_doc_LAW_8585/8b0fbe781750ca08f5bd5ce672747890f8878fb7/"
+        "https://www.consultant.ru/document/cons_doc_LAW_8585/8b0fbe781750ca08f5bd5ce672747890f8878fb7/",
+        "https://www.consultant.ru/document/cons_doc_LAW_72386/d815e149e72342151144533709e7ebcf7aa60b8c/",
+        "https://epp.genproc.gov.ru/ru/proc_28/mass-media/news/regional/e5664303/"
       ],
-      "source_scope": "inherited_basis_requires_current_verification",
-      "review_date": "2026-11-27",
+      "source_scope": "specific_norm_and_related_search_results_partial",
+      "review_date": "2026-11-28",
       "documentary_recheck": {
         "date": "2026-11-28",
         "status": "official_article_text_search_extraction_core_episode_confirmed",
@@ -6079,13 +6147,19 @@
         "additional_source_urls": []
       },
       "norm_recheck_2026_11_28": {
-        "status": "specific_articles_read_not_full_case_verification",
-        "basis": "№257-ФЗ (ред. 25.05.2026), ст. 17 ч. 1–2, 4–6: содержание и диагностика дороги; при несоответствии техническим регламентам предусмотрен ремонт, отчёт о диагностике дороги общего пользования размещает владелец. №196-ФЗ (ред. 04.08.2026), ст. 12 ч. 1–2: безопасность при ремонте и содержании; соответствие при содержании обеспечивают выполняющие его лица. Нельзя возлагать технические обязанности на депутата либо подменять ремонт временным объездом.",
+        "status": "targeted_norm_and_individual_alternatives_reviewed_not_full_acceptance",
+        "limitation": "Основное историческое сообщение подтверждено поисковым извлечением, не новым чтением полного текста. Категория дороги, собственник и исполнение судебного решения не установлены.",
         "urls": [
           "https://www.consultant.ru/document/cons_doc_LAW_72386/1692e755d61192abb296c96e101a443f4b701edf/",
-          "https://www.consultant.ru/document/cons_doc_LAW_8585/8b0fbe781750ca08f5bd5ce672747890f8878fb7/"
-        ],
-        "limitation": "Справочная консолидированная редакция; первичная публикация поправок и все варианты ответа отдельно не проверены."
+          "https://www.consultant.ru/document/cons_doc_LAW_72386/d815e149e72342151144533709e7ebcf7aa60b8c/",
+          "https://www.consultant.ru/document/cons_doc_LAW_8585/8b0fbe781750ca08f5bd5ce672747890f8878fb7/",
+          "https://epp.genproc.gov.ru/ru/proc_28/mass-media/news/regional/e5664303/"
+        ]
+      },
+      "targeted_individual_review": {
+        "status": "targeted_norm_and_individual_alternatives_reviewed_not_full_acceptance",
+        "option_count": 5,
+        "remaining": "Основное историческое сообщение подтверждено поисковым извлечением, не новым чтением полного текста. Категория дороги, собственник и исполнение судебного решения не установлены."
       }
     },
     {
@@ -6146,14 +6220,37 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "Закон №68-ФЗ, в том числе статья 11, регулирует защиту населения в пределах компетенции органов власти. Статья 6 Водного кодекса РФ предусматривает общедоступность водных объектов с установленными законом ограничениями. Конкретный режим пляжа определяется применимыми правилами безопасности: общедоступность не означает право игнорировать подтверждённую опасность. Источники: https://01.mchs.gov.ru/deyatelnost/napravleniya-deyatelnosti/grazhdanskaya-zashchita/preduprezhdenie-chrezvychaynyh-situaciy/1-1-normativnye-pravovye-akty/2-federalnye-zakony/federalnyy-zakon-ot-21-dekabrya-1994-g-n-68-fz-o-zashchite-naseleniya-i-territoriy-ot-chrezvychaynyh-situaciy-prirodnogo-i-tehnogennogo-haraktera",
-      "legal_urls": [],
+      "legal_basis": "4-ФЗ от 03.02.2025, ст. 12: спасательный пост, обозначение зоны купания, информирование об опасности и меры предупреждения; ВК РФ, ст. 6: общедоступность с предусмотренными ограничениями.",
+      "legal_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_497704/739ded4899c959907cde678b0b16d820403be277/",
+        "https://www.consultant.ru/document/cons_doc_LAW_60683/9a073f7358f63cc80f8bf4b9406df3978054e8dc/"
+      ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
       "option_analysis_status": "draft",
-      "checked_norm_urls": [],
-      "source_scope": "inherited_basis_requires_current_verification",
-      "review_date": "2026-11-27"
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_497704/739ded4899c959907cde678b0b16d820403be277/",
+        "https://www.consultant.ru/document/cons_doc_LAW_60683/9a073f7358f63cc80f8bf4b9406df3978054e8dc/"
+      ],
+      "source_scope": "specific_norm_and_related_search_results_partial",
+      "review_date": "2026-11-28",
+      "norm_recheck_2026_11_28": {
+        "status": "targeted_norm_and_individual_alternatives_reviewed_not_full_acceptance",
+        "limitation": "Приказ МЧС №732 действовал до 01.09.2026; не применять как текущий. Точные действующие федеральные и региональные требования к комплектованию поста отдельно не подтверждены.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_497704/739ded4899c959907cde678b0b16d820403be277/",
+          "https://www.consultant.ru/document/cons_doc_LAW_60683/9a073f7358f63cc80f8bf4b9406df3978054e8dc/"
+        ]
+      },
+      "targeted_individual_review": {
+        "status": "targeted_norm_and_individual_alternatives_reviewed_not_full_acceptance",
+        "option_count": 6,
+        "remaining": "Приказ МЧС №732 действовал до 01.09.2026; не применять как текущий. Точные действующие федеральные и региональные требования к комплектованию поста отдельно не подтверждены."
+      },
+      "superseded_reference": {
+        "url": "https://www.consultant.ru/document/cons_doc_LAW_366261/2ff7a8c72de3994f30496a0ccbb1ddafdaddf518/",
+        "reason": "Окончание срока действия 01.09.2026; не использовать как действующую норму."
+      }
     },
     {
       "case_key": "bank-curated-serious-22",
@@ -6181,15 +6278,45 @@
       "title": "Дагестан: перебои с инсулином для ребёнка",
       "source_url": "https://epp.genproc.gov.ru/ru/gprf/mass-media/news/main/e8477406/",
       "source_status": "official_article_read_core_episode_confirmed",
-      "resolved_source_url": null,
-      "legal_basis": "Статьи 10 и 19 Закона №323-ФЗ регулируют доступность помощи и права пациента. Основания конкретного бесплатного лекарственного обеспечения определяются применимыми специальными и региональными нормами. Проверяется не только контракт или складской остаток, но и получение назначенного средства пациентом с сохранением медицинского контроля. Источники: http://www.kremlin.ru/acts/constitution",
-      "legal_urls": [],
+      "resolved_source_url": "https://epp.genproc.gov.ru/ru/gprf/mass-media/news/main/e8477406/",
+      "legal_basis": "323-ФЗ, ст. 10, 19: доступность помощи и гарантированный объём; конкретное льготное лекарственное обеспечение зависит от специальных оснований. Публикация Генпрокуратуры 27.04.2026 подтверждает выдачу препаратов, но не завершение обеспечения всеми изделиями.",
+      "legal_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_121895/e63d3344841b2f5636a73710e906a23ebaf9ab82/",
+        "https://www.consultant.ru/document/cons_doc_LAW_121895/2912a75fd9253758c03a8c9069299a513b58b620/",
+        "https://epp.genproc.gov.ru/ru/gprf/mass-media/news/main/e8477406/"
+      ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
       "option_analysis_status": "draft",
-      "checked_norm_urls": [],
-      "source_scope": "inherited_basis_requires_current_verification",
-      "review_date": "2026-11-27"
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_121895/e63d3344841b2f5636a73710e906a23ebaf9ab82/",
+        "https://www.consultant.ru/document/cons_doc_LAW_121895/2912a75fd9253758c03a8c9069299a513b58b620/",
+        "https://epp.genproc.gov.ru/ru/gprf/mass-media/news/main/e8477406/"
+      ],
+      "source_scope": "specific_norm_and_related_search_results_partial",
+      "review_date": "2026-11-28",
+      "norm_recheck_2026_11_28": {
+        "status": "targeted_norm_and_individual_alternatives_reviewed_not_full_acceptance",
+        "limitation": "Медицинское назначение, федеральное или региональное основание льготы и номенклатура изделий не устанавливаются из новости; не подменять врача.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_121895/e63d3344841b2f5636a73710e906a23ebaf9ab82/",
+          "https://www.consultant.ru/document/cons_doc_LAW_121895/2912a75fd9253758c03a8c9069299a513b58b620/",
+          "https://epp.genproc.gov.ru/ru/gprf/mass-media/news/main/e8477406/"
+        ]
+      },
+      "targeted_individual_review": {
+        "status": "targeted_norm_and_individual_alternatives_reviewed_not_full_acceptance",
+        "option_count": 5,
+        "remaining": "Медицинское назначение, федеральное или региональное основание льготы и номенклатура изделий не устанавливаются из новости; не подменять врача."
+      },
+      "documentary_recheck": {
+        "date": "2026-11-28",
+        "status": "official_article_reopened_core_episode_confirmed",
+        "additional_source_urls": [
+          "https://epp.genproc.gov.ru/ru/gprf/mass-media/news/main/e8477406/"
+        ],
+        "notes": "Медицинское назначение, федеральное или региональное основание льготы и номенклатура изделий не устанавливаются из новости; не подменять врача."
+      }
     },
     {
       "case_key": "bank-curated-serious-24",
@@ -6218,14 +6345,36 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "Статья 58 Закона №61-ФЗ регулирует хранение лекарственных средств; применимые правила хранения и перевозки требуют соответствующих условий и контроля. Решение о пригодности партии принимает компетентный специалист по надлежащим данным. Неполная запись не должна ни скрываться при приёмке, ни автоматически превращаться в заключение о качестве. Источники: https://roszdravnadzor.gov.ru/faq/medicines",
-      "legal_urls": [],
+      "legal_basis": "61-ФЗ, ст. 58; приказ Минздрава №260н от 29.04.2025: хранение лекарств по установленным условиям, документирование и организация контроля. Для вакцин применяются также специальные требования перевозки и холодовой цепи.",
+      "legal_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_99350/dbf1daffdda5622cd839fb6a36130a63324a3bdd/",
+        "https://base.garant.ru/412109870/",
+        "https://roszdravnadzor.gov.ru/documents/87501"
+      ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
       "option_analysis_status": "draft",
-      "checked_norm_urls": [],
-      "source_scope": "inherited_basis_requires_current_verification",
-      "review_date": "2026-11-27"
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_99350/dbf1daffdda5622cd839fb6a36130a63324a3bdd/",
+        "https://base.garant.ru/412109870/",
+        "https://roszdravnadzor.gov.ru/documents/87501"
+      ],
+      "source_scope": "specific_norm_and_related_search_results_partial",
+      "review_date": "2026-11-28",
+      "norm_recheck_2026_11_28": {
+        "status": "targeted_norm_and_individual_alternatives_reviewed_not_full_acceptance",
+        "limitation": "Точный вид вакцины, режим перевозки и специальные санитарные правила не подтверждены; не делать вывода о пригодности по одному пропуску записи.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_99350/dbf1daffdda5622cd839fb6a36130a63324a3bdd/",
+          "https://base.garant.ru/412109870/",
+          "https://roszdravnadzor.gov.ru/documents/87501"
+        ]
+      },
+      "targeted_individual_review": {
+        "status": "targeted_norm_and_individual_alternatives_reviewed_not_full_acceptance",
+        "option_count": 5,
+        "remaining": "Точный вид вакцины, режим перевозки и специальные санитарные правила не подтверждены; не делать вывода о пригодности по одному пропуску записи."
+      }
     },
     {
       "case_key": "bank-curated-v2-03",
@@ -6274,14 +6423,33 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "Статья 20 Закона №190-ФЗ регулирует обеспечение готовности к отопительному периоду, а статья 15 — организацию теплоснабжения. Работы и ограничения выполняются по применимым техническим правилам. Медицинский объект требует согласованной непрерывности безопасных условий; административное решение не заменяет инженерное подтверждение. Источники: https://01.mchs.gov.ru/deyatelnost/napravleniya-deyatelnosti/grazhdanskaya-zashchita/preduprezhdenie-chrezvychaynyh-situaciy/1-1-normativnye-pravovye-akty/2-federalnye-zakony/federalnyy-zakon-ot-21-dekabrya-1994-g-n-68-fz-o-zashchite-naseleniya-i-territoriy-ot-chrezvychaynyh-situaciy-prirodnogo-i-tehnogennogo-haraktera",
-      "legal_urls": [],
+      "legal_basis": "190-ФЗ, ст. 20, 23.2: готовность к отопительному периоду и безопасность эксплуатации, квалификация работников. Технический ремонт и временный режим стационара согласуются отдельно.",
+      "legal_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_102975/c0ba7de8be5a8b38c08f4cc54f61ffe6cc3c0f41/",
+        "https://www.consultant.ru/document/cons_doc_LAW_102975/78f7d1ede2ca299d08537fe118d40ee09ac72d97/"
+      ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
       "option_analysis_status": "draft",
-      "checked_norm_urls": [],
-      "source_scope": "inherited_basis_requires_current_verification",
-      "review_date": "2026-11-27"
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_102975/c0ba7de8be5a8b38c08f4cc54f61ffe6cc3c0f41/",
+        "https://www.consultant.ru/document/cons_doc_LAW_102975/78f7d1ede2ca299d08537fe118d40ee09ac72d97/"
+      ],
+      "source_scope": "specific_norm_and_related_search_results_partial",
+      "review_date": "2026-11-28",
+      "norm_recheck_2026_11_28": {
+        "status": "targeted_norm_and_individual_alternatives_reviewed_not_full_acceptance",
+        "limitation": "Технические правила, договор и порядок ограничений не выверены; не устанавливать универсальный допустимый срок отключения.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_102975/c0ba7de8be5a8b38c08f4cc54f61ffe6cc3c0f41/",
+          "https://www.consultant.ru/document/cons_doc_LAW_102975/78f7d1ede2ca299d08537fe118d40ee09ac72d97/"
+        ]
+      },
+      "targeted_individual_review": {
+        "status": "targeted_norm_and_individual_alternatives_reviewed_not_full_acceptance",
+        "option_count": 5,
+        "remaining": "Технические правила, договор и порядок ограничений не выверены; не устанавливать универсальный допустимый срок отключения."
+      }
     },
     {
       "case_key": "bank-curated-v2-06",
@@ -6452,13 +6620,39 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "Статьи 11 и 63 Закона №7-ФЗ предусматривают экологические права и государственный экологический мониторинг; статья 23 Закона №96-ФЗ регулирует мониторинг атмосферного воздуха. Статья 41 Закона №273-ФЗ касается охраны здоровья обучающихся. Ограничения деятельности предприятия требуют компетенции и надлежащих оснований, а не только предположения о причине. Источники: http://www.kremlin.ru/acts/constitution https://minobrnauki.gov.ru/open_ministry/gossluzhba/entry/files/Федеральный%20закон%20от%2029.12.2012%20N%20273-ФЗ%20(ред.%20от%2015.10.2025.pdf",
-      "legal_urls": [],
+      "legal_basis": "7-ФЗ, ст. 11, 63; 96-ФЗ, ст. 23: достоверная информация и компетентный государственный мониторинг воздуха; 273-ФЗ, ст. 41: охрана здоровья обучающихся. Бытовой датчик не устанавливает виновность предприятия.",
+      "legal_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_34823/bff976b2d5a0e4eaf44a1ffbfcefdff8a779515f/",
+        "https://www.consultant.ru/document/cons_doc_LAW_34823/1de21f3d2f646b12715a2629b5593f44edd1717f/",
+        "https://www.consultant.ru/document/cons_doc_LAW_22971/ad03863bb52ba2d7d0bed6a807e3e5492c53abd6/",
+        "https://www.consultant.ru/document/cons_doc_LAW_140174/48b9101fff215f3aeb122d86593a129a34d96d3c/"
+      ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
       "option_analysis_status": "draft",
-      "source_scope": "inherited_basis_requires_current_verification",
-      "review_date": "2026-11-27"
+      "source_scope": "specific_norm_and_related_search_results_partial",
+      "review_date": "2026-11-28",
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_34823/bff976b2d5a0e4eaf44a1ffbfcefdff8a779515f/",
+        "https://www.consultant.ru/document/cons_doc_LAW_34823/1de21f3d2f646b12715a2629b5593f44edd1717f/",
+        "https://www.consultant.ru/document/cons_doc_LAW_22971/ad03863bb52ba2d7d0bed6a807e3e5492c53abd6/",
+        "https://www.consultant.ru/document/cons_doc_LAW_140174/48b9101fff215f3aeb122d86593a129a34d96d3c/"
+      ],
+      "norm_recheck_2026_11_28": {
+        "status": "targeted_norm_and_individual_alternatives_reviewed_not_full_acceptance",
+        "limitation": "Не установлены вещества, нормы концентраций и методика измерений; временные меры только по оценке компетентных лиц.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_34823/bff976b2d5a0e4eaf44a1ffbfcefdff8a779515f/",
+          "https://www.consultant.ru/document/cons_doc_LAW_34823/1de21f3d2f646b12715a2629b5593f44edd1717f/",
+          "https://www.consultant.ru/document/cons_doc_LAW_22971/ad03863bb52ba2d7d0bed6a807e3e5492c53abd6/",
+          "https://www.consultant.ru/document/cons_doc_LAW_140174/48b9101fff215f3aeb122d86593a129a34d96d3c/"
+        ]
+      },
+      "targeted_individual_review": {
+        "status": "targeted_norm_and_individual_alternatives_reviewed_not_full_acceptance",
+        "option_count": 5,
+        "remaining": "Не установлены вещества, нормы концентраций и методика измерений; временные меры только по оценке компетентных лиц."
+      }
     },
     {
       "case_key": "bank-curated-v2-15",
@@ -6467,13 +6661,33 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "Статья 32 Закона №7-ФЗ предусматривает оценку воздействия, а Закон №174-ФЗ регулирует экологическую экспертизу в применимых случаях. Правила общественных обсуждений конкретизируют извещение и учёт замечаний. Снежный затор не отменяет эти требования; срочная смена зала допустима лишь при соблюдении применимого порядка. Источники: http://www.kremlin.ru/acts/constitution",
-      "legal_urls": [],
+      "legal_basis": "7-ФЗ, ст. 32; постановление Правительства РФ №1644 от 28.11.2024 (изм. 15.11.2025): порядок оценки воздействия, компетентные организаторы обсуждения, информирование и учёт замечаний. Изменение формы или места требует соблюдения применимой процедуры.",
+      "legal_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_34823/22ff5ed049c33d6e71c1aff212b36a0cba0def9a/",
+        "https://www.consultant.ru/document/cons_doc_LAW_491757/d15585a8985d2c0ebf0202107cd8ce6373a6e2e1/"
+      ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
       "option_analysis_status": "draft",
-      "source_scope": "inherited_basis_requires_current_verification",
-      "review_date": "2026-11-27"
+      "source_scope": "specific_norm_and_related_search_results_partial",
+      "review_date": "2026-11-28",
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_34823/22ff5ed049c33d6e71c1aff212b36a0cba0def9a/",
+        "https://www.consultant.ru/document/cons_doc_LAW_491757/d15585a8985d2c0ebf0202107cd8ce6373a6e2e1/"
+      ],
+      "norm_recheck_2026_11_28": {
+        "status": "targeted_norm_and_individual_alternatives_reviewed_not_full_acceptance",
+        "limitation": "Не установлены конкретный формат и стадии обсуждения, применимые исключения и сроки; проверять пункты 16–48 правил по конкретной процедуре.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_34823/22ff5ed049c33d6e71c1aff212b36a0cba0def9a/",
+          "https://www.consultant.ru/document/cons_doc_LAW_491757/d15585a8985d2c0ebf0202107cd8ce6373a6e2e1/"
+        ]
+      },
+      "targeted_individual_review": {
+        "status": "targeted_norm_and_individual_alternatives_reviewed_not_full_acceptance",
+        "option_count": 5,
+        "remaining": "Не установлены конкретный формат и стадии обсуждения, применимые исключения и сроки; проверять пункты 16–48 правил по конкретной процедуре."
+      }
     },
     {
       "case_key": "bank-curated-v2-16",
@@ -6565,13 +6779,36 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "Статья 3.1 КоАП РФ определяет цель административного наказания, а статья 1.5 — презумпцию невиновности. Закон №196-ФЗ закрепляет обеспечение безопасности дорожного движения. Доходный показатель не заменяет доказанность отдельного нарушения и оценку опасных участков; дефект знака проверяется компетентным владельцем и органом. Источники: http://www.kremlin.ru/acts/constitution",
-      "legal_urls": [],
+      "legal_basis": "КоАП РФ, ст. 1.5, 3.1: виновность устанавливается в установленном порядке с предусмотренными законом исключениями из отдельных правил доказывания; наказание направлено на предупреждение правонарушений. 196-ФЗ, ст. 12: безопасное состояние дороги при содержании.",
+      "legal_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_34661/c4e643d138637f4eafb763d628fc44ef99c71a15/",
+        "https://www.consultant.ru/document/cons_doc_LAW_34661/8bf465e4f65d04133835b2b184706bb053ee92ac/",
+        "https://www.consultant.ru/document/cons_doc_LAW_8585/8b0fbe781750ca08f5bd5ce672747890f8878fb7/"
+      ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
       "option_analysis_status": "draft",
-      "source_scope": "inherited_basis_requires_current_verification",
-      "review_date": "2026-11-27"
+      "source_scope": "specific_norm_and_related_search_results_partial",
+      "review_date": "2026-11-28",
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_34661/c4e643d138637f4eafb763d628fc44ef99c71a15/",
+        "https://www.consultant.ru/document/cons_doc_LAW_34661/8bf465e4f65d04133835b2b184706bb053ee92ac/",
+        "https://www.consultant.ru/document/cons_doc_LAW_8585/8b0fbe781750ca08f5bd5ce672747890f8878fb7/"
+      ],
+      "norm_recheck_2026_11_28": {
+        "status": "targeted_norm_and_individual_alternatives_reviewed_not_full_acceptance",
+        "limitation": "Конкретные полномочия дорожного центра и составы правонарушений не установлены.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_34661/c4e643d138637f4eafb763d628fc44ef99c71a15/",
+          "https://www.consultant.ru/document/cons_doc_LAW_34661/8bf465e4f65d04133835b2b184706bb053ee92ac/",
+          "https://www.consultant.ru/document/cons_doc_LAW_8585/8b0fbe781750ca08f5bd5ce672747890f8878fb7/"
+        ]
+      },
+      "targeted_individual_review": {
+        "status": "targeted_norm_and_individual_alternatives_reviewed_not_full_acceptance",
+        "option_count": 5,
+        "remaining": "Конкретные полномочия дорожного центра и составы правонарушений не установлены."
+      }
     },
     {
       "case_key": "bank-curated-v2-22",
@@ -7128,13 +7365,36 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "Федеральный закон № 7-ФЗ, статья 11: право граждан на достоверную экологическую информацию. Конституция РФ, статья 42: право на благоприятную окружающую среду и достоверную информацию о её состоянии. Конкретные контрольные действия выполняет компетентный орган, а не пресс-служба. Источники: https://epp.genproc.gov.ru/upload/iblock/0d0/hghg8nrmg2v25zrox7cvk28868b3fr21.pdf https://minjust.gov.ru/ru/documents/8011/",
-      "legal_urls": [],
+      "legal_basis": "7-ФЗ, ст. 4.3, 11, 63: экологическая информация, права граждан и компетентный мониторинг. Цвет воды и отдельный журнал не устанавливают состав или источник загрязнения.",
+      "legal_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_34823/bff976b2d5a0e4eaf44a1ffbfcefdff8a779515f/",
+        "https://www.consultant.ru/document/cons_doc_LAW_34823/b850021a75bea5a4c205b365d32b169459b31417/",
+        "https://www.consultant.ru/document/cons_doc_LAW_34823/1de21f3d2f646b12715a2629b5593f44edd1717f/"
+      ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
       "option_analysis_status": "draft",
-      "source_scope": "inherited_basis_requires_current_verification",
-      "review_date": "2026-11-27"
+      "source_scope": "specific_norm_and_related_search_results_partial",
+      "review_date": "2026-11-28",
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_34823/bff976b2d5a0e4eaf44a1ffbfcefdff8a779515f/",
+        "https://www.consultant.ru/document/cons_doc_LAW_34823/b850021a75bea5a4c205b365d32b169459b31417/",
+        "https://www.consultant.ru/document/cons_doc_LAW_34823/1de21f3d2f646b12715a2629b5593f44edd1717f/"
+      ],
+      "norm_recheck_2026_11_28": {
+        "status": "targeted_norm_and_individual_alternatives_reviewed_not_full_acceptance",
+        "limitation": "Применимый водный и санитарный режим, вещества, полномочия лаборатории и критерии безопасности водозабора не установлены.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_34823/bff976b2d5a0e4eaf44a1ffbfcefdff8a779515f/",
+          "https://www.consultant.ru/document/cons_doc_LAW_34823/b850021a75bea5a4c205b365d32b169459b31417/",
+          "https://www.consultant.ru/document/cons_doc_LAW_34823/1de21f3d2f646b12715a2629b5593f44edd1717f/"
+        ]
+      },
+      "targeted_individual_review": {
+        "status": "targeted_norm_and_individual_alternatives_reviewed_not_full_acceptance",
+        "option_count": 5,
+        "remaining": "Применимый водный и санитарный режим, вещества, полномочия лаборатории и критерии безопасности водозабора не установлены."
+      }
     },
     {
       "case_key": "bank-expanded-light-01-01",
@@ -7855,13 +8115,36 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "Федеральный закон №257-ФЗ, статьи 17 и 30: содержание дорог и временные ограничения или прекращение движения в предусмотренных случаях. Конкретные ограничения оформляются компетентным субъектом с учётом применимого порядка, а не произвольным сообщением подрядчика. Источники: https://mintrans.gov.ru/storage/app/media/epd/0811201.pdf",
-      "legal_urls": [],
+      "legal_basis": "257-ФЗ, ст. 17 и 30; 196-ФЗ, ст. 12: содержание, компетентные ограничения, информирование пользователей и безопасное состояние дороги.",
+      "legal_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_72386/1692e755d61192abb296c96e101a443f4b701edf/",
+        "https://www.consultant.ru/document/cons_doc_LAW_72386/d815e149e72342151144533709e7ebcf7aa60b8c/",
+        "https://www.consultant.ru/document/cons_doc_LAW_8585/8b0fbe781750ca08f5bd5ce672747890f8878fb7/"
+      ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
       "option_analysis_status": "draft",
-      "source_scope": "inherited_basis_requires_current_verification",
-      "review_date": "2026-11-27"
+      "source_scope": "specific_norm_and_related_search_results_partial",
+      "review_date": "2026-11-28",
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_72386/1692e755d61192abb296c96e101a443f4b701edf/",
+        "https://www.consultant.ru/document/cons_doc_LAW_72386/d815e149e72342151144533709e7ebcf7aa60b8c/",
+        "https://www.consultant.ru/document/cons_doc_LAW_8585/8b0fbe781750ca08f5bd5ce672747890f8878fb7/"
+      ],
+      "norm_recheck_2026_11_28": {
+        "status": "targeted_norm_and_individual_alternatives_reviewed_not_full_acceptance",
+        "limitation": "Категория дороги, компетентный субъект, действующий порядок ограничения и инженерное решение проверяются отдельно.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_72386/1692e755d61192abb296c96e101a443f4b701edf/",
+          "https://www.consultant.ru/document/cons_doc_LAW_72386/d815e149e72342151144533709e7ebcf7aa60b8c/",
+          "https://www.consultant.ru/document/cons_doc_LAW_8585/8b0fbe781750ca08f5bd5ce672747890f8878fb7/"
+        ]
+      },
+      "targeted_individual_review": {
+        "status": "targeted_norm_and_individual_alternatives_reviewed_not_full_acceptance",
+        "option_count": 5,
+        "remaining": "Категория дороги, компетентный субъект, действующий порядок ограничения и инженерное решение проверяются отдельно."
+      }
     },
     {
       "case_key": "bank-expanded-serious-14-01",
@@ -8309,13 +8592,39 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "Конституция РФ, статья 42; Федеральный закон №7-ФЗ, статья 11: благоприятная среда и достоверная информация. Применимые нормативы и защитные меры устанавливаются компетентно; условное контрольное значение задачи не выдаётся за реальный санитарный норматив. Источники: https://minjust.gov.ru/ru/documents/8011/ https://epp.genproc.gov.ru/upload/iblock/0d0/hghg8nrmg2v25zrox7cvk28868b3fr21.pdf",
-      "legal_urls": [],
+      "legal_basis": "7-ФЗ, ст. 4.3, 11; 96-ФЗ, ст. 23; 273-ФЗ, ст. 41: достоверность экологических сведений, компетентные измерения и охрана здоровья детей. Неопределённость источника не препятствует оценке временных защитных мер.",
+      "legal_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_34823/bff976b2d5a0e4eaf44a1ffbfcefdff8a779515f/",
+        "https://www.consultant.ru/document/cons_doc_LAW_34823/b850021a75bea5a4c205b365d32b169459b31417/",
+        "https://www.consultant.ru/document/cons_doc_LAW_22971/ad03863bb52ba2d7d0bed6a807e3e5492c53abd6/",
+        "https://www.consultant.ru/document/cons_doc_LAW_140174/48b9101fff215f3aeb122d86593a129a34d96d3c/"
+      ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
       "option_analysis_status": "draft",
-      "source_scope": "inherited_basis_requires_current_verification",
-      "review_date": "2026-11-27"
+      "source_scope": "specific_norm_and_related_search_results_partial",
+      "review_date": "2026-11-28",
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_34823/bff976b2d5a0e4eaf44a1ffbfcefdff8a779515f/",
+        "https://www.consultant.ru/document/cons_doc_LAW_34823/b850021a75bea5a4c205b365d32b169459b31417/",
+        "https://www.consultant.ru/document/cons_doc_LAW_22971/ad03863bb52ba2d7d0bed6a807e3e5492c53abd6/",
+        "https://www.consultant.ru/document/cons_doc_LAW_140174/48b9101fff215f3aeb122d86593a129a34d96d3c/"
+      ],
+      "norm_recheck_2026_11_28": {
+        "status": "targeted_norm_and_individual_alternatives_reviewed_not_full_acceptance",
+        "limitation": "Вещество, норматив, методика и источник не установлены; учебное значение не выдавать за санитарную норму.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_34823/bff976b2d5a0e4eaf44a1ffbfcefdff8a779515f/",
+          "https://www.consultant.ru/document/cons_doc_LAW_34823/b850021a75bea5a4c205b365d32b169459b31417/",
+          "https://www.consultant.ru/document/cons_doc_LAW_22971/ad03863bb52ba2d7d0bed6a807e3e5492c53abd6/",
+          "https://www.consultant.ru/document/cons_doc_LAW_140174/48b9101fff215f3aeb122d86593a129a34d96d3c/"
+        ]
+      },
+      "targeted_individual_review": {
+        "status": "targeted_norm_and_individual_alternatives_reviewed_not_full_acceptance",
+        "option_count": 5,
+        "remaining": "Вещество, норматив, методика и источник не установлены; учебное значение не выдавать за санитарную норму."
+      }
     },
     {
       "case_key": "bank-expanded-serious-28-01",
