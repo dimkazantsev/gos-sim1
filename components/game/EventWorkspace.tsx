@@ -214,7 +214,7 @@ export default function EventWorkspace({g,readOnly=false,mode='feed'}:{g:ReturnT
   return [...new Set([...byCase.keys(),...invitations.map(i=>i.case_id)])].filter(id=>{
    if(titles&&!Object.prototype.hasOwnProperty.call(titles,id))return false;
    const assigned=byCase.get(id)||[];
-   if(!teacher&&me?.kind!=='observer'&&!assigned.some(x=>x.recipient_id===me?.user_id)&&!pendingInvites.has(id))return false;
+   if(!teacher&&me?.kind!=='observer'&&!assigned.some(x=>x.recipient_id===me?.user_id)&&!pendingInvites.has(id)&&!invitations.some(i=>i.case_id===id&&i.inviter_id===me?.user_id&&i.transfer_stage_no!=null))return false;
    if(feedPerson&&!assigned.some(x=>x.recipient_id===feedPerson))return false;
    if(feedRole&&!assigned.some(x=>rolesMap.get(x.recipient_id)===feedRole))return false;
    if(legalFilter!=='all'&&!authority.some(x=>x.case_id===id&&(!feedPerson||x.actor_id===feedPerson)&&(legalFilter==='valid'?(x.authority_ok&&x.lawful):(!x.authority_ok||!x.lawful))))return false;
@@ -362,17 +362,18 @@ export default function EventWorkspace({g,readOnly=false,mode='feed'}:{g:ReturnT
     const kind=outcome?.resolution_kind||(outcome?(Number(chosenEffect?.trust)>0?'beneficial':Number(chosenEffect?.trust)<0?'harmful':'neutral'):'pending');
     const expandedCase=true;
     const invites=invitations.filter(i=>i.case_id===c.id);
+    const transferMode=c.audience==='single'&&c.comic_scene?.event_rules_version===2;
     const pendingInvites=invites.some(i=>i.status==='pending');
     return <EventCaseModal key={c.id} title={c.title} onClose={()=>setExpanded('')}><div className="eventCaseBundle"><article className={'eventCaseCard eventStory '+(kind==='beneficial'?'eventStoryResolved ':kind==='harmful'?'eventStoryRejected ':outcome?'eventStoryNeutral ':'')}>
      <div className="eventStoryVisual"><EventComic silent title={c.title} category={gameValueLabel(c.category,'Ситуация')} caseKey={c.case_key} scene={c.comic_scene} compact/></div>
      <div className="eventStoryContent">
-      {teacher&&<div className="eventCaseTop"><span>{gameValueLabel(c.category,'Ситуация')}</span><span>{c.seriousness==='serious'?'Серьёзная':'Повседневная'} · {invites.some(i=>i.status==='accepted')?'Совместно':c.audience==='all'?'Все':c.audience==='group'?'Совместно':'Личная'}</span></div>}
+      {teacher&&<div className="eventCaseTop"><span>{gameValueLabel(c.category,'Ситуация')}</span><span>{c.seriousness==='serious'?'Серьёзная':'Повседневная'} · {!transferMode&&invites.some(i=>i.status==='accepted')?'Совместно':c.audience==='all'?'Все':c.audience==='group'?'Совместно':'Личная'}</span></div>}
       <h4>{c.title}</h4>{caseRegions[c.id]&&<p className="eventRegionAssignmentNotice"><strong>Регион под контролем партии «{caseRegions[c.id].party}» — {caseRegions[c.id].name}.</strong> {me.kind==='student'?'В регионе, который контролирует ваша партия, возникла следующая ситуация.':'В регионе под контролем указанной партии возникла следующая ситуация.'} По правилам ГОС.ID контролирующая партия управляет региональными органами власти, включая губернатора. Решение по этой ситуации принимает назначенный участник контролирующей партии; при необходимости можно пригласить других участников.</p>}{expandedCase&&<><p>{c.situation.replace(/\\n/g,'\n')}</p>
       <div className="eventStoryRecipients">{assigned.map(a=><span key={a.id}>{members.find(m=>m.user_id===a.recipient_id)?.full_name||'Участник'} · {members.find(m=>m.user_id===a.recipient_id)?.role_title||'Без должности'}</span>)}</div>
       <div className="eventCaseFooter"><span><UsersRound size={15} aria-hidden="true"/>{assigned.length} назначено</span><span><CheckCircle2 size={15} aria-hidden="true"/>{responded.length} ответили · {pct(responded.length,assigned.length)}%</span>
       </div>
-      {expandedCase&&<EventCollaboration g={g} caseId={c.id} audience={c.audience} invitations={invites} assignedIds={assigned.map(a=>a.recipient_id)} closed={!!outcome} votingStarted={responded.length>0} onChanged={()=>reload(false)} readOnly={readOnly}/>}
-      <EventChoicePanel labels={labels} decisions={responded} members={members} profiles={g.profiles} currentChoice={mineAnswer?.choice} canAnswer={!!my&&my.status==='pending'&&me.kind==='student'&&!outcome&&!busyId&&!readOnly&&!pendingInvites} onAnswer={choice=>{if(my)void answer(my,choice)}} revealResults={teacher||!!outcome||!!mineAnswer} showCorrectExplanation={!!mineAnswer&&!!outcome&&me.kind==='student'} correctIndex={bestIndex} bestDescription={bestOption?.description} bestLegalBasis={bestOption?.legal_basis} shuffleSeed={c.id+':'+me.user_id} notice={pendingInvites?'Ожидаем ответа на приглашения.':undefined}/>
+      {expandedCase&&<EventCollaboration g={g} caseId={c.id} audience={c.audience} transferMode={transferMode} invitations={invites} assignedIds={assigned.map(a=>a.recipient_id)} closed={!!outcome} votingStarted={responded.length>0} onChanged={()=>reload(false)} readOnly={readOnly}/>}
+      <EventChoicePanel labels={labels} decisions={responded} members={members} profiles={g.profiles} currentChoice={mineAnswer?.choice} canAnswer={!!my&&my.status==='pending'&&me.kind==='student'&&!outcome&&!busyId&&!readOnly&&!pendingInvites} onAnswer={choice=>{if(my)void answer(my,choice)}} revealResults={teacher||!!outcome||!!mineAnswer} showCorrectExplanation={!!mineAnswer&&!!outcome&&me.kind==='student'} correctIndex={bestIndex} bestDescription={bestOption?.description} bestLegalBasis={bestOption?.legal_basis} shuffleSeed={c.id+':'+me.user_id} notice={pendingInvites?(transferMode?'Ожидаем подтверждения передачи полномочий.':'Ожидаем ответа на приглашения.'):undefined}/>
 
       {mineAnswer&&!teacher&&<div className="eventOutcomeNote">Ваш голос: {labels[mineAnswer.choice==='accept'?0:mineAnswer.choice==='reject'?1:Math.max(0,Number(mineAnswer.choice.replace('option_',''))-1)]||'Учтён'}</div>}
       {outcome&&<div className="eventOutcomeNote final"><strong>Итог голосования: {outcome.winner==='tie'?'Большинство участников не поддержало единый вариант — решение не принято':labels[winnerIndex]}</strong>
