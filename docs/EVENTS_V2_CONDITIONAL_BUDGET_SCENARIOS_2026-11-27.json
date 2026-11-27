@@ -1,0 +1,822 @@
+{
+  "status": "draft_not_for_production",
+  "note": "Размеры частичных этапов — явно обозначенные учебные допущения, не подтверждённые сметы. Для разных типов работ нельзя считать долю достаточной без проверки. Источник финансирования не предполагается, если он неизвестен. Обязательные выплаты, права граждан и меры безопасности сохраняются. Любая проводка требует отдельного решения, подтверждения и защиты от дублей. Не включать в активный effect_plan до согласования.",
+  "cases": [
+    {
+      "case_key": "budget-region-2026-05-essential-services-gap",
+      "original_request_mln": 420,
+      "options": [
+        {
+          "key": "option_1",
+          "scope": "Предложить полное покрытие подтверждённого разрыва общей дотацией",
+          "assumed_scope_pct": 100,
+          "illustrative_estimate_mln": 420,
+          "proposed_federal_mln": 420,
+          "proposed_regional_mln": 0,
+          "funding_basis": "hypothetical_funding_mix"
+        },
+        {
+          "key": "option_2",
+          "scope": "Предложить частичную дотацию и законное перераспределение свободных региональных лимитов",
+          "assumed_scope_pct": 100,
+          "illustrative_estimate_mln": 420,
+          "proposed_federal_mln": 210,
+          "proposed_regional_mln": 210,
+          "funding_basis": "hypothetical_funding_mix"
+        },
+        {
+          "key": "option_3",
+          "scope": "Предложить ускоренный пересмотр кассового плана с временным законным источником",
+          "assumed_scope_pct": 100,
+          "illustrative_estimate_mln": 420,
+          "proposed_federal_mln": 0,
+          "proposed_regional_mln": 420,
+          "funding_basis": "hypothetical_funding_mix"
+        },
+        {
+          "key": "option_4",
+          "scope": "Предложить перенести только ещё не законтрактованные мероприятия и закрыть выплаты",
+          "assumed_scope_pct": 100,
+          "illustrative_estimate_mln": 420,
+          "proposed_federal_mln": 0,
+          "proposed_regional_mln": 420,
+          "funding_basis": "hypothetical_funding_mix"
+        },
+        {
+          "key": "option_5",
+          "scope": "Сочетать запрос общей помощи с адресным планом восстановления заказов",
+          "assumed_scope_pct": 100,
+          "illustrative_estimate_mln": 420,
+          "proposed_federal_mln": 420,
+          "proposed_regional_mln": 0,
+          "funding_basis": "hypothetical_funding_mix"
+        }
+      ]
+    },
+    {
+      "case_key": "budget-region-2026-10-hospital-equipment",
+      "original_request_mln": 675,
+      "options": [
+        {
+          "key": "option_1",
+          "scope": "Запросить полный диагностический блок с выездной службой и подготовкой персонала",
+          "assumed_scope_pct": 100,
+          "illustrative_estimate_mln": 675,
+          "proposed_federal_mln": 540,
+          "proposed_regional_mln": 135,
+          "funding_basis": "original_request"
+        },
+        {
+          "key": "option_2",
+          "scope": "Начать с выездной диагностики и аренды исправного оборудования",
+          "assumed_scope_pct": 30,
+          "illustrative_estimate_mln": 202.5,
+          "proposed_federal_mln": null,
+          "proposed_regional_mln": null,
+          "funding_basis": "undetermined"
+        },
+        {
+          "key": "option_3",
+          "scope": "Сначала оснастить один диагностический кабинет и проверить его загрузку",
+          "assumed_scope_pct": 45,
+          "illustrative_estimate_mln": 303.75,
+          "proposed_federal_mln": null,
+          "proposed_regional_mln": null,
+          "funding_basis": "undetermined"
+        },
+        {
+          "key": "option_4",
+          "scope": "Согласовать межрайонный маршрут обследований с компенсацией перевозки",
+          "assumed_scope_pct": 20,
+          "illustrative_estimate_mln": 135,
+          "proposed_federal_mln": null,
+          "proposed_regional_mln": null,
+          "funding_basis": "undetermined"
+        },
+        {
+          "key": "option_5",
+          "scope": "Подготовить поэтапную закупку и обучение на базе соседней больницы",
+          "assumed_scope_pct": 60,
+          "illustrative_estimate_mln": 405,
+          "proposed_federal_mln": null,
+          "proposed_regional_mln": null,
+          "funding_basis": "undetermined"
+        }
+      ]
+    },
+    {
+      "case_key": "budget-region-2026-22-drought-irrigation",
+      "original_request_mln": 700,
+      "options": [
+        {
+          "key": "option_1",
+          "scope": "Сосредоточить заявку на ремонте общей оросительной инфраструктуры",
+          "assumed_scope_pct": 65,
+          "illustrative_estimate_mln": 455,
+          "proposed_federal_mln": null,
+          "proposed_regional_mln": null,
+          "funding_basis": "undetermined"
+        },
+        {
+          "key": "option_2",
+          "scope": "Приоритизировать повторный посев и временную подачу воды",
+          "assumed_scope_pct": 45,
+          "illustrative_estimate_mln": 315,
+          "proposed_federal_mln": null,
+          "proposed_regional_mln": null,
+          "funding_basis": "undetermined"
+        },
+        {
+          "key": "option_3",
+          "scope": "Предложить поэтапную реконструкцию водоснабжения с техническим сопровождением",
+          "assumed_scope_pct": 60,
+          "illustrative_estimate_mln": 420,
+          "proposed_federal_mln": null,
+          "proposed_regional_mln": null,
+          "funding_basis": "undetermined"
+        },
+        {
+          "key": "option_4",
+          "scope": "Подготовить открытый отбор поддержки хозяйств по объективным критериям потерь",
+          "assumed_scope_pct": 70,
+          "illustrative_estimate_mln": 490,
+          "proposed_federal_mln": null,
+          "proposed_regional_mln": null,
+          "funding_basis": "undetermined"
+        },
+        {
+          "key": "option_5",
+          "scope": "Запросить меньший объём помощи и перераспределить свободные региональные средства",
+          "assumed_scope_pct": 50,
+          "illustrative_estimate_mln": 350,
+          "proposed_federal_mln": null,
+          "proposed_regional_mln": null,
+          "funding_basis": "undetermined"
+        }
+      ]
+    },
+    {
+      "case_key": "budget-region-2026-25-bridge-detour",
+      "original_request_mln": 1800,
+      "options": [
+        {
+          "key": "option_1",
+          "scope": "Предложить ускоренное восстановление моста и подходов с независимым контролем",
+          "assumed_scope_pct": 100,
+          "illustrative_estimate_mln": 1800,
+          "proposed_federal_mln": 1440,
+          "proposed_regional_mln": 360,
+          "funding_basis": "original_request"
+        },
+        {
+          "key": "option_2",
+          "scope": "Разделить ремонт на этапы, поддержав перевозчиков на безопасном объезде",
+          "assumed_scope_pct": 70,
+          "illustrative_estimate_mln": 1260,
+          "proposed_federal_mln": null,
+          "proposed_regional_mln": null,
+          "funding_basis": "undetermined"
+        },
+        {
+          "key": "option_3",
+          "scope": "Предложить временный безопасный маршрут и конкурентный выбор подрядчика",
+          "assumed_scope_pct": 20,
+          "illustrative_estimate_mln": 360,
+          "proposed_federal_mln": null,
+          "proposed_regional_mln": null,
+          "funding_basis": "undetermined"
+        },
+        {
+          "key": "option_4",
+          "scope": "Сосредоточить заявку на опорах, отложив необязательное благоустройство подходов",
+          "assumed_scope_pct": 85,
+          "illustrative_estimate_mln": 1530,
+          "proposed_federal_mln": null,
+          "proposed_regional_mln": null,
+          "funding_basis": "undetermined"
+        },
+        {
+          "key": "option_5",
+          "scope": "Подготовить совместное финансирование дорожного ремонта с региональными программами",
+          "assumed_scope_pct": 100,
+          "illustrative_estimate_mln": 1800,
+          "proposed_federal_mln": null,
+          "proposed_regional_mln": null,
+          "funding_basis": "undetermined"
+        }
+      ]
+    },
+    {
+      "case_key": "budget-region-2026-38-forest-recovery",
+      "original_request_mln": 1100,
+      "options": [
+        {
+          "key": "option_1",
+          "scope": "Предложить комплексное обследование, очистку и восстановление всех подтверждённых участков",
+          "assumed_scope_pct": 100,
+          "illustrative_estimate_mln": 1100,
+          "proposed_federal_mln": 880,
+          "proposed_regional_mln": 220,
+          "funding_basis": "original_request"
+        },
+        {
+          "key": "option_2",
+          "scope": "Начать с участков у населённых пунктов, остальной объём планировать поэтапно",
+          "assumed_scope_pct": 55,
+          "illustrative_estimate_mln": 605,
+          "proposed_federal_mln": null,
+          "proposed_regional_mln": null,
+          "funding_basis": "undetermined"
+        },
+        {
+          "key": "option_3",
+          "scope": "Предложить природное восстановление там, где это допускает обследование, и активные работы в остальных зонах",
+          "assumed_scope_pct": 35,
+          "illustrative_estimate_mln": 385,
+          "proposed_federal_mln": null,
+          "proposed_regional_mln": null,
+          "funding_basis": "undetermined"
+        },
+        {
+          "key": "option_4",
+          "scope": "Сосредоточить ресурсы на подъездах, мониторинге и предотвращении повторного ущерба",
+          "assumed_scope_pct": 40,
+          "illustrative_estimate_mln": 440,
+          "proposed_federal_mln": null,
+          "proposed_regional_mln": null,
+          "funding_basis": "undetermined"
+        },
+        {
+          "key": "option_5",
+          "scope": "Согласовать разделение работ между лесными службами и законными исполнителями",
+          "assumed_scope_pct": 65,
+          "illustrative_estimate_mln": 715,
+          "proposed_federal_mln": null,
+          "proposed_regional_mln": null,
+          "funding_basis": "undetermined"
+        }
+      ]
+    },
+    {
+      "case_key": "budget-region-2026-40-industrial-grid",
+      "original_request_mln": 1000,
+      "options": [
+        {
+          "key": "option_1",
+          "scope": "Предложить общий сетевой узел для всех подтверждённых участков",
+          "assumed_scope_pct": 100,
+          "illustrative_estimate_mln": 1000,
+          "proposed_federal_mln": 800,
+          "proposed_regional_mln": 200,
+          "funding_basis": "original_request"
+        },
+        {
+          "key": "option_2",
+          "scope": "Сначала обеспечить постоянное питание уже работающих предприятий",
+          "assumed_scope_pct": 45,
+          "illustrative_estimate_mln": 450,
+          "proposed_federal_mln": null,
+          "proposed_regional_mln": null,
+          "funding_basis": "undetermined"
+        },
+        {
+          "key": "option_3",
+          "scope": "Согласовать поэтапное строительство сетей с проверяемым спросом",
+          "assumed_scope_pct": 60,
+          "illustrative_estimate_mln": 600,
+          "proposed_federal_mln": null,
+          "proposed_regional_mln": null,
+          "funding_basis": "undetermined"
+        },
+        {
+          "key": "option_4",
+          "scope": "Приоритизировать подъезд и общую инфраструктуру с отдельными договорами подключения",
+          "assumed_scope_pct": 35,
+          "illustrative_estimate_mln": 350,
+          "proposed_federal_mln": null,
+          "proposed_regional_mln": null,
+          "funding_basis": "undetermined"
+        },
+        {
+          "key": "option_5",
+          "scope": "Предложить софинансирование инфраструктуры по равным условиям доступа",
+          "assumed_scope_pct": 65,
+          "illustrative_estimate_mln": 650,
+          "proposed_federal_mln": null,
+          "proposed_regional_mln": null,
+          "funding_basis": "undetermined"
+        }
+      ]
+    },
+    {
+      "case_key": "budget-region-2026-42-employment-retraining",
+      "original_request_mln": 600,
+      "options": [
+        {
+          "key": "option_1",
+          "scope": "Сконцентрировать обучение на профессиях с подтверждённым быстрым трудоустройством",
+          "assumed_scope_pct": 50,
+          "illustrative_estimate_mln": 300,
+          "proposed_federal_mln": null,
+          "proposed_regional_mln": null,
+          "funding_basis": "undetermined"
+        },
+        {
+          "key": "option_2",
+          "scope": "Предложить широкий набор курсов с независимой оценкой результатов",
+          "assumed_scope_pct": 100,
+          "illustrative_estimate_mln": 600,
+          "proposed_federal_mln": 480,
+          "proposed_regional_mln": 120,
+          "funding_basis": "original_request"
+        },
+        {
+          "key": "option_3",
+          "scope": "Сочетать короткие курсы с практикой у проверенных работодателей",
+          "assumed_scope_pct": 70,
+          "illustrative_estimate_mln": 420,
+          "proposed_federal_mln": null,
+          "proposed_regional_mln": null,
+          "funding_basis": "undetermined"
+        },
+        {
+          "key": "option_4",
+          "scope": "Запустить первую очередь для наиболее уязвимых работников по общим критериям",
+          "assumed_scope_pct": 40,
+          "illustrative_estimate_mln": 240,
+          "proposed_federal_mln": null,
+          "proposed_regional_mln": null,
+          "funding_basis": "undetermined"
+        },
+        {
+          "key": "option_5",
+          "scope": "Предложить меньший бюджет обучения и усилить существующую службу трудоустройства",
+          "assumed_scope_pct": 35,
+          "illustrative_estimate_mln": 210,
+          "proposed_federal_mln": null,
+          "proposed_regional_mln": null,
+          "funding_basis": "undetermined"
+        }
+      ]
+    },
+    {
+      "case_key": "budget-region-2026-43-rural-cultural-centres",
+      "original_request_mln": 200,
+      "options": [
+        {
+          "key": "option_1",
+          "scope": "Предложить одновременный ремонт всех пяти центров с доступным оборудованием",
+          "assumed_scope_pct": 100,
+          "illustrative_estimate_mln": 200,
+          "proposed_federal_mln": 160,
+          "proposed_regional_mln": 40,
+          "funding_basis": "original_request"
+        },
+        {
+          "key": "option_2",
+          "scope": "Начать с наиболее посещаемых безопасно восстанавливаемых центров",
+          "assumed_scope_pct": 55,
+          "illustrative_estimate_mln": 110,
+          "proposed_federal_mln": null,
+          "proposed_regional_mln": null,
+          "funding_basis": "undetermined"
+        },
+        {
+          "key": "option_3",
+          "scope": "Приоритизировать центры в населённых пунктах без альтернативной культурной услуги",
+          "assumed_scope_pct": 50,
+          "illustrative_estimate_mln": 100,
+          "proposed_federal_mln": null,
+          "proposed_regional_mln": null,
+          "funding_basis": "undetermined"
+        },
+        {
+          "key": "option_4",
+          "scope": "Использовать выездные программы на период последовательного ремонта",
+          "assumed_scope_pct": 25,
+          "illustrative_estimate_mln": 50,
+          "proposed_federal_mln": null,
+          "proposed_regional_mln": null,
+          "funding_basis": "undetermined"
+        },
+        {
+          "key": "option_5",
+          "scope": "Согласовать ремонт помещений отдельно от обновления оборудования по очередям",
+          "assumed_scope_pct": 65,
+          "illustrative_estimate_mln": 130,
+          "proposed_federal_mln": null,
+          "proposed_regional_mln": null,
+          "funding_basis": "undetermined"
+        }
+      ]
+    },
+    {
+      "case_key": "budget-region-2026-45-rural-broadband",
+      "original_request_mln": 450,
+      "options": [
+        {
+          "key": "option_1",
+          "scope": "Предложить сплошную прокладку сети по всем восемнадцати поселениям",
+          "assumed_scope_pct": 100,
+          "illustrative_estimate_mln": 450,
+          "proposed_federal_mln": 360,
+          "proposed_regional_mln": 90,
+          "funding_basis": "original_request"
+        },
+        {
+          "key": "option_2",
+          "scope": "Сначала подключить учреждения и наиболее удалённые поселения",
+          "assumed_scope_pct": 55,
+          "illustrative_estimate_mln": 247.5,
+          "proposed_federal_mln": null,
+          "proposed_regional_mln": null,
+          "funding_basis": "undetermined"
+        },
+        {
+          "key": "option_3",
+          "scope": "Начать с участков с подтверждённым спросом предпринимателей",
+          "assumed_scope_pct": 40,
+          "illustrative_estimate_mln": 180,
+          "proposed_federal_mln": null,
+          "proposed_regional_mln": null,
+          "funding_basis": "undetermined"
+        },
+        {
+          "key": "option_4",
+          "scope": "Сочетать постоянную сеть и допустимые временные технологии доступа",
+          "assumed_scope_pct": 60,
+          "illustrative_estimate_mln": 270,
+          "proposed_federal_mln": null,
+          "proposed_regional_mln": null,
+          "funding_basis": "undetermined"
+        },
+        {
+          "key": "option_5",
+          "scope": "Предложить поэтапное софинансирование с прозрачными условиями доступа",
+          "assumed_scope_pct": 70,
+          "illustrative_estimate_mln": 315,
+          "proposed_federal_mln": null,
+          "proposed_regional_mln": null,
+          "funding_basis": "undetermined"
+        }
+      ]
+    },
+    {
+      "case_key": "budget-region-2026-47-food-logistics",
+      "original_request_mln": 700,
+      "options": [
+        {
+          "key": "option_1",
+          "scope": "Предложить один общий холодильный узел с резервом мощности",
+          "assumed_scope_pct": 100,
+          "illustrative_estimate_mln": 700,
+          "proposed_federal_mln": 560,
+          "proposed_regional_mln": 140,
+          "funding_basis": "original_request"
+        },
+        {
+          "key": "option_2",
+          "scope": "Организовать меньшие распределённые склады по основным маршрутам",
+          "assumed_scope_pct": 90,
+          "illustrative_estimate_mln": 630,
+          "proposed_federal_mln": null,
+          "proposed_regional_mln": null,
+          "funding_basis": "undetermined"
+        },
+        {
+          "key": "option_3",
+          "scope": "Начать с аренды доступных мощностей и цифрового бронирования",
+          "assumed_scope_pct": 25,
+          "illustrative_estimate_mln": 175,
+          "proposed_federal_mln": null,
+          "proposed_regional_mln": null,
+          "funding_basis": "undetermined"
+        },
+        {
+          "key": "option_4",
+          "scope": "Предложить кооперативное участие производителей на недискриминационных условиях",
+          "assumed_scope_pct": 70,
+          "illustrative_estimate_mln": 490,
+          "proposed_federal_mln": null,
+          "proposed_regional_mln": null,
+          "funding_basis": "undetermined"
+        },
+        {
+          "key": "option_5",
+          "scope": "Планировать постоянный узел по очередям с измерением фактической загрузки",
+          "assumed_scope_pct": 60,
+          "illustrative_estimate_mln": 420,
+          "proposed_federal_mln": null,
+          "proposed_regional_mln": null,
+          "funding_basis": "undetermined"
+        }
+      ]
+    },
+    {
+      "case_key": "budget-region-2026-54-school-capacity",
+      "original_request_mln": 1200,
+      "options": [
+        {
+          "key": "option_1",
+          "scope": "Предложить строительство школы на подтверждённом участке с полной заявкой",
+          "assumed_scope_pct": 100,
+          "illustrative_estimate_mln": 1200,
+          "proposed_federal_mln": 960,
+          "proposed_regional_mln": 240,
+          "funding_basis": "original_request"
+        },
+        {
+          "key": "option_2",
+          "scope": "Сочетать проект новой школы с временным перераспределением мест и подвоза",
+          "assumed_scope_pct": 85,
+          "illustrative_estimate_mln": 1020,
+          "proposed_federal_mln": null,
+          "proposed_regional_mln": null,
+          "funding_basis": "undetermined"
+        },
+        {
+          "key": "option_3",
+          "scope": "Подготовить этапное строительство с сохранением санитарных требований и проектной мощности",
+          "assumed_scope_pct": 65,
+          "illustrative_estimate_mln": 780,
+          "proposed_federal_mln": null,
+          "proposed_regional_mln": null,
+          "funding_basis": "undetermined"
+        },
+        {
+          "key": "option_4",
+          "scope": "Предложить ускоренную подготовку подключения и проектной документации",
+          "assumed_scope_pct": 15,
+          "illustrative_estimate_mln": 180,
+          "proposed_federal_mln": null,
+          "proposed_regional_mln": null,
+          "funding_basis": "undetermined"
+        },
+        {
+          "key": "option_5",
+          "scope": "Согласовать региональную очередь новых образовательных объектов по подтверждённой потребности",
+          "assumed_scope_pct": 0,
+          "illustrative_estimate_mln": 0,
+          "proposed_federal_mln": 0,
+          "proposed_regional_mln": 0,
+          "funding_basis": "no_new_capital_commitment"
+        }
+      ]
+    },
+    {
+      "case_key": "budget-region-2026-56-flood-drainage",
+      "original_request_mln": 1350,
+      "options": [
+        {
+          "key": "option_1",
+          "scope": "Предложить комплекс водоотводов, укрепления берегов и предупреждения",
+          "assumed_scope_pct": 100,
+          "illustrative_estimate_mln": 1350,
+          "proposed_federal_mln": 1080,
+          "proposed_regional_mln": 270,
+          "funding_basis": "original_request"
+        },
+        {
+          "key": "option_2",
+          "scope": "Начать с наиболее уязвимых жилых кварталов по карте риска",
+          "assumed_scope_pct": 60,
+          "illustrative_estimate_mln": 810,
+          "proposed_federal_mln": null,
+          "proposed_regional_mln": null,
+          "funding_basis": "undetermined"
+        },
+        {
+          "key": "option_3",
+          "scope": "Приоритизировать водоотводы, обслуживающие жильё и действующие предприятия",
+          "assumed_scope_pct": 70,
+          "illustrative_estimate_mln": 945,
+          "proposed_federal_mln": null,
+          "proposed_regional_mln": null,
+          "funding_basis": "undetermined"
+        },
+        {
+          "key": "option_4",
+          "scope": "Предложить временные безопасные защитные меры и поэтапную реконструкцию",
+          "assumed_scope_pct": 30,
+          "illustrative_estimate_mln": 405,
+          "proposed_federal_mln": null,
+          "proposed_regional_mln": null,
+          "funding_basis": "undetermined"
+        },
+        {
+          "key": "option_5",
+          "scope": "Согласовать отдельные этапы после гидрологического обследования и проверки смет",
+          "assumed_scope_pct": 10,
+          "illustrative_estimate_mln": 135,
+          "proposed_federal_mln": null,
+          "proposed_regional_mln": null,
+          "funding_basis": "undetermined"
+        }
+      ]
+    },
+    {
+      "case_key": "budget-region-2026-59-heating-network",
+      "original_request_mln": 900,
+      "options": [
+        {
+          "key": "option_1",
+          "scope": "Предложить одновременную замену двенадцати участков с временным теплоснабжением",
+          "assumed_scope_pct": 100,
+          "illustrative_estimate_mln": 900,
+          "proposed_federal_mln": 720,
+          "proposed_regional_mln": 180,
+          "funding_basis": "original_request"
+        },
+        {
+          "key": "option_2",
+          "scope": "Сначала заменить узлы, обеспечивающие школы и наиболее уязвимые дома",
+          "assumed_scope_pct": 55,
+          "illustrative_estimate_mln": 495,
+          "proposed_federal_mln": null,
+          "proposed_regional_mln": null,
+          "funding_basis": "undetermined"
+        },
+        {
+          "key": "option_3",
+          "scope": "Приоритизировать участки с максимальными потерями тепла по обследованию",
+          "assumed_scope_pct": 65,
+          "illustrative_estimate_mln": 585,
+          "proposed_federal_mln": null,
+          "proposed_regional_mln": null,
+          "funding_basis": "undetermined"
+        },
+        {
+          "key": "option_4",
+          "scope": "Выполнить работы по очередям, совместив их с сезонными переключениями",
+          "assumed_scope_pct": 60,
+          "illustrative_estimate_mln": 540,
+          "proposed_federal_mln": null,
+          "proposed_regional_mln": null,
+          "funding_basis": "undetermined"
+        },
+        {
+          "key": "option_5",
+          "scope": "Сочетать ограниченную замену и контроль утечек на остальных допустимых участках",
+          "assumed_scope_pct": 35,
+          "illustrative_estimate_mln": 315,
+          "proposed_federal_mln": null,
+          "proposed_regional_mln": null,
+          "funding_basis": "undetermined"
+        }
+      ]
+    },
+    {
+      "case_key": "budget-region-2026-63-technical-college",
+      "original_request_mln": 500,
+      "options": [
+        {
+          "key": "option_1",
+          "scope": "Предложить полноценную учебную линию для заявленных шестисот мест",
+          "assumed_scope_pct": 100,
+          "illustrative_estimate_mln": 500,
+          "proposed_federal_mln": 400,
+          "proposed_regional_mln": 100,
+          "funding_basis": "original_request"
+        },
+        {
+          "key": "option_2",
+          "scope": "Начать с коротких программ для подтверждённых вакансий",
+          "assumed_scope_pct": 30,
+          "illustrative_estimate_mln": 150,
+          "proposed_federal_mln": null,
+          "proposed_regional_mln": null,
+          "funding_basis": "undetermined"
+        },
+        {
+          "key": "option_3",
+          "scope": "Согласовать практику у работодателей и поэтапно оснастить колледж",
+          "assumed_scope_pct": 65,
+          "illustrative_estimate_mln": 325,
+          "proposed_federal_mln": null,
+          "proposed_regional_mln": null,
+          "funding_basis": "undetermined"
+        },
+        {
+          "key": "option_4",
+          "scope": "Предложить совместное использование существующего оборудования учебных центров",
+          "assumed_scope_pct": 40,
+          "illustrative_estimate_mln": 200,
+          "proposed_federal_mln": null,
+          "proposed_regional_mln": null,
+          "funding_basis": "undetermined"
+        },
+        {
+          "key": "option_5",
+          "scope": "Расширить подготовку постепенно после оценки трудоустройства первой группы",
+          "assumed_scope_pct": 50,
+          "illustrative_estimate_mln": 250,
+          "proposed_federal_mln": null,
+          "proposed_regional_mln": null,
+          "funding_basis": "undetermined"
+        }
+      ]
+    },
+    {
+      "case_key": "budget-region-2026-64-wastewater-cleaning",
+      "original_request_mln": 800,
+      "options": [
+        {
+          "key": "option_1",
+          "scope": "Предложить полное обновление оборудования с испытаниями и обучением",
+          "assumed_scope_pct": 100,
+          "illustrative_estimate_mln": 800,
+          "proposed_federal_mln": 640,
+          "proposed_regional_mln": 160,
+          "funding_basis": "original_request"
+        },
+        {
+          "key": "option_2",
+          "scope": "Сначала устранить узкие места с наибольшим подтверждённым экологическим эффектом",
+          "assumed_scope_pct": 50,
+          "illustrative_estimate_mln": 400,
+          "proposed_federal_mln": null,
+          "proposed_regional_mln": null,
+          "funding_basis": "undetermined"
+        },
+        {
+          "key": "option_3",
+          "scope": "Проводить модернизацию по линиям при безопасном режиме действующих сооружений",
+          "assumed_scope_pct": 60,
+          "illustrative_estimate_mln": 480,
+          "proposed_federal_mln": null,
+          "proposed_regional_mln": null,
+          "funding_basis": "undetermined"
+        },
+        {
+          "key": "option_4",
+          "scope": "Сочетать оборудование с усиленным лабораторным контролем и обучением",
+          "assumed_scope_pct": 40,
+          "illustrative_estimate_mln": 320,
+          "proposed_federal_mln": null,
+          "proposed_regional_mln": null,
+          "funding_basis": "undetermined"
+        },
+        {
+          "key": "option_5",
+          "scope": "Согласовать вклад будущих подключений по действующим прозрачным условиям",
+          "assumed_scope_pct": 80,
+          "illustrative_estimate_mln": 640,
+          "proposed_federal_mln": null,
+          "proposed_regional_mln": null,
+          "funding_basis": "undetermined"
+        }
+      ]
+    },
+    {
+      "case_key": "budget-region-2026-72-temporary-family-housing",
+      "original_request_mln": 900,
+      "options": [
+        {
+          "key": "option_1",
+          "scope": "Предложить полную заявку на обеспечение прав семей с переездом и сопровождением",
+          "assumed_scope_pct": 100,
+          "illustrative_estimate_mln": 900,
+          "proposed_federal_mln": 720,
+          "proposed_regional_mln": 180,
+          "funding_basis": "original_request"
+        },
+        {
+          "key": "option_2",
+          "scope": "Поэтапно обеспечить постоянное жильё при сохранении допустимого временного размещения",
+          "assumed_scope_pct": 60,
+          "illustrative_estimate_mln": 540,
+          "proposed_federal_mln": null,
+          "proposed_regional_mln": null,
+          "funding_basis": "undetermined"
+        },
+        {
+          "key": "option_3",
+          "scope": "Приоритетно решить наиболее срочные случаи по установленным основаниям",
+          "assumed_scope_pct": 50,
+          "illustrative_estimate_mln": 450,
+          "proposed_federal_mln": null,
+          "proposed_regional_mln": null,
+          "funding_basis": "undetermined"
+        },
+        {
+          "key": "option_4",
+          "scope": "Предложить выбор допустимых форм обеспечения по статусу и предпочтениям жителей",
+          "assumed_scope_pct": 80,
+          "illustrative_estimate_mln": 720,
+          "proposed_federal_mln": null,
+          "proposed_regional_mln": null,
+          "funding_basis": "undetermined"
+        },
+        {
+          "key": "option_5",
+          "scope": "Согласовать межведомственное сопровождение и поиск доступного жилищного фонда",
+          "assumed_scope_pct": 20,
+          "illustrative_estimate_mln": 180,
+          "proposed_federal_mln": null,
+          "proposed_regional_mln": null,
+          "funding_basis": "undetermined"
+        }
+      ]
+    }
+  ]
+}
