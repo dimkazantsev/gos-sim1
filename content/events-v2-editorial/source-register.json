@@ -5392,21 +5392,39 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "152-ФЗ, ст. 5, 7; ГК РФ, ст. 152.2: без самостоятельного законного основания нельзя раскрывать идентифицируемые личные сведения. Удаление звука, ограничение комментариев и согласие автора записи не заменяют проверку прав субъекта данных. Для передачи оригинала проверяется необходимость доступа.",
+      "legal_basis": "152-ФЗ, ст. 5, 6, 7, 21; ГК РФ, ст. 152.2. Необходимость и законное основание обработки, конфиденциальность, прекращение неправомерной обработки и реагирование на установленный инцидент.",
       "legal_urls": [
         "https://www.consultant.ru/document/cons_doc_LAW_61801/96fbc469f91f57235cc842a85e0516a99f23dc85/",
         "https://www.consultant.ru/document/cons_doc_LAW_61801/a15bab6050028753706f22c32fe60627a7be79f9/",
-        "https://www.consultant.ru/document/cons_doc_LAW_5142/9c307a0f2164645c15ca4e3146ff5f6e56060b23/"
+        "https://www.consultant.ru/document/cons_doc_LAW_5142/9c307a0f2164645c15ca4e3146ff5f6e56060b23/",
+        "https://www.consultant.ru/document/cons_doc_LAW_61801/315f051396c88f1e4f827ba3f2ae313d999a1873/",
+        "https://www.consultant.ru/document/cons_doc_LAW_61801/d3fe43a7c415353b17faab255bc0de92bea127da/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
       "checked_norm_urls": [
         "https://www.consultant.ru/document/cons_doc_LAW_61801/96fbc469f91f57235cc842a85e0516a99f23dc85/",
-        "https://www.consultant.ru/document/cons_doc_LAW_61801/a15bab6050028753706f22c32fe60627a7be79f9/"
+        "https://www.consultant.ru/document/cons_doc_LAW_61801/a15bab6050028753706f22c32fe60627a7be79f9/",
+        "https://www.consultant.ru/document/cons_doc_LAW_61801/315f051396c88f1e4f827ba3f2ae313d999a1873/",
+        "https://www.consultant.ru/document/cons_doc_LAW_61801/d3fe43a7c415353b17faab255bc0de92bea127da/",
+        "https://www.consultant.ru/document/cons_doc_LAW_5142/9c307a0f2164645c15ca4e3146ff5f6e56060b23/"
       ],
       "option_analysis_status": "draft",
       "source_scope": "specific_norm_and_related_search_results_partial",
-      "review_date": "2026-11-27"
+      "review_date": "2026-11-27",
+      "norm_recheck_2026_11_28": {
+        "status": "targeted_norm_and_all_individual_alternatives_reviewed_not_full_acceptance",
+        "basis": "152-ФЗ, ст. 5, 6, 7, 21; ГК РФ, ст. 152.2. Необходимость и законное основание обработки, конфиденциальность, прекращение неправомерной обработки и реагирование на установленный инцидент.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_61801/96fbc469f91f57235cc842a85e0516a99f23dc85/",
+          "https://www.consultant.ru/document/cons_doc_LAW_61801/315f051396c88f1e4f827ba3f2ae313d999a1873/",
+          "https://www.consultant.ru/document/cons_doc_LAW_61801/a15bab6050028753706f22c32fe60627a7be79f9/",
+          "https://www.consultant.ru/document/cons_doc_LAW_61801/d3fe43a7c415353b17faab255bc0de92bea127da/",
+          "https://www.consultant.ru/document/cons_doc_LAW_5142/9c307a0f2164645c15ca4e3146ff5f6e56060b23/"
+        ],
+        "limitation": "Сам факт съёмки ещё не доказывает инцидент; действия оператора зависят от фактов доступа и распространения.",
+        "source_scope": "Тексты отдельных статей и поисковые извлечения из КонсультантПлюс, 28.11.2026; не полная сверка поправок."
+      }
     },
     {
       "case_key": "bank-ceremony",
@@ -5491,21 +5509,37 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "152-ФЗ, ст. 7, 10; Конституция РФ, ст. 44: культурная деятельность не отменяет конфиденциальность и особый режим сведений о здоровье. Обезличивание должно исключать идентификацию; права на изображения проверяются отдельно.",
+      "legal_basis": "152-ФЗ, ст. 5, 6, 7, 10. Ограничение цели и объёма обработки, основания обработки, конфиденциальность, специальный режим сведений о здоровье.",
       "legal_urls": [
         "https://minjust.gov.ru/ru/documents/8011/",
         "https://www.consultant.ru/document/cons_doc_LAW_61801/a15bab6050028753706f22c32fe60627a7be79f9/",
-        "https://www.consultant.ru/document/cons_doc_LAW_61801/26edb2934b899bf9c74c3a8f7e574651c6565e6d/"
+        "https://www.consultant.ru/document/cons_doc_LAW_61801/26edb2934b899bf9c74c3a8f7e574651c6565e6d/",
+        "https://www.consultant.ru/document/cons_doc_LAW_61801/96fbc469f91f57235cc842a85e0516a99f23dc85/",
+        "https://www.consultant.ru/document/cons_doc_LAW_61801/315f051396c88f1e4f827ba3f2ae313d999a1873/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
       "checked_norm_urls": [
         "https://www.consultant.ru/document/cons_doc_LAW_61801/a15bab6050028753706f22c32fe60627a7be79f9/",
-        "https://www.consultant.ru/document/cons_doc_LAW_61801/26edb2934b899bf9c74c3a8f7e574651c6565e6d/"
+        "https://www.consultant.ru/document/cons_doc_LAW_61801/26edb2934b899bf9c74c3a8f7e574651c6565e6d/",
+        "https://www.consultant.ru/document/cons_doc_LAW_61801/96fbc469f91f57235cc842a85e0516a99f23dc85/",
+        "https://www.consultant.ru/document/cons_doc_LAW_61801/315f051396c88f1e4f827ba3f2ae313d999a1873/"
       ],
       "option_analysis_status": "draft",
       "source_scope": "specific_norm_and_related_search_results_partial",
-      "review_date": "2026-11-27"
+      "review_date": "2026-11-27",
+      "norm_recheck_2026_11_28": {
+        "status": "targeted_norm_and_all_individual_alternatives_reviewed_not_full_acceptance",
+        "basis": "152-ФЗ, ст. 5, 6, 7, 10. Ограничение цели и объёма обработки, основания обработки, конфиденциальность, специальный режим сведений о здоровье.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_61801/96fbc469f91f57235cc842a85e0516a99f23dc85/",
+          "https://www.consultant.ru/document/cons_doc_LAW_61801/315f051396c88f1e4f827ba3f2ae313d999a1873/",
+          "https://www.consultant.ru/document/cons_doc_LAW_61801/a15bab6050028753706f22c32fe60627a7be79f9/",
+          "https://www.consultant.ru/document/cons_doc_LAW_61801/26edb2934b899bf9c74c3a8f7e574651c6565e6d/"
+        ],
+        "limitation": "Не любое старое дело открыто для публикации; проверяется возможность идентификации и применимые основания.",
+        "source_scope": "Тексты отдельных статей и поисковые извлечения из КонсультантПлюс, 28.11.2026; не полная сверка поправок."
+      }
     },
     {
       "case_key": "bank-curated-light-03",
@@ -5889,18 +5923,39 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "Статьи 886 и 891 ГК РФ регулируют договор хранения и меры по сохранности вещи. Статьи 5 и 7 Закона № 152-ФЗ требуют учитывать цель обработки и конфиденциальность персональных сведений. Передача музею не означает согласия авторов на немедленную публикацию писем. Источники: https://www.consultant.ru/document/cons_doc_LAW_9027/ https://mintrud.gov.ru/docs/laws/130",
+      "legal_basis": "152-ФЗ, ст. 5, 6, 7; ГК РФ, ст. 886, 891. Хранение вещей с обязанностью обеспечить сохранность; отдельная правовая оценка обработки и раскрытия сведений.",
       "legal_urls": [
-        "https://www.consultant.ru/document/cons_doc_LAW_61801/a15bab6050028753706f22c32fe60627a7be79f9/"
+        "https://www.consultant.ru/document/cons_doc_LAW_61801/a15bab6050028753706f22c32fe60627a7be79f9/",
+        "https://www.consultant.ru/document/cons_doc_LAW_61801/96fbc469f91f57235cc842a85e0516a99f23dc85/",
+        "https://www.consultant.ru/document/cons_doc_LAW_61801/315f051396c88f1e4f827ba3f2ae313d999a1873/",
+        "https://www.consultant.ru/document/cons_doc_LAW_9027/afbf7746a8ab4a8753f6eeeca8749b7412f21e2a/",
+        "https://www.consultant.ru/document/cons_doc_LAW_9027/8e46f85492bc9acc81b567455479b0c78a53ebe8/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
       "checked_norm_urls": [
-        "https://www.consultant.ru/document/cons_doc_LAW_61801/a15bab6050028753706f22c32fe60627a7be79f9/"
+        "https://www.consultant.ru/document/cons_doc_LAW_61801/a15bab6050028753706f22c32fe60627a7be79f9/",
+        "https://www.consultant.ru/document/cons_doc_LAW_61801/96fbc469f91f57235cc842a85e0516a99f23dc85/",
+        "https://www.consultant.ru/document/cons_doc_LAW_61801/315f051396c88f1e4f827ba3f2ae313d999a1873/",
+        "https://www.consultant.ru/document/cons_doc_LAW_9027/afbf7746a8ab4a8753f6eeeca8749b7412f21e2a/",
+        "https://www.consultant.ru/document/cons_doc_LAW_9027/8e46f85492bc9acc81b567455479b0c78a53ebe8/"
       ],
       "option_analysis_status": "draft",
       "source_scope": "specific_norm_and_related_search_results_partial",
-      "review_date": "2026-11-27"
+      "review_date": "2026-11-27",
+      "norm_recheck_2026_11_28": {
+        "status": "targeted_norm_and_all_individual_alternatives_reviewed_not_full_acceptance",
+        "basis": "152-ФЗ, ст. 5, 6, 7; ГК РФ, ст. 886, 891. Хранение вещей с обязанностью обеспечить сохранность; отдельная правовая оценка обработки и раскрытия сведений.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_61801/96fbc469f91f57235cc842a85e0516a99f23dc85/",
+          "https://www.consultant.ru/document/cons_doc_LAW_61801/315f051396c88f1e4f827ba3f2ae313d999a1873/",
+          "https://www.consultant.ru/document/cons_doc_LAW_61801/a15bab6050028753706f22c32fe60627a7be79f9/",
+          "https://www.consultant.ru/document/cons_doc_LAW_9027/afbf7746a8ab4a8753f6eeeca8749b7412f21e2a/",
+          "https://www.consultant.ru/document/cons_doc_LAW_9027/8e46f85492bc9acc81b567455479b0c78a53ebe8/"
+        ],
+        "limitation": "Договор хранения не заменяет основания обработки; истечение двадцати лет не разрешает публикацию автоматически.",
+        "source_scope": "Тексты отдельных статей и поисковые извлечения из КонсультантПлюс, 28.11.2026; не полная сверка поправок."
+      }
     },
     {
       "case_key": "bank-curated-serious-04",
@@ -5909,18 +5964,33 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "Статья 15 Закона №442-ФЗ называет насилие в семье среди обстоятельств нуждаемости; статья 21 регулирует срочные социальные услуги без индивидуальной программы и договора. Статья 6 защищает конфиденциальность сведений. Эти меры не заменяют полномочия полиции и суда и не создают автоматического права на постоянное жильё. Источники: https://mintrud.gov.ru/docs/laws/112",
+      "legal_basis": "442-ФЗ, ст. 6, 15, 21. Внутрисемейный конфликт, в том числе насилие, может служить основанием признания нуждаемости; срочные услуги предоставляются без индивидуальной программы и договора на основании заявления или информации с подтверждением актом.",
       "legal_urls": [
-        "https://www.consultant.ru/document/cons_doc_LAW_156558/f496bba45a6529882c567252bb9eef69357470c1/"
+        "https://www.consultant.ru/document/cons_doc_LAW_156558/f496bba45a6529882c567252bb9eef69357470c1/",
+        "https://www.consultant.ru/document/cons_doc_LAW_156558/43e5b97938c3c7ebd3bd9009104cf22d1f3da45e/",
+        "https://www.consultant.ru/document/cons_doc_LAW_156558/ef50b92ba884d530dda28070a67d3b412f3415bd/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
       "option_analysis_status": "draft",
       "checked_norm_urls": [
-        "https://www.consultant.ru/document/cons_doc_LAW_156558/f496bba45a6529882c567252bb9eef69357470c1/"
+        "https://www.consultant.ru/document/cons_doc_LAW_156558/f496bba45a6529882c567252bb9eef69357470c1/",
+        "https://www.consultant.ru/document/cons_doc_LAW_156558/43e5b97938c3c7ebd3bd9009104cf22d1f3da45e/",
+        "https://www.consultant.ru/document/cons_doc_LAW_156558/ef50b92ba884d530dda28070a67d3b412f3415bd/"
       ],
       "source_scope": "specific_norm_and_related_search_results_partial",
-      "review_date": "2026-11-27"
+      "review_date": "2026-11-27",
+      "norm_recheck_2026_11_28": {
+        "status": "targeted_norm_and_all_individual_alternatives_reviewed_not_full_acceptance",
+        "basis": "442-ФЗ, ст. 6, 15, 21. Внутрисемейный конфликт, в том числе насилие, может служить основанием признания нуждаемости; срочные услуги предоставляются без индивидуальной программы и договора на основании заявления или информации с подтверждением актом.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_156558/43e5b97938c3c7ebd3bd9009104cf22d1f3da45e/",
+          "https://www.consultant.ru/document/cons_doc_LAW_156558/ef50b92ba884d530dda28070a67d3b412f3415bd/",
+          "https://www.consultant.ru/document/cons_doc_LAW_156558/f496bba45a6529882c567252bb9eef69357470c1/"
+        ],
+        "limitation": "Не устанавливается универсальная обязанность конкретного приюта иметь место; требуется координация доступных услуг и соблюдение условий конфиденциальности.",
+        "source_scope": "Тексты отдельных статей и поисковые извлечения из КонсультантПлюс, 28.11.2026; не полная сверка поправок."
+      }
     },
     {
       "case_key": "bank-curated-serious-05",
@@ -6105,16 +6175,31 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "Статьи 26 и 34 Закона №273-ФЗ об образовании предусматривают участие обучающихся в управлении организацией в установленном уставом порядке и создание их советов для учёта мнения. Статья 28 закрепляет компетенцию образовательной организации. Представительство не означает передачи ученикам всех полномочий директора или педагогического совета. Источники: https://minobrnauki.gov.ru/open_ministry/gossluzhba/entry/files/Федеральный%20закон%20от%2029.12.2012%20N%20273-ФЗ%20(ред.%20от%2015.10.2025.pdf",
+      "legal_basis": "273-ФЗ от 29.12.2012, ст. 26 ч. 6, ст. 34 ч. 1 п. 17. Советы обучающихся и участие в управлении образовательной организацией в порядке её устава.",
       "legal_urls": [
-        "https://base.garant.ru/70291362/3ac805f6d87af32d44de92b042d51285/"
+        "https://base.garant.ru/70291362/3ac805f6d87af32d44de92b042d51285/",
+        "https://www.consultant.ru/document/cons_doc_LAW_140174/e20e07c635fef774b363dcf3da4bc91d29368299/",
+        "https://www.consultant.ru/document/cons_doc_LAW_140174/6b08530edad66747252fe4b34361d250e7af65ac/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
       "option_analysis_status": "draft",
-      "checked_norm_urls": [],
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_140174/e20e07c635fef774b363dcf3da4bc91d29368299/",
+        "https://www.consultant.ru/document/cons_doc_LAW_140174/6b08530edad66747252fe4b34361d250e7af65ac/"
+      ],
       "source_scope": "specific_norm_and_related_search_results_partial",
-      "review_date": "2026-11-27"
+      "review_date": "2026-11-27",
+      "norm_recheck_2026_11_28": {
+        "status": "targeted_norm_and_all_individual_alternatives_reviewed_not_full_acceptance",
+        "basis": "273-ФЗ от 29.12.2012, ст. 26 ч. 6, ст. 34 ч. 1 п. 17. Советы обучающихся и участие в управлении образовательной организацией в порядке её устава.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_140174/e20e07c635fef774b363dcf3da4bc91d29368299/",
+          "https://www.consultant.ru/document/cons_doc_LAW_140174/6b08530edad66747252fe4b34361d250e7af65ac/"
+        ],
+        "limitation": "Мотивированный маршрут обратной связи — выбранная управленческая мера; не универсальная федеральная обязанность ответить на каждый вопрос совета.",
+        "source_scope": "Тексты отдельных статей и поисковые извлечения из КонсультантПлюс, 28.11.2026; не полная сверка поправок."
+      }
     },
     {
       "case_key": "bank-curated-serious-12",
@@ -6161,18 +6246,33 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "Статья 21 Закона №442-ФЗ предусматривает срочные социальные услуги. Статья 11 Закона №323-ФЗ запрещает отказ в экстренной медицинской помощи. Дальнейшее зачисление в школу и предоставление плановых мер оформляются по их специальным правилам; срочность не означает отмены всех документов для любой услуги. Источники: https://mintrud.gov.ru/docs/laws/112 http://www.kremlin.ru/acts/constitution",
+      "legal_basis": "442-ФЗ, ст. 15, 21; 323-ФЗ, ст. 11. Срочные социальные услуги не требуют индивидуальной программы и договора; экстренная медицинская помощь оказывается безотлагательно, отказ не допускается.",
       "legal_urls": [
-        "https://www.consultant.ru/document/cons_doc_LAW_156558/f496bba45a6529882c567252bb9eef69357470c1/"
+        "https://www.consultant.ru/document/cons_doc_LAW_156558/f496bba45a6529882c567252bb9eef69357470c1/",
+        "https://www.consultant.ru/document/cons_doc_LAW_156558/ef50b92ba884d530dda28070a67d3b412f3415bd/",
+        "https://www.consultant.ru/document/cons_doc_LAW_121895/8e8caa29efb42dd54e3924ee7441f06d469f4a80/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
       "option_analysis_status": "draft",
       "checked_norm_urls": [
-        "https://www.consultant.ru/document/cons_doc_LAW_156558/f496bba45a6529882c567252bb9eef69357470c1/"
+        "https://www.consultant.ru/document/cons_doc_LAW_156558/f496bba45a6529882c567252bb9eef69357470c1/",
+        "https://www.consultant.ru/document/cons_doc_LAW_156558/ef50b92ba884d530dda28070a67d3b412f3415bd/",
+        "https://www.consultant.ru/document/cons_doc_LAW_121895/8e8caa29efb42dd54e3924ee7441f06d469f4a80/"
       ],
       "source_scope": "specific_norm_and_related_search_results_partial",
-      "review_date": "2026-11-27"
+      "review_date": "2026-11-27",
+      "norm_recheck_2026_11_28": {
+        "status": "targeted_norm_and_all_individual_alternatives_reviewed_not_full_acceptance",
+        "basis": "442-ФЗ, ст. 15, 21; 323-ФЗ, ст. 11. Срочные социальные услуги не требуют индивидуальной программы и договора; экстренная медицинская помощь оказывается безотлагательно, отказ не допускается.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_156558/ef50b92ba884d530dda28070a67d3b412f3415bd/",
+          "https://www.consultant.ru/document/cons_doc_LAW_156558/f496bba45a6529882c567252bb9eef69357470c1/",
+          "https://www.consultant.ru/document/cons_doc_LAW_121895/8e8caa29efb42dd54e3924ee7441f06d469f4a80/"
+        ],
+        "limitation": "Температура сама по себе не устанавливает экстренное состояние; его оценивает медработник. Дальнейшее оформление и доступ к услугам определяются применимыми процедурами.",
+        "source_scope": "Тексты отдельных статей и поисковые извлечения из КонсультантПлюс, 28.11.2026; не полная сверка поправок."
+      }
     },
     {
       "case_key": "bank-curated-serious-14",
@@ -6498,7 +6598,7 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "Статья 59 Закона №273-ФЗ регулирует государственную итоговую аттестацию; статьи 28 и 34 — обязанности организации и права обучающихся. Конкретные резервные материалы, перенос и последствия нарушений определяет специальный порядок аттестации. Подозрительный файл не доказывает вину каждого получившего его студента. Источники: https://minobrnauki.gov.ru/open_ministry/gossluzhba/entry/files/Федеральный%20закон%20от%2029.12.2012%20N%20273-ФЗ%20(ред.%20от%2015.10.2025.pdf",
+      "legal_basis": "273-ФЗ от 29.12.2012, ст. 59. Государственная итоговая аттестация проводится в установленном порядке; меры при подозрении на компрометацию материалов принимает компетентный организатор.",
       "legal_urls": [
         "https://www.consultant.ru/document/cons_doc_LAW_140174/95d9ecc180e13e58ff632723375f109b36986b8c/"
       ],
@@ -6509,7 +6609,16 @@
         "https://www.consultant.ru/document/cons_doc_LAW_140174/95d9ecc180e13e58ff632723375f109b36986b8c/"
       ],
       "source_scope": "specific_federal_norm_checked_partial",
-      "review_date": "2026-11-27"
+      "review_date": "2026-11-27",
+      "norm_recheck_2026_11_28": {
+        "status": "targeted_norm_and_all_individual_alternatives_reviewed_not_full_acceptance",
+        "basis": "273-ФЗ от 29.12.2012, ст. 59. Государственная итоговая аттестация проводится в установленном порядке; меры при подозрении на компрометацию материалов принимает компетентный организатор.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_140174/95d9ecc180e13e58ff632723375f109b36986b8c/"
+        ],
+        "limitation": "Вид программы и действующий специальный порядок аттестации не установлены; конкретное право на резервный комплект или новый срок не подтверждается этой общей нормой.",
+        "source_scope": "Тексты отдельных статей и поисковые извлечения из КонсультантПлюс, 28.11.2026; не полная сверка поправок."
+      }
     },
     {
       "case_key": "bank-curated-serious-23",
@@ -6622,20 +6731,33 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "Статья 91 ТК РФ обязывает работодателя учитывать фактически отработанное время, статья 154 устанавливает повышенную оплату ночного труда, статья 136 регулирует сроки выплаты. Корректировка производится на подтверждённых данных с сохранением документов; единая выплата без сверки не заменяет исправления каждого начисления. Источники: https://git15.rostrud.gov.ru/upload/iblock/449/trudovoy-kodeks-rossiyskoy-federatsii-ot-30.12.2001-_-197_fz.pdf",
+      "legal_basis": "ТК РФ, ст. 91, 136, 154. Учёт фактически отработанного времени, соблюдение сроков выплаты заработной платы и повышенная оплата работы в ночное время.",
       "legal_urls": [
         "https://www.consultant.ru/document/cons_doc_LAW_34683/bd14cccf0a1f074ef104e82522f7e2dea04d651f/",
-        "https://www.consultant.ru/document/cons_doc_LAW_34683/d11de7be54026a50672948edfb583e5f37bc48b6/"
+        "https://www.consultant.ru/document/cons_doc_LAW_34683/d11de7be54026a50672948edfb583e5f37bc48b6/",
+        "https://www.consultant.ru/document/cons_doc_law_34683/a0a891ee650687026ef53d5d1194983419be6793/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
       "option_analysis_status": "draft",
       "checked_norm_urls": [
         "https://www.consultant.ru/document/cons_doc_LAW_34683/bd14cccf0a1f074ef104e82522f7e2dea04d651f/",
-        "https://www.consultant.ru/document/cons_doc_LAW_34683/d11de7be54026a50672948edfb583e5f37bc48b6/"
+        "https://www.consultant.ru/document/cons_doc_LAW_34683/d11de7be54026a50672948edfb583e5f37bc48b6/",
+        "https://www.consultant.ru/document/cons_doc_law_34683/a0a891ee650687026ef53d5d1194983419be6793/"
       ],
       "source_scope": "specific_federal_norm_checked_partial",
-      "review_date": "2026-11-27"
+      "review_date": "2026-11-27",
+      "norm_recheck_2026_11_28": {
+        "status": "targeted_norm_and_all_individual_alternatives_reviewed_not_full_acceptance",
+        "basis": "ТК РФ, ст. 91, 136, 154. Учёт фактически отработанного времени, соблюдение сроков выплаты заработной платы и повышенная оплата работы в ночное время.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_34683/bd14cccf0a1f074ef104e82522f7e2dea04d651f/",
+          "https://www.consultant.ru/document/cons_doc_law_34683/a0a891ee650687026ef53d5d1194983419be6793/",
+          "https://www.consultant.ru/document/cons_doc_LAW_34683/d11de7be54026a50672948edfb583e5f37bc48b6/"
+        ],
+        "limitation": "Размер доплаты определяется применимыми нормами и условиями оплаты; конкретный процент не устанавливается кейсом.",
+        "source_scope": "Тексты отдельных статей и поисковые извлечения из КонсультантПлюс, 28.11.2026; не полная сверка поправок."
+      }
     },
     {
       "case_key": "bank-curated-v2-04",
@@ -6749,18 +6871,39 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "Статьи 5–7 Закона №152-ФЗ регулируют цель, основание и конфиденциальность обработки данных. Статьи 6 и 21 Закона №442-ФЗ предусматривают конфиденциальность и срочные услуги. Обязанность перевода и его форма зависят от конкретной процедуры; нельзя автоматически передавать полный набор документов внешнему сервису ради удобства. Источники: https://mintrud.gov.ru/docs/laws/130 https://mintrud.gov.ru/docs/laws/112",
+      "legal_basis": "442-ФЗ, ст. 6, 21; 152-ФЗ, ст. 5, 6, 7. Срочная помощь на установленном основании без индивидуальной программы и договора, минимизация доступа переводчика к сведениям и конфиденциальность.",
       "legal_urls": [
-        "https://www.consultant.ru/document/cons_doc_LAW_156558/f496bba45a6529882c567252bb9eef69357470c1/"
+        "https://www.consultant.ru/document/cons_doc_LAW_156558/f496bba45a6529882c567252bb9eef69357470c1/",
+        "https://www.consultant.ru/document/cons_doc_LAW_156558/43e5b97938c3c7ebd3bd9009104cf22d1f3da45e/",
+        "https://www.consultant.ru/document/cons_doc_LAW_61801/96fbc469f91f57235cc842a85e0516a99f23dc85/",
+        "https://www.consultant.ru/document/cons_doc_LAW_61801/315f051396c88f1e4f827ba3f2ae313d999a1873/",
+        "https://www.consultant.ru/document/cons_doc_LAW_61801/a15bab6050028753706f22c32fe60627a7be79f9/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
       "option_analysis_status": "draft",
       "checked_norm_urls": [
-        "https://www.consultant.ru/document/cons_doc_LAW_156558/f496bba45a6529882c567252bb9eef69357470c1/"
+        "https://www.consultant.ru/document/cons_doc_LAW_156558/f496bba45a6529882c567252bb9eef69357470c1/",
+        "https://www.consultant.ru/document/cons_doc_LAW_156558/43e5b97938c3c7ebd3bd9009104cf22d1f3da45e/",
+        "https://www.consultant.ru/document/cons_doc_LAW_61801/96fbc469f91f57235cc842a85e0516a99f23dc85/",
+        "https://www.consultant.ru/document/cons_doc_LAW_61801/315f051396c88f1e4f827ba3f2ae313d999a1873/",
+        "https://www.consultant.ru/document/cons_doc_LAW_61801/a15bab6050028753706f22c32fe60627a7be79f9/"
       ],
       "source_scope": "specific_norm_and_related_search_results_partial",
-      "review_date": "2026-11-27"
+      "review_date": "2026-11-27",
+      "norm_recheck_2026_11_28": {
+        "status": "targeted_norm_and_all_individual_alternatives_reviewed_not_full_acceptance",
+        "basis": "442-ФЗ, ст. 6, 21; 152-ФЗ, ст. 5, 6, 7. Срочная помощь на установленном основании без индивидуальной программы и договора, минимизация доступа переводчика к сведениям и конфиденциальность.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_156558/43e5b97938c3c7ebd3bd9009104cf22d1f3da45e/",
+          "https://www.consultant.ru/document/cons_doc_LAW_156558/f496bba45a6529882c567252bb9eef69357470c1/",
+          "https://www.consultant.ru/document/cons_doc_LAW_61801/96fbc469f91f57235cc842a85e0516a99f23dc85/",
+          "https://www.consultant.ru/document/cons_doc_LAW_61801/315f051396c88f1e4f827ba3f2ae313d999a1873/",
+          "https://www.consultant.ru/document/cons_doc_LAW_61801/a15bab6050028753706f22c32fe60627a7be79f9/"
+        ],
+        "limitation": "Условия доступа переводчика зависят от законного основания и организации обработки; отсутствие штатного переводчика не означает отсутствия любого способа коммуникации.",
+        "source_scope": "Тексты отдельных статей и поисковые извлечения из КонсультантПлюс, 28.11.2026; не полная сверка поправок."
+      }
     },
     {
       "case_key": "bank-curated-v2-08",
@@ -7158,15 +7301,30 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "Статьи 5 и 21 Закона №152-ФЗ предусматривают точность и уточнение данных; статья 19 Конституции РФ — равенство. Допустимость и стадия исправления определяются применимым актом о стипендии. Уточнение подтверждённого адреса не является разрешением произвольно менять критерии или включать новых лиц вне процедуры. Источники: https://mintrud.gov.ru/docs/laws/130 http://www.kremlin.ru/acts/constitution",
+      "legal_basis": "152-ФЗ, ст. 5, 21. Достоверность и актуальность данных, уточнение подтверждённо неточных сведений в предусмотренном законом порядке.",
       "legal_urls": [
-        "https://www.consultant.ru/document/cons_doc_LAW_61801/d3fe43a7c415353b17faab255bc0de92bea127da/"
+        "https://www.consultant.ru/document/cons_doc_LAW_61801/d3fe43a7c415353b17faab255bc0de92bea127da/",
+        "https://www.consultant.ru/document/cons_doc_LAW_61801/96fbc469f91f57235cc842a85e0516a99f23dc85/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
       "option_analysis_status": "draft",
       "source_scope": "specific_norm_and_related_search_results_partial",
-      "review_date": "2026-11-27"
+      "review_date": "2026-11-27",
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_61801/96fbc469f91f57235cc842a85e0516a99f23dc85/",
+        "https://www.consultant.ru/document/cons_doc_LAW_61801/d3fe43a7c415353b17faab255bc0de92bea127da/"
+      ],
+      "norm_recheck_2026_11_28": {
+        "status": "targeted_norm_and_all_individual_alternatives_reviewed_not_full_acceptance",
+        "basis": "152-ФЗ, ст. 5, 21. Достоверность и актуальность данных, уточнение подтверждённо неточных сведений в предусмотренном законом порядке.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_61801/96fbc469f91f57235cc842a85e0516a99f23dc85/",
+          "https://www.consultant.ru/document/cons_doc_LAW_61801/d3fe43a7c415353b17faab255bc0de92bea127da/"
+        ],
+        "limitation": "Право на стипендию и порядок пересмотра решения устанавливаются применимым положением; исправление адреса не означает автоматическое начисление.",
+        "source_scope": "Тексты отдельных статей и поисковые извлечения из КонсультантПлюс, 28.11.2026; не полная сверка поправок."
+      }
     },
     {
       "case_key": "bank-curated-v2-23",
@@ -8774,15 +8932,33 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "Федеральный закон №323-ФЗ, статьи 10, 19 и 33: доступность помощи, права пациента и первичная медико-санитарная помощь. Административное распределение записи не подменяет медицинскую оценку срочности и установленные условия оказания помощи. Источники: https://minzdrav.gov.ru/en/documents/7025-federalnyy-zakon-ot-21-noyabrya-2011-g-323-fz-ob-osnovah-ohrany-zdorovya-grazhdan-v-rossiyskoy-federatsii",
+      "legal_basis": "323-ФЗ, ст. 10, 11, 79. Доступность медицинской помощи, запрет отказа в экстренной помощи, обязанности медицинской организации.",
       "legal_urls": [
-        "https://www.consultant.ru/document/cons_doc_LAW_121895/e63d3344841b2f5636a73710e906a23ebaf9ab82/"
+        "https://www.consultant.ru/document/cons_doc_LAW_121895/e63d3344841b2f5636a73710e906a23ebaf9ab82/",
+        "https://www.consultant.ru/document/cons_doc_LAW_121895/8e8caa29efb42dd54e3924ee7441f06d469f4a80/",
+        "https://www.consultant.ru/document/cons_doc_LAW_121895/256d3c9ccb172b31210f5f1728fd5a3f538a3cce/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
       "option_analysis_status": "draft",
       "source_scope": "specific_norm_and_related_search_results_partial",
-      "review_date": "2026-11-27"
+      "review_date": "2026-11-27",
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_121895/e63d3344841b2f5636a73710e906a23ebaf9ab82/",
+        "https://www.consultant.ru/document/cons_doc_LAW_121895/8e8caa29efb42dd54e3924ee7441f06d469f4a80/",
+        "https://www.consultant.ru/document/cons_doc_LAW_121895/256d3c9ccb172b31210f5f1728fd5a3f538a3cce/"
+      ],
+      "norm_recheck_2026_11_28": {
+        "status": "targeted_norm_and_all_individual_alternatives_reviewed_not_full_acceptance",
+        "basis": "323-ФЗ, ст. 10, 11, 79. Доступность медицинской помощи, запрет отказа в экстренной помощи, обязанности медицинской организации.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_121895/e63d3344841b2f5636a73710e906a23ebaf9ab82/",
+          "https://www.consultant.ru/document/cons_doc_LAW_121895/8e8caa29efb42dd54e3924ee7441f06d469f4a80/",
+          "https://www.consultant.ru/document/cons_doc_LAW_121895/256d3c9ccb172b31210f5f1728fd5a3f538a3cce/"
+        ],
+        "limitation": "Распределение пациентов, сроки и маршруты определяются медицинскими организациями с учётом клинической срочности, ресурсов и применимого порядка.",
+        "source_scope": "Тексты отдельных статей и поисковые извлечения из КонсультантПлюс, 28.11.2026; не полная сверка поправок."
+      }
     },
     {
       "case_key": "bank-expanded-serious-05-01",
@@ -9343,15 +9519,36 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "Федеральный закон №323-ФЗ, статьи 10, 13 и 19: доступность помощи, врачебная тайна и права пациентов. Перемещение лекарств требует применимого законного порядка, контроля качества и учёта; решение администрации само по себе не заменяет эти условия. Источники: https://minzdrav.gov.ru/en/documents/7025-federalnyy-zakon-ot-21-noyabrya-2011-g-323-fz-ob-osnovah-ohrany-zdorovya-grazhdan-v-rossiyskoy-federatsii",
+      "legal_basis": "323-ФЗ, ст. 10, 13, 79; 61-ФЗ, ст. 58. Доступность помощи, врачебная тайна, обязанности медорганизации, соблюдение правил хранения лекарств.",
       "legal_urls": [
-        "https://www.consultant.ru/document/cons_doc_LAW_121895/e63d3344841b2f5636a73710e906a23ebaf9ab82/"
+        "https://www.consultant.ru/document/cons_doc_LAW_121895/e63d3344841b2f5636a73710e906a23ebaf9ab82/",
+        "https://www.consultant.ru/document/cons_doc_LAW_121895/9f906d460f9454a8a0d290738d9fc2798c1e865a/",
+        "https://www.consultant.ru/document/cons_doc_LAW_121895/256d3c9ccb172b31210f5f1728fd5a3f538a3cce/",
+        "https://www.consultant.ru/document/cons_doc_LAW_99350/dbf1daffdda5622cd839fb6a36130a63324a3bdd/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
       "option_analysis_status": "draft",
       "source_scope": "specific_norm_and_related_search_results_partial",
-      "review_date": "2026-11-27"
+      "review_date": "2026-11-27",
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_121895/e63d3344841b2f5636a73710e906a23ebaf9ab82/",
+        "https://www.consultant.ru/document/cons_doc_LAW_121895/9f906d460f9454a8a0d290738d9fc2798c1e865a/",
+        "https://www.consultant.ru/document/cons_doc_LAW_121895/256d3c9ccb172b31210f5f1728fd5a3f538a3cce/",
+        "https://www.consultant.ru/document/cons_doc_LAW_99350/dbf1daffdda5622cd839fb6a36130a63324a3bdd/"
+      ],
+      "norm_recheck_2026_11_28": {
+        "status": "targeted_norm_and_all_individual_alternatives_reviewed_not_full_acceptance",
+        "basis": "323-ФЗ, ст. 10, 13, 79; 61-ФЗ, ст. 58. Доступность помощи, врачебная тайна, обязанности медорганизации, соблюдение правил хранения лекарств.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_121895/e63d3344841b2f5636a73710e906a23ebaf9ab82/",
+          "https://www.consultant.ru/document/cons_doc_LAW_121895/9f906d460f9454a8a0d290738d9fc2798c1e865a/",
+          "https://www.consultant.ru/document/cons_doc_LAW_121895/256d3c9ccb172b31210f5f1728fd5a3f538a3cce/",
+          "https://www.consultant.ru/document/cons_doc_LAW_99350/dbf1daffdda5622cd839fb6a36130a63324a3bdd/"
+        ],
+        "limitation": "Общей нормы, разрешающей любые межучрежденческие передачи препаратов, не установлено. Проверяются вид препарата, правовой режим, учёт, качество, хранение и решение ответственных медицинских работников.",
+        "source_scope": "Тексты отдельных статей и поисковые извлечения из КонсультантПлюс, 28.11.2026; не полная сверка поправок."
+      }
     },
     {
       "case_key": "bank-expanded-serious-22-01",
