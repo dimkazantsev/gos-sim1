@@ -2115,21 +2115,35 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "НК РФ, статья 343.1: условия налогового вычета по НДПИ при добыче угля. Источники: https://www.nalog.gov.ru/rn77/taxation/tax_legislation/",
+      "legal_basis": "НК РФ, ст. 343.1, 325.1: специальный вычет по НДПИ для документированных расходов на безопасность и охрану труда при добыче угля, с установленными ограничениями.",
       "legal_urls": [
         "https://www.nalog.gov.ru/rn77/taxation/tax_legislation/",
-        "https://klerk.systems/docs/nk_rf/article/343.1/date20261001/"
+        "https://klerk.systems/docs/nk_rf/article/343.1/date20261001/",
+        "https://www.consultant.ru/document/cons_doc_LAW_28165/4ffebe76248e91a14d607918fd1da8801e122f81/"
       ],
-      "legal_status": "requires_case_specific_current_law_review",
+      "legal_status": "verified_current",
       "activation_allowed": false,
       "checked_norm_urls": [
-        "https://klerk.systems/docs/nk_rf/article/343.1/date20261001/"
+        "https://klerk.systems/docs/nk_rf/article/343.1/date20261001/",
+        "https://www.consultant.ru/document/cons_doc_LAW_28165/4ffebe76248e91a14d607918fd1da8801e122f81/"
       ],
       "review_date": "2026-11-28",
       "targeted_option_review": {
-        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
         "option_count": 5,
-        "remaining": "Предел вычета, установленный перечень затрат, участок недр, налоговый период, выбранный режим признания расходов."
+        "remaining": "Правовая оценка ограничена указанными учебными обстоятельствами и рекомендательными действиями. Реальные местные акты, индивидуальные разрешения, договоры, специальные режимы и полная официальная цепочка поправок независимо не подтверждены. Активация запрещена."
+      },
+      "final_case_review_2026_11_28": {
+        "date": "2026-11-28",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
+        "norm": "НК РФ, ст. 343.1, 325.1: специальный вычет по НДПИ для документированных расходов на безопасность и охрану труда при добыче угля, с установленными ограничениями.",
+        "option_count": 5,
+        "finding": "Исключить неподтверждённые и непрофильные суммы из вычета; отдельно проверить перенос превышения и допустимое признание расходов по ст. 325.1, не допуская двойного учёта.",
+        "remaining": "Правовая оценка ограничена указанными учебными обстоятельствами и рекомендательными действиями. Реальные местные акты, индивидуальные разрешения, договоры, специальные режимы и полная официальная цепочка поправок независимо не подтверждены. Активация запрещена.",
+        "urls": [
+          "https://klerk.systems/docs/nk_rf/article/343.1/date20261001/",
+          "https://www.consultant.ru/document/cons_doc_LAW_28165/4ffebe76248e91a14d607918fd1da8801e122f81/"
+        ]
       }
     },
     {
@@ -2187,23 +2201,44 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "НК РФ, статьи 164–165: нулевая ставка НДС по отдельным операциям и их подтверждение. Источники: https://www.nalog.gov.ru/rn77/taxation/tax_legislation/",
+      "legal_basis": "НК РФ, ст. 154, 164, 165, 81: экспортная ставка 0% применяется при выполнении условий и подтверждении; для указанных внутренних продаж действует общая ставка 22%.",
       "legal_urls": [
         "https://www.nalog.gov.ru/rn77/taxation/tax_legislation/",
         "https://www.consultant.ru/document/cons_doc_LAW_28165/e54dfbc2dc809d2678879853e2e9be6861fd24be/",
-        "https://www.nalog.gov.ru/rn77/taxation/taxes/nds/exporter/"
+        "https://www.nalog.gov.ru/rn77/taxation/taxes/nds/exporter/",
+        "https://www.consultant.ru/document/cons_doc_LAW_28165/076a8f7742580a39ddb7c28ce3b3b48c6519df2f/",
+        "https://www.consultant.ru/document/cons_doc_LAW_28165/35cc6698564adc4507baa31c9cfdbb4f2516d068/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19671/47b9619255352b248d98fdecc89f4eaa36a85018/"
       ],
-      "legal_status": "requires_case_specific_current_law_review",
+      "legal_status": "verified_current",
       "activation_allowed": false,
       "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_28165/076a8f7742580a39ddb7c28ce3b3b48c6519df2f/",
+        "https://www.consultant.ru/document/cons_doc_LAW_28165/35cc6698564adc4507baa31c9cfdbb4f2516d068/",
         "https://www.consultant.ru/document/cons_doc_LAW_28165/e54dfbc2dc809d2678879853e2e9be6861fd24be/",
-        "https://www.nalog.gov.ru/rn77/taxation/taxes/nds/exporter/"
+        "https://www.nalog.gov.ru/rn77/taxation/taxes/nds/exporter/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19671/47b9619255352b248d98fdecc89f4eaa36a85018/"
       ],
       "review_date": "2026-11-28",
       "targeted_option_review": {
-        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
         "option_count": 5,
-        "remaining": "Вид экспорта (ЕАЭС или иной), дата реализации, состав реестров, срок подтверждения и применимая ставка внутренней операции."
+        "remaining": "Правовая оценка ограничена указанными учебными обстоятельствами и рекомендательными действиями. Реальные местные акты, индивидуальные разрешения, договоры, специальные режимы и полная официальная цепочка поправок независимо не подтверждены. Активация запрещена."
+      },
+      "final_case_review_2026_11_28": {
+        "date": "2026-11-28",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
+        "norm": "НК РФ, ст. 154, 164, 165, 81: экспортная ставка 0% применяется при выполнении условий и подтверждении; для указанных внутренних продаж действует общая ставка 22%.",
+        "option_count": 5,
+        "finding": "Аванс по подпадающему под нулевую ставку экспорту не включается в базу по соответствующему правилу ст. 154 и не доказывает право на нулевую ставку внутренних продаж. Уточнение расчётов отдельно по операциям.",
+        "remaining": "Правовая оценка ограничена указанными учебными обстоятельствами и рекомендательными действиями. Реальные местные акты, индивидуальные разрешения, договоры, специальные режимы и полная официальная цепочка поправок независимо не подтверждены. Активация запрещена.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_28165/076a8f7742580a39ddb7c28ce3b3b48c6519df2f/",
+          "https://www.consultant.ru/document/cons_doc_LAW_28165/35cc6698564adc4507baa31c9cfdbb4f2516d068/",
+          "https://www.consultant.ru/document/cons_doc_LAW_28165/e54dfbc2dc809d2678879853e2e9be6861fd24be/",
+          "https://www.nalog.gov.ru/rn77/taxation/taxes/nds/exporter/",
+          "https://www.consultant.ru/document/cons_doc_LAW_19671/47b9619255352b248d98fdecc89f4eaa36a85018/"
+        ]
       }
     },
     {
@@ -2550,23 +2585,38 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "НК РФ, глава 25.1, в частности статьи 333.2–333.5: объект, ставки и порядок расчёта сбора за пользование водными биоресурсами. Источники: https://www.nalog.gov.ru/rn77/taxation/tax_legislation/",
+      "legal_basis": "НК РФ, гл. 25.1, ст. 333.4, 333.5: расчёт сбора по применимым объектам, количеству и ставкам разрешения, с установленным порядком уплаты.",
       "legal_urls": [
         "https://www.nalog.gov.ru/rn77/taxation/tax_legislation/",
         "https://www.consultant.ru/document/cons_doc_LAW_28165/642399c96c8ff576b9bf0f19c28c3d2032e52162/",
-        "https://www.consultant.ru/document/cons_doc_LAW_28165/1f0dacd612fe16cd877e5d8f31ff29790687daa4/"
+        "https://www.consultant.ru/document/cons_doc_LAW_28165/1f0dacd612fe16cd877e5d8f31ff29790687daa4/",
+        "https://www.consultant.ru/document/cons_doc_LAW_28165/c4a6f9b56378f5c991245ffca8c33cfb48f49fb5/"
       ],
-      "legal_status": "requires_case_specific_current_law_review",
+      "legal_status": "verified_current",
       "activation_allowed": false,
       "checked_norm_urls": [
         "https://www.consultant.ru/document/cons_doc_LAW_28165/642399c96c8ff576b9bf0f19c28c3d2032e52162/",
-        "https://www.consultant.ru/document/cons_doc_LAW_28165/1f0dacd612fe16cd877e5d8f31ff29790687daa4/"
+        "https://www.consultant.ru/document/cons_doc_LAW_28165/1f0dacd612fe16cd877e5d8f31ff29790687daa4/",
+        "https://www.consultant.ru/document/cons_doc_LAW_28165/c4a6f9b56378f5c991245ffca8c33cfb48f49fb5/"
       ],
       "review_date": "2026-11-28",
       "targeted_option_review": {
-        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
         "option_count": 5,
-        "remaining": "Вид биоресурса, разрешение, применимость ст. 333.2–333.5 и 333.4-1, изменение разрешения и законные вычеты."
+        "remaining": "Правовая оценка ограничена указанными учебными обстоятельствами и рекомендательными действиями. Реальные местные акты, индивидуальные разрешения, договоры, специальные режимы и полная официальная цепочка поправок независимо не подтверждены. Активация запрещена."
+      },
+      "final_case_review_2026_11_28": {
+        "date": "2026-11-28",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
+        "norm": "НК РФ, гл. 25.1, ст. 333.4, 333.5: расчёт сбора по применимым объектам, количеству и ставкам разрешения, с установленным порядком уплаты.",
+        "option_count": 5,
+        "finding": "Само по себе меньшее фактическое количество добытых ресурсов не даёт права пересчитать сбор по своему усмотрению. Сумма и график без полного разрешения и ставок не вычисляются.",
+        "remaining": "Правовая оценка ограничена указанными учебными обстоятельствами и рекомендательными действиями. Реальные местные акты, индивидуальные разрешения, договоры, специальные режимы и полная официальная цепочка поправок независимо не подтверждены. Активация запрещена.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_28165/642399c96c8ff576b9bf0f19c28c3d2032e52162/",
+          "https://www.consultant.ru/document/cons_doc_LAW_28165/1f0dacd612fe16cd877e5d8f31ff29790687daa4/",
+          "https://www.consultant.ru/document/cons_doc_LAW_28165/c4a6f9b56378f5c991245ffca8c33cfb48f49fb5/"
+        ]
       }
     },
     {
@@ -2803,23 +2853,38 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "НК РФ, статьи 63–64: органы и условия изменения срока уплаты налога. Источники: https://www.nalog.gov.ru/rn77/taxation/tax_legislation/",
+      "legal_basis": "НК РФ, ст. 63, 64; БК РФ, ст. 78: решение об отсрочке принимает компетентный орган; согласование с финансовым органом в предусмотренных случаях не заменяет решение. Субсидия требует самостоятельного основания.",
       "legal_urls": [
         "https://www.nalog.gov.ru/rn77/taxation/tax_legislation/",
         "https://www.consultant.ru/document/cons_doc_LAW_19671/082f5502d0c3170dd6a91b3a71905e9282c8aa5b/",
-        "https://www.consultant.ru/document/cons_doc_LAW_19671/b9ebbf37f9f90df9d4a294197b5f42b9e341af0d/"
+        "https://www.consultant.ru/document/cons_doc_LAW_19671/b9ebbf37f9f90df9d4a294197b5f42b9e341af0d/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/1b6959f23cc516d0e11ddc2e213ca2dca83560df/"
       ],
-      "legal_status": "requires_case_specific_current_law_review",
+      "legal_status": "verified_current",
       "activation_allowed": false,
       "checked_norm_urls": [
         "https://www.consultant.ru/document/cons_doc_LAW_19671/082f5502d0c3170dd6a91b3a71905e9282c8aa5b/",
-        "https://www.consultant.ru/document/cons_doc_LAW_19671/b9ebbf37f9f90df9d4a294197b5f42b9e341af0d/"
+        "https://www.consultant.ru/document/cons_doc_LAW_19671/b9ebbf37f9f90df9d4a294197b5f42b9e341af0d/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/1b6959f23cc516d0e11ddc2e213ca2dca83560df/"
       ],
       "review_date": "2026-11-28",
       "targeted_option_review": {
-        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
         "option_count": 5,
-        "remaining": "Вид платежа, основания ст. 64, орган по ст. 63, требования к обеспечению и согласованию."
+        "remaining": "Правовая оценка ограничена указанными учебными обстоятельствами и рекомендательными действиями. Реальные местные акты, индивидуальные разрешения, договоры, специальные режимы и полная официальная цепочка поправок независимо не подтверждены. Активация запрещена."
+      },
+      "final_case_review_2026_11_28": {
+        "date": "2026-11-28",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
+        "norm": "НК РФ, ст. 63, 64; БК РФ, ст. 78: решение об отсрочке принимает компетентный орган; согласование с финансовым органом в предусмотренных случаях не заменяет решение. Субсидия требует самостоятельного основания.",
+        "option_count": 5,
+        "finding": "Снижение выручки не означает автоматически наличие законного основания отсрочки. Срок уплаты сохраняется до предусмотренного законом изменения или временного приостановления.",
+        "remaining": "Правовая оценка ограничена указанными учебными обстоятельствами и рекомендательными действиями. Реальные местные акты, индивидуальные разрешения, договоры, специальные режимы и полная официальная цепочка поправок независимо не подтверждены. Активация запрещена.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_19671/082f5502d0c3170dd6a91b3a71905e9282c8aa5b/",
+          "https://www.consultant.ru/document/cons_doc_LAW_19671/b9ebbf37f9f90df9d4a294197b5f42b9e341af0d/",
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/1b6959f23cc516d0e11ddc2e213ca2dca83560df/"
+        ]
       }
     },
     {
@@ -2829,21 +2894,38 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "НК РФ, статьи 8 и 252: налоговая обязанность и условия признания расходов для налога на прибыль. Источники: https://www.nalog.gov.ru/rn77/taxation/tax_legislation/",
+      "legal_basis": "НК РФ, ст. 252, 270; БК РФ, ст. 78: признание расходов по налогу на прибыль зависит от установленных требований и исключений; прямого зачёта добровольного взноса нет.",
       "legal_urls": [
         "https://www.nalog.gov.ru/rn77/taxation/tax_legislation/",
-        "https://www.consultant.ru/document/cons_doc_LAW_28165/ef9b3e2f8e3046127b2ef57fccf5141b694e2138/"
+        "https://www.consultant.ru/document/cons_doc_LAW_28165/ef9b3e2f8e3046127b2ef57fccf5141b694e2138/",
+        "https://www.consultant.ru/document/cons_doc_LAW_28165/4a9b9d33ed310f587a190f133c589bb8711456b0/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/1b6959f23cc516d0e11ddc2e213ca2dca83560df/"
       ],
-      "legal_status": "requires_case_specific_current_law_review",
+      "legal_status": "verified_current",
       "activation_allowed": false,
       "checked_norm_urls": [
-        "https://www.consultant.ru/document/cons_doc_LAW_28165/ef9b3e2f8e3046127b2ef57fccf5141b694e2138/"
+        "https://www.consultant.ru/document/cons_doc_LAW_28165/ef9b3e2f8e3046127b2ef57fccf5141b694e2138/",
+        "https://www.consultant.ru/document/cons_doc_LAW_28165/4a9b9d33ed310f587a190f133c589bb8711456b0/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/1b6959f23cc516d0e11ddc2e213ca2dca83560df/"
       ],
       "review_date": "2026-11-28",
       "targeted_option_review": {
-        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
         "option_count": 5,
-        "remaining": "Характер соглашения, связь расходов с деятельностью, нормы статьи 270 и специальные природоохранные платежи."
+        "remaining": "Правовая оценка ограничена указанными учебными обстоятельствами и рекомендательными действиями. Реальные местные акты, индивидуальные разрешения, договоры, специальные режимы и полная официальная цепочка поправок независимо не подтверждены. Активация запрещена."
+      },
+      "final_case_review_2026_11_28": {
+        "date": "2026-11-28",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
+        "norm": "НК РФ, ст. 252, 270; БК РФ, ст. 78: признание расходов по налогу на прибыль зависит от установленных требований и исключений; прямого зачёта добровольного взноса нет.",
+        "option_count": 5,
+        "finding": "Не отождествлять общественно полезный результат с вычетом суммы взноса из налога. Возможность признания конкретного расхода в базе устанавливается отдельно.",
+        "remaining": "Правовая оценка ограничена указанными учебными обстоятельствами и рекомендательными действиями. Реальные местные акты, индивидуальные разрешения, договоры, специальные режимы и полная официальная цепочка поправок независимо не подтверждены. Активация запрещена.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_28165/ef9b3e2f8e3046127b2ef57fccf5141b694e2138/",
+          "https://www.consultant.ru/document/cons_doc_LAW_28165/4a9b9d33ed310f587a190f133c589bb8711456b0/",
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/1b6959f23cc516d0e11ddc2e213ca2dca83560df/"
+        ]
       }
     },
     {
@@ -2853,23 +2935,38 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "Федеральный закон от 10.01.2006 №16-ФЗ об Особой экономической зоне в Калининградской области; НК РФ, статьи 288.1 и 385.1: специальные условия налогового режима. Источники: https://www.nalog.gov.ru/rn77/service/complaint_decision/10196747/",
+      "legal_basis": "Федеральный закон № 16-ФЗ, ст. 4; НК РФ, ст. 288.1, 385.1: специальные правила для резидентов ОЭЗ при соблюдении условий по проекту, деятельности, активам и учёту.",
       "legal_urls": [
         "https://www.nalog.gov.ru/rn77/service/complaint_decision/10196747/",
         "https://www.consultant.ru/document/cons_doc_LAW_28165/c437b81e783230c00b32042c001ed41726a92020/",
-        "https://www.consultant.ru/document/cons_doc_LAW_28165/8f57f0be0e210ea6e11ba916cccd7b2ccbcc542d/"
+        "https://www.consultant.ru/document/cons_doc_LAW_28165/8f57f0be0e210ea6e11ba916cccd7b2ccbcc542d/",
+        "https://www.consultant.ru/document/cons_doc_LAW_57687/4d4b389a1fef032acaa5a3bfadccc750b4ed79bc/"
       ],
-      "legal_status": "requires_case_specific_current_law_review",
+      "legal_status": "verified_current",
       "activation_allowed": false,
       "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_57687/4d4b389a1fef032acaa5a3bfadccc750b4ed79bc/",
         "https://www.consultant.ru/document/cons_doc_LAW_28165/c437b81e783230c00b32042c001ed41726a92020/",
         "https://www.consultant.ru/document/cons_doc_LAW_28165/8f57f0be0e210ea6e11ba916cccd7b2ccbcc542d/"
       ],
       "review_date": "2026-11-28",
       "targeted_option_review": {
-        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
         "option_count": 5,
-        "remaining": "Реестр, условия 16-ФЗ, инвестиционный проект, раздельный учёт, период и применимые ограничения налоговых преимуществ."
+        "remaining": "Правовая оценка ограничена указанными учебными обстоятельствами и рекомендательными действиями. Реальные местные акты, индивидуальные разрешения, договоры, специальные режимы и полная официальная цепочка поправок независимо не подтверждены. Активация запрещена."
+      },
+      "final_case_review_2026_11_28": {
+        "date": "2026-11-28",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
+        "norm": "Федеральный закон № 16-ФЗ, ст. 4; НК РФ, ст. 288.1, 385.1: специальные правила для резидентов ОЭЗ при соблюдении условий по проекту, деятельности, активам и учёту.",
+        "option_count": 5,
+        "finding": "Аренда офиса и адрес не создают статус резидента или право на льготу; общий режим сохраняется до возникновения доказанного специального основания.",
+        "remaining": "Правовая оценка ограничена указанными учебными обстоятельствами и рекомендательными действиями. Реальные местные акты, индивидуальные разрешения, договоры, специальные режимы и полная официальная цепочка поправок независимо не подтверждены. Активация запрещена.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_57687/4d4b389a1fef032acaa5a3bfadccc750b4ed79bc/",
+          "https://www.consultant.ru/document/cons_doc_LAW_28165/c437b81e783230c00b32042c001ed41726a92020/",
+          "https://www.consultant.ru/document/cons_doc_LAW_28165/8f57f0be0e210ea6e11ba916cccd7b2ccbcc542d/"
+        ]
       }
     },
     {
@@ -3028,25 +3125,39 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "НК РФ, статьи 346.12 и 346.43: ограничения специальных налоговых режимов по видам деятельности и предусмотренные исключения. Источники: https://www.nalog.gov.ru/rn77/taxation/tax_legislation/",
+      "legal_basis": "НК РФ, подп. 22 п. 3 ст. 346.12, п. 4 ст. 346.13, подп. 8 п. 6 ст. 346.43: ограничение УСН относится к налогоплательщику, ПСН — к соответствующей деятельности.",
       "legal_urls": [
         "https://www.nalog.gov.ru/rn77/taxation/tax_legislation/",
         "https://www.consultant.ru/document/cons_doc_LAW_28165/a1d86f7078e645869b02fde85e8c972193557dee/",
         "https://www.consultant.ru/document/cons_doc_LAW_28165/dfe87d3a71d81daff6243d64c49ef41c5c3302eb/",
-        "https://www.nalog.gov.ru/rn77/about_fts/about_nalog/15563817/"
+        "https://www.nalog.gov.ru/rn77/about_fts/about_nalog/15563817/",
+        "https://www.consultant.ru/document/cons_doc_LAW_28165/d4ddf64a8dd3e5ca9a2357aabbf32bcf7abcc5f8/"
       ],
-      "legal_status": "requires_case_specific_current_law_review",
+      "legal_status": "verified_current",
       "activation_allowed": false,
       "checked_norm_urls": [
         "https://www.consultant.ru/document/cons_doc_LAW_28165/a1d86f7078e645869b02fde85e8c972193557dee/",
-        "https://www.consultant.ru/document/cons_doc_LAW_28165/dfe87d3a71d81daff6243d64c49ef41c5c3302eb/",
-        "https://www.nalog.gov.ru/rn77/about_fts/about_nalog/15563817/"
+        "https://www.consultant.ru/document/cons_doc_LAW_28165/d4ddf64a8dd3e5ca9a2357aabbf32bcf7abcc5f8/",
+        "https://www.consultant.ru/document/cons_doc_LAW_28165/dfe87d3a71d81daff6243d64c49ef41c5c3302eb/"
       ],
       "review_date": "2026-11-28",
       "targeted_option_review": {
-        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
         "option_count": 5,
-        "remaining": "Режим ИП, вид и пробообразующий металл товаров, дата начала запрещённой деятельности, порядок утраты права и допустимость иных режимов."
+        "remaining": "Правовая оценка ограничена указанными учебными обстоятельствами и рекомендательными действиями. Реальные местные акты, индивидуальные разрешения, договоры, специальные режимы и полная официальная цепочка поправок независимо не подтверждены. Активация запрещена."
+      },
+      "final_case_review_2026_11_28": {
+        "date": "2026-11-28",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
+        "norm": "НК РФ, подп. 22 п. 3 ст. 346.12, п. 4 ст. 346.13, подп. 8 п. 6 ст. 346.43: ограничение УСН относится к налогоплательщику, ПСН — к соответствующей деятельности.",
+        "option_count": 5,
+        "finding": "При возникновении указанного несоответствия право на УСН утрачивается с первого числа месяца нарушения; раздельный учёт не сохраняет УСН. ПСН по иной деятельности оценивается отдельно.",
+        "remaining": "Правовая оценка ограничена указанными учебными обстоятельствами и рекомендательными действиями. Реальные местные акты, индивидуальные разрешения, договоры, специальные режимы и полная официальная цепочка поправок независимо не подтверждены. Активация запрещена.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_28165/a1d86f7078e645869b02fde85e8c972193557dee/",
+          "https://www.consultant.ru/document/cons_doc_LAW_28165/d4ddf64a8dd3e5ca9a2357aabbf32bcf7abcc5f8/",
+          "https://www.consultant.ru/document/cons_doc_LAW_28165/dfe87d3a71d81daff6243d64c49ef41c5c3302eb/"
+        ]
       }
     },
     {
@@ -3513,23 +3624,39 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "НК РФ, глава 26, в частности статьи 342 и 342.4: ставки и коэффициенты НДПИ для соответствующих полезных ископаемых. Источники: https://www.nalog.gov.ru/rn77/taxation/tax_legislation/",
+      "legal_basis": "НК РФ, ст. 342, 342.4, 81: ставки и коэффициенты НДПИ выбираются для конкретного полезного ископаемого и обстоятельств добычи; ошибочная отчётность исправляется в установленном порядке.",
       "legal_urls": [
         "https://www.nalog.gov.ru/rn77/taxation/tax_legislation/",
         "https://www.consultant.ru/document/cons_doc_LAW_28165/9522f95c4165c757c0d4d4095f49cd1e62fad7f0/",
-        "https://www.consultant.ru/document/cons_doc_LAW_28165/"
+        "https://www.consultant.ru/document/cons_doc_LAW_28165/",
+        "https://www.consultant.ru/document/cons_doc_LAW_28165/b0945496f341b2d7e1f79e0bc9dd4e4522a466b1/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19671/47b9619255352b248d98fdecc89f4eaa36a85018/"
       ],
-      "legal_status": "requires_case_specific_current_law_review",
+      "legal_status": "verified_current",
       "activation_allowed": false,
       "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_28165/b0945496f341b2d7e1f79e0bc9dd4e4522a466b1/",
         "https://www.consultant.ru/document/cons_doc_LAW_28165/9522f95c4165c757c0d4d4095f49cd1e62fad7f0/",
-        "https://www.consultant.ru/document/cons_doc_LAW_28165/"
+        "https://www.consultant.ru/document/cons_doc_LAW_19671/47b9619255352b248d98fdecc89f4eaa36a85018/"
       ],
       "review_date": "2026-11-28",
       "targeted_option_review": {
-        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
         "option_count": 5,
-        "remaining": "Вид ископаемого, налоговый период, характеристики залежи, точные применимые статьи и ставки; числовые коэффициенты не проверялись для конкретного участка."
+        "remaining": "Правовая оценка ограничена указанными учебными обстоятельствами и рекомендательными действиями. Реальные местные акты, индивидуальные разрешения, договоры, специальные режимы и полная официальная цепочка поправок независимо не подтверждены. Активация запрещена."
+      },
+      "final_case_review_2026_11_28": {
+        "date": "2026-11-28",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
+        "norm": "НК РФ, ст. 342, 342.4, 81: ставки и коэффициенты НДПИ выбираются для конкретного полезного ископаемого и обстоятельств добычи; ошибочная отчётность исправляется в установленном порядке.",
+        "option_count": 5,
+        "finding": "Раздельный расчёт по каждому сырью и участку. Конкретные ставки и суммы не утверждаются без параметров добычи и применимых специальных норм.",
+        "remaining": "Правовая оценка ограничена указанными учебными обстоятельствами и рекомендательными действиями. Реальные местные акты, индивидуальные разрешения, договоры, специальные режимы и полная официальная цепочка поправок независимо не подтверждены. Активация запрещена.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_28165/b0945496f341b2d7e1f79e0bc9dd4e4522a466b1/",
+          "https://www.consultant.ru/document/cons_doc_LAW_28165/9522f95c4165c757c0d4d4095f49cd1e62fad7f0/",
+          "https://www.consultant.ru/document/cons_doc_LAW_19671/47b9619255352b248d98fdecc89f4eaa36a85018/"
+        ]
       }
     },
     {
@@ -3775,13 +3902,15 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "НК РФ, статьи 66–68: инвестиционный налоговый кредит. Источники: https://www.nalog.gov.ru/rn77/taxation/tax_legislation/",
+      "legal_basis": "НК РФ, ст. 63, 66, 67; БК РФ, ст. 78: инвестиционный налоговый кредит оформляется компетентным органом по договору при наличии законного основания, с последующим погашением и процентами; субсидия оформляется отдельно.",
       "legal_urls": [
         "https://www.nalog.gov.ru/rn77/taxation/tax_legislation/",
         "https://www.consultant.ru/document/cons_doc_LAW_19671/a89f6e27872ba595439ca2902f233cd969c41b56/",
-        "https://www.consultant.ru/document/cons_doc_LAW_19671/d742ffa792b4e20830fd93a2124bfcc027bd03d6/"
+        "https://www.consultant.ru/document/cons_doc_LAW_19671/d742ffa792b4e20830fd93a2124bfcc027bd03d6/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19671/082f5502d0c3170dd6a91b3a71905e9282c8aa5b/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/1b6959f23cc516d0e11ddc2e213ca2dca83560df/"
       ],
-      "legal_status": "requires_case_specific_current_law_review",
+      "legal_status": "verified_current",
       "activation_allowed": false,
       "legal_evidence": [
         {
@@ -3800,19 +3929,15 @@
         }
       ],
       "targeted_option_review": {
-        "date": "2026-11-27",
-        "norm": "НК РФ, ст. 66–67",
-        "urls": [
-          "https://www.consultant.ru/document/cons_doc_LAW_19671/a89f6e27872ba595439ca2902f233cd969c41b56/",
-          "https://www.consultant.ru/document/cons_doc_LAW_19671/d742ffa792b4e20830fd93a2124bfcc027bd03d6/"
-        ],
-        "options": 5,
-        "status": "specific_text_read_and_alternatives_reviewed_under_stated_conditions_not_full_case_acceptance",
-        "remaining": "Проверены правовая природа и договорный режим кредита. Правила конкретной субсидии и основание модернизации не доказаны."
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
+        "option_count": 5,
+        "remaining": "Правовая оценка ограничена указанными учебными обстоятельствами и рекомендательными действиями. Реальные местные акты, индивидуальные разрешения, договоры, специальные режимы и полная официальная цепочка поправок независимо не подтверждены. Активация запрещена."
       },
       "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_19671/082f5502d0c3170dd6a91b3a71905e9282c8aa5b/",
         "https://www.consultant.ru/document/cons_doc_LAW_19671/a89f6e27872ba595439ca2902f233cd969c41b56/",
-        "https://www.consultant.ru/document/cons_doc_LAW_19671/d742ffa792b4e20830fd93a2124bfcc027bd03d6/"
+        "https://www.consultant.ru/document/cons_doc_LAW_19671/d742ffa792b4e20830fd93a2124bfcc027bd03d6/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/1b6959f23cc516d0e11ddc2e213ca2dca83560df/"
       ],
       "legal_followup_2026_11_28": {
         "date": "2026-11-28",
@@ -3823,6 +3948,21 @@
         ],
         "option_count": 5,
         "finding": "Ст. 66–67 НК РФ, ред. 04.08.2026, изменения с 01.10.2026: кредит меняет срок уплаты, применяется к определённым налогам, имеет основания и договорный порядок. Модернизация требует подтверждения основания; вид налога и программа субсидии не заданы."
+      },
+      "review_date": "2026-11-28",
+      "final_case_review_2026_11_28": {
+        "date": "2026-11-28",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
+        "norm": "НК РФ, ст. 63, 66, 67; БК РФ, ст. 78: инвестиционный налоговый кредит оформляется компетентным органом по договору при наличии законного основания, с последующим погашением и процентами; субсидия оформляется отдельно.",
+        "option_count": 5,
+        "finding": "В действующей редакции общий срок договора инвестиционного налогового кредита — от одного года до десяти лет. Это не гарантирует одобрение, конкретный срок или сумму; условия возврата субсидии проверяются отдельно.",
+        "remaining": "Правовая оценка ограничена указанными учебными обстоятельствами и рекомендательными действиями. Реальные местные акты, индивидуальные разрешения, договоры, специальные режимы и полная официальная цепочка поправок независимо не подтверждены. Активация запрещена.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_19671/082f5502d0c3170dd6a91b3a71905e9282c8aa5b/",
+          "https://www.consultant.ru/document/cons_doc_LAW_19671/a89f6e27872ba595439ca2902f233cd969c41b56/",
+          "https://www.consultant.ru/document/cons_doc_LAW_19671/d742ffa792b4e20830fd93a2124bfcc027bd03d6/",
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/1b6959f23cc516d0e11ddc2e213ca2dca83560df/"
+        ]
       }
     },
     {
@@ -3885,23 +4025,39 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "НК РФ, глава 26.4: налогообложение при выполнении соглашений о разделе продукции. Источники: https://www.nalog.gov.ru/rn77/taxation/tax_legislation/",
+      "legal_basis": "НК РФ, гл. 26.4, ст. 346.35, 346.37, 346.38: специальный режим для соответствующего соглашения; особенности НДПИ и налога на прибыль учитываются по установленному порядку.",
       "legal_urls": [
         "https://www.nalog.gov.ru/rn77/taxation/tax_legislation/",
         "https://www.consultant.ru/document/cons_doc_LAW_28165/9c76493a68e26450c7ea3652931850d0c0944084/",
-        "https://www.consultant.ru/document/cons_doc_LAW_28165/01ecaf4b9b3e38c6a79369856ac198257bb4f202/"
+        "https://www.consultant.ru/document/cons_doc_LAW_28165/01ecaf4b9b3e38c6a79369856ac198257bb4f202/",
+        "https://www.consultant.ru/document/cons_doc_LAW_28165/ac3fd19f536928b3ccf5ec974c3572de1b41f421/",
+        "https://www.consultant.ru/document/cons_doc_LAW_28165/2a1ac7da663175fb9a594203bebbf506d014bea1/"
       ],
-      "legal_status": "requires_case_specific_current_law_review",
+      "legal_status": "verified_current",
       "activation_allowed": false,
       "checked_norm_urls": [
-        "https://www.consultant.ru/document/cons_doc_LAW_28165/9c76493a68e26450c7ea3652931850d0c0944084/",
-        "https://www.consultant.ru/document/cons_doc_LAW_28165/01ecaf4b9b3e38c6a79369856ac198257bb4f202/"
+        "https://www.consultant.ru/document/cons_doc_LAW_28165/01ecaf4b9b3e38c6a79369856ac198257bb4f202/",
+        "https://www.consultant.ru/document/cons_doc_LAW_28165/ac3fd19f536928b3ccf5ec974c3572de1b41f421/",
+        "https://www.consultant.ru/document/cons_doc_LAW_28165/2a1ac7da663175fb9a594203bebbf506d014bea1/"
       ],
       "review_date": "2026-11-28",
       "targeted_option_review": {
-        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
         "option_count": 5,
-        "remaining": "Дата заключения соглашения и переходный режим статьи 346.35, конкретные условия раздела, нормативы зачисления и фактические расчёты."
+        "remaining": "Правовая оценка ограничена указанными учебными обстоятельствами и рекомендательными действиями. Реальные местные акты, индивидуальные разрешения, договоры, специальные режимы и полная официальная цепочка поправок независимо не подтверждены. Активация запрещена."
+      },
+      "final_case_review_2026_11_28": {
+        "date": "2026-11-28",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
+        "norm": "НК РФ, гл. 26.4, ст. 346.35, 346.37, 346.38: специальный режим для соответствующего соглашения; особенности НДПИ и налога на прибыль учитываются по установленному порядку.",
+        "option_count": 5,
+        "finding": "Раздельно учитывать потоки продукции и налоговые поступления, исключая двойной счёт. Не устанавливать фактические доли, ставки и суммы без соглашения; прогноз не создаёт бюджетного резерва автоматически.",
+        "remaining": "Правовая оценка ограничена указанными учебными обстоятельствами и рекомендательными действиями. Реальные местные акты, индивидуальные разрешения, договоры, специальные режимы и полная официальная цепочка поправок независимо не подтверждены. Активация запрещена.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_28165/01ecaf4b9b3e38c6a79369856ac198257bb4f202/",
+          "https://www.consultant.ru/document/cons_doc_LAW_28165/ac3fd19f536928b3ccf5ec974c3572de1b41f421/",
+          "https://www.consultant.ru/document/cons_doc_LAW_28165/2a1ac7da663175fb9a594203bebbf506d014bea1/"
+        ]
       }
     },
     {
@@ -4269,21 +4425,41 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "НК РФ, статья 217: освобождения доходов от НДФЛ. Источники: https://www.nalog.gov.ru/rn77/taxation/tax_legislation/",
+      "legal_basis": "НК РФ, ст. 217, 211, 81; ТК РФ, ст. 169: налоговая квалификация определяется юридическим основанием выплаты, условиями освобождения и характером дохода.",
       "legal_urls": [
         "https://www.nalog.gov.ru/rn77/taxation/tax_legislation/",
-        "https://www.consultant.ru/document/cons_doc_LAW_28165/625f7f7ad302ab285fe87457521eb265c7dbee3c/"
+        "https://www.consultant.ru/document/cons_doc_LAW_28165/625f7f7ad302ab285fe87457521eb265c7dbee3c/",
+        "https://www.consultant.ru/document/cons_doc_LAW_28165/f647be9a20b71a4d818e1160bef1ef132d757d2f/",
+        "https://www.consultant.ru/document/cons_doc_LAW_34683/0624c62ab0f6ee0bb3f03f93276a2ec318765cf3/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19671/47b9619255352b248d98fdecc89f4eaa36a85018/"
       ],
-      "legal_status": "requires_case_specific_current_law_review",
+      "legal_status": "verified_current",
       "activation_allowed": false,
       "checked_norm_urls": [
-        "https://www.consultant.ru/document/cons_doc_LAW_28165/625f7f7ad302ab285fe87457521eb265c7dbee3c/"
+        "https://www.consultant.ru/document/cons_doc_LAW_28165/625f7f7ad302ab285fe87457521eb265c7dbee3c/",
+        "https://www.consultant.ru/document/cons_doc_LAW_28165/f647be9a20b71a4d818e1160bef1ef132d757d2f/",
+        "https://www.consultant.ru/document/cons_doc_LAW_34683/0624c62ab0f6ee0bb3f03f93276a2ec318765cf3/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19671/47b9619255352b248d98fdecc89f4eaa36a85018/"
       ],
       "review_date": "2026-11-28",
       "targeted_option_review": {
-        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
         "option_count": 5,
-        "remaining": "Конкретный вид переезда, трудовое основание, нормы компенсации, документы и дата выплаты; освобождение длительной оплаты жилья не предполагается."
+        "remaining": "Правовая оценка ограничена указанными учебными обстоятельствами и рекомендательными действиями. Реальные местные акты, индивидуальные разрешения, договоры, специальные режимы и полная официальная цепочка поправок независимо не подтверждены. Активация запрещена."
+      },
+      "final_case_review_2026_11_28": {
+        "date": "2026-11-28",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
+        "norm": "НК РФ, ст. 217, 211, 81; ТК РФ, ст. 169: налоговая квалификация определяется юридическим основанием выплаты, условиями освобождения и характером дохода.",
+        "option_count": 5,
+        "finding": "Не считать всякую оплату жилья зарплатой либо всякую компенсацию освобождённой. Для каждой выплаты установить характер, документы и условия освобождения; исправлять расчёт по законной процедуре.",
+        "remaining": "Правовая оценка ограничена указанными учебными обстоятельствами и рекомендательными действиями. Реальные местные акты, индивидуальные разрешения, договоры, специальные режимы и полная официальная цепочка поправок независимо не подтверждены. Активация запрещена.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_28165/625f7f7ad302ab285fe87457521eb265c7dbee3c/",
+          "https://www.consultant.ru/document/cons_doc_LAW_28165/f647be9a20b71a4d818e1160bef1ef132d757d2f/",
+          "https://www.consultant.ru/document/cons_doc_LAW_34683/0624c62ab0f6ee0bb3f03f93276a2ec318765cf3/",
+          "https://www.consultant.ru/document/cons_doc_LAW_19671/47b9619255352b248d98fdecc89f4eaa36a85018/"
+        ]
       }
     },
     {
@@ -4332,13 +4508,13 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "НК РФ, статьи 412–415: объект и ставки торгового сбора. Источники: https://www.nalog.gov.ru/rn77/taxation/tax_legislation/",
+      "legal_basis": "НК РФ, гл. 33, ст. 415 и применимые определения площади торгового зала; действующее регулирование торгового сбора Москвы, разъяснения ФНС.",
       "legal_urls": [
         "https://www.nalog.gov.ru/rn77/taxation/tax_legislation/",
         "https://www.nalog.gov.ru/rn77/taxation/shopcoll/",
         "https://www.consultant.ru/document/cons_doc_LAW_28165/5205eca70db07766f5c2f740e4a9b04b7e80ae15/"
       ],
-      "legal_status": "requires_case_specific_current_law_review",
+      "legal_status": "verified_current",
       "activation_allowed": false,
       "legal_evidence": [
         {
@@ -4355,9 +4531,21 @@
       ],
       "review_date": "2026-11-28",
       "targeted_option_review": {
-        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
         "option_count": 5,
-        "remaining": "Категория и адрес объекта, площадь по применимому определению, редакция московского закона, льготы и период; ставка не рассчитывалась."
+        "remaining": "Правовая оценка ограничена указанными учебными обстоятельствами и рекомендательными действиями. Реальные местные акты, индивидуальные разрешения, договоры, специальные режимы и полная официальная цепочка поправок независимо не подтверждены. Активация запрещена."
+      },
+      "final_case_review_2026_11_28": {
+        "date": "2026-11-28",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
+        "norm": "НК РФ, гл. 33, ст. 415 и применимые определения площади торгового зала; действующее регулирование торгового сбора Москвы, разъяснения ФНС.",
+        "option_count": 5,
+        "finding": "Физический показатель данного объекта — 80 м², а не 900 м² всего здания. Сумма сбора не рассчитывается без адреса, действующей ставки и иных условий.",
+        "remaining": "Правовая оценка ограничена указанными учебными обстоятельствами и рекомендательными действиями. Реальные местные акты, индивидуальные разрешения, договоры, специальные режимы и полная официальная цепочка поправок независимо не подтверждены. Активация запрещена.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_28165/5205eca70db07766f5c2f740e4a9b04b7e80ae15/",
+          "https://www.nalog.gov.ru/rn77/taxation/shopcoll/"
+        ]
       }
     },
     {
