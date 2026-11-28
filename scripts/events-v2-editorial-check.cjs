@@ -102,6 +102,13 @@ console.log(JSON.stringify({individualRecheckCount},null,2));
  const scopeByKey=new Map(scopeProposal.candidate_cases.map(c=>[c.case_key,c]));
  const balanceByKey=new Map(balanceProposal.cases.map(c=>[c.case_key,c]));
  assert.equal(scopeByKey.size,189);assert.equal(balanceByKey.size,6);
+ const remainingByKey=new Map();
+ for(const letter of ['A','B','C','D','E']){
+  const pack=JSON.parse(fs.readFileSync('docs/EVENTS_V2_REMAINING_BALANCE_PROPOSAL_'+letter+'_2026-11-28.json','utf8'));
+  for(const c of pack.cases){assert.ok(!remainingByKey.has(c.case_key),c.case_key+' duplicate approved case');remainingByKey.set(c.case_key,c.changes);}
+ }
+ assert.equal(remainingByKey.size,90);
+ let verifiedRemainingCorrections=0,addedRemainingFields=0;
  let verifiedApprovedCorrections=0,verifiedScaledOptions=0,scope89=0,scope16=0;
  for(const c of cases.filter(c=>c.audience!=='single')){
   const p=scopeByKey.get(c.case_key),b=balanceByKey.get(c.case_key),d=p.scope.denominator;
@@ -119,6 +126,16 @@ console.log(JSON.stringify({individualRecheckCount},null,2));
     else{assert.equal(raw.metric_effects[ch.metric],ch.before,c.case_key);raw.metric_effects[ch.metric]=ch.after;}
     verifiedApprovedCorrections++;
    }
+   for(const ch of (remainingByKey.get(c.case_key)??[]).filter(x=>x.option===o.key)){
+    assert.equal(c.decision_options[Number(o.key.slice(7))-1],ch.label,c.case_key);
+    const before=ch.metric==='trust'?raw.trust:raw.metric_effects[ch.metric];
+    assert.equal(before??0,ch.raw_before,c.case_key+' remaining raw before');
+    assert.equal(Number((ch.raw_before/d).toFixed(6)),ch.scaled_before,c.case_key);
+    assert.equal(Number((ch.raw_after/d).toFixed(6)),ch.scaled_after,c.case_key);
+    if(ch.metric==='trust')raw.trust=ch.raw_after;
+    else{if(!Object.hasOwn(raw.metric_effects,ch.metric))addedRemainingFields++;raw.metric_effects[ch.metric]=ch.raw_after;}
+    verifiedRemainingCorrections++;
+   }
    assert.ok([raw.trust,...Object.values(raw.metric_effects)].every(x=>Number.isFinite(x)&&Math.abs(x)<=4),c.case_key);
    const scaled=x=>Number((x/d).toFixed(6));
    assert.equal(o.trust,scaled(raw.trust),c.case_key+' trust');
@@ -127,8 +144,10 @@ console.log(JSON.stringify({individualRecheckCount},null,2));
   }
  }
  assert.equal(verifiedApprovedCorrections,7);assert.equal(verifiedScaledOptions,947);
+ assert.equal(verifiedRemainingCorrections,125);assert.equal(addedRemainingFields,14);
+ assert.equal(dominated,0,'Approved collective direct dominance');
  assert.equal(scope89,179);assert.equal(scope16,10);
- console.log(JSON.stringify({verifiedApprovedCorrections,verifiedScaledOptions,scope89,scope16},null,2));
+ console.log(JSON.stringify({verifiedApprovedCorrections,verifiedRemainingCorrections,addedRemainingFields,verifiedScaledOptions,scope89,scope16},null,2));
 
 let collectiveReviewCount=0,collectiveReviewOptions=0;
 for(const c of cases){

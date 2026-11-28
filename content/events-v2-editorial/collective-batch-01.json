@@ -291,7 +291,7 @@
             "lawful": true,
             "trust": 0.011236,
             "metric_effects": {
-              "elite_support": -0.011236,
+              "elite_support": 0,
               "economy": 0,
               "social_stability": 0.011236
             },
@@ -3464,7 +3464,7 @@
             "lawful": true,
             "trust": -0.011236,
             "metric_effects": {
-              "elite_support": 0.022472,
+              "elite_support": 0.033708,
               "economy": 0.022472,
               "social_stability": -0.022472
             },
@@ -4359,7 +4359,7 @@
             "lawful": true,
             "trust": -0.011236,
             "metric_effects": {
-              "elite_support": 0.011236,
+              "elite_support": 0.022472,
               "economy": 0.022472,
               "security": -0.011236
             },
@@ -5676,7 +5676,7 @@
             "lawful": true,
             "trust": 0,
             "metric_effects": {
-              "elite_support": -0.0625,
+              "elite_support": 0,
               "economy": 0.0625,
               "international_standing": 0.0625
             },
@@ -6082,7 +6082,7 @@
             "lawful": true,
             "trust": 0.0625,
             "metric_effects": {
-              "elite_support": 0.0625,
+              "elite_support": 0.125,
               "economy": -0.0625,
               "media_climate": 0
             },
@@ -7207,7 +7207,7 @@
           {
             "key": "option_3",
             "lawful": true,
-            "trust": 0.011236,
+            "trust": 0.022472,
             "metric_effects": {
               "elite_support": -0.011236,
               "economy": 0.011236
@@ -7232,7 +7232,7 @@
           {
             "key": "option_4",
             "lawful": true,
-            "trust": 0.022472,
+            "trust": 0.033708,
             "metric_effects": {
               "elite_support": 0,
               "economy": -0.011236
