@@ -5548,16 +5548,30 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "498-ФЗ, ст. 13: при выгуле соблюдаются требования безопасности и установленные ограничения. Назначение участка и конкретные местные правила не названы: ни отсутствие построек, ни согласие жителей не устанавливают разрешённое использование. Условие выбора — не начинать работы до компетентного решения.",
+      "legal_basis": "498-ФЗ, ст. 13: безопасность при выгуле и соблюдение разрешённых мест. Земельный режим проверяется отдельно.",
       "legal_urls": [
-        "https://www.consultant.ru/document/cons_doc_LAW_314646/8542fa4c9d641b61bf26a98656aae6b4ae72b5dd/"
+        "https://www.consultant.ru/document/cons_doc_LAW_314646/8542fa4c9d641b61bf26a98656aae6b4ae72b5dd/",
+        "https://www.consultant.ru/document/cons_doc_LAW_33773/1db6a167a314b11e23a0f926740b2efab40ed94a/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
-      "checked_norm_urls": [],
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_314646/8542fa4c9d641b61bf26a98656aae6b4ae72b5dd/",
+        "https://www.consultant.ru/document/cons_doc_LAW_33773/1db6a167a314b11e23a0f926740b2efab40ed94a/"
+      ],
       "option_analysis_status": "draft",
       "source_scope": "specific_norm_and_related_search_results_partial",
-      "review_date": "2026-11-27"
+      "review_date": "2026-11-27",
+      "norm_recheck_2026_11_28": {
+        "status": "targeted_norm_and_all_individual_alternatives_reviewed_not_full_acceptance",
+        "basis": "498-ФЗ, ст. 13: безопасность при выгуле и соблюдение разрешённых мест. Земельный режим проверяется отдельно.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_314646/8542fa4c9d641b61bf26a98656aae6b4ae72b5dd/",
+          "https://www.consultant.ru/document/cons_doc_LAW_33773/1db6a167a314b11e23a0f926740b2efab40ed94a/"
+        ],
+        "limitation": "Границы участка и местный акт не установлены; не предполагается право на ограждение до согласования.",
+        "source_scope": "Тексты и поисковые извлечения отдельных статей из КонсультантПлюс, 28.11.2026; специальные и местные нормы не полностью проверены."
+      }
     },
     {
       "case_key": "bank-curated-light-04",
@@ -5999,16 +6013,30 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "Закон РФ №4979-1 «О ветеринарии» регулирует обязательные ветеринарные меры, карантин и обязанности владельцев, в том числе статьи 17–19. Конкретные ограничения устанавливаются компетентным органом по применимым ветеринарным правилам. Возмещение при предусмотренном законом изъятии требует самостоятельной проверки оснований и процедуры; его нельзя гарантировать всем пострадавшим в произвольном размере. Источники: https://checklist.fsvps.gov.ru/checks/forms/index?formId=3",
+      "legal_basis": "Закон РФ №4979-1, ст. 17, 19: карантин и изъятие животных при предусмотренных законом обстоятельствах; возмещение ущерба от изъятия имеет специальный порядок.",
       "legal_urls": [
-        "https://www.consultant.ru/document/cons_doc_LAW_4438/c36dc50cd93048048618fbce118d49304ab28f17/"
+        "https://www.consultant.ru/document/cons_doc_LAW_4438/c36dc50cd93048048618fbce118d49304ab28f17/",
+        "https://www.consultant.ru/document/cons_doc_LAW_4438/d3b5cad02f89b95ff543fed2b8af547c8cccb42d/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
       "option_analysis_status": "draft",
-      "checked_norm_urls": [],
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_4438/c36dc50cd93048048618fbce118d49304ab28f17/",
+        "https://www.consultant.ru/document/cons_doc_LAW_4438/d3b5cad02f89b95ff543fed2b8af547c8cccb42d/"
+      ],
       "source_scope": "specific_norm_and_related_search_results_partial",
-      "review_date": "2026-11-27"
+      "review_date": "2026-11-27",
+      "norm_recheck_2026_11_28": {
+        "status": "targeted_norm_and_all_individual_alternatives_reviewed_not_full_acceptance",
+        "basis": "Закон РФ №4979-1, ст. 17, 19: карантин и изъятие животных при предусмотренных законом обстоятельствах; возмещение ущерба от изъятия имеет специальный порядок.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_4438/c36dc50cd93048048618fbce118d49304ab28f17/",
+          "https://www.consultant.ru/document/cons_doc_LAW_4438/d3b5cad02f89b95ff543fed2b8af547c8cccb42d/"
+        ],
+        "limitation": "Вид болезни, компетентный орган и ветеринарные правила определяются по фактам; не всякая заразная болезнь является особо опасной.",
+        "source_scope": "Тексты и поисковые извлечения отдельных статей из КонсультантПлюс, 28.11.2026; специальные и местные нормы не полностью проверены."
+      }
     },
     {
       "case_key": "bank-curated-serious-06",
@@ -6054,16 +6082,27 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "Статья 17 Закона №125-ФЗ об архивном деле предусматривает обеспечение сохранности архивных документов. Правила Росархива регулируют хранение, учёт и использование фонда. Аварийное перемещение требует документирования и профессиональной обработки; оно не отменяет ограничения доступа к документам с охраняемой информацией. Источники: https://archives.gov.ru/documents/rules/pravila-2020.shtml",
+      "legal_basis": "125-ФЗ, ст. 17: обязанность обеспечить сохранность архивных документов. Условия доступа к защищённым сведениям сохраняются при аварии.",
       "legal_urls": [
         "https://www.consultant.ru/document/cons_doc_LAW_1406/853f5f9b88a8631659f20438281fdf2e323c1429/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
       "option_analysis_status": "draft",
-      "checked_norm_urls": [],
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_1406/853f5f9b88a8631659f20438281fdf2e323c1429/"
+      ],
       "source_scope": "specific_norm_and_related_search_results_partial",
-      "review_date": "2026-11-27"
+      "review_date": "2026-11-27",
+      "norm_recheck_2026_11_28": {
+        "status": "targeted_norm_and_all_individual_alternatives_reviewed_not_full_acceptance",
+        "basis": "125-ФЗ, ст. 17: обязанность обеспечить сохранность архивных документов. Условия доступа к защищённым сведениям сохраняются при аварии.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_1406/853f5f9b88a8631659f20438281fdf2e323c1429/"
+        ],
+        "limitation": "Точный режим стабилизации определяется архивистом и реставратором, а не данной статьёй.",
+        "source_scope": "Тексты и поисковые извлечения отдельных статей из КонсультантПлюс, 28.11.2026; специальные и местные нормы не полностью проверены."
+      }
     },
     {
       "case_key": "bank-curated-serious-08",
@@ -6673,7 +6712,7 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "Статья 36 Закона №73-ФЗ предусматривает меры сохранения при работах, в том числе действия при обнаружении объекта с признаками культурного наследия. Решение о дальнейшем исследовании и режиме работ принимается по установленной процедуре с участием органа охраны; подрядчик не определяет статус находки единолично. Источники: http://www.kremlin.ru/acts/constitution",
+      "legal_basis": "73-ФЗ, ст. 36: при обнаружении объекта с признаками наследия указанные работы незамедлительно приостанавливают, заявление в региональный орган охраны направляют в течение трёх дней.",
       "legal_urls": [
         "https://www.consultant.ru/document/cons_doc_LAW_37318/555d42c04d8e6d7d9874776c46e180043cc8cb0c/"
       ],
@@ -6684,7 +6723,16 @@
         "https://www.consultant.ru/document/cons_doc_LAW_37318/555d42c04d8e6d7d9874776c46e180043cc8cb0c/"
       ],
       "source_scope": "specific_norm_and_related_search_results_partial",
-      "review_date": "2026-11-27"
+      "review_date": "2026-11-27",
+      "norm_recheck_2026_11_28": {
+        "status": "targeted_norm_and_all_individual_alternatives_reviewed_not_full_acceptance",
+        "basis": "73-ФЗ, ст. 36: при обнаружении объекта с признаками наследия указанные работы незамедлительно приостанавливают, заявление в региональный орган охраны направляют в течение трёх дней.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_37318/555d42c04d8e6d7d9874776c46e180043cc8cb0c/"
+        ],
+        "limitation": "Статус и границы объекта определяются компетентной процедурой; продолжение работ требует оценки затрагивания объекта.",
+        "source_scope": "Тексты и поисковые извлечения отдельных статей из КонсультантПлюс, 28.11.2026; специальные и местные нормы не полностью проверены."
+      }
     },
     {
       "case_key": "bank-curated-v2-02",
@@ -6912,7 +6960,7 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "Статья 21 Закона №416-ФЗ регулирует случаи и порядок временного прекращения или ограничения водоснабжения. Техническое обследование устанавливает необходимость конкретных работ; применимые обязанности уведомления и обеспечения потребителей исполняются отдельно. Разница показаний сама по себе не определяет ни причину, ни виновного. Источники: https://epp.genproc.gov.ru/ru/proc_91/activity/legal-education/explain/e2075484/",
+      "legal_basis": "416-ФЗ, ст. 21: основания временного прекращения и ограничения водоснабжения и специальный порядок уведомления; плановое и аварийное прекращение разграничиваются.",
       "legal_urls": [
         "https://www.consultant.ru/document/cons_doc_LAW_122867/018c76d39ac10ec567e2f9fbcfca7298f2e026ee/"
       ],
@@ -6923,7 +6971,16 @@
         "https://www.consultant.ru/document/cons_doc_LAW_122867/018c76d39ac10ec567e2f9fbcfca7298f2e026ee/"
       ],
       "source_scope": "specific_norm_and_related_search_results_partial",
-      "review_date": "2026-11-27"
+      "review_date": "2026-11-27",
+      "norm_recheck_2026_11_28": {
+        "status": "targeted_norm_and_all_individual_alternatives_reviewed_not_full_acceptance",
+        "basis": "416-ФЗ, ст. 21: основания временного прекращения и ограничения водоснабжения и специальный порядок уведомления; плановое и аварийное прекращение разграничиваются.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_122867/018c76d39ac10ec567e2f9fbcfca7298f2e026ee/"
+        ],
+        "limitation": "Конкретные сроки и адресаты уведомления зависят от вида водоснабжения, основания и применимых правил.",
+        "source_scope": "Тексты и поисковые извлечения отдельных статей из КонсультантПлюс, 28.11.2026; специальные и местные нормы не полностью проверены."
+      }
     },
     {
       "case_key": "bank-curated-v2-09",
@@ -6932,15 +6989,30 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "Статья 130 Конституции РФ связывает местное самоуправление с решением вопросов местного значения. Статьи 39.1 и 39.6 ЗК РФ регулируют основания предоставления публичных земель и случаи аренды. Обсуждение социальной потребности не является само по себе договором и не отменяет специальных земельных процедур. Источники: http://www.kremlin.ru/acts/constitution",
+      "legal_basis": "ЗК РФ, ст. 39.1, 39.6: права на публичный участок возникают по установленным основаниям; аренда оформляется на торгах или без торгов в предусмотренных случаях.",
       "legal_urls": [
-        "https://www.consultant.ru/document/cons_doc_LAW_33773/79da6e3bbbc8eb967db0714e8378269bfea9f83c/"
+        "https://www.consultant.ru/document/cons_doc_LAW_33773/79da6e3bbbc8eb967db0714e8378269bfea9f83c/",
+        "https://www.consultant.ru/document/cons_doc_LAW_33773/1db6a167a314b11e23a0f926740b2efab40ed94a/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
       "option_analysis_status": "draft",
       "source_scope": "specific_norm_and_related_search_results_partial",
-      "review_date": "2026-11-27"
+      "review_date": "2026-11-27",
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_33773/1db6a167a314b11e23a0f926740b2efab40ed94a/",
+        "https://www.consultant.ru/document/cons_doc_LAW_33773/79da6e3bbbc8eb967db0714e8378269bfea9f83c/"
+      ],
+      "norm_recheck_2026_11_28": {
+        "status": "targeted_norm_and_all_individual_alternatives_reviewed_not_full_acceptance",
+        "basis": "ЗК РФ, ст. 39.1, 39.6: права на публичный участок возникают по установленным основаниям; аренда оформляется на торгах или без торгов в предусмотренных случаях.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_33773/1db6a167a314b11e23a0f926740b2efab40ed94a/",
+          "https://www.consultant.ru/document/cons_doc_LAW_33773/79da6e3bbbc8eb967db0714e8378269bfea9f83c/"
+        ],
+        "limitation": "Не определены правообладатель, вид разрешённого использования, способ предоставления и полномочия конкретного органа.",
+        "source_scope": "Тексты и поисковые извлечения отдельных статей из КонсультантПлюс, 28.11.2026; специальные и местные нормы не полностью проверены."
+      }
     },
     {
       "case_key": "bank-curated-v2-10",
@@ -7031,15 +7103,30 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "Статья 20 Закона №196-ФЗ устанавливает обязанности по обеспечению безопасности перевозок; статья 329 ТК РФ предусматривает специальные правила труда работников транспорта. Применимые пределы рабочего времени и отдыха соблюдаются отдельно от желания выполнить расписание. Конкретный режим проверяется по действующим специальным правилам и данным учёта. Источники: https://git15.rostrud.gov.ru/upload/iblock/449/trudovoy-kodeks-rossiyskoy-federatsii-ot-30.12.2001-_-197_fz.pdf",
+      "legal_basis": "196-ФЗ, ст. 20; ТК РФ, ст. 329: обязанности перевозчика по безопасности и соблюдению режима работы и отдыха водителей.",
       "legal_urls": [
-        "https://www.consultant.ru/document/cons_doc_LAW_8585/16db67ba2656536d83e1eeb8bc449a68755c77c3/"
+        "https://www.consultant.ru/document/cons_doc_LAW_8585/16db67ba2656536d83e1eeb8bc449a68755c77c3/",
+        "https://www.consultant.ru/document/cons_doc_LAW_34683/1e900974e45bee998a7b2a6691285ed9b6560b86/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
       "option_analysis_status": "draft",
       "source_scope": "specific_norm_and_related_search_results_partial",
-      "review_date": "2026-11-27"
+      "review_date": "2026-11-27",
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_8585/16db67ba2656536d83e1eeb8bc449a68755c77c3/",
+        "https://www.consultant.ru/document/cons_doc_LAW_34683/1e900974e45bee998a7b2a6691285ed9b6560b86/"
+      ],
+      "norm_recheck_2026_11_28": {
+        "status": "targeted_norm_and_all_individual_alternatives_reviewed_not_full_acceptance",
+        "basis": "196-ФЗ, ст. 20; ТК РФ, ст. 329: обязанности перевозчика по безопасности и соблюдению режима работы и отдыха водителей.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_8585/16db67ba2656536d83e1eeb8bc449a68755c77c3/",
+          "https://www.consultant.ru/document/cons_doc_LAW_34683/1e900974e45bee998a7b2a6691285ed9b6560b86/"
+        ],
+        "limitation": "Численные пределы зависят от применимого специального порядка; кейс прямо устанавливает превышение допустимого режима.",
+        "source_scope": "Тексты и поисковые извлечения отдельных статей из КонсультантПлюс, 28.11.2026; специальные и местные нормы не полностью проверены."
+      }
     },
     {
       "case_key": "bank-curated-v2-13",
@@ -7124,15 +7211,30 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "Статья 14 Закона №68-ФЗ предусматривает обязанности организаций по защите от чрезвычайных ситуаций и созданию резервов в установленных случаях. Статья 3 Закона №29-ФЗ ограничивает обращение пищевых продуктов с истёкшим сроком годности. Договорный обмен и согласованная передача отражаются отдельно от пригодного остатка. Источники: https://01.mchs.gov.ru/deyatelnost/napravleniya-deyatelnosti/grazhdanskaya-zashchita/preduprezhdenie-chrezvychaynyh-situaciy/1-1-normativnye-pravovye-akty/2-federalnye-zakony/federalnyy-zakon-ot-21-dekabrya-1994-g-n-68-fz-o-zashchite-naseleniya-i-territoriy-ot-chrezvychaynyh-situaciy-prirodnogo-i-tehnogennogo-haraktera",
+      "legal_basis": "68-ФЗ, ст. 14; 29-ФЗ, ст. 3: создание резервов в установленных случаях; просроченные пищевые продукты не допускаются к обращению.",
       "legal_urls": [
-        "https://www.consultant.ru/document/cons_doc_LAW_25584/e9278b4da9d697e7ffac54e2c395f58c8306f72c/"
+        "https://www.consultant.ru/document/cons_doc_LAW_25584/e9278b4da9d697e7ffac54e2c395f58c8306f72c/",
+        "https://www.consultant.ru/document/cons_doc_LAW_5295/a053d1a23c215d14941f99fd381dba6f90ce4969/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
       "option_analysis_status": "draft",
       "source_scope": "specific_norm_and_related_search_results_partial",
-      "review_date": "2026-11-27"
+      "review_date": "2026-11-27",
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_5295/a053d1a23c215d14941f99fd381dba6f90ce4969/",
+        "https://www.consultant.ru/document/cons_doc_LAW_25584/e9278b4da9d697e7ffac54e2c395f58c8306f72c/"
+      ],
+      "norm_recheck_2026_11_28": {
+        "status": "targeted_norm_and_all_individual_alternatives_reviewed_not_full_acceptance",
+        "basis": "68-ФЗ, ст. 14; 29-ФЗ, ст. 3: создание резервов в установленных случаях; просроченные пищевые продукты не допускаются к обращению.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_5295/a053d1a23c215d14941f99fd381dba6f90ce4969/",
+          "https://www.consultant.ru/document/cons_doc_LAW_25584/e9278b4da9d697e7ffac54e2c395f58c8306f72c/"
+        ],
+        "limitation": "Конкретный порядок списания, возврата и утилизации зависит от вида продукции и договора; обмен не делает просроченное пригодным.",
+        "source_scope": "Тексты и поисковые извлечения отдельных статей из КонсультантПлюс, 28.11.2026; специальные и местные нормы не полностью проверены."
+      }
     },
     {
       "case_key": "bank-curated-v2-17",
@@ -7141,15 +7243,28 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "Статья 3 Водного кодекса РФ закрепляет принципы охраны водных объектов, статья 11 регулирует основания водопользования. Конкретный договор, решение и технические условия зависят от схемы забора и снабжения. Заявленная занятость не заменяет проверку допустимого объёма и условий пользования ресурсом. Источники: http://www.kremlin.ru/acts/constitution",
+      "legal_basis": "ВК РФ, ст. 11: основания приобретения права пользования поверхностными водными объектами; разрешительный режим зависит от вида пользования.",
       "legal_urls": [
-        "https://www.consultant.ru/document/cons_doc_LAW_60683/d8506cc78b9dc825c874fa280a0e0f5b72080d53/"
+        "https://www.consultant.ru/document/cons_doc_LAW_60683/d8506cc78b9dc825c874fa280a0e0f5b72080d53/",
+        "https://www.consultant.ru/document/cons_doc_LAW_60683/1b7b129bd91b638bd2306cf2e65b1328e1f72d5d/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
       "option_analysis_status": "draft",
       "source_scope": "specific_norm_and_related_search_results_partial",
-      "review_date": "2026-11-27"
+      "review_date": "2026-11-27",
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_60683/1b7b129bd91b638bd2306cf2e65b1328e1f72d5d/"
+      ],
+      "norm_recheck_2026_11_28": {
+        "status": "targeted_norm_and_all_individual_alternatives_reviewed_not_full_acceptance",
+        "basis": "ВК РФ, ст. 11: основания приобретения права пользования поверхностными водными объектами; разрешительный режим зависит от вида пользования.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_60683/1b7b129bd91b638bd2306cf2e65b1328e1f72d5d/"
+        ],
+        "limitation": "Вид источника прямо не установлен; статья 11 применима к поверхностным водным объектам, для подземных вод и сетей действуют иные режимы.",
+        "source_scope": "Тексты и поисковые извлечения отдельных статей из КонсультантПлюс, 28.11.2026; специальные и местные нормы не полностью проверены."
+      }
     },
     {
       "case_key": "bank-curated-v2-18",
@@ -7889,15 +8004,30 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "ГК РФ, статья 136: плоды вещи принадлежат собственнику, если иное не установлено законом, договором или существом отношений; статья 209 — распоряжение имуществом. Труд добровольца не создаёт автоматически долю в каждом яблоке. Источники: https://11.rosguard.gov.ru/uploads/2025/07/5_grazhdanskijj_kodeks_rossijjskojj_federacii_chast_pervaya.pdf",
+      "legal_basis": "ГК РФ, ст. 136, 209: урожай принадлежит собственнику, если иной режим не установлен; распоряжение имуществом осуществляется в пределах полномочий.",
       "legal_urls": [
-        "https://www.consultant.ru/document/cons_doc_LAW_5142/e76cbd72b7917a719160f39231998418094c73b4/"
+        "https://www.consultant.ru/document/cons_doc_LAW_5142/e76cbd72b7917a719160f39231998418094c73b4/",
+        "https://www.consultant.ru/document/cons_doc_LAW_5142/9bc79ae09d078798e7a4ee4647ac9ea495da9fa0/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
       "option_analysis_status": "draft",
       "source_scope": "specific_norm_and_related_search_results_partial",
-      "review_date": "2026-11-27"
+      "review_date": "2026-11-27",
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_5142/e76cbd72b7917a719160f39231998418094c73b4/",
+        "https://www.consultant.ru/document/cons_doc_LAW_5142/9bc79ae09d078798e7a4ee4647ac9ea495da9fa0/"
+      ],
+      "norm_recheck_2026_11_28": {
+        "status": "targeted_norm_and_all_individual_alternatives_reviewed_not_full_acceptance",
+        "basis": "ГК РФ, ст. 136, 209: урожай принадлежит собственнику, если иной режим не установлен; распоряжение имуществом осуществляется в пределах полномочий.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_5142/e76cbd72b7917a719160f39231998418094c73b4/",
+          "https://www.consultant.ru/document/cons_doc_LAW_5142/9bc79ae09d078798e7a4ee4647ac9ea495da9fa0/"
+        ],
+        "limitation": "Учреждение не обязательно собственник участка и урожая; проверяются вещное право, договор и компетенция директора.",
+        "source_scope": "Тексты и поисковые извлечения отдельных статей из КонсультантПлюс, 28.11.2026; специальные и местные нормы не полностью проверены."
+      }
     },
     {
       "case_key": "bank-curated-v2-40",
@@ -7906,15 +8036,30 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "Федеральный закон от 24.11.1995 № 181-ФЗ, статья 15: обеспечение доступности объектов и услуг для инвалидов в пределах установленных обязанностей. ГК РФ, статья 210: содержание имущества. Испытание техники не отменяет прав пользователей площади. Источники: https://sfr.gov.ru/order/law_rehabilitation~11198 https://11.rosguard.gov.ru/uploads/2025/07/5_grazhdanskijj_kodeks_rossijjskojj_federacii_chast_pervaya.pdf",
+      "legal_basis": "181-ФЗ, ст. 15; ГК РФ, ст. 210: условия доступности объектов и ответственность за содержание имущества в пределах применимых обязанностей.",
       "legal_urls": [
-        "https://www.consultant.ru/document/cons_doc_LAW_8559/1f3d91284a26982ce51392b5fd178e392fe53404/"
+        "https://www.consultant.ru/document/cons_doc_LAW_8559/1f3d91284a26982ce51392b5fd178e392fe53404/",
+        "https://www.consultant.ru/document/cons_doc_LAW_5142/c63c967d22055f1df0fcfecca564826dedb3b8c7/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
       "option_analysis_status": "draft",
       "source_scope": "specific_norm_and_related_search_results_partial",
-      "review_date": "2026-11-27"
+      "review_date": "2026-11-27",
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_8559/1f3d91284a26982ce51392b5fd178e392fe53404/",
+        "https://www.consultant.ru/document/cons_doc_LAW_5142/c63c967d22055f1df0fcfecca564826dedb3b8c7/"
+      ],
+      "norm_recheck_2026_11_28": {
+        "status": "targeted_norm_and_all_individual_alternatives_reviewed_not_full_acceptance",
+        "basis": "181-ФЗ, ст. 15; ГК РФ, ст. 210: условия доступности объектов и ответственность за содержание имущества в пределах применимых обязанностей.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_8559/1f3d91284a26982ce51392b5fd178e392fe53404/",
+          "https://www.consultant.ru/document/cons_doc_LAW_5142/c63c967d22055f1df0fcfecca564826dedb3b8c7/"
+        ],
+        "limitation": "Обследование не устанавливает автоматическую обязанность немедленно реконструировать всю площадь; дети не используются для опасного переноса.",
+        "source_scope": "Тексты и поисковые извлечения отдельных статей из КонсультантПлюс, 28.11.2026; специальные и местные нормы не полностью проверены."
+      }
     },
     {
       "case_key": "bank-curated-v2-41",
@@ -7993,7 +8138,7 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "Федеральный закон № 29-ФЗ, статья 3: требования к нахождению пищевой продукции в обращении. Предупреждение волонтёра не подменяет сведения, позволяющие установить безопасность и условия использования продукта. Источники: https://13.rospotrebnadzor.ru/sites/default/files/federalnyy_zakon_ot_2_yanvarya_2000_g_n_29_fz_o_kachestve_i_bezopasnosti_pishchevyh_p.pdf",
+      "legal_basis": "29-ФЗ, ст. 3: пищевые продукты, не отвечающие обязательным требованиям безопасности и предусмотренной информации, не допускаются к обращению.",
       "legal_urls": [
         "https://www.consultant.ru/document/cons_doc_LAW_25584/e9278b4da9d697e7ffac54e2c395f58c8306f72c/"
       ],
@@ -8001,7 +8146,19 @@
       "activation_allowed": false,
       "option_analysis_status": "draft",
       "source_scope": "specific_norm_and_related_search_results_partial",
-      "review_date": "2026-11-27"
+      "review_date": "2026-11-27",
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_25584/e9278b4da9d697e7ffac54e2c395f58c8306f72c/"
+      ],
+      "norm_recheck_2026_11_28": {
+        "status": "targeted_norm_and_all_individual_alternatives_reviewed_not_full_acceptance",
+        "basis": "29-ФЗ, ст. 3: пищевые продукты, не отвечающие обязательным требованиям безопасности и предусмотренной информации, не допускаются к обращению.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_25584/e9278b4da9d697e7ffac54e2c395f58c8306f72c/"
+        ],
+        "limitation": "Конкретный режим домашней продукции зависит от формы её обращения; для организованной выдачи детям условие устанавливает невозможность подтвердить безопасность.",
+        "source_scope": "Тексты и поисковые извлечения отдельных статей из КонсультантПлюс, 28.11.2026; специальные и местные нормы не полностью проверены."
+      }
     },
     {
       "case_key": "bank-curated-v2-44",
@@ -8010,15 +8167,30 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "Закон РФ № 2300-1, статьи 7 и 10: безопасность оказываемой услуги и необходимая информация потребителю. Доступность объектов для инвалидов обеспечивается по статье 15 Федерального закона № 181-ФЗ. Источники: https://44.rospotrebnadzor.ru/osnovnye_napravlenij/zacshita_prav_potreb/normativnye_dokument/48/ https://sfr.gov.ru/order/law_rehabilitation~11198",
+      "legal_basis": "181-ФЗ, ст. 15; Закон №2300-1, ст. 10: доступность услуг и предоставление необходимой информации потребителю.",
       "legal_urls": [
-        "https://www.consultant.ru/document/cons_doc_LAW_8559/1f3d91284a26982ce51392b5fd178e392fe53404/"
+        "https://www.consultant.ru/document/cons_doc_LAW_8559/1f3d91284a26982ce51392b5fd178e392fe53404/",
+        "https://www.consultant.ru/document/cons_doc_LAW_305/e96b1cbe2a0795305a08c97b1a7f34ddab4ae908/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
       "option_analysis_status": "draft",
       "source_scope": "specific_norm_and_related_search_results_partial",
-      "review_date": "2026-11-27"
+      "review_date": "2026-11-27",
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_8559/1f3d91284a26982ce51392b5fd178e392fe53404/",
+        "https://www.consultant.ru/document/cons_doc_LAW_305/e96b1cbe2a0795305a08c97b1a7f34ddab4ae908/"
+      ],
+      "norm_recheck_2026_11_28": {
+        "status": "targeted_norm_and_all_individual_alternatives_reviewed_not_full_acceptance",
+        "basis": "181-ФЗ, ст. 15; Закон №2300-1, ст. 10: доступность услуг и предоставление необходимой информации потребителю.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_8559/1f3d91284a26982ce51392b5fd178e392fe53404/",
+          "https://www.consultant.ru/document/cons_doc_LAW_305/e96b1cbe2a0795305a08c97b1a7f34ddab4ae908/"
+        ],
+        "limitation": "Конкретный график объявлений и требования безопасности определяются правилами вокзала и перевозок.",
+        "source_scope": "Тексты и поисковые извлечения отдельных статей из КонсультантПлюс, 28.11.2026; специальные и местные нормы не полностью проверены."
+      }
     },
     {
       "case_key": "bank-curated-v2-45",
@@ -8405,15 +8577,30 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "Федеральный закон № 181-ФЗ, статья 15: доступность услуг и необходимая помощь инвалидам. ГК РФ, статья 309: исполнение согласованных условий услуги. Конкретное техническое решение выбирается по обстоятельствам, а не предписывается этими статьями как единственный способ. Источники: https://sfr.gov.ru/order/law_rehabilitation~11198 https://11.rosguard.gov.ru/uploads/2025/07/5_grazhdanskijj_kodeks_rossijjskojj_federacii_chast_pervaya.pdf",
+      "legal_basis": "181-ФЗ, ст. 15; ГК РФ, ст. 309: доступность услуг и исполнение согласованных обязательств.",
       "legal_urls": [
-        "https://www.consultant.ru/document/cons_doc_LAW_8559/1f3d91284a26982ce51392b5fd178e392fe53404/"
+        "https://www.consultant.ru/document/cons_doc_LAW_8559/1f3d91284a26982ce51392b5fd178e392fe53404/",
+        "https://www.consultant.ru/document/cons_doc_LAW_5142/1cd43e51fbd4129343b325971a466ec5cd32a425/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
       "option_analysis_status": "draft",
       "source_scope": "specific_norm_and_related_search_results_partial",
-      "review_date": "2026-11-27"
+      "review_date": "2026-11-27",
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_8559/1f3d91284a26982ce51392b5fd178e392fe53404/",
+        "https://www.consultant.ru/document/cons_doc_LAW_5142/1cd43e51fbd4129343b325971a466ec5cd32a425/"
+      ],
+      "norm_recheck_2026_11_28": {
+        "status": "targeted_norm_and_all_individual_alternatives_reviewed_not_full_acceptance",
+        "basis": "181-ФЗ, ст. 15; ГК РФ, ст. 309: доступность услуг и исполнение согласованных обязательств.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_8559/1f3d91284a26982ce51392b5fd178e392fe53404/",
+          "https://www.consultant.ru/document/cons_doc_LAW_5142/1cd43e51fbd4129343b325971a466ec5cd32a425/"
+        ],
+        "limitation": "Закон не предписывает именно проводной микрофон; конкретный способ выбирается по доступным средствам и проверке слышимости.",
+        "source_scope": "Тексты и поисковые извлечения отдельных статей из КонсультантПлюс, 28.11.2026; специальные и местные нормы не полностью проверены."
+      }
     },
     {
       "case_key": "bank-expanded-light-05-01",
@@ -8584,15 +8771,33 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "ГК РФ, статьи 210 и 309: содержание имущества и надлежащее исполнение обязательств обслуживания; Федеральный закон № 8-ФЗ, статья 11: достоверность публикуемого графика. Конкретные требования к шуму определяются применимыми санитарными и региональными нормами, а не выдуманным общим часом тишины. Источники: https://11.rosguard.gov.ru/uploads/2025/07/5_grazhdanskijj_kodeks_rossijjskojj_federacii_chast_pervaya.pdf https://mintrud.gov.ru/docs/laws/129",
+      "legal_basis": "ГК РФ, ст. 210, 309; 8-ФЗ, ст. 11: содержание имущества, исполнение обязательств обслуживания, достоверность официальной информации.",
       "legal_urls": [
-        "https://www.consultant.ru/document/cons_doc_LAW_84602/e4fb380d53822434913f8449aa9b9e6bdf9f67a4/"
+        "https://www.consultant.ru/document/cons_doc_LAW_84602/e4fb380d53822434913f8449aa9b9e6bdf9f67a4/",
+        "https://www.consultant.ru/document/cons_doc_LAW_5142/c63c967d22055f1df0fcfecca564826dedb3b8c7/",
+        "https://www.consultant.ru/document/cons_doc_LAW_5142/1cd43e51fbd4129343b325971a466ec5cd32a425/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
       "option_analysis_status": "draft",
       "source_scope": "specific_norm_and_related_search_results_partial",
-      "review_date": "2026-11-27"
+      "review_date": "2026-11-27",
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_5142/c63c967d22055f1df0fcfecca564826dedb3b8c7/",
+        "https://www.consultant.ru/document/cons_doc_LAW_5142/1cd43e51fbd4129343b325971a466ec5cd32a425/",
+        "https://www.consultant.ru/document/cons_doc_LAW_84602/e4fb380d53822434913f8449aa9b9e6bdf9f67a4/"
+      ],
+      "norm_recheck_2026_11_28": {
+        "status": "targeted_norm_and_all_individual_alternatives_reviewed_not_full_acceptance",
+        "basis": "ГК РФ, ст. 210, 309; 8-ФЗ, ст. 11: содержание имущества, исполнение обязательств обслуживания, достоверность официальной информации.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_5142/c63c967d22055f1df0fcfecca564826dedb3b8c7/",
+          "https://www.consultant.ru/document/cons_doc_LAW_5142/1cd43e51fbd4129343b325971a466ec5cd32a425/",
+          "https://www.consultant.ru/document/cons_doc_LAW_84602/e4fb380d53822434913f8449aa9b9e6bdf9f67a4/"
+        ],
+        "limitation": "Регион и местные требования к шуму не заданы; универсальное время тишины не выводится из этих норм.",
+        "source_scope": "Тексты и поисковые извлечения отдельных статей из КонсультантПлюс, 28.11.2026; специальные и местные нормы не полностью проверены."
+      }
     },
     {
       "case_key": "bank-expanded-light-10-01",
@@ -8601,15 +8806,30 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "Федеральный закон № 69-ФЗ, статьи 37–38: обязанности и ответственность организаций в области пожарной безопасности. Вместимость и маршруты определяются применимыми требованиями и согласованными условиями объекта, а не числом желающих войти. Источники: https://18.mchs.gov.ru/uploads/resource/2026-01-27/teksty-normativnyh-pravovyh-aktov-reguliruyushchih-osushchestvlenie-federalnogo-gosudarstvennogo-pozharnogo-nadzora_1769497965271437721.pdf",
+      "legal_basis": "69-ФЗ, ст. 37; Правила противопожарного режима, ПП РФ №1479, п. 71: обеспечение пожарной безопасности и свободного проезда пожарной техники.",
       "legal_urls": [
-        "https://www.consultant.ru/document/cons_doc_LAW_5438/6edfbcbbcead156edf25d16814bb6778153fb2d1/"
+        "https://www.consultant.ru/document/cons_doc_LAW_5438/6edfbcbbcead156edf25d16814bb6778153fb2d1/",
+        "https://www.consultant.ru/document/cons_doc_LAW_363263/66c0a499a34fe1ecd100e4af9f80ee3b0a526284/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
       "option_analysis_status": "draft",
       "source_scope": "specific_norm_and_related_search_results_partial",
-      "review_date": "2026-11-27"
+      "review_date": "2026-11-27",
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_5438/6edfbcbbcead156edf25d16814bb6778153fb2d1/",
+        "https://www.consultant.ru/document/cons_doc_LAW_363263/66c0a499a34fe1ecd100e4af9f80ee3b0a526284/"
+      ],
+      "norm_recheck_2026_11_28": {
+        "status": "targeted_norm_and_all_individual_alternatives_reviewed_not_full_acceptance",
+        "basis": "69-ФЗ, ст. 37; Правила противопожарного режима, ПП РФ №1479, п. 71: обеспечение пожарной безопасности и свободного проезда пожарной техники.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_5438/6edfbcbbcead156edf25d16814bb6778153fb2d1/",
+          "https://www.consultant.ru/document/cons_doc_LAW_363263/66c0a499a34fe1ecd100e4af9f80ee3b0a526284/"
+        ],
+        "limitation": "Вместимость площадки и маршруты заданы согласованной схемой; пункт 71 проверен в редакции, действующей до 31.12.2026.",
+        "source_scope": "Тексты и поисковые извлечения отдельных статей из КонсультантПлюс, 28.11.2026; специальные и местные нормы не полностью проверены."
+      }
     },
     {
       "case_key": "bank-expanded-light-11-01",
@@ -8723,16 +8943,34 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "ГК РФ, статьи 209–210: полномочия собственника и содержание имущества; Федеральный закон №181-ФЗ, статья 15: доступность объектов и услуг. Художественная популярность не заменяет прав на размещение, технической проверки и условий содержания. Источники: https://11.rosguard.gov.ru/uploads/2025/07/5_grazhdanskijj_kodeks_rossijjskojj_federacii_chast_pervaya.pdf https://sfr.gov.ru/order/law_rehabilitation~11198",
+      "legal_basis": "ГК РФ, ст. 209, 210; 181-ФЗ, ст. 15: правомерное использование имущества, содержание и доступность объектов.",
       "legal_urls": [
         "https://www.consultant.ru/document/cons_doc_LAW_8559/1f3d91284a26982ce51392b5fd178e392fe53404/",
-        "https://www.consultant.ru/document/cons_doc_LAW_64629/98ad2641f95945c4b7956150260564c8b44028d9/"
+        "https://www.consultant.ru/document/cons_doc_LAW_64629/98ad2641f95945c4b7956150260564c8b44028d9/",
+        "https://www.consultant.ru/document/cons_doc_LAW_5142/9bc79ae09d078798e7a4ee4647ac9ea495da9fa0/",
+        "https://www.consultant.ru/document/cons_doc_LAW_5142/c63c967d22055f1df0fcfecca564826dedb3b8c7/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
       "option_analysis_status": "draft",
       "source_scope": "specific_norm_and_related_search_results_partial",
-      "review_date": "2026-11-27"
+      "review_date": "2026-11-27",
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_5142/9bc79ae09d078798e7a4ee4647ac9ea495da9fa0/",
+        "https://www.consultant.ru/document/cons_doc_LAW_5142/c63c967d22055f1df0fcfecca564826dedb3b8c7/",
+        "https://www.consultant.ru/document/cons_doc_LAW_8559/1f3d91284a26982ce51392b5fd178e392fe53404/"
+      ],
+      "norm_recheck_2026_11_28": {
+        "status": "targeted_norm_and_all_individual_alternatives_reviewed_not_full_acceptance",
+        "basis": "ГК РФ, ст. 209, 210; 181-ФЗ, ст. 15: правомерное использование имущества, содержание и доступность объектов.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_5142/9bc79ae09d078798e7a4ee4647ac9ea495da9fa0/",
+          "https://www.consultant.ru/document/cons_doc_LAW_5142/c63c967d22055f1df0fcfecca564826dedb3b8c7/",
+          "https://www.consultant.ru/document/cons_doc_LAW_8559/1f3d91284a26982ce51392b5fd178e392fe53404/"
+        ],
+        "limitation": "Авторские права и условия передачи проверяются по конкретному договору; популярность объекта не разрешает монтаж.",
+        "source_scope": "Тексты и поисковые извлечения отдельных статей из КонсультантПлюс, 28.11.2026; специальные и местные нормы не полностью проверены."
+      }
     },
     {
       "case_key": "bank-expanded-light-15-01",
@@ -8741,15 +8979,33 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "ГК РФ, статьи 209 и 309: использование имущества и исполнение договорённостей по оформлению; Федеральный закон №8-ФЗ, статья 11: достоверность официального пояснения. Специальные правила государственных символов нельзя применять к предмету, который таким символом не является. Источники: https://11.rosguard.gov.ru/uploads/2025/07/5_grazhdanskijj_kodeks_rossijjskojj_federacii_chast_pervaya.pdf https://mintrud.gov.ru/docs/laws/129",
+      "legal_basis": "ГК РФ, ст. 209, 309; 8-ФЗ, ст. 11: использование имущества и исполнение обязательств, достоверность официальных пояснений.",
       "legal_urls": [
-        "https://www.consultant.ru/document/cons_doc_LAW_84602/e4fb380d53822434913f8449aa9b9e6bdf9f67a4/"
+        "https://www.consultant.ru/document/cons_doc_LAW_84602/e4fb380d53822434913f8449aa9b9e6bdf9f67a4/",
+        "https://www.consultant.ru/document/cons_doc_LAW_5142/9bc79ae09d078798e7a4ee4647ac9ea495da9fa0/",
+        "https://www.consultant.ru/document/cons_doc_LAW_5142/1cd43e51fbd4129343b325971a466ec5cd32a425/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
       "option_analysis_status": "draft",
       "source_scope": "specific_norm_and_related_search_results_partial",
-      "review_date": "2026-11-27"
+      "review_date": "2026-11-27",
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_5142/9bc79ae09d078798e7a4ee4647ac9ea495da9fa0/",
+        "https://www.consultant.ru/document/cons_doc_LAW_5142/1cd43e51fbd4129343b325971a466ec5cd32a425/",
+        "https://www.consultant.ru/document/cons_doc_LAW_84602/e4fb380d53822434913f8449aa9b9e6bdf9f67a4/"
+      ],
+      "norm_recheck_2026_11_28": {
+        "status": "targeted_norm_and_all_individual_alternatives_reviewed_not_full_acceptance",
+        "basis": "ГК РФ, ст. 209, 309; 8-ФЗ, ст. 11: использование имущества и исполнение обязательств, достоверность официальных пояснений.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_5142/9bc79ae09d078798e7a4ee4647ac9ea495da9fa0/",
+          "https://www.consultant.ru/document/cons_doc_LAW_5142/1cd43e51fbd4129343b325971a466ec5cd32a425/",
+          "https://www.consultant.ru/document/cons_doc_LAW_84602/e4fb380d53822434913f8449aa9b9e6bdf9f67a4/"
+        ],
+        "limitation": "По условию декоративный флажок не является официальным государственным или муниципальным символом.",
+        "source_scope": "Тексты и поисковые извлечения отдельных статей из КонсультантПлюс, 28.11.2026; специальные и местные нормы не полностью проверены."
+      }
     },
     {
       "case_key": "bank-expanded-light-16-01",
@@ -8790,15 +9046,39 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "Федеральный закон №29-ФЗ, статьи 3 и 17: оборот пищевых продуктов и требования к условиям их хранения и перевозки; ГК РФ, статьи 209–210: использование и содержание площадки. Правила конкретной торговли и приготовления пищи проверяются отдельно по применимому режиму. Источники: https://13.rospotrebnadzor.ru/sites/default/files/federalnyy_zakon_ot_2_yanvarya_2000_g_n_29_fz_o_kachestve_i_bezopasnosti_pishchevyh_p.pdf https://11.rosguard.gov.ru/uploads/2025/07/5_grazhdanskijj_kodeks_rossijjskojj_federacii_chast_pervaya.pdf",
+      "legal_basis": "29-ФЗ, ст. 3, 17, 19: безопасность обращения, изготовления, хранения и перевозки пищевых продуктов; ГК РФ, ст. 209–210: использование и содержание площадки.",
       "legal_urls": [
-        "https://www.consultant.ru/document/cons_doc_LAW_25584/e9278b4da9d697e7ffac54e2c395f58c8306f72c/"
+        "https://www.consultant.ru/document/cons_doc_LAW_25584/e9278b4da9d697e7ffac54e2c395f58c8306f72c/",
+        "https://www.consultant.ru/document/cons_doc_LAW_25584/34e0e24ae21953be58ff56c36aff3456b7c0d302/",
+        "https://www.consultant.ru/document/cons_doc_LAW_25584/e6022123c58177e089589015e378591a1dd1bdc0/",
+        "https://www.consultant.ru/document/cons_doc_LAW_5142/9bc79ae09d078798e7a4ee4647ac9ea495da9fa0/",
+        "https://www.consultant.ru/document/cons_doc_LAW_5142/c63c967d22055f1df0fcfecca564826dedb3b8c7/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
       "option_analysis_status": "draft",
       "source_scope": "specific_norm_and_related_search_results_partial",
-      "review_date": "2026-11-27"
+      "review_date": "2026-11-27",
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_25584/e9278b4da9d697e7ffac54e2c395f58c8306f72c/",
+        "https://www.consultant.ru/document/cons_doc_LAW_25584/34e0e24ae21953be58ff56c36aff3456b7c0d302/",
+        "https://www.consultant.ru/document/cons_doc_LAW_25584/e6022123c58177e089589015e378591a1dd1bdc0/",
+        "https://www.consultant.ru/document/cons_doc_LAW_5142/9bc79ae09d078798e7a4ee4647ac9ea495da9fa0/",
+        "https://www.consultant.ru/document/cons_doc_LAW_5142/c63c967d22055f1df0fcfecca564826dedb3b8c7/"
+      ],
+      "norm_recheck_2026_11_28": {
+        "status": "targeted_norm_and_all_individual_alternatives_reviewed_not_full_acceptance",
+        "basis": "29-ФЗ, ст. 3, 17, 19: безопасность обращения, изготовления, хранения и перевозки пищевых продуктов; ГК РФ, ст. 209–210: использование и содержание площадки.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_25584/e9278b4da9d697e7ffac54e2c395f58c8306f72c/",
+          "https://www.consultant.ru/document/cons_doc_LAW_25584/34e0e24ae21953be58ff56c36aff3456b7c0d302/",
+          "https://www.consultant.ru/document/cons_doc_LAW_25584/e6022123c58177e089589015e378591a1dd1bdc0/",
+          "https://www.consultant.ru/document/cons_doc_LAW_5142/9bc79ae09d078798e7a4ee4647ac9ea495da9fa0/",
+          "https://www.consultant.ru/document/cons_doc_LAW_5142/c63c967d22055f1df0fcfecca564826dedb3b8c7/"
+        ],
+        "limitation": "Форма торговли и приготовления определяет применимые санитарные и торговые требования; финансирование уборки проверяется отдельно.",
+        "source_scope": "Тексты и поисковые извлечения отдельных статей из КонсультантПлюс, 28.11.2026; специальные и местные нормы не полностью проверены."
+      }
     },
     {
       "case_key": "bank-expanded-light-18-01",
@@ -9120,15 +9400,33 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "Федеральный закон №273-ФЗ от 29.12.2012, статья 28: обеспечение деятельности образовательной организации; БК РФ, статьи 38 и 78: целевое назначение и условия субсидии, если выбран именно такой механизм. Права на линию и условия обслуживания оформляются отдельно. Источники: http://www.kremlin.ru/acts/bank/36698 https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
+      "legal_basis": "273-ФЗ, ст. 28; БК РФ, ст. 38, 78: обеспечение деятельности школы, целевой характер бюджетных средств, условия субсидирования при выборе такого механизма.",
       "legal_urls": [
-        "https://www.consultant.ru/document/cons_doc_LAW_19702/1b6959f23cc516d0e11ddc2e213ca2dca83560df/"
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/1b6959f23cc516d0e11ddc2e213ca2dca83560df/",
+        "https://www.consultant.ru/document/cons_doc_LAW_140174/552097cad5942f36c9484dbde7ebf92db1f783f3/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/9a0e8abcbe24837343cdcc599bccf0f09413968a/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
       "option_analysis_status": "draft",
       "source_scope": "specific_norm_and_related_search_results_partial",
-      "review_date": "2026-11-27"
+      "review_date": "2026-11-27",
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_140174/552097cad5942f36c9484dbde7ebf92db1f783f3/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/9a0e8abcbe24837343cdcc599bccf0f09413968a/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/1b6959f23cc516d0e11ddc2e213ca2dca83560df/"
+      ],
+      "norm_recheck_2026_11_28": {
+        "status": "targeted_norm_and_all_individual_alternatives_reviewed_not_full_acceptance",
+        "basis": "273-ФЗ, ст. 28; БК РФ, ст. 38, 78: обеспечение деятельности школы, целевой характер бюджетных средств, условия субсидирования при выборе такого механизма.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_140174/552097cad5942f36c9484dbde7ebf92db1f783f3/",
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/9a0e8abcbe24837343cdcc599bccf0f09413968a/",
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/1b6959f23cc516d0e11ddc2e213ca2dca83560df/"
+        ],
+        "limitation": "Субсидия коммерческому оператору не является автоматически допустимым способом; определяются правовой механизм, получатель, собственник и условия эксплуатации.",
+        "source_scope": "Тексты и поисковые извлечения отдельных статей из КонсультантПлюс, 28.11.2026; специальные и местные нормы не полностью проверены."
+      }
     },
     {
       "case_key": "bank-expanded-serious-10-01",
@@ -9137,7 +9435,7 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "Федеральный закон №181-ФЗ, статья 15: условия доступности объектов и услуг и предусмотренные меры помощи. Временный порядок при существующем объекте определяется установленными условиями; он не означает освобождения от требований доступности или универсального разрешения опасной переноски людей. Источники: https://sfr.gov.ru/order/law_rehabilitation~11198",
+      "legal_basis": "181-ФЗ, ст. 15: условия доступности объектов и услуг; при невозможности полного приспособления существующего объекта применяются предусмотренные законом меры доступа.",
       "legal_urls": [
         "https://www.consultant.ru/document/cons_doc_LAW_8559/1f3d91284a26982ce51392b5fd178e392fe53404/"
       ],
@@ -9145,7 +9443,19 @@
       "activation_allowed": false,
       "option_analysis_status": "draft",
       "source_scope": "specific_norm_and_related_search_results_partial",
-      "review_date": "2026-11-27"
+      "review_date": "2026-11-27",
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_8559/1f3d91284a26982ce51392b5fd178e392fe53404/"
+      ],
+      "norm_recheck_2026_11_28": {
+        "status": "targeted_norm_and_all_individual_alternatives_reviewed_not_full_acceptance",
+        "basis": "181-ФЗ, ст. 15: условия доступности объектов и услуг; при невозможности полного приспособления существующего объекта применяются предусмотренные законом меры доступа.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_8559/1f3d91284a26982ce51392b5fd178e392fe53404/"
+        ],
+        "limitation": "Временная помощь не заменяет автоматически реконструкцию; конкретный порядок определяется с учётом законных условий и безопасности.",
+        "source_scope": "Тексты и поисковые извлечения отдельных статей из КонсультантПлюс, 28.11.2026; специальные и местные нормы не полностью проверены."
+      }
     },
     {
       "case_key": "bank-expanded-serious-11-01",
@@ -9423,15 +9733,30 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "Федеральный закон №220-ФЗ, статья 14: организация перевозок по регулируемым тарифам; БК РФ, статья 78: условия субсидии, если компенсация оформляется этим механизмом. Компетентный тарифный орган и методика устанавливаются применимым регулированием, а не выбираются участником произвольно. Источники: https://mintrans.gov.ru/activities/214/169 https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
+      "legal_basis": "220-ФЗ, ст. 14; БК РФ, ст. 78: регулируемые перевозки и условия субсидирования затрат при соответствующем механизме.",
       "legal_urls": [
-        "https://www.consultant.ru/document/cons_doc_LAW_19702/1b6959f23cc516d0e11ddc2e213ca2dca83560df/"
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/1b6959f23cc516d0e11ddc2e213ca2dca83560df/",
+        "https://www.consultant.ru/document/cons_doc_LAW_182659/2a81d1737eb14693e515423a77157b0fb20088c8/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
       "option_analysis_status": "draft",
       "source_scope": "specific_norm_and_related_search_results_partial",
-      "review_date": "2026-11-27"
+      "review_date": "2026-11-27",
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_182659/2a81d1737eb14693e515423a77157b0fb20088c8/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/1b6959f23cc516d0e11ddc2e213ca2dca83560df/"
+      ],
+      "norm_recheck_2026_11_28": {
+        "status": "targeted_norm_and_all_individual_alternatives_reviewed_not_full_acceptance",
+        "basis": "220-ФЗ, ст. 14; БК РФ, ст. 78: регулируемые перевозки и условия субсидирования затрат при соответствующем механизме.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_182659/2a81d1737eb14693e515423a77157b0fb20088c8/",
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/1b6959f23cc516d0e11ddc2e213ca2dca83560df/"
+        ],
+        "limitation": "Тарифная методика и полномочия устанавливаются региональным актом; по условию решение принимает уполномоченный региональный орган.",
+        "source_scope": "Тексты и поисковые извлечения отдельных статей из КонсультантПлюс, 28.11.2026; специальные и местные нормы не полностью проверены."
+      }
     },
     {
       "case_key": "bank-expanded-serious-19-01",
@@ -9831,15 +10156,31 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "Федеральный закон №323-ФЗ, статьи 10 и 33: доступность и первичная помощь; статья 36.2: особенности помощи с телемедицинскими технологиями. Допустимость конкретной дистанционной консультации определяют медицинские специалисты по действующему порядку и ограничениям, включая применимые специальные режимы. Источники: https://minzdrav.gov.ru/en/documents/7025-federalnyy-zakon-ot-21-noyabrya-2011-g-323-fz-ob-osnovah-ohrany-zdorovya-grazhdan-v-rossiyskoy-federatsii https://fcmk.minzdrav.gov.ru/wp-content/uploads/2025/09/ob-osnovah-ohrany-zdorovya-grazhdan-v-rossijskoj-federaczii.pdf",
+      "legal_basis": "323-ФЗ, ст. 33, 36.2: первичная помощь и особенности применения телемедицинских технологий в установленных пределах.",
       "legal_urls": [
-        "https://www.consultant.ru/document/cons_doc_LAW_121895/e63d3344841b2f5636a73710e906a23ebaf9ab82/"
+        "https://www.consultant.ru/document/cons_doc_LAW_121895/e63d3344841b2f5636a73710e906a23ebaf9ab82/",
+        "https://www.consultant.ru/document/cons_doc_LAW_121895/dd5b443a6d2c374dc77998bcc6ccad68c593488e/",
+        "https://www.consultant.ru/document/cons_doc_LAW_121895/ccf02734a76e335943ae86f86b319d6035cca374/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
       "option_analysis_status": "draft",
       "source_scope": "specific_norm_and_related_search_results_partial",
-      "review_date": "2026-11-27"
+      "review_date": "2026-11-27",
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_121895/dd5b443a6d2c374dc77998bcc6ccad68c593488e/",
+        "https://www.consultant.ru/document/cons_doc_LAW_121895/ccf02734a76e335943ae86f86b319d6035cca374/"
+      ],
+      "norm_recheck_2026_11_28": {
+        "status": "targeted_norm_and_all_individual_alternatives_reviewed_not_full_acceptance",
+        "basis": "323-ФЗ, ст. 33, 36.2: первичная помощь и особенности применения телемедицинских технологий в установленных пределах.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_121895/dd5b443a6d2c374dc77998bcc6ccad68c593488e/",
+          "https://www.consultant.ru/document/cons_doc_LAW_121895/ccf02734a76e335943ae86f86b319d6035cca374/"
+        ],
+        "limitation": "Телемедицинская консультация не заменяет любой очный осмотр; допустимость определяется медицинским специалистом и применимым порядком.",
+        "source_scope": "Тексты и поисковые извлечения отдельных статей из КонсультантПлюс, 28.11.2026; специальные и местные нормы не полностью проверены."
+      }
     },
     {
       "case_key": "bank-expanded-serious-30-01",
@@ -9848,15 +10189,33 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "Федеральный закон №69-ФЗ, статья 37: обязанности организации по пожарной безопасности; Федеральный закон №273-ФЗ от 29.12.2012, статья 39; ЖК РФ, статьи 94 и 100: предоставление и договорный режим общежития. Ограничение опасного помещения и прекращение жилищных прав не являются одним действием. Источники: https://18.mchs.gov.ru/uploads/resource/2026-01-27/teksty-normativnyh-pravovyh-aktov-reguliruyushchih-osushchestvlenie-federalnogo-gosudarstvennogo-pozharnogo-nadzora_1769497965271437721.pdf https://epp.genproc.gov.ru/ru/proc_26/activity/legal-education/explain/e239070/",
+      "legal_basis": "69-ФЗ, ст. 37; 273-ФЗ, ст. 39; ЖК РФ, ст. 100: пожарная безопасность и установленный договорный порядок предоставления общежития.",
       "legal_urls": [
-        "https://www.consultant.ru/document/cons_doc_LAW_5438/6edfbcbbcead156edf25d16814bb6778153fb2d1/"
+        "https://www.consultant.ru/document/cons_doc_LAW_5438/6edfbcbbcead156edf25d16814bb6778153fb2d1/",
+        "https://www.consultant.ru/document/cons_doc_LAW_140174/25bebf68593b645792b7acc93e25a5f370336cbe/",
+        "https://www.consultant.ru/document/cons_doc_LAW_51057/69cba7e0cec456c45a2b08077a5b45d3b8664e62/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
       "option_analysis_status": "draft",
       "source_scope": "specific_norm_and_related_search_results_partial",
-      "review_date": "2026-11-27"
+      "review_date": "2026-11-27",
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_5438/6edfbcbbcead156edf25d16814bb6778153fb2d1/",
+        "https://www.consultant.ru/document/cons_doc_LAW_140174/25bebf68593b645792b7acc93e25a5f370336cbe/",
+        "https://www.consultant.ru/document/cons_doc_LAW_51057/69cba7e0cec456c45a2b08077a5b45d3b8664e62/"
+      ],
+      "norm_recheck_2026_11_28": {
+        "status": "targeted_norm_and_all_individual_alternatives_reviewed_not_full_acceptance",
+        "basis": "69-ФЗ, ст. 37; 273-ФЗ, ст. 39; ЖК РФ, ст. 100: пожарная безопасность и установленный договорный порядок предоставления общежития.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_5438/6edfbcbbcead156edf25d16814bb6778153fb2d1/",
+          "https://www.consultant.ru/document/cons_doc_LAW_140174/25bebf68593b645792b7acc93e25a5f370336cbe/",
+          "https://www.consultant.ru/document/cons_doc_LAW_51057/69cba7e0cec456c45a2b08077a5b45d3b8664e62/"
+        ],
+        "limitation": "Временное размещение зависит от наличия фонда и компетентного решения; закрытие опасной зоны само по себе не расторгает договор найма.",
+        "source_scope": "Тексты и поисковые извлечения отдельных статей из КонсультантПлюс, 28.11.2026; специальные и местные нормы не полностью проверены."
+      }
     },
     {
       "case_key": "bank-library",
