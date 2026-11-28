@@ -30,7 +30,7 @@ function compile(cases,registry,matrix){
    assert.ok(portfolio_keys.length&&portfolio_keys.every(x=>portfolios.has(x)),c.case_key);
    effect_plan.competence={portfolio_keys,committee_before_9:earlyCommitteeKeys.has(c.case_key)};
   }else{assert.ok(!Object.hasOwn(c.effect_plan,'best_option_key'));assert.ok(options.every(o=>o.lawful));}
-  const situation=c.audience==='single'?c.original_situation:c.original_situation+'\n\nОбязательные условия рассмотрения. '+c.mandatory_boundary;
+  const situation=c.original_situation;
   if(c.audience!=='single')assert.ok(typeof c.mandatory_boundary==='string'&&c.mandatory_boundary.trim(),c.case_key);
   return {case_key:c.case_key,title:c.title,category:c.category,audience:c.audience,situation,
    decision_options:c.decision_options,effect_plan,source_url:c.source_url??null,source_note:c.source_note??null,
@@ -49,8 +49,8 @@ const payload=compile(cases,register,matrix);
 assert.equal(payload.filter(c=>c.effect_plan.competence?.committee_before_9).length,20);
 assert.equal(payload.filter(c=>c.effect_plan.competence).length,141);
 const originalByKey=new Map(cases.map(c=>[c.case_key,c]));
-assert.equal(payload.filter(c=>c.audience!=='single'&&c.situation.endsWith(originalByKey.get(c.case_key).mandatory_boundary)).length,189);
-assert.ok(payload.filter(c=>c.audience==='single').every(c=>c.situation===originalByKey.get(c.case_key).original_situation));
+assert.equal(cases.filter(c=>c.audience!=='single'&&typeof c.mandatory_boundary==='string'&&c.mandatory_boundary.trim()).length,189);
+assert.ok(payload.every(c=>c.situation===originalByKey.get(c.case_key).original_situation&&!c.situation.includes('Обязательные условия рассмотрения.')));
 const blocked=payload.filter(c=>!(c.verified&&c.editorial_status==='approved'&&c.legal_status==='verified_current'&&c.activation_allowed&&c.competence_allowed)).length;
 console.log(JSON.stringify({catalogueCases:payload.length,options:1660,blocked,editorialBytes:Buffer.byteLength(JSON.stringify(cases)),candidateBytes:Buffer.byteLength(JSON.stringify(payload))}));
 if(require.main===module&&process.argv.includes('--release'))assertReleaseReady(payload);
