@@ -1926,23 +1926,45 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "БК РФ, статьи 6, 215.1 и 217.1: исполнение бюджета и кассовый план. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
+      "legal_basis": "БК РФ, ст. 6, 33, 217, 217.1, 219: временная нехватка ликвидности на едином счёте не тождественна годовому дефициту; кассовый план и законный порядок исполнения обязательств сохраняются.",
       "legal_urls": [
         "https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
         "https://www.consultant.ru/document/cons_doc_LAW_19702/24a94562b0b0557393897b9d9ef6f591ff1fb19b/",
-        "https://www.consultant.ru/document/cons_doc_LAW_19702/c336c2a2d3276d558fe6d7c58d8bbe778908254d/"
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/c336c2a2d3276d558fe6d7c58d8bbe778908254d/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/055a71948dbf2a4fc2478437cd89cd864ee8e6e5/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/bfe84bef16378ca35200b610fe85a50ee121673c/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/cf2863695f409dd40e50baa388ab6ae07175b29e/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/15d7c58c01bf75dcd6cf84a008bfef761ba731eb/"
       ],
-      "legal_status": "requires_case_specific_current_law_review",
+      "legal_status": "verified_current",
       "activation_allowed": false,
       "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/055a71948dbf2a4fc2478437cd89cd864ee8e6e5/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/bfe84bef16378ca35200b610fe85a50ee121673c/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/cf2863695f409dd40e50baa388ab6ae07175b29e/",
         "https://www.consultant.ru/document/cons_doc_LAW_19702/24a94562b0b0557393897b9d9ef6f591ff1fb19b/",
-        "https://www.consultant.ru/document/cons_doc_LAW_19702/c336c2a2d3276d558fe6d7c58d8bbe778908254d/"
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/15d7c58c01bf75dcd6cf84a008bfef761ba731eb/"
       ],
       "review_date": "2026-11-28",
       "targeted_option_review": {
-        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
         "option_count": 5,
-        "remaining": "Доступные остатки, условия краткосрочного финансирования, обязательные сроки платежей и порядок изменения кассового плана."
+        "remaining": "Оценка относится к явно заданным учебным обстоятельствам, не к реальному бюджетному решению. Все пять вариантов — дополнительные предложения уполномоченному органу, а не самостоятельное разрешение расходовать средства, менять обязательства или заимствовать. Полная независимая сверка официальной цепочки поправок не проведена."
+      },
+      "final_case_review_2026_11_28": {
+        "date": "2026-11-28",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
+        "norm": "БК РФ, ст. 6, 33, 217, 217.1, 219: временная нехватка ликвидности на едином счёте не тождественна годовому дефициту; кассовый план и законный порядок исполнения обязательств сохраняются.",
+        "option_count": 5,
+        "finding": "Различены ликвидность и дефицит; все пять мер являются предложениями, не разрешением задержать обязательный платёж или привлечь кредит без проверки условий.",
+        "remaining": "Оценка относится к явно заданным учебным обстоятельствам, не к реальному бюджетному решению. Все пять вариантов — дополнительные предложения уполномоченному органу, а не самостоятельное разрешение расходовать средства, менять обязательства или заимствовать. Полная независимая сверка официальной цепочки поправок не проведена.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/055a71948dbf2a4fc2478437cd89cd864ee8e6e5/",
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/bfe84bef16378ca35200b610fe85a50ee121673c/",
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/cf2863695f409dd40e50baa388ab6ae07175b29e/",
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/24a94562b0b0557393897b9d9ef6f591ff1fb19b/",
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/15d7c58c01bf75dcd6cf84a008bfef761ba731eb/"
+        ]
       }
     },
     {
@@ -2050,23 +2072,38 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "БК РФ, статьи 33 и 37: сбалансированность бюджета и достоверность показателей. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
+      "legal_basis": "БК РФ, ст. 33, 37, п. 3 ст. 41: продажа указанного склада даёт разовый неналоговый доход; прогноз должен быть реалистичным. Общего запрета направлять разовый доход на зарплату эти нормы не устанавливают.",
       "legal_urls": [
         "https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
         "https://www.consultant.ru/document/cons_doc_LAW_19702/bfe84bef16378ca35200b610fe85a50ee121673c/",
-        "https://www.consultant.ru/document/cons_doc_LAW_19702/73147d61f1183d32e517768da079cfdf28cca0a9/"
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/73147d61f1183d32e517768da079cfdf28cca0a9/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/c5a5b77bd2e9718ef6faf32c062d3faeff632d8f/"
       ],
-      "legal_status": "requires_case_specific_current_law_review",
+      "legal_status": "verified_current",
       "activation_allowed": false,
       "checked_norm_urls": [
         "https://www.consultant.ru/document/cons_doc_LAW_19702/bfe84bef16378ca35200b610fe85a50ee121673c/",
-        "https://www.consultant.ru/document/cons_doc_LAW_19702/73147d61f1183d32e517768da079cfdf28cca0a9/"
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/73147d61f1183d32e517768da079cfdf28cca0a9/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/c5a5b77bd2e9718ef6faf32c062d3faeff632d8f/"
       ],
       "review_date": "2026-11-28",
       "targeted_option_review": {
-        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
         "option_count": 5,
-        "remaining": "Вид проданного имущества, классификация поступления, бюджетный прогноз и действующие зарплатные обязательства. Ст. 33 и 37 не запрещают вообще использовать разовый доход для зарплаты; проблема в необоснованном постоянном прогнозе."
+        "remaining": "Оценка относится к явно заданным учебным обстоятельствам, не к реальному бюджетному решению. Все пять вариантов — дополнительные предложения уполномоченному органу, а не самостоятельное разрешение расходовать средства, менять обязательства или заимствовать. Полная независимая сверка официальной цепочки поправок не проведена."
+      },
+      "final_case_review_2026_11_28": {
+        "date": "2026-11-28",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
+        "norm": "БК РФ, ст. 33, 37, п. 3 ст. 41: продажа указанного склада даёт разовый неналоговый доход; прогноз должен быть реалистичным. Общего запрета направлять разовый доход на зарплату эти нормы не устанавливают.",
+        "option_count": 5,
+        "finding": "Уточнена классификация поступления и отсутствие универсального запрета на зарплатные расходы; проблема состоит в необоснованной повторяемости дохода.",
+        "remaining": "Оценка относится к явно заданным учебным обстоятельствам, не к реальному бюджетному решению. Все пять вариантов — дополнительные предложения уполномоченному органу, а не самостоятельное разрешение расходовать средства, менять обязательства или заимствовать. Полная независимая сверка официальной цепочки поправок не проведена.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/bfe84bef16378ca35200b610fe85a50ee121673c/",
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/73147d61f1183d32e517768da079cfdf28cca0a9/",
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/c5a5b77bd2e9718ef6faf32c062d3faeff632d8f/"
+        ]
       }
     },
     {
@@ -3340,21 +3377,35 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "БК РФ, статьи 36 и 264.1: прозрачность бюджета и бюджетная отчётность. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
+      "legal_basis": "БК РФ, ст. 36, 264.1: полнота и сопоставимость открытой информации, разграничение фактического исполнения и поясняющих данных; аналитическая таблица не подменяет бюджетную отчётность.",
       "legal_urls": [
         "https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
-        "https://www.consultant.ru/document/cons_doc_LAW_19702/a822d521b7e939dc36b96b17da82719f28c22c59/"
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/a822d521b7e939dc36b96b17da82719f28c22c59/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/ac7eb6cf1d15c2a4225e64864e980f435d2142bc/"
       ],
-      "legal_status": "requires_case_specific_current_law_review",
+      "legal_status": "verified_current",
       "activation_allowed": false,
       "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/ac7eb6cf1d15c2a4225e64864e980f435d2142bc/",
         "https://www.consultant.ru/document/cons_doc_LAW_19702/a822d521b7e939dc36b96b17da82719f28c22c59/"
       ],
       "review_date": "2026-11-28",
       "targeted_option_review": {
-        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
         "option_count": 5,
-        "remaining": "Вид отчётности, применимые формы и правила раскрытия, учётная дата и состав показателей."
+        "remaining": "Оценка относится к явно заданным учебным обстоятельствам, не к реальному бюджетному решению. Все пять вариантов — дополнительные предложения уполномоченному органу, а не самостоятельное разрешение расходовать средства, менять обязательства или заимствовать. Полная независимая сверка официальной цепочки поправок не проведена."
+      },
+      "final_case_review_2026_11_28": {
+        "date": "2026-11-28",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
+        "norm": "БК РФ, ст. 36, 264.1: полнота и сопоставимость открытой информации, разграничение фактического исполнения и поясняющих данных; аналитическая таблица не подменяет бюджетную отчётность.",
+        "option_count": 5,
+        "finding": "Уточнены вид документа, единая дата и знаменатель; 72% факта не заменяются 100% плановых ассигнований, все пять мер дополнительны.",
+        "remaining": "Оценка относится к явно заданным учебным обстоятельствам, не к реальному бюджетному решению. Все пять вариантов — дополнительные предложения уполномоченному органу, а не самостоятельное разрешение расходовать средства, менять обязательства или заимствовать. Полная независимая сверка официальной цепочки поправок не проведена.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/ac7eb6cf1d15c2a4225e64864e980f435d2142bc/",
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/a822d521b7e939dc36b96b17da82719f28c22c59/"
+        ]
       }
     },
     {
@@ -3578,13 +3629,13 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "БК РФ, статьи 99 и 107: состав государственного долга субъекта РФ. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
+      "legal_basis": "БК РФ, п. 2–4 ст. 99, ст. 107: действующие обязательства из государственной гарантии включаются в долг субъекта; возможное исполнение гарантии и денежный отток оцениваются отдельно без двойного учёта.",
       "legal_urls": [
         "https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
         "https://www.consultant.ru/document/cons_doc_LAW_19702/95351b068ed8020a8891410884e60ecb81f26164/",
         "https://www.consultant.ru/document/cons_doc_LAW_19702/7b5f77362fb1983215e0525ce8a2b08de83e1dbf/"
       ],
-      "legal_status": "requires_case_specific_current_law_review",
+      "legal_status": "verified_current",
       "activation_allowed": false,
       "legal_evidence": [
         {
@@ -3596,15 +3647,9 @@
         }
       ],
       "targeted_option_review": {
-        "date": "2026-11-27",
-        "norm": "БК РФ, ст. 99, п. 2–3; ст. 107",
-        "urls": [
-          "https://www.consultant.ru/document/cons_doc_LAW_19702/95351b068ed8020a8891410884e60ecb81f26164/",
-          "https://www.consultant.ru/document/cons_doc_LAW_19702/7b5f77362fb1983215e0525ce8a2b08de83e1dbf/"
-        ],
-        "options": 5,
-        "status": "specific_text_read_and_alternatives_reviewed_under_stated_conditions_not_full_case_acceptance",
-        "remaining": "Конкретный предел долга зависит от статуса субъекта и бюджетных данных; фактический размер и выплата гарантии не рассчитаны."
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
+        "option_count": 5,
+        "remaining": "Оценка относится к явно заданным учебным обстоятельствам, не к реальному бюджетному решению. Все пять вариантов — дополнительные предложения уполномоченному органу, а не самостоятельное разрешение расходовать средства, менять обязательства или заимствовать. Полная независимая сверка официальной цепочки поправок не проведена."
       },
       "checked_norm_urls": [
         "https://www.consultant.ru/document/cons_doc_LAW_19702/95351b068ed8020a8891410884e60ecb81f26164/",
@@ -3619,6 +3664,19 @@
         ],
         "option_count": 5,
         "finding": "Ст. 99 и 107 БК РФ, ред. 02.11.2026: гарантии включаются в долг субъекта, пределы определяются законом о бюджете и требованиями долговой устойчивости. Возможный денежный отток не равен новому долгу; конкретные бюджетные данные отсутствуют."
+      },
+      "review_date": "2026-11-28",
+      "final_case_review_2026_11_28": {
+        "date": "2026-11-28",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
+        "norm": "БК РФ, п. 2–4 ст. 99, ст. 107: действующие обязательства из государственной гарантии включаются в долг субъекта; возможное исполнение гарантии и денежный отток оцениваются отдельно без двойного учёта.",
+        "option_count": 5,
+        "finding": "Уточнён действующий объём обязательства, не рассчитан вымышленный долговой предел; все меры управления риском сохраняют существующую гарантию.",
+        "remaining": "Оценка относится к явно заданным учебным обстоятельствам, не к реальному бюджетному решению. Все пять вариантов — дополнительные предложения уполномоченному органу, а не самостоятельное разрешение расходовать средства, менять обязательства или заимствовать. Полная независимая сверка официальной цепочки поправок не проведена.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/95351b068ed8020a8891410884e60ecb81f26164/",
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/7b5f77362fb1983215e0525ce8a2b08de83e1dbf/"
+        ]
       }
     },
     {
@@ -3705,12 +3763,13 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "БК РФ, статья 6: бюджет субъекта РФ и консолидированный бюджет. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
+      "legal_basis": "БК РФ, ст. 6, 14: отдельный бюджет субъекта и его консолидированный бюджет различаются. Дополнительный межрегиональный аналитический свод с заданным периметром нельзя выдавать за областной бюджет.",
       "legal_urls": [
         "https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
-        "https://www.consultant.ru/document/cons_doc_LAW_19702/055a71948dbf2a4fc2478437cd89cd864ee8e6e5/"
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/055a71948dbf2a4fc2478437cd89cd864ee8e6e5/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/bb41379ccfcd791a488b9d89da16a1fdffce5155/"
       ],
-      "legal_status": "requires_case_specific_current_law_review",
+      "legal_status": "verified_current",
       "activation_allowed": false,
       "legal_evidence": [
         {
@@ -3722,13 +3781,26 @@
         }
       ],
       "checked_norm_urls": [
-        "https://www.consultant.ru/document/cons_doc_LAW_19702/055a71948dbf2a4fc2478437cd89cd864ee8e6e5/"
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/055a71948dbf2a4fc2478437cd89cd864ee8e6e5/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/bb41379ccfcd791a488b9d89da16a1fdffce5155/"
       ],
       "review_date": "2026-11-28",
       "targeted_option_review": {
-        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
         "option_count": 5,
-        "remaining": "Состав свода, межрегиональные соглашения при применимости, отчётный период и источник данных; отдельные субъекты не объединять автоматически."
+        "remaining": "Оценка относится к явно заданным учебным обстоятельствам, не к реальному бюджетному решению. Все пять вариантов — дополнительные предложения уполномоченному органу, а не самостоятельное разрешение расходовать средства, менять обязательства или заимствовать. Полная независимая сверка официальной цепочки поправок не проведена."
+      },
+      "final_case_review_2026_11_28": {
+        "date": "2026-11-28",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
+        "norm": "БК РФ, ст. 6, 14: отдельный бюджет субъекта и его консолидированный бюджет различаются. Дополнительный межрегиональный аналитический свод с заданным периметром нельзя выдавать за областной бюджет.",
+        "option_count": 5,
+        "finding": "Зафиксированы состав свода и исключение внутренних трансфертов; разграничены отдельный региональный бюджет, установленная законом консолидация и учебный аналитический агрегат.",
+        "remaining": "Оценка относится к явно заданным учебным обстоятельствам, не к реальному бюджетному решению. Все пять вариантов — дополнительные предложения уполномоченному органу, а не самостоятельное разрешение расходовать средства, менять обязательства или заимствовать. Полная независимая сверка официальной цепочки поправок не проведена.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/055a71948dbf2a4fc2478437cd89cd864ee8e6e5/",
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/bb41379ccfcd791a488b9d89da16a1fdffce5155/"
+        ]
       }
     },
     {
