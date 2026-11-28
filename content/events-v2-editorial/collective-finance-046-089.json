@@ -400,7 +400,11 @@
           "https://www.consultant.ru/document/cons_doc_LAW_19702/4ce55543bc62fa4c4587fa50514b56aa0121a671/",
           "https://www.consultant.ru/document/cons_doc_LAW_19702/ca20da6e9e9d1116bbcf04288c9656fcd121ab94/",
           "https://www.consultant.ru/document/cons_doc_LAW_501319/e46b2c9eca58d3afa1e973e2e8a7c188f390cdb2/",
-          "https://www.consultant.ru/document/cons_doc_LAW_501319/d76059a3a15193b837145d02058cd732dc0c4565/"
+          "https://www.consultant.ru/document/cons_doc_LAW_501319/d76059a3a15193b837145d02058cd732dc0c4565/",
+          "https://www.consultant.ru/document/cons_doc_LAW_501319/b8394f4cd60580ecc9e5ad6e55f730c65215b313/",
+          "https://www.consultant.ru/document/cons_doc_LAW_501319/96dfe686f5207ba45ee2cbb4cde45c91a05b4ef9/",
+          "https://www.kontur-extern.ru/info/normativ/document/1/505621-federalnyy-zakon-ot-09-04-2026-n-85-fz",
+          "https://www.consultant.ru/document/cons_doc_LAW_44571/7af8214defd24542ba9c45e06a63067a0fda4e2c/"
         ],
         "collective_option_analysis": {
           "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
@@ -447,13 +451,17 @@
           "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
           "norm": "Конституция РФ, статья 132; 33-ФЗ, статьи 33–34; БК РФ, статьи 79.1, 86.",
           "option_count": 5,
-          "finding": "Нахождение объекта на территории муниципалитета само по себе не создаёт муниципальное расходное обязательство.",
+          "finding": "Нахождение объекта на территории муниципалитета само по себе не создаёт муниципальное расходное обязательство. Ст. 34 ч. 8 №33-ФЗ требует заключения совета муниципальных образований субъекта при внесении регионального законопроекта о наделении отдельными государственными полномочиями. Передача полномочий не равнозначна автоматическому переносу имущественного обязательства; законное софинансирование возможно лишь при отдельном основании. В 2026 году применяются переходные положения ч. 1–2 ст. 91 и ст. 94 №33-ФЗ в редакции от 09.04.2026: до 01.01.2028 перечень муниципальных полномочий определяется по ст. 14–18 №131-ФЗ; ст. 32 №33-ФЗ ещё не вступила в силу. Это не отменяет уже действующие процедурные нормы №33-ФЗ. Вид муниципального образования и региональное перераспределение полномочий устанавливаются отдельно.",
           "remaining": "Учебная квалификация при прямо заданных условиях. Конкретные региональные и местные акты, договоры, финансовые документы и вся официальная цепочка поправок независимо не проверены; активация запрещена.",
           "urls": [
             "https://www.consultant.ru/document/cons_doc_LAW_19702/4ce55543bc62fa4c4587fa50514b56aa0121a671/",
             "https://www.consultant.ru/document/cons_doc_LAW_19702/ca20da6e9e9d1116bbcf04288c9656fcd121ab94/",
             "https://www.consultant.ru/document/cons_doc_LAW_501319/e46b2c9eca58d3afa1e973e2e8a7c188f390cdb2/",
-            "https://www.consultant.ru/document/cons_doc_LAW_501319/d76059a3a15193b837145d02058cd732dc0c4565/"
+            "https://www.consultant.ru/document/cons_doc_LAW_501319/d76059a3a15193b837145d02058cd732dc0c4565/",
+            "https://www.consultant.ru/document/cons_doc_LAW_501319/b8394f4cd60580ecc9e5ad6e55f730c65215b313/",
+            "https://www.consultant.ru/document/cons_doc_LAW_501319/96dfe686f5207ba45ee2cbb4cde45c91a05b4ef9/",
+            "https://www.kontur-extern.ru/info/normativ/document/1/505621-federalnyy-zakon-ot-09-04-2026-n-85-fz",
+            "https://www.consultant.ru/document/cons_doc_LAW_44571/7af8214defd24542ba9c45e06a63067a0fda4e2c/"
           ]
         }
       },
@@ -5102,7 +5110,11 @@
         ],
         "checked_norm_urls": [
           "https://www.consultant.ru/document/cons_doc_LAW_501319/07d01c5cc986e77d47e5b098e7a80cb185dde940/",
-          "https://www.consultant.ru/document/cons_doc_LAW_501319/cdbe6b2b737a57e9534c5dcb9cd1b89a66837956/"
+          "https://www.consultant.ru/document/cons_doc_LAW_501319/cdbe6b2b737a57e9534c5dcb9cd1b89a66837956/",
+          "https://www.consultant.ru/document/cons_doc_LAW_501319/b8394f4cd60580ecc9e5ad6e55f730c65215b313/",
+          "https://www.consultant.ru/document/cons_doc_LAW_501319/96dfe686f5207ba45ee2cbb4cde45c91a05b4ef9/",
+          "https://www.kontur-extern.ru/info/normativ/document/1/505621-federalnyy-zakon-ot-09-04-2026-n-85-fz",
+          "https://www.consultant.ru/document/cons_doc_LAW_44571/7af8214defd24542ba9c45e06a63067a0fda4e2c/"
         ],
         "collective_option_analysis": {
           "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
@@ -5147,11 +5159,15 @@
           "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
           "norm": "33-ФЗ, статьи 49, 70.",
           "option_count": 5,
-          "finding": "Выбор жителей не заменяет бюджетное решение, но администрация не вправе самовольно подменять объект. Дополнительные меры сохраняют предусмотренное участие инициаторов.",
+          "finding": "Выбор жителей не заменяет бюджетное решение, но администрация не вправе самовольно подменять объект. Дополнительные меры сохраняют предусмотренное участие инициаторов. Ст. 49 ч. 5–7, 11, 13–15 №33-ФЗ разграничивает поддержку инициативы, совместную доработку и конкурсный порядок; ч. 3–4 ст. 70 устанавливает возврат неиспользованных инициативных платежей. Согласие инициаторов само по себе не заменяет муниципальный порядок и бюджетное основание. В 2026 году применяются переходные положения ч. 1–2 ст. 91 и ст. 94 №33-ФЗ в редакции от 09.04.2026: до 01.01.2028 перечень муниципальных полномочий определяется по ст. 14–18 №131-ФЗ; ст. 32 №33-ФЗ ещё не вступила в силу. Это не отменяет уже действующие процедурные нормы №33-ФЗ. Вид муниципального образования и региональное перераспределение полномочий устанавливаются отдельно.",
           "remaining": "Учебная квалификация при прямо заданных условиях. Конкретные региональные и местные акты, договоры, финансовые документы и вся официальная цепочка поправок независимо не проверены; активация запрещена.",
           "urls": [
             "https://www.consultant.ru/document/cons_doc_LAW_501319/07d01c5cc986e77d47e5b098e7a80cb185dde940/",
-            "https://www.consultant.ru/document/cons_doc_LAW_501319/cdbe6b2b737a57e9534c5dcb9cd1b89a66837956/"
+            "https://www.consultant.ru/document/cons_doc_LAW_501319/cdbe6b2b737a57e9534c5dcb9cd1b89a66837956/",
+            "https://www.consultant.ru/document/cons_doc_LAW_501319/b8394f4cd60580ecc9e5ad6e55f730c65215b313/",
+            "https://www.consultant.ru/document/cons_doc_LAW_501319/96dfe686f5207ba45ee2cbb4cde45c91a05b4ef9/",
+            "https://www.kontur-extern.ru/info/normativ/document/1/505621-federalnyy-zakon-ot-09-04-2026-n-85-fz",
+            "https://www.consultant.ru/document/cons_doc_LAW_44571/7af8214defd24542ba9c45e06a63067a0fda4e2c/"
           ]
         }
       },
@@ -9539,7 +9555,10 @@
           "https://www.consultant.ru/document/cons_doc_LAW_19702/aba5757994f1d3d2f17a4f4262fb9519d2de5238/",
           "https://www.consultant.ru/document/cons_doc_LAW_501319/e46b2c9eca58d3afa1e973e2e8a7c188f390cdb2/",
           "https://www.consultant.ru/document/cons_doc_LAW_501319/d76059a3a15193b837145d02058cd732dc0c4565/",
-          "https://www.consultant.ru/document/cons_doc_LAW_501319/dd0cc50f64bf03b4782e314160b5110439809cab/"
+          "https://www.consultant.ru/document/cons_doc_LAW_501319/dd0cc50f64bf03b4782e314160b5110439809cab/",
+          "https://www.consultant.ru/document/cons_doc_LAW_501319/b8394f4cd60580ecc9e5ad6e55f730c65215b313/",
+          "https://www.consultant.ru/document/cons_doc_LAW_501319/96dfe686f5207ba45ee2cbb4cde45c91a05b4ef9/",
+          "https://www.kontur-extern.ru/info/normativ/document/1/505621-federalnyy-zakon-ot-09-04-2026-n-85-fz"
         ],
         "collective_option_analysis": {
           "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
@@ -9587,14 +9606,17 @@
           "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
           "norm": "Конституция РФ, ч. 2 ст. 132; БК РФ, п. 2.1, 3 и 6 ст. 140; Закон №33-ФЗ, ст. 33, 34 и 71: наделение муниципалитета государственными полномочиями осуществляется законом с необходимым финансовым и материальным обеспечением, распределение субвенции — по установленной методике.",
           "option_count": 5,
-          "finding": "Разграничены проект закона, действующее полномочие и распределение средств. Само увеличение обращений не изменяет норматив; законопроект и расчёт должны пройти применимую процедуру, действующие услуги сохраняются.",
+          "finding": "Разграничены проект закона, действующее полномочие и распределение средств. Само увеличение обращений не изменяет норматив; законопроект и расчёт должны пройти применимую процедуру, действующие услуги сохраняются. При внесении проекта регионального закона о наделении отдельными государственными полномочиями необходимо учитывать ч. 8 ст. 34 №33-ФЗ о заключении совета муниципальных образований. Обновление финансового обеспечения и рассмотрение проекта не равнозначны досрочному изменению действующих обязанностей. Специальный территориальный режим и конкретный региональный акт не установлены. В 2026 году применяются переходные положения ч. 1–2 ст. 91 и ст. 94 №33-ФЗ в редакции от 09.04.2026: до 01.01.2028 перечень муниципальных полномочий определяется по ст. 14–18 №131-ФЗ; ст. 32 №33-ФЗ ещё не вступила в силу. Это не отменяет уже действующие процедурные нормы №33-ФЗ. Вид муниципального образования и региональное перераспределение полномочий устанавливаются отдельно.",
           "remaining": "Вывод относится к явно заданным вымышленным учебным условиям и предложениям компетентному органу. Конкретный региональный акт, реальные обстоятельства и полный официальный ряд поправок независимо не подтверждены. Отдельные условия исполнения и бюджетные решения требуют проверки при реализации. Активация запрещена.",
           "urls": [
             "https://minjust.gov.ru/ru/documents/8011/",
             "https://www.consultant.ru/document/cons_doc_LAW_19702/aba5757994f1d3d2f17a4f4262fb9519d2de5238/",
             "https://www.consultant.ru/document/cons_doc_LAW_501319/e46b2c9eca58d3afa1e973e2e8a7c188f390cdb2/",
             "https://www.consultant.ru/document/cons_doc_LAW_501319/d76059a3a15193b837145d02058cd732dc0c4565/",
-            "https://www.consultant.ru/document/cons_doc_LAW_501319/dd0cc50f64bf03b4782e314160b5110439809cab/"
+            "https://www.consultant.ru/document/cons_doc_LAW_501319/dd0cc50f64bf03b4782e314160b5110439809cab/",
+            "https://www.consultant.ru/document/cons_doc_LAW_501319/b8394f4cd60580ecc9e5ad6e55f730c65215b313/",
+            "https://www.consultant.ru/document/cons_doc_LAW_501319/96dfe686f5207ba45ee2cbb4cde45c91a05b4ef9/",
+            "https://www.kontur-extern.ru/info/normativ/document/1/505621-federalnyy-zakon-ot-09-04-2026-n-85-fz"
           ]
         }
       },

@@ -5634,7 +5634,12 @@
           "https://www.consultant.ru/document/cons_doc_LAW_19702/deb860cae9c5187f73ff9e422a7e77ade2c35946/",
           "https://www.consultant.ru/document/cons_doc_LAW_19702/15d7c58c01bf75dcd6cf84a008bfef761ba731eb/",
           "https://www.consultant.ru/document/cons_doc_LAW_501319/5d1b5174c78b997b5d1ca9641cc99a7106174666/",
-          "https://www.consultant.ru/document/cons_doc_LAW_501319/724d2a13a1e8150bc5e9245707a9f71b50db9dad/"
+          "https://www.consultant.ru/document/cons_doc_LAW_501319/724d2a13a1e8150bc5e9245707a9f71b50db9dad/",
+          "https://www.consultant.ru/document/cons_doc_LAW_501319/b8394f4cd60580ecc9e5ad6e55f730c65215b313/",
+          "https://www.consultant.ru/document/cons_doc_LAW_501319/96dfe686f5207ba45ee2cbb4cde45c91a05b4ef9/",
+          "https://www.kontur-extern.ru/info/normativ/document/1/505621-federalnyy-zakon-ot-09-04-2026-n-85-fz",
+          "https://www.consultant.ru/document/cons_doc_LAW_44571/f0cefce0e845309261e82ed31a42579f64eebbfc/",
+          "https://www.consultant.ru/document/cons_doc_LAW_44571/7af8214defd24542ba9c45e06a63067a0fda4e2c/"
         ],
         "norm_recheck_2026_11_28": {
           "status": "targeted_norm_and_individual_alternatives_reviewed_not_full_acceptance",
@@ -5652,14 +5657,19 @@
           "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
           "source_scope": "targeted_prior_norm_review_and_current_case_option_assessment",
           "option_count": 5,
-          "finding": "Слушания по проекту местного бюджета не создают автоматических расходов. Проверка компетенции, действующих обязательств и свободного ресурса обязательна перед включением предложений; мотивированное рассмотрение не заменяет принятие бюджета.",
+          "finding": "Слушания по проекту местного бюджета не создают автоматических расходов. Проверка компетенции, действующих обязательств и свободного ресурса обязательна перед включением предложений; мотивированное рассмотрение не заменяет принятие бюджета. Ст. 47 №33-ФЗ регулирует публичные слушания проекта бюджета, ст. 16 — компетенцию представительного органа. Конкретная принадлежность спортивного поля, автобусного маршрута и озеленения определяется действующими нормами о местных полномочиях, а не только территорией размещения. Для городского округа проверяются ст. 16 и 17 №131-ФЗ; вид муниципального образования в задаче не установлен. В 2026 году применяются переходные положения ч. 1–2 ст. 91 и ст. 94 №33-ФЗ в редакции от 09.04.2026: до 01.01.2028 перечень муниципальных полномочий определяется по ст. 14–18 №131-ФЗ; ст. 32 №33-ФЗ ещё не вступила в силу. Это не отменяет уже действующие процедурные нормы №33-ФЗ. Вид муниципального образования и региональное перераспределение полномочий устанавливаются отдельно.",
           "remaining": "Приёмка правовой конструкции учебной ситуации; конкретные местные акты, специальные процедуры исполнения, фактическая роль исполнителя и полная официальная цепочка поправок независимо не сертифицированы. Утверждённая редакционная привязка роли не является авторизацией. Активация запрещена.",
           "urls": [
             "https://www.consultant.ru/document/cons_doc_LAW_19702/ac7eb6cf1d15c2a4225e64864e980f435d2142bc/",
             "https://www.consultant.ru/document/cons_doc_LAW_19702/deb860cae9c5187f73ff9e422a7e77ade2c35946/",
             "https://www.consultant.ru/document/cons_doc_LAW_19702/15d7c58c01bf75dcd6cf84a008bfef761ba731eb/",
             "https://www.consultant.ru/document/cons_doc_LAW_501319/5d1b5174c78b997b5d1ca9641cc99a7106174666/",
-            "https://www.consultant.ru/document/cons_doc_LAW_501319/724d2a13a1e8150bc5e9245707a9f71b50db9dad/"
+            "https://www.consultant.ru/document/cons_doc_LAW_501319/724d2a13a1e8150bc5e9245707a9f71b50db9dad/",
+            "https://www.consultant.ru/document/cons_doc_LAW_501319/b8394f4cd60580ecc9e5ad6e55f730c65215b313/",
+            "https://www.consultant.ru/document/cons_doc_LAW_501319/96dfe686f5207ba45ee2cbb4cde45c91a05b4ef9/",
+            "https://www.kontur-extern.ru/info/normativ/document/1/505621-federalnyy-zakon-ot-09-04-2026-n-85-fz",
+            "https://www.consultant.ru/document/cons_doc_LAW_44571/f0cefce0e845309261e82ed31a42579f64eebbfc/",
+            "https://www.consultant.ru/document/cons_doc_LAW_44571/7af8214defd24542ba9c45e06a63067a0fda4e2c/"
           ],
           "approved_portfolio": "ministry_economic"
         }

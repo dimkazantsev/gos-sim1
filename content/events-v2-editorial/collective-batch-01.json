@@ -8422,7 +8422,11 @@
         "checked_norm_urls": [
           "https://www.consultant.ru/document/cons_doc_LAW_501319/9d3746121f118490d463b84d3924d6c398e08596/",
           "https://minjust.gov.ru/ru/documents/8011/",
-          "https://www.consultant.ru/document/cons_doc_LAW_61801/ca9e5658710519f09ab2fdb8196fcb3eb024a051/"
+          "https://www.consultant.ru/document/cons_doc_LAW_61801/ca9e5658710519f09ab2fdb8196fcb3eb024a051/",
+          "https://www.consultant.ru/document/cons_doc_LAW_501319/b8394f4cd60580ecc9e5ad6e55f730c65215b313/",
+          "https://www.consultant.ru/document/cons_doc_LAW_501319/96dfe686f5207ba45ee2cbb4cde45c91a05b4ef9/",
+          "https://www.kontur-extern.ru/info/normativ/document/1/505621-federalnyy-zakon-ot-09-04-2026-n-85-fz",
+          "https://www.consultant.ru/document/cons_doc_LAW_44571/7af8214defd24542ba9c45e06a63067a0fda4e2c/"
         ],
         "collective_option_analysis": {
           "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
@@ -8468,12 +8472,16 @@
           "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
           "norm": "33-ФЗ от 20.03.2025, статья 46; Конституция РФ; 152-ФЗ, статья 19: муниципальный опрос, участие граждан и защита данных.",
           "option_count": 5,
-          "finding": "Не выборы и не референдум; организатор не вправе самовольно менять обязательные условия. Дополнительные каналы и сроки допустимы лишь по надлежащей процедуре.",
+          "finding": "Не выборы и не референдум; организатор не вправе самовольно менять обязательные условия. Дополнительные каналы и сроки допустимы лишь по надлежащей процедуре. Ст. 46 ч. 2, 5–8: для данного обычного опроса участники — жители с избирательным правом; сроки, методика и интернет-идентификация определяются решением представительного органа. Оповещение о проведении — не менее чем за 10 дней. Дополнительные каналы не вводятся односторонне; условия задачи прямо допускают очный канал. В 2026 году применяются переходные положения ч. 1–2 ст. 91 и ст. 94 №33-ФЗ в редакции от 09.04.2026: до 01.01.2028 перечень муниципальных полномочий определяется по ст. 14–18 №131-ФЗ; ст. 32 №33-ФЗ ещё не вступила в силу. Это не отменяет уже действующие процедурные нормы №33-ФЗ. Вид муниципального образования и региональное перераспределение полномочий устанавливаются отдельно.",
           "remaining": "Учебная квалификация при прямо заданных условиях. Конкретные местные акты, договоры, технические заключения и вся официальная цепочка поправок независимо не проверены; активация запрещена.",
           "urls": [
             "https://www.consultant.ru/document/cons_doc_LAW_501319/9d3746121f118490d463b84d3924d6c398e08596/",
             "https://minjust.gov.ru/ru/documents/8011/",
-            "https://www.consultant.ru/document/cons_doc_LAW_61801/ca9e5658710519f09ab2fdb8196fcb3eb024a051/"
+            "https://www.consultant.ru/document/cons_doc_LAW_61801/ca9e5658710519f09ab2fdb8196fcb3eb024a051/",
+            "https://www.consultant.ru/document/cons_doc_LAW_501319/b8394f4cd60580ecc9e5ad6e55f730c65215b313/",
+            "https://www.consultant.ru/document/cons_doc_LAW_501319/96dfe686f5207ba45ee2cbb4cde45c91a05b4ef9/",
+            "https://www.kontur-extern.ru/info/normativ/document/1/505621-federalnyy-zakon-ot-09-04-2026-n-85-fz",
+            "https://www.consultant.ru/document/cons_doc_LAW_44571/7af8214defd24542ba9c45e06a63067a0fda4e2c/"
           ]
         }
       },
@@ -8632,7 +8640,11 @@
         "checked_norm_urls": [
           "https://www.consultant.ru/document/cons_doc_LAW_501319/9d3746121f118490d463b84d3924d6c398e08596/",
           "https://minjust.gov.ru/ru/documents/8011/",
-          "https://www.consultant.ru/document/cons_doc_LAW_19702/9a0e8abcbe24837343cdcc599bccf0f09413968a/"
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/9a0e8abcbe24837343cdcc599bccf0f09413968a/",
+          "https://www.consultant.ru/document/cons_doc_LAW_501319/b8394f4cd60580ecc9e5ad6e55f730c65215b313/",
+          "https://www.consultant.ru/document/cons_doc_LAW_501319/96dfe686f5207ba45ee2cbb4cde45c91a05b4ef9/",
+          "https://www.kontur-extern.ru/info/normativ/document/1/505621-federalnyy-zakon-ot-09-04-2026-n-85-fz",
+          "https://www.consultant.ru/document/cons_doc_LAW_44571/7af8214defd24542ba9c45e06a63067a0fda4e2c/"
         ],
         "collective_option_analysis": {
           "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
@@ -8678,12 +8690,16 @@
           "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
           "norm": "33-ФЗ от 20.03.2025, статья 46; Конституция РФ; БК РФ, статья 38: рекомендательность опроса и самостоятельность бюджетных оснований.",
           "option_count": 5,
-          "finding": "Финансовые предпочтения обсуждаются раздельно; ни один вариант не подменяет правовой акт о плате или бюджетное решение.",
+          "finding": "Финансовые предпочтения обсуждаются раздельно; ни один вариант не подменяет правовой акт о плате или бюджетное решение. Ст. 46 ч. 5–8: формулировку вопросов и сроки устанавливает представительный орган, уведомление о проведении опроса — не менее чем за 10 дней. Короткая повторная консультация допустима только при соблюдении процедуры, не как сокращение установленного срока. Парковочная плата требует самостоятельного основания. В 2026 году применяются переходные положения ч. 1–2 ст. 91 и ст. 94 №33-ФЗ в редакции от 09.04.2026: до 01.01.2028 перечень муниципальных полномочий определяется по ст. 14–18 №131-ФЗ; ст. 32 №33-ФЗ ещё не вступила в силу. Это не отменяет уже действующие процедурные нормы №33-ФЗ. Вид муниципального образования и региональное перераспределение полномочий устанавливаются отдельно.",
           "remaining": "Учебная квалификация при прямо заданных условиях. Конкретные местные акты, договоры, технические заключения и вся официальная цепочка поправок независимо не проверены; активация запрещена.",
           "urls": [
             "https://www.consultant.ru/document/cons_doc_LAW_501319/9d3746121f118490d463b84d3924d6c398e08596/",
             "https://minjust.gov.ru/ru/documents/8011/",
-            "https://www.consultant.ru/document/cons_doc_LAW_19702/9a0e8abcbe24837343cdcc599bccf0f09413968a/"
+            "https://www.consultant.ru/document/cons_doc_LAW_19702/9a0e8abcbe24837343cdcc599bccf0f09413968a/",
+            "https://www.consultant.ru/document/cons_doc_LAW_501319/b8394f4cd60580ecc9e5ad6e55f730c65215b313/",
+            "https://www.consultant.ru/document/cons_doc_LAW_501319/96dfe686f5207ba45ee2cbb4cde45c91a05b4ef9/",
+            "https://www.kontur-extern.ru/info/normativ/document/1/505621-federalnyy-zakon-ot-09-04-2026-n-85-fz",
+            "https://www.consultant.ru/document/cons_doc_LAW_44571/7af8214defd24542ba9c45e06a63067a0fda4e2c/"
           ]
         }
       },
