@@ -3428,7 +3428,8 @@
         "checked_norm_urls": [
           "https://www.consultant.ru/document/cons_doc_LAW_144624/d6aec91603ff628ea274b8552ce2849e06e0aa4c/",
           "https://www.consultant.ru/document/cons_doc_LAW_144624/17c58c1903f7b6212924ba9ce701489655e9a8e0/",
-          "https://www.consultant.ru/document/cons_doc_LAW_144624/f4823c3311874efd0ecdfa668c9705968edbc47c/"
+          "https://www.consultant.ru/document/cons_doc_LAW_144624/f4823c3311874efd0ecdfa668c9705968edbc47c/",
+          "https://www.kontur-extern.ru/info/normativ/document/1/507584-federalnyy-zakon-ot-04-08-2026-n-279-fz"
         ],
         "source_scope": "specific_norm_and_related_search_results_partial",
         "competence_review": {
@@ -3460,12 +3461,13 @@
           "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
           "source_scope": "targeted_prior_norm_review_and_current_case_option_assessment",
           "option_count": 5,
-          "finding": "Выбор разрешённого оттенка отличается от изменения существенных условий; вариант 4 нарушает заданный порядок оформления, а не обязательно содержит изменение технической характеристики.",
+          "finding": "Выбор разрешённого оттенка отличается от изменения существенных условий; вариант 4 нарушает заданный порядок оформления, а не обязательно содержит изменение технической характеристики. С 01.10.2026 п. 1.6 ч. 1 ст. 95 по №279-ФЗ допускает при установленных условиях согласованную замену на аналог с аналогичными или улучшенными характеристиками; это не делает консультативный опрос решением заказчика и не разрешает произвольно менять проект. Выбор одного из трёх предусмотренных договором оттенков не требует считать опрос изменением контракта.",
           "remaining": "Приёмка правовой конструкции учебной ситуации; конкретные местные акты, специальные процедуры исполнения, фактическая роль исполнителя и полная официальная цепочка поправок независимо не сертифицированы. Утверждённая редакционная привязка роли не является авторизацией. Активация запрещена.",
           "urls": [
             "https://www.consultant.ru/document/cons_doc_LAW_144624/d6aec91603ff628ea274b8552ce2849e06e0aa4c/",
             "https://www.consultant.ru/document/cons_doc_LAW_144624/17c58c1903f7b6212924ba9ce701489655e9a8e0/",
-            "https://www.consultant.ru/document/cons_doc_LAW_144624/f4823c3311874efd0ecdfa668c9705968edbc47c/"
+            "https://www.consultant.ru/document/cons_doc_LAW_144624/f4823c3311874efd0ecdfa668c9705968edbc47c/",
+            "https://www.kontur-extern.ru/info/normativ/document/1/507584-federalnyy-zakon-ot-04-08-2026-n-279-fz"
           ],
           "approved_portfolio": "ministry_economic"
         },

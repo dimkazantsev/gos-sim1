@@ -865,7 +865,8 @@
         "checked_norm_urls": [
           "https://www.consultant.ru/document/cons_doc_LAW_19702/055a71948dbf2a4fc2478437cd89cd864ee8e6e5/",
           "https://www.consultant.ru/document/cons_doc_LAW_19702/bfe84bef16378ca35200b610fe85a50ee121673c/",
-          "https://www.consultant.ru/document/cons_doc_LAW_19702/73147d61f1183d32e517768da079cfdf28cca0a9/"
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/73147d61f1183d32e517768da079cfdf28cca0a9/",
+          "https://www.kontur-extern.ru/info/normativ/document/1/509061-federalnyy-zakon-ot-02-11-2026-n-348-fz"
         ],
         "collective_option_analysis": {
           "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
@@ -911,12 +912,13 @@
           "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
           "norm": "БК РФ, ст. 6, 33, 37: расчёт доходов и расходов должен основываться на реалистичном прогнозе. Ожидаемое налоговое поступление не тождественно источнику финансирования дефицита. Неопределённые предпосылки раскрываются в сценариях.",
           "option_count": 5,
-          "finding": "Оценка только достоверности прогноза; не утверждается право на недропользование, размер налога или норматив зачисления. Сохранены все возникшие обязательства.",
+          "finding": "Оценка только достоверности прогноза; не утверждается право на недропользование, размер налога или норматив зачисления. Сохранены все возникшие обязательства. Сверен №348-ФЗ от 02.11.2026, действующий с 13.11.2026: поправки к ст. 51 и 57 БК РФ касаются неналоговых платежей за пользование недрами и аукционов. Они не превращают неподтверждённый прогноз в гарантированный доход и не определяют налоговую сумму в данном условии; норматив зачисления зависит от вида платежа и участка.",
           "remaining": "Оценка относится к явно заданным учебным обстоятельствам, не к реальному бюджетному или закупочному решению. Все пять вариантов — предложения уполномоченному органу; отдельные условия исполнения, финансирование и специальные исключения проверяются при реализации. Полная независимая сверка официальной цепочки поправок не проведена.",
           "urls": [
             "https://www.consultant.ru/document/cons_doc_LAW_19702/055a71948dbf2a4fc2478437cd89cd864ee8e6e5/",
             "https://www.consultant.ru/document/cons_doc_LAW_19702/bfe84bef16378ca35200b610fe85a50ee121673c/",
-            "https://www.consultant.ru/document/cons_doc_LAW_19702/73147d61f1183d32e517768da079cfdf28cca0a9/"
+            "https://www.consultant.ru/document/cons_doc_LAW_19702/73147d61f1183d32e517768da079cfdf28cca0a9/",
+            "https://www.kontur-extern.ru/info/normativ/document/1/509061-federalnyy-zakon-ot-02-11-2026-n-348-fz"
           ]
         }
       },
@@ -1298,7 +1300,8 @@
         "status": "verified_current",
         "checked_norm_urls": [
           "https://www.consultant.ru/document/cons_doc_LAW_144624/f4823c3311874efd0ecdfa668c9705968edbc47c/",
-          "https://www.consultant.ru/document/cons_doc_LAW_144624/14979ba8493a52d2aa29ae0930046cf6f81caea0/"
+          "https://www.consultant.ru/document/cons_doc_LAW_144624/14979ba8493a52d2aa29ae0930046cf6f81caea0/",
+          "https://www.kontur-extern.ru/info/normativ/document/1/507584-federalnyy-zakon-ot-04-08-2026-n-279-fz"
         ],
         "collective_option_analysis": {
           "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
@@ -1343,11 +1346,12 @@
           "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
           "norm": "44-ФЗ, статьи 95, 112.",
           "option_count": 5,
-          "finding": "Экспертная оценка не создаёт права на увеличение цены; варианты учитывают возможное законное основание, не предполагают автоматической индексации.",
+          "finding": "Экспертная оценка не создаёт права на увеличение цены; варианты учитывают возможное законное основание, не предполагают автоматической индексации. С 01.10.2026 действует редакция ст. 95 по №279-ФЗ: п. 1.2 ч. 1 предусматривает при установленных условиях однократное пропорциональное увеличение цены до 10% при увеличении объёма; новые п. 1.5–1.8 регулируют отдельные основания изменения контракта. Рост логистических затрат сам по себе не является таким основанием. Специальные временные основания проверяются отдельно.",
           "remaining": "Учебная квалификация при прямо заданных условиях. Конкретные региональные и местные акты, договоры, финансовые документы и вся официальная цепочка поправок независимо не проверены; активация запрещена.",
           "urls": [
             "https://www.consultant.ru/document/cons_doc_LAW_144624/f4823c3311874efd0ecdfa668c9705968edbc47c/",
-            "https://www.consultant.ru/document/cons_doc_LAW_144624/14979ba8493a52d2aa29ae0930046cf6f81caea0/"
+            "https://www.consultant.ru/document/cons_doc_LAW_144624/14979ba8493a52d2aa29ae0930046cf6f81caea0/",
+            "https://www.kontur-extern.ru/info/normativ/document/1/507584-federalnyy-zakon-ot-04-08-2026-n-279-fz"
           ]
         }
       },
@@ -6452,7 +6456,8 @@
         ],
         "checked_norm_urls": [
           "https://www.consultant.ru/document/cons_doc_LAW_19702/ac6c532ee1f365c6e1ff222f22b3f10587918494/",
-          "https://www.consultant.ru/document/cons_doc_LAW_144624/f4823c3311874efd0ecdfa668c9705968edbc47c/"
+          "https://www.consultant.ru/document/cons_doc_LAW_144624/f4823c3311874efd0ecdfa668c9705968edbc47c/",
+          "https://www.kontur-extern.ru/info/normativ/document/1/507584-federalnyy-zakon-ot-04-08-2026-n-279-fz"
         ],
         "collective_option_analysis": {
           "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
@@ -6497,11 +6502,12 @@
           "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
           "norm": "БК РФ, статья 79; 44-ФЗ, статья 95.",
           "option_count": 5,
-          "finding": "Рост сметы не разрешает выплату сверх обеспечения. Альтернативы требуют собственных проектных и финансовых оснований.",
+          "finding": "Рост сметы не разрешает выплату сверх обеспечения. Альтернативы требуют собственных проектных и финансовых оснований. По №279-ФЗ с 01.10.2026 увеличение объёма работ по реконструкции исключено из общего механизма п. 1.2 ч. 1 ст. 95; специальные основания строительного контракта проверяются отдельно. Нельзя применить общий предел 10% к добавленному корпусу как самостоятельное разрешение на увеличение цены. Требуются надлежащие инвестиционное решение, проектные и бюджетные основания.",
           "remaining": "Учебная квалификация при прямо заданных условиях. Конкретные региональные и местные акты, договоры, финансовые документы и вся официальная цепочка поправок независимо не проверены; активация запрещена.",
           "urls": [
             "https://www.consultant.ru/document/cons_doc_LAW_19702/ac6c532ee1f365c6e1ff222f22b3f10587918494/",
-            "https://www.consultant.ru/document/cons_doc_LAW_144624/f4823c3311874efd0ecdfa668c9705968edbc47c/"
+            "https://www.consultant.ru/document/cons_doc_LAW_144624/f4823c3311874efd0ecdfa668c9705968edbc47c/",
+            "https://www.kontur-extern.ru/info/normativ/document/1/507584-federalnyy-zakon-ot-04-08-2026-n-279-fz"
           ]
         }
       },

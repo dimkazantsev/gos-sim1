@@ -1732,7 +1732,8 @@
         "checked_norm_urls": [
           "https://www.consultant.ru/document/cons_doc_LAW_144624/17c58c1903f7b6212924ba9ce701489655e9a8e0/",
           "https://www.consultant.ru/document/cons_doc_LAW_144624/f4823c3311874efd0ecdfa668c9705968edbc47c/",
-          "https://www.consultant.ru/document/cons_doc_LAW_5142/1cd43e51fbd4129343b325971a466ec5cd32a425/"
+          "https://www.consultant.ru/document/cons_doc_LAW_5142/1cd43e51fbd4129343b325971a466ec5cd32a425/",
+          "https://www.kontur-extern.ru/info/normativ/document/1/507584-federalnyy-zakon-ot-04-08-2026-n-279-fz"
         ],
         "norm_recheck_2026_11_28": {
           "status": "targeted_norm_and_all_individual_alternatives_reviewed_not_full_acceptance",
@@ -1750,12 +1751,13 @@
           "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
           "source_scope": "targeted_prior_norm_review_and_current_case_option_assessment",
           "option_count": 5,
-          "finding": "Контракт требует полного охвата, отдельный запуск возможен, но отдельная оплата не предполагается без основания. Неполный охват нельзя объявлять полной приёмкой или менять объём и цену без законного основания.",
+          "finding": "Контракт требует полного охвата, отдельный запуск возможен, но отдельная оплата не предполагается без основания. Неполный охват нельзя объявлять полной приёмкой или менять объём и цену без законного основания. По №279-ФЗ с 01.10.2026 п. 1.2 ч. 1 ст. 95 при применимости предусматривает уменьшение цены пропорционально уменьшению предусмотренного объёма. Вариант с меньшим охватом при неизменной первоначальной цене и полной приёмке не становится допустимым. Фактическая недопоставка и изменение обязательства по соглашению — разные процедуры.",
           "remaining": "Приёмка правовой конструкции учебной ситуации; конкретные местные акты, специальные процедуры исполнения, фактическая роль исполнителя и полная официальная цепочка поправок независимо не сертифицированы. Утверждённая редакционная привязка роли не является авторизацией. Активация запрещена.",
           "urls": [
             "https://www.consultant.ru/document/cons_doc_LAW_144624/17c58c1903f7b6212924ba9ce701489655e9a8e0/",
             "https://www.consultant.ru/document/cons_doc_LAW_144624/f4823c3311874efd0ecdfa668c9705968edbc47c/",
-            "https://www.consultant.ru/document/cons_doc_LAW_5142/1cd43e51fbd4129343b325971a466ec5cd32a425/"
+            "https://www.consultant.ru/document/cons_doc_LAW_5142/1cd43e51fbd4129343b325971a466ec5cd32a425/",
+            "https://www.kontur-extern.ru/info/normativ/document/1/507584-federalnyy-zakon-ot-04-08-2026-n-279-fz"
           ],
           "approved_portfolio": "ministry_economic"
         }
@@ -2442,7 +2444,8 @@
         },
         "checked_norm_urls": [
           "https://www.consultant.ru/document/cons_doc_LAW_72386/1692e755d61192abb296c96e101a443f4b701edf/",
-          "https://www.consultant.ru/document/cons_doc_LAW_144624/f4823c3311874efd0ecdfa668c9705968edbc47c/"
+          "https://www.consultant.ru/document/cons_doc_LAW_144624/f4823c3311874efd0ecdfa668c9705968edbc47c/",
+          "https://www.kontur-extern.ru/info/normativ/document/1/507584-federalnyy-zakon-ot-04-08-2026-n-279-fz"
         ],
         "norm_recheck_2026_11_28": {
           "status": "targeted_norm_and_all_individual_alternatives_reviewed_not_full_acceptance",
@@ -2459,11 +2462,12 @@
           "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
           "source_scope": "targeted_prior_norm_review_and_current_case_option_assessment",
           "option_count": 5,
-          "finding": "Дорожка принята в публичное содержание, непосредственная опасность требует надлежащих временных мер. Дополнительная оплата без установленного основания недопустима; свободное окно техники не изменяет контракт.",
+          "finding": "Дорожка принята в публичное содержание, непосредственная опасность требует надлежащих временных мер. Дополнительная оплата без установленного основания недопустима; свободное окно техники не изменяет контракт. По №279-ФЗ с 01.10.2026 изменение объёма или цены по п. 1.2 ч. 1 ст. 95 возможно только при применимости этой нормы и её условиях; увеличение цены по п. 1.5 имеет отдельный режим. Свободная техника и обращение жителей не подтверждают ни одного из этих оснований, а временное обеспечение безопасности не подменяет изменение контракта.",
           "remaining": "Приёмка правовой конструкции учебной ситуации; конкретные местные акты, специальные процедуры исполнения, фактическая роль исполнителя и полная официальная цепочка поправок независимо не сертифицированы. Утверждённая редакционная привязка роли не является авторизацией. Активация запрещена.",
           "urls": [
             "https://www.consultant.ru/document/cons_doc_LAW_72386/1692e755d61192abb296c96e101a443f4b701edf/",
-            "https://www.consultant.ru/document/cons_doc_LAW_144624/f4823c3311874efd0ecdfa668c9705968edbc47c/"
+            "https://www.consultant.ru/document/cons_doc_LAW_144624/f4823c3311874efd0ecdfa668c9705968edbc47c/",
+            "https://www.kontur-extern.ru/info/normativ/document/1/507584-federalnyy-zakon-ot-04-08-2026-n-279-fz"
           ],
           "approved_portfolio": "ministry_internal"
         },
@@ -2620,7 +2624,8 @@
         },
         "checked_norm_urls": [
           "https://www.consultant.ru/document/cons_doc_LAW_144624/17c58c1903f7b6212924ba9ce701489655e9a8e0/",
-          "https://www.consultant.ru/document/cons_doc_LAW_144624/f4823c3311874efd0ecdfa668c9705968edbc47c/"
+          "https://www.consultant.ru/document/cons_doc_LAW_144624/f4823c3311874efd0ecdfa668c9705968edbc47c/",
+          "https://www.kontur-extern.ru/info/normativ/document/1/507584-federalnyy-zakon-ot-04-08-2026-n-279-fz"
         ],
         "norm_recheck_2026_11_28": {
           "status": "targeted_norm_and_all_individual_alternatives_reviewed_not_full_acceptance",
@@ -2637,11 +2642,12 @@
           "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
           "source_scope": "targeted_prior_norm_review_and_current_case_option_assessment",
           "option_count": 5,
-          "finding": "Поставка автобуса обязательна и не завершена; полная приёмка не допускается. Временный выезд согласуется отдельно с владельцем и перевозчиком; школьные рейсы сохраняются.",
+          "finding": "Поставка автобуса обязательна и не завершена; полная приёмка не допускается. Временный выезд согласуется отдельно с владельцем и перевозчиком; школьные рейсы сохраняются. С 01.10.2026 п. 1.6 ч. 1 ст. 95 по №279-ФЗ допускает при установленных условиях согласованную замену на аналог с аналогичными или улучшенными характеристиками. Отсутствующий автобус не является согласованной заменой или исполненной поставкой; устное обещание доставить его позже не подтверждает полную приёмку.",
           "remaining": "Приёмка правовой конструкции учебной ситуации; конкретные местные акты, специальные процедуры исполнения, фактическая роль исполнителя и полная официальная цепочка поправок независимо не сертифицированы. Утверждённая редакционная привязка роли не является авторизацией. Активация запрещена.",
           "urls": [
             "https://www.consultant.ru/document/cons_doc_LAW_144624/17c58c1903f7b6212924ba9ce701489655e9a8e0/",
-            "https://www.consultant.ru/document/cons_doc_LAW_144624/f4823c3311874efd0ecdfa668c9705968edbc47c/"
+            "https://www.consultant.ru/document/cons_doc_LAW_144624/f4823c3311874efd0ecdfa668c9705968edbc47c/",
+            "https://www.kontur-extern.ru/info/normativ/document/1/507584-federalnyy-zakon-ot-04-08-2026-n-279-fz"
           ],
           "approved_portfolio": "ministry_social"
         },
