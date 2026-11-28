@@ -5580,19 +5580,32 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "59-ФЗ, ст. 8, 10: обращения, поступившие в установленном порядке, регистрируются и рассматриваются по компетенции; игровая активность сама по себе не является официальным обращением. Учебные карточки не наделяют авторов правом устанавливать обязательные правила услуг.",
+      "legal_basis": "59-ФЗ, ст. 8 ч. 2 и 10 ч. 1: поступившие надлежащим образом письменные обращения регистрируются в трёхдневный срок и рассматриваются по существу в компетенции органа. Игровые реплики не становятся обращениями автоматически.",
       "legal_urls": [
         "https://minjust.gov.ru/ru/documents/8011/",
-        "https://www.consultant.ru/document/cons_doc_LAW_59999/ca24c3b3a2032a1f727146f988f406723bf9ea1a/"
+        "https://www.consultant.ru/document/cons_doc_LAW_59999/ca24c3b3a2032a1f727146f988f406723bf9ea1a/",
+        "https://www.consultant.ru/document/cons_doc_LAW_59999/0c7123ee40ad90f89afa6fa544a87ffe76c084c0/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
       "checked_norm_urls": [
-        "https://www.consultant.ru/document/cons_doc_LAW_59999/"
+        "https://www.consultant.ru/document/cons_doc_LAW_59999/",
+        "https://www.consultant.ru/document/cons_doc_LAW_59999/0c7123ee40ad90f89afa6fa544a87ffe76c084c0/",
+        "https://www.consultant.ru/document/cons_doc_LAW_59999/ca24c3b3a2032a1f727146f988f406723bf9ea1a/"
       ],
       "option_analysis_status": "draft",
       "source_scope": "specific_norm_and_related_search_results_partial",
-      "review_date": "2026-11-27"
+      "review_date": "2026-11-27",
+      "norm_recheck_2026_11_28": {
+        "status": "targeted_norm_and_all_individual_alternatives_reviewed_not_full_acceptance",
+        "basis": "59-ФЗ, ст. 8 ч. 2 и 10 ч. 1: поступившие надлежащим образом письменные обращения регистрируются в трёхдневный срок и рассматриваются по существу в компетенции органа. Игровые реплики не становятся обращениями автоматически.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_59999/0c7123ee40ad90f89afa6fa544a87ffe76c084c0/",
+          "https://www.consultant.ru/document/cons_doc_LAW_59999/ca24c3b3a2032a1f727146f988f406723bf9ea1a/"
+        ],
+        "limitation": "Норма относится к надлежащим письменным обращениям; для устного личного приёма и электронных каналов применяются специальные правила. Учебная актуальность карточек — отдельный критерий.",
+        "source_scope": "Тексты отдельных статей и поисковые извлечения из КонсультантПлюс, 28.11.2026; не полный аудит поправок."
+      }
     },
     {
       "case_key": "bank-curated-light-07",
@@ -5680,16 +5693,30 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "Статья 5 Закона от 27.07.2010 № 210-ФЗ закрепляет права заявителя при получении государственных и муниципальных услуг. Статья 44 Конституции РФ гарантирует участие в культурной жизни, но не превращает спектакль в обязательный этап административной процедуры. Источники: https://ivo.garant.ru/document/redirect/12177515/7001 https://minjust.gov.ru/ru/documents/8011/",
+      "legal_basis": "210-ФЗ, ст. 4 п. 5 и ст. 5 п. 1: доступность услуг и получение услуги своевременно по установленному стандарту. Посещение центра не может превращаться в новый обязательный этап получения услуги. Участие в спектакле — отдельная добровольная активность.",
       "legal_urls": [
-        "https://www.consultant.ru/document/cons_doc_LAW_103023/ec44362ff44a1158aa5b56cf5c77285e3c470b4e/"
+        "https://www.consultant.ru/document/cons_doc_LAW_103023/ec44362ff44a1158aa5b56cf5c77285e3c470b4e/",
+        "https://www.consultant.ru/document/cons_doc_LAW_103023/dc7967099816debe7736be1cefa6baeb2fd1c02e/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
-      "checked_norm_urls": [],
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_103023/ec44362ff44a1158aa5b56cf5c77285e3c470b4e/",
+        "https://www.consultant.ru/document/cons_doc_LAW_103023/dc7967099816debe7736be1cefa6baeb2fd1c02e/"
+      ],
       "option_analysis_status": "draft",
       "source_scope": "specific_norm_and_related_search_results_partial",
-      "review_date": "2026-11-27"
+      "review_date": "2026-11-27",
+      "norm_recheck_2026_11_28": {
+        "status": "targeted_norm_and_all_individual_alternatives_reviewed_not_full_acceptance",
+        "basis": "210-ФЗ, ст. 4 п. 5 и ст. 5 п. 1: доступность услуг и получение услуги своевременно по установленному стандарту. Посещение центра не может превращаться в новый обязательный этап получения услуги. Участие в спектакле — отдельная добровольная активность.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_103023/ec44362ff44a1158aa5b56cf5c77285e3c470b4e/",
+          "https://www.consultant.ru/document/cons_doc_LAW_103023/dc7967099816debe7736be1cefa6baeb2fd1c02e/"
+        ],
+        "limitation": "Конкретный стандарт услуги и режим помещения не установлены; правовая оценка связана с заданным препятствием своевременному приёму, а не с любым присутствием на представлении. Съёмка не предполагается.",
+        "source_scope": "Тексты отдельных статей и поисковые извлечения из КонсультантПлюс, 28.11.2026; не полный аудит поправок."
+      }
     },
     {
       "case_key": "bank-curated-light-10",
@@ -6553,16 +6580,33 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "Статья 11 Закона №59-ФЗ устанавливает особенности обращений без необходимых сведений о заявителе. Закон №8-ФЗ регулирует доступ к информации о деятельности органов власти. Анонимность не доказывает ни ложность сообщения, ни виновность собственника; публикация требует подтверждения фактов и соблюдения охраняемых законом тайн. Источники: http://www.kremlin.ru/acts/constitution",
+      "legal_basis": "59-ФЗ, ст. 11 ч. 1: при отсутствии необходимых реквизитов письменного обращения ответ не даётся; сведения о противоправном деянии и совершившем его лице направляются по компетенции. 8-ФЗ, ст. 11 пп. 1–3: достоверность и исключение сведений ограниченного доступа.",
       "legal_urls": [
-        "https://www.consultant.ru/document/cons_doc_LAW_59999/1a1719408a99f43738c30a453a74ddaf6ccd7ae7/"
+        "https://www.consultant.ru/document/cons_doc_LAW_59999/1a1719408a99f43738c30a453a74ddaf6ccd7ae7/",
+        "https://www.consultant.ru/document/cons_doc_LAW_59999/0c7123ee40ad90f89afa6fa544a87ffe76c084c0/",
+        "https://www.consultant.ru/document/cons_doc_LAW_84602/e4fb380d53822434913f8449aa9b9e6bdf9f67a4/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
       "option_analysis_status": "draft",
-      "checked_norm_urls": [],
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_59999/1a1719408a99f43738c30a453a74ddaf6ccd7ae7/",
+        "https://www.consultant.ru/document/cons_doc_LAW_59999/0c7123ee40ad90f89afa6fa544a87ffe76c084c0/",
+        "https://www.consultant.ru/document/cons_doc_LAW_84602/e4fb380d53822434913f8449aa9b9e6bdf9f67a4/"
+      ],
       "source_scope": "specific_norm_and_related_search_results_partial",
-      "review_date": "2026-11-27"
+      "review_date": "2026-11-27",
+      "norm_recheck_2026_11_28": {
+        "status": "targeted_norm_and_all_individual_alternatives_reviewed_not_full_acceptance",
+        "basis": "59-ФЗ, ст. 11 ч. 1: при отсутствии необходимых реквизитов письменного обращения ответ не даётся; сведения о противоправном деянии и совершившем его лице направляются по компетенции. 8-ФЗ, ст. 11 пп. 1–3: достоверность и исключение сведений ограниченного доступа.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_59999/1a1719408a99f43738c30a453a74ddaf6ccd7ae7/",
+          "https://www.consultant.ru/document/cons_doc_LAW_59999/0c7123ee40ad90f89afa6fa544a87ffe76c084c0/",
+          "https://www.consultant.ru/document/cons_doc_LAW_84602/e4fb380d53822434913f8449aa9b9e6bdf9f67a4/"
+        ],
+        "limitation": "Письмо в условии бумажное, без имени и адреса. Само подозрение о продаже участка не устанавливает состав правонарушения и не идентифицирует виновного. Правила раскрытия кадастровых и персональных сведений дополнительно зависят от их вида.",
+        "source_scope": "Тексты отдельных статей и поисковые извлечения из КонсультантПлюс, 28.11.2026; не полный аудит поправок."
+      }
     },
     {
       "case_key": "bank-curated-v2-05",
@@ -7072,15 +7116,30 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "Статья 5 Закона №210-ФЗ закрепляет права заявителей при получении услуг; конкретная очерёдность и приоритеты определяются регламентом услуги. Статья 19 Конституции РФ требует равенства. Объединение записей должно сохранять подтверждённую последовательность и специальные законные основания приёма, а не просто вызывать по удобному экрану. Источники: http://www.kremlin.ru/acts/constitution",
+      "legal_basis": "210-ФЗ, ст. 4 п. 5, ст. 5 пп. 1, 3: доступность и своевременность услуг, предусмотренный законом выбор формы обращения. Конкретная очерёдность зависит от регламента; единая фактическая регистрация и сохранение приоритетов заданы условием.",
       "legal_urls": [
-        "https://www.consultant.ru/document/cons_doc_LAW_103023/ec44362ff44a1158aa5b56cf5c77285e3c470b4e/"
+        "https://www.consultant.ru/document/cons_doc_LAW_103023/ec44362ff44a1158aa5b56cf5c77285e3c470b4e/",
+        "https://www.consultant.ru/document/cons_doc_LAW_103023/dc7967099816debe7736be1cefa6baeb2fd1c02e/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
       "option_analysis_status": "draft",
       "source_scope": "specific_norm_and_related_search_results_partial",
-      "review_date": "2026-11-27"
+      "review_date": "2026-11-27",
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_103023/dc7967099816debe7736be1cefa6baeb2fd1c02e/",
+        "https://www.consultant.ru/document/cons_doc_LAW_103023/ec44362ff44a1158aa5b56cf5c77285e3c470b4e/"
+      ],
+      "norm_recheck_2026_11_28": {
+        "status": "targeted_norm_and_all_individual_alternatives_reviewed_not_full_acceptance",
+        "basis": "210-ФЗ, ст. 4 п. 5, ст. 5 пп. 1, 3: доступность и своевременность услуг, предусмотренный законом выбор формы обращения. Конкретная очерёдность зависит от регламента; единая фактическая регистрация и сохранение приоритетов заданы условием.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_103023/dc7967099816debe7736be1cefa6baeb2fd1c02e/",
+          "https://www.consultant.ru/document/cons_doc_LAW_103023/ec44362ff44a1158aa5b56cf5c77285e3c470b4e/"
+        ],
+        "limitation": "Не утверждается существование универсального федерального правила очереди по минутам; специальная категория приоритета и регламент не названы. Остальные варианты — подготовительные расчёты без отмены обязательной очереди.",
+        "source_scope": "Тексты отдельных статей и поисковые извлечения из КонсультантПлюс, 28.11.2026; не полный аудит поправок."
+      }
     },
     {
       "case_key": "bank-curated-v2-26",
@@ -7961,15 +8020,33 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "Федеральный закон № 8-ФЗ, статьи 8 и 11: достоверность и своевременность информации о деятельности органа. Сувенирная идея не меняет содержание протокола и требует самостоятельного решения в пределах компетенции. Источники: https://mintrud.gov.ru/docs/laws/129",
+      "legal_basis": "8-ФЗ, ст. 11 пп. 1–3: достоверность и порядок предоставления официальных сведений, изъятие ограниченной информации. Закон о СМИ №2124-1, ст. 39–40: редакционный запрос имеет специальный порядок. Пауза трансляции не доказывает утрату кворума; регламент заседания определяет основания повторного голосования.",
       "legal_urls": [
-        "https://www.consultant.ru/document/cons_doc_LAW_84602/e4fb380d53822434913f8449aa9b9e6bdf9f67a4/"
+        "https://www.consultant.ru/document/cons_doc_LAW_84602/e4fb380d53822434913f8449aa9b9e6bdf9f67a4/",
+        "https://www.consultant.ru/document/cons_doc_LAW_1511/1599bf6f7ccc24d4966727daa0243ffe117f5ac3/",
+        "https://www.consultant.ru/document/Cons_doc_LAW_1511/12db20528ef103ea40bc2f310053b8748c479ed8/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
       "option_analysis_status": "draft",
       "source_scope": "specific_norm_and_related_search_results_partial",
-      "review_date": "2026-11-27"
+      "review_date": "2026-11-27",
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_84602/e4fb380d53822434913f8449aa9b9e6bdf9f67a4/",
+        "https://www.consultant.ru/document/cons_doc_LAW_1511/1599bf6f7ccc24d4966727daa0243ffe117f5ac3/",
+        "https://www.consultant.ru/document/Cons_doc_LAW_1511/12db20528ef103ea40bc2f310053b8748c479ed8/"
+      ],
+      "norm_recheck_2026_11_28": {
+        "status": "targeted_norm_and_all_individual_alternatives_reviewed_not_full_acceptance",
+        "basis": "8-ФЗ, ст. 11 пп. 1–3: достоверность и порядок предоставления официальных сведений, изъятие ограниченной информации. Закон о СМИ №2124-1, ст. 39–40: редакционный запрос имеет специальный порядок. Пауза трансляции не доказывает утрату кворума; регламент заседания определяет основания повторного голосования.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_84602/e4fb380d53822434913f8449aa9b9e6bdf9f67a4/",
+          "https://www.consultant.ru/document/cons_doc_LAW_1511/1599bf6f7ccc24d4966727daa0243ffe117f5ac3/",
+          "https://www.consultant.ru/document/Cons_doc_LAW_1511/12db20528ef103ea40bc2f310053b8748c479ed8/"
+        ],
+        "limitation": "Регламент совета, права на видеозапись и правовое основание расходов не проверены. Кворум и неизменность протокола установлены условием.",
+        "source_scope": "Тексты отдельных статей и поисковые извлечения из КонсультантПлюс, 28.11.2026; не полный аудит поправок."
+      }
     },
     {
       "case_key": "bank-expanded-light-03-01",
@@ -8074,15 +8151,33 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "Федеральный закон № 8-ФЗ, статьи 8 и 11: достоверность информации о деятельности органа. Закон РФ № 2124-1 «О СМИ», статьи 39–40: специальный режим редакционных запросов; бытовая тема не превращает неподтверждённую причинность в факт. Источники: https://mintrud.gov.ru/docs/laws/129 https://epp.genproc.gov.ru/ru/proc_72/activity/legal-education/explain/e1331886/",
+      "legal_basis": "8-ФЗ, ст. 11 пп. 1–3: достоверность сведений органа и исключение информации ограниченного доступа. Закон о СМИ, ст. 39–40: редакция может запрашивать сведения устно или письменно; отсрочка и отказ имеют специальные основания и порядок. Две неоднородные встречи не устанавливают причинность.",
       "legal_urls": [
-        "https://www.consultant.ru/document/cons_doc_LAW_84602/e4fb380d53822434913f8449aa9b9e6bdf9f67a4/"
+        "https://www.consultant.ru/document/cons_doc_LAW_84602/e4fb380d53822434913f8449aa9b9e6bdf9f67a4/",
+        "https://www.consultant.ru/document/cons_doc_LAW_1511/1599bf6f7ccc24d4966727daa0243ffe117f5ac3/",
+        "https://www.consultant.ru/document/Cons_doc_LAW_1511/12db20528ef103ea40bc2f310053b8748c479ed8/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
       "option_analysis_status": "draft",
       "source_scope": "specific_norm_and_related_search_results_partial",
-      "review_date": "2026-11-27"
+      "review_date": "2026-11-27",
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_84602/e4fb380d53822434913f8449aa9b9e6bdf9f67a4/",
+        "https://www.consultant.ru/document/cons_doc_LAW_1511/1599bf6f7ccc24d4966727daa0243ffe117f5ac3/",
+        "https://www.consultant.ru/document/Cons_doc_LAW_1511/12db20528ef103ea40bc2f310053b8748c479ed8/"
+      ],
+      "norm_recheck_2026_11_28": {
+        "status": "targeted_norm_and_all_individual_alternatives_reviewed_not_full_acceptance",
+        "basis": "8-ФЗ, ст. 11 пп. 1–3: достоверность сведений органа и исключение информации ограниченного доступа. Закон о СМИ, ст. 39–40: редакция может запрашивать сведения устно или письменно; отсрочка и отказ имеют специальные основания и порядок. Две неоднородные встречи не устанавливают причинность.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_84602/e4fb380d53822434913f8449aa9b9e6bdf9f67a4/",
+          "https://www.consultant.ru/document/cons_doc_LAW_1511/1599bf6f7ccc24d4966727daa0243ffe117f5ac3/",
+          "https://www.consultant.ru/document/Cons_doc_LAW_1511/12db20528ef103ea40bc2f310053b8748c479ed8/"
+        ],
+        "limitation": "Срок сегодня вечером — редакционная просьба, не универсальный срок закона. Для письменного запроса уведомления об отказе/отсрочке оформляются в трёхдневный срок; основание для отсрочки — невозможность представить сведения в семь дней.",
+        "source_scope": "Тексты отдельных статей и поисковые извлечения из КонсультантПлюс, 28.11.2026; не полный аудит поправок."
+      }
     },
     {
       "case_key": "bank-expanded-light-07-01",
@@ -8284,7 +8379,7 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "Федеральный закон № 8-ФЗ, статьи 8 и 11: право на достоверную информацию о деятельности органа и требования её своевременности. Здесь разовая организационная ошибка не создаёт вымышленного переноса концерта. Источники: https://mintrud.gov.ru/docs/laws/129",
+      "legal_basis": "8-ФЗ, ст. 11 пп. 1–2: достоверность и соблюдение порядка предоставления информации о деятельности органа. Исправление бумажных экземпляров — способ устранить известную ошибку, а не универсальное требование печати нового тиража.",
       "legal_urls": [
         "https://www.consultant.ru/document/cons_doc_LAW_84602/e4fb380d53822434913f8449aa9b9e6bdf9f67a4/"
       ],
@@ -8292,7 +8387,19 @@
       "activation_allowed": false,
       "option_analysis_status": "draft",
       "source_scope": "specific_norm_and_related_search_results_partial",
-      "review_date": "2026-11-27"
+      "review_date": "2026-11-27",
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_84602/e4fb380d53822434913f8449aa9b9e6bdf9f67a4/"
+      ],
+      "norm_recheck_2026_11_28": {
+        "status": "targeted_norm_and_all_individual_alternatives_reviewed_not_full_acceptance",
+        "basis": "8-ФЗ, ст. 11 пп. 1–2: достоверность и соблюдение порядка предоставления информации о деятельности органа. Исправление бумажных экземпляров — способ устранить известную ошибку, а не универсальное требование печати нового тиража.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_84602/e4fb380d53822434913f8449aa9b9e6bdf9f67a4/"
+        ],
+        "limitation": "В задаче календарь опубликован от имени администрации; специальный порядок опубликования НПА и договор о концерте не затрагиваются. Способы исправления оцениваются по достижению получателей.",
+        "source_scope": "Тексты отдельных статей и поисковые извлечения из КонсультантПлюс, 28.11.2026; не полный аудит поправок."
+      }
     },
     {
       "case_key": "bank-expanded-light-14-01",
@@ -8336,15 +8443,30 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "Федеральный закон №8-ФЗ, статья 11: достоверность информации органа; Федеральный закон №68-ФЗ, статья 6: гласность и информирование о защите от ЧС. Сам по себе дождь не объявляется чрезвычайной ситуацией; меры выбираются по фактической угрозе и применимому плану. Источники: https://mintrud.gov.ru/docs/laws/129 https://mchs.gov.ru/dokumenty/bazovye-normativnye-pravovye-akty/federalnye-zakony/5788",
+      "legal_basis": "8-ФЗ, ст. 11: достоверность официальных сведений; 68-ФЗ, ст. 6: оперативное достоверное информирование о прогнозируемых и возникших ЧС и мерах защиты. Ливень не равен объявленному режиму ЧС; применимость плана определяется предупреждениями и фактической угрозой.",
       "legal_urls": [
-        "https://www.consultant.ru/document/cons_doc_LAW_84602/e4fb380d53822434913f8449aa9b9e6bdf9f67a4/"
+        "https://www.consultant.ru/document/cons_doc_LAW_84602/e4fb380d53822434913f8449aa9b9e6bdf9f67a4/",
+        "https://www.consultant.ru/document/cons_doc_LAW_5295/511234bf0190c9b2b49d27b4645f9b5de217ae6d/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
       "option_analysis_status": "draft",
       "source_scope": "specific_norm_and_related_search_results_partial",
-      "review_date": "2026-11-27"
+      "review_date": "2026-11-27",
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_84602/e4fb380d53822434913f8449aa9b9e6bdf9f67a4/",
+        "https://www.consultant.ru/document/cons_doc_LAW_5295/511234bf0190c9b2b49d27b4645f9b5de217ae6d/"
+      ],
+      "norm_recheck_2026_11_28": {
+        "status": "targeted_norm_and_all_individual_alternatives_reviewed_not_full_acceptance",
+        "basis": "8-ФЗ, ст. 11: достоверность официальных сведений; 68-ФЗ, ст. 6: оперативное достоверное информирование о прогнозируемых и возникших ЧС и мерах защиты. Ливень не равен объявленному режиму ЧС; применимость плана определяется предупреждениями и фактической угрозой.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_84602/e4fb380d53822434913f8449aa9b9e6bdf9f67a4/",
+          "https://www.consultant.ru/document/cons_doc_LAW_5295/511234bf0190c9b2b49d27b4645f9b5de217ae6d/"
+        ],
+        "limitation": "Не установлены режим ЧС, содержание технических требований к площадке и опасность грозы; учебный запасной план применяется после проверки фактической безопасности.",
+        "source_scope": "Тексты отдельных статей и поисковые извлечения из КонсультантПлюс, 28.11.2026; не полный аудит поправок."
+      }
     },
     {
       "case_key": "bank-expanded-light-17-01",
@@ -8462,16 +8584,31 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "Федеральный закон №125-ФЗ, статья 17: обязанность обеспечивать сохранность архивных документов; Федеральный закон №59-ФЗ, статья 8: регистрация обращений. Изменение внутренней формы допустимо в пределах компетенции, но не отменяет внешнее обязательное требование. Источники: https://archives.gov.ru/documents/methodics/OAD/data/attachments/FZ.pdf https://mintrud.gov.ru/docs/laws/108",
+      "legal_basis": "125-ФЗ от 22.10.2004, ст. 17: архивные документы сохраняются в течение установленных сроков; 59-ФЗ, ст. 8 ч. 2: надлежащие письменные обращения регистрируются в течение трёх дней. Конкретный обязательный журнал определяется регламентом, а не названием формы.",
       "legal_urls": [
         "https://www.consultant.ru/document/cons_doc_LAW_1406/853f5f9b88a8631659f20438281fdf2e323c1429/",
-        "https://mintrud.gov.ru/docs/laws/108"
+        "https://mintrud.gov.ru/docs/laws/108",
+        "https://www.consultant.ru/document/cons_doc_LAW_59999/0c7123ee40ad90f89afa6fa544a87ffe76c084c0/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
       "option_analysis_status": "draft",
       "source_scope": "specific_norm_and_related_search_results_partial",
-      "review_date": "2026-11-27"
+      "review_date": "2026-11-27",
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_1406/853f5f9b88a8631659f20438281fdf2e323c1429/",
+        "https://www.consultant.ru/document/cons_doc_LAW_59999/0c7123ee40ad90f89afa6fa544a87ffe76c084c0/"
+      ],
+      "norm_recheck_2026_11_28": {
+        "status": "targeted_norm_and_all_individual_alternatives_reviewed_not_full_acceptance",
+        "basis": "125-ФЗ от 22.10.2004, ст. 17: архивные документы сохраняются в течение установленных сроков; 59-ФЗ, ст. 8 ч. 2: надлежащие письменные обращения регистрируются в течение трёх дней. Конкретный обязательный журнал определяется регламентом, а не названием формы.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_1406/853f5f9b88a8631659f20438281fdf2e323c1429/",
+          "https://www.consultant.ru/document/cons_doc_LAW_59999/0c7123ee40ad90f89afa6fa544a87ffe76c084c0/"
+        ],
+        "limitation": "Условия хранения и номенклатура дел конкретного органа не проверены. В учебном условии один журнал прямо обязательный, а второй лист — подтверждённый необязательный дубль.",
+        "source_scope": "Тексты отдельных статей и поисковые извлечения из КонсультантПлюс, 28.11.2026; не полный аудит поправок."
+      }
     },
     {
       "case_key": "bank-expanded-serious-04-01",
@@ -8903,15 +9040,33 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "Федеральный закон №8-ФЗ, статьи 8 и 11: достоверность информации; Федеральный закон №273-ФЗ от 29.12.2012, статьи 28 и 41: ответственность образовательной организации за условия и охрану здоровья. Пресс-служба не заменяет компетентное техническое подтверждение безопасности. Источники: https://mintrud.gov.ru/docs/laws/129 http://www.kremlin.ru/acts/bank/36698",
+      "legal_basis": "8-ФЗ, ст. 11 пп. 1–3: достоверность и изъятие сведений ограниченного доступа. 273-ФЗ от 29.12.2012, ст. 28 ч. 6 п. 2, ч. 7 и ст. 41: школа обязана обеспечивать безопасное обучение; техническая пригодность не определяется пресс-службой.",
       "legal_urls": [
-        "https://www.consultant.ru/document/cons_doc_LAW_84602/e4fb380d53822434913f8449aa9b9e6bdf9f67a4/"
+        "https://www.consultant.ru/document/cons_doc_LAW_84602/e4fb380d53822434913f8449aa9b9e6bdf9f67a4/",
+        "https://www.consultant.ru/document/cons_doc_LAW_140174/552097cad5942f36c9484dbde7ebf92db1f783f3/",
+        "https://www.consultant.ru/document/cons_doc_LAW_140174/48b9101fff215f3aeb122d86593a129a34d96d3c/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
       "option_analysis_status": "draft",
       "source_scope": "specific_norm_and_related_search_results_partial",
-      "review_date": "2026-11-27"
+      "review_date": "2026-11-27",
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_84602/e4fb380d53822434913f8449aa9b9e6bdf9f67a4/",
+        "https://www.consultant.ru/document/cons_doc_LAW_140174/552097cad5942f36c9484dbde7ebf92db1f783f3/",
+        "https://www.consultant.ru/document/cons_doc_LAW_140174/48b9101fff215f3aeb122d86593a129a34d96d3c/"
+      ],
+      "norm_recheck_2026_11_28": {
+        "status": "targeted_norm_and_all_individual_alternatives_reviewed_not_full_acceptance",
+        "basis": "8-ФЗ, ст. 11 пп. 1–3: достоверность и изъятие сведений ограниченного доступа. 273-ФЗ от 29.12.2012, ст. 28 ч. 6 п. 2, ч. 7 и ст. 41: школа обязана обеспечивать безопасное обучение; техническая пригодность не определяется пресс-службой.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_84602/e4fb380d53822434913f8449aa9b9e6bdf9f67a4/",
+          "https://www.consultant.ru/document/cons_doc_LAW_140174/552097cad5942f36c9484dbde7ebf92db1f783f3/",
+          "https://www.consultant.ru/document/cons_doc_LAW_140174/48b9101fff215f3aeb122d86593a129a34d96d3c/"
+        ],
+        "limitation": "Тип акта, полномочия инженера и органа по снятию ограничений определяются применимой процедурой; новая служебная записка не считается разрешением на эксплуатацию.",
+        "source_scope": "Тексты отдельных статей и поисковые извлечения из КонсультантПлюс, 28.11.2026; не полный аудит поправок."
+      }
     },
     {
       "case_key": "bank-expanded-serious-18-01",
@@ -9388,15 +9543,33 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "Федеральный закон №8-ФЗ, статьи 8 и 11: достоверность информации о деятельности органа; Закон РФ №2124-1, статьи 39–40: предоставление сведений по редакционному запросу. Фактическое отсутствие решения сегодня не является гарантией неизменности всех будущих планов. Источники: https://mintrud.gov.ru/docs/laws/129 https://epp.genproc.gov.ru/ru/proc_72/activity/legal-education/explain/e1331886/",
+      "legal_basis": "8-ФЗ, ст. 11 пп. 1–3: достоверность, порядок и ограничения доступа. Закон РФ №2124-1, ст. 39–40: редакционный запрос требует ответа по специальной процедуре; отсутствие принятого решения сегодня не гарантирует будущих планов.",
       "legal_urls": [
-        "https://www.consultant.ru/document/cons_doc_LAW_84602/e4fb380d53822434913f8449aa9b9e6bdf9f67a4/"
+        "https://www.consultant.ru/document/cons_doc_LAW_84602/e4fb380d53822434913f8449aa9b9e6bdf9f67a4/",
+        "https://www.consultant.ru/document/cons_doc_LAW_1511/1599bf6f7ccc24d4966727daa0243ffe117f5ac3/",
+        "https://www.consultant.ru/document/Cons_doc_LAW_1511/12db20528ef103ea40bc2f310053b8748c479ed8/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
       "option_analysis_status": "draft",
       "source_scope": "specific_norm_and_related_search_results_partial",
-      "review_date": "2026-11-27"
+      "review_date": "2026-11-27",
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_84602/e4fb380d53822434913f8449aa9b9e6bdf9f67a4/",
+        "https://www.consultant.ru/document/cons_doc_LAW_1511/1599bf6f7ccc24d4966727daa0243ffe117f5ac3/",
+        "https://www.consultant.ru/document/Cons_doc_LAW_1511/12db20528ef103ea40bc2f310053b8748c479ed8/"
+      ],
+      "norm_recheck_2026_11_28": {
+        "status": "targeted_norm_and_all_individual_alternatives_reviewed_not_full_acceptance",
+        "basis": "8-ФЗ, ст. 11 пп. 1–3: достоверность, порядок и ограничения доступа. Закон РФ №2124-1, ст. 39–40: редакционный запрос требует ответа по специальной процедуре; отсутствие принятого решения сегодня не гарантирует будущих планов.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_84602/e4fb380d53822434913f8449aa9b9e6bdf9f67a4/",
+          "https://www.consultant.ru/document/cons_doc_LAW_1511/1599bf6f7ccc24d4966727daa0243ffe117f5ac3/",
+          "https://www.consultant.ru/document/Cons_doc_LAW_1511/12db20528ef103ea40bc2f310053b8748c479ed8/"
+        ],
+        "limitation": "Срок и форма запроса определяются фактическим обращением редакции; сведения об имуществе предоставляются в допустимом объёме. Пресс-служба не принимает решения о продаже.",
+        "source_scope": "Тексты отдельных статей и поисковые извлечения из КонсультантПлюс, 28.11.2026; не полный аудит поправок."
+      }
     },
     {
       "case_key": "bank-meeting",
@@ -9472,7 +9645,7 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "Федеральный закон №125-ФЗ, статья 17: обеспечение сохранности архивных документов; Федеральный закон №8-ФЗ, статья 11: достоверность опубликованной информации. Допуск к рассмотрению и необходимые материалы определяются применимым регламентом; неподтверждённую запись нельзя выдавать за восстановленный подлинник. Источники: https://archives.gov.ru/documents/methodics/OAD/data/attachments/FZ.pdf https://mintrud.gov.ru/docs/laws/129",
+      "legal_basis": "125-ФЗ, ст. 17: сохранность архивных документов в установленный срок; 8-ФЗ, ст. 11 пп. 1–3: достоверность предоставляемых сведений и соблюдение порядка. Заданный местный регламент позволяет надлежащие копии с отметками, но не подмену подлинника проектом.",
       "legal_urls": [
         "https://www.consultant.ru/document/cons_doc_LAW_1406/853f5f9b88a8631659f20438281fdf2e323c1429/",
         "https://www.consultant.ru/document/cons_doc_LAW_84602/e4fb380d53822434913f8449aa9b9e6bdf9f67a4/"
@@ -9481,7 +9654,21 @@
       "activation_allowed": false,
       "option_analysis_status": "draft",
       "source_scope": "specific_norm_and_related_search_results_partial",
-      "review_date": "2026-11-27"
+      "review_date": "2026-11-27",
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_1406/853f5f9b88a8631659f20438281fdf2e323c1429/",
+        "https://www.consultant.ru/document/cons_doc_LAW_84602/e4fb380d53822434913f8449aa9b9e6bdf9f67a4/"
+      ],
+      "norm_recheck_2026_11_28": {
+        "status": "targeted_norm_and_all_individual_alternatives_reviewed_not_full_acceptance",
+        "basis": "125-ФЗ, ст. 17: сохранность архивных документов в установленный срок; 8-ФЗ, ст. 11 пп. 1–3: достоверность предоставляемых сведений и соблюдение порядка. Заданный местный регламент позволяет надлежащие копии с отметками, но не подмену подлинника проектом.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_1406/853f5f9b88a8631659f20438281fdf2e323c1429/",
+          "https://www.consultant.ru/document/cons_doc_LAW_84602/e4fb380d53822434913f8449aa9b9e6bdf9f67a4/"
+        ],
+        "limitation": "Конкретный местный акт не проверен; возможность выделить зависимый вопрос и размещать копии прямо установлена учебным условием.",
+        "source_scope": "Тексты отдельных статей и поисковые извлечения из КонсультантПлюс, 28.11.2026; не полный аудит поправок."
+      }
     }
   ]
 }
