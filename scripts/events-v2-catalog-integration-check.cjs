@@ -86,4 +86,4 @@ CREATE TABLE private.event_content_revisions(revision text,event_case_id uuid,sn
   console.log('PASS isolated SQL catalogue candidate: release denial, 330 synthetic templates, two safe instances, seven preserved, markers, snapshots, privilege, repeat denied');
  }finally{await db.close();}
 }
-main().catch(e=>{console.error(e);process.exitCode=1});
+main().catch(e=>{console.error(e.code??'ERROR',e.message,e.where??'');process.exitCode=1});

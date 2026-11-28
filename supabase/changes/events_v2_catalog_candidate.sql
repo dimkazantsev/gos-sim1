@@ -70,13 +70,13 @@ BEGIN
   ON CONFLICT(revision,event_case_id) DO NOTHING RETURNING event_case_id)
  UPDATE public.event_cases c SET situation=e.doc->>'situation',decision_options=e.doc->'decision_options',
   effect_plan=e.doc->'effect_plan',source_url=e.doc->>'source_url',source_note=e.doc->>'source_note',verified=true,
-  comic_scene=(c.comic_scene-'vote_round'-'runoff_options'-'first_round_tallies')||jsonb_build_object('event_rules_version',2)
+  comic_scene=(c.comic_scene - ARRAY['vote_round','runoff_options','first_round_tallies']::text[])||jsonb_build_object('event_rules_version',2)
  FROM eligible e JOIN saved s ON s.event_case_id=e.id WHERE c.id=e.id;
  GET DIAGNOSTICS changed=ROW_COUNT;
  UPDATE private.authored_event_catalog c SET content=c.content||jsonb_build_object(
   'situation',x->>'situation','decision_options',x->'decision_options','effect_plan',x->'effect_plan',
   'source_url',x->>'source_url','source_note',x->>'source_note','verified',true,
-  'comic_scene',(c.content->'comic_scene'-'vote_round'-'runoff_options'-'first_round_tallies')||jsonb_build_object('event_rules_version',2))
+  'comic_scene',((c.content->'comic_scene') - ARRAY['vote_round','runoff_options','first_round_tallies']::text[])||jsonb_build_object('event_rules_version',2))
  FROM jsonb_array_elements(p_payload) x WHERE c.case_key=x->>'case_key';
  GET DIAGNOSTICS catalog_changed=ROW_COUNT;
  IF catalog_changed<>330 THEN RAISE EXCEPTION 'Incomplete V2 catalogue migration';END IF;
