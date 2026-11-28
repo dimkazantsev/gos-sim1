@@ -12,7 +12,7 @@ export function placeTourCard(target:TourRect|null,viewport:{width:number;height
  const leftSpace=Math.max(0,target.left-gap-margin);
  // A side panel is preferable to covering the desktop sidebar; never put it
  // alongside a mobile dock button, where the other dock items would be covered.
- if(w>=600&&Math.max(rightSpace,leftSpace)>=248){
+ if(w>900&&Math.max(rightSpace,leftSpace)>=248){
   const side=rightSpace>=leftSpace?'right':'left';
   const width=Math.min(preferredWidth,side==='right'?rightSpace:leftSpace);
   const left=side==='right'?target.right+gap:target.left-gap-width;
