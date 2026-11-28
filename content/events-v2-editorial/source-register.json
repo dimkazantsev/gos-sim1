@@ -5785,24 +5785,46 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "ГК РФ, ст. 1229, 1259, 1270, 1274, 1286: охраняемая фотография используется по разрешению или предусмотренному исключению; имя автора само по себе не заменяет основание воспроизведения и размещения. В заданной декоративной обложке исключение не установлено. Лицензия проверяется по объёму прав, включая печать и сеть.",
+      "legal_basis": "ГК РФ, ст. 1229, 1259, 1270, 1274, 1286, 1286.1: указание автора не заменяет согласие правообладателя; декоративное использование без применимого исключения требует надлежащего разрешения. Учитываются способы использования, тираж и размещение в сети.",
       "legal_urls": [
         "https://www.consultant.ru/document/cons_doc_LAW_64629/98ad2641f95945c4b7956150260564c8b44028d9/",
-        "https://rospatent.gov.ru/ru/documents/grazhdanskiy-kodeks-rossiyskoy-federacii-chast-chetvertaya",
-        "https://www.consultant.ru/document/cons_doc_LAW_64629/dffcf0b87b80ff38f430dc822a0074e76ccd41a0/"
+        "https://www.consultant.ru/document/cons_doc_LAW_64629/be05678dc42ddc67aae5be9ba9beebd367fb9a3f/",
+        "https://www.consultant.ru/document/cons_doc_LAW_64629/dffcf0b87b80ff38f430dc822a0074e76ccd41a0/",
+        "https://www.consultant.ru/document/cons_doc_LAW_64629/84bbd636598a59112a4fe972432343dd4f51da1d/",
+        "https://www.consultant.ru/document/cons_doc_LAW_64629/5023e7ec1885fe99c14e29a9e328c664a001f599/",
+        "https://www.consultant.ru/document/cons_doc_LAW_64629/e0c0d28fc67b7998751c3a7f98f6be9dfb789911/"
       ],
-      "legal_status": "requires_case_specific_current_law_review",
+      "legal_status": "verified_current",
       "activation_allowed": false,
       "review_date": "2026-11-28",
-      "source_scope": "specific_norm_and_related_search_results_partial",
+      "source_scope": "case_specific_current_norms_and_all_alternatives_reviewed_under_stated_facts",
       "checked_norm_urls": [
         "https://www.consultant.ru/document/cons_doc_LAW_64629/98ad2641f95945c4b7956150260564c8b44028d9/",
-        "https://www.consultant.ru/document/cons_doc_LAW_64629/dffcf0b87b80ff38f430dc822a0074e76ccd41a0/"
+        "https://www.consultant.ru/document/cons_doc_LAW_64629/be05678dc42ddc67aae5be9ba9beebd367fb9a3f/",
+        "https://www.consultant.ru/document/cons_doc_LAW_64629/dffcf0b87b80ff38f430dc822a0074e76ccd41a0/",
+        "https://www.consultant.ru/document/cons_doc_LAW_64629/84bbd636598a59112a4fe972432343dd4f51da1d/",
+        "https://www.consultant.ru/document/cons_doc_LAW_64629/5023e7ec1885fe99c14e29a9e328c664a001f599/",
+        "https://www.consultant.ru/document/cons_doc_LAW_64629/e0c0d28fc67b7998751c3a7f98f6be9dfb789911/"
       ],
       "targeted_option_review": {
-        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
         "option_count": 5,
-        "remaining": "Проверить правообладателя, объём лицензии, срок, территорию, тираж, сетевое использование, права на изображение людей и условия конкретных исключений."
+        "remaining": "Правовая граница и пять вариантов проверены для прямо заданных учебных обстоятельств; конкретное исполнение и процедуры за пределами задания не сертифицированы."
+      },
+      "final_case_review_2026_11_28": {
+        "date": "2026-11-28",
+        "scope": "case_specific_legal_acceptance_under_explicit_educational_facts",
+        "option_count": 5,
+        "conclusion": "Приобретение лицензии, заказ оригинального изображения с оформлением прав, использование открытой лицензии в её пределах, собственная типографика и отсрочка до проверки прав допустимы; не предполагается право на публикацию до проверки условий.",
+        "remaining": "Правовая граница и пять вариантов проверены для прямо заданных учебных обстоятельств; конкретное исполнение и процедуры за пределами задания не сертифицированы.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_64629/98ad2641f95945c4b7956150260564c8b44028d9/",
+          "https://www.consultant.ru/document/cons_doc_LAW_64629/be05678dc42ddc67aae5be9ba9beebd367fb9a3f/",
+          "https://www.consultant.ru/document/cons_doc_LAW_64629/dffcf0b87b80ff38f430dc822a0074e76ccd41a0/",
+          "https://www.consultant.ru/document/cons_doc_LAW_64629/84bbd636598a59112a4fe972432343dd4f51da1d/",
+          "https://www.consultant.ru/document/cons_doc_LAW_64629/5023e7ec1885fe99c14e29a9e328c664a001f599/",
+          "https://www.consultant.ru/document/cons_doc_LAW_64629/e0c0d28fc67b7998751c3a7f98f6be9dfb789911/"
+        ]
       }
     },
     {
@@ -5812,22 +5834,37 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "ЖК РФ, ст. 199, ч. 1 и 3, в редакции с 01.09.2026: аннулирование лицензии производится по решению суда по заявлению органа жилищного надзора; основания прекращения действия лицензии самостоятельны. В истории они исключены. Основания судебного обращения проверяются отдельно, жалобы рассматриваются независимо. Не требуется прежнее решение лицензионной комиссии.",
+      "legal_basis": "ЖК РФ, ст. 198, 199, 200 в редакции, действующей с 01.09.2026: аннулирование лицензии судом по заявлению органа жилищного надзора; жалобы сами по себе не заменяют предусмотренные законом основания. Обеспечение непрерывности управления осуществляется в установленном порядке.",
       "legal_urls": [
         "https://www.consultant.ru/document/cons_doc_LAW_51057/14db416f7441199d612af5491ddc1b45ed664a10/",
-        "https://publication.pravo.gov.ru/document/0001202510150008"
+        "https://www.consultant.ru/document/cons_doc_LAW_51057/2d6ac13c62652aaf19a5b319f9e4fa33f9fe8188/",
+        "https://www.consultant.ru/document/cons_doc_LAW_51057/fd6312abcf995e891826d6bcd0f3a0a9c2c18ef8/"
       ],
-      "legal_status": "requires_case_specific_current_law_review",
+      "legal_status": "verified_current",
       "activation_allowed": false,
       "review_date": "2026-11-28",
-      "source_scope": "specific_norm_and_related_search_results_partial",
+      "source_scope": "case_specific_current_norms_and_all_alternatives_reviewed_under_stated_facts",
       "checked_norm_urls": [
-        "https://www.consultant.ru/document/cons_doc_LAW_51057/14db416f7441199d612af5491ddc1b45ed664a10/"
+        "https://www.consultant.ru/document/cons_doc_LAW_51057/14db416f7441199d612af5491ddc1b45ed664a10/",
+        "https://www.consultant.ru/document/cons_doc_LAW_51057/2d6ac13c62652aaf19a5b319f9e4fa33f9fe8188/",
+        "https://www.consultant.ru/document/cons_doc_LAW_51057/fd6312abcf995e891826d6bcd0f3a0a9c2c18ef8/"
       ],
       "targeted_option_review": {
-        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
         "option_count": 5,
-        "remaining": "Необходимо проверить реестр, основания ст. 198, последствия законного прекращения управления и специальный порядок жилищного контроля; жалобы не заменяют судебную процедуру."
+        "remaining": "Правовая граница и пять вариантов проверены для прямо заданных учебных обстоятельств; конкретное исполнение и процедуры за пределами задания не сертифицированы."
+      },
+      "final_case_review_2026_11_28": {
+        "date": "2026-11-28",
+        "scope": "case_specific_legal_acceptance_under_explicit_educational_facts",
+        "option_count": 5,
+        "conclusion": "Пять вариантов дополнительного реагирования допустимы как рекомендации, не заменяющие судебную процедуру и законный жилищный надзор; меры непрерывности не означают самостоятельного выбора нового управляющего без оснований.",
+        "remaining": "Правовая граница и пять вариантов проверены для прямо заданных учебных обстоятельств; конкретное исполнение и процедуры за пределами задания не сертифицированы.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_51057/14db416f7441199d612af5491ddc1b45ed664a10/",
+          "https://www.consultant.ru/document/cons_doc_LAW_51057/2d6ac13c62652aaf19a5b319f9e4fa33f9fe8188/",
+          "https://www.consultant.ru/document/cons_doc_LAW_51057/fd6312abcf995e891826d6bcd0f3a0a9c2c18ef8/"
+        ]
       }
     },
     {
@@ -5837,23 +5874,37 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "КоАП РФ, ст. 4.1, ч. 5 и 24.5, ч. 1 п. 7: повторное административное наказание за тот же эпизод недопустимо при заданном тождестве. Второе постановление устраняется уполномоченным органом в надлежащей процедуре, а не коллективным голосованием.",
+      "legal_basis": "КоАП РФ, ч. 5 ст. 4.1, п. 7 ч. 1 ст. 24.5, п. 3 ч. 1 ст. 30.7: повторное наказание за одно и то же административное правонарушение недопустимо, второе постановление подлежит отмене с прекращением производства при установленных обстоятельствах.",
       "legal_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_34661/93fe5340f4a47211790c8cfa5ba3ac94e3766a3c/",
         "https://www.consultant.ru/document/cons_doc_LAW_34661/7f47b148e60467b00c0f1705dac5c97386201451/",
-        "https://www.consultant.ru/document/cons_doc_LAW_34661/93fe5340f4a47211790c8cfa5ba3ac94e3766a3c/"
+        "https://www.consultant.ru/document/cons_doc_LAW_34661/772d9a1da3b29166c8d08499cc4d16ef4d5269f4/"
       ],
-      "legal_status": "requires_case_specific_current_law_review",
+      "legal_status": "verified_current",
       "activation_allowed": false,
       "review_date": "2026-11-28",
-      "source_scope": "specific_norm_and_related_search_results_partial",
+      "source_scope": "case_specific_current_norms_and_all_alternatives_reviewed_under_stated_facts",
       "checked_norm_urls": [
         "https://www.consultant.ru/document/cons_doc_LAW_34661/93fe5340f4a47211790c8cfa5ba3ac94e3766a3c/",
-        "https://www.consultant.ru/document/cons_doc_LAW_34661/7f47b148e60467b00c0f1705dac5c97386201451/"
+        "https://www.consultant.ru/document/cons_doc_LAW_34661/7f47b148e60467b00c0f1705dac5c97386201451/",
+        "https://www.consultant.ru/document/cons_doc_LAW_34661/772d9a1da3b29166c8d08499cc4d16ef4d5269f4/"
       ],
       "targeted_option_review": {
-        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
         "option_count": 5,
-        "remaining": "Учебное условие задаёт тождество и вступившее в силу решение. Отмена второго постановления и возврат уплаченного — компетентная процедура, не итог голосования."
+        "remaining": "Правовая граница и пять вариантов проверены для прямо заданных учебных обстоятельств; конкретное исполнение и процедуры за пределами задания не сертифицированы."
+      },
+      "final_case_review_2026_11_28": {
+        "date": "2026-11-28",
+        "scope": "case_specific_legal_acceptance_under_explicit_educational_facts",
+        "option_count": 5,
+        "conclusion": "Пять вариантов дополнительной помощи допустимы без подмены решения уполномоченного лица или суда; разъяснение возврата относится только к фактически уплаченным суммам при законном основании.",
+        "remaining": "Правовая граница и пять вариантов проверены для прямо заданных учебных обстоятельств; конкретное исполнение и процедуры за пределами задания не сертифицированы.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_34661/93fe5340f4a47211790c8cfa5ba3ac94e3766a3c/",
+          "https://www.consultant.ru/document/cons_doc_LAW_34661/7f47b148e60467b00c0f1705dac5c97386201451/",
+          "https://www.consultant.ru/document/cons_doc_LAW_34661/772d9a1da3b29166c8d08499cc4d16ef4d5269f4/"
+        ]
       }
     },
     {
@@ -5863,21 +5914,34 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "Конституция РФ, ст. 46–47, 118: правосудие осуществляется судом. Внутриведомственная процедура возможна в пределах закона, но орган-ответчик не вправе своим распоряжением окончательно подменять судебную защиту. Конкретный процессуальный маршрут определяется видом спора.",
+      "legal_basis": "Конституция РФ, ст. 46, 47, 118; КАС РФ, ст. 218: ведомственная комиссия не может исключить судебное оспаривание публично-правового решения или подменить правосудие.",
       "legal_urls": [
-        "https://minjust.gov.ru/ru/documents/8011/"
+        "https://minjust.gov.ru/ru/documents/8011/",
+        "https://www.consultant.ru/document/cons_doc_LAW_176147/98b69fee6357343965f5b57193fcaaa54b0f21e4/"
       ],
-      "legal_status": "requires_case_specific_current_law_review",
+      "legal_status": "verified_current",
       "activation_allowed": false,
       "review_date": "2026-11-28",
-      "source_scope": "previous_constitution_text_and_case_specific_reasoning",
+      "source_scope": "case_specific_current_norms_and_all_alternatives_reviewed_under_stated_facts",
       "checked_norm_urls": [
-        "https://minjust.gov.ru/ru/documents/8011/"
+        "https://minjust.gov.ru/ru/documents/8011/",
+        "https://www.consultant.ru/document/cons_doc_LAW_176147/98b69fee6357343965f5b57193fcaaa54b0f21e4/"
       ],
       "targeted_option_review": {
-        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
         "option_count": 5,
-        "remaining": "Процессуальная подсудность определяется законом, не руководителем ответчика. Вид конкретного спора не установлен."
+        "remaining": "Правовая граница и пять вариантов проверены для прямо заданных учебных обстоятельств; конкретное исполнение и процедуры за пределами задания не сертифицированы."
+      },
+      "final_case_review_2026_11_28": {
+        "date": "2026-11-28",
+        "scope": "case_specific_legal_acceptance_under_explicit_educational_facts",
+        "option_count": 5,
+        "conclusion": "Пять организационных и разъяснительных мер допустимы при сохранении доступа к компетентному суду, без признания ведомственной комиссии судом.",
+        "remaining": "Правовая граница и пять вариантов проверены для прямо заданных учебных обстоятельств; конкретное исполнение и процедуры за пределами задания не сертифицированы.",
+        "urls": [
+          "https://minjust.gov.ru/ru/documents/8011/",
+          "https://www.consultant.ru/document/cons_doc_LAW_176147/98b69fee6357343965f5b57193fcaaa54b0f21e4/"
+        ]
       }
     },
     {
@@ -5887,36 +5951,39 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "210-ФЗ, ст. 7 ч. 1 п. 2 и ч. 6, ст. 7.1–7.2: подлежащие межведомственному получению документы нельзя требовать от заявителя вне установленных исключений; добровольное представление допустимо. Срок ответа на запрос определяется ст. 7.2 и специальными нормами; он не равен общему сроку услуги.",
+      "legal_basis": "210-ФЗ, п. 2 ч. 1 и ч. 6 ст. 7, ст. 7.1, 7.2, 16: сведения, находящиеся в распоряжении органов и доступные по межведомственному запросу, не истребуются от заявителя вне предусмотренных законом исключений. МФЦ принимает документы в пределах полномочий по соглашению.",
       "legal_urls": [
         "https://www.consultant.ru/document/cons_doc_LAW_103023/a593eaab768d34bf2d7419322eac79481e73cf03/",
         "https://www.consultant.ru/document/cons_doc_LAW_103023/dae12f04d4f7e53b43596ece42c666374101e68b/",
-        "https://www.consultant.ru/document/cons_doc_LAW_103023/a33164e93c89b483b80e6a1aa812612ec8364982/"
+        "https://www.consultant.ru/document/cons_doc_LAW_103023/a33164e93c89b483b80e6a1aa812612ec8364982/",
+        "https://www.consultant.ru/document/cons_doc_LAW_103023/a2588b2a1374c05e0939bb4df8e54fc0dfd6e000/"
       ],
-      "legal_status": "requires_case_specific_current_law_review",
+      "legal_status": "verified_current",
       "activation_allowed": false,
       "review_date": "2026-11-28",
-      "source_scope": "specific_norm_and_related_search_results_partial",
+      "source_scope": "case_specific_current_norms_and_all_alternatives_reviewed_under_stated_facts",
       "checked_norm_urls": [
         "https://www.consultant.ru/document/cons_doc_LAW_103023/a593eaab768d34bf2d7419322eac79481e73cf03/",
         "https://www.consultant.ru/document/cons_doc_LAW_103023/dae12f04d4f7e53b43596ece42c666374101e68b/",
-        "https://www.consultant.ru/document/cons_doc_LAW_103023/a33164e93c89b483b80e6a1aa812612ec8364982/"
+        "https://www.consultant.ru/document/cons_doc_LAW_103023/a33164e93c89b483b80e6a1aa812612ec8364982/",
+        "https://www.consultant.ru/document/cons_doc_LAW_103023/a2588b2a1374c05e0939bb4df8e54fc0dfd6e000/"
       ],
       "targeted_option_review": {
-        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
         "option_count": 5,
-        "remaining": "Конкретная услуга и регламент МФЦ не названы; специальный срок и порядок резервного обмена не подтверждены."
+        "remaining": "Правовая граница и пять вариантов проверены для прямо заданных учебных обстоятельств; конкретное исполнение и процедуры за пределами задания не сертифицированы."
       },
       "final_case_review_2026_11_28": {
         "date": "2026-11-28",
-        "scope": "specific_norm_followup_not_full_acceptance",
+        "scope": "case_specific_legal_acceptance_under_explicit_educational_facts",
         "option_count": 5,
-        "conclusion": "Прочитаны ст. 7, 7.1, 7.2 №210-ФЗ в редакции 04.08.2026 с изменениями с 01.11.2026. Пять мер не перекладывают обязанность на гражданина. Не вводится единый срок для всех видов услуг.",
-        "remaining": "Конкретная услуга и регламент МФЦ не названы; специальный срок и порядок резервного обмена не подтверждены.",
+        "conclusion": "Пять мер допустимы при законном межведомственном обмене; не устанавливается конкретный срок или специальный порядок для неназванной услуги, обязательные документы и идентификация сохраняются.",
+        "remaining": "Правовая граница и пять вариантов проверены для прямо заданных учебных обстоятельств; конкретное исполнение и процедуры за пределами задания не сертифицированы.",
         "urls": [
           "https://www.consultant.ru/document/cons_doc_LAW_103023/a593eaab768d34bf2d7419322eac79481e73cf03/",
           "https://www.consultant.ru/document/cons_doc_LAW_103023/dae12f04d4f7e53b43596ece42c666374101e68b/",
-          "https://www.consultant.ru/document/cons_doc_LAW_103023/a33164e93c89b483b80e6a1aa812612ec8364982/"
+          "https://www.consultant.ru/document/cons_doc_LAW_103023/a33164e93c89b483b80e6a1aa812612ec8364982/",
+          "https://www.consultant.ru/document/cons_doc_LAW_103023/a2588b2a1374c05e0939bb4df8e54fc0dfd6e000/"
         ]
       }
     },
@@ -5976,21 +6043,34 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "Конституция РФ, ст. 15, 46: индивидуальный приказ органа не отменяет право, установленное законом. По условию отсутствуют иные основания отказа. Отказ устраняется компетентным способом; вид правоотношения и процессуальный порядок не конкретизированы, поэтому универсальный способ отмены не утверждается.",
+      "legal_basis": "Конституция РФ, ст. 15, 46; КАС РФ, ст. 218: индивидуальный ведомственный акт не может отменить право, установленное законом, лишь потому, что он принят позднее. Право на оспаривание сохраняется.",
       "legal_urls": [
-        "https://minjust.gov.ru/ru/documents/8011/"
+        "https://minjust.gov.ru/ru/documents/8011/",
+        "https://www.consultant.ru/document/cons_doc_LAW_176147/98b69fee6357343965f5b57193fcaaa54b0f21e4/"
       ],
-      "legal_status": "requires_case_specific_current_law_review",
+      "legal_status": "verified_current",
       "activation_allowed": false,
       "review_date": "2026-11-28",
-      "source_scope": "previous_constitution_text_and_case_specific_reasoning",
+      "source_scope": "case_specific_current_norms_and_all_alternatives_reviewed_under_stated_facts",
       "checked_norm_urls": [
-        "https://minjust.gov.ru/ru/documents/8011/"
+        "https://minjust.gov.ru/ru/documents/8011/",
+        "https://www.consultant.ru/document/cons_doc_LAW_176147/98b69fee6357343965f5b57193fcaaa54b0f21e4/"
       ],
       "targeted_option_review": {
-        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
         "option_count": 5,
-        "remaining": "Компетентный орган либо суд устраняет отказ по установленному порядку; вид правоотношения и способы отмены не конкретизированы."
+        "remaining": "Правовая граница и пять вариантов проверены для прямо заданных учебных обстоятельств; конкретное исполнение и процедуры за пределами задания не сертифицированы."
+      },
+      "final_case_review_2026_11_28": {
+        "date": "2026-11-28",
+        "scope": "case_specific_legal_acceptance_under_explicit_educational_facts",
+        "option_count": 5,
+        "conclusion": "Пять мер допустимы как дополнительная правовая и организационная помощь без самостоятельной отмены акта неуполномоченными участниками.",
+        "remaining": "Правовая граница и пять вариантов проверены для прямо заданных учебных обстоятельств; конкретное исполнение и процедуры за пределами задания не сертифицированы.",
+        "urls": [
+          "https://minjust.gov.ru/ru/documents/8011/",
+          "https://www.consultant.ru/document/cons_doc_LAW_176147/98b69fee6357343965f5b57193fcaaa54b0f21e4/"
+        ]
       }
     },
     {
@@ -6000,23 +6080,34 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "79-ФЗ от 27.07.2004, ст. 17, ч. 1 п. 6; 273-ФЗ от 25.12.2008, ст. 9: вознаграждение, связанное с должностным действием, не допускается, обращение с целью склонения подлежит установленному уведомлению. Сумма карты не определяет законность; уголовная квалификация не устанавливается автоматически.",
+      "legal_basis": "79-ФЗ, п. 6 ч. 1 ст. 17; 273-ФЗ, ст. 9: вознаграждение в связи с исполнением должностных обязанностей запрещено; склонение к коррупционному правонарушению подлежит уведомлению в установленном порядке. Переданная карта документируется и передаётся по применимой процедуре, не используется; уголовная квалификация отдельно устанавливается компетентным органом.",
       "legal_urls": [
         "https://www.consultant.ru/document/cons_doc_LAW_48601/e7b86a940bc71a71af7b9288590f1ca92a69d878/",
         "https://www.consultant.ru/document/cons_doc_LAW_82959/168ac76599fb643077ad0b13c4f2dc2c6126333a/"
       ],
-      "legal_status": "requires_case_specific_current_law_review",
+      "legal_status": "verified_current",
       "activation_allowed": false,
       "review_date": "2026-11-28",
-      "source_scope": "specific_norm_and_related_search_results_partial",
+      "source_scope": "case_specific_current_norms_and_all_alternatives_reviewed_under_stated_facts",
       "checked_norm_urls": [
         "https://www.consultant.ru/document/cons_doc_LAW_48601/e7b86a940bc71a71af7b9288590f1ca92a69d878/",
         "https://www.consultant.ru/document/cons_doc_LAW_82959/168ac76599fb643077ad0b13c4f2dc2c6126333a/"
       ],
       "targeted_option_review": {
-        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
         "option_count": 5,
-        "remaining": "Порядок уведомления утверждает представитель нанимателя; уголовная квалификация и действия с предметом передачи требуют установления обстоятельств."
+        "remaining": "Правовая граница и пять вариантов проверены для прямо заданных учебных обстоятельств; конкретное исполнение и процедуры за пределами задания не сертифицированы."
+      },
+      "final_case_review_2026_11_28": {
+        "date": "2026-11-28",
+        "scope": "case_specific_legal_acceptance_under_explicit_educational_facts",
+        "option_count": 5,
+        "conclusion": "Пять дополнительных профилактических мер допустимы в пределах компетенции и конфиденциальности; уведомление и служебные ограничения обязательны независимо от рекомендации.",
+        "remaining": "Правовая граница и пять вариантов проверены для прямо заданных учебных обстоятельств; конкретное исполнение и процедуры за пределами задания не сертифицированы.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_48601/e7b86a940bc71a71af7b9288590f1ca92a69d878/",
+          "https://www.consultant.ru/document/cons_doc_LAW_82959/168ac76599fb643077ad0b13c4f2dc2c6126333a/"
+        ]
       }
     },
     {
