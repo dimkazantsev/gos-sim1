@@ -1,0 +1,794 @@
+{
+  "status": "proposal_only_not_applied_requires_owner_approval",
+  "date": "2026-11-28",
+  "source_commit": "7d950df71f7e28428588a0fffbb47788ebaf8d02",
+  "depends_on": "docs/EVENTS_V2_REMAINING_BALANCE_PROPOSAL_A_2026-11-28.json",
+  "policy": "Предложения B совместимы с A; прямые эффекты в пределах ±4 до утверждённого деления. Новые поля используют только существующие разрешённые показатели, новых механизмов нет. Реакции элит и доверие условные. Не вводить до утверждения.",
+  "summary": {
+    "cases": 20,
+    "changed_fields": 30,
+    "direct_dominated_before": 103,
+    "direct_dominated_after": 74,
+    "pairs_before": 108,
+    "pairs_after": 79,
+    "remaining_cases": 55,
+    "projections": 5682,
+    "errors": 0
+  },
+  "cases": [
+    {
+      "case_key": "bank-legal-2026-013",
+      "title": "Спорная дотация",
+      "before": [
+        {
+          "option": "option_1",
+          "by": "option_3"
+        }
+      ],
+      "changes": [
+        {
+          "option": "option_1",
+          "label": "Предложить муниципалитету добровольное согласование будущих проектов",
+          "metric": "social_stability",
+          "raw_before": 0,
+          "raw_after": 1,
+          "scaled_before": 0,
+          "scaled_after": 0.011236,
+          "introduces_existing_metric_to_option": true,
+          "reason": "Добровольное согласование будущих проектов при сохранении самостоятельности бюджета может уменьшить конфликты региона и муниципалитета; условная устойчивость взаимодействия, не право региона навязать условия дотации."
+        }
+      ],
+      "after": []
+    },
+    {
+      "case_key": "bank-legal-2026-017",
+      "title": "Дорога в долг",
+      "before": [
+        {
+          "option": "option_3",
+          "by": "option_1"
+        }
+      ],
+      "changes": [
+        {
+          "option": "option_3",
+          "label": "Предложить отсрочить необязательный этап до устойчивого источника",
+          "metric": "elite_support",
+          "raw_before": 2,
+          "raw_after": 3,
+          "scaled_before": 0.022472,
+          "scaled_after": 0.033708,
+          "introduces_existing_metric_to_option": false,
+          "reason": "Отсрочка необязательного этапа не создаёт нового долга до устойчивого источника. Условно больше поддержки у органов, отвечающих за соблюдение долгового предела; ремонт не завершён."
+        }
+      ],
+      "after": []
+    },
+    {
+      "case_key": "bank-legal-2026-020",
+      "title": "Кассовый разрыв",
+      "before": [
+        {
+          "option": "option_3",
+          "by": "option_5"
+        }
+      ],
+      "changes": [
+        {
+          "option": "option_3",
+          "label": "Перенести только свободные незаконтрактованные мероприятия",
+          "metric": "elite_support",
+          "raw_before": 2,
+          "raw_after": 3,
+          "scaled_before": 0.022472,
+          "scaled_after": 0.033708,
+          "introduces_existing_metric_to_option": false,
+          "reason": "Перенос свободных незаконтрактованных мероприятий позволяет реагировать на разрыв до поступления дохода через десять дней без новой инициативы по резерву. Условно меньше согласований; обязательные выплаты сохранены."
+        }
+      ],
+      "after": []
+    },
+    {
+      "case_key": "bank-legal-2026-022",
+      "title": "Агростраховой платёж",
+      "before": [
+        {
+          "option": "option_4",
+          "by": "option_2"
+        }
+      ],
+      "changes": [
+        {
+          "option": "option_4",
+          "label": "Сосредоточить ресурсы на проверке действующих страховых договоров",
+          "metric": "elite_support",
+          "raw_before": 2,
+          "raw_after": 3,
+          "scaled_before": 0.022472,
+          "scaled_after": 0.033708,
+          "introduces_existing_metric_to_option": false,
+          "reason": "Проверка действующих договоров концентрирует работу на уже представленных полисах без запуска следующего отбора в посевную. Условно выше поддержка администраторов программы, не отменяется проверка каждого получателя."
+        }
+      ],
+      "after": []
+    },
+    {
+      "case_key": "bank-legal-2026-024",
+      "title": "Разовый доход и постоянная зарплата",
+      "before": [
+        {
+          "option": "option_2",
+          "by": "option_1"
+        },
+        {
+          "option": "option_3",
+          "by": "option_1"
+        },
+        {
+          "option": "option_4",
+          "by": "option_1"
+        }
+      ],
+      "changes": [
+        {
+          "option": "option_2",
+          "label": "Создать предусмотренный законом запас ликвидности для будущих платежей",
+          "metric": "elite_support",
+          "raw_before": 2,
+          "raw_after": 3,
+          "scaled_before": 0.022472,
+          "scaled_after": 0.033708,
+          "introduces_existing_metric_to_option": false,
+          "reason": "Запас ликвидности сохраняет доступность разового поступления для будущих платежей по надлежащему бюджетному основанию; условно выше поддержка осторожных финансовых органов."
+        },
+        {
+          "option": "option_3",
+          "label": "Подготовить устойчивые источники финансирования постоянных расходов",
+          "metric": "trust",
+          "raw_before": 1,
+          "raw_after": 2,
+          "scaled_before": 0.011236,
+          "scaled_after": 0.022472,
+          "introduces_existing_metric_to_option": false,
+          "reason": "Устойчивые источники для постоянных выплат уменьшают неопределённость у получателей зарплаты после разовой продажи склада; доверие условно выше, чем от разового проекта."
+        },
+        {
+          "option": "option_4",
+          "label": "Предложить пересмотр новых необязательных постоянных обязательств",
+          "metric": "elite_support",
+          "raw_before": 2,
+          "raw_after": 3,
+          "scaled_before": 0.022472,
+          "scaled_after": 0.033708,
+          "introduces_existing_metric_to_option": false,
+          "reason": "Пересмотр только новых необязательных постоянных обязательств ограничивает будущую нагрузку при отсутствии повторных продаж. Условно выше поддержка финансовых органов, действующие зарплаты не сокращаются."
+        },
+        {
+          "option": "option_5",
+          "label": "Опубликовать многолетний прогноз и обсудить приоритет разовых вложений",
+          "metric": "trust",
+          "raw_before": 2,
+          "raw_after": 3,
+          "scaled_before": 0.022472,
+          "scaled_after": 0.033708,
+          "introduces_existing_metric_to_option": false,
+          "reason": "Публикация многолетнего прогноза и открытое обсуждение раскрывают гражданам временный характер 140 млн рублей и выбор приоритетов. Это условно более сильный эффект прозрачности, чем внутренняя подготовка источников."
+        }
+      ],
+      "after": []
+    },
+    {
+      "case_key": "bank-legal-2026-025",
+      "title": "Портовая льгота",
+      "before": [
+        {
+          "option": "option_5",
+          "by": "option_4"
+        }
+      ],
+      "changes": [
+        {
+          "option": "option_5",
+          "label": "Отказаться от новой поддержки после оценки бюджетной окупаемости",
+          "metric": "elite_support",
+          "raw_before": 2,
+          "raw_after": 3,
+          "scaled_before": 0.022472,
+          "scaled_after": 0.033708,
+          "introduces_existing_metric_to_option": false,
+          "reason": "Отказ от новой поддержки после расчёта окупаемости ограничивает риск обязательств по складу, когда заявитель уже распространяет неподтверждённые льготы. Условно выше поддержка органов бюджетного контроля."
+        }
+      ],
+      "after": []
+    },
+    {
+      "case_key": "bank-legal-2026-027",
+      "title": "Мостовой эскроу",
+      "before": [
+        {
+          "option": "option_1",
+          "by": "option_2"
+        },
+        {
+          "option": "option_3",
+          "by": "option_4"
+        }
+      ],
+      "changes": [
+        {
+          "option": "option_1",
+          "label": "Предложить ускоренную подготовку надлежащих документов для аванса",
+          "metric": "economy",
+          "raw_before": 1,
+          "raw_after": 2,
+          "scaled_before": 0.011236,
+          "scaled_after": 0.022472,
+          "introduces_existing_metric_to_option": false,
+          "reason": "Ускоренная законная подготовка документов для аванса на материалы может раньше снять остановку мостовых работ, чем пересогласование этапного графика. Условный эффект непрерывности работ, не прямой доход или перечисление аванса."
+        },
+        {
+          "option": "option_3",
+          "label": "Организовать дополнительный контроль целевого расходования аванса",
+          "metric": "trust",
+          "raw_before": 2,
+          "raw_after": 3,
+          "scaled_before": 0.022472,
+          "scaled_after": 0.033708,
+          "introduces_existing_metric_to_option": false,
+          "reason": "Дополнительная проверка использования 30 млн рублей по целевому назначению даёт более конкретную гарантию контроля именно этого аванса, чем общее сопровождение участников; условный эффект доверия, не подтверждение расхода."
+        }
+      ],
+      "after": []
+    },
+    {
+      "case_key": "bank-legal-2026-028",
+      "title": "Неподписанная субсидия",
+      "before": [
+        {
+          "option": "option_2",
+          "by": "option_3"
+        },
+        {
+          "option": "option_4",
+          "by": "option_1"
+        },
+        {
+          "option": "option_5",
+          "by": "option_3"
+        }
+      ],
+      "changes": [
+        {
+          "option": "option_2",
+          "label": "Подготовить проверку допустимости поддержки уже понесённых расходов по действующим правилам",
+          "metric": "trust",
+          "raw_before": 1,
+          "raw_after": 2,
+          "scaled_before": 0.011236,
+          "scaled_after": 0.022472,
+          "introduces_existing_metric_to_option": false,
+          "reason": "Проверка допустимости поддержки уже понесённых расходов даёт заявителю конкретный ответ о текущих счетах, тогда как следующий самостоятельный этап их не решает. Доверие условно выше; выплаты не обещаются."
+        },
+        {
+          "option": "option_4",
+          "label": "Организовать консультацию получателя о рисках неподтверждённых обязательств",
+          "metric": "trust",
+          "raw_before": 2,
+          "raw_after": 3,
+          "scaled_before": 0.022472,
+          "scaled_after": 0.033708,
+          "introduces_existing_metric_to_option": false,
+          "reason": "Адресная консультация получателя о рисках неподтверждённых обязательств предотвращает продолжение работ на ошибочном ожидании субсидии. Условно более сильное немедленное доверие, чем будущий отбор."
+        },
+        {
+          "option": "option_5",
+          "label": "Отказаться от новой субсидии при отсутствии основания и объяснить решение",
+          "metric": "elite_support",
+          "raw_before": 2,
+          "raw_after": 3,
+          "scaled_before": 0.022472,
+          "scaled_after": 0.033708,
+          "introduces_existing_metric_to_option": false,
+          "reason": "Отказ при отсутствии основания предотвращает возникновение нового бюджетного обязательства по уже начатому строительству. Условно выше поддержка финансовых контролёров; обязательное письменное объяснение сохраняется."
+        }
+      ],
+      "after": []
+    },
+    {
+      "case_key": "bank-legal-2026-029",
+      "title": "Ненецкий знаменатель",
+      "before": [
+        {
+          "option": "option_3",
+          "by": "option_1"
+        }
+      ],
+      "changes": [
+        {
+          "option": "option_3",
+          "label": "Предложить дополнительный запас до предельного долгового показателя",
+          "metric": "elite_support",
+          "raw_before": 2,
+          "raw_after": 3,
+          "scaled_before": 0.022472,
+          "scaled_after": 0.033708,
+          "introduces_existing_metric_to_option": false,
+          "reason": "Дополнительный запас до предела заимствования после устранения двойного учёта снижает риск пограничного долгового решения. Условно больше поддержки у финансовой команды, не создаёт новый предел."
+        }
+      ],
+      "after": []
+    },
+    {
+      "case_key": "bank-legal-2026-030",
+      "title": "Каспийская квота",
+      "before": [
+        {
+          "option": "option_3",
+          "by": "option_1"
+        }
+      ],
+      "changes": [
+        {
+          "option": "option_3",
+          "label": "Подготовить прогноз поступлений с учётом подтверждённых разрешений",
+          "metric": "elite_support",
+          "raw_before": 2,
+          "raw_after": 3,
+          "scaled_before": 0.022472,
+          "scaled_after": 0.033708,
+          "introduces_existing_metric_to_option": false,
+          "reason": "Прогноз по подтверждённым разрешениям позволяет корректировать бюджетный план без расширенной сверки всех отчётов пользователей. Условно выше поддержка планирующих органов; обязательная корректировка платежа не отменяется."
+        }
+      ],
+      "after": []
+    },
+    {
+      "case_key": "bank-legal-2026-032",
+      "title": "Пограничный автобус",
+      "before": [
+        {
+          "option": "option_1",
+          "by": "option_3"
+        },
+        {
+          "option": "option_5",
+          "by": "option_2"
+        }
+      ],
+      "changes": [
+        {
+          "option": "option_1",
+          "label": "Предложить перераспределение допустимых средств на востребованные выполненные маршруты",
+          "metric": "economy",
+          "raw_before": 1,
+          "raw_after": 3,
+          "scaled_before": 0.011236,
+          "scaled_after": 0.033708,
+          "introduces_existing_metric_to_option": false,
+          "reason": "Направление допустимых средств на востребованные фактически выполненные маршруты может улучшить полезность транспортной работы, тогда как журнал контроля сам по себе не перераспределяет транспортное предложение. Условный эффект доступности труда и услуг, не бюджетная проводка."
+        },
+        {
+          "option": "option_5",
+          "label": "Согласовать уменьшение необязательного объёма перевозок без нарушения доступности",
+          "metric": "elite_support",
+          "raw_before": 2,
+          "raw_after": 3,
+          "scaled_before": 0.022472,
+          "scaled_after": 0.033708,
+          "introduces_existing_metric_to_option": false,
+          "reason": "Сокращение лишь необязательного объёма перевозок без ущерба доступности ограничивает будущие организационные обязательства. Условно больше поддержки у распорядителя; подтверждённые 62 рейса учитываются по правилам."
+        }
+      ],
+      "after": []
+    },
+    {
+      "case_key": "bank-legal-2026-035",
+      "title": "Стальная переоценка",
+      "before": [
+        {
+          "option": "option_3",
+          "by": "option_1"
+        }
+      ],
+      "changes": [
+        {
+          "option": "option_3",
+          "label": "Подготовить прогноз поступлений с учётом уточнённого расчёта",
+          "metric": "elite_support",
+          "raw_before": 2,
+          "raw_after": 3,
+          "scaled_before": 0.022472,
+          "scaled_after": 0.033708,
+          "introduces_existing_metric_to_option": false,
+          "reason": "Уточнение прогноза поступлений после исправления кадастрового расчёта позволяет быстрее скорректировать доходный план без дополнительной проверки всех характеристик объекта. Условно выше поддержка планировщиков; кадастровая база не меняется."
+        }
+      ],
+      "after": []
+    },
+    {
+      "case_key": "bank-legal-2026-037",
+      "title": "Текстильная отсрочка",
+      "before": [
+        {
+          "option": "option_5",
+          "by": "option_4"
+        }
+      ],
+      "changes": [
+        {
+          "option": "option_5",
+          "label": "Подготовить прогноз региональных поступлений при нескольких сценариях",
+          "metric": "elite_support",
+          "raw_before": 2,
+          "raw_after": 3,
+          "scaled_before": 0.022472,
+          "scaled_after": 0.033708,
+          "introduces_existing_metric_to_option": false,
+          "reason": "Несколько сценариев поступлений позволяют финансовому органу планировать кассовый риск независимо от решения налогового органа. Условно больше поддержки у бюджетной команды, не обещание отсрочки."
+        }
+      ],
+      "after": []
+    },
+    {
+      "case_key": "bank-legal-2026-038",
+      "title": "Байкальский ущерб",
+      "before": [
+        {
+          "option": "option_5",
+          "by": "option_4"
+        }
+      ],
+      "changes": [
+        {
+          "option": "option_5",
+          "label": "Организовать оценку эффективности добровольных природоохранных расходов",
+          "metric": "media_climate",
+          "raw_before": 0,
+          "raw_after": 1,
+          "scaled_before": 0,
+          "scaled_after": 0.011236,
+          "introduces_existing_metric_to_option": true,
+          "reason": "Проверяемая оценка результата уже состоявшихся добровольных природоохранных расходов даёт основание для точной информации об их эффективности, а не обещания новой поддержки. Условное преимущество возникает при доведении проверенного вывода до допустимой аудитории; требуется явно отразить это условие в редакции до применения."
+        }
+      ],
+      "after": []
+    },
+    {
+      "case_key": "bank-legal-2026-039",
+      "title": "Особая зона",
+      "before": [
+        {
+          "option": "option_1",
+          "by": "option_3"
+        },
+        {
+          "option": "option_4",
+          "by": "option_5"
+        }
+      ],
+      "changes": [
+        {
+          "option": "option_1",
+          "label": "Предложить консультацию об условиях получения законного статуса резидента",
+          "metric": "elite_support",
+          "raw_before": -1,
+          "raw_after": 0,
+          "scaled_before": -0.011236,
+          "scaled_after": 0,
+          "introduces_existing_metric_to_option": false,
+          "reason": "Консультация о законном получении статуса резидента позволяет устранить ошибочное ожидание фирмы до расширенной проверки действующих резидентов. Условно меньше административное сопротивление; адрес офиса не даёт льготу."
+        },
+        {
+          "option": "option_4",
+          "label": "Сохранить общий налоговый режим до появления подтверждённого основания",
+          "metric": "elite_support",
+          "raw_before": 2,
+          "raw_after": 3,
+          "scaled_before": 0.022472,
+          "scaled_after": 0.033708,
+          "introduces_existing_metric_to_option": false,
+          "reason": "Сохранение общего режима до подтверждения статуса не требует разработки новой меры поддержки. Условно выше поддержка органов, отвечающих за соблюдение оснований льгот; не отказ в законном будущем статусе."
+        }
+      ],
+      "after": []
+    },
+    {
+      "case_key": "bank-legal-2026-040",
+      "title": "Кластерный конкурс",
+      "before": [
+        {
+          "option": "option_2",
+          "by": "option_4"
+        }
+      ],
+      "changes": [
+        {
+          "option": "option_2",
+          "label": "Предложить открытый конкурс по ожидаемому эффекту и стоимости проекта",
+          "metric": "elite_support",
+          "raw_before": -1,
+          "raw_after": 0,
+          "scaled_before": -0.011236,
+          "scaled_after": 0,
+          "introduces_existing_metric_to_option": false,
+          "reason": "Открытый конкурс с объективными показателями стоимости и эффекта использует общие критерии для четырёх заявок вместо организации дополнительной независимой экспертизы. Условно меньше процедурное сопротивление; требование объективности остаётся обязательным."
+        }
+      ],
+      "after": []
+    },
+    {
+      "case_key": "bank-legal-2026-041",
+      "title": "Рыбный рейс",
+      "before": [
+        {
+          "option": "option_3",
+          "by": "option_1"
+        }
+      ],
+      "changes": [
+        {
+          "option": "option_3",
+          "label": "Подготовить корректировку расписания по подтверждённому спросу",
+          "metric": "social_stability",
+          "raw_before": 0,
+          "raw_after": 1,
+          "scaled_before": 0,
+          "scaled_after": 0.011236,
+          "introduces_existing_metric_to_option": true,
+          "reason": "Корректировка расписания доставки по подтверждённому спросу способна улучшить регулярность снабжения труднодоступных населённых пунктов, тогда как раздельный реестр сам по себе только подтверждает право на возмещение. Условный эффект социальной устойчивости, не гарантированное изменение фактических поставок."
+        }
+      ],
+      "after": []
+    },
+    {
+      "case_key": "bank-legal-2026-043",
+      "title": "Лесной купон",
+      "before": [
+        {
+          "option": "option_3",
+          "by": "option_2"
+        },
+        {
+          "option": "option_5",
+          "by": "option_1"
+        }
+      ],
+      "changes": [
+        {
+          "option": "option_3",
+          "label": "Подготовить несколько допустимых сценариев доходности для инвесторов",
+          "metric": "media_climate",
+          "raw_before": 0,
+          "raw_after": 1,
+          "scaled_before": 0,
+          "scaled_after": 0.011236,
+          "introduces_existing_metric_to_option": true,
+          "reason": "Сценарии доходности, адресованные инвесторам, позволяют объяснить отличие облигации от вклада и отсутствие устной гарантии выкупа. Условный информационный эффект, не изменение условий выпуска."
+        },
+        {
+          "option": "option_5",
+          "label": "Предложить сократить необязательную потребность в финансировании",
+          "metric": "elite_support",
+          "raw_before": 2,
+          "raw_after": 3,
+          "scaled_before": 0.022472,
+          "scaled_after": 0.033708,
+          "introduces_existing_metric_to_option": false,
+          "reason": "Сокращение необязательной потребности в финансировании уменьшает потребность в новом выпуске, а не только его размер. Условно выше поддержка финансового контроля; действующий долг сохраняется."
+        }
+      ],
+      "after": []
+    },
+    {
+      "case_key": "bank-legal-2026-044",
+      "title": "Ювелирная касса",
+      "before": [
+        {
+          "option": "option_3",
+          "by": "option_1"
+        },
+        {
+          "option": "option_5",
+          "by": "option_1"
+        }
+      ],
+      "changes": [
+        {
+          "option": "option_3",
+          "label": "Подготовить переходный план исполнения налоговых обязанностей",
+          "metric": "elite_support",
+          "raw_before": 1,
+          "raw_after": 3,
+          "scaled_before": 0.011236,
+          "scaled_after": 0.033708,
+          "introduces_existing_metric_to_option": false,
+          "reason": "Переходный план исполнения обязанностей по смешанной деятельности уменьшает риск хаотичной смены режима и повторных ошибок при оформлении. Условно выше поддержка администраторов и предпринимательских представителей; не восстанавливает право на недопустимый режим."
+        },
+        {
+          "option": "option_5",
+          "label": "Улучшить внутреннюю классификацию товаров для предотвращения повторных ошибок",
+          "metric": "elite_support",
+          "raw_before": 2,
+          "raw_after": 3,
+          "scaled_before": 0.022472,
+          "scaled_after": 0.033708,
+          "introduces_existing_metric_to_option": false,
+          "reason": "Внутренняя классификация золотых и иных изделий уменьшает вероятность повторных ошибок без дополнительного постоянного процесса внешней сверки каждой операции. Условно больше поддержки у администраторов учёта; действующие обязательства исполняются."
+        }
+      ],
+      "after": []
+    },
+    {
+      "case_key": "bank-legal-2026-045",
+      "title": "Курганский паводок",
+      "before": [
+        {
+          "option": "option_4",
+          "by": "option_2"
+        }
+      ],
+      "changes": [
+        {
+          "option": "option_4",
+          "label": "Предложить временное сопровождение заявителей до завершения проверки",
+          "metric": "social_stability",
+          "raw_before": 0,
+          "raw_after": 1,
+          "scaled_before": 0,
+          "scaled_after": 0.011236,
+          "introduces_existing_metric_to_option": true,
+          "reason": "Временное сопровождение заявителей помогает семьям пройти проверку спорных адресов без обещания необоснованной выплаты. Условно снижает социальную напряжённость до окончания обследования; размер компенсации не меняется."
+        }
+      ],
+      "after": []
+    }
+  ],
+  "rejected": [],
+  "projection": {
+    "before": {
+      "cases": 189,
+      "options": 947,
+      "projections": 5682,
+      "baseDominated": 103,
+      "basePairs": 108,
+      "basePairsWithRevenueAdvantageInSomeScenario": 33,
+      "basePairsWithRevenueAdvantageNeutral": 0,
+      "basePairsWithNoEconomicAdvantageInAnyScenario": 75,
+      "scenarioRanges": [
+        {
+          "key": "neutral",
+          "minRevenueDelta": -13870.58,
+          "maxRevenueDelta": 67725.9,
+          "minBusinessDelta": -0.000379,
+          "maxBusinessDelta": 0.001949,
+          "minCollectionDelta": -0.022045,
+          "maxCollectionDelta": 0.03734,
+          "clippedOptions": 0
+        },
+        {
+          "key": "manual_56",
+          "minRevenueDelta": -7458.1,
+          "maxRevenueDelta": 35135.74,
+          "minBusinessDelta": -0.000212,
+          "maxBusinessDelta": 0.001091,
+          "minCollectionDelta": -0.023345,
+          "maxCollectionDelta": 0.03466,
+          "clippedOptions": 0
+        },
+        {
+          "key": "stress",
+          "minRevenueDelta": -8736.77,
+          "maxRevenueDelta": 45305.19,
+          "minBusinessDelta": -0.000378,
+          "maxBusinessDelta": 0.001947,
+          "minCollectionDelta": -0.025,
+          "maxCollectionDelta": 0.03125,
+          "clippedOptions": 0
+        },
+        {
+          "key": "near_lower_bounds",
+          "minRevenueDelta": -1440.81,
+          "maxRevenueDelta": 1373.28,
+          "minBusinessDelta": 0,
+          "maxBusinessDelta": 0,
+          "minCollectionDelta": -0.000941,
+          "maxCollectionDelta": 0.001417,
+          "clippedOptions": 0
+        },
+        {
+          "key": "near_upper_bounds",
+          "minRevenueDelta": -18765.69,
+          "maxRevenueDelta": 46177.15,
+          "minBusinessDelta": -0.000629,
+          "maxBusinessDelta": 0.001574,
+          "minCollectionDelta": -0.000159,
+          "maxCollectionDelta": 0.000238,
+          "clippedOptions": 0
+        },
+        {
+          "key": "manual_zero",
+          "minRevenueDelta": -780.75,
+          "maxRevenueDelta": 1888.94,
+          "minBusinessDelta": 0,
+          "maxBusinessDelta": 0,
+          "minCollectionDelta": -0.025,
+          "maxCollectionDelta": 0.03125,
+          "clippedOptions": 0
+        }
+      ]
+    },
+    "after": {
+      "cases": 189,
+      "options": 947,
+      "projections": 5682,
+      "baseDominated": 74,
+      "basePairs": 79,
+      "basePairsWithRevenueAdvantageInSomeScenario": 21,
+      "basePairsWithRevenueAdvantageNeutral": 0,
+      "basePairsWithNoEconomicAdvantageInAnyScenario": 58,
+      "scenarioRanges": [
+        {
+          "key": "neutral",
+          "minRevenueDelta": -13870.58,
+          "maxRevenueDelta": 67725.9,
+          "minBusinessDelta": -0.000379,
+          "maxBusinessDelta": 0.001949,
+          "minCollectionDelta": -0.022045,
+          "maxCollectionDelta": 0.03734,
+          "clippedOptions": 0
+        },
+        {
+          "key": "manual_56",
+          "minRevenueDelta": -7458.1,
+          "maxRevenueDelta": 35135.74,
+          "minBusinessDelta": -0.000212,
+          "maxBusinessDelta": 0.001091,
+          "minCollectionDelta": -0.023345,
+          "maxCollectionDelta": 0.03466,
+          "clippedOptions": 0
+        },
+        {
+          "key": "stress",
+          "minRevenueDelta": -8736.77,
+          "maxRevenueDelta": 45305.19,
+          "minBusinessDelta": -0.000378,
+          "maxBusinessDelta": 0.001947,
+          "minCollectionDelta": -0.025,
+          "maxCollectionDelta": 0.03125,
+          "clippedOptions": 0
+        },
+        {
+          "key": "near_lower_bounds",
+          "minRevenueDelta": -1440.81,
+          "maxRevenueDelta": 1373.28,
+          "minBusinessDelta": 0,
+          "maxBusinessDelta": 0,
+          "minCollectionDelta": -0.000941,
+          "maxCollectionDelta": 0.001417,
+          "clippedOptions": 0
+        },
+        {
+          "key": "near_upper_bounds",
+          "minRevenueDelta": -18765.69,
+          "maxRevenueDelta": 46177.15,
+          "minBusinessDelta": -0.000629,
+          "maxBusinessDelta": 0.001574,
+          "minCollectionDelta": -0.000159,
+          "maxCollectionDelta": 0.000238,
+          "clippedOptions": 0
+        },
+        {
+          "key": "manual_zero",
+          "minRevenueDelta": -780.75,
+          "maxRevenueDelta": 1888.94,
+          "minBusinessDelta": 0,
+          "maxBusinessDelta": 0,
+          "minCollectionDelta": -0.025,
+          "maxCollectionDelta": 0.03125,
+          "clippedOptions": 0
+        }
+      ]
+    }
+  },
+  "limitations": "Сценарный результат при совместном применении A и B. Для новых полей social_stability и media_climate необходима содержательная редакционная приёмка; не выдавать модель за факт. Оставшиеся пары требуют дальнейшего разбора."
+}
