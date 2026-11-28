@@ -3803,7 +3803,18 @@
       "targeted_option_review": {
         "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
         "option_count": 5,
-        "remaining": "Орган услуги; компетенция распорядителя, способ закупки и возможность цифрового канала требуют проверки по конкретной услуге."
+        "remaining": "Вид разрешения, применимый специальный регламент и основания закупки не конкретизированы; статус полного допуска не меняется."
+      },
+      "final_case_review_2026_11_28": {
+        "date": "2026-11-28",
+        "scope": "specific_norm_followup_not_full_acceptance",
+        "option_count": 5,
+        "conclusion": "Прочитана ст. 8 ч. 1–3 №210-ФЗ (ред. 04.08.2026, действует с 01.11.2026). Бесплатность не абсолютна: ч. 3 учитывает законно установленные случаи оплаты. В учебной истории прямо отсутствует законное основание. Все пять вариантов — предложения по финансированию, каналу обслуживания или информированию; ни один не вводит сбор.",
+        "remaining": "Вид разрешения, применимый специальный регламент и основания закупки не конкретизированы; статус полного допуска не меняется.",
+        "urls": [
+          "https://minjust.gov.ru/ru/documents/8011/",
+          "https://www.consultant.ru/document/cons_doc_LAW_103023/780c9842ff82f94d415db6b22a625ea65f69b662/"
+        ]
       }
     },
     {
@@ -3837,7 +3848,7 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "Конституция РФ, ст. 105; Регламент ГД, ст. 116 (три чтения по общему правилу, исключения прямо исключены условием). Голосование палаты обязательно; пресс-релиз его не заменяет. Полная редакция Регламента на 27.11.2026 не подтверждена: найденный актуализированный текст не открылся.",
+      "legal_basis": "Конституция РФ, ст. 105; Регламент ГД, ст. 116 ч. 1, ст. 124–125: по общему правилу три чтения, третье назначает Совет ГД для голосования палаты. Исключения исключены условием. Пресс-релиз не заменяет решение. Прочитан текст соответствующих статей; полнота редакции с изменениями на 19.11.2026 не подтверждена отдельным чтением этого консолидированного источника.",
       "legal_urls": [
         "https://minjust.gov.ru/ru/documents/8011/",
         "https://duma.gov.ru/media/files/7Yh7Q0KU4D7oknJkHhAEc0fGlP8Gn6Uz.pdf",
@@ -3850,13 +3861,26 @@
       "source_scope": "constitutional_text_checked_regulation_current_text_unavailable",
       "checked_norm_urls": [
         "https://minjust.gov.ru/ru/documents/8011/",
+        "https://duma.gov.ru/media/files/7Yh7Q0KU4D7oknJkHhAEc0fGlP8Gn6Uz.pdf",
         "https://kodeks.karelia.ru/api/show/901700817",
         "https://www.consultant.ru/law/review/lawmaking/reglduma/"
       ],
       "targeted_option_review": {
         "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
         "option_count": 5,
-        "remaining": "Ответственный комитет предлагает; Совет ГД назначает; палата голосует. Конкретный комплект документов и экспертиза по законопроекту отдельно проверяются."
+        "remaining": "Сохраняется ограничение актуальности полного текста Регламента; вид законопроекта не уточнён для специальных требований ч. 1.2 ст. 125."
+      },
+      "final_case_review_2026_11_28": {
+        "date": "2026-11-28",
+        "scope": "specific_norm_followup_not_full_acceptance",
+        "option_count": 5,
+        "conclusion": "Прочитаны ст. 116 ч. 1 и 125 ч. 1, включая специальное правило ч. 1.2. Все пять мер — подготовка, информирование или планирование без подмены решения Совета и палаты. Копия с изменениями на 19.11.2026 снова не открылась (цикл перенаправлений).",
+        "remaining": "Сохраняется ограничение актуальности полного текста Регламента; вид законопроекта не уточнён для специальных требований ч. 1.2 ст. 125.",
+        "urls": [
+          "https://minjust.gov.ru/ru/documents/8011/",
+          "https://www.consultant.ru/law/review/lawmaking/reglduma/",
+          "https://kodeks.karelia.ru/api/show/901700817"
+        ]
       }
     },
     {
@@ -3866,23 +3890,37 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "Конституция РФ, ст. 104, ч. 3. Заключение Правительства требуется до внесения данного расходного законопроекта; оно не равнозначно утверждению проекта и не заменяет бюджетную процедуру.",
+      "legal_basis": "Конституция РФ, ст. 104 ч. 3; Регламент ГД, ст. 105 ч. 1 пп. г, д: финансово-экономическое обоснование при материальных затратах и заключение Правительства для проектов, предусмотренных ч. 3 ст. 104. Заключение не равно положительному одобрению; письмо региона его не заменяет.",
       "legal_urls": [
         "https://minjust.gov.ru/ru/documents/8011/",
-        "https://www.consultant.ru/document/cons_doc_LAW_28399/3f8c850abc4dc2ba4207acc563b176d93bdcf5f7/"
+        "https://www.consultant.ru/document/cons_doc_LAW_28399/3f8c850abc4dc2ba4207acc563b176d93bdcf5f7/",
+        "https://www.consultant.ru/law/review/lawmaking/reglduma/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
-      "review_date": "2026-11-27",
+      "review_date": "2026-11-28",
       "source_scope": "specific_norm_checked_partial",
       "checked_norm_urls": [
         "https://minjust.gov.ru/ru/documents/8011/",
-        "https://www.consultant.ru/document/cons_doc_LAW_28399/3f8c850abc4dc2ba4207acc563b176d93bdcf5f7/"
+        "https://www.consultant.ru/document/cons_doc_LAW_28399/3f8c850abc4dc2ba4207acc563b176d93bdcf5f7/",
+        "https://www.consultant.ru/law/review/lawmaking/reglduma/"
       ],
       "targeted_option_review": {
         "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
         "option_count": 5,
-        "remaining": "Регламент внесения, содержание финансового обоснования и конкретный бюджетный механизм."
+        "remaining": "Конкретное финансирование и специальные требования к комплекту проекта не заданы; полнота новейшей редакции Регламента отдельно не подтверждена."
+      },
+      "final_case_review_2026_11_28": {
+        "date": "2026-11-28",
+        "scope": "specific_norm_followup_not_full_acceptance",
+        "option_count": 5,
+        "conclusion": "Прочитаны Конституция, ст. 104 ч. 3 и Регламент ГД, ст. 105 ч. 1. Пять альтернатив — концепции будущей выплаты до внесения; ни одна не создаёт расходное обязательство.",
+        "remaining": "Конкретное финансирование и специальные требования к комплекту проекта не заданы; полнота новейшей редакции Регламента отдельно не подтверждена.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_28399/3f8c850abc4dc2ba4207acc563b176d93bdcf5f7/",
+          "https://minjust.gov.ru/ru/documents/8011/",
+          "https://www.consultant.ru/law/review/lawmaking/reglduma/"
+        ]
       }
     },
     {
@@ -3892,23 +3930,40 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "Конституция РФ, ст. 107, ч. 3. Преодоление президентского отклонения в прежней редакции требует не менее двух третей от общего числа сенаторов и депутатов соответственно. Новая инициатива имеет собственную процедуру и не заменяет повторное одобрение прежнего текста.",
+      "legal_basis": "Конституция РФ, ст. 107 ч. 3; Регламент ГД, ст. 134.3, 135.2, 135.3; Регламент СФ, ст. 119, 120, 120.2. Для преодоления отклонения в прежней редакции нужны две трети от общего числа каждой палаты. Президентская редакция или редакция специальной комиссии рассматривается по отдельным регламентным правилам; новый законопроект также возможен и не заменяет повторное одобрение прежнего текста.",
       "legal_urls": [
         "https://minjust.gov.ru/ru/documents/8011/",
-        "https://www.consultant.ru/document/cons_doc_LAW_28399/bdb6e3b84ca23ec909e111e3d18908e25a355111/"
+        "https://www.consultant.ru/document/cons_doc_LAW_28399/bdb6e3b84ca23ec909e111e3d18908e25a355111/",
+        "https://www.consultant.ru/law/review/lawmaking/reglduma/",
+        "https://www.consultant.ru/law/review/lawmaking/reglsovet/?ysclid=l8kry8cfvj439608251"
       ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
-      "review_date": "2026-11-27",
+      "review_date": "2026-11-28",
       "source_scope": "specific_norm_checked_partial",
       "checked_norm_urls": [
         "https://minjust.gov.ru/ru/documents/8011/",
-        "https://www.consultant.ru/document/cons_doc_LAW_28399/bdb6e3b84ca23ec909e111e3d18908e25a355111/"
+        "https://www.consultant.ru/document/cons_doc_LAW_28399/bdb6e3b84ca23ec909e111e3d18908e25a355111/",
+        "https://www.consultant.ru/law/review/lawmaking/reglduma/",
+        "https://www.consultant.ru/law/review/lawmaking/reglsovet/?ysclid=l8kry8cfvj439608251"
       ],
       "targeted_option_review": {
         "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
         "option_count": 5,
-        "remaining": "Регламенты палат, конкретный график рассмотрения и оформление новой инициативы."
+        "remaining": "Полнота последних поправок к регламентам не установлена; конкретный календарь заседаний не задан."
+      },
+      "final_case_review_2026_11_28": {
+        "date": "2026-11-28",
+        "scope": "specific_norm_followup_not_full_acceptance",
+        "option_count": 5,
+        "conclusion": "Прочитаны положения о голосовании и повторном рассмотрении в обеих палатах. Устранена возможная трактовка, будто любая новая редакция требует внесения нового законопроекта. Все пять организационных предложений остаются допустимыми в рамках регламентных сроков.",
+        "remaining": "Полнота последних поправок к регламентам не установлена; конкретный календарь заседаний не задан.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_28399/bdb6e3b84ca23ec909e111e3d18908e25a355111/",
+          "https://minjust.gov.ru/ru/documents/8011/",
+          "https://www.consultant.ru/law/review/lawmaking/reglduma/",
+          "https://www.consultant.ru/law/review/lawmaking/reglsovet/?ysclid=l8kry8cfvj439608251"
+        ]
       }
     },
     {
@@ -3918,23 +3973,45 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "Конституция РФ, ст. 107, ч. 3. При своевременном запросе Президента срок подписи приостанавливается; при подтверждении конституционности закон подписывается в трёхдневный срок от решения КС, при неподтверждении возвращается в ГД без подписи.",
+      "legal_basis": "Конституция РФ, ст. 107 ч. 3; ФКЗ от 21.07.1994 №1-ФКЗ, ст. 110.7, 110.8, 110.11, 110.12. При своевременном допустимом запросе Президента о конституционности неподписанного закона срок подписи приостанавливается. При подтверждении конституционности — подпись в течение трёх дней с решения КС; при неподтверждении — возврат в ГД без подписи для исключения неконституционных положений.",
       "legal_urls": [
         "https://minjust.gov.ru/ru/documents/8011/",
-        "https://www.consultant.ru/document/cons_doc_LAW_28399/bdb6e3b84ca23ec909e111e3d18908e25a355111/"
+        "https://www.consultant.ru/document/cons_doc_LAW_28399/bdb6e3b84ca23ec909e111e3d18908e25a355111/",
+        "https://www.consultant.ru/document/cons_doc_LAW_4172/25bcaf1c6e141578dae386be7e8318758255968d/",
+        "https://www.consultant.ru/document/cons_doc_LAW_4172/066133e25b24c3e9f18a6e7b9ae5c35aa2e853d0/",
+        "https://www.consultant.ru/document/cons_doc_LAW_4172/a4c4f81478205eed3eaa30bc9504b43386aa66f1/",
+        "https://www.consultant.ru/document/cons_doc_LAW_4172/9d237861d35d929fa8659d9201a6e7af72d5a8ff/"
       ],
-      "legal_status": "requires_case_specific_current_law_review",
+      "legal_status": "verified_current",
       "activation_allowed": false,
-      "review_date": "2026-11-27",
-      "source_scope": "specific_norm_checked_partial",
+      "review_date": "2026-11-28",
+      "source_scope": "case_specific_current_norms_and_all_alternatives_reviewed_under_stated_facts",
       "checked_norm_urls": [
         "https://minjust.gov.ru/ru/documents/8011/",
-        "https://www.consultant.ru/document/cons_doc_LAW_28399/bdb6e3b84ca23ec909e111e3d18908e25a355111/"
+        "https://www.consultant.ru/document/cons_doc_LAW_28399/bdb6e3b84ca23ec909e111e3d18908e25a355111/",
+        "https://www.consultant.ru/document/cons_doc_LAW_4172/25bcaf1c6e141578dae386be7e8318758255968d/",
+        "https://www.consultant.ru/document/cons_doc_LAW_4172/066133e25b24c3e9f18a6e7b9ae5c35aa2e853d0/",
+        "https://www.consultant.ru/document/cons_doc_LAW_4172/a4c4f81478205eed3eaa30bc9504b43386aa66f1/",
+        "https://www.consultant.ru/document/cons_doc_LAW_4172/9d237861d35d929fa8659d9201a6e7af72d5a8ff/"
       ],
       "targeted_option_review": {
-        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
         "option_count": 5,
-        "remaining": "Процессуальная допустимость и форма конкретного запроса, специальное законодательство о КС."
+        "remaining": "Правовая граница и все варианты проверены для прямо заданной гипотезы; проверка конституционности конкретного текста закона и формы реального запроса не является предметом учебного задания."
+      },
+      "final_case_review_2026_11_28": {
+        "date": "2026-11-28",
+        "scope": "case_specific_legal_acceptance_under_explicit_educational_facts",
+        "option_count": 5,
+        "conclusion": "Прочитаны четыре статьи №1-ФКЗ (ред. 31.07.2023) и ст. 107 Конституции. Уточнены условия допустимости и последствия отрицательного решения. Пять вариантов не вводят закон в действие и не подменяют обязательный возврат; экспертное обсуждение — без воздействия на суд.",
+        "remaining": "Правовая граница и все варианты проверены для прямо заданной гипотезы; проверка конституционности конкретного текста закона и формы реального запроса не является предметом учебного задания.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_28399/bdb6e3b84ca23ec909e111e3d18908e25a355111/",
+          "https://www.consultant.ru/document/cons_doc_LAW_4172/25bcaf1c6e141578dae386be7e8318758255968d/",
+          "https://www.consultant.ru/document/cons_doc_LAW_4172/066133e25b24c3e9f18a6e7b9ae5c35aa2e853d0/",
+          "https://www.consultant.ru/document/cons_doc_LAW_4172/a4c4f81478205eed3eaa30bc9504b43386aa66f1/",
+          "https://www.consultant.ru/document/cons_doc_LAW_4172/9d237861d35d929fa8659d9201a6e7af72d5a8ff/"
+        ]
       }
     },
     {
@@ -3968,25 +4045,49 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "95-ФЗ от 11.07.2001, ст. 16, 20 и 21, п. 2, подп. в, е. Устав обязателен и должен регулировать членство и компетенцию органов. Выявленный недостаток оформляется уполномоченным органом по процедуре закона; консультация не заменяет официального решения и не исправляет устав за учредителей.",
+      "legal_basis": "95-ФЗ от 11.07.2001, ст. 13 п. 3, ст. 15, 16, 20, ст. 21 п. 2 подп. в, е, ст. 25 п. 1. После учредительного съезда оргкомитет прекращает деятельность; документы подают уполномоченные лица партии в Минюст России, решение принимает федеральный уполномоченный орган, запись в ЕГРЮЛ вносит регистрирующий орган. Недостающие положения о членстве и компетенции исправляет съезд партии по закону.",
       "legal_urls": [
         "https://www.consultant.ru/document/cons_doc_LAW_32459/cb1de735e98c141e8261445e5deb739bcd629797/",
         "https://www.consultant.ru/document/cons_doc_LAW_32459/1224d47b5c29fdee0b8681bb7d80932b34634909/",
-        "https://www.consultant.ru/document/cons_doc_LAW_32459/5201289aa509dda5d86c24fa198ace17a882ef32/"
+        "https://www.consultant.ru/document/cons_doc_LAW_32459/5201289aa509dda5d86c24fa198ace17a882ef32/",
+        "https://www.consultant.ru/document/cons_doc_LAW_32459/6f5b2b575c1c1c480d56f492f1006d7f2bbe2945/",
+        "https://www.consultant.ru/document/cons_doc_LAW_32459/a86fb428ab7949e8187549958b0f96f7d47cad29/",
+        "https://www.consultant.ru/document/cons_doc_LAW_32459/72570ba275cec68fe9aa38cd7db84d201314546d/",
+        "https://minjust.gov.ru/ru/pages/politicheskih-partij/"
       ],
-      "legal_status": "requires_case_specific_current_law_review",
+      "legal_status": "verified_current",
       "activation_allowed": false,
       "review_date": "2026-11-28",
-      "source_scope": "specific_norm_checked_partial",
+      "source_scope": "case_specific_current_norms_and_all_alternatives_reviewed_under_stated_facts",
       "checked_norm_urls": [
         "https://www.consultant.ru/document/cons_doc_LAW_32459/cb1de735e98c141e8261445e5deb739bcd629797/",
         "https://www.consultant.ru/document/cons_doc_LAW_32459/1224d47b5c29fdee0b8681bb7d80932b34634909/",
-        "https://www.consultant.ru/document/cons_doc_LAW_32459/5201289aa509dda5d86c24fa198ace17a882ef32/"
+        "https://www.consultant.ru/document/cons_doc_LAW_32459/5201289aa509dda5d86c24fa198ace17a882ef32/",
+        "https://www.consultant.ru/document/cons_doc_LAW_32459/6f5b2b575c1c1c480d56f492f1006d7f2bbe2945/",
+        "https://www.consultant.ru/document/cons_doc_LAW_32459/a86fb428ab7949e8187549958b0f96f7d47cad29/",
+        "https://www.consultant.ru/document/cons_doc_LAW_32459/72570ba275cec68fe9aa38cd7db84d201314546d/",
+        "https://minjust.gov.ru/ru/pages/politicheskih-partij/"
       ],
       "targeted_option_review": {
-        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
         "option_count": 5,
-        "remaining": "Регистрация и приостановление — компетенция уполномоченного органа; принятие устава — компетенция партии. Не считать консультацию официальным решением."
+        "remaining": "Юридический вывод относится к установленному дефекту устава и дополнительным мерам; иные основания и способ подачи проверяются в реальном деле. Конкретный срок не задан, старые формы с официальной справочной страницы не перенесены."
+      },
+      "final_case_review_2026_11_28": {
+        "date": "2026-11-28",
+        "scope": "case_specific_legal_acceptance_under_explicit_educational_facts",
+        "option_count": 5,
+        "conclusion": "Прочитаны ст. 13, 15, 16, 20, 21, 25 №95-ФЗ в редакции 20.02.2026. Исправлены заявитель, компетенция Минюста и съезда. Все пять дополнительных мер общедоступны и не создают новых условий регистрации.",
+        "remaining": "Юридический вывод относится к установленному дефекту устава и дополнительным мерам; иные основания и способ подачи проверяются в реальном деле. Конкретный срок не задан, старые формы с официальной справочной страницы не перенесены.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_32459/cb1de735e98c141e8261445e5deb739bcd629797/",
+          "https://www.consultant.ru/document/cons_doc_LAW_32459/1224d47b5c29fdee0b8681bb7d80932b34634909/",
+          "https://www.consultant.ru/document/cons_doc_LAW_32459/5201289aa509dda5d86c24fa198ace17a882ef32/",
+          "https://www.consultant.ru/document/cons_doc_LAW_32459/6f5b2b575c1c1c480d56f492f1006d7f2bbe2945/",
+          "https://www.consultant.ru/document/cons_doc_LAW_32459/a86fb428ab7949e8187549958b0f96f7d47cad29/",
+          "https://www.consultant.ru/document/cons_doc_LAW_32459/72570ba275cec68fe9aa38cd7db84d201314546d/",
+          "https://minjust.gov.ru/ru/pages/politicheskih-partij/"
+        ]
       }
     },
     {
@@ -3996,23 +4097,40 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "Конституция РФ, ст. 13; 95-ФЗ от 11.07.2001, ст. 20. Отказ возможен по предусмотренным законом основаниям; политический тон сам по себе в них не входит. По условиям задачи иных оснований не установлено. Решение принимает уполномоченный орган, не голосующие.",
+      "legal_basis": "Конституция РФ, ст. 13; 95-ФЗ от 11.07.2001, ст. 15 п. 2, ст. 20 п. 1, 3–5. Минюст России принимает решение о регистрации партии по установленным законом основаниям; содержание программы не оценивается по лояльности, с учётом исключения п. 1 ст. 9. Запись в ЕГРЮЛ вносит регистрирующий орган. По условию законных оснований отказа не установлено.",
       "legal_urls": [
         "https://minjust.gov.ru/ru/documents/8011/",
-        "https://www.consultant.ru/document/cons_doc_LAW_32459/1224d47b5c29fdee0b8681bb7d80932b34634909/"
+        "https://www.consultant.ru/document/cons_doc_LAW_32459/1224d47b5c29fdee0b8681bb7d80932b34634909/",
+        "https://www.consultant.ru/document/cons_doc_LAW_32459/a86fb428ab7949e8187549958b0f96f7d47cad29/",
+        "https://minjust.gov.ru/ru/pages/politicheskih-partij/"
       ],
-      "legal_status": "requires_case_specific_current_law_review",
+      "legal_status": "verified_current",
       "activation_allowed": false,
       "review_date": "2026-11-28",
-      "source_scope": "specific_norm_checked_partial",
+      "source_scope": "case_specific_current_norms_and_all_alternatives_reviewed_under_stated_facts",
       "checked_norm_urls": [
         "https://minjust.gov.ru/ru/documents/8011/",
-        "https://www.consultant.ru/document/cons_doc_LAW_32459/1224d47b5c29fdee0b8681bb7d80932b34634909/"
+        "https://www.consultant.ru/document/cons_doc_LAW_32459/1224d47b5c29fdee0b8681bb7d80932b34634909/",
+        "https://www.consultant.ru/document/cons_doc_LAW_32459/a86fb428ab7949e8187549958b0f96f7d47cad29/",
+        "https://minjust.gov.ru/ru/pages/politicheskih-partij/"
       ],
       "targeted_option_review": {
-        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
         "option_count": 5,
-        "remaining": "Уполномоченный регистрирующий орган, а не коллектив голосующих. Не исключены законные основания отказа в других фактических ситуациях."
+        "remaining": "Проверка ограничена прямо заданным отсутствием законных оснований отказа; факты, документы и исключения ст. 9 реальной партии не оцениваются."
+      },
+      "final_case_review_2026_11_28": {
+        "date": "2026-11-28",
+        "scope": "case_specific_legal_acceptance_under_explicit_educational_facts",
+        "option_count": 5,
+        "conclusion": "Прочитаны ст. 15 и 20 №95-ФЗ (ред. 20.02.2026). Уточнена федеральная компетенция и различие между решением и записью в ЕГРЮЛ. Все пять мер нейтральны, равны для заявителей и не заменяют индивидуальное решение.",
+        "remaining": "Проверка ограничена прямо заданным отсутствием законных оснований отказа; факты, документы и исключения ст. 9 реальной партии не оцениваются.",
+        "urls": [
+          "https://minjust.gov.ru/ru/documents/8011/",
+          "https://www.consultant.ru/document/cons_doc_LAW_32459/1224d47b5c29fdee0b8681bb7d80932b34634909/",
+          "https://www.consultant.ru/document/cons_doc_LAW_32459/a86fb428ab7949e8187549958b0f96f7d47cad29/",
+          "https://minjust.gov.ru/ru/pages/politicheskih-partij/"
+        ]
       }
     },
     {
@@ -5254,10 +5372,11 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "210-ФЗ, ст. 7, ч. 1 п. 2, ст. 7.1: документы, находящиеся в распоряжении органов и подлежащие межведомственному получению, не требуются от заявителя, кроме предусмотренных законом исключений. В истории исключение отсутствует. Добровольное представление допустимо, но не является условием регистрации.",
+      "legal_basis": "210-ФЗ, ст. 7 ч. 1 п. 2 и ч. 6, ст. 7.1–7.2: подлежащие межведомственному получению документы нельзя требовать от заявителя вне установленных исключений; добровольное представление допустимо. Срок ответа на запрос определяется ст. 7.2 и специальными нормами; он не равен общему сроку услуги.",
       "legal_urls": [
         "https://www.consultant.ru/document/cons_doc_LAW_103023/a593eaab768d34bf2d7419322eac79481e73cf03/",
-        "https://www.consultant.ru/document/cons_doc_LAW_103023/dae12f04d4f7e53b43596ece42c666374101e68b/"
+        "https://www.consultant.ru/document/cons_doc_LAW_103023/dae12f04d4f7e53b43596ece42c666374101e68b/",
+        "https://www.consultant.ru/document/cons_doc_LAW_103023/a33164e93c89b483b80e6a1aa812612ec8364982/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
@@ -5265,12 +5384,25 @@
       "source_scope": "specific_norm_and_related_search_results_partial",
       "checked_norm_urls": [
         "https://www.consultant.ru/document/cons_doc_LAW_103023/a593eaab768d34bf2d7419322eac79481e73cf03/",
-        "https://www.consultant.ru/document/cons_doc_LAW_103023/dae12f04d4f7e53b43596ece42c666374101e68b/"
+        "https://www.consultant.ru/document/cons_doc_LAW_103023/dae12f04d4f7e53b43596ece42c666374101e68b/",
+        "https://www.consultant.ru/document/cons_doc_LAW_103023/a33164e93c89b483b80e6a1aa812612ec8364982/"
       ],
       "targeted_option_review": {
         "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
         "option_count": 5,
-        "remaining": "Конкретный регламент услуги, каналы и сроки межведомственных запросов требуют проверки; МФЦ и орган действуют каждый в своей компетенции."
+        "remaining": "Конкретная услуга и регламент МФЦ не названы; специальный срок и порядок резервного обмена не подтверждены."
+      },
+      "final_case_review_2026_11_28": {
+        "date": "2026-11-28",
+        "scope": "specific_norm_followup_not_full_acceptance",
+        "option_count": 5,
+        "conclusion": "Прочитаны ст. 7, 7.1, 7.2 №210-ФЗ в редакции 04.08.2026 с изменениями с 01.11.2026. Пять мер не перекладывают обязанность на гражданина. Не вводится единый срок для всех видов услуг.",
+        "remaining": "Конкретная услуга и регламент МФЦ не названы; специальный срок и порядок резервного обмена не подтверждены.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_103023/a593eaab768d34bf2d7419322eac79481e73cf03/",
+          "https://www.consultant.ru/document/cons_doc_LAW_103023/dae12f04d4f7e53b43596ece42c666374101e68b/",
+          "https://www.consultant.ru/document/cons_doc_LAW_103023/a33164e93c89b483b80e6a1aa812612ec8364982/"
+        ]
       }
     },
     {
