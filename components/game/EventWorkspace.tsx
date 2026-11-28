@@ -42,7 +42,7 @@ export default function EventWorkspace({g,readOnly=false,mode='feed'}:{g:ReturnT
  const [caseLoading,setCaseLoading]=useState(false);
  const [caseError,setCaseError]=useState('');
  const [retryPage,setRetryPage]=useState(0);
- const inflightCases=useRef(new Set<string>()),failedCases=useRef(new Set<string>());
+ const inflightCases=useRef(new Set<string>()),failedCases=useRef(new Set<string>()),finalDetails=useRef(new Set<string>());
  const [caseRegions,setCaseRegions]=useState<Record<string,{name:string;party:string}>>({});
  const [readyCaseCount,setReadyCaseCount]=useState<number|null>(null);
  const [assignments,setAssignments]=useState<Assignment[]>([]);
@@ -69,7 +69,7 @@ export default function EventWorkspace({g,readOnly=false,mode='feed'}:{g:ReturnT
  if(reads.current.scope!==feedScope)reads.current={scope:feedScope,promise:null,queued:false,count:false,explicit:false};
  const scopeCurrent=()=>alive.current&&activeScope.current===feedScope;
  useEffect(()=>{alive.current=true;return()=>{alive.current=false}},[]);
- useEffect(()=>{inflightCases.current.clear();failedCases.current.clear();setVisibleLimit(EVENT_FEED_PAGE_SIZE);setTitles(null);setEffectCounts(null);setCaseLoading(false);setCaseError('');setCases([]);setAssignments([]);setDecisions([]);setOutcomes([]);setInvitations([]);setAuthority([]);setCaseRegions({});setReadyCaseCount(null);setExpanded('');setNotice('');setBusyId(null);setSaving(false)},[feedScope]);
+ useEffect(()=>{inflightCases.current.clear();failedCases.current.clear();finalDetails.current.clear();setVisibleLimit(EVENT_FEED_PAGE_SIZE);setTitles(null);setEffectCounts(null);setCaseLoading(false);setCaseError('');setCases([]);setAssignments([]);setDecisions([]);setOutcomes([]);setInvitations([]);setAuthority([]);setCaseRegions({});setReadyCaseCount(null);setExpanded('');setNotice('');setBusyId(null);setSaving(false)},[feedScope]);
  async function readFeed(includeCount:boolean,background:boolean){
   const current=()=>scopeCurrent()&&(!background||document.visibilityState==='visible');
   if(!game||!me||!current())return;
@@ -237,7 +237,8 @@ export default function EventWorkspace({g,readOnly=false,mode='feed'}:{g:ReturnT
  const hasMore=orderedIds.length>visibleLimit;
  useEffect(()=>{
   if(!game||!me||!titles||document.visibilityState!=='visible')return;
-  const missing=requestedIds.filter(id=>!loadedMap.has(id)&&!inflightCases.current.has(id)&&!failedCases.current.has(id)).slice(0,EVENT_FEED_PAGE_SIZE);
+  const resolved=new Set(outcomes.map(o=>o.case_id));
+  const missing=requestedIds.filter(id=>(!loadedMap.has(id)||(!teacher&&resolved.has(id)&&!finalDetails.current.has(id)))&&!inflightCases.current.has(id)&&!failedCases.current.has(id)).slice(0,EVENT_FEED_PAGE_SIZE);
   if(!missing.length)return;
   for(const id of missing)inflightCases.current.add(id);
   setCaseLoading(true);setCaseError('');
@@ -248,14 +249,15 @@ export default function EventWorkspace({g,readOnly=false,mode='feed'}:{g:ReturnT
     if(response.error)throw response.error;
     if(!alive.current||activeScope.current!==scope)return;
     const rows=(response.data||[]) as CaseRow[],returned=new Set(rows.map(row=>row.id));
-    for(const id of missing)if(!returned.has(id))failedCases.current.add(id);
+    for(const id of missing){if(!returned.has(id))failedCases.current.add(id);else if(resolved.has(id))finalDetails.current.add(id);}
     setCases(previous=>{
      const map=new Map(previous.map(c=>[c.id,c]));
      for(const row of rows)map.set(row.id,row);
      return [...map.values()];
     });
-    if(!rows.length)return;
-    const routing=await supabase.from('event_case_routing').select('case_id,region_code').eq('game_id',game.id).in('case_id',rows.map(row=>row.id)).not('region_code','is',null);
+    const firstDetails=rows.filter(row=>!loadedMap.has(row.id)).map(row=>row.id);
+    if(!firstDetails.length)return;
+    const routing=await supabase.from('event_case_routing').select('case_id,region_code').eq('game_id',game.id).in('case_id',firstDetails).not('region_code','is',null);
     if(!alive.current||activeScope.current!==scope||routing.error||!routing.data?.length)return;
     const codes=[...new Set(routing.data.map(row=>row.region_code))];
     const [reference,control]=await Promise.all([
@@ -279,7 +281,7 @@ export default function EventWorkspace({g,readOnly=false,mode='feed'}:{g:ReturnT
     if(alive.current&&activeScope.current===scope)setCaseLoading(inflightCases.current.size>0);
    }
   })();
- },[game?.id,me?.user_id,feedScope,requestedIds,loadedMap,titles,retryPage]);
+ },[game?.id,me?.user_id,feedScope,requestedIds,loadedMap,titles,retryPage,outcomes,teacher,caseLoading]);
  const seenAssignments=teacher?assignments:mine;
  const caseIds=new Set(seenAssignments.map(a=>a.case_id));
  const roundByCase=new Map(assignments.map(a=>[a.case_id,a.vote_round??1]));
@@ -294,7 +296,7 @@ export default function EventWorkspace({g,readOnly=false,mode='feed'}:{g:ReturnT
   if(!teacher||busyId||!window.confirm('Подвести итог по текущим ответам и завершить голосование досрочно?'))return;
   setBusyId(id);const r=await (round?supabase.rpc('finalize_event_case_round',{p_case_id:id,p_round:round}):supabase.rpc('finalize_event_case',{p_case_id:id}));
   if(!scopeCurrent())return;
-  setNotice(r.error?userError(r.error):r.data?.reason==='no_answers'?'Пока нет голосов.':'Итог зафиксирован.');
+  setNotice(r.error?userError(r.error):r.data?.reason==='no_answers'?'Пока нет голосов.':r.data?.reason==='runoff_started'?'Назначен второй тур голосования.':'Итог зафиксирован.');
   if(!r.error)await Promise.all([reload(false),g.refreshEventEffects()]);if(scopeCurrent())setBusyId(null);
  }
  if(!game||!me)return null;
@@ -347,7 +349,7 @@ export default function EventWorkspace({g,readOnly=false,mode='feed'}:{g:ReturnT
     const transferred=invitations.some(i=>i.case_id===c.id&&i.inviter_id===me.user_id&&i.transfer_stage_no!=null);
     const transferMode=c.audience==='single'&&c.comic_scene?.event_rules_version===2;
     const collectiveMode=c.audience!=='single'&&c.comic_scene?.event_rules_version===2;
-    return <EventCaseTile key={c.id} item={c} meta={collectiveMode&&round===2&&!closed?'Второй тур · '+responded.length+'/'+assigned.length:invited?(transferMode?'Передача полномочий':'Приглашение к решению'):transferred?'Полномочия переданы · 0,5 балла':closed?'Решено · '+responded.length+' ответов':assigned.length?'Ожидает решения · '+responded.length+'/'+assigned.length:'Можно назначить'} onClick={()=>setExpanded(c.id)}/>;
+    return <EventCaseTile key={c.id} item={c} meta={collectiveMode&&round===2&&!closed?'Второй тур · '+responded.length+'/'+assigned.length:invited?(transferMode?'Передача ситуации':'Приглашение к решению'):transferred?'Ситуация передана · 0,5 балла':closed?'Решено · '+responded.length+' ответов':assigned.length?'Ожидает решения · '+responded.length+'/'+assigned.length:'Можно назначить'} onClick={()=>setExpanded(c.id)}/>;
    })}</div>}
    {caseLoading&&<p className="eventFeedLoading" role="status">Загрузка ситуаций…</p>}
    {caseError&&<p className="eventFeedLoading" role="alert">{caseError} <button type="button" onClick={()=>{failedCases.current.clear();setRetryPage(n=>n+1)}}>Повторить</button></p>}
@@ -379,7 +381,7 @@ export default function EventWorkspace({g,readOnly=false,mode='feed'}:{g:ReturnT
       </div>
       {expandedCase&&<EventCollaboration g={g} caseId={c.id} audience={c.audience} collectiveMode={collectiveMode} transferMode={transferMode} invitations={invites} assignedIds={assigned.map(a=>a.recipient_id)} closed={!!outcome} votingStarted={responded.length>0} onChanged={()=>reload(false)} readOnly={readOnly}/>}
       {collectiveMode&&<p className="eventInviteExplanation"><strong>{round===2?'Второй тур голосования':'Первый тур голосования'}</strong> · У вариантов нет единственного правильного ответа. Выберите решение с приемлемыми последствиями.</p>}
-      <EventChoicePanel allowedKeys={collectiveMode&&round===2?assigned[0]?.runoff_options??[]:undefined} labels={labels} decisions={responded} members={members} profiles={g.profiles} currentChoice={mineAnswer?.choice} canAnswer={!!my&&my.status==='pending'&&me.kind==='student'&&!outcome&&!busyId&&!readOnly&&!pendingInvites} onAnswer={choice=>{if(my)void answer(my,collectiveMode&&round===2?'round2:'+choice:choice)}} revealResults={teacher||!!outcome||!!mineAnswer} showCorrectExplanation={!!mineAnswer&&!!outcome&&me.kind==='student'} correctIndex={collectiveMode?null:bestIndex} bestDescription={bestOption?.description} bestLegalBasis={bestOption?.legal_basis} shuffleSeed={c.id+':'+me.user_id} notice={pendingInvites?(transferMode?'Ожидаем подтверждения передачи полномочий.':'Ожидаем ответа на приглашения.'):undefined}/>
+      <EventChoicePanel allowedKeys={collectiveMode&&round===2?assigned[0]?.runoff_options??[]:undefined} labels={labels} decisions={responded} members={members} profiles={g.profiles} currentChoice={mineAnswer?.choice} canAnswer={!!my&&my.status==='pending'&&me.kind==='student'&&!outcome&&!busyId&&!readOnly&&!pendingInvites} onAnswer={choice=>{if(my)void answer(my,collectiveMode&&round===2?'round2:'+choice:choice)}} revealResults={teacher||!!outcome||!!mineAnswer} showCorrectExplanation={!!mineAnswer&&!!outcome&&me.kind==='student'} correctIndex={collectiveMode?null:bestIndex} bestDescription={bestOption?.description} bestLegalBasis={bestOption?.legal_basis} shuffleSeed={c.id+':'+me.user_id} notice={pendingInvites?(transferMode?'Ожидаем подтверждения передачи ситуации.':'Ожидаем ответа на приглашения.'):undefined}/>
 
       {mineAnswer&&!teacher&&<div className="eventOutcomeNote">Ваш голос: {labels[mineAnswer.choice==='accept'?0:mineAnswer.choice==='reject'?1:Math.max(0,Number(mineAnswer.choice.replace('option_',''))-1)]||'Учтён'}</div>}
       {outcome&&<div className="eventOutcomeNote final"><strong>Итог голосования: {outcome.winner==='tie'?'Большинство участников не поддержало единый вариант — решение не принято':labels[winnerIndex]}</strong>

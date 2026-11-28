@@ -14,6 +14,7 @@ on:
       - 'scripts/events-v2-postgres-100-check.cjs'
       - 'scripts/events-v2-catalog-integration-check.cjs'
       - 'scripts/events-v2-atomic-release-check.cjs'
+      - 'scripts/events-v2-interactive-check.cjs'
       - 'scripts/events-v2-individual*'
       - 'scripts/events-v2-editorial*'
       - 'content/events-v2-editorial/**'
@@ -27,7 +28,7 @@ concurrency:
 jobs:
   verify:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -45,6 +46,7 @@ jobs:
       - run: node scripts/events-v2-atomic-release-check.cjs
       - run: node scripts/event-answer-api-privacy-check.cjs
       - run: node scripts/events-v2-browser-check.cjs
+      - run: node scripts/events-v2-atomic-release-check.cjs --browser
       - uses: actions/upload-artifact@v4
         if: always()
         with:

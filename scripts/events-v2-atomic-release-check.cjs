@@ -53,6 +53,7 @@ const synthetic=payload.map((c,i)=>({...c,case_key:'fixture-'+i,title:'Тест 
  assert.equal((await one("SELECT private.seed_authored_event_bank($1) n",[next])).n,330);
  assert.equal((await one("SELECT count(*)::int n FROM event_cases WHERE game_id=$1 AND verified AND effect_plan->>'rules_version'='2' AND comic_scene->>'event_rules_version'='2'",[next])).n,330);
  async function as(u){await db.exec('RESET ROLE');await q("SELECT set_config('request.jwt.claim.sub',$1,false)",[u]);await db.exec('SET ROLE authenticated')}
+ if(process.argv.includes('--browser')){await require('./events-v2-interactive-check.cjs')({db,q,rows,one,as,game,teacher,sender,expert,third,guest,sc,ac});return;}
  await as(teacher);
  const assign=(c,ids,stage=7)=>one('SELECT public.assign_event_case_at_stage($1,$2,$3) n',[c,ids,stage]);
  assert.equal((await assign(sc,[sender])).n,1);
