@@ -1153,7 +1153,8 @@ export function useRepublicGame(gameId:string){
   if(!chatOpen||!channelId)return;
   void loadMessages(channelId,true);
   void loadChatPins(channelId);
-  void markChatRead(channelId);
+  // The receipt effect below owns the initial acknowledgement as well as
+  // changes to the displayed messages. Do not queue a second receipt here.
  },[chatOpen,channelId]);
  useEffect(()=>{if(chatOpen&&channelId)void markChatRead(channelId)},[chatOpen,channelId,messages.length]);
  useEffect(()=>{
@@ -1220,7 +1221,13 @@ export function useRepublicGame(gameId:string){
   const previousMember=acceptedMember.current;
   const roleChanged=!!previousMember&&(['kind','role_title','team','group_name','roster_archived_at'] as const).some(key=>previousMember[key]!==member[key]);
   if(roleChanged){readEpoch.current++;clearGameData();}
-  authUser.current=userId;acceptedMember.current=member;setGame(g.data as Game);setMe(member);setError('');
+  authUser.current=userId;acceptedMember.current=member;
+  // Identity remains server-authoritative. Identical recovery snapshots do
+  // not need to invalidate every descendant of the game shell.
+  const nextGame=g.data as Game;
+  setGame(previous=>previous&&JSON.stringify(previous)===JSON.stringify(nextGame)?previous:nextGame);
+  setMe(previous=>previous&&JSON.stringify(previous)===JSON.stringify(member)?previous:member);
+  setError('');
   return true;
  }
 

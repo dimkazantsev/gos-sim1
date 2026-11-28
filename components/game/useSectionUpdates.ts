@@ -40,7 +40,9 @@ export function useSectionUpdates(gameId:string|undefined,userId:string|undefine
     // timer expired during active Realtime traffic.
     if(live&&!r.error&&r.data&&startedVersion===optimisticVersion.current){
      lastFallbackAt=Date.now();
-     setCounts(r.data as Record<string,number>);
+     const next=r.data as Record<string,number>;
+     // An unchanged polling snapshot must not rerender the entire game shell.
+     setCounts(previous=>Object.keys(previous).length===Object.keys(next).length&&Object.keys(next).every(key=>previous[key]===next[key])?previous:next);
     }
    }catch{recoveryAfter=Date.now()+30000}
    finally{running=false;if(queued&&live){queued=false;schedule()}}

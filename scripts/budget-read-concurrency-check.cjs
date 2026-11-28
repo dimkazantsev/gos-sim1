@@ -6,7 +6,7 @@ assert.equal(result.diagnostics.length,0,'BudgetView must transpile');
 const tick=()=>new Promise(resolve=>setImmediate(resolve));
 function realm(){
  const hooks=[],effects=[],calls=[],timers=new Map();
- let cursor=0,dirty=false,tree,load,now=0,timerId=0,revision=1,hold=false,ignoreAbort=false,fail=false,disposed=false,throwRpc=false;
+ let cursor=0,dirty=false,tree,load,now=0,timerId=0,revision=1,hold=false,ignoreAbort=false,fail=false,disposed=false,throwRpc=false,legacy=false,missing=false;
  let props={g:{game:{id:'game-a'},me:{user_id:'student-a'},teacher:true},onOpenDocument(){},onOpenEvents(){}};
  const react={
   useRef(value){return(hooks[cursor++]??={current:value})},
@@ -17,7 +17,7 @@ function realm(){
   if(throwRpc)throw new Error('synthetic synchronous RPC failure');
   const call={name,args,revision,signal:null,done:false,release:null};calls.push(call);
   if(!name.startsWith('get_')){revision++;call.done=true;return Promise.resolve({data:null,error:null})}
-  const response=()=>({data:name==='get_fiscal_budget'?{regions:[{region_code:'54',name:'Учебный регион',enterprises:call.revision,employees_per_firm:10,monthly_wage:1,profit_per_firm:1,consumption_per_firm:1,expenditure:1,transfer_in:0,debt:0,compliance:1}],rates:[],proposals:[],can_propose:true}:name==='get_fiscal_context'?{policy:{key_rate:call.revision}}:[],error:fail?{message:'synthetic budget outage'}:null});
+  const response=()=>({data:name==='get_fiscal_budget'?{regions:[{region_code:'54',name:'Учебный регион',enterprises:call.revision,employees_per_firm:10,monthly_wage:1,profit_per_firm:1,consumption_per_firm:1,expenditure:1,transfer_in:0,debt:0,compliance:1}],rates:[],proposals:[],can_propose:true,...(args.p_workspace&&!legacy&&!missing?{context:{policy:{key_rate:call.revision}},programs:[]}:{} )}:name==='get_fiscal_context'?{policy:{key_rate:call.revision}}:[],error:fail?{message:'synthetic budget outage'}:missing&&args.p_workspace?{code:'PGRST202',message:'old server'}:null});
   return{abortSignal(signal){call.signal=signal;return this},then(resolve,reject){
    call.release=()=>{call.done=true;resolve(response())};
    if(call.signal)call.signal.addEventListener('abort',()=>{if(!ignoreAbort){call.done=true;reject(new Error('aborted'))}},{once:true});
@@ -47,7 +47,7 @@ function realm(){
  const text=node=>Array.isArray(node)?node.map(text).join(' '):node&&typeof node==='object'?text(node.props?.children):node==null||node===false?'':String(node);
  render();
  return{
-  calls,load(){const button=find(tree,n=>n.type==='button'&&text(n).includes('Обновить данные'));assert(button);button.props.onClick();return tick()},automatic:()=>load(),hold(value=true){hold=value},ignoreAbort(){ignoreAbort=true},fail(){fail=true},throwRpc(value){throwRpc=value},revision(value){revision=value},
+  calls,load(){const button=find(tree,n=>n.type==='button'&&text(n).includes('Обновить данные'));assert(button);button.props.onClick();return tick()},automatic:()=>load(),hold(value=true){hold=value},legacy(){legacy=true},missing(){missing=true},ignoreAbort(){ignoreAbort=true},fail(){fail=true},throwRpc(value){throwRpc=value},revision(value){revision=value},
   release(start=0){for(const call of calls.slice(start))if(!call.done)call.release?.()},settle,
   switch(game,user){props={...props,g:{...props.g,game:{id:game},me:{user_id:user}}};render()},
   click(label){const button=find(tree,n=>n.type==='button'&&text(n).includes(label));assert(button,'Missing button '+label);return button.props.onClick()},
@@ -62,35 +62,37 @@ function realm(){
 }
 (async()=>{
  const h=realm();h.hold();const first=h.load();for(let i=0;i<9;i++)void h.load();await tick();
- assert.equal(h.calls.length,3,'Ten concurrent manual/automatic loads must share one RPC triple');
+ assert.equal(h.calls.length,1,'Ten concurrent manual/automatic loads must share one compact RPC');assert.equal(h.calls[0].args.p_workspace,true);
  h.release();await first;await h.settle();assert.equal(h.context().policy.key_rate,1);
  h.hold();const delayed=h.load();await tick();await h.advance(18001);await delayed;
- assert(h.calls.slice(3).every(c=>c.signal?.aborted),'Timeout aborts every RPC');
+ assert(h.calls.slice(1).every(c=>c.signal?.aborted),'Timeout aborts every RPC');
  assert.match(h.error(),/18|вовремя/,'Timeout is visible');assert.equal(h.context().policy.key_rate,1,'Timeout retains accepted data');
  h.hold(false);h.revision(2);await h.load();await h.settle();assert.equal(h.context().policy.key_rate,2,'Timeout releases next refresh');
  h.fail();await h.load();await h.settle();assert.match(h.error(),/synthetic/);assert.equal(h.context().policy.key_rate,2,'Failure preserves last data');h.close();
  for(const [game,user] of [['game-b','student-a'],['game-a','student-b']]){
   const r=realm();r.hold();r.ignoreAbort();const old=r.load();await tick();r.switch(game,user);r.revision(3);const next=r.load();await tick();
-  assert(r.calls.slice(0,3).every(c=>c.signal?.aborted),'Scope switch aborts old RPCs');
-  r.release(3);await next;await r.settle();r.release(0);await old;await r.settle();
-  assert.equal(r.calls[3].args.p_game_id,game);assert.equal(r.context().policy.key_rate,3,'Old scope cannot overwrite new scope snapshot');r.close();
+  assert(r.calls.slice(0,1).every(c=>c.signal?.aborted),'Scope switch aborts old RPCs');
+  r.release(1);await next;await r.settle();r.release(0);await old;await r.settle();
+  assert.equal(r.calls[1].args.p_game_id,game);assert.equal(r.context().policy.key_rate,3,'Old scope cannot overwrite new scope snapshot');r.close();
  }
  const unmounted=realm();unmounted.hold();unmounted.ignoreAbort();const pending=unmounted.load();await tick();unmounted.close();assert(unmounted.calls.every(c=>c.signal?.aborted));unmounted.release();await pending;
  const pushed=realm();pushed.hold();pushed.ignoreAbort();void pushed.load();await tick();pushed.revision(4);const reconciled=pushed.automatic();await tick();
- assert.equal(pushed.calls.length,6,'A pushed change starts a post-event snapshot instead of joining an older manual read');assert(pushed.calls.slice(0,3).every(c=>c.signal?.aborted));
- pushed.release(3);await reconciled;await pushed.settle();pushed.release();await pushed.settle();assert.equal(pushed.context().policy.key_rate,4,'Late manual snapshot cannot hide a pushed change');pushed.close();
+ assert.equal(pushed.calls.length,2,'A pushed change starts a post-event snapshot instead of joining an older manual read');assert(pushed.calls.slice(0,1).every(c=>c.signal?.aborted));
+ pushed.release(1);await reconciled;await pushed.settle();pushed.release();await pushed.settle();assert.equal(pushed.context().policy.key_rate,4,'Late manual snapshot cannot hide a pushed change');pushed.close();
  for(const action of ['Подготовить налоговую инициативу','Сохранить параметры региона','simulator']){
   const r=realm();await r.load();await r.settle();r.hold();r.ignoreAbort();const stale=r.load();await tick();
   const saved=action==='simulator'?(r.revision(2),r.saved()):r.click(action);await tick();
-  assert.equal(r.calls.filter(c=>c.name.startsWith('get_')).length,9,'Successful write must start a fresh triple: '+action);
-  assert(r.calls.slice(3,6).every(c=>c.signal?.aborted),'Successful write aborts pre-write read');
-  r.release(6);await saved;await r.settle();assert.equal(r.context().policy.key_rate,2,'Saved state replaces pre-write snapshot');
-  r.release(3);await stale;await r.settle();assert.equal(r.context().policy.key_rate,2,'Late pre-write read cannot undo saved state');r.close();
+  assert.equal(r.calls.filter(c=>c.name.startsWith('get_')).length,3,'Successful write must start a fresh compact read: '+action);
+  assert(r.calls.filter(c=>c.name.startsWith('get_')).slice(1,2).every(c=>c.signal?.aborted),'Successful write aborts pre-write read');
+  r.release(r.calls.findIndex(c=>c.name.startsWith('get_')&&c.revision===2));await saved;await r.settle();assert.equal(r.context().policy.key_rate,2,'Saved state replaces pre-write snapshot');
+  r.release();await stale;await r.settle();assert.equal(r.context().policy.key_rate,2,'Late pre-write read cannot undo saved state');r.close();
  }
  const macro=realm();await macro.load();await macro.settle();macro.hold();macro.ignoreAbort();const obsolete=macro.load();await tick();macro.macro();await macro.settle();macro.release();await obsolete;await macro.settle();assert.equal(macro.context().policy.key_rate,9,'A confirmed macro edit survives stale read');macro.close();
  const oldMacro=realm();await oldMacro.load();await oldMacro.settle();const savedOldMacro=oldMacro.macroCallback();oldMacro.switch('game-b','student-b');oldMacro.hold();oldMacro.revision(5);void oldMacro.load();await tick();savedOldMacro({key_rate:99});
- assert(oldMacro.calls.slice(3).every(c=>!c.signal.aborted),'An old macro callback must not cancel the next game snapshot');oldMacro.release(3);await oldMacro.settle();assert.equal(oldMacro.context().policy.key_rate,5,'An old macro callback cannot patch the next game');oldMacro.close();
- const throwing=realm();throwing.throwRpc(true);await throwing.load();await throwing.settle();assert.match(throwing.error(),/synchronous/);throwing.throwRpc(false);await throwing.load();await throwing.settle();assert.equal(throwing.calls.length,3,'Synchronous failure releases pending read');assert(throwing.context());throwing.close();
- console.log('PASS budget reads: ten manual calls share three RPCs; fresh pushed changes; 18s abort/recovery; retained data/errors; game/user/unmount cancellation; fresh mutation/simulator and scoped macro results.');
+ assert(oldMacro.calls.slice(1).every(c=>!c.signal.aborted),'An old macro callback must not cancel the next game snapshot');oldMacro.release(1);await oldMacro.settle();assert.equal(oldMacro.context().policy.key_rate,5,'An old macro callback cannot patch the next game');oldMacro.close();
+ const throwing=realm();throwing.throwRpc(true);await throwing.load();await throwing.settle();assert.match(throwing.error(),/synchronous/);throwing.throwRpc(false);await throwing.load();await throwing.settle();assert.equal(throwing.calls.length,1,'Synchronous failure releases pending read');assert(throwing.context());throwing.close();
+ const legacy=realm();legacy.legacy();await legacy.load();await legacy.settle();assert.equal(legacy.calls.length,3,'Legacy response loads two missing projections only');assert.equal(legacy.context().policy.key_rate,1);legacy.close();
+ const missing=realm();missing.missing();await missing.load();await missing.settle();assert.equal(missing.calls.length,4,'Explicit missing overload uses existing RPCs');assert.equal(missing.context().policy.key_rate,1);missing.close();
+ console.log('PASS budget reads: ten manual calls share one RPC; legacy schema fallback; fresh pushed changes; 18s abort/recovery; retained data/errors; game/user/unmount cancellation; fresh mutation/simulator and scoped macro results.');
 })().catch(error=>{console.error(error);process.exitCode=1});
 
