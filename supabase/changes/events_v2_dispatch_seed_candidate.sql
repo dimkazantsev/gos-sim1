@@ -82,7 +82,7 @@ begin
         select 1 from public.game_parties party
         where party.game_id=gm.game_id and party.name=gm.team
           and party.id=c.party_id))
-      and (not c.v2_single or private.role_is_available(p_game,gm.user_id))
+      and (not c.v2_single or (private.role_is_available(p_game,gm.user_id) AND NOT EXISTS(SELECT 1 FROM public.game_member_access_blocks b WHERE b.game_id=p_game AND b.user_id=gm.user_id)))
       and (gm.user_id=ANY(v_competent) or c.region_code is not null or c.destination='federal_collective' or
         exists(select 1 from unnest(c.allowed_roles) ar
           where lower(coalesce(gm.role_title,'')) like '%'||lower(ar)||'%'

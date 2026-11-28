@@ -34,6 +34,9 @@ const id=n=>'26000000-0000-4000-8000-'+String(n).padStart(12,'0');
   await as(u);await assert.rejects(project,denied);assert.deepEqual(await details(),[]);
   for(const tab of ['event_assignments','event_decisions','event_case_outcomes','event_collaboration_invites','event_authority_evidence','event_cases'])assert.equal((await rows('SELECT count(*)::int n FROM public.'+tab+' WHERE game_id=$1',[g]))[0].n,0,tab);
   await assert.rejects(()=>rows('SELECT public.get_event_decision_feedback($1)',[closed]),denied);
+  await assert.rejects(()=>rows('SELECT public.invite_event_collaborator($1,$2)',[closed,receiver]),denied);
+  await assert.rejects(()=>rows('SELECT public.send_event_discussion($1,$2)',[closed,'Тест']),denied);
+  await assert.rejects(()=>rows('SELECT public.cancel_event_invitation($1)',[inv]),denied);
  }
  await as(guest);await assert.rejects(()=>rows('SELECT public.finalize_event_case_round($1,1)',[c]),/Teacher|required|преподавател/i);
  await as(null,'anon');await assert.rejects(project,denied);await assert.rejects(details,denied);
