@@ -42,7 +42,7 @@ export const SURVEY_BLOCKS=[
  'Приобретённые в ходе игры компетенции могут быть востребованы в моей будущей профессиональной деятельности.',
  'Использование деловых образовательных игр является целесообразным дополнением к традиционным формам обучения.']}
 ] as const;
-export const SCALE=['Затрудняюсь ответить / неприменимо','Полностью не согласен','Скорее не согласен','И согласен, и не согласен','Скорее согласен','Полностью согласен'];
+export const SCALE=['','Полностью не согласен','Скорее не согласен','И согласен, и не согласен','Скорее согласен','Полностью согласен'];
 export const EXTRA_QUESTIONS=[
  'Сколько времени в среднем в неделю вы уделяли участию в игре?',
  'Какие этапы игры оказались наиболее значимыми для вашего профессионального развития?',
@@ -50,9 +50,9 @@ export const EXTRA_QUESTIONS=[
  'С какими основными затруднениями вы столкнулись в процессе участия в игре?',
  'Как вы оцениваете деловую образовательную игру ГОС.ID в целом?'
 ];
-export const TIME_OPTIONS=['Затрудняюсь ответить','Менее 1 часа','От 1 до менее 3 часов','От 3 до менее 5 часов','От 5 до менее 8 часов','8 часов и более'];
-export const MECHANIC_OPTIONS=['Нет предложений / затрудняюсь ответить','Распределение должностей и полномочий','Партийная конкуренция и переговоры','Выборы и голосования','Законотворчество и заседания','Государственные программы и бюджет','Ситуации, события и кризисы','Система оценивания','Интерфейс и цифровые инструменты'];
-export const DIFFICULTY_OPTIONS=['Не испытывал затруднений / затрудняюсь ответить','Понимание правил и процедур','Поиск и применение законодательства','Выполнение задач своей должности','Взаимодействие с другими участниками','Нехватка времени','Понимание начисления баллов','Навигация и поиск документов','Технические проблемы'];
+export const TIME_OPTIONS=['','Менее 1 часа','От 1 до менее 3 часов','От 3 до менее 5 часов','От 5 до менее 8 часов','8 часов и более'];
+export const MECHANIC_OPTIONS=['Нет предложений','Распределение должностей и полномочий','Партийная конкуренция и переговоры','Выборы и голосования','Законотворчество и заседания','Государственные программы и бюджет','Ситуации, события и кризисы','Система оценивания','Интерфейс и цифровые инструменты'];
+export const DIFFICULTY_OPTIONS=['Не испытывал затруднений','Понимание правил и процедур','Поиск и применение законодательства','Выполнение задач своей должности','Взаимодействие с другими участниками','Нехватка времени','Понимание начисления баллов','Навигация и поиск документов','Технические проблемы'];
 export type Answer=number|number[]|null;
 export type SurveyDraft={answers:Answer[];proposal:string;section:number};
 export type SurveyRow={user_id:string;answers:Answer[];proposal:string;word_count:number;role_title:string|null;team:string|null;group_name:string|null;submitted_at:string};
@@ -60,12 +60,12 @@ export const QUESTION_TEXTS=[...SURVEY_BLOCKS.flatMap(b=>[...b.questions]),...EX
 export const emptyDraft=():SurveyDraft=>({answers:Array.from({length:40},()=>null),proposal:'',section:0});
 export const countWords=(s:string)=>(s.match(/[\p{L}\p{N}]+(?:[-–][\p{L}\p{N}]+)*/gu)||[]).length;
 export function validAnswer(i:number,a:Answer|undefined){
- if(i>=36&&i<=38){const max=i===36?16:8;return Array.isArray(a)&&a.length>0&&a.length<=max&&new Set(a).size===a.length&&a.every(x=>Number.isInteger(x)&&x>=0&&x<=max)&&(!a.includes(0)||a.length===1)}
- return typeof a==='number'&&Number.isInteger(a)&&a>=(i===39?1:0)&&a<=(i===39?10:5);
+ if(i>=36&&i<=38){const max=i===36?16:8;return Array.isArray(a)&&a.length>0&&a.length<=max&&new Set(a).size===a.length&&a.every(x=>Number.isInteger(x)&&x>=(i===36?1:0)&&x<=max)&&(!a.includes(0)||a.length===1)}
+ return typeof a==='number'&&Number.isInteger(a)&&a>=1&&a<=(i===39?10:5);
 }
 export function restoreDraft(raw:string|null):SurveyDraft{
  try{const x=JSON.parse(raw||'null');if(!x||!Array.isArray(x.answers)||x.answers.length!==40||typeof x.proposal!=='string')return emptyDraft();
- return {answers:x.answers.map((a:Answer,i:number)=>validAnswer(i,a)?a:null),proposal:x.proposal.slice(0,40000),section:Number.isInteger(x.section)?Math.min(8,Math.max(0,x.section)):0};
+ const answers=x.answers.map((a:Answer,i:number)=>validAnswer(i,a)?a:null);const first=answers.findIndex((a:Answer)=>a===null);const firstSection=first<0?8:Math.min(7,Math.floor(first/5));return {answers,proposal:x.proposal.slice(0,40000),section:Number.isInteger(x.section)?Math.min(firstSection,Math.max(0,x.section)):0};
  }catch{return emptyDraft()}
 }
 export function toggleAnswer(old:Answer,value:number):number[]|null{
