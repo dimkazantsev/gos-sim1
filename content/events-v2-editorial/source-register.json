@@ -1354,23 +1354,47 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "БК РФ, ст. 78, 78.5: предоставление субсидий и предусмотренный порядок отбора. В условии предполагается конкурсная программа, а не безусловное право фирмы на грант.",
+      "legal_basis": "БК РФ, ст. 78, ст. 78.5 п. 2–4, 7; ПП РФ №1782, п. 20–22. Для конкурса объявление содержит критерии, сроки, объём и способ распределения средств; общий минимум приёма — 30 календарных дней после публикации объявления по пп. «в» п. 21. В заданной программе нет прямого предоставления. Сезонный срок не отменяет отбор и соглашение.",
       "legal_urls": [
         "https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
         "https://www.consultant.ru/document/cons_doc_LAW_19702/1b6959f23cc516d0e11ddc2e213ca2dca83560df/",
-        "https://www.consultant.ru/document/cons_doc_LAW_19702/cc1a194570930b60765fa0b326aae1fd5a41d5bc/"
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/cc1a194570930b60765fa0b326aae1fd5a41d5bc/",
+        "https://www.consultant.ru/document/cons_doc_LAW_461663/92d969e26a4326c5d02fa79b8f9cf4994ee5633b/",
+        "https://www.consultant.ru/document/cons_doc_LAW_461663/e56a585eaa2468f46672a0a90a9b0734402270db/",
+        "https://www.consultant.ru/document/cons_doc_LAW_461663/38f2a1e9ba8429f7dacc3cdbfb382974ac607eb1/",
+        "https://www.consultant.ru/document/cons_doc_LAW_461663/f497ae12435f300be00468c6d8a0d058bc77955e/"
       ],
-      "legal_status": "requires_case_specific_current_law_review",
+      "legal_status": "verified_current",
       "activation_allowed": false,
       "review_date": "2026-11-28",
       "checked_norm_urls": [
         "https://www.consultant.ru/document/cons_doc_LAW_19702/1b6959f23cc516d0e11ddc2e213ca2dca83560df/",
-        "https://www.consultant.ru/document/cons_doc_LAW_19702/cc1a194570930b60765fa0b326aae1fd5a41d5bc/"
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/cc1a194570930b60765fa0b326aae1fd5a41d5bc/",
+        "https://www.consultant.ru/document/cons_doc_LAW_461663/92d969e26a4326c5d02fa79b8f9cf4994ee5633b/",
+        "https://www.consultant.ru/document/cons_doc_LAW_461663/e56a585eaa2468f46672a0a90a9b0734402270db/",
+        "https://www.consultant.ru/document/cons_doc_LAW_461663/38f2a1e9ba8429f7dacc3cdbfb382974ac607eb1/",
+        "https://www.consultant.ru/document/cons_doc_LAW_461663/f497ae12435f300be00468c6d8a0d058bc77955e/"
       ],
       "targeted_option_review": {
-        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
         "option_count": 5,
-        "remaining": "Конкретный порядок гранта, природоохранные ограничения, бюджет и календарь отбора."
+        "remaining": "Оценка дана для явно заданных вымышленных условий, а не реального регионального акта. Конкретный порядок учебной программы задан условием, не выдаётся за действующую реальную программу. Все варианты — рекомендации компетентному органу, а не разрешение расходовать средства; отдельное решение и соблюдение специальных требований обязательны. Полная независимая сверка официальной цепочки поправок не проведена."
+      },
+      "source_scope": "case_specific_current_norms_and_all_alternatives_reviewed_under_stated_facts",
+      "final_case_review_2026_11_28": {
+        "date": "2026-11-28",
+        "scope": "case_specific_legal_acceptance_under_explicit_educational_facts",
+        "option_count": 5,
+        "conclusion": "Пять альтернатив — предложения о параметрах нового конкурса: дробление, крупный проект, этапность, доступность и сохранение средств. Они реализуются только до объявления, при наличии ассигнований, объективных критериев и соблюдении минимального срока.",
+        "remaining": "Оценка дана для явно заданных вымышленных условий, а не реального регионального акта. Конкретный порядок учебной программы задан условием, не выдаётся за действующую реальную программу. Все варианты — рекомендации компетентному органу, а не разрешение расходовать средства; отдельное решение и соблюдение специальных требований обязательны. Полная независимая сверка официальной цепочки поправок не проведена.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/1b6959f23cc516d0e11ddc2e213ca2dca83560df/",
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/cc1a194570930b60765fa0b326aae1fd5a41d5bc/",
+          "https://www.consultant.ru/document/cons_doc_LAW_461663/92d969e26a4326c5d02fa79b8f9cf4994ee5633b/",
+          "https://www.consultant.ru/document/cons_doc_LAW_461663/e56a585eaa2468f46672a0a90a9b0734402270db/",
+          "https://www.consultant.ru/document/cons_doc_LAW_461663/38f2a1e9ba8429f7dacc3cdbfb382974ac607eb1/",
+          "https://www.consultant.ru/document/cons_doc_LAW_461663/f497ae12435f300be00468c6d8a0d058bc77955e/"
+        ]
       }
     },
     {
@@ -1781,21 +1805,44 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "БК РФ, ст. 78: условия, цель и контроль субсидии определяются применимым порядком и соглашением. Повторное возмещение одного расхода вопреки условиям исключается.",
+      "legal_basis": "БК РФ, ст. 78 п. 1–3; ПП РФ №1782, п. 3, п. 11. Подтверждаются собственные допустимые затраты и расчёт по условиям каждой программы; один счёт сам по себе не запрещает законное сочетание мер на разные части затрат, но повторное возмещение той же части вопреки установленным условиям недопустимо. Неправомерная выплата при её выявлении возвращается по предусмотренному порядку (п. 3.1 ст. 78).",
       "legal_urls": [
         "https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
-        "https://www.consultant.ru/document/cons_doc_LAW_19702/1b6959f23cc516d0e11ddc2e213ca2dca83560df/"
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/1b6959f23cc516d0e11ddc2e213ca2dca83560df/",
+        "https://www.consultant.ru/document/cons_doc_LAW_461663/92d969e26a4326c5d02fa79b8f9cf4994ee5633b/",
+        "https://www.consultant.ru/document/cons_doc_LAW_461663/21a16253b3660f098ca5f0433fe7166d356e2714/",
+        "https://www.consultant.ru/document/cons_doc_LAW_461663/d0fb212365c2f797bd5d33df1afc201b444b67f6/",
+        "https://www.consultant.ru/document/cons_doc_LAW_461663/f497ae12435f300be00468c6d8a0d058bc77955e/"
       ],
-      "legal_status": "requires_case_specific_current_law_review",
+      "legal_status": "verified_current",
       "activation_allowed": false,
       "review_date": "2026-11-28",
       "checked_norm_urls": [
-        "https://www.consultant.ru/document/cons_doc_LAW_19702/1b6959f23cc516d0e11ddc2e213ca2dca83560df/"
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/1b6959f23cc516d0e11ddc2e213ca2dca83560df/",
+        "https://www.consultant.ru/document/cons_doc_LAW_461663/92d969e26a4326c5d02fa79b8f9cf4994ee5633b/",
+        "https://www.consultant.ru/document/cons_doc_LAW_461663/21a16253b3660f098ca5f0433fe7166d356e2714/",
+        "https://www.consultant.ru/document/cons_doc_LAW_461663/d0fb212365c2f797bd5d33df1afc201b444b67f6/",
+        "https://www.consultant.ru/document/cons_doc_LAW_461663/f497ae12435f300be00468c6d8a0d058bc77955e/"
       ],
       "targeted_option_review": {
-        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
         "option_count": 5,
-        "remaining": "Сверить условия обеих программ, допустимое софинансирование и последствия выявленного нарушения."
+        "remaining": "Оценка дана для явно заданных вымышленных условий, а не реального регионального акта. Конкретный порядок учебной программы задан условием, не выдаётся за действующую реальную программу. Все варианты — рекомендации компетентному органу, а не разрешение расходовать средства; отдельное решение и соблюдение специальных требований обязательны. Полная независимая сверка официальной цепочки поправок не проведена."
+      },
+      "source_scope": "case_specific_current_norms_and_all_alternatives_reviewed_under_stated_facts",
+      "final_case_review_2026_11_28": {
+        "date": "2026-11-28",
+        "scope": "case_specific_legal_acceptance_under_explicit_educational_facts",
+        "option_count": 5,
+        "conclusion": "Проверены пять способов профилактики: единая сверка, риск-ориентированный контроль сверх обязательного, консультации, ограниченный реестр, аудит. Ни один не разрешает второй платёж и не лишает законного софинансирования.",
+        "remaining": "Оценка дана для явно заданных вымышленных условий, а не реального регионального акта. Конкретный порядок учебной программы задан условием, не выдаётся за действующую реальную программу. Все варианты — рекомендации компетентному органу, а не разрешение расходовать средства; отдельное решение и соблюдение специальных требований обязательны. Полная независимая сверка официальной цепочки поправок не проведена.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/1b6959f23cc516d0e11ddc2e213ca2dca83560df/",
+          "https://www.consultant.ru/document/cons_doc_LAW_461663/92d969e26a4326c5d02fa79b8f9cf4994ee5633b/",
+          "https://www.consultant.ru/document/cons_doc_LAW_461663/21a16253b3660f098ca5f0433fe7166d356e2714/",
+          "https://www.consultant.ru/document/cons_doc_LAW_461663/d0fb212365c2f797bd5d33df1afc201b444b67f6/",
+          "https://www.consultant.ru/document/cons_doc_LAW_461663/f497ae12435f300be00468c6d8a0d058bc77955e/"
+        ]
       }
     },
     {
@@ -2109,23 +2156,47 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "БК РФ, ст. 78, 78.5: правовое основание, порядок предоставления субсидии, отбор при его применимости и условия финансирования. Устное обещание не создаёт основания для выплаты.",
+      "legal_basis": "БК РФ, ст. 78 п. 1, пп. 2 п. 2, п. 3, 3.1; ПП РФ от 25.10.2023 №1782 в ред. 14.11.2026, п. 3, 5–8. Пункты 3 (подп. «ж»), 10 и 11 постановления №1782 разграничивают финансирование затрат и возмещение. В данном случае соглашение обязательно; устная договорённость не заменяет бюджетное основание. Для уже понесённых затрат требуется отдельный допускающий их порядок, а не заднее оформление.",
       "legal_urls": [
         "https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
         "https://www.consultant.ru/document/cons_doc_LAW_19702/1b6959f23cc516d0e11ddc2e213ca2dca83560df/",
-        "https://www.consultant.ru/document/cons_doc_LAW_19702/cc1a194570930b60765fa0b326aae1fd5a41d5bc/"
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/cc1a194570930b60765fa0b326aae1fd5a41d5bc/",
+        "https://www.consultant.ru/document/cons_doc_LAW_461663/92d969e26a4326c5d02fa79b8f9cf4994ee5633b/",
+        "https://www.consultant.ru/document/cons_doc_LAW_461663/f497ae12435f300be00468c6d8a0d058bc77955e/",
+        "https://www.consultant.ru/document/cons_doc_LAW_461663/a1a45a1ff2c85c2136aa42b1b36f0bd1a62de4c0/",
+        "https://www.consultant.ru/document/cons_doc_LAW_461663/21a16253b3660f098ca5f0433fe7166d356e2714/"
       ],
-      "legal_status": "requires_case_specific_current_law_review",
+      "legal_status": "verified_current",
       "activation_allowed": false,
       "review_date": "2026-11-28",
       "checked_norm_urls": [
         "https://www.consultant.ru/document/cons_doc_LAW_19702/1b6959f23cc516d0e11ddc2e213ca2dca83560df/",
-        "https://www.consultant.ru/document/cons_doc_LAW_19702/cc1a194570930b60765fa0b326aae1fd5a41d5bc/"
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/cc1a194570930b60765fa0b326aae1fd5a41d5bc/",
+        "https://www.consultant.ru/document/cons_doc_LAW_461663/92d969e26a4326c5d02fa79b8f9cf4994ee5633b/",
+        "https://www.consultant.ru/document/cons_doc_LAW_461663/f497ae12435f300be00468c6d8a0d058bc77955e/",
+        "https://www.consultant.ru/document/cons_doc_LAW_461663/a1a45a1ff2c85c2136aa42b1b36f0bd1a62de4c0/",
+        "https://www.consultant.ru/document/cons_doc_LAW_461663/21a16253b3660f098ca5f0433fe7166d356e2714/"
       ],
       "targeted_option_review": {
-        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
         "option_count": 5,
-        "remaining": "Установить вид получателя, правила конкретной программы, допустимость возмещения ранее понесённых расходов и форму соглашения."
+        "remaining": "Оценка дана для явно заданных вымышленных условий, а не реального регионального акта. Конкретный порядок учебной программы задан условием, не выдаётся за действующую реальную программу. Все варианты — рекомендации компетентному органу, а не разрешение расходовать средства; отдельное решение и соблюдение специальных требований обязательны. Полная независимая сверка официальной цепочки поправок не проведена."
+      },
+      "source_scope": "case_specific_current_norms_and_all_alternatives_reviewed_under_stated_facts",
+      "final_case_review_2026_11_28": {
+        "date": "2026-11-28",
+        "scope": "case_specific_legal_acceptance_under_explicit_educational_facts",
+        "option_count": 5,
+        "conclusion": "Пять мер — конкурс, проверка отдельного режима возмещения, будущий этап, консультация и мотивированный отказ. Исключение из соглашения для некоторых единовременных возмещений не распространено на авансовую программу.",
+        "remaining": "Оценка дана для явно заданных вымышленных условий, а не реального регионального акта. Конкретный порядок учебной программы задан условием, не выдаётся за действующую реальную программу. Все варианты — рекомендации компетентному органу, а не разрешение расходовать средства; отдельное решение и соблюдение специальных требований обязательны. Полная независимая сверка официальной цепочки поправок не проведена.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/1b6959f23cc516d0e11ddc2e213ca2dca83560df/",
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/cc1a194570930b60765fa0b326aae1fd5a41d5bc/",
+          "https://www.consultant.ru/document/cons_doc_LAW_461663/92d969e26a4326c5d02fa79b8f9cf4994ee5633b/",
+          "https://www.consultant.ru/document/cons_doc_LAW_461663/f497ae12435f300be00468c6d8a0d058bc77955e/",
+          "https://www.consultant.ru/document/cons_doc_LAW_461663/a1a45a1ff2c85c2136aa42b1b36f0bd1a62de4c0/",
+          "https://www.consultant.ru/document/cons_doc_LAW_461663/21a16253b3660f098ca5f0433fe7166d356e2714/"
+        ]
       }
     },
     {
@@ -2196,23 +2267,44 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "БК РФ, ст. 78: соблюдение условий предоставления, контроль и предусмотренные последствия нарушения; ст. 38 — целевое назначение бюджетных ассигнований и лимитов. Конкретный расход оценивается по условиям субсидии.",
+      "legal_basis": "БК РФ, ст. 78 п. 1, пп. 2 п. 2, п. 3, 3.1; ПП РФ от 25.10.2023 №1782 в ред. 14.11.2026, п. 3, 5–8. Пункты 7–8 и 10 общих требований определяют контроль, возврат средств и допустимые расходы. При заданном нарушении возврат соответствующей суммы обязателен; новые меры помощи требуют самостоятельного основания.",
       "legal_urls": [
         "https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
         "https://www.consultant.ru/document/cons_doc_LAW_19702/1b6959f23cc516d0e11ddc2e213ca2dca83560df/",
-        "https://www.consultant.ru/document/cons_doc_LAW_19702/9a0e8abcbe24837343cdcc599bccf0f09413968a/"
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/9a0e8abcbe24837343cdcc599bccf0f09413968a/",
+        "https://www.consultant.ru/document/cons_doc_LAW_461663/92d969e26a4326c5d02fa79b8f9cf4994ee5633b/",
+        "https://www.consultant.ru/document/cons_doc_LAW_461663/d0fb212365c2f797bd5d33df1afc201b444b67f6/",
+        "https://www.consultant.ru/document/cons_doc_LAW_461663/a1a45a1ff2c85c2136aa42b1b36f0bd1a62de4c0/"
       ],
-      "legal_status": "requires_case_specific_current_law_review",
+      "legal_status": "verified_current",
       "activation_allowed": false,
       "review_date": "2026-11-28",
       "checked_norm_urls": [
         "https://www.consultant.ru/document/cons_doc_LAW_19702/1b6959f23cc516d0e11ddc2e213ca2dca83560df/",
-        "https://www.consultant.ru/document/cons_doc_LAW_19702/9a0e8abcbe24837343cdcc599bccf0f09413968a/"
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/9a0e8abcbe24837343cdcc599bccf0f09413968a/",
+        "https://www.consultant.ru/document/cons_doc_LAW_461663/92d969e26a4326c5d02fa79b8f9cf4994ee5633b/",
+        "https://www.consultant.ru/document/cons_doc_LAW_461663/d0fb212365c2f797bd5d33df1afc201b444b67f6/",
+        "https://www.consultant.ru/document/cons_doc_LAW_461663/a1a45a1ff2c85c2136aa42b1b36f0bd1a62de4c0/"
       ],
       "targeted_option_review": {
-        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
         "option_count": 5,
-        "remaining": "Установить сумму нарушения, порядок возврата, полномочия контролёра и основания нового финансирования; обязательные меры выполняются независимо от голосования."
+        "remaining": "Оценка дана для явно заданных вымышленных условий, а не реального регионального акта. Конкретный порядок учебной программы задан условием, не выдаётся за действующую реальную программу. Все варианты — рекомендации компетентному органу, а не разрешение расходовать средства; отдельное решение и соблюдение специальных требований обязательны. Полная независимая сверка официальной цепочки поправок не проведена."
+      },
+      "source_scope": "case_specific_current_norms_and_all_alternatives_reviewed_under_stated_facts",
+      "final_case_review_2026_11_28": {
+        "date": "2026-11-28",
+        "scope": "case_specific_legal_acceptance_under_explicit_educational_facts",
+        "option_count": 5,
+        "conclusion": "Пять мер — новый отбор, дополнительная проверка, законная логистическая помощь, профилактический контроль, допустимое раскрытие отчёта. Ни одна не заменяет обязательный возврат или не обеспечивает выплату прежнему получателю без новой проверки.",
+        "remaining": "Оценка дана для явно заданных вымышленных условий, а не реального регионального акта. Конкретный порядок учебной программы задан условием, не выдаётся за действующую реальную программу. Все варианты — рекомендации компетентному органу, а не разрешение расходовать средства; отдельное решение и соблюдение специальных требований обязательны. Полная независимая сверка официальной цепочки поправок не проведена.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/1b6959f23cc516d0e11ddc2e213ca2dca83560df/",
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/9a0e8abcbe24837343cdcc599bccf0f09413968a/",
+          "https://www.consultant.ru/document/cons_doc_LAW_461663/92d969e26a4326c5d02fa79b8f9cf4994ee5633b/",
+          "https://www.consultant.ru/document/cons_doc_LAW_461663/d0fb212365c2f797bd5d33df1afc201b444b67f6/",
+          "https://www.consultant.ru/document/cons_doc_LAW_461663/a1a45a1ff2c85c2136aa42b1b36f0bd1a62de4c0/"
+        ]
       }
     },
     {
@@ -2222,21 +2314,40 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "БК РФ, ст. 78: возмещение затрат или недополученных доходов по установленным условиям. В учебном случае основанием являются фактически выполненные рейсы.",
+      "legal_basis": "БК РФ, ст. 78 п. 1–3; ПП РФ №1782, п. 3, п. 11. Оплата работ по регулярным перевозкам по регулируемому тарифу регулируется также ст. 14 Закона №220-ФЗ: контракт или предусмотренные законом соглашения. Режим субсидии должен быть отделён от оплаты контракта. 62 фактических рейса из 80 не равны плановому объёму.",
       "legal_urls": [
         "https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
-        "https://www.consultant.ru/document/cons_doc_LAW_19702/1b6959f23cc516d0e11ddc2e213ca2dca83560df/"
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/1b6959f23cc516d0e11ddc2e213ca2dca83560df/",
+        "https://www.consultant.ru/document/cons_doc_LAW_461663/92d969e26a4326c5d02fa79b8f9cf4994ee5633b/",
+        "https://www.consultant.ru/document/cons_doc_LAW_461663/21a16253b3660f098ca5f0433fe7166d356e2714/",
+        "https://www.consultant.ru/document/cons_doc_LAW_182659/2a81d1737eb14693e515423a77157b0fb20088c8/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
       "review_date": "2026-11-28",
       "checked_norm_urls": [
-        "https://www.consultant.ru/document/cons_doc_LAW_19702/1b6959f23cc516d0e11ddc2e213ca2dca83560df/"
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/1b6959f23cc516d0e11ddc2e213ca2dca83560df/",
+        "https://www.consultant.ru/document/cons_doc_LAW_461663/92d969e26a4326c5d02fa79b8f9cf4994ee5633b/",
+        "https://www.consultant.ru/document/cons_doc_LAW_461663/21a16253b3660f098ca5f0433fe7166d356e2714/",
+        "https://www.consultant.ru/document/cons_doc_LAW_182659/2a81d1737eb14693e515423a77157b0fb20088c8/"
       ],
       "targeted_option_review": {
         "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
         "option_count": 5,
-        "remaining": "Условия соглашения, порядок расчёта и изменения маршрутов, транспортные полномочия и финансовые лимиты."
+        "remaining": "Установить вид маршрута, тариф, контракт, полномочия и отсутствие повторного покрытия."
+      },
+      "final_case_review_2026_11_28": {
+        "date": "2026-11-28",
+        "scope": "specific_norm_followup_not_full_acceptance",
+        "option_count": 5,
+        "conclusion": "Проверены исходные документы и разграничение субсидии и оплаты перевозок. Перераспределение, изменение расписания, журнал, усиление и уменьшение объёма не оценены как окончательно допустимые без конкретного транспортного режима.",
+        "remaining": "Установить вид маршрута, тариф, контракт, полномочия и отсутствие повторного покрытия.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/1b6959f23cc516d0e11ddc2e213ca2dca83560df/",
+          "https://www.consultant.ru/document/cons_doc_LAW_461663/92d969e26a4326c5d02fa79b8f9cf4994ee5633b/",
+          "https://www.consultant.ru/document/cons_doc_LAW_461663/21a16253b3660f098ca5f0433fe7166d356e2714/",
+          "https://www.consultant.ru/document/cons_doc_LAW_182659/2a81d1737eb14693e515423a77157b0fb20088c8/"
+        ]
       }
     },
     {
@@ -2426,25 +2537,47 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "БК РФ, ст. 78, 78.5; 135-ФЗ, ст. 15: условия предоставления и отбора, запрет необоснованного ограничения конкуренции органами власти.",
+      "legal_basis": "БК РФ, ст. 78, ст. 78.5 п. 2–4, 7; ПП РФ №1782, п. 20–22. Ст. 15 ч. 1 Закона №135-ФЗ запрещает необоснованное ограничение конкуренции. Условия нового конкурса устанавливаются до его начала, с одинаковой оценкой и документируемыми критериями. Объективная приоритизация допускается лишь при законной цели и обосновании.",
       "legal_urls": [
         "https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
         "https://www.consultant.ru/document/cons_doc_LAW_19702/1b6959f23cc516d0e11ddc2e213ca2dca83560df/",
         "https://www.consultant.ru/document/cons_doc_LAW_19702/cc1a194570930b60765fa0b326aae1fd5a41d5bc/",
-        "https://www.consultant.ru/document/cons_doc_LAW_61763/871fb1003dab1dd3ef350f8f7f0f0d10ea20b5c6/"
+        "https://www.consultant.ru/document/cons_doc_LAW_61763/871fb1003dab1dd3ef350f8f7f0f0d10ea20b5c6/",
+        "https://www.consultant.ru/document/cons_doc_LAW_461663/92d969e26a4326c5d02fa79b8f9cf4994ee5633b/",
+        "https://www.consultant.ru/document/cons_doc_LAW_461663/e56a585eaa2468f46672a0a90a9b0734402270db/",
+        "https://www.consultant.ru/document/cons_doc_LAW_461663/f497ae12435f300be00468c6d8a0d058bc77955e/"
       ],
-      "legal_status": "requires_case_specific_current_law_review",
+      "legal_status": "verified_current",
       "activation_allowed": false,
       "review_date": "2026-11-28",
       "checked_norm_urls": [
         "https://www.consultant.ru/document/cons_doc_LAW_19702/1b6959f23cc516d0e11ddc2e213ca2dca83560df/",
         "https://www.consultant.ru/document/cons_doc_LAW_19702/cc1a194570930b60765fa0b326aae1fd5a41d5bc/",
-        "https://www.consultant.ru/document/cons_doc_LAW_61763/871fb1003dab1dd3ef350f8f7f0f0d10ea20b5c6/"
+        "https://www.consultant.ru/document/cons_doc_LAW_61763/871fb1003dab1dd3ef350f8f7f0f0d10ea20b5c6/",
+        "https://www.consultant.ru/document/cons_doc_LAW_461663/92d969e26a4326c5d02fa79b8f9cf4994ee5633b/",
+        "https://www.consultant.ru/document/cons_doc_LAW_461663/e56a585eaa2468f46672a0a90a9b0734402270db/",
+        "https://www.consultant.ru/document/cons_doc_LAW_461663/f497ae12435f300be00468c6d8a0d058bc77955e/"
       ],
       "targeted_option_review": {
-        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
         "option_count": 5,
-        "remaining": "Установить порядок исправления или повторного отбора, критерии программы и допустимость каждой меры поддержки."
+        "remaining": "Оценка дана для явно заданных вымышленных условий, а не реального регионального акта. Конкретный порядок учебной программы задан условием, не выдаётся за действующую реальную программу. Все варианты — рекомендации компетентному органу, а не разрешение расходовать средства; отдельное решение и соблюдение специальных требований обязательны. Полная независимая сверка официальной цепочки поправок не проведена."
+      },
+      "source_scope": "case_specific_current_norms_and_all_alternatives_reviewed_under_stated_facts",
+      "final_case_review_2026_11_28": {
+        "date": "2026-11-28",
+        "scope": "case_specific_legal_acceptance_under_explicit_educational_facts",
+        "option_count": 5,
+        "conclusion": "Проверены все пять предложений нового отбора: объективная готовность, эффективность и стоимость, обоснованный приоритет, независимая экспертиза, этапность. Ни одно не исправляет результат задним числом.",
+        "remaining": "Оценка дана для явно заданных вымышленных условий, а не реального регионального акта. Конкретный порядок учебной программы задан условием, не выдаётся за действующую реальную программу. Все варианты — рекомендации компетентному органу, а не разрешение расходовать средства; отдельное решение и соблюдение специальных требований обязательны. Полная независимая сверка официальной цепочки поправок не проведена.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/1b6959f23cc516d0e11ddc2e213ca2dca83560df/",
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/cc1a194570930b60765fa0b326aae1fd5a41d5bc/",
+          "https://www.consultant.ru/document/cons_doc_LAW_61763/871fb1003dab1dd3ef350f8f7f0f0d10ea20b5c6/",
+          "https://www.consultant.ru/document/cons_doc_LAW_461663/92d969e26a4326c5d02fa79b8f9cf4994ee5633b/",
+          "https://www.consultant.ru/document/cons_doc_LAW_461663/e56a585eaa2468f46672a0a90a9b0734402270db/",
+          "https://www.consultant.ru/document/cons_doc_LAW_461663/f497ae12435f300be00468c6d8a0d058bc77955e/"
+        ]
       }
     },
     {
@@ -2454,21 +2587,40 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "БК РФ, ст. 78: возмещаются затраты по установленной цели и условиям. В учебном случае коммерческие туристические рейсы не относятся к доставке продуктов.",
+      "legal_basis": "БК РФ, ст. 78 п. 1–3; ПП РФ №1782, п. 3, п. 11. Документы подтверждают фактические затраты по допустимому направлению. Общие затраты нельзя автоматически целиком отнести на субсидию; применимая методика распределения и особые правила доставки определяются отдельно.",
       "legal_urls": [
         "https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
-        "https://www.consultant.ru/document/cons_doc_LAW_19702/1b6959f23cc516d0e11ddc2e213ca2dca83560df/"
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/1b6959f23cc516d0e11ddc2e213ca2dca83560df/",
+        "https://www.consultant.ru/document/cons_doc_LAW_461663/92d969e26a4326c5d02fa79b8f9cf4994ee5633b/",
+        "https://www.consultant.ru/document/cons_doc_LAW_461663/21a16253b3660f098ca5f0433fe7166d356e2714/",
+        "https://www.consultant.ru/document/cons_doc_LAW_461663/f497ae12435f300be00468c6d8a0d058bc77955e/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
       "review_date": "2026-11-28",
       "checked_norm_urls": [
-        "https://www.consultant.ru/document/cons_doc_LAW_19702/1b6959f23cc516d0e11ddc2e213ca2dca83560df/"
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/1b6959f23cc516d0e11ddc2e213ca2dca83560df/",
+        "https://www.consultant.ru/document/cons_doc_LAW_461663/92d969e26a4326c5d02fa79b8f9cf4994ee5633b/",
+        "https://www.consultant.ru/document/cons_doc_LAW_461663/21a16253b3660f098ca5f0433fe7166d356e2714/",
+        "https://www.consultant.ru/document/cons_doc_LAW_461663/f497ae12435f300be00468c6d8a0d058bc77955e/"
       ],
       "targeted_option_review": {
         "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
         "option_count": 5,
-        "remaining": "Правила распределения общих затрат, подтверждающие документы и договоры перевозки."
+        "remaining": "Определить применимость специального порядка северного завоза, вид транспорта, методику общих затрат и полномочия."
+      },
+      "final_case_review_2026_11_28": {
+        "date": "2026-11-28",
+        "scope": "specific_norm_followup_not_full_acceptance",
+        "option_count": 5,
+        "conclusion": "Уточнена граница допустимых расходов. Пять мер — реестр, приоритет, расписание, проверка, координация — требуют отдельного установления условий перевозок и северного завоза.",
+        "remaining": "Определить применимость специального порядка северного завоза, вид транспорта, методику общих затрат и полномочия.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/1b6959f23cc516d0e11ddc2e213ca2dca83560df/",
+          "https://www.consultant.ru/document/cons_doc_LAW_461663/92d969e26a4326c5d02fa79b8f9cf4994ee5633b/",
+          "https://www.consultant.ru/document/cons_doc_LAW_461663/21a16253b3660f098ca5f0433fe7166d356e2714/",
+          "https://www.consultant.ru/document/cons_doc_LAW_461663/f497ae12435f300be00468c6d8a0d058bc77955e/"
+        ]
       }
     },
     {
@@ -2669,21 +2821,41 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "БК РФ, статья 78: измеримые условия результата предоставления субсидии. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
+      "legal_basis": "БК РФ, ст. 78 п. 1, пп. 2 п. 2, п. 3, 3.1; ПП РФ от 25.10.2023 №1782 в ред. 14.11.2026, п. 3, 5–8. Пункты 3, 5–7 общих требований: результат, отчётность, мониторинг и возврат при нарушении. Проверяется установленное соглашением определение результата; независимые услуги не считаются новыми рабочими местами по этой программе. При наступлении срока применяются предусмотренные последствия недостижения.",
       "legal_urls": [
         "https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
-        "https://www.consultant.ru/document/cons_doc_LAW_19702/1b6959f23cc516d0e11ddc2e213ca2dca83560df/"
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/1b6959f23cc516d0e11ddc2e213ca2dca83560df/",
+        "https://www.consultant.ru/document/cons_doc_LAW_461663/92d969e26a4326c5d02fa79b8f9cf4994ee5633b/",
+        "https://www.consultant.ru/document/cons_doc_LAW_461663/d0fb212365c2f797bd5d33df1afc201b444b67f6/",
+        "https://www.consultant.ru/document/cons_doc_LAW_461663/f497ae12435f300be00468c6d8a0d058bc77955e/"
       ],
-      "legal_status": "requires_case_specific_current_law_review",
+      "legal_status": "verified_current",
       "activation_allowed": false,
       "checked_norm_urls": [
-        "https://www.consultant.ru/document/cons_doc_LAW_19702/1b6959f23cc516d0e11ddc2e213ca2dca83560df/"
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/1b6959f23cc516d0e11ddc2e213ca2dca83560df/",
+        "https://www.consultant.ru/document/cons_doc_LAW_461663/92d969e26a4326c5d02fa79b8f9cf4994ee5633b/",
+        "https://www.consultant.ru/document/cons_doc_LAW_461663/d0fb212365c2f797bd5d33df1afc201b444b67f6/",
+        "https://www.consultant.ru/document/cons_doc_LAW_461663/f497ae12435f300be00468c6d8a0d058bc77955e/"
       ],
       "review_date": "2026-11-28",
       "targeted_option_review": {
-        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
         "option_count": 5,
-        "remaining": "Тип получателя, порядок предоставления субсидии, определение рабочего места, сроки и условия возврата."
+        "remaining": "Оценка дана для явно заданных вымышленных условий, а не реального регионального акта. Конкретный порядок учебной программы задан условием, не выдаётся за действующую реальную программу. Все варианты — рекомендации компетентному органу, а не разрешение расходовать средства; отдельное решение и соблюдение специальных требований обязательны. Полная независимая сверка официальной цепочки поправок не проведена."
+      },
+      "source_scope": "case_specific_current_norms_and_all_alternatives_reviewed_under_stated_facts",
+      "final_case_review_2026_11_28": {
+        "date": "2026-11-28",
+        "scope": "case_specific_legal_acceptance_under_explicit_educational_facts",
+        "option_count": 5,
+        "conclusion": "Пять мер — подбор/обучение, самостоятельная поддержка подрядчиков, проверка занятости, изменение будущих критериев, контроль исполнения. Все сохраняют исходный показатель, не обещают изменение обязанности или освобождение от возврата.",
+        "remaining": "Оценка дана для явно заданных вымышленных условий, а не реального регионального акта. Конкретный порядок учебной программы задан условием, не выдаётся за действующую реальную программу. Все варианты — рекомендации компетентному органу, а не разрешение расходовать средства; отдельное решение и соблюдение специальных требований обязательны. Полная независимая сверка официальной цепочки поправок не проведена.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/1b6959f23cc516d0e11ddc2e213ca2dca83560df/",
+          "https://www.consultant.ru/document/cons_doc_LAW_461663/92d969e26a4326c5d02fa79b8f9cf4994ee5633b/",
+          "https://www.consultant.ru/document/cons_doc_LAW_461663/d0fb212365c2f797bd5d33df1afc201b444b67f6/",
+          "https://www.consultant.ru/document/cons_doc_LAW_461663/f497ae12435f300be00468c6d8a0d058bc77955e/"
+        ]
       }
     },
     {
@@ -2780,21 +2952,43 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "БК РФ, статья 78: нормативные условия расчёта возмещения недополученных доходов. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
+      "legal_basis": "БК РФ, ст. 78 п. 1–3; ПП РФ №1782, п. 3, п. 11. Размер возмещения определяется применимым нормативным порядком с обоснованной формулой и подтверждёнными данными. Учитывается специальный режим транспортного обслуживания по ст. 14 Закона №220-ФЗ, если он применим.",
       "legal_urls": [
         "https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
-        "https://www.consultant.ru/document/cons_doc_LAW_19702/1b6959f23cc516d0e11ddc2e213ca2dca83560df/"
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/1b6959f23cc516d0e11ddc2e213ca2dca83560df/",
+        "https://www.consultant.ru/document/cons_doc_LAW_461663/92d969e26a4326c5d02fa79b8f9cf4994ee5633b/",
+        "https://www.consultant.ru/document/cons_doc_LAW_461663/21a16253b3660f098ca5f0433fe7166d356e2714/",
+        "https://www.consultant.ru/document/cons_doc_LAW_461663/f497ae12435f300be00468c6d8a0d058bc77955e/",
+        "https://www.consultant.ru/document/cons_doc_LAW_182659/2a81d1737eb14693e515423a77157b0fb20088c8/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
       "checked_norm_urls": [
-        "https://www.consultant.ru/document/cons_doc_LAW_19702/1b6959f23cc516d0e11ddc2e213ca2dca83560df/"
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/1b6959f23cc516d0e11ddc2e213ca2dca83560df/",
+        "https://www.consultant.ru/document/cons_doc_LAW_461663/92d969e26a4326c5d02fa79b8f9cf4994ee5633b/",
+        "https://www.consultant.ru/document/cons_doc_LAW_461663/21a16253b3660f098ca5f0433fe7166d356e2714/",
+        "https://www.consultant.ru/document/cons_doc_LAW_461663/f497ae12435f300be00468c6d8a0d058bc77955e/",
+        "https://www.consultant.ru/document/cons_doc_LAW_182659/2a81d1737eb14693e515423a77157b0fb20088c8/"
       ],
       "review_date": "2026-11-28",
       "targeted_option_review": {
         "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
         "option_count": 5,
-        "remaining": "Правовая форма компенсации, тарифное и транспортное регулирование, порядок субсидии и отсутствие двойного возмещения."
+        "remaining": "Установить льготный тариф, основания компенсации, вид маршрутов, оплату контракта и отсутствие дублирования."
+      },
+      "final_case_review_2026_11_28": {
+        "date": "2026-11-28",
+        "scope": "specific_norm_followup_not_full_acceptance",
+        "option_count": 5,
+        "conclusion": "Различены субсидия на недополученный доход и контрактная оплата. Пять мер требуют проверки тарифных полномочий, льготных категорий и способа расчёта.",
+        "remaining": "Установить льготный тариф, основания компенсации, вид маршрутов, оплату контракта и отсутствие дублирования.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/1b6959f23cc516d0e11ddc2e213ca2dca83560df/",
+          "https://www.consultant.ru/document/cons_doc_LAW_461663/92d969e26a4326c5d02fa79b8f9cf4994ee5633b/",
+          "https://www.consultant.ru/document/cons_doc_LAW_461663/21a16253b3660f098ca5f0433fe7166d356e2714/",
+          "https://www.consultant.ru/document/cons_doc_LAW_461663/f497ae12435f300be00468c6d8a0d058bc77955e/",
+          "https://www.consultant.ru/document/cons_doc_LAW_182659/2a81d1737eb14693e515423a77157b0fb20088c8/"
+        ]
       }
     },
     {
@@ -2853,23 +3047,50 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "БК РФ, статья 78: сохранение целевого результата и допустимый порядок изменения условий субсидии. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
+      "legal_basis": "БК РФ, ст. 78 п. 1, пп. 2 п. 2, п. 3, 3.1; ПП РФ от 25.10.2023 №1782 в ред. 14.11.2026, п. 3, 5–8. Пункт 15 постановления №1782 устанавливает специальные требования к субсидиям на гражданские НИОКР, включая применимые документы о софинансировании, охраноспособный результат и учёт сведений о работах. Замена результата или срока допускается лишь при наличии предусмотренного основания и надлежащем оформлении; реклама не подтверждает научный результат.",
       "legal_urls": [
         "https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
         "https://www.consultant.ru/document/cons_doc_LAW_19702/1b6959f23cc516d0e11ddc2e213ca2dca83560df/",
-        "https://www.consultant.ru/document/cons_doc_LAW_19702/2a2fd8efeffb727e38658d8fcbfc12849b352733/"
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/2a2fd8efeffb727e38658d8fcbfc12849b352733/",
+        "https://www.consultant.ru/document/cons_doc_LAW_461663/92d969e26a4326c5d02fa79b8f9cf4994ee5633b/",
+        "https://www.consultant.ru/document/cons_doc_LAW_461663/c0dc6aaeb948e314982f2003e2c39963f6bd0be6/",
+        "https://www.consultant.ru/document/cons_doc_LAW_461663/38f2a1e9ba8429f7dacc3cdbfb382974ac607eb1/",
+        "https://www.consultant.ru/document/cons_doc_LAW_461663/d0fb212365c2f797bd5d33df1afc201b444b67f6/",
+        "https://www.consultant.ru/document/cons_doc_LAW_461663/f497ae12435f300be00468c6d8a0d058bc77955e/"
       ],
-      "legal_status": "requires_case_specific_current_law_review",
+      "legal_status": "verified_current",
       "activation_allowed": false,
       "checked_norm_urls": [
         "https://www.consultant.ru/document/cons_doc_LAW_19702/1b6959f23cc516d0e11ddc2e213ca2dca83560df/",
-        "https://www.consultant.ru/document/cons_doc_LAW_19702/2a2fd8efeffb727e38658d8fcbfc12849b352733/"
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/2a2fd8efeffb727e38658d8fcbfc12849b352733/",
+        "https://www.consultant.ru/document/cons_doc_LAW_461663/92d969e26a4326c5d02fa79b8f9cf4994ee5633b/",
+        "https://www.consultant.ru/document/cons_doc_LAW_461663/c0dc6aaeb948e314982f2003e2c39963f6bd0be6/",
+        "https://www.consultant.ru/document/cons_doc_LAW_461663/38f2a1e9ba8429f7dacc3cdbfb382974ac607eb1/",
+        "https://www.consultant.ru/document/cons_doc_LAW_461663/d0fb212365c2f797bd5d33df1afc201b444b67f6/",
+        "https://www.consultant.ru/document/cons_doc_LAW_461663/f497ae12435f300be00468c6d8a0d058bc77955e/"
       ],
       "review_date": "2026-11-28",
       "targeted_option_review": {
-        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
         "option_count": 5,
-        "remaining": "Организационно-правовая форма получателя (статья 78 либо 78.1), вид гранта, порядок изменения, срок и возврат."
+        "remaining": "Оценка дана для явно заданных вымышленных условий, а не реального регионального акта. Конкретный порядок учебной программы задан условием, не выдаётся за действующую реальную программу. Все варианты — рекомендации компетентному органу, а не разрешение расходовать средства; отдельное решение и соблюдение специальных требований обязательны. Полная независимая сверка официальной цепочки поправок не проведена."
+      },
+      "source_scope": "case_specific_current_norms_and_all_alternatives_reviewed_under_stated_facts",
+      "final_case_review_2026_11_28": {
+        "date": "2026-11-28",
+        "scope": "case_specific_legal_acceptance_under_explicit_educational_facts",
+        "option_count": 5,
+        "conclusion": "Пять вариантов — доработка, законное изменение, независимая оценка, отдельная мера популяризации, контроль. Обязательные научные результаты не отменены, основания изменения или дополнительной поддержки не презюмируются.",
+        "remaining": "Оценка дана для явно заданных вымышленных условий, а не реального регионального акта. Конкретный порядок учебной программы задан условием, не выдаётся за действующую реальную программу. Все варианты — рекомендации компетентному органу, а не разрешение расходовать средства; отдельное решение и соблюдение специальных требований обязательны. Полная независимая сверка официальной цепочки поправок не проведена.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/1b6959f23cc516d0e11ddc2e213ca2dca83560df/",
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/2a2fd8efeffb727e38658d8fcbfc12849b352733/",
+          "https://www.consultant.ru/document/cons_doc_LAW_461663/92d969e26a4326c5d02fa79b8f9cf4994ee5633b/",
+          "https://www.consultant.ru/document/cons_doc_LAW_461663/c0dc6aaeb948e314982f2003e2c39963f6bd0be6/",
+          "https://www.consultant.ru/document/cons_doc_LAW_461663/38f2a1e9ba8429f7dacc3cdbfb382974ac607eb1/",
+          "https://www.consultant.ru/document/cons_doc_LAW_461663/d0fb212365c2f797bd5d33df1afc201b444b67f6/",
+          "https://www.consultant.ru/document/cons_doc_LAW_461663/f497ae12435f300be00468c6d8a0d058bc77955e/"
+        ]
       }
     },
     {
@@ -2941,23 +3162,44 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "БК РФ, статья 78: опубликованные условия и процедура отбора получателей субсидии. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
+      "legal_basis": "БК РФ, ст. 78, ст. 78.5 п. 2–4, 7; ПП РФ №1782, п. 20–22. П. 21 и 22 общих требований устанавливают опубликованные сроки и основания отклонения, в том числе фактическую просрочку. Устное указание не меняет опубликованную дату. Своевременность не означает автоматическую победу: заявка оценивается по всем законным критериям.",
       "legal_urls": [
         "https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
         "https://www.consultant.ru/document/cons_doc_LAW_19702/1b6959f23cc516d0e11ddc2e213ca2dca83560df/",
-        "https://www.consultant.ru/document/cons_doc_LAW_19702/cc1a194570930b60765fa0b326aae1fd5a41d5bc/"
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/cc1a194570930b60765fa0b326aae1fd5a41d5bc/",
+        "https://www.consultant.ru/document/cons_doc_LAW_461663/92d969e26a4326c5d02fa79b8f9cf4994ee5633b/",
+        "https://www.consultant.ru/document/cons_doc_LAW_461663/e56a585eaa2468f46672a0a90a9b0734402270db/",
+        "https://www.consultant.ru/document/cons_doc_LAW_461663/f497ae12435f300be00468c6d8a0d058bc77955e/"
       ],
-      "legal_status": "requires_case_specific_current_law_review",
+      "legal_status": "verified_current",
       "activation_allowed": false,
       "checked_norm_urls": [
         "https://www.consultant.ru/document/cons_doc_LAW_19702/1b6959f23cc516d0e11ddc2e213ca2dca83560df/",
-        "https://www.consultant.ru/document/cons_doc_LAW_19702/cc1a194570930b60765fa0b326aae1fd5a41d5bc/"
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/cc1a194570930b60765fa0b326aae1fd5a41d5bc/",
+        "https://www.consultant.ru/document/cons_doc_LAW_461663/92d969e26a4326c5d02fa79b8f9cf4994ee5633b/",
+        "https://www.consultant.ru/document/cons_doc_LAW_461663/e56a585eaa2468f46672a0a90a9b0734402270db/",
+        "https://www.consultant.ru/document/cons_doc_LAW_461663/f497ae12435f300be00468c6d8a0d058bc77955e/"
       ],
       "review_date": "2026-11-28",
       "targeted_option_review": {
-        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
         "option_count": 5,
-        "remaining": "Региональный порядок отбора, стадия процедуры, механизм исправления протокола или повторного отбора; конкретное средство защиты проверяется отдельно."
+        "remaining": "Оценка дана для явно заданных вымышленных условий, а не реального регионального акта. Конкретный порядок учебной программы задан условием, не выдаётся за действующую реальную программу. Все варианты — рекомендации компетентному органу, а не разрешение расходовать средства; отдельное решение и соблюдение специальных требований обязательны. Полная независимая сверка официальной цепочки поправок не проведена."
+      },
+      "source_scope": "case_specific_current_norms_and_all_alternatives_reviewed_under_stated_facts",
+      "final_case_review_2026_11_28": {
+        "date": "2026-11-28",
+        "scope": "case_specific_legal_acceptance_under_explicit_educational_facts",
+        "option_count": 5,
+        "conclusion": "Пять мер — контроль равного рассмотрения, проверка записей, пояснение календаря, контроль неизменности условий, разъяснение каналов защиты. Все дополнительные к обязательному исправлению проекта протокола.",
+        "remaining": "Оценка дана для явно заданных вымышленных условий, а не реального регионального акта. Конкретный порядок учебной программы задан условием, не выдаётся за действующую реальную программу. Все варианты — рекомендации компетентному органу, а не разрешение расходовать средства; отдельное решение и соблюдение специальных требований обязательны. Полная независимая сверка официальной цепочки поправок не проведена.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/1b6959f23cc516d0e11ddc2e213ca2dca83560df/",
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/cc1a194570930b60765fa0b326aae1fd5a41d5bc/",
+          "https://www.consultant.ru/document/cons_doc_LAW_461663/92d969e26a4326c5d02fa79b8f9cf4994ee5633b/",
+          "https://www.consultant.ru/document/cons_doc_LAW_461663/e56a585eaa2468f46672a0a90a9b0734402270db/",
+          "https://www.consultant.ru/document/cons_doc_LAW_461663/f497ae12435f300be00468c6d8a0d058bc77955e/"
+        ]
       }
     },
     {
@@ -2967,21 +3209,44 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "БК РФ, статья 78: возмещение предусмотренных программой видов затрат. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
+      "legal_basis": "БК РФ, ст. 78 п. 1–3; ПП РФ №1782, п. 3, п. 11. Ст. 28 Закона №164-ФЗ допускает включение выкупной цены в общую сумму лизингового договора, поэтому её нельзя считать всегда незаконной. Исключение в этой задаче вытекает именно из перечня допустимых затрат учебной программы. Неустойка также не входит в перечень.",
       "legal_urls": [
         "https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
-        "https://www.consultant.ru/document/cons_doc_LAW_19702/1b6959f23cc516d0e11ddc2e213ca2dca83560df/"
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/1b6959f23cc516d0e11ddc2e213ca2dca83560df/",
+        "https://www.consultant.ru/document/cons_doc_LAW_461663/92d969e26a4326c5d02fa79b8f9cf4994ee5633b/",
+        "https://www.consultant.ru/document/cons_doc_LAW_461663/21a16253b3660f098ca5f0433fe7166d356e2714/",
+        "https://www.consultant.ru/document/cons_doc_LAW_461663/f497ae12435f300be00468c6d8a0d058bc77955e/",
+        "https://www.consultant.ru/document/cons_doc_LAW_20780/68e64416d1697461e8677d6c9f1c2640a4131c23/"
       ],
-      "legal_status": "requires_case_specific_current_law_review",
+      "legal_status": "verified_current",
       "activation_allowed": false,
       "checked_norm_urls": [
-        "https://www.consultant.ru/document/cons_doc_LAW_19702/1b6959f23cc516d0e11ddc2e213ca2dca83560df/"
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/1b6959f23cc516d0e11ddc2e213ca2dca83560df/",
+        "https://www.consultant.ru/document/cons_doc_LAW_461663/92d969e26a4326c5d02fa79b8f9cf4994ee5633b/",
+        "https://www.consultant.ru/document/cons_doc_LAW_461663/21a16253b3660f098ca5f0433fe7166d356e2714/",
+        "https://www.consultant.ru/document/cons_doc_LAW_461663/f497ae12435f300be00468c6d8a0d058bc77955e/",
+        "https://www.consultant.ru/document/cons_doc_LAW_20780/68e64416d1697461e8677d6c9f1c2640a4131c23/"
       ],
       "review_date": "2026-11-28",
       "targeted_option_review": {
-        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
         "option_count": 5,
-        "remaining": "Договор лизинга, вид получателя, утверждённый перечень расходов и период, основания иных мер."
+        "remaining": "Оценка дана для явно заданных вымышленных условий, а не реального регионального акта. Конкретный порядок учебной программы задан условием, не выдаётся за действующую реальную программу. Все варианты — рекомендации компетентному органу, а не разрешение расходовать средства; отдельное решение и соблюдение специальных требований обязательны. Полная независимая сверка официальной цепочки поправок не проведена."
+      },
+      "source_scope": "case_specific_current_norms_and_all_alternatives_reviewed_under_stated_facts",
+      "final_case_review_2026_11_28": {
+        "date": "2026-11-28",
+        "scope": "case_specific_legal_acceptance_under_explicit_educational_facts",
+        "option_count": 5,
+        "conclusion": "Проверены пять мер: предусмотренная компенсация, самостоятельная модернизация, консультации, проверка сложных графиков и будущие критерии. Ни одна не включает выкуп или штраф в текущую выплату.",
+        "remaining": "Оценка дана для явно заданных вымышленных условий, а не реального регионального акта. Конкретный порядок учебной программы задан условием, не выдаётся за действующую реальную программу. Все варианты — рекомендации компетентному органу, а не разрешение расходовать средства; отдельное решение и соблюдение специальных требований обязательны. Полная независимая сверка официальной цепочки поправок не проведена.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/1b6959f23cc516d0e11ddc2e213ca2dca83560df/",
+          "https://www.consultant.ru/document/cons_doc_LAW_461663/92d969e26a4326c5d02fa79b8f9cf4994ee5633b/",
+          "https://www.consultant.ru/document/cons_doc_LAW_461663/21a16253b3660f098ca5f0433fe7166d356e2714/",
+          "https://www.consultant.ru/document/cons_doc_LAW_461663/f497ae12435f300be00468c6d8a0d058bc77955e/",
+          "https://www.consultant.ru/document/cons_doc_LAW_20780/68e64416d1697461e8677d6c9f1c2640a4131c23/"
+        ]
       }
     },
     {
@@ -3473,21 +3738,41 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "БК РФ, статья 78: получатель и подтверждённые возмещаемые затраты. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
+      "legal_basis": "БК РФ, ст. 78 п. 1–3; ПП РФ №1782, п. 3, п. 11. Возмещаются расходы конкретного надлежащего получателя по документам. Само вхождение в группу компаний не делает расходы одного юридического лица затратами другого. Иной режим совместных проектов может быть предусмотрен только самостоятельно и законно.",
       "legal_urls": [
         "https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
-        "https://www.consultant.ru/document/cons_doc_LAW_19702/1b6959f23cc516d0e11ddc2e213ca2dca83560df/"
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/1b6959f23cc516d0e11ddc2e213ca2dca83560df/",
+        "https://www.consultant.ru/document/cons_doc_LAW_461663/92d969e26a4326c5d02fa79b8f9cf4994ee5633b/",
+        "https://www.consultant.ru/document/cons_doc_LAW_461663/21a16253b3660f098ca5f0433fe7166d356e2714/",
+        "https://www.consultant.ru/document/cons_doc_LAW_461663/f497ae12435f300be00468c6d8a0d058bc77955e/"
       ],
-      "legal_status": "requires_case_specific_current_law_review",
+      "legal_status": "verified_current",
       "activation_allowed": false,
       "checked_norm_urls": [
-        "https://www.consultant.ru/document/cons_doc_LAW_19702/1b6959f23cc516d0e11ddc2e213ca2dca83560df/"
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/1b6959f23cc516d0e11ddc2e213ca2dca83560df/",
+        "https://www.consultant.ru/document/cons_doc_LAW_461663/92d969e26a4326c5d02fa79b8f9cf4994ee5633b/",
+        "https://www.consultant.ru/document/cons_doc_LAW_461663/21a16253b3660f098ca5f0433fe7166d356e2714/",
+        "https://www.consultant.ru/document/cons_doc_LAW_461663/f497ae12435f300be00468c6d8a0d058bc77955e/"
       ],
       "review_date": "2026-11-28",
       "targeted_option_review": {
-        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
         "option_count": 5,
-        "remaining": "Получатель, право на оборудование, фактический плательщик, условия программы и возможность совместных проектов."
+        "remaining": "Оценка дана для явно заданных вымышленных условий, а не реального регионального акта. Конкретный порядок учебной программы задан условием, не выдаётся за действующую реальную программу. Все варианты — рекомендации компетентному органу, а не разрешение расходовать средства; отдельное решение и соблюдение специальных требований обязательны. Полная независимая сверка официальной цепочки поправок не проведена."
+      },
+      "source_scope": "case_specific_current_norms_and_all_alternatives_reviewed_under_stated_facts",
+      "final_case_review_2026_11_28": {
+        "date": "2026-11-28",
+        "scope": "case_specific_legal_acceptance_under_explicit_educational_facts",
+        "option_count": 5,
+        "conclusion": "Пять мер — проверка принадлежности, консультация, надлежащая заявка при наличии основания, будущая совместная программа, контроль повторного возмещения. Они не санкционируют выплату головной компании по чужому акту.",
+        "remaining": "Оценка дана для явно заданных вымышленных условий, а не реального регионального акта. Конкретный порядок учебной программы задан условием, не выдаётся за действующую реальную программу. Все варианты — рекомендации компетентному органу, а не разрешение расходовать средства; отдельное решение и соблюдение специальных требований обязательны. Полная независимая сверка официальной цепочки поправок не проведена.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/1b6959f23cc516d0e11ddc2e213ca2dca83560df/",
+          "https://www.consultant.ru/document/cons_doc_LAW_461663/92d969e26a4326c5d02fa79b8f9cf4994ee5633b/",
+          "https://www.consultant.ru/document/cons_doc_LAW_461663/21a16253b3660f098ca5f0433fe7166d356e2714/",
+          "https://www.consultant.ru/document/cons_doc_LAW_461663/f497ae12435f300be00468c6d8a0d058bc77955e/"
+        ]
       }
     },
     {
@@ -3725,21 +4010,44 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "БК РФ, статья 78: условия предоставления субсидии и соглашение. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
+      "legal_basis": "БК РФ, ст. 78 п. 1, пп. 2 п. 2, п. 3, 3.1; ПП РФ от 25.10.2023 №1782 в ред. 14.11.2026, п. 3, 5–8. П. 3 подп. «ж», «з» общих требований определяет порядок соглашений и их изменений, в том числе при сокращении лимитов. Новые обязанности не возникают из произвольного письма; изменение возможно при наличии правового основания и надлежащей формы, а не только по желанию одной стороны.",
       "legal_urls": [
         "https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
-        "https://www.consultant.ru/document/cons_doc_LAW_19702/1b6959f23cc516d0e11ddc2e213ca2dca83560df/"
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/1b6959f23cc516d0e11ddc2e213ca2dca83560df/",
+        "https://www.consultant.ru/document/cons_doc_LAW_461663/92d969e26a4326c5d02fa79b8f9cf4994ee5633b/",
+        "https://www.consultant.ru/document/cons_doc_LAW_461663/f497ae12435f300be00468c6d8a0d058bc77955e/",
+        "https://www.consultant.ru/document/cons_doc_LAW_461663/d0fb212365c2f797bd5d33df1afc201b444b67f6/",
+        "https://www.consultant.ru/document/cons_doc_LAW_461663/a1a45a1ff2c85c2136aa42b1b36f0bd1a62de4c0/"
       ],
-      "legal_status": "requires_case_specific_current_law_review",
+      "legal_status": "verified_current",
       "activation_allowed": false,
       "checked_norm_urls": [
-        "https://www.consultant.ru/document/cons_doc_LAW_19702/1b6959f23cc516d0e11ddc2e213ca2dca83560df/"
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/1b6959f23cc516d0e11ddc2e213ca2dca83560df/",
+        "https://www.consultant.ru/document/cons_doc_LAW_461663/92d969e26a4326c5d02fa79b8f9cf4994ee5633b/",
+        "https://www.consultant.ru/document/cons_doc_LAW_461663/f497ae12435f300be00468c6d8a0d058bc77955e/",
+        "https://www.consultant.ru/document/cons_doc_LAW_461663/d0fb212365c2f797bd5d33df1afc201b444b67f6/",
+        "https://www.consultant.ru/document/cons_doc_LAW_461663/a1a45a1ff2c85c2136aa42b1b36f0bd1a62de4c0/"
       ],
       "review_date": "2026-11-28",
       "targeted_option_review": {
-        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
         "option_count": 5,
-        "remaining": "Вид получателя, действующий порядок, основания изменения или приостановления выплаты, условия соглашения."
+        "remaining": "Оценка дана для явно заданных вымышленных условий, а не реального регионального акта. Конкретный порядок учебной программы задан условием, не выдаётся за действующую реальную программу. Все варианты — рекомендации компетентному органу, а не разрешение расходовать средства; отдельное решение и соблюдение специальных требований обязательны. Полная независимая сверка официальной цепочки поправок не проведена."
+      },
+      "source_scope": "case_specific_current_norms_and_all_alternatives_reviewed_under_stated_facts",
+      "final_case_review_2026_11_28": {
+        "date": "2026-11-28",
+        "scope": "case_specific_legal_acceptance_under_explicit_educational_facts",
+        "option_count": 5,
+        "conclusion": "Пять мер — допустимое добровольное изменение, сохранение условий с будущими критериями, консультация, новая программа, оценка исполнения. Ни одна не легализует самовольное приостановление платежа.",
+        "remaining": "Оценка дана для явно заданных вымышленных условий, а не реального регионального акта. Конкретный порядок учебной программы задан условием, не выдаётся за действующую реальную программу. Все варианты — рекомендации компетентному органу, а не разрешение расходовать средства; отдельное решение и соблюдение специальных требований обязательны. Полная независимая сверка официальной цепочки поправок не проведена.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/1b6959f23cc516d0e11ddc2e213ca2dca83560df/",
+          "https://www.consultant.ru/document/cons_doc_LAW_461663/92d969e26a4326c5d02fa79b8f9cf4994ee5633b/",
+          "https://www.consultant.ru/document/cons_doc_LAW_461663/f497ae12435f300be00468c6d8a0d058bc77955e/",
+          "https://www.consultant.ru/document/cons_doc_LAW_461663/d0fb212365c2f797bd5d33df1afc201b444b67f6/",
+          "https://www.consultant.ru/document/cons_doc_LAW_461663/a1a45a1ff2c85c2136aa42b1b36f0bd1a62de4c0/"
+        ]
       }
     },
     {
@@ -3786,21 +4094,40 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "БК РФ, статья 78: получатель, целевые условия и перечисление субсидии. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
+      "legal_basis": "БК РФ, ст. 78 п. 1, пп. 2 п. 2, п. 3, 3.1; ПП РФ от 25.10.2023 №1782 в ред. 14.11.2026, п. 3, 5–8. П. 10 подп. «а» общих требований и п. 11 подп. «б» разграничивают счета получателей и возможные специальные режимы. Смена получателя или платёж третьему лицу не могут служить обходом законного ареста. Последствия конкретного исполнительного ограничения требуют отдельной проверки.",
       "legal_urls": [
         "https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
-        "https://www.consultant.ru/document/cons_doc_LAW_19702/1b6959f23cc516d0e11ddc2e213ca2dca83560df/"
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/1b6959f23cc516d0e11ddc2e213ca2dca83560df/",
+        "https://www.consultant.ru/document/cons_doc_LAW_461663/92d969e26a4326c5d02fa79b8f9cf4994ee5633b/",
+        "https://www.consultant.ru/document/cons_doc_LAW_461663/a1a45a1ff2c85c2136aa42b1b36f0bd1a62de4c0/",
+        "https://www.consultant.ru/document/cons_doc_LAW_461663/21a16253b3660f098ca5f0433fe7166d356e2714/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
       "checked_norm_urls": [
-        "https://www.consultant.ru/document/cons_doc_LAW_19702/1b6959f23cc516d0e11ddc2e213ca2dca83560df/"
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/1b6959f23cc516d0e11ddc2e213ca2dca83560df/",
+        "https://www.consultant.ru/document/cons_doc_LAW_461663/92d969e26a4326c5d02fa79b8f9cf4994ee5633b/",
+        "https://www.consultant.ru/document/cons_doc_LAW_461663/a1a45a1ff2c85c2136aa42b1b36f0bd1a62de4c0/",
+        "https://www.consultant.ru/document/cons_doc_LAW_461663/21a16253b3660f098ca5f0433fe7166d356e2714/"
       ],
       "review_date": "2026-11-28",
       "targeted_option_review": {
         "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
         "option_count": 5,
-        "remaining": "Вид и объём ареста, применимый порядок субсидии, правопреемство, возможные меры исполнения или возврата."
+        "remaining": "Установить исполнительный документ, объект ареста, режим счёта, допустимость изменения получателя и правопреемство."
+      },
+      "final_case_review_2026_11_28": {
+        "date": "2026-11-28",
+        "scope": "specific_norm_followup_not_full_acceptance",
+        "option_count": 5,
+        "conclusion": "Уточнено, что третья фирма не является установленным получателем. Пять мер требуют проверки вида ареста и правопреемства; статус не повышен.",
+        "remaining": "Установить исполнительный документ, объект ареста, режим счёта, допустимость изменения получателя и правопреемство.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/1b6959f23cc516d0e11ddc2e213ca2dca83560df/",
+          "https://www.consultant.ru/document/cons_doc_LAW_461663/92d969e26a4326c5d02fa79b8f9cf4994ee5633b/",
+          "https://www.consultant.ru/document/cons_doc_LAW_461663/a1a45a1ff2c85c2136aa42b1b36f0bd1a62de4c0/",
+          "https://www.consultant.ru/document/cons_doc_LAW_461663/21a16253b3660f098ca5f0433fe7166d356e2714/"
+        ]
       }
     },
     {
