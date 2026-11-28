@@ -1,0 +1,605 @@
+{
+  "status": "proposal_only_not_applied_requires_owner_approval",
+  "date": "2026-11-28",
+  "source_commit": "db6768e7a493c4cf4f8c11f5f379f6cf75c15358",
+  "policy": "Независимый пакет E; не пересекается с A–D. Прямые эффекты ±4 до утверждённого деления. Только существующие разрешённые показатели, условные игровые гипотезы. Не вводить до утверждения.",
+  "summary": {
+    "cases": 17,
+    "changed_fields": 19,
+    "direct_dominated_before": 122,
+    "direct_dominated_after": 103,
+    "pairs_before": 127,
+    "pairs_after": 108,
+    "removed_pairs": 19,
+    "projections": 5682,
+    "errors": 0
+  },
+  "cases": [
+    {
+      "case_key": "bank-legal-2026-104",
+      "title": "Техническое задание под марку",
+      "before": [
+        {
+          "option": "option_3",
+          "by": "option_5"
+        }
+      ],
+      "changes": [
+        {
+          "option": "option_3",
+          "label": "Сопоставить допустимые образцы по единым функциональным критериям до закупки",
+          "metric": "elite_support",
+          "raw_before": -1,
+          "raw_after": 0,
+          "scaled_before": -0.011236,
+          "scaled_after": 0,
+          "introduces_existing_metric_to_option": false,
+          "reason": "Единые функциональные испытания доступных образцов до закупки снижают риск принятия неподходящей спецификации. Это условное преимущество согласования внутри учреждения, а не результат закупки."
+        }
+      ],
+      "after": []
+    },
+    {
+      "case_key": "bank-legal-2026-113",
+      "title": "Испытание для беременной",
+      "before": [
+        {
+          "option": "option_1",
+          "by": "option_3"
+        }
+      ],
+      "changes": [
+        {
+          "option": "option_1",
+          "label": "Организовать обычную адаптацию нового сотрудника без испытательного срока",
+          "metric": "trust",
+          "raw_before": 2,
+          "raw_after": 3,
+          "scaled_before": 0.022472,
+          "scaled_after": 0.033708,
+          "introduces_existing_metric_to_option": false,
+          "reason": "Обычная адаптация без запрещённого испытания непосредственно поддерживает нового работника; проверка иных договоров действует менее адресно."
+        }
+      ],
+      "after": []
+    },
+    {
+      "case_key": "bank-legal-2026-116",
+      "title": "Публичный список диагнозов",
+      "before": [
+        {
+          "option": "option_3",
+          "by": "option_5"
+        }
+      ],
+      "changes": [
+        {
+          "option": "option_3",
+          "label": "Организовать очную помощь через существующую регистратуру для пациентов без электронного доступа",
+          "metric": "social_stability",
+          "raw_before": 0,
+          "raw_after": 1,
+          "scaled_before": 0,
+          "scaled_after": 0.011236,
+          "introduces_existing_metric_to_option": true,
+          "reason": "Очная помощь через существующую регистратуру сохраняет доступ к медицинской услуге для людей без электронного доступа, без расширения раскрытия диагнозов."
+        }
+      ],
+      "after": []
+    },
+    {
+      "case_key": "bank-legal-2026-121",
+      "title": "Согласование мирного собрания",
+      "before": [
+        {
+          "option": "option_5",
+          "by": "option_4"
+        }
+      ],
+      "changes": [
+        {
+          "option": "option_5",
+          "label": "Предложить обезличенный разбор практики обработки уведомлений",
+          "metric": "trust",
+          "raw_before": 1,
+          "raw_after": 2,
+          "scaled_before": 0.011236,
+          "scaled_after": 0.022472,
+          "introduces_existing_metric_to_option": false,
+          "reason": "Обезличенный разбор выявляет системные ошибки обработки уведомлений и помогает последовательно соблюдать права всех организаторов; эффект условен."
+        }
+      ],
+      "after": []
+    },
+    {
+      "case_key": "bank-legal-2026-126",
+      "title": "Льгота за партийный билет",
+      "before": [
+        {
+          "option": "option_5",
+          "by": "option_1"
+        }
+      ],
+      "changes": [
+        {
+          "option": "option_5",
+          "label": "Провести публичное обсуждение альтернатив поддержки без партийного критерия",
+          "metric": "media_climate",
+          "raw_before": 0,
+          "raw_after": 1,
+          "scaled_before": 0,
+          "scaled_after": 0.011236,
+          "introduces_existing_metric_to_option": true,
+          "reason": "Публичное обсуждение объективных альтернатив поддержки создаёт прозрачную информационную среду без партийного критерия."
+        }
+      ],
+      "after": []
+    },
+    {
+      "case_key": "bank-legal-2026-127",
+      "title": "Региональный запрет торговли",
+      "before": [
+        {
+          "option": "option_5",
+          "by": "option_3"
+        }
+      ],
+      "changes": [
+        {
+          "option": "option_5",
+          "label": "Подготовить рекомендации о совершенствовании правил через компетентные органы",
+          "metric": "elite_support",
+          "raw_before": -1,
+          "raw_after": 0,
+          "scaled_before": -0.011236,
+          "scaled_after": 0,
+          "introduces_existing_metric_to_option": false,
+          "reason": "Рекомендации компетентным органам позволяют обсуждать предсказуемые правила без немедленного обязательства финансировать программу поддержки."
+        }
+      ],
+      "after": []
+    },
+    {
+      "case_key": "bank-legal-2026-128",
+      "title": "Конкурентная аренда земли",
+      "before": [
+        {
+          "option": "option_5",
+          "by": "option_1"
+        }
+      ],
+      "changes": [
+        {
+          "option": "option_5",
+          "label": "Согласовать план контроля соблюдения условий после заключения договора",
+          "metric": "economy",
+          "raw_before": 1,
+          "raw_after": 2,
+          "scaled_before": 0.011236,
+          "scaled_after": 0.022472,
+          "introduces_existing_metric_to_option": false,
+          "reason": "План контроля после заключения договора уменьшает риск ненадлежащего использования участка и последующих затрат; это условная оценка, не доход бюджета."
+        }
+      ],
+      "after": []
+    },
+    {
+      "case_key": "bank-legal-2026-130",
+      "title": "Экологический платёж вместо разрешения",
+      "before": [
+        {
+          "option": "option_3",
+          "by": "option_1"
+        }
+      ],
+      "changes": [
+        {
+          "option": "option_3",
+          "label": "Согласовать законные временные ограничения работы до выполнения требований",
+          "metric": "trust",
+          "raw_before": 2,
+          "raw_after": 3,
+          "scaled_before": 0.022472,
+          "scaled_after": 0.033708,
+          "introduces_existing_metric_to_option": false,
+          "reason": "Законное временное ограничение до выполнения требований даёт более немедленный видимый ответ на подтверждённое нарушение, чем постепенная модернизация; фактический экологический результат не гарантирован."
+        }
+      ],
+      "after": []
+    },
+    {
+      "case_key": "bank-legal-2026-133",
+      "title": "Обязательное примирение без согласия",
+      "before": [
+        {
+          "option": "option_3",
+          "by": "option_1"
+        }
+      ],
+      "changes": [
+        {
+          "option": "option_3",
+          "label": "Подготовить раздельное юридическое разъяснение прав каждой стороне",
+          "metric": "trust",
+          "raw_before": 3,
+          "raw_after": 4,
+          "scaled_before": 0.033708,
+          "scaled_after": 0.044944,
+          "introduces_existing_metric_to_option": false,
+          "reason": "Раздельное объяснение прав каждой стороне защищает автономию решения после попытки навязать несогласованное соглашение."
+        }
+      ],
+      "after": []
+    },
+    {
+      "case_key": "bank-legal-2026-136",
+      "title": "Наследство и неподписанное обещание",
+      "before": [
+        {
+          "option": "option_3",
+          "by": "option_1"
+        },
+        {
+          "option": "option_4",
+          "by": "option_1"
+        }
+      ],
+      "changes": [
+        {
+          "option": "option_3",
+          "label": "Согласовать добровольное обсуждение интересов наследников без предрешения прав",
+          "metric": "social_stability",
+          "raw_before": 0,
+          "raw_after": 1,
+          "scaled_before": 0,
+          "scaled_after": 0.011236,
+          "introduces_existing_metric_to_option": true,
+          "reason": "Добровольное обсуждение интересов наследников может снизить конфликт, не предрешая наследственные права."
+        },
+        {
+          "option": "option_4",
+          "label": "Подготовить перечень спорных вопросов для разрешения компетентным органом",
+          "metric": "elite_support",
+          "raw_before": 2,
+          "raw_after": 3,
+          "scaled_before": 0.022472,
+          "scaled_after": 0.033708,
+          "introduces_existing_metric_to_option": false,
+          "reason": "Структурированный перечень спорных вопросов сокращает повторную подготовку материалов компетентным органом; не подменяет его решение."
+        }
+      ],
+      "after": []
+    },
+    {
+      "case_key": "bank-legal-2026-137",
+      "title": "Договор с несовершеннолетним",
+      "before": [
+        {
+          "option": "option_2",
+          "by": "option_3"
+        },
+        {
+          "option": "option_5",
+          "by": "option_1"
+        }
+      ],
+      "changes": [
+        {
+          "option": "option_2",
+          "label": "Организовать консультацию о последствиях сделки и способах оспаривания",
+          "metric": "elite_support",
+          "raw_before": -1,
+          "raw_after": 0,
+          "scaled_before": -0.011236,
+          "scaled_after": 0,
+          "introduces_existing_metric_to_option": false,
+          "reason": "Консультация о способах оспаривания позволяет представителю и продавцу выбирать законный порядок исправления конкретной сделки без сплошной внутренней проверки."
+        },
+        {
+          "option": "option_5",
+          "label": "Предложить улучшить информационные материалы магазина о договорных условиях",
+          "metric": "economy",
+          "raw_before": 1,
+          "raw_after": 2,
+          "scaled_before": 0.011236,
+          "scaled_after": 0.022472,
+          "introduces_existing_metric_to_option": false,
+          "reason": "Понятные материалы об условиях договора уменьшают риск повторных недоразумений и издержек на урегулирование будущих сделок."
+        }
+      ],
+      "after": []
+    },
+    {
+      "case_key": "bank-legal-2026-138",
+      "title": "Благоустройство без слушаний",
+      "before": [
+        {
+          "option": "option_1",
+          "by": "option_5"
+        }
+      ],
+      "changes": [
+        {
+          "option": "option_1",
+          "label": "Организовать дополнительные очные обсуждения в затронутом квартале",
+          "metric": "social_stability",
+          "raw_before": 0,
+          "raw_after": 1,
+          "scaled_before": 0,
+          "scaled_after": 0.011236,
+          "introduces_existing_metric_to_option": true,
+          "reason": "Очное обсуждение в затронутом квартале вовлекает жителей, пропустивших онлайн-опрос, и условно снижает конфликтность; обязательную публичную процедуру не заменяет."
+        }
+      ],
+      "after": []
+    },
+    {
+      "case_key": "bank-legal-2026-139",
+      "title": "Публичное обещание компенсации",
+      "before": [
+        {
+          "option": "option_1",
+          "by": "option_5"
+        }
+      ],
+      "changes": [
+        {
+          "option": "option_1",
+          "label": "Предложить адресную дополнительную меру с прозрачными критериями нуждаемости",
+          "metric": "social_stability",
+          "raw_before": 0,
+          "raw_after": 1,
+          "scaled_before": 0,
+          "scaled_after": 0.011236,
+          "introduces_existing_metric_to_option": true,
+          "reason": "Адресные прозрачные критерии нуждаемости позволяют при наличии законного основания направить поддержку наиболее нуждающимся; право на выплату не возникает автоматически."
+        }
+      ],
+      "after": []
+    },
+    {
+      "case_key": "bank-legal-2026-142",
+      "title": "Чужое фото в партийной программе",
+      "before": [
+        {
+          "option": "option_1",
+          "by": "option_5"
+        }
+      ],
+      "changes": [
+        {
+          "option": "option_1",
+          "label": "Предложить приобрести необходимую лицензию на выбранную фотографию",
+          "metric": "economy",
+          "raw_before": -1,
+          "raw_after": 0,
+          "scaled_before": -0.011236,
+          "scaled_after": 0,
+          "introduces_existing_metric_to_option": false,
+          "reason": "Доступная по условию готовая лицензия может предотвратить задержку всего тиража при проверке её условий; оценка не означает бесплатного приобретения прав."
+        }
+      ],
+      "after": []
+    },
+    {
+      "case_key": "bank-legal-2026-146",
+      "title": "Лишняя справка для услуги",
+      "before": [
+        {
+          "option": "option_2",
+          "by": "option_4"
+        }
+      ],
+      "changes": [
+        {
+          "option": "option_2",
+          "label": "Организовать немедленную помощь через существующих сотрудников при сбое обмена",
+          "metric": "trust",
+          "raw_before": 3,
+          "raw_after": 4,
+          "scaled_before": 0.033708,
+          "scaled_after": 0.044944,
+          "introduces_existing_metric_to_option": false,
+          "reason": "Немедленная помощь существующих сотрудников при сбое обмена непосредственно сокращает препятствия для конкретного заявителя; обязательную регистрацию не заменяет."
+        }
+      ],
+      "after": []
+    },
+    {
+      "case_key": "bank-legal-2026-148",
+      "title": "Государственная помощь без контроля",
+      "before": [
+        {
+          "option": "option_4",
+          "by": "option_2"
+        }
+      ],
+      "changes": [
+        {
+          "option": "option_4",
+          "label": "Подготовить контрольный перечень данных до заключения новых соглашений",
+          "metric": "economy",
+          "raw_before": 2,
+          "raw_after": 3,
+          "scaled_before": 0.022472,
+          "scaled_after": 0.033708,
+          "introduces_existing_metric_to_option": false,
+          "reason": "Контрольный перечень до новых соглашений может уменьшить повторное оформление документов и издержки исправления условий; не означает фактической экономии бюджета."
+        }
+      ],
+      "after": []
+    },
+    {
+      "case_key": "bank-legal-2026-150",
+      "title": "Вознаграждение за обязательную услугу",
+      "before": [
+        {
+          "option": "option_1",
+          "by": "option_5"
+        }
+      ],
+      "changes": [
+        {
+          "option": "option_1",
+          "label": "Организовать дополнительное обучение служащих правилам предотвращения конфликта",
+          "metric": "elite_support",
+          "raw_before": 2,
+          "raw_after": 3,
+          "scaled_before": 0.022472,
+          "scaled_after": 0.033708,
+          "introduces_existing_metric_to_option": false,
+          "reason": "Дополнительное обучение существующих служащих проясняет обязанности без изменения каналов сообщения; условно снижает организационное сопротивление, не оправдывает вознаграждение."
+        }
+      ],
+      "after": []
+    }
+  ],
+  "rejected": [],
+  "projection": {
+    "before": {
+      "cases": 189,
+      "options": 947,
+      "projections": 5682,
+      "baseDominated": 122,
+      "basePairs": 127,
+      "basePairsWithRevenueAdvantageInSomeScenario": 41,
+      "basePairsWithRevenueAdvantageNeutral": 0,
+      "basePairsWithNoEconomicAdvantageInAnyScenario": 86,
+      "scenarioRanges": [
+        {
+          "key": "neutral",
+          "minRevenueDelta": -13870.58,
+          "maxRevenueDelta": 67725.9,
+          "minBusinessDelta": -0.000379,
+          "maxBusinessDelta": 0.001949,
+          "minCollectionDelta": -0.022045,
+          "maxCollectionDelta": 0.03734,
+          "clippedOptions": 0
+        },
+        {
+          "key": "manual_56",
+          "minRevenueDelta": -7458.1,
+          "maxRevenueDelta": 35135.74,
+          "minBusinessDelta": -0.000212,
+          "maxBusinessDelta": 0.001091,
+          "minCollectionDelta": -0.023345,
+          "maxCollectionDelta": 0.03466,
+          "clippedOptions": 0
+        },
+        {
+          "key": "stress",
+          "minRevenueDelta": -8736.77,
+          "maxRevenueDelta": 45305.19,
+          "minBusinessDelta": -0.000378,
+          "maxBusinessDelta": 0.001947,
+          "minCollectionDelta": -0.025,
+          "maxCollectionDelta": 0.03125,
+          "clippedOptions": 0
+        },
+        {
+          "key": "near_lower_bounds",
+          "minRevenueDelta": -1440.81,
+          "maxRevenueDelta": 1373.28,
+          "minBusinessDelta": 0,
+          "maxBusinessDelta": 0,
+          "minCollectionDelta": -0.000941,
+          "maxCollectionDelta": 0.001417,
+          "clippedOptions": 0
+        },
+        {
+          "key": "near_upper_bounds",
+          "minRevenueDelta": -18765.69,
+          "maxRevenueDelta": 46177.15,
+          "minBusinessDelta": -0.000629,
+          "maxBusinessDelta": 0.001574,
+          "minCollectionDelta": -0.000159,
+          "maxCollectionDelta": 0.000238,
+          "clippedOptions": 0
+        },
+        {
+          "key": "manual_zero",
+          "minRevenueDelta": -780.75,
+          "maxRevenueDelta": 1888.94,
+          "minBusinessDelta": 0,
+          "maxBusinessDelta": 0,
+          "minCollectionDelta": -0.025,
+          "maxCollectionDelta": 0.03125,
+          "clippedOptions": 0
+        }
+      ]
+    },
+    "after": {
+      "cases": 189,
+      "options": 947,
+      "projections": 5682,
+      "baseDominated": 103,
+      "basePairs": 108,
+      "basePairsWithRevenueAdvantageInSomeScenario": 37,
+      "basePairsWithRevenueAdvantageNeutral": 0,
+      "basePairsWithNoEconomicAdvantageInAnyScenario": 71,
+      "scenarioRanges": [
+        {
+          "key": "neutral",
+          "minRevenueDelta": -13870.58,
+          "maxRevenueDelta": 67725.9,
+          "minBusinessDelta": -0.000379,
+          "maxBusinessDelta": 0.001949,
+          "minCollectionDelta": -0.022045,
+          "maxCollectionDelta": 0.03734,
+          "clippedOptions": 0
+        },
+        {
+          "key": "manual_56",
+          "minRevenueDelta": -7458.1,
+          "maxRevenueDelta": 35135.74,
+          "minBusinessDelta": -0.000212,
+          "maxBusinessDelta": 0.001091,
+          "minCollectionDelta": -0.023345,
+          "maxCollectionDelta": 0.03466,
+          "clippedOptions": 0
+        },
+        {
+          "key": "stress",
+          "minRevenueDelta": -8736.77,
+          "maxRevenueDelta": 45305.19,
+          "minBusinessDelta": -0.000378,
+          "maxBusinessDelta": 0.001947,
+          "minCollectionDelta": -0.025,
+          "maxCollectionDelta": 0.03125,
+          "clippedOptions": 0
+        },
+        {
+          "key": "near_lower_bounds",
+          "minRevenueDelta": -1440.81,
+          "maxRevenueDelta": 1373.28,
+          "minBusinessDelta": 0,
+          "maxBusinessDelta": 0,
+          "minCollectionDelta": -0.000941,
+          "maxCollectionDelta": 0.001417,
+          "clippedOptions": 0
+        },
+        {
+          "key": "near_upper_bounds",
+          "minRevenueDelta": -18765.69,
+          "maxRevenueDelta": 46177.15,
+          "minBusinessDelta": -0.000629,
+          "maxBusinessDelta": 0.001574,
+          "minCollectionDelta": -0.000159,
+          "maxCollectionDelta": 0.000238,
+          "clippedOptions": 0
+        },
+        {
+          "key": "manual_zero",
+          "minRevenueDelta": -780.75,
+          "maxRevenueDelta": 1888.94,
+          "minBusinessDelta": 0,
+          "maxBusinessDelta": 0,
+          "minCollectionDelta": -0.025,
+          "maxCollectionDelta": 0.03125,
+          "clippedOptions": 0
+        }
+      ]
+    }
+  },
+  "limitations": "Изолированный сценарный результат E относительно утверждённого каталога, не совокупный A–E. Новые поля существующих показателей требуют содержательной приёмки; ни одно предложение не применено."
+}
