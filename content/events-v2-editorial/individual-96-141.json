@@ -167,7 +167,7 @@
       "title": "Музыкальный день района",
       "audience": "single",
       "category": "Культура и протокол",
-      "original_situation": "Молодёжные коллективы пригласили сотрудников администрации исполнить общую песню на районном фестивале. Участие в репетиции добровольное, приказа о выступлении нет. Несколько работников согласны выйти на сцену, остальные готовы помогать навигации зрителей в согласованное рабочее время. Организатор уже получил разрешённую фонограмму, но не проверил, разрешено ли её публичное исполнение именно на этом мероприятии. Замена на произведение с подтверждёнными условиями использования доступна.",
+      "original_situation": "Молодёжные коллективы пригласили сотрудников администрации исполнить общую песню на районном фестивале. Участие в репетиции добровольное, приказа о выступлении нет. Несколько работников согласны выйти на сцену, остальные готовы помогать навигации зрителей в согласованное рабочее время. Организатор уже получил разрешённую фонограмму, но не проверил, разрешено ли её публичное исполнение именно на этом мероприятии. Замена на произведение с подтверждёнными условиями использования доступна.\n\nУчебное условие: номер является обычной развлекательной частью фестиваля, а не официальной церемонией; участия в сценическом номере должностные обязанности не требуют.",
       "decision_options": [
         "Собрать добровольные заявки участников и отложить использование фонограммы до проверки разрешений.",
         "Согласовать добровольное участие, график помощников и разрешения на исполнение песни.",
@@ -189,16 +189,16 @@
               "муницип",
               "губернатор"
             ],
-            "description": "Допустимое действие. Не определяет график помощников и разрешённый репертуар.",
-            "legal_basis": "ГК РФ, статьи 1229 и 1270: исключительное право и публичное исполнение произведения. Конституция РФ, статья 37: свобода труда. Участие в конкретном номере не становится обязательным лишь по просьбе организатора. Источники: https://rospatent.gov.ru/ru/documents/grazhdanskiy-kodeks-rossiyskoy-federacii-chast-chetvertaya https://minjust.gov.ru/ru/documents/8011/"
+            "description": "Добровольные заявки и отсрочка использования до проверки допустимы, но не решают график помощников.",
+            "legal_basis": "ТК РФ, ст. 60: нельзя требовать работы вне трудового договора, кроме предусмотренных законом случаев. ГК РФ, ст. 1270 п. 2 подп. 6, 1277, 1317, 1326: публичное исполнение и использование фонограммы имеют самостоятельные основания; исключение для официальной церемонии не охватывает автоматически любой фестиваль. Источники: https://www.consultant.ru/document/cons_doc_LAW_34683/4b11138f88cca50c663bdfde1ae210c80ffd8ad2/; https://www.consultant.ru/document/cons_doc_LAW_64629/dffcf0b87b80ff38f430dc822a0074e76ccd41a0/; https://www.consultant.ru/document/cons_doc_LAW_64629/a5c188f3157c03936f55e75ca40660594b8802f8/; https://www.consultant.ru/document/cons_doc_LAW_64629/7f64aff5b7b90ee3a76a6b3029412837b60372d8/; https://www.consultant.ru/document/cons_doc_LAW_64629/e3366d4715d8841757b6545f7bcb1b7dcc0a1d97/"
           },
           {
             "key": "option_2",
             "news": "Музыкальный день района — Обоснованный ближайший шаг",
             "trust": 2,
             "lawful": true,
-            "description": "Учитывает два самостоятельных условия: согласие людей и законное использование произведения.",
-            "legal_basis": "ГК РФ, статьи 1229 и 1270: исключительное право и публичное исполнение произведения. Конституция РФ, статья 37: свобода труда. Участие в конкретном номере не становится обязательным лишь по просьбе организатора. Источники: https://rospatent.gov.ru/ru/documents/grazhdanskiy-kodeks-rossiyskoy-federacii-chast-chetvertaya https://minjust.gov.ru/ru/documents/8011/",
+            "description": "Совмещает добровольность, согласованную организацию работы и проверку законного основания исполнения.",
+            "legal_basis": "ТК РФ, ст. 60: нельзя требовать работы вне трудового договора, кроме предусмотренных законом случаев. ГК РФ, ст. 1270 п. 2 подп. 6, 1277, 1317, 1326: публичное исполнение и использование фонограммы имеют самостоятельные основания; исключение для официальной церемонии не охватывает автоматически любой фестиваль. Источники: https://www.consultant.ru/document/cons_doc_LAW_34683/4b11138f88cca50c663bdfde1ae210c80ffd8ad2/; https://www.consultant.ru/document/cons_doc_LAW_64629/dffcf0b87b80ff38f430dc822a0074e76ccd41a0/; https://www.consultant.ru/document/cons_doc_LAW_64629/a5c188f3157c03936f55e75ca40660594b8802f8/; https://www.consultant.ru/document/cons_doc_LAW_64629/7f64aff5b7b90ee3a76a6b3029412837b60372d8/; https://www.consultant.ru/document/cons_doc_LAW_64629/e3366d4715d8841757b6545f7bcb1b7dcc0a1d97/",
             "public_interest": "beneficial",
             "authorized_roles": [
               "министр культуры",
@@ -217,8 +217,8 @@
               "муницип",
               "губернатор"
             ],
-            "description": "Допустимое действие. Не проверяет права на песню и не распределяет помощников.",
-            "legal_basis": "ГК РФ, статьи 1229 и 1270: исключительное право и публичное исполнение произведения. Конституция РФ, статья 37: свобода труда. Участие в конкретном номере не становится обязательным лишь по просьбе организатора. Источники: https://rospatent.gov.ru/ru/documents/grazhdanskiy-kodeks-rossiyskoy-federacii-chast-chetvertaya https://minjust.gov.ru/ru/documents/8011/"
+            "description": "Добровольная репетиция без изменения обязанностей допустима, но не обеспечивает правовую проверку музыки.",
+            "legal_basis": "ТК РФ, ст. 60: нельзя требовать работы вне трудового договора, кроме предусмотренных законом случаев. ГК РФ, ст. 1270 п. 2 подп. 6, 1277, 1317, 1326: публичное исполнение и использование фонограммы имеют самостоятельные основания; исключение для официальной церемонии не охватывает автоматически любой фестиваль. Источники: https://www.consultant.ru/document/cons_doc_LAW_34683/4b11138f88cca50c663bdfde1ae210c80ffd8ad2/; https://www.consultant.ru/document/cons_doc_LAW_64629/dffcf0b87b80ff38f430dc822a0074e76ccd41a0/; https://www.consultant.ru/document/cons_doc_LAW_64629/a5c188f3157c03936f55e75ca40660594b8802f8/; https://www.consultant.ru/document/cons_doc_LAW_64629/7f64aff5b7b90ee3a76a6b3029412837b60372d8/; https://www.consultant.ru/document/cons_doc_LAW_64629/e3366d4715d8841757b6545f7bcb1b7dcc0a1d97/"
           },
           {
             "key": "option_4",
@@ -230,8 +230,8 @@
               "муницип",
               "губернатор"
             ],
-            "description": "Допустимое действие. Не определяет график и добровольность участия.",
-            "legal_basis": "ГК РФ, статьи 1229 и 1270: исключительное право и публичное исполнение произведения. Конституция РФ, статья 37: свобода труда. Участие в конкретном номере не становится обязательным лишь по просьбе организатора. Источники: https://rospatent.gov.ru/ru/documents/grazhdanskiy-kodeks-rossiyskoy-federacii-chast-chetvertaya https://minjust.gov.ru/ru/documents/8011/"
+            "description": "Предложения по музыке допустимы как подготовка, но не решают график и условия участия.",
+            "legal_basis": "ТК РФ, ст. 60: нельзя требовать работы вне трудового договора, кроме предусмотренных законом случаев. ГК РФ, ст. 1270 п. 2 подп. 6, 1277, 1317, 1326: публичное исполнение и использование фонограммы имеют самостоятельные основания; исключение для официальной церемонии не охватывает автоматически любой фестиваль. Источники: https://www.consultant.ru/document/cons_doc_LAW_34683/4b11138f88cca50c663bdfde1ae210c80ffd8ad2/; https://www.consultant.ru/document/cons_doc_LAW_64629/dffcf0b87b80ff38f430dc822a0074e76ccd41a0/; https://www.consultant.ru/document/cons_doc_LAW_64629/a5c188f3157c03936f55e75ca40660594b8802f8/; https://www.consultant.ru/document/cons_doc_LAW_64629/7f64aff5b7b90ee3a76a6b3029412837b60372d8/; https://www.consultant.ru/document/cons_doc_LAW_64629/e3366d4715d8841757b6545f7bcb1b7dcc0a1d97/"
           },
           {
             "key": "option_5",
@@ -243,8 +243,8 @@
               "муницип",
               "губернатор"
             ],
-            "description": "Допустимое действие. Не решает правовую проверку музыки и организацию помощников.",
-            "legal_basis": "ГК РФ, статьи 1229 и 1270: исключительное право и публичное исполнение произведения. Конституция РФ, статья 37: свобода труда. Участие в конкретном номере не становится обязательным лишь по просьбе организатора. Источники: https://rospatent.gov.ru/ru/documents/grazhdanskiy-kodeks-rossiyskoy-federacii-chast-chetvertaya https://minjust.gov.ru/ru/documents/8011/"
+            "description": "Добровольный выбор роли не подменяет проверку прав и организацию работы остальных сотрудников.",
+            "legal_basis": "ТК РФ, ст. 60: нельзя требовать работы вне трудового договора, кроме предусмотренных законом случаев. ГК РФ, ст. 1270 п. 2 подп. 6, 1277, 1317, 1326: публичное исполнение и использование фонограммы имеют самостоятельные основания; исключение для официальной церемонии не охватывает автоматически любой фестиваль. Источники: https://www.consultant.ru/document/cons_doc_LAW_34683/4b11138f88cca50c663bdfde1ae210c80ffd8ad2/; https://www.consultant.ru/document/cons_doc_LAW_64629/dffcf0b87b80ff38f430dc822a0074e76ccd41a0/; https://www.consultant.ru/document/cons_doc_LAW_64629/a5c188f3157c03936f55e75ca40660594b8802f8/; https://www.consultant.ru/document/cons_doc_LAW_64629/7f64aff5b7b90ee3a76a6b3029412837b60372d8/; https://www.consultant.ru/document/cons_doc_LAW_64629/e3366d4715d8841757b6545f7bcb1b7dcc0a1d97/"
           }
         ]
       },
@@ -256,38 +256,38 @@
       "verified": false,
       "history_protected": false,
       "legal_review": {
-        "basis": "ГК РФ, статьи 1229 и 1270: исключительное право и публичное исполнение произведения. Конституция РФ, статья 37: свобода труда. Участие в конкретном номере не становится обязательным лишь по просьбе организатора. Источники: https://rospatent.gov.ru/ru/documents/grazhdanskiy-kodeks-rossiyskoy-federacii-chast-chetvertaya https://minjust.gov.ru/ru/documents/8011/",
+        "basis": "ТК РФ, ст. 60: нельзя требовать работы вне трудового договора, кроме предусмотренных законом случаев. ГК РФ, ст. 1270 п. 2 подп. 6, 1277, 1317, 1326: публичное исполнение и использование фонограммы имеют самостоятельные основания; исключение для официальной церемонии не охватывает автоматически любой фестиваль.",
         "status": "requires_case_specific_current_law_review",
         "note": "Неверный или неполный ответ не является автоматически незаконным; требуется отдельная правовая разметка.",
         "option_analysis": [
           {
             "key": "option_1",
             "classification": "lawful_but_incomplete",
-            "reason": "Допустимое действие. Не определяет график помощников и разрешённый репертуар.",
+            "reason": "Добровольные заявки и отсрочка использования до проверки допустимы, но не решают график помощников.",
             "lawfulness_proposal": true
           },
           {
             "key": "option_2",
             "classification": "best",
-            "reason": "Добровольное участие и права согласованы",
+            "reason": "Совмещает добровольность, согласованную организацию работы и проверку законного основания исполнения.",
             "lawfulness_proposal": true
           },
           {
             "key": "option_3",
             "classification": "lawful_but_incomplete",
-            "reason": "Допустимое действие. Не проверяет права на песню и не распределяет помощников.",
+            "reason": "Добровольная репетиция без изменения обязанностей допустима, но не обеспечивает правовую проверку музыки.",
             "lawfulness_proposal": true
           },
           {
             "key": "option_4",
             "classification": "lawful_but_incomplete",
-            "reason": "Допустимое действие. Не определяет график и добровольность участия.",
+            "reason": "Предложения по музыке допустимы как подготовка, но не решают график и условия участия.",
             "lawfulness_proposal": true
           },
           {
             "key": "option_5",
             "classification": "lawful_but_incomplete",
-            "reason": "Допустимое действие. Не решает правовую проверку музыки и организацию помощников.",
+            "reason": "Добровольный выбор роли не подменяет проверку прав и организацию работы остальных сотрудников.",
             "lawfulness_proposal": true
           }
         ],
@@ -307,8 +307,25 @@
         },
         "checked_norm_urls": [
           "https://www.consultant.ru/document/cons_doc_LAW_64629/98ad2641f95945c4b7956150260564c8b44028d9/",
-          "https://www.consultant.ru/document/cons_doc_LAW_64629/dffcf0b87b80ff38f430dc822a0074e76ccd41a0/"
-        ]
+          "https://www.consultant.ru/document/cons_doc_LAW_64629/dffcf0b87b80ff38f430dc822a0074e76ccd41a0/",
+          "https://www.consultant.ru/document/cons_doc_LAW_34683/4b11138f88cca50c663bdfde1ae210c80ffd8ad2/",
+          "https://www.consultant.ru/document/cons_doc_LAW_64629/a5c188f3157c03936f55e75ca40660594b8802f8/",
+          "https://www.consultant.ru/document/cons_doc_LAW_64629/7f64aff5b7b90ee3a76a6b3029412837b60372d8/",
+          "https://www.consultant.ru/document/cons_doc_LAW_64629/e3366d4715d8841757b6545f7bcb1b7dcc0a1d97/"
+        ],
+        "norm_recheck_2026_11_28": {
+          "status": "targeted_norm_and_all_individual_alternatives_reviewed_not_full_acceptance",
+          "basis": "ТК РФ, ст. 60: нельзя требовать работы вне трудового договора, кроме предусмотренных законом случаев. ГК РФ, ст. 1270 п. 2 подп. 6, 1277, 1317, 1326: публичное исполнение и использование фонограммы имеют самостоятельные основания; исключение для официальной церемонии не охватывает автоматически любой фестиваль.",
+          "urls": [
+            "https://www.consultant.ru/document/cons_doc_LAW_34683/4b11138f88cca50c663bdfde1ae210c80ffd8ad2/",
+            "https://www.consultant.ru/document/cons_doc_LAW_64629/dffcf0b87b80ff38f430dc822a0074e76ccd41a0/",
+            "https://www.consultant.ru/document/cons_doc_LAW_64629/a5c188f3157c03936f55e75ca40660594b8802f8/",
+            "https://www.consultant.ru/document/cons_doc_LAW_64629/7f64aff5b7b90ee3a76a6b3029412837b60372d8/",
+            "https://www.consultant.ru/document/cons_doc_LAW_64629/e3366d4715d8841757b6545f7bcb1b7dcc0a1d97/"
+          ],
+          "limitation": "В учебной ситуации речь об обычном развлекательном фестивале, а не об официальной церемонии. Трудовые договоры, рабочее время и специальные статусы служащих не проверены. Коммерческое опубликование фонограммы не установлено.",
+          "source_scope": "Тексты отдельных статей и поисковые извлечения из КонсультантПлюс от 28.11.2026; первичная публикация всех изменений и полная редакция не сверены."
+        }
       }
     },
     {
@@ -1671,7 +1688,7 @@
       "title": "Арт-объект из вторсырья",
       "audience": "single",
       "category": "Экология",
-      "original_situation": "Школьники собрали лёгкую скульптуру из пластиковых крышек и предлагают поставить её перед зданием библиотеки. Сама работа устойчива на ровном полу, но на открытой площади ветер может поднять отдельные детали. Авторы согласны изменить основание; мастер готов проверить крепление. Владелец здания разрешает недельную пробную экспозицию у стены, где остаётся широкий проход, а уборщик сможет осматривать объект утром. Крепить скульптуру к фасаду без согласования нельзя.",
+      "original_situation": "Школьники собрали лёгкую скульптуру из пластиковых крышек и предлагают поставить её перед зданием библиотеки. Сама работа устойчива на ровном полу, но на открытой площади ветер может поднять отдельные детали. Авторы согласны изменить основание; мастер готов проверить крепление. Владелец здания разрешает недельную пробную экспозицию у стены, где остаётся широкий проход, а уборщик сможет осматривать объект утром. Крепить скульптуру к фасаду без согласования нельзя.\n\nУчебное условие: авторы разрешили согласованный пробный показ и изменение основания, а владелец уполномочен согласовать указанное место; обязательные требования безопасности должны быть выполнены.",
       "decision_options": [
         "Подготовить временную схему размещения и передать основание на испытание до установки.",
         "Испытать крепление, согласовать пробное место и ответственного за осмотр конструкции.",
@@ -1693,16 +1710,16 @@
               "муницип",
               "губернатор"
             ],
-            "description": "Допустимое действие. Не определяет согласованное место и ответственного за осмотр.",
-            "legal_basis": "ГК РФ, статьи 209–210: полномочия владельца и содержание имущества; статьи 1229 и 1270: права на использование произведения. Согласие автора не заменяет согласия владельца площадки и проверки фактического крепления. Источники: https://11.rosguard.gov.ru/uploads/2025/07/5_grazhdanskijj_kodeks_rossijjskojj_federacii_chast_pervaya.pdf https://rospatent.gov.ru/ru/documents/grazhdanskiy-kodeks-rossiyskoy-federacii-chast-chetvertaya"
+            "description": "Испытание основания допустимо, но ещё не закрепляет согласованное место и порядок осмотра.",
+            "legal_basis": "ГК РФ, ст. 209, 210: распоряжение и содержание имущества в пределах прав собственника и требований закона; ст. 1259, 1266, 1270, 1291: права на произведение и оригинал различаются, изменения требуют учёта воли автора, а показ приобретённого оригинала может иметь отдельное основание. Безопасное крепление и свободный проход — конкретные условия задачи. Источники: https://www.consultant.ru/document/cons_doc_LAW_5142/9bc79ae09d078798e7a4ee4647ac9ea495da9fa0/; https://www.consultant.ru/document/cons_doc_LAW_5142/c63c967d22055f1df0fcfecca564826dedb3b8c7/; https://www.consultant.ru/document/cons_doc_LAW_64629/be05678dc42ddc67aae5be9ba9beebd367fb9a3f/; https://www.consultant.ru/document/cons_doc_LAW_64629/2e5f7a6ad08a484234d2fb2e82558971e37eac2e/; https://www.consultant.ru/document/cons_doc_LAW_64629/dffcf0b87b80ff38f430dc822a0074e76ccd41a0/; https://www.consultant.ru/document/cons_doc_LAW_64629/755d4c8eef0d90535de31caba82a59e06fc87cc0/"
           },
           {
             "key": "option_2",
             "news": "Арт-объект из вторсырья — Обоснованный ближайший шаг",
             "trust": 2,
             "lawful": true,
-            "description": "Связывает права авторов, разрешение владельца и конкретную техническую особенность лёгкого объекта.",
-            "legal_basis": "ГК РФ, статьи 209–210: полномочия владельца и содержание имущества; статьи 1229 и 1270: права на использование произведения. Согласие автора не заменяет согласия владельца площадки и проверки фактического крепления. Источники: https://11.rosguard.gov.ru/uploads/2025/07/5_grazhdanskijj_kodeks_rossijjskojj_federacii_chast_pervaya.pdf https://rospatent.gov.ru/ru/documents/grazhdanskiy-kodeks-rossiyskoy-federacii-chast-chetvertaya",
+            "description": "Испытание, согласованное место и ответственный за осмотр совместно решают заданную задачу; право показа и изменения задано в условии.",
+            "legal_basis": "ГК РФ, ст. 209, 210: распоряжение и содержание имущества в пределах прав собственника и требований закона; ст. 1259, 1266, 1270, 1291: права на произведение и оригинал различаются, изменения требуют учёта воли автора, а показ приобретённого оригинала может иметь отдельное основание. Безопасное крепление и свободный проход — конкретные условия задачи. Источники: https://www.consultant.ru/document/cons_doc_LAW_5142/9bc79ae09d078798e7a4ee4647ac9ea495da9fa0/; https://www.consultant.ru/document/cons_doc_LAW_5142/c63c967d22055f1df0fcfecca564826dedb3b8c7/; https://www.consultant.ru/document/cons_doc_LAW_64629/be05678dc42ddc67aae5be9ba9beebd367fb9a3f/; https://www.consultant.ru/document/cons_doc_LAW_64629/2e5f7a6ad08a484234d2fb2e82558971e37eac2e/; https://www.consultant.ru/document/cons_doc_LAW_64629/dffcf0b87b80ff38f430dc822a0074e76ccd41a0/; https://www.consultant.ru/document/cons_doc_LAW_64629/755d4c8eef0d90535de31caba82a59e06fc87cc0/",
             "public_interest": "beneficial",
             "authorized_roles": [
               "министр культуры",
@@ -1721,8 +1738,8 @@
               "муницип",
               "губернатор"
             ],
-            "description": "Допустимое действие. Не согласует срок размещения и обслуживание.",
-            "legal_basis": "ГК РФ, статьи 209–210: полномочия владельца и содержание имущества; статьи 1229 и 1270: права на использование произведения. Согласие автора не заменяет согласия владельца площадки и проверки фактического крепления. Источники: https://11.rosguard.gov.ru/uploads/2025/07/5_grazhdanskijj_kodeks_rossijjskojj_federacii_chast_pervaya.pdf https://rospatent.gov.ru/ru/documents/grazhdanskiy-kodeks-rossiyskoy-federacii-chast-chetvertaya"
+            "description": "Обследование участка до монтажа допустимо, но не обеспечивает согласование срока и обслуживания.",
+            "legal_basis": "ГК РФ, ст. 209, 210: распоряжение и содержание имущества в пределах прав собственника и требований закона; ст. 1259, 1266, 1270, 1291: права на произведение и оригинал различаются, изменения требуют учёта воли автора, а показ приобретённого оригинала может иметь отдельное основание. Безопасное крепление и свободный проход — конкретные условия задачи. Источники: https://www.consultant.ru/document/cons_doc_LAW_5142/9bc79ae09d078798e7a4ee4647ac9ea495da9fa0/; https://www.consultant.ru/document/cons_doc_LAW_5142/c63c967d22055f1df0fcfecca564826dedb3b8c7/; https://www.consultant.ru/document/cons_doc_LAW_64629/be05678dc42ddc67aae5be9ba9beebd367fb9a3f/; https://www.consultant.ru/document/cons_doc_LAW_64629/2e5f7a6ad08a484234d2fb2e82558971e37eac2e/; https://www.consultant.ru/document/cons_doc_LAW_64629/dffcf0b87b80ff38f430dc822a0074e76ccd41a0/; https://www.consultant.ru/document/cons_doc_LAW_64629/755d4c8eef0d90535de31caba82a59e06fc87cc0/"
           },
           {
             "key": "option_4",
@@ -1734,8 +1751,8 @@
               "муницип",
               "губернатор"
             ],
-            "description": "Допустимое действие. Не проверяет крепление и порядок осмотра.",
-            "legal_basis": "ГК РФ, статьи 209–210: полномочия владельца и содержание имущества; статьи 1229 и 1270: права на использование произведения. Согласие автора не заменяет согласия владельца площадки и проверки фактического крепления. Источники: https://11.rosguard.gov.ru/uploads/2025/07/5_grazhdanskijj_kodeks_rossijjskojj_federacii_chast_pervaya.pdf https://rospatent.gov.ru/ru/documents/grazhdanskiy-kodeks-rossiyskoy-federacii-chast-chetvertaya"
+            "description": "Согласование пользования площадкой допустимо, но техническая устойчивость и контроль ещё не обеспечены.",
+            "legal_basis": "ГК РФ, ст. 209, 210: распоряжение и содержание имущества в пределах прав собственника и требований закона; ст. 1259, 1266, 1270, 1291: права на произведение и оригинал различаются, изменения требуют учёта воли автора, а показ приобретённого оригинала может иметь отдельное основание. Безопасное крепление и свободный проход — конкретные условия задачи. Источники: https://www.consultant.ru/document/cons_doc_LAW_5142/9bc79ae09d078798e7a4ee4647ac9ea495da9fa0/; https://www.consultant.ru/document/cons_doc_LAW_5142/c63c967d22055f1df0fcfecca564826dedb3b8c7/; https://www.consultant.ru/document/cons_doc_LAW_64629/be05678dc42ddc67aae5be9ba9beebd367fb9a3f/; https://www.consultant.ru/document/cons_doc_LAW_64629/2e5f7a6ad08a484234d2fb2e82558971e37eac2e/; https://www.consultant.ru/document/cons_doc_LAW_64629/dffcf0b87b80ff38f430dc822a0074e76ccd41a0/; https://www.consultant.ru/document/cons_doc_LAW_64629/755d4c8eef0d90535de31caba82a59e06fc87cc0/"
           },
           {
             "key": "option_5",
@@ -1747,8 +1764,8 @@
               "муницип",
               "губернатор"
             ],
-            "description": "Допустимое действие. Не организует безопасное пробное размещение.",
-            "legal_basis": "ГК РФ, статьи 209–210: полномочия владельца и содержание имущества; статьи 1229 и 1270: права на использование произведения. Согласие автора не заменяет согласия владельца площадки и проверки фактического крепления. Источники: https://11.rosguard.gov.ru/uploads/2025/07/5_grazhdanskijj_kodeks_rossijjskojj_federacii_chast_pervaya.pdf https://rospatent.gov.ru/ru/documents/grazhdanskiy-kodeks-rossiyskoy-federacii-chast-chetvertaya"
+            "description": "Оценка постоянного размещения допустима как дальнейшая работа, но не решает ближайший безопасный пробный показ.",
+            "legal_basis": "ГК РФ, ст. 209, 210: распоряжение и содержание имущества в пределах прав собственника и требований закона; ст. 1259, 1266, 1270, 1291: права на произведение и оригинал различаются, изменения требуют учёта воли автора, а показ приобретённого оригинала может иметь отдельное основание. Безопасное крепление и свободный проход — конкретные условия задачи. Источники: https://www.consultant.ru/document/cons_doc_LAW_5142/9bc79ae09d078798e7a4ee4647ac9ea495da9fa0/; https://www.consultant.ru/document/cons_doc_LAW_5142/c63c967d22055f1df0fcfecca564826dedb3b8c7/; https://www.consultant.ru/document/cons_doc_LAW_64629/be05678dc42ddc67aae5be9ba9beebd367fb9a3f/; https://www.consultant.ru/document/cons_doc_LAW_64629/2e5f7a6ad08a484234d2fb2e82558971e37eac2e/; https://www.consultant.ru/document/cons_doc_LAW_64629/dffcf0b87b80ff38f430dc822a0074e76ccd41a0/; https://www.consultant.ru/document/cons_doc_LAW_64629/755d4c8eef0d90535de31caba82a59e06fc87cc0/"
           }
         ]
       },
@@ -1760,38 +1777,38 @@
       "verified": false,
       "history_protected": false,
       "legal_review": {
-        "basis": "ГК РФ, статьи 209–210: полномочия владельца и содержание имущества; статьи 1229 и 1270: права на использование произведения. Согласие автора не заменяет согласия владельца площадки и проверки фактического крепления. Источники: https://11.rosguard.gov.ru/uploads/2025/07/5_grazhdanskijj_kodeks_rossijjskojj_federacii_chast_pervaya.pdf https://rospatent.gov.ru/ru/documents/grazhdanskiy-kodeks-rossiyskoy-federacii-chast-chetvertaya",
+        "basis": "ГК РФ, ст. 209, 210: распоряжение и содержание имущества в пределах прав собственника и требований закона; ст. 1259, 1266, 1270, 1291: права на произведение и оригинал различаются, изменения требуют учёта воли автора, а показ приобретённого оригинала может иметь отдельное основание. Безопасное крепление и свободный проход — конкретные условия задачи.",
         "status": "requires_case_specific_current_law_review",
         "note": "Неверный или неполный ответ не является автоматически незаконным; требуется отдельная правовая разметка.",
         "option_analysis": [
           {
             "key": "option_1",
             "classification": "lawful_but_incomplete",
-            "reason": "Допустимое действие. Не определяет согласованное место и ответственного за осмотр.",
+            "reason": "Испытание основания допустимо, но ещё не закрепляет согласованное место и порядок осмотра.",
             "lawfulness_proposal": true
           },
           {
             "key": "option_2",
             "classification": "best",
-            "reason": "Крепление испытано и установлен ответственный",
+            "reason": "Испытание, согласованное место и ответственный за осмотр совместно решают заданную задачу; право показа и изменения задано в условии.",
             "lawfulness_proposal": true
           },
           {
             "key": "option_3",
             "classification": "lawful_but_incomplete",
-            "reason": "Допустимое действие. Не согласует срок размещения и обслуживание.",
+            "reason": "Обследование участка до монтажа допустимо, но не обеспечивает согласование срока и обслуживания.",
             "lawfulness_proposal": true
           },
           {
             "key": "option_4",
             "classification": "lawful_but_incomplete",
-            "reason": "Допустимое действие. Не проверяет крепление и порядок осмотра.",
+            "reason": "Согласование пользования площадкой допустимо, но техническая устойчивость и контроль ещё не обеспечены.",
             "lawfulness_proposal": true
           },
           {
             "key": "option_5",
             "classification": "lawful_but_incomplete",
-            "reason": "Допустимое действие. Не организует безопасное пробное размещение.",
+            "reason": "Оценка постоянного размещения допустима как дальнейшая работа, но не решает ближайший безопасный пробный показ.",
             "lawfulness_proposal": true
           }
         ],
@@ -1810,8 +1827,28 @@
           }
         },
         "checked_norm_urls": [
-          "https://www.consultant.ru/document/cons_doc_LAW_64629/98ad2641f95945c4b7956150260564c8b44028d9/"
-        ]
+          "https://www.consultant.ru/document/cons_doc_LAW_64629/98ad2641f95945c4b7956150260564c8b44028d9/",
+          "https://www.consultant.ru/document/cons_doc_LAW_5142/9bc79ae09d078798e7a4ee4647ac9ea495da9fa0/",
+          "https://www.consultant.ru/document/cons_doc_LAW_5142/c63c967d22055f1df0fcfecca564826dedb3b8c7/",
+          "https://www.consultant.ru/document/cons_doc_LAW_64629/be05678dc42ddc67aae5be9ba9beebd367fb9a3f/",
+          "https://www.consultant.ru/document/cons_doc_LAW_64629/2e5f7a6ad08a484234d2fb2e82558971e37eac2e/",
+          "https://www.consultant.ru/document/cons_doc_LAW_64629/dffcf0b87b80ff38f430dc822a0074e76ccd41a0/",
+          "https://www.consultant.ru/document/cons_doc_LAW_64629/755d4c8eef0d90535de31caba82a59e06fc87cc0/"
+        ],
+        "norm_recheck_2026_11_28": {
+          "status": "targeted_norm_and_all_individual_alternatives_reviewed_not_full_acceptance",
+          "basis": "ГК РФ, ст. 209, 210: распоряжение и содержание имущества в пределах прав собственника и требований закона; ст. 1259, 1266, 1270, 1291: права на произведение и оригинал различаются, изменения требуют учёта воли автора, а показ приобретённого оригинала может иметь отдельное основание. Безопасное крепление и свободный проход — конкретные условия задачи.",
+          "urls": [
+            "https://www.consultant.ru/document/cons_doc_LAW_5142/9bc79ae09d078798e7a4ee4647ac9ea495da9fa0/",
+            "https://www.consultant.ru/document/cons_doc_LAW_5142/c63c967d22055f1df0fcfecca564826dedb3b8c7/",
+            "https://www.consultant.ru/document/cons_doc_LAW_64629/be05678dc42ddc67aae5be9ba9beebd367fb9a3f/",
+            "https://www.consultant.ru/document/cons_doc_LAW_64629/2e5f7a6ad08a484234d2fb2e82558971e37eac2e/",
+            "https://www.consultant.ru/document/cons_doc_LAW_64629/dffcf0b87b80ff38f430dc822a0074e76ccd41a0/",
+            "https://www.consultant.ru/document/cons_doc_LAW_64629/755d4c8eef0d90535de31caba82a59e06fc87cc0/"
+          ],
+          "limitation": "Право собственности на оригинал, технические нормы безопасности площадки, местные правила и полномочия владельца здания не устанавливаются только общими нормами. В учебном условии авторы и уполномоченный владелец согласуют пробный показ.",
+          "source_scope": "Тексты отдельных статей и поисковые извлечения из КонсультантПлюс от 28.11.2026; первичная публикация всех изменений и полная редакция не сверены."
+        }
       }
     },
     {
