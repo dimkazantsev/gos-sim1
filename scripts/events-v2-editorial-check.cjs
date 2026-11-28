@@ -82,17 +82,53 @@ console.log(JSON.stringify({individualRecheckCount},null,2));
   assert.ok(p,c.case_key+' missing catalogue competence proposal');
   assert.equal(p.office_key,m.primary.office_key,c.case_key+' stale portfolio key');
   assert.equal(p.office_title,m.primary.office_title,c.case_key+' stale portfolio title');
-  if(competenceMatrix.status==='owner_decision_candidate_not_for_import'){
-   assert.equal(p.status,'proposed_not_authorization',c.case_key);
-   assert.equal(m.activation_allowed,false,c.case_key);
-   assert.equal(c.verified,false,c.case_key);
-  }
+  assert.equal(competenceMatrix.status,'owner_approved_editorial_pending_legal_and_runtime');
+  assert.equal(m.owner_approved,true,c.case_key);
+  assert.equal(p.owner_approved,true,c.case_key);
+  assert.equal(p.status,'owner_approved_editorial_not_authorization',c.case_key);
+  assert.deepEqual(p.secondary_profiles,m.secondary??[],c.case_key);
+  if(c.verified!==true)assert.equal(m.activation_allowed,false,c.case_key);
  }
  for(const c of cases.filter(c=>c.audience==='single'))checkCompetenceProposal(c,competenceByKey.get(c.case_key));
  if(process.argv.includes('--release')){
   assert.notEqual(competenceMatrix.status,'owner_decision_candidate_not_for_import','Competence proposal still awaits owner approval');
   assert.ok(competenceMatrix.cases.every(c=>c.activation_allowed===true),'Competence route activation not approved');
  }
+
+
+ // Check approved effects against the immutable proposals and the exact seven corrections.
+ const scopeProposal=JSON.parse(fs.readFileSync('docs/EVENTS_V2_SCOPE_CALIBRATION_PROPOSAL_2026-11-27.json','utf8'));
+ const balanceProposal=JSON.parse(fs.readFileSync('docs/EVENTS_V2_DIRECT_BALANCE_PROPOSAL_2026-11-28.json','utf8'));
+ const scopeByKey=new Map(scopeProposal.candidate_cases.map(c=>[c.case_key,c]));
+ const balanceByKey=new Map(balanceProposal.cases.map(c=>[c.case_key,c]));
+ assert.equal(scopeByKey.size,189);assert.equal(balanceByKey.size,6);
+ let verifiedApprovedCorrections=0,verifiedScaledOptions=0,scope89=0,scope16=0;
+ for(const c of cases.filter(c=>c.audience!=='single')){
+  const p=scopeByKey.get(c.case_key),b=balanceByKey.get(c.case_key),d=p.scope.denominator;
+  assert.ok(d===89||d===16,c.case_key);if(d===89)scope89++;else scope16++;
+  assert.equal(c.approved_effect_scaling.denominator,d,c.case_key);
+  assert.equal(c.approved_effect_scaling.pre_scale_abs_limit,4,c.case_key);
+  assert.equal(c.approved_effect_scaling.decimal_places,6,c.case_key);
+  assert.equal(c.approved_effect_scaling.approved_correction_count,b?.changes.length??0,c.case_key);
+  for(const o of c.effect_plan.options){
+   const src=p.options.find(x=>x.key===o.key).original;
+   const raw={trust:src.trust,metric_effects:{...src.metric_effects}};
+   for(const ch of b?.changes.filter(x=>x.option===o.key)??[]){
+    assert.equal(c.decision_options[Number(o.key.slice(7))-1],ch.label,c.case_key);
+    if(ch.metric==='trust'){assert.equal(raw.trust,ch.before,c.case_key);raw.trust=ch.after;}
+    else{assert.equal(raw.metric_effects[ch.metric],ch.before,c.case_key);raw.metric_effects[ch.metric]=ch.after;}
+    verifiedApprovedCorrections++;
+   }
+   assert.ok([raw.trust,...Object.values(raw.metric_effects)].every(x=>Number.isFinite(x)&&Math.abs(x)<=4),c.case_key);
+   const scaled=x=>Number((x/d).toFixed(6));
+   assert.equal(o.trust,scaled(raw.trust),c.case_key+' trust');
+   assert.deepEqual(o.metric_effects,Object.fromEntries(Object.entries(raw.metric_effects).map(([k,v])=>[k,scaled(v)])),c.case_key+' effects');
+   verifiedScaledOptions++;
+  }
+ }
+ assert.equal(verifiedApprovedCorrections,7);assert.equal(verifiedScaledOptions,947);
+ assert.equal(scope89,179);assert.equal(scope16,10);
+ console.log(JSON.stringify({verifiedApprovedCorrections,verifiedScaledOptions,scope89,scope16},null,2));
 
 let collectiveReviewCount=0,collectiveReviewOptions=0;
 for(const c of cases){

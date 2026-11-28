@@ -140,8 +140,10 @@
             "office_key": "ministry_social",
             "office_title": "Министерство по социальной политике",
             "scope": "Рекомендация профильному участнику подготовить решение/координировать обращение к действительному исполнителю; не наделяет правом самостоятельно исполнять действие, распоряжаться средствами или заменять реальный орган.",
-            "status": "proposed_not_authorization",
-            "legacy_role_match_needs_replacement": true
+            "status": "owner_approved_editorial_not_authorization",
+            "legacy_role_match_needs_replacement": true,
+            "owner_approved": true,
+            "secondary_profiles": []
           }
         },
         "checked_norm_urls": [
@@ -301,8 +303,10 @@
             "office_key": "ministry_social",
             "office_title": "Министерство по социальной политике",
             "scope": "Рекомендация профильному участнику подготовить решение/координировать обращение к действительному исполнителю; не наделяет правом самостоятельно исполнять действие, распоряжаться средствами или заменять реальный орган.",
-            "status": "proposed_not_authorization",
-            "legacy_role_match_needs_replacement": true
+            "status": "owner_approved_editorial_not_authorization",
+            "legacy_role_match_needs_replacement": true,
+            "owner_approved": true,
+            "secondary_profiles": []
           }
         },
         "checked_norm_urls": [
@@ -467,8 +471,10 @@
             "office_key": "ministry_internal",
             "office_title": "Министерство по внутренней политике и государству",
             "scope": "Рекомендация профильному участнику подготовить решение/координировать обращение к действительному исполнителю; не наделяет правом самостоятельно исполнять действие, распоряжаться средствами или заменять реальный орган.",
-            "status": "proposed_not_authorization",
-            "legacy_role_match_needs_replacement": true
+            "status": "owner_approved_editorial_not_authorization",
+            "legacy_role_match_needs_replacement": true,
+            "owner_approved": true,
+            "secondary_profiles": []
           }
         },
         "checked_norm_urls": [
@@ -628,8 +634,15 @@
             "office_key": "ministry_social",
             "office_title": "Министерство по социальной политике",
             "scope": "Рекомендация профильному участнику подготовить решение/координировать обращение к действительному исполнителю; не наделяет правом самостоятельно исполнять действие, распоряжаться средствами или заменять реальный орган.",
-            "status": "proposed_not_authorization",
-            "legacy_role_match_needs_replacement": true
+            "status": "owner_approved_editorial_not_authorization",
+            "legacy_role_match_needs_replacement": true,
+            "owner_approved": true,
+            "secondary_profiles": [
+              {
+                "office_key": "ministry_internal",
+                "office_title": "Министерство по внутренней политике и государству"
+              }
+            ]
           }
         },
         "checked_norm_urls": [
@@ -787,8 +800,10 @@
             "office_key": "ministry_internal",
             "office_title": "Министерство по внутренней политике и государству",
             "scope": "Рекомендация профильному участнику подготовить решение/координировать обращение к действительному исполнителю; не наделяет правом самостоятельно исполнять действие, распоряжаться средствами или заменять реальный орган.",
-            "status": "proposed_not_authorization",
-            "legacy_role_match_needs_replacement": true
+            "status": "owner_approved_editorial_not_authorization",
+            "legacy_role_match_needs_replacement": true,
+            "owner_approved": true,
+            "secondary_profiles": []
           }
         },
         "checked_norm_urls": [
@@ -946,8 +961,10 @@
             "office_key": "ministry_social",
             "office_title": "Министерство по социальной политике",
             "scope": "Рекомендация профильному участнику подготовить решение/координировать обращение к действительному исполнителю; не наделяет правом самостоятельно исполнять действие, распоряжаться средствами или заменять реальный орган.",
-            "status": "proposed_not_authorization",
-            "legacy_role_match_needs_replacement": true
+            "status": "owner_approved_editorial_not_authorization",
+            "legacy_role_match_needs_replacement": true,
+            "owner_approved": true,
+            "secondary_profiles": []
           }
         },
         "checked_norm_urls": [
@@ -1105,8 +1122,15 @@
             "office_key": "ministry_social",
             "office_title": "Министерство по социальной политике",
             "scope": "Рекомендация профильному участнику подготовить решение/координировать обращение к действительному исполнителю; не наделяет правом самостоятельно исполнять действие, распоряжаться средствами или заменять реальный орган.",
-            "status": "proposed_not_authorization",
-            "legacy_role_match_needs_replacement": true
+            "status": "owner_approved_editorial_not_authorization",
+            "legacy_role_match_needs_replacement": true,
+            "owner_approved": true,
+            "secondary_profiles": [
+              {
+                "office_key": "ministry_internal",
+                "office_title": "Министерство по внутренней политике и государству"
+              }
+            ]
           }
         },
         "checked_norm_urls": [
@@ -1262,8 +1286,10 @@
             "office_key": "ministry_social",
             "office_title": "Министерство по социальной политике",
             "scope": "Рекомендация профильному участнику подготовить решение/координировать обращение к действительному исполнителю; не наделяет правом самостоятельно исполнять действие, распоряжаться средствами или заменять реальный орган.",
-            "status": "proposed_not_authorization",
-            "legacy_role_match_needs_replacement": true
+            "status": "owner_approved_editorial_not_authorization",
+            "legacy_role_match_needs_replacement": true,
+            "owner_approved": true,
+            "secondary_profiles": []
           }
         },
         "checked_norm_urls": [
@@ -1424,8 +1450,15 @@
             "office_key": "ministry_social",
             "office_title": "Министерство по социальной политике",
             "scope": "Рекомендация профильному участнику подготовить решение/координировать обращение к действительному исполнителю; не наделяет правом самостоятельно исполнять действие, распоряжаться средствами или заменять реальный орган.",
-            "status": "proposed_not_authorization",
-            "legacy_role_match_needs_replacement": true
+            "status": "owner_approved_editorial_not_authorization",
+            "legacy_role_match_needs_replacement": true,
+            "owner_approved": true,
+            "secondary_profiles": [
+              {
+                "office_key": "ministry_internal",
+                "office_title": "Министерство по внутренней политике и государству"
+              }
+            ]
           }
         },
         "checked_norm_urls": [
@@ -1585,8 +1618,15 @@
             "office_key": "ministry_internal",
             "office_title": "Министерство по внутренней политике и государству",
             "scope": "Рекомендация профильному участнику подготовить решение/координировать обращение к действительному исполнителю; не наделяет правом самостоятельно исполнять действие, распоряжаться средствами или заменять реальный орган.",
-            "status": "proposed_not_authorization",
-            "legacy_role_match_needs_replacement": true
+            "status": "owner_approved_editorial_not_authorization",
+            "legacy_role_match_needs_replacement": true,
+            "owner_approved": true,
+            "secondary_profiles": [
+              {
+                "office_key": "ministry_social",
+                "office_title": "Министерство по социальной политике"
+              }
+            ]
           }
         },
         "checked_norm_urls": [
@@ -1744,8 +1784,19 @@
             "office_key": "ministry_social",
             "office_title": "Министерство по социальной политике",
             "scope": "Рекомендация профильному участнику подготовить решение/координировать обращение к действительному исполнителю; не наделяет правом самостоятельно исполнять действие, распоряжаться средствами или заменять реальный орган.",
-            "status": "proposed_not_authorization",
-            "legacy_role_match_needs_replacement": true
+            "status": "owner_approved_editorial_not_authorization",
+            "legacy_role_match_needs_replacement": true,
+            "owner_approved": true,
+            "secondary_profiles": [
+              {
+                "office_key": "ministry_economic",
+                "office_title": "Министерство по экономической политике"
+              },
+              {
+                "office_key": "ministry_internal",
+                "office_title": "Министерство по внутренней политике и государству"
+              }
+            ]
           }
         },
         "checked_norm_urls": [
@@ -1909,8 +1960,15 @@
             "office_key": "ministry_social",
             "office_title": "Министерство по социальной политике",
             "scope": "Рекомендация профильному участнику подготовить решение/координировать обращение к действительному исполнителю; не наделяет правом самостоятельно исполнять действие, распоряжаться средствами или заменять реальный орган.",
-            "status": "proposed_not_authorization",
-            "legacy_role_match_needs_replacement": true
+            "status": "owner_approved_editorial_not_authorization",
+            "legacy_role_match_needs_replacement": true,
+            "owner_approved": true,
+            "secondary_profiles": [
+              {
+                "office_key": "ministry_internal",
+                "office_title": "Министерство по внутренней политике и государству"
+              }
+            ]
           }
         },
         "checked_norm_urls": [
@@ -2077,8 +2135,10 @@
             "office_key": "ministry_social",
             "office_title": "Министерство по социальной политике",
             "scope": "Рекомендация профильному участнику подготовить решение/координировать обращение к действительному исполнителю; не наделяет правом самостоятельно исполнять действие, распоряжаться средствами или заменять реальный орган.",
-            "status": "proposed_not_authorization",
-            "legacy_role_match_needs_replacement": true
+            "status": "owner_approved_editorial_not_authorization",
+            "legacy_role_match_needs_replacement": true,
+            "owner_approved": true,
+            "secondary_profiles": []
           }
         },
         "checked_norm_urls": [
@@ -2247,8 +2307,10 @@
             "office_key": "ministry_internal",
             "office_title": "Министерство по внутренней политике и государству",
             "scope": "Рекомендация профильному участнику подготовить решение/координировать обращение к действительному исполнителю; не наделяет правом самостоятельно исполнять действие, распоряжаться средствами или заменять реальный орган.",
-            "status": "proposed_not_authorization",
-            "legacy_role_match_needs_replacement": true
+            "status": "owner_approved_editorial_not_authorization",
+            "legacy_role_match_needs_replacement": true,
+            "owner_approved": true,
+            "secondary_profiles": []
           }
         },
         "checked_norm_urls": [
@@ -2407,8 +2469,10 @@
             "office_key": "ministry_social",
             "office_title": "Министерство по социальной политике",
             "scope": "Рекомендация профильному участнику подготовить решение/координировать обращение к действительному исполнителю; не наделяет правом самостоятельно исполнять действие, распоряжаться средствами или заменять реальный орган.",
-            "status": "proposed_not_authorization",
-            "legacy_role_match_needs_replacement": true
+            "status": "owner_approved_editorial_not_authorization",
+            "legacy_role_match_needs_replacement": true,
+            "owner_approved": true,
+            "secondary_profiles": []
           }
         },
         "checked_norm_urls": [
@@ -2568,8 +2632,15 @@
             "office_key": "ministry_social",
             "office_title": "Министерство по социальной политике",
             "scope": "Рекомендация профильному участнику подготовить решение/координировать обращение к действительному исполнителю; не наделяет правом самостоятельно исполнять действие, распоряжаться средствами или заменять реальный орган.",
-            "status": "proposed_not_authorization",
-            "legacy_role_match_needs_replacement": true
+            "status": "owner_approved_editorial_not_authorization",
+            "legacy_role_match_needs_replacement": true,
+            "owner_approved": true,
+            "secondary_profiles": [
+              {
+                "office_key": "ministry_economic",
+                "office_title": "Министерство по экономической политике"
+              }
+            ]
           }
         },
         "checked_norm_urls": [
@@ -2748,8 +2819,10 @@
             "office_key": "ministry_internal",
             "office_title": "Министерство по внутренней политике и государству",
             "scope": "Рекомендация профильному участнику подготовить решение/координировать обращение к действительному исполнителю; не наделяет правом самостоятельно исполнять действие, распоряжаться средствами или заменять реальный орган.",
-            "status": "proposed_not_authorization",
-            "legacy_role_match_needs_replacement": true
+            "status": "owner_approved_editorial_not_authorization",
+            "legacy_role_match_needs_replacement": true,
+            "owner_approved": true,
+            "secondary_profiles": []
           }
         },
         "checked_norm_urls": [
@@ -2927,8 +3000,15 @@
             "office_key": "ministry_internal",
             "office_title": "Министерство по внутренней политике и государству",
             "scope": "Рекомендация профильному участнику подготовить решение/координировать обращение к действительному исполнителю; не наделяет правом самостоятельно исполнять действие, распоряжаться средствами или заменять реальный орган.",
-            "status": "proposed_not_authorization",
-            "legacy_role_match_needs_replacement": true
+            "status": "owner_approved_editorial_not_authorization",
+            "legacy_role_match_needs_replacement": true,
+            "owner_approved": true,
+            "secondary_profiles": [
+              {
+                "office_key": "ministry_social",
+                "office_title": "Министерство по социальной политике"
+              }
+            ]
           }
         },
         "checked_norm_urls": [
@@ -3088,8 +3168,15 @@
             "office_key": "ministry_economic",
             "office_title": "Министерство по экономической политике",
             "scope": "Рекомендация профильному участнику подготовить решение/координировать обращение к действительному исполнителю; не наделяет правом самостоятельно исполнять действие, распоряжаться средствами или заменять реальный орган.",
-            "status": "proposed_not_authorization",
-            "legacy_role_match_needs_replacement": true
+            "status": "owner_approved_editorial_not_authorization",
+            "legacy_role_match_needs_replacement": true,
+            "owner_approved": true,
+            "secondary_profiles": [
+              {
+                "office_key": "ministry_internal",
+                "office_title": "Министерство по внутренней политике и государству"
+              }
+            ]
           }
         },
         "checked_norm_urls": [
@@ -3247,8 +3334,15 @@
             "office_key": "ministry_economic",
             "office_title": "Министерство по экономической политике",
             "scope": "Рекомендация профильному участнику подготовить решение/координировать обращение к действительному исполнителю; не наделяет правом самостоятельно исполнять действие, распоряжаться средствами или заменять реальный орган.",
-            "status": "proposed_not_authorization",
-            "legacy_role_match_needs_replacement": true
+            "status": "owner_approved_editorial_not_authorization",
+            "legacy_role_match_needs_replacement": true,
+            "owner_approved": true,
+            "secondary_profiles": [
+              {
+                "office_key": "ministry_social",
+                "office_title": "Министерство по социальной политике"
+              }
+            ]
           }
         },
         "checked_norm_urls": [
@@ -3408,8 +3502,15 @@
             "office_key": "ministry_internal",
             "office_title": "Министерство по внутренней политике и государству",
             "scope": "Рекомендация профильному участнику подготовить решение/координировать обращение к действительному исполнителю; не наделяет правом самостоятельно исполнять действие, распоряжаться средствами или заменять реальный орган.",
-            "status": "proposed_not_authorization",
-            "legacy_role_match_needs_replacement": true
+            "status": "owner_approved_editorial_not_authorization",
+            "legacy_role_match_needs_replacement": true,
+            "owner_approved": true,
+            "secondary_profiles": [
+              {
+                "office_key": "ministry_social",
+                "office_title": "Министерство по социальной политике"
+              }
+            ]
           }
         },
         "checked_norm_urls": [
@@ -3565,8 +3666,10 @@
             "office_key": "ministry_social",
             "office_title": "Министерство по социальной политике",
             "scope": "Рекомендация профильному участнику подготовить решение/координировать обращение к действительному исполнителю; не наделяет правом самостоятельно исполнять действие, распоряжаться средствами или заменять реальный орган.",
-            "status": "proposed_not_authorization",
-            "legacy_role_match_needs_replacement": true
+            "status": "owner_approved_editorial_not_authorization",
+            "legacy_role_match_needs_replacement": true,
+            "owner_approved": true,
+            "secondary_profiles": []
           }
         },
         "checked_norm_urls": [
@@ -3726,8 +3829,10 @@
             "office_key": "ministry_social",
             "office_title": "Министерство по социальной политике",
             "scope": "Рекомендация профильному участнику подготовить решение/координировать обращение к действительному исполнителю; не наделяет правом самостоятельно исполнять действие, распоряжаться средствами или заменять реальный орган.",
-            "status": "proposed_not_authorization",
-            "legacy_role_match_needs_replacement": true
+            "status": "owner_approved_editorial_not_authorization",
+            "legacy_role_match_needs_replacement": true,
+            "owner_approved": true,
+            "secondary_profiles": []
           }
         },
         "checked_norm_urls": [
@@ -3887,8 +3992,10 @@
             "office_key": "ministry_economic",
             "office_title": "Министерство по экономической политике",
             "scope": "Рекомендация профильному участнику подготовить решение/координировать обращение к действительному исполнителю; не наделяет правом самостоятельно исполнять действие, распоряжаться средствами или заменять реальный орган.",
-            "status": "proposed_not_authorization",
-            "legacy_role_match_needs_replacement": true
+            "status": "owner_approved_editorial_not_authorization",
+            "legacy_role_match_needs_replacement": true,
+            "owner_approved": true,
+            "secondary_profiles": []
           }
         },
         "checked_norm_urls": [
@@ -4066,8 +4173,10 @@
             "office_key": "ministry_internal",
             "office_title": "Министерство по внутренней политике и государству",
             "scope": "Рекомендация профильному участнику подготовить решение/координировать обращение к действительному исполнителю; не наделяет правом самостоятельно исполнять действие, распоряжаться средствами или заменять реальный орган.",
-            "status": "proposed_not_authorization",
-            "legacy_role_match_needs_replacement": true
+            "status": "owner_approved_editorial_not_authorization",
+            "legacy_role_match_needs_replacement": true,
+            "owner_approved": true,
+            "secondary_profiles": []
           }
         },
         "checked_norm_urls": [
@@ -4225,8 +4334,10 @@
             "office_key": "ministry_economic",
             "office_title": "Министерство по экономической политике",
             "scope": "Рекомендация профильному участнику подготовить решение/координировать обращение к действительному исполнителю; не наделяет правом самостоятельно исполнять действие, распоряжаться средствами или заменять реальный орган.",
-            "status": "proposed_not_authorization",
-            "legacy_role_match_needs_replacement": true
+            "status": "owner_approved_editorial_not_authorization",
+            "legacy_role_match_needs_replacement": true,
+            "owner_approved": true,
+            "secondary_profiles": []
           }
         },
         "checked_norm_urls": [
@@ -4384,8 +4495,10 @@
             "office_key": "ministry_internal",
             "office_title": "Министерство по внутренней политике и государству",
             "scope": "Рекомендация профильному участнику подготовить решение/координировать обращение к действительному исполнителю; не наделяет правом самостоятельно исполнять действие, распоряжаться средствами или заменять реальный орган.",
-            "status": "proposed_not_authorization",
-            "legacy_role_match_needs_replacement": true
+            "status": "owner_approved_editorial_not_authorization",
+            "legacy_role_match_needs_replacement": true,
+            "owner_approved": true,
+            "secondary_profiles": []
           }
         },
         "checked_norm_urls": [
@@ -4543,8 +4656,10 @@
             "office_key": "ministry_social",
             "office_title": "Министерство по социальной политике",
             "scope": "Рекомендация профильному участнику подготовить решение/координировать обращение к действительному исполнителю; не наделяет правом самостоятельно исполнять действие, распоряжаться средствами или заменять реальный орган.",
-            "status": "proposed_not_authorization",
-            "legacy_role_match_needs_replacement": true
+            "status": "owner_approved_editorial_not_authorization",
+            "legacy_role_match_needs_replacement": true,
+            "owner_approved": true,
+            "secondary_profiles": []
           }
         },
         "checked_norm_urls": [
@@ -4704,8 +4819,10 @@
             "office_key": "ministry_economic",
             "office_title": "Министерство по экономической политике",
             "scope": "Рекомендация профильному участнику подготовить решение/координировать обращение к действительному исполнителю; не наделяет правом самостоятельно исполнять действие, распоряжаться средствами или заменять реальный орган.",
-            "status": "proposed_not_authorization",
-            "legacy_role_match_needs_replacement": true
+            "status": "owner_approved_editorial_not_authorization",
+            "legacy_role_match_needs_replacement": true,
+            "owner_approved": true,
+            "secondary_profiles": []
           }
         },
         "checked_norm_urls": [
@@ -4863,8 +4980,10 @@
             "office_key": "ministry_social",
             "office_title": "Министерство по социальной политике",
             "scope": "Рекомендация профильному участнику подготовить решение/координировать обращение к действительному исполнителю; не наделяет правом самостоятельно исполнять действие, распоряжаться средствами или заменять реальный орган.",
-            "status": "proposed_not_authorization",
-            "legacy_role_match_needs_replacement": true
+            "status": "owner_approved_editorial_not_authorization",
+            "legacy_role_match_needs_replacement": true,
+            "owner_approved": true,
+            "secondary_profiles": []
           }
         },
         "checked_norm_urls": [
@@ -5020,8 +5139,10 @@
             "office_key": "ministry_economic",
             "office_title": "Министерство по экономической политике",
             "scope": "Рекомендация профильному участнику подготовить решение/координировать обращение к действительному исполнителю; не наделяет правом самостоятельно исполнять действие, распоряжаться средствами или заменять реальный орган.",
-            "status": "proposed_not_authorization",
-            "legacy_role_match_needs_replacement": true
+            "status": "owner_approved_editorial_not_authorization",
+            "legacy_role_match_needs_replacement": true,
+            "owner_approved": true,
+            "secondary_profiles": []
           }
         },
         "checked_norm_urls": [
@@ -5183,8 +5304,10 @@
             "office_key": "ministry_social",
             "office_title": "Министерство по социальной политике",
             "scope": "Рекомендация профильному участнику подготовить решение/координировать обращение к действительному исполнителю; не наделяет правом самостоятельно исполнять действие, распоряжаться средствами или заменять реальный орган.",
-            "status": "proposed_not_authorization",
-            "legacy_role_match_needs_replacement": true
+            "status": "owner_approved_editorial_not_authorization",
+            "legacy_role_match_needs_replacement": true,
+            "owner_approved": true,
+            "secondary_profiles": []
           }
         },
         "checked_norm_urls": [
@@ -5346,8 +5469,10 @@
             "office_key": "ministry_social",
             "office_title": "Министерство по социальной политике",
             "scope": "Рекомендация профильному участнику подготовить решение/координировать обращение к действительному исполнителю; не наделяет правом самостоятельно исполнять действие, распоряжаться средствами или заменять реальный орган.",
-            "status": "proposed_not_authorization",
-            "legacy_role_match_needs_replacement": true
+            "status": "owner_approved_editorial_not_authorization",
+            "legacy_role_match_needs_replacement": true,
+            "owner_approved": true,
+            "secondary_profiles": []
           }
         },
         "checked_norm_urls": [
@@ -5507,8 +5632,10 @@
             "office_key": "ministry_social",
             "office_title": "Министерство по социальной политике",
             "scope": "Рекомендация профильному участнику подготовить решение/координировать обращение к действительному исполнителю; не наделяет правом самостоятельно исполнять действие, распоряжаться средствами или заменять реальный орган.",
-            "status": "proposed_not_authorization",
-            "legacy_role_match_needs_replacement": true
+            "status": "owner_approved_editorial_not_authorization",
+            "legacy_role_match_needs_replacement": true,
+            "owner_approved": true,
+            "secondary_profiles": []
           }
         },
         "checked_norm_urls": [
@@ -5664,8 +5791,15 @@
             "office_key": "ministry_internal",
             "office_title": "Министерство по внутренней политике и государству",
             "scope": "Рекомендация профильному участнику подготовить решение/координировать обращение к действительному исполнителю; не наделяет правом самостоятельно исполнять действие, распоряжаться средствами или заменять реальный орган.",
-            "status": "proposed_not_authorization",
-            "legacy_role_match_needs_replacement": true
+            "status": "owner_approved_editorial_not_authorization",
+            "legacy_role_match_needs_replacement": true,
+            "owner_approved": true,
+            "secondary_profiles": [
+              {
+                "office_key": "ministry_economic",
+                "office_title": "Министерство по экономической политике"
+              }
+            ]
           }
         },
         "checked_norm_urls": [
@@ -5821,8 +5955,10 @@
             "office_key": "ministry_internal",
             "office_title": "Министерство по внутренней политике и государству",
             "scope": "Рекомендация профильному участнику подготовить решение/координировать обращение к действительному исполнителю; не наделяет правом самостоятельно исполнять действие, распоряжаться средствами или заменять реальный орган.",
-            "status": "proposed_not_authorization",
-            "legacy_role_match_needs_replacement": true
+            "status": "owner_approved_editorial_not_authorization",
+            "legacy_role_match_needs_replacement": true,
+            "owner_approved": true,
+            "secondary_profiles": []
           }
         },
         "checked_norm_urls": [
@@ -5980,8 +6116,10 @@
             "office_key": "ministry_economic",
             "office_title": "Министерство по экономической политике",
             "scope": "Рекомендация профильному участнику подготовить решение/координировать обращение к действительному исполнителю; не наделяет правом самостоятельно исполнять действие, распоряжаться средствами или заменять реальный орган.",
-            "status": "proposed_not_authorization",
-            "legacy_role_match_needs_replacement": true
+            "status": "owner_approved_editorial_not_authorization",
+            "legacy_role_match_needs_replacement": true,
+            "owner_approved": true,
+            "secondary_profiles": []
           }
         },
         "checked_norm_urls": [
@@ -6139,8 +6277,15 @@
             "office_key": "ministry_social",
             "office_title": "Министерство по социальной политике",
             "scope": "Рекомендация профильному участнику подготовить решение/координировать обращение к действительному исполнителю; не наделяет правом самостоятельно исполнять действие, распоряжаться средствами или заменять реальный орган.",
-            "status": "proposed_not_authorization",
-            "legacy_role_match_needs_replacement": true
+            "status": "owner_approved_editorial_not_authorization",
+            "legacy_role_match_needs_replacement": true,
+            "owner_approved": true,
+            "secondary_profiles": [
+              {
+                "office_key": "ministry_internal",
+                "office_title": "Министерство по внутренней политике и государству"
+              }
+            ]
           }
         },
         "checked_norm_urls": [
@@ -6320,8 +6465,10 @@
             "office_key": "ministry_internal",
             "office_title": "Министерство по внутренней политике и государству",
             "scope": "Рекомендация профильному участнику подготовить решение/координировать обращение к действительному исполнителю; не наделяет правом самостоятельно исполнять действие, распоряжаться средствами или заменять реальный орган.",
-            "status": "proposed_not_authorization",
-            "legacy_role_match_needs_replacement": true
+            "status": "owner_approved_editorial_not_authorization",
+            "legacy_role_match_needs_replacement": true,
+            "owner_approved": true,
+            "secondary_profiles": []
           }
         },
         "checked_norm_urls": [
@@ -6479,8 +6626,10 @@
             "office_key": "ministry_social",
             "office_title": "Министерство по социальной политике",
             "scope": "Рекомендация профильному участнику подготовить решение/координировать обращение к действительному исполнителю; не наделяет правом самостоятельно исполнять действие, распоряжаться средствами или заменять реальный орган.",
-            "status": "proposed_not_authorization",
-            "legacy_role_match_needs_replacement": true
+            "status": "owner_approved_editorial_not_authorization",
+            "legacy_role_match_needs_replacement": true,
+            "owner_approved": true,
+            "secondary_profiles": []
           }
         },
         "checked_norm_urls": [
@@ -6659,8 +6808,10 @@
             "office_key": "ministry_social",
             "office_title": "Министерство по социальной политике",
             "scope": "Рекомендация профильному участнику подготовить решение/координировать обращение к действительному исполнителю; не наделяет правом самостоятельно исполнять действие, распоряжаться средствами или заменять реальный орган.",
-            "status": "proposed_not_authorization",
-            "legacy_role_match_needs_replacement": true
+            "status": "owner_approved_editorial_not_authorization",
+            "legacy_role_match_needs_replacement": true,
+            "owner_approved": true,
+            "secondary_profiles": []
           }
         },
         "checked_norm_urls": [
@@ -6820,8 +6971,10 @@
             "office_key": "ministry_social",
             "office_title": "Министерство по социальной политике",
             "scope": "Рекомендация профильному участнику подготовить решение/координировать обращение к действительному исполнителю; не наделяет правом самостоятельно исполнять действие, распоряжаться средствами или заменять реальный орган.",
-            "status": "proposed_not_authorization",
-            "legacy_role_match_needs_replacement": true
+            "status": "owner_approved_editorial_not_authorization",
+            "legacy_role_match_needs_replacement": true,
+            "owner_approved": true,
+            "secondary_profiles": []
           }
         },
         "checked_norm_urls": [
@@ -6985,8 +7138,10 @@
             "office_key": "ministry_internal",
             "office_title": "Министерство по внутренней политике и государству",
             "scope": "Рекомендация профильному участнику подготовить решение/координировать обращение к действительному исполнителю; не наделяет правом самостоятельно исполнять действие, распоряжаться средствами или заменять реальный орган.",
-            "status": "proposed_not_authorization",
-            "legacy_role_match_needs_replacement": true
+            "status": "owner_approved_editorial_not_authorization",
+            "legacy_role_match_needs_replacement": true,
+            "owner_approved": true,
+            "secondary_profiles": []
           }
         },
         "checked_norm_urls": [
@@ -7151,8 +7306,10 @@
             "office_key": "ministry_internal",
             "office_title": "Министерство по внутренней политике и государству",
             "scope": "Рекомендация профильному участнику подготовить решение/координировать обращение к действительному исполнителю; не наделяет правом самостоятельно исполнять действие, распоряжаться средствами или заменять реальный орган.",
-            "status": "proposed_not_authorization",
-            "legacy_role_match_needs_replacement": true
+            "status": "owner_approved_editorial_not_authorization",
+            "legacy_role_match_needs_replacement": true,
+            "owner_approved": true,
+            "secondary_profiles": []
           }
         },
         "checked_norm_urls": [
@@ -7308,8 +7465,10 @@
             "office_key": "ministry_internal",
             "office_title": "Министерство по внутренней политике и государству",
             "scope": "Рекомендация профильному участнику подготовить решение/координировать обращение к действительному исполнителю; не наделяет правом самостоятельно исполнять действие, распоряжаться средствами или заменять реальный орган.",
-            "status": "proposed_not_authorization",
-            "legacy_role_match_needs_replacement": true
+            "status": "owner_approved_editorial_not_authorization",
+            "legacy_role_match_needs_replacement": true,
+            "owner_approved": true,
+            "secondary_profiles": []
           }
         },
         "checked_norm_urls": [
@@ -7463,8 +7622,10 @@
             "office_key": "ministry_internal",
             "office_title": "Министерство по внутренней политике и государству",
             "scope": "Рекомендация профильному участнику подготовить решение/координировать обращение к действительному исполнителю; не наделяет правом самостоятельно исполнять действие, распоряжаться средствами или заменять реальный орган.",
-            "status": "proposed_not_authorization",
-            "legacy_role_match_needs_replacement": true
+            "status": "owner_approved_editorial_not_authorization",
+            "legacy_role_match_needs_replacement": true,
+            "owner_approved": true,
+            "secondary_profiles": []
           }
         },
         "checked_norm_urls": [
