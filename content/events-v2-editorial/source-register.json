@@ -5258,33 +5258,45 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "ЗК РФ, ст. 39.6, п. 1–2: договор аренды публичной земли по общему правилу заключается на аукционе, кроме предусмотренных законом исключений. В условии исключения отсутствуют; письмо поддержки не заменяет правового основания. Процедурные условия ст. 39.11 и последующих статей проверяются при подготовке торгов.",
+      "legal_basis": "ЗК РФ, ст. 11.9, 39.6, 39.11–39.13; №135-ФЗ, ст. 17.3: при заданном отсутствии исключений аренда предоставляется по результатам электронной конкурентной процедуры; решение принимается уполномоченным органом. Самостоятельные участки формируются только при соблюдении требований к их размерам, границам и использованию. Письмо поддержки не заменяет основание предоставления.",
       "legal_urls": [
         "https://www.consultant.ru/document/cons_doc_LAW_33773/79da6e3bbbc8eb967db0714e8378269bfea9f83c/",
-        "https://www.consultant.ru/document/cons_doc_LAW_33773/8a479c028d080f9c4013f9a12ca4bc04a1bc7527/"
+        "https://www.consultant.ru/document/cons_doc_LAW_33773/8a479c028d080f9c4013f9a12ca4bc04a1bc7527/",
+        "https://www.consultant.ru/document/cons_doc_LAW_33773/3446ddfcafad7edd45fa9e4766584f3a09c11d98/",
+        "https://www.consultant.ru/document/cons_doc_LAW_33773/11fee8899982f95489314b2c97aeefd67a3ef541/",
+        "https://www.consultant.ru/document/cons_doc_LAW_33773/878fb9545863b1203029aec55b9835dbfba6db85/",
+        "https://www.consultant.ru/document/cons_doc_LAW_61763/eb940f353b9469628dddbcad26d5e4e4add5060d/"
       ],
-      "legal_status": "requires_case_specific_current_law_review",
+      "legal_status": "verified_current",
       "activation_allowed": false,
       "review_date": "2026-11-28",
-      "source_scope": "specific_norm_and_related_search_results_partial",
+      "source_scope": "case_specific_current_norms_and_all_alternatives_reviewed_under_stated_facts",
       "checked_norm_urls": [
         "https://www.consultant.ru/document/cons_doc_LAW_33773/79da6e3bbbc8eb967db0714e8378269bfea9f83c/",
-        "https://www.consultant.ru/document/cons_doc_LAW_33773/8a479c028d080f9c4013f9a12ca4bc04a1bc7527/"
+        "https://www.consultant.ru/document/cons_doc_LAW_33773/8a479c028d080f9c4013f9a12ca4bc04a1bc7527/",
+        "https://www.consultant.ru/document/cons_doc_LAW_33773/3446ddfcafad7edd45fa9e4766584f3a09c11d98/",
+        "https://www.consultant.ru/document/cons_doc_LAW_33773/11fee8899982f95489314b2c97aeefd67a3ef541/",
+        "https://www.consultant.ru/document/cons_doc_LAW_33773/878fb9545863b1203029aec55b9835dbfba6db85/",
+        "https://www.consultant.ru/document/cons_doc_LAW_61763/eb940f353b9469628dddbcad26d5e4e4add5060d/"
       ],
       "targeted_option_review": {
-        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
         "option_count": 5,
-        "remaining": "Уточнить ст. 39.11–39.13 ЗК, общие требования ст. 17.3 №135-ФЗ, статус и возможность формирования участков."
+        "remaining": "Проверено для прямо заданных учебных обстоятельств. Индивидуальные документы, числовые нормативы и процедуры исполнения в реальном деле не сертифицированы; источники — доступные справочные редакции, не полная независимая сверка официальной цепочки поправок."
       },
       "final_case_review_2026_11_28": {
         "date": "2026-11-28",
-        "scope": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "scope": "case_specific_legal_acceptance_under_explicit_educational_facts",
         "option_count": 5,
-        "conclusion": "Ст. 39.6 ЗК подтверждает аукцион при отсутствии исключений; ст. 39.11 содержит порядок подготовки, включая действующие с 01.07.2026 общие требования к торгам. Пять мер допустимы при надлежащей подготовке. Дополнительный порядок электронных торгов и условия формирования самостоятельных участков не полностью проверены.",
-        "remaining": "Уточнить ст. 39.11–39.13 ЗК, общие требования ст. 17.3 №135-ФЗ, статус и возможность формирования участков.",
+        "conclusion": "Прочитаны конкретные статьи ЗК и ст. 17.3 №135-ФЗ с действующими с 01.07.2026 изменениями. Уточнён момент принятия решения о торгах. Все пять мер допустимы: описание и информирование равнодоступны, инфраструктурная проверка предшествует торгам, раздел только после законного формирования, контроль аренды в пределах договора. Не исключается специальный порядок заключения договора по результатам несостоявшегося аукциона, если возникнут предусмотренные законом обстоятельства.",
+        "remaining": "Проверено для прямо заданных учебных обстоятельств. Индивидуальные документы, числовые нормативы и процедуры исполнения в реальном деле не сертифицированы; источники — доступные справочные редакции, не полная независимая сверка официальной цепочки поправок.",
         "urls": [
           "https://www.consultant.ru/document/cons_doc_LAW_33773/79da6e3bbbc8eb967db0714e8378269bfea9f83c/",
-          "https://www.consultant.ru/document/cons_doc_LAW_33773/8a479c028d080f9c4013f9a12ca4bc04a1bc7527/"
+          "https://www.consultant.ru/document/cons_doc_LAW_33773/8a479c028d080f9c4013f9a12ca4bc04a1bc7527/",
+          "https://www.consultant.ru/document/cons_doc_LAW_33773/3446ddfcafad7edd45fa9e4766584f3a09c11d98/",
+          "https://www.consultant.ru/document/cons_doc_LAW_33773/11fee8899982f95489314b2c97aeefd67a3ef541/",
+          "https://www.consultant.ru/document/cons_doc_LAW_33773/878fb9545863b1203029aec55b9835dbfba6db85/",
+          "https://www.consultant.ru/document/cons_doc_LAW_61763/eb940f353b9469628dddbcad26d5e4e4add5060d/"
         ]
       }
     },
@@ -5332,36 +5344,43 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "7-ФЗ, ст. 16, 34: плата за негативное воздействие не отменяет самостоятельные природоохранные обязанности и соблюдение применимых разрешительных условий. Выявленное нарушение рассматривается компетентным органом. Вид разрешения и специальный порядок воздействия в задаче не конкретизированы; голосование не может разрешить продолжение незаконных выбросов.",
+      "legal_basis": "№7-ФЗ, ст. 16, 31.1, 34, 65, 67: плата за выбросы не разрешает нарушение условий комплексного экологического разрешения. Производственный контроль и надзор за обязательными требованиями сохраняются. Устранение превышения и исполнение законных предписаний обязательны, конкретные меры принуждения определяются компетентным органом в установленной процедуре.",
       "legal_urls": [
         "https://epp.genproc.gov.ru/ru/proc_27/activity/legal-education/explain/e260271/",
         "https://www.consultant.ru/document/cons_doc_LAW_34823/4d2f994d3199b20f35934603e85132412705d121/",
-        "https://www.consultant.ru/document/cons_doc_LAW_34823/ddc0e897eb549460b7ccb5f47c2558ae829611bf/"
+        "https://www.consultant.ru/document/cons_doc_LAW_34823/ddc0e897eb549460b7ccb5f47c2558ae829611bf/",
+        "https://www.consultant.ru/document/cons_doc_LAW_34823/5faf81ba52595911c525ac6bbb1949e0b73e6fcc/",
+        "https://www.consultant.ru/document/cons_doc_LAW_34823/cd02477ea2aa8c7527091799e718cadfcfb04c4d/",
+        "https://www.consultant.ru/document/cons_doc_LAW_34823/df580a2a65d06c74926bee9ba755b43d85b9b6d0/"
       ],
-      "legal_status": "requires_case_specific_current_law_review",
+      "legal_status": "verified_current",
       "activation_allowed": false,
       "review_date": "2026-11-28",
-      "source_scope": "prior_official_explanation_not_reopened",
+      "source_scope": "case_specific_current_norms_and_all_alternatives_reviewed_under_stated_facts",
       "checked_norm_urls": [
         "https://www.consultant.ru/document/cons_doc_LAW_34823/4d2f994d3199b20f35934603e85132412705d121/",
+        "https://www.consultant.ru/document/cons_doc_LAW_34823/5faf81ba52595911c525ac6bbb1949e0b73e6fcc/",
         "https://www.consultant.ru/document/cons_doc_LAW_34823/ddc0e897eb549460b7ccb5f47c2558ae829611bf/",
-        "https://epp.genproc.gov.ru/ru/proc_27/activity/legal-education/explain/e260271/"
+        "https://www.consultant.ru/document/cons_doc_LAW_34823/cd02477ea2aa8c7527091799e718cadfcfb04c4d/",
+        "https://www.consultant.ru/document/cons_doc_LAW_34823/df580a2a65d06c74926bee9ba755b43d85b9b6d0/"
       ],
       "targeted_option_review": {
-        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
         "option_count": 5,
-        "remaining": "Установить категорию объекта, вид разрешительного документа, конкретный норматив выбросов, полномочия и применимые меры реагирования."
+        "remaining": "Проверено для прямо заданных учебных обстоятельств. Индивидуальные документы, числовые нормативы и процедуры исполнения в реальном деле не сертифицированы; источники — доступные справочные редакции, не полная независимая сверка официальной цепочки поправок."
       },
       "final_case_review_2026_11_28": {
         "date": "2026-11-28",
-        "scope": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "scope": "case_specific_legal_acceptance_under_explicit_educational_facts",
         "option_count": 5,
-        "conclusion": "Ст. 16, 34 №7-ФЗ в действующей редакции проверены. Уплата за негативное воздействие не заменяет обязательные экологические требования. Пять мер допустимы при соблюдении обязательного реагирования, однако категория объекта и конкретный разрешительный режим не определены.",
-        "remaining": "Установить категорию объекта, вид разрешительного документа, конкретный норматив выбросов, полномочия и применимые меры реагирования.",
+        "conclusion": "Прочитаны статьи №7-ФЗ в редакции от 04.08.2026 с изменениями с 01.09.2026. Установлены категория объекта, действующее КЭР и технологический норматив. Модернизация при необходимости требует пересмотра разрешения; дополнительный контроль не заменяет обязательный; добровольные ограничения не подменяют меры государственного надзора; поддержка требует самостоятельного основания; оценка рисков не отсрочивает устранение нарушения.",
+        "remaining": "Проверено для прямо заданных учебных обстоятельств. Индивидуальные документы, числовые нормативы и процедуры исполнения в реальном деле не сертифицированы; источники — доступные справочные редакции, не полная независимая сверка официальной цепочки поправок.",
         "urls": [
           "https://www.consultant.ru/document/cons_doc_LAW_34823/4d2f994d3199b20f35934603e85132412705d121/",
+          "https://www.consultant.ru/document/cons_doc_LAW_34823/5faf81ba52595911c525ac6bbb1949e0b73e6fcc/",
           "https://www.consultant.ru/document/cons_doc_LAW_34823/ddc0e897eb549460b7ccb5f47c2558ae829611bf/",
-          "https://epp.genproc.gov.ru/ru/proc_27/activity/legal-education/explain/e260271/"
+          "https://www.consultant.ru/document/cons_doc_LAW_34823/cd02477ea2aa8c7527091799e718cadfcfb04c4d/",
+          "https://www.consultant.ru/document/cons_doc_LAW_34823/df580a2a65d06c74926bee9ba755b43d85b9b6d0/"
         ]
       }
     },
@@ -5759,23 +5778,41 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "Конституция РФ, ст. 23–24; ГК РФ, ст. 152.2; 152-ФЗ: сведения о частной жизни защищены. В истории нет основания для публикации семейной переписки. Доступ ограничивается и проверяется законность уже совершённой передачи; обязательные меры не заменяются редактурой отчёта.",
+      "legal_basis": "ГК РФ, ст. 152.2; №152-ФЗ, ст. 6, 7, 21 ч. 3 и 3.1: использование и раскрытие семейной переписки без применимого законного основания недопустимы. При заданном факте неправомерной передачи с нарушением прав оператор обязан прекратить незаконную обработку, применить предусмотренные законом меры и уведомить Роскомнадзор: первоначально в течение 24 часов, о результатах внутреннего расследования в течение 72 часов с выявления инцидента. Отсутствие публичной публикации не исключает инцидент.",
       "legal_urls": [
         "https://minjust.gov.ru/ru/documents/8011/",
         "https://www.consultant.ru/document/cons_doc_LAW_5142/9c307a0f2164645c15ca4e3146ff5f6e56060b23/",
-        "https://www.consultant.ru/document/cons_doc_LAW_61801/d3fe43a7c415353b17faab255bc0de92bea127da/"
+        "https://www.consultant.ru/document/cons_doc_LAW_61801/d3fe43a7c415353b17faab255bc0de92bea127da/",
+        "https://www.consultant.ru/document/cons_doc_LAW_61801/315f051396c88f1e4f827ba3f2ae313d999a1873/",
+        "https://www.consultant.ru/document/cons_doc_LAW_61801/a15bab6050028753706f22c32fe60627a7be79f9/"
       ],
-      "legal_status": "requires_case_specific_current_law_review",
+      "legal_status": "verified_current",
       "activation_allowed": false,
       "review_date": "2026-11-28",
-      "source_scope": "specific_norm_and_related_search_results_partial",
+      "source_scope": "case_specific_current_norms_and_all_alternatives_reviewed_under_stated_facts",
       "checked_norm_urls": [
-        "https://www.consultant.ru/document/cons_doc_LAW_5142/9c307a0f2164645c15ca4e3146ff5f6e56060b23/"
+        "https://www.consultant.ru/document/cons_doc_LAW_5142/9c307a0f2164645c15ca4e3146ff5f6e56060b23/",
+        "https://www.consultant.ru/document/cons_doc_LAW_61801/315f051396c88f1e4f827ba3f2ae313d999a1873/",
+        "https://www.consultant.ru/document/cons_doc_LAW_61801/a15bab6050028753706f22c32fe60627a7be79f9/",
+        "https://www.consultant.ru/document/cons_doc_LAW_61801/d3fe43a7c415353b17faab255bc0de92bea127da/"
       ],
       "targeted_option_review": {
-        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
         "option_count": 5,
-        "remaining": "Нужно проверить статус оператора и факт неправомерной передачи по 152-ФЗ, конкретные меры реагирования и исключения; не утверждать публичную утечку, пока отчёт не опубликован."
+        "remaining": "Проверено для прямо заданных учебных обстоятельств. Индивидуальные документы, числовые нормативы и процедуры исполнения в реальном деле не сертифицированы; источники — доступные справочные редакции, не полная независимая сверка официальной цепочки поправок."
+      },
+      "final_case_review_2026_11_28": {
+        "date": "2026-11-28",
+        "scope": "case_specific_legal_acceptance_under_explicit_educational_facts",
+        "option_count": 5,
+        "conclusion": "Проверены ст. 152.2 ГК и ст. 6, 7, 21 №152-ФЗ (ред. 26.07.2026). Уточнены статус оператора, неуполномоченный получатель и установленное нарушение прав; обязанность уведомления возникает независимо от голосования. Все пять вариантов являются дополнительными: обезличивание с проверкой обратной идентификации, аудит, правила, помощь и обучение не заменяют обязательное реагирование.",
+        "remaining": "Проверено для прямо заданных учебных обстоятельств. Индивидуальные документы, числовые нормативы и процедуры исполнения в реальном деле не сертифицированы; источники — доступные справочные редакции, не полная независимая сверка официальной цепочки поправок.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_5142/9c307a0f2164645c15ca4e3146ff5f6e56060b23/",
+          "https://www.consultant.ru/document/cons_doc_LAW_61801/315f051396c88f1e4f827ba3f2ae313d999a1873/",
+          "https://www.consultant.ru/document/cons_doc_LAW_61801/a15bab6050028753706f22c32fe60627a7be79f9/",
+          "https://www.consultant.ru/document/cons_doc_LAW_61801/d3fe43a7c415353b17faab255bc0de92bea127da/"
+        ]
       }
     },
     {
@@ -6018,22 +6055,32 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "БК РФ, ст. 78: в учебном условии получатель — коммерческая организация; правовые условия субсидии, отчётность и контроль зависят от применимого акта и соглашения. Факт ввода объекта не доказывает исполнение отчётности; автоматический возврат всей суммы без проверки оснований не утверждается.",
+      "legal_basis": "БК РФ, ст. 78 п. 3 подп. 2, 3, 5: цели, условия и результаты субсидии, порядок возврата и контроль определяются применимым правовым актом; главный распорядитель и органы финансового контроля проверяют соблюдение условий и достижение результата. Ввод объекта не заменяет предусмотренный соглашением отчёт. Размер и необходимость возврата определяются применимым порядком, а не голосованием.",
       "legal_urls": [
         "https://www.consultant.ru/document/cons_doc_LAW_19702/1b6959f23cc516d0e11ddc2e213ca2dca83560df/",
         "https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721"
       ],
-      "legal_status": "requires_case_specific_current_law_review",
+      "legal_status": "verified_current",
       "activation_allowed": false,
       "review_date": "2026-11-28",
-      "source_scope": "prior_article_evidence_and_special_regime_unresolved",
+      "source_scope": "case_specific_current_norms_and_all_alternatives_reviewed_under_stated_facts",
       "checked_norm_urls": [
         "https://www.consultant.ru/document/cons_doc_LAW_19702/1b6959f23cc516d0e11ddc2e213ca2dca83560df/"
       ],
       "targeted_option_review": {
-        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
         "option_count": 5,
-        "remaining": "Условия конкретной субсидии, соглашение, основания возврата и объём контроля требуют проверки; ввод объекта не означает выполнения всех условий."
+        "remaining": "Проверено для прямо заданных учебных обстоятельств. Индивидуальные документы, числовые нормативы и процедуры исполнения в реальном деле не сертифицированы; источники — доступные справочные редакции, не полная независимая сверка официальной цепочки поправок."
+      },
+      "final_case_review_2026_11_28": {
+        "date": "2026-11-28",
+        "scope": "case_specific_legal_acceptance_under_explicit_educational_facts",
+        "option_count": 5,
+        "conclusion": "Прочитан п. 3 ст. 78 БК РФ в редакции 02.11.2026. Уточнены источник субсидии, вид получателя, назначение, обязательная отчётность и порядок контроля. Дополнительная документальная проверка, календарь, выездная оценка по основанию, перечень для будущих соглашений и допустимая обезличенная публикация не заменяют обязательный контроль и не предрешают сумму возврата.",
+        "remaining": "Проверено для прямо заданных учебных обстоятельств. Индивидуальные документы, числовые нормативы и процедуры исполнения в реальном деле не сертифицированы; источники — доступные справочные редакции, не полная независимая сверка официальной цепочки поправок.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/1b6959f23cc516d0e11ddc2e213ca2dca83560df/"
+        ]
       }
     },
     {
