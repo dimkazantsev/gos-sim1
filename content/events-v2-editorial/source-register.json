@@ -3885,38 +3885,42 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "Конституция РФ, ст. 105; Регламент ГД, ст. 116 ч. 1, ст. 124–125: по общему правилу три чтения, третье назначает Совет ГД для голосования палаты. Исключения исключены условием. Пресс-релиз не заменяет решение. Прочитан текст соответствующих статей; полнота редакции с изменениями на 19.11.2026 не подтверждена отдельным чтением этого консолидированного источника.",
+      "legal_basis": "Конституция РФ, ст. 105; Регламент ГД, ст. 116 ч. 1, ст. 124, 125 ч. 1–2, 126 ч. 1. Для заданного проекта действует обычное третье чтение, назначаемое Советом Государственной Думы, с голосованием палаты; решение оформляется постановлением. Поправки в третьем чтении не вносятся. Исключения, включая специальные условия ч. 1.2 ст. 125, исключены обстоятельствами задачи.",
       "legal_urls": [
         "https://minjust.gov.ru/ru/documents/8011/",
         "https://duma.gov.ru/media/files/7Yh7Q0KU4D7oknJkHhAEc0fGlP8Gn6Uz.pdf",
         "https://kodeks.karelia.ru/api/show/901700817",
-        "https://www.consultant.ru/law/review/lawmaking/reglduma/"
+        "https://www.consultant.ru/law/review/lawmaking/reglduma/",
+        "https://bbagcoegoo6cocknvq97.containers.yandexcloud.net/bill/37542-9"
       ],
-      "legal_status": "requires_case_specific_current_law_review",
+      "legal_status": "verified_current",
       "activation_allowed": false,
       "review_date": "2026-11-28",
-      "source_scope": "constitutional_text_checked_regulation_current_text_unavailable",
+      "source_scope": "case_specific_current_norms_and_all_alternatives_reviewed_under_stated_facts",
       "checked_norm_urls": [
         "https://minjust.gov.ru/ru/documents/8011/",
         "https://duma.gov.ru/media/files/7Yh7Q0KU4D7oknJkHhAEc0fGlP8Gn6Uz.pdf",
         "https://kodeks.karelia.ru/api/show/901700817",
-        "https://www.consultant.ru/law/review/lawmaking/reglduma/"
+        "https://www.consultant.ru/law/review/lawmaking/reglduma/",
+        "https://bbagcoegoo6cocknvq97.containers.yandexcloud.net/bill/37542-9"
       ],
       "targeted_option_review": {
-        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
         "option_count": 5,
-        "remaining": "Сохраняется ограничение актуальности полного текста Регламента; вид законопроекта не уточнён для специальных требований ч. 1.2 ст. 125."
+        "remaining": "Проверено применительно к заданным учебным обстоятельствам: прочитаны соответствующие статьи в доступном тексте, дополнительно сверены поисковые извлечения редакции на 19.11.2026. Полный текст этой редакции напрямую не открылся; независимая сверка всей цепочки поправок не проведена."
       },
       "final_case_review_2026_11_28": {
         "date": "2026-11-28",
-        "scope": "specific_norm_followup_not_full_acceptance",
+        "scope": "case_specific_legal_acceptance_under_explicit_educational_facts",
         "option_count": 5,
-        "conclusion": "Прочитаны ст. 116 ч. 1 и 125 ч. 1, включая специальное правило ч. 1.2. Все пять мер — подготовка, информирование или планирование без подмены решения Совета и палаты. Копия с изменениями на 19.11.2026 снова не открылась (цикл перенаправлений).",
-        "remaining": "Сохраняется ограничение актуальности полного текста Регламента; вид законопроекта не уточнён для специальных требований ч. 1.2 ст. 125.",
+        "conclusion": "Поисковые извлечения текста на 19.11.2026 подтвердили ст. 116 ч. 1, ст. 125 ч. 1–2 и ст. 126 ч. 1. В условии отдельно исключён специальный случай ч. 1.2 ст. 125. Все пять вариантов — организационные предложения, а не замена решения палаты; проверка текста не допускает неформального изменения поправок.",
+        "remaining": "Проверено применительно к заданным учебным обстоятельствам: прочитаны соответствующие статьи в доступном тексте, дополнительно сверены поисковые извлечения редакции на 19.11.2026. Полный текст этой редакции напрямую не открылся; независимая сверка всей цепочки поправок не проведена.",
         "urls": [
           "https://minjust.gov.ru/ru/documents/8011/",
+          "https://duma.gov.ru/media/files/7Yh7Q0KU4D7oknJkHhAEc0fGlP8Gn6Uz.pdf",
+          "https://kodeks.karelia.ru/api/show/901700817",
           "https://www.consultant.ru/law/review/lawmaking/reglduma/",
-          "https://kodeks.karelia.ru/api/show/901700817"
+          "https://bbagcoegoo6cocknvq97.containers.yandexcloud.net/bill/37542-9"
         ]
       }
     },
@@ -3927,36 +3931,42 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "Конституция РФ, ст. 104 ч. 3; Регламент ГД, ст. 105 ч. 1 пп. г, д: финансово-экономическое обоснование при материальных затратах и заключение Правительства для проектов, предусмотренных ч. 3 ст. 104. Заключение не равно положительному одобрению; письмо региона его не заменяет.",
+      "legal_basis": "Конституция РФ, ст. 104 ч. 3; Регламент ГД, ст. 105 ч. 1 пп. г, д; ст. 107 — предварительная проверка внесённых материалов. Нужны финансово-экономическое обоснование и заключение Правительства; письмо регионального органа его не заменяет. Техническая регистрация не равна надлежащему внесению. Положительность заключения не является установленным здесь условием.",
       "legal_urls": [
         "https://minjust.gov.ru/ru/documents/8011/",
         "https://www.consultant.ru/document/cons_doc_LAW_28399/3f8c850abc4dc2ba4207acc563b176d93bdcf5f7/",
-        "https://www.consultant.ru/law/review/lawmaking/reglduma/"
+        "https://www.consultant.ru/law/review/lawmaking/reglduma/",
+        "https://kodeks.karelia.ru/api/show/901700817",
+        "https://bbagcoegoo6cocknvq97.containers.yandexcloud.net/bill/37542-9"
       ],
-      "legal_status": "requires_case_specific_current_law_review",
+      "legal_status": "verified_current",
       "activation_allowed": false,
       "review_date": "2026-11-28",
-      "source_scope": "specific_norm_checked_partial",
+      "source_scope": "case_specific_current_norms_and_all_alternatives_reviewed_under_stated_facts",
       "checked_norm_urls": [
         "https://minjust.gov.ru/ru/documents/8011/",
         "https://www.consultant.ru/document/cons_doc_LAW_28399/3f8c850abc4dc2ba4207acc563b176d93bdcf5f7/",
-        "https://www.consultant.ru/law/review/lawmaking/reglduma/"
+        "https://www.consultant.ru/law/review/lawmaking/reglduma/",
+        "https://kodeks.karelia.ru/api/show/901700817",
+        "https://bbagcoegoo6cocknvq97.containers.yandexcloud.net/bill/37542-9"
       ],
       "targeted_option_review": {
-        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
         "option_count": 5,
-        "remaining": "Конкретное финансирование и специальные требования к комплекту проекта не заданы; полнота новейшей редакции Регламента отдельно не подтверждена."
+        "remaining": "Проверено применительно к заданным учебным обстоятельствам: прочитаны соответствующие статьи в доступном тексте, дополнительно сверены поисковые извлечения редакции на 19.11.2026. Полный текст этой редакции напрямую не открылся; независимая сверка всей цепочки поправок не проведена."
       },
       "final_case_review_2026_11_28": {
         "date": "2026-11-28",
-        "scope": "specific_norm_followup_not_full_acceptance",
+        "scope": "case_specific_legal_acceptance_under_explicit_educational_facts",
         "option_count": 5,
-        "conclusion": "Прочитаны Конституция, ст. 104 ч. 3 и Регламент ГД, ст. 105 ч. 1. Пять альтернатив — концепции будущей выплаты до внесения; ни одна не создаёт расходное обязательство.",
-        "remaining": "Конкретное финансирование и специальные требования к комплекту проекта не заданы; полнота новейшей редакции Регламента отдельно не подтверждена.",
+        "conclusion": "Поисковое извлечение редакции на 19.11.2026 подтвердило п. д ч. 1 ст. 105 и специальную проверку отсутствующего заключения. Пункт г проверен по доступному тексту. Условие уточняет, что просрочки представления заключения нет, и различает регистрацию и надлежащее внесение. Все пять альтернатив — концепции, требующие расчёта, а не принятие расходного обязательства.",
+        "remaining": "Проверено применительно к заданным учебным обстоятельствам: прочитаны соответствующие статьи в доступном тексте, дополнительно сверены поисковые извлечения редакции на 19.11.2026. Полный текст этой редакции напрямую не открылся; независимая сверка всей цепочки поправок не проведена.",
         "urls": [
-          "https://www.consultant.ru/document/cons_doc_LAW_28399/3f8c850abc4dc2ba4207acc563b176d93bdcf5f7/",
           "https://minjust.gov.ru/ru/documents/8011/",
-          "https://www.consultant.ru/law/review/lawmaking/reglduma/"
+          "https://www.consultant.ru/document/cons_doc_LAW_28399/3f8c850abc4dc2ba4207acc563b176d93bdcf5f7/",
+          "https://www.consultant.ru/law/review/lawmaking/reglduma/",
+          "https://kodeks.karelia.ru/api/show/901700817",
+          "https://bbagcoegoo6cocknvq97.containers.yandexcloud.net/bill/37542-9"
         ]
       }
     },
@@ -3972,7 +3982,11 @@
         "https://minjust.gov.ru/ru/documents/8011/",
         "https://www.consultant.ru/document/cons_doc_LAW_28399/bdb6e3b84ca23ec909e111e3d18908e25a355111/",
         "https://www.consultant.ru/law/review/lawmaking/reglduma/",
-        "https://www.consultant.ru/law/review/lawmaking/reglsovet/?ysclid=l8kry8cfvj439608251"
+        "https://www.consultant.ru/law/review/lawmaking/reglsovet/?ysclid=l8kry8cfvj439608251",
+        "https://base.garant.ru/12125778/",
+        "https://www.consultant.ru/law/review/lawmaking/reglsovet/",
+        "https://bbagcoegoo6cocknvq97.containers.yandexcloud.net/bill/37542-9",
+        "https://kodeks.karelia.ru/api/show/901700817"
       ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
@@ -3982,7 +3996,11 @@
         "https://minjust.gov.ru/ru/documents/8011/",
         "https://www.consultant.ru/document/cons_doc_LAW_28399/bdb6e3b84ca23ec909e111e3d18908e25a355111/",
         "https://www.consultant.ru/law/review/lawmaking/reglduma/",
-        "https://www.consultant.ru/law/review/lawmaking/reglsovet/?ysclid=l8kry8cfvj439608251"
+        "https://www.consultant.ru/law/review/lawmaking/reglsovet/?ysclid=l8kry8cfvj439608251",
+        "https://base.garant.ru/12125778/",
+        "https://www.consultant.ru/law/review/lawmaking/reglsovet/",
+        "https://bbagcoegoo6cocknvq97.containers.yandexcloud.net/bill/37542-9",
+        "https://kodeks.karelia.ru/api/show/901700817"
       ],
       "targeted_option_review": {
         "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
@@ -3993,13 +4011,17 @@
         "date": "2026-11-28",
         "scope": "specific_norm_followup_not_full_acceptance",
         "option_count": 5,
-        "conclusion": "Прочитаны положения о голосовании и повторном рассмотрении в обеих палатах. Устранена возможная трактовка, будто любая новая редакция требует внесения нового законопроекта. Все пять организационных предложений остаются допустимыми в рамках регламентных сроков.",
+        "conclusion": "Дополнительно найдена консолидированная справочная копия Регламента СФ с изменениями, вступившими в силу 24.07.2026; прочитаны ст. 135.2–135.3 Регламента ГД и ст. 120.2 Регламента СФ в доступных текстах. Паспорт поправок 509-9 ГД подтверждает их направленность на презентации и второе чтение; полный текст поправок не получен. Сохраняется блокировка до установления применимости последней редакции. Стратегия отсрочки относится к политическому продвижению, а не к нарушению обязательных сроков.",
         "remaining": "Полнота последних поправок к регламентам не установлена; конкретный календарь заседаний не задан.",
         "urls": [
-          "https://www.consultant.ru/document/cons_doc_LAW_28399/bdb6e3b84ca23ec909e111e3d18908e25a355111/",
           "https://minjust.gov.ru/ru/documents/8011/",
+          "https://www.consultant.ru/document/cons_doc_LAW_28399/bdb6e3b84ca23ec909e111e3d18908e25a355111/",
           "https://www.consultant.ru/law/review/lawmaking/reglduma/",
-          "https://www.consultant.ru/law/review/lawmaking/reglsovet/?ysclid=l8kry8cfvj439608251"
+          "https://www.consultant.ru/law/review/lawmaking/reglsovet/?ysclid=l8kry8cfvj439608251",
+          "https://base.garant.ru/12125778/",
+          "https://www.consultant.ru/law/review/lawmaking/reglsovet/",
+          "https://bbagcoegoo6cocknvq97.containers.yandexcloud.net/bill/37542-9",
+          "https://kodeks.karelia.ru/api/show/901700817"
         ]
       }
     },
@@ -6133,19 +6155,32 @@
       "resolved_source_url": null,
       "legal_basis": "ГК РФ, ст. 242: реквизиция предполагает установленное чрезвычайное основание, решение государственного органа и выплату стоимости в законном порядке. Оценку можно оспорить в суде; после прекращения обстоятельств собственник может требовать судебного возврата сохранившегося имущества. Специальный режим и допустимость добровольного возврата проверяются отдельно.",
       "legal_urls": [
-        "https://www.consultant.ru/document/cons_doc_LAW_5142/4ad68a20a41c7429791e5942e898312c4569ef46/"
+        "https://www.consultant.ru/document/cons_doc_LAW_5142/4ad68a20a41c7429791e5942e898312c4569ef46/",
+        "https://www.consultant.ru/document/cons_doc_LAW_390045/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
       "review_date": "2026-11-28",
       "source_scope": "specific_norm_and_related_search_results_partial",
       "checked_norm_urls": [
-        "https://www.consultant.ru/document/cons_doc_LAW_5142/4ad68a20a41c7429791e5942e898312c4569ef46/"
+        "https://www.consultant.ru/document/cons_doc_LAW_5142/4ad68a20a41c7429791e5942e898312c4569ef46/",
+        "https://www.consultant.ru/document/cons_doc_LAW_390045/"
       ],
       "targeted_option_review": {
         "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
         "option_count": 5,
         "remaining": "Особый режим, конкретная процедура реквизиции и условия добровольного возврата требуют установления; не обещать одновременно полный размер компенсации и возврат без урегулирования."
+      },
+      "final_case_review_2026_11_28": {
+        "date": "2026-11-28",
+        "scope": "specific_norm_followup_not_full_acceptance",
+        "option_count": 5,
+        "conclusion": "Статья 242 ГК РФ прочитана полностью в редакции от 10.06.2026 с изменениями от 22.10.2026. Постановление КС РФ №33-П от 08.07.2021 подтверждает общие гарантии и отличие реквизиции от конфискации; его специальный вывод о животных и продукции животноводства не переносится автоматически на автомобиль. Специальное основание изъятия автомобиля и конкретный порядок компенсации и возврата не установлены. Статус не повышается.",
+        "remaining": "Особый режим, конкретная процедура реквизиции и условия добровольного возврата требуют установления; не обещать одновременно полный размер компенсации и возврат без урегулирования.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_5142/4ad68a20a41c7429791e5942e898312c4569ef46/",
+          "https://www.consultant.ru/document/cons_doc_LAW_390045/"
+        ]
       }
     },
     {
