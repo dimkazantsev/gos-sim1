@@ -11,7 +11,12 @@ const synthetic=payload.map((c,i)=>({...c,case_key:'fixture-'+i,title:'Тест 
  const read=p=>fs.readFileSync(p,'utf8'),candidate=n=>read('supabase/changes/events_v2_'+n+'_candidate.sql');
  await db.exec(read('scripts/events-v2-individual-fixture.sql'));
  await db.exec(read('scripts/events-v2-dispatch-fixture.sql'));
- await db.exec(read('scripts/events-v2-rls-fixture.sql').replace("ALTER TABLE public.event_cases ADD COLUMN allowed_roles text[] DEFAULT '{}',ADD COLUMN created_at timestamptz DEFAULT now();","ALTER TABLE public.event_cases ADD COLUMN created_at timestamptz DEFAULT now();"));
+ await db.exec("ALTER TABLE public.event_cases ADD COLUMN created_at timestamptz DEFAULT now();");
+ const install=async()=>{
+  for(const n of ['individual_transfer','collective','dispatch_seed'])await db.exec(candidate(n));
+  await db.exec(read('scripts/events-v2-rls-fixture.sql').replace("ALTER TABLE public.event_cases ADD COLUMN allowed_roles text[] DEFAULT '{}',ADD COLUMN created_at timestamptz DEFAULT now();",""));
+  for(const n of ['security','catalog'])await db.exec(candidate(n));
+ };
  await db.exec("CREATE TABLE private.event_content_revisions(revision text,event_case_id uuid,snapshot jsonb,PRIMARY KEY(revision,event_case_id));");
  await q("INSERT INTO games(id,owner_id,current_round) VALUES($1,$2,7),($3,$2,7)",[game,teacher,next]);
  for(const [u,k,a] of [[teacher,'teacher',null],[sender,'student',null],[expert,'student',null],[third,'student',null],[blocked,'student',null],[archived,'student',new Date().toISOString()],[guest,'observer',null]])await q("INSERT INTO game_members(game_id,user_id,kind,roster_archived_at,role_title) VALUES($1,$2,$3,$4,'Депутат')",[game,u,k,a]);
@@ -31,7 +36,7 @@ const synthetic=payload.map((c,i)=>({...c,case_key:'fixture-'+i,title:'Тест 
  const history=await one("SELECT to_jsonb(c) c FROM event_cases c WHERE id=$1",[lc]);
  // First transaction intentionally fails with the actual blocked source.
  await db.exec('BEGIN');
- for(const n of ['individual_transfer','collective','dispatch_seed','security','catalog'])await db.exec(candidate(n));
+ await install();
  const apply=(p)=>q("SELECT private.events_v2_apply_catalog_candidate($1::jsonb,'{}'::uuid[]) AS result",[JSON.stringify(p)]);
  assert.throws(()=>assertReleaseReady(payload),/release blocked/);
  await assert.rejects(()=>apply(payload),/release blocked/);
@@ -39,7 +44,7 @@ const synthetic=payload.map((c,i)=>({...c,case_key:'fixture-'+i,title:'Тест 
  assert.equal((await one("SELECT count(*)::int n FROM information_schema.columns WHERE table_schema='public' AND table_name='event_decisions' AND column_name='vote_round'")).n,0);
  // A deliberately fictional, legally irrelevant dataset tests the positive path.
  await db.exec('BEGIN');
- for(const n of ['individual_transfer','collective','dispatch_seed','security','catalog'])await db.exec(candidate(n));
+ await install();
  assert.deepEqual((await apply(synthetic)).rows[0].result,{catalogue:330,updated_instances:2});
  await db.exec("DROP FUNCTION private.events_v2_apply_catalog_candidate(jsonb,uuid[]); COMMIT; SET check_function_bodies=on;");
  // Production already has these trigger attachments; explicitly reproduce them here.
