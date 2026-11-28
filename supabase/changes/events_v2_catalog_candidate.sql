@@ -66,6 +66,8 @@ BEGIN
    AND NOT EXISTS(SELECT 1 FROM public.event_authority_evidence e WHERE e.case_id=c.id)
    AND (NOT EXISTS(SELECT 1 FROM public.event_assignments a WHERE a.case_id=c.id)
     OR (c.id=ANY(p_open_case_ids)
+      -- A previously issued regional V1 case retains its original electorate.
+      AND nullif(c.comic_scene->>'region_code','') IS NULL
       AND (c.audience<>'single' OR (SELECT count(*) FROM public.event_assignments a WHERE a.case_id=c.id)=1)
       AND NOT EXISTS(SELECT 1 FROM public.event_assignments a
        LEFT JOIN public.game_members m ON m.game_id=a.game_id AND m.user_id=a.recipient_id

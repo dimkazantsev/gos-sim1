@@ -14,6 +14,7 @@ export default function EventAutopilotPanel({g,onChanged,readyCaseCount,panelMod
  const {game,members,teacher}=g;
  const [settings,setSettings]=useState<Settings>(DEFAULT);
  const [bank,setBank]=useState<BankCase[]>([]);
+ const [regionalContext,setRegionalContext]=useState<{regions:Record<string,string>;parties:Record<string,{name:string;members:string[]}>}|null>(null);
  const [busy,setBusy]=useState(false);
  const [notice,setNotice]=useState('');
  const [chosen,setChosen]=useState('');
@@ -36,8 +37,8 @@ export default function EventAutopilotPanel({g,onChanged,readyCaseCount,panelMod
  const visible=useMemo(()=>bank.filter(c=>[c.title,c.category,c.situation].join(' ').toLowerCase().includes(search.trim().toLowerCase())),[bank,search]);
  const selected=bank.find(c=>c.id===chosen);
  const regionCode=selected?.comic_scene?.event_rules_version===2?selected.comic_scene.region_code:undefined;
- const controllingParty=regionCode?g.parties.find(p=>p.id===g.regionalControl.find(r=>r.code===regionCode)?.party_id):undefined;
- const eligible=regionCode?students.filter(m=>!!controllingParty&&m.team===controllingParty.name):students;
+ const controllingParty=regionCode&&regionalContext?regionalContext.parties[regionalContext.regions[regionCode]]:undefined;
+ const eligible=regionCode?students.filter(m=>controllingParty?.members.includes(m.user_id)):students;
  const regionalReady=!regionCode||eligible.length>=2;
  const effectiveInterval=settings.activity_weight===0?settings.interval_hours:Math.max(4,settings.interval_hours/(1+settings.activity_weight*2));
  async function loadSettings(){
@@ -48,6 +49,7 @@ export default function EventAutopilotPanel({g,onChanged,readyCaseCount,panelMod
  async function loadBank(){
   if(!game||loadingBank)return;
   setLoadingBank(true);
+  setRegionalContext(null);
   const [b,c0,d,decision,invites,discussion,authority,budget]=await Promise.all([
    supabase.from('event_cases').select('id,case_key,title,situation,category,seriousness,allowed_roles,audience,status,source_url,comic_scene').eq('game_id',game.id).eq('status','ready').order('category').order('title'),
    supabase.from('event_assignments').select('case_id,recipient_id').eq('game_id',game.id),
@@ -66,12 +68,18 @@ export default function EventAutopilotPanel({g,onChanged,readyCaseCount,panelMod
    ...(discussion.data||[]).map(x=>x.case_id),...(authority.data||[]).map(x=>x.case_id),
    ...(budget.data||[]).map(x=>x.event_case_id)
   ]);
-  setBank((b.data||[]) as BankCase[]);setBankTotal((b.data||[]).length);
+  const bankRows=(b.data||[]) as BankCase[];
+  if(bankRows.some(c=>c.comic_scene?.event_rules_version===2&&c.comic_scene.region_code)){
+   const context=await supabase.rpc('get_event_v2_regional_assignment_context',{p_game_id:game.id});
+   if(context.error)setNotice('Не удалось получить состав контролирующих партий: '+userError(context.error));
+   else setRegionalContext(context.data as {regions:Record<string,string>;parties:Record<string,{name:string;members:string[]}>});
+  }
+  setBank(bankRows);setBankTotal(bankRows.length);
   setProtectedIds([...protectedSet]);setAssigned(c0.data||[]);
   setSelectedForDelete([]);setBankLoaded(true);setLoadingBank(false);
  }
  useEffect(()=>{if(panelMode==='settings')void loadSettings()},[game?.id,panelMode]);
- useEffect(()=>{if(!game?.id)return;setBank([]);setBankTotal(null);setBankLoaded(false);setSelectedForDelete([]);setProtectedIds([]);setChosen('');setOpenBank(false)},[game?.id]);
+ useEffect(()=>{if(!game?.id)return;setBank([]);setRegionalContext(null);setBankTotal(null);setBankLoaded(false);setSelectedForDelete([]);setProtectedIds([]);setChosen('');setOpenBank(false)},[game?.id]);
  useEffect(()=>{if(openBank&&panelMode==='bank'&&!bankLoaded&&!loadingBank)void loadBank()},[openBank,panelMode,bankLoaded,loadingBank,game?.id]);
  useEffect(()=>{if(bank.length&&!bank.some(c=>c.id===chosen))setChosen(bank[0].id)},[bank,chosen]);
  const selectable=visible.filter(c=>!protectedIds.includes(c.id));
@@ -180,7 +188,7 @@ export default function EventAutopilotPanel({g,onChanged,readyCaseCount,panelMod
        {openStages.length>1&&<div className="autoEventCaseAssign"><StyledSelect label="Этап назначения" value={assignmentStage} onChange={setAssignmentStage}
         options={[{value:'',label:'Выберите этап'},...openStages.map(s=>({value:String(s.stage_no),label:'Этап '+s.stage_no+' · '+s.title}))]}/></div>}
        {!openStages.length&&<p>Для назначения ситуации необходимо открыть этап.</p>}
-       {regionCode&&<p>{controllingParty?'Регион контролирует партия «'+controllingParty.name+'». Действующих участников: '+eligible.length:'Контролирующая партия не определена.'}{!regionalReady?' Назначение отложено: нужны не менее двух участников.':''}</p>}
+       {regionCode&&<p>{controllingParty?'Регион контролирует партия «'+controllingParty.name+'». Действующих участников: '+eligible.length:regionalContext?'Контролирующая партия не определена.':'Состав контролирующих партий недоступен. Обновите список.'}{!regionalReady?' Назначение отложено: нужны не менее двух участников.':''}</p>}
        {selected.audience==='all'?<div className="autoEventCaseAssign">
         <p>{regionCode?'Голосуют все действующие участники контролирующей партии. Состав фиксируется при назначении.':'Ситуация для всей аудитории. При назначении каждый участник получает личное задание, а результаты объединяются в статистике.'}</p>
         <button type="button" disabled={busy||readOnly||!chosenStage||!regionalReady||!eligible.length||eligible.every(m=>assigned.some(a=>a.case_id===chosen&&a.recipient_id===m.user_id))}

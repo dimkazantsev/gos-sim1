@@ -161,3 +161,16 @@ GRANT EXECUTE ON FUNCTION private.event_assignment_legacy(uuid,uuid) TO authenti
 CREATE POLICY event_assignment_legacy_insert ON public.event_assignments AS RESTRICTIVE FOR INSERT TO authenticated WITH CHECK(private.event_assignment_legacy(game_id,case_id));
 CREATE POLICY event_assignment_legacy_update ON public.event_assignments AS RESTRICTIVE FOR UPDATE TO authenticated USING(private.event_assignment_legacy(game_id,case_id)) WITH CHECK(private.event_assignment_legacy(game_id,case_id));
 CREATE POLICY event_assignment_legacy_delete ON public.event_assignments AS RESTRICTIVE FOR DELETE TO authenticated USING(private.event_assignment_legacy(game_id,case_id));
+
+-- One lazy teacher-only projection for the regional bank. No per-case or per-player request.
+CREATE OR REPLACE FUNCTION public.get_event_v2_regional_assignment_context(p_game_id uuid)
+RETURNS jsonb LANGUAGE plpgsql STABLE SECURITY DEFINER SET search_path TO '' AS $f$
+DECLARE result jsonb;
+BEGIN
+ IF NOT private.is_game_teacher(p_game_id) THEN RAISE EXCEPTION 'Требуются права преподавателя' USING ERRCODE='42501';END IF;
+ SELECT jsonb_build_object('regions',coalesce((SELECT jsonb_object_agg(r.region_code,r.party_id) FROM public.game_region_party_control r WHERE r.game_id=p_game_id AND r.fixed_at IS NOT NULL),'{}'::jsonb),
+ 'parties',coalesce((SELECT jsonb_object_agg(p.id::text,jsonb_build_object('name',p.name,'members',coalesce((SELECT jsonb_agg(m.user_id ORDER BY m.user_id) FROM public.game_members m WHERE m.game_id=p.game_id AND m.team=p.name AND m.kind='student' AND m.roster_archived_at IS NULL AND NOT EXISTS(SELECT 1 FROM public.game_member_access_blocks b WHERE b.game_id=m.game_id AND b.user_id=m.user_id)),'[]'::jsonb))) FROM public.game_parties p WHERE p.game_id=p_game_id),'{}'::jsonb)) INTO result;
+ RETURN result;
+END $f$;
+REVOKE ALL ON FUNCTION public.get_event_v2_regional_assignment_context(uuid) FROM PUBLIC,anon;
+GRANT EXECUTE ON FUNCTION public.get_event_v2_regional_assignment_context(uuid) TO authenticated;

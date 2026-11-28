@@ -40,5 +40,33 @@ const id=n=>'24000000-0000-4000-8000-'+String(n).padStart(12,'0');
  await q("UPDATE private.authored_event_catalog SET content=$1::jsonb",[JSON.stringify(legacy)]);
  assert.equal((await rows('SELECT private.seed_authored_event_bank($1) AS n',[third]))[0].n,1);
  assert.equal((await rows('SELECT verified FROM event_cases WHERE game_id=$1',[third]))[0].verified,false);
+ // Regional automatic dispatch: 3 eligible members of party A, one rival,
+ // one archived and one blocked; no partial general electorate.
+ const rg=id(20),ra=id(21),p1=id(22),p2=id(23),m2=id(24),m3=id(25),rival=id(26),arch=id(27),blocked=id(28);
+ await q("INSERT INTO game_parties VALUES($1,$2,'А'),($3,$2,'Б')",[p1,g,p2]);
+ await q("INSERT INTO game_region_party_control VALUES($1,'99',$2,now())",[g,p1]);
+ await q("UPDATE game_members SET team='А' WHERE user_id=$1",[expert]);
+ for(const [u,team,a] of [[m2,'А',null],[m3,'А',null],[rival,'Б',null],[arch,'А',new Date().toISOString()],[blocked,'А',null]])await q("INSERT INTO game_members(game_id,user_id,kind,role_title,team,roster_archived_at) VALUES($1,$2,'student','Депутат',$3,$4)",[g,u,team,a]);
+ await q("INSERT INTO game_member_access_blocks VALUES($1,$2)",[g,blocked]);
+ const cp={rules_version:2,options:[{key:'option_1',lawful:true,trust:0},{key:'option_2',lawful:true,trust:0}]};
+ for(const [cid,aud,dest] of [[ra,'all','regional'],[rg,'group','regional_joint']]){
+  await q("INSERT INTO event_cases(id,game_id,case_key,title,audience,status,effect_plan,decision_options,comic_scene) VALUES($1,$2,$3,'Регион',$4,'ready',$5::jsonb,'[\"А\",\"Б\"]','{\"event_rules_version\":2,\"region_code\":\"99\"}')",[cid,g,'region-'+aud,aud,JSON.stringify(cp)]);
+  await q("INSERT INTO event_case_routing(game_id,case_id,earliest_stage,latest_stage,destination,region_code) VALUES($1,$2,4,15,$3,'99')",[g,cid,dest]);
+ }
+ await q("UPDATE event_cases SET status='archived' WHERE id=$1",[rg]);
+ const reset=()=>q("UPDATE event_auto_settings SET last_run_at=now()-interval '2 hours',last_dispatched_at=now()-interval '25 hours' WHERE game_id=$1",[g]);
+ const run=async()=>(await rows('SELECT private.run_game_autopilot($1) AS result',[g]))[0].result.sent;
+ await reset();assert.equal(await run(),0,'General case must wait for the entire party, including expert on cooldown');
+ await q("UPDATE event_assignments SET created_at=now()-interval '30 hours',status='resolved' WHERE case_id=$1",[caseId]);
+ await reset();assert.equal(await run(),3);
+ assert.deepEqual((await rows("SELECT recipient_id FROM event_assignments WHERE case_id=$1 ORDER BY recipient_id",[ra])).map(x=>x.recipient_id),[expert,m2,m3]);
+ await q("UPDATE event_assignments SET created_at=now()-interval '30 hours',status='resolved' WHERE case_id=$1",[ra]);
+ await q("UPDATE event_cases SET status='ready' WHERE id=$1",[rg]);
+ await q("INSERT INTO game_member_access_blocks VALUES($1,$2),($1,$3)",[g,m2,m3]);
+ await reset();assert.equal(await run(),0,'Group needs at least two eligible members');
+ await q("DELETE FROM game_member_access_blocks WHERE game_id=$1 AND user_id=$2",[g,m2]);
+ await reset();assert.equal(await run(),2);
+ assert.deepEqual((await rows("SELECT recipient_id FROM event_assignments WHERE case_id=$1 ORDER BY recipient_id",[rg])).map(x=>x.recipient_id),[expert,m2]);
+ console.log('PASS automatic regional all/group, entire party cooldown, group minimum, foreign/blocked/archived exclusions');
  console.log('PASS exact committee dispatch, no impossible assignment, paired markers and verified new-game seed, repeat safe');
  }finally{await db.close()}})().catch(e=>{console.error(e.code??'ERROR',e.message,e.where??'');process.exitCode=1});

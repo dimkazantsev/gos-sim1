@@ -92,6 +92,8 @@ const synthetic=payload.map((c,i)=>({...c,case_key:'fixture-'+i,title:'Тест 
   await q("INSERT INTO event_case_routing(game_id,case_id,earliest_stage,latest_stage,destination,region_code) VALUES($1,$2,4,15,$3,'99')",[game,cid,dest]);
  }
  await as(teacher);
+ const context=(await one('SELECT public.get_event_v2_regional_assignment_context($1) v',[game])).v;
+ assert.equal(context.regions['99'],party);assert.deepEqual(context.parties[party].members,[sender,expert]);
  await assert.rejects(()=>assign(rg,[sender,third]),/контролирующей партии/);
  await assert.rejects(()=>assign(ra,[sender]),/контролирующей партии/);
  assert.equal((await assign(rg,[sender,expert])).n,2);
@@ -102,6 +104,7 @@ const synthetic=payload.map((c,i)=>({...c,case_key:'fixture-'+i,title:'Тест 
  await as(teacher);
  await assert.rejects(()=>q("INSERT INTO event_assignments(case_id,game_id,recipient_id,stage_no) VALUES($1,$2,$3,7)",[ra,game,third]),/row-level security|policy/i);
  assert.equal((await q("DELETE FROM event_assignments WHERE case_id=$1",[ra])).affectedRows,0);
+ await as(guest);await assert.rejects(()=>q('SELECT public.get_event_v2_regional_assignment_context($1)',[game]),/преподавател/);
  await db.exec('RESET ROLE');
  console.log('PASS regional manual electorate, foreign party rejection, entire party, immutable direct client rows');
  console.log('PASS five candidates in a single transaction: actual blocked payload rollback, fictional 330 catalogue, two changed instances, protected legacy, verified seed, authenticated transfer and two-round vote, role isolation, temporary helper removed');
