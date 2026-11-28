@@ -8,6 +8,7 @@ on:
       - 'supabase/changes/events_v2_catalog_candidate.sql'
       - 'supabase/changes/events_v2_dispatch_seed_candidate.sql'
       - 'scripts/events-v2-dispatch*'
+      - 'scripts/events-v2-postgres-100-check.cjs'
       - 'scripts/events-v2-catalog-integration-check.cjs'
       - 'scripts/events-v2-individual*'
       - 'scripts/events-v2-editorial*'
@@ -36,3 +37,31 @@ jobs:
       - run: node scripts/events-v2-economic-projection-check.cjs
       - run: node scripts/events-v2-catalog-integration-check.cjs
       - run: node scripts/events-v2-dispatch-check.cjs
+  postgres-concurrency:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Start isolated PostgreSQL for 100 sessions
+        run: |
+          command -v psql >/dev/null || { sudo apt-get update -qq; sudo apt-get install -y -qq postgresql-client; }
+          docker run --rm -d --name gos-events-disposable -p 127.0.0.1:5432:5432 \
+            -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=fixture-only \
+            -e POSTGRES_DB=gos_events_fixture postgres:17 -c max_connections=160
+          for attempt in $(seq 1 60); do
+            if docker exec gos-events-disposable pg_isready -U postgres -d gos_events_fixture; then exit 0; fi
+            sleep 1
+          done
+          exit 1
+      - name: Two synchronized waves of 100 PostgreSQL clients
+        env:
+          GOS_EVENTS_DISPOSABLE: 'YES'
+          PGHOST: 127.0.0.1
+          PGPORT: '5432'
+          PGUSER: postgres
+          PGPASSWORD: fixture-only
+          PGDATABASE: gos_events_fixture
+        run: node scripts/events-v2-postgres-100-check.cjs
+      - name: Remove isolated database
+        if: always()
+        run: docker rm -f gos-events-disposable || true

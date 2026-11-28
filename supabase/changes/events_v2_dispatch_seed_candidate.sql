@@ -125,7 +125,7 @@ begin
  where game_id=p_game;
  perform private.apply_event_trust(p_game);
  return jsonb_build_object('sent',dispatched,'checked_at',v_now);
-end $function$
+end $function$;
 
 CREATE OR REPLACE FUNCTION private.seed_authored_event_bank(p_game uuid)
  RETURNS integer
@@ -137,7 +137,7 @@ DECLARE added integer;
 BEGIN
  IF NOT EXISTS(SELECT 1 FROM public.games WHERE id=p_game) THEN RAISE EXCEPTION 'Игра недоступна'; END IF;
  IF EXISTS(SELECT 1 FROM private.authored_event_catalog cat WHERE
-    (cat.content->'effect_plan'->>'rules_version'='2') IS DISTINCT FROM (cat.content->'comic_scene'->>'event_rules_version'='2')
+    coalesce(cat.content->'effect_plan'->>'rules_version'='2',false) IS DISTINCT FROM coalesce(cat.content->'comic_scene'->>'event_rules_version'='2',false)
     OR ((cat.content->'effect_plan'->>'rules_version'='2' OR cat.content->'comic_scene'->>'event_rules_version'='2') AND cat.content->'verified' IS DISTINCT FROM 'true'::jsonb)) THEN
    RAISE EXCEPTION 'Несогласованная версия банка событий'; END IF;
  INSERT INTO public.event_cases(game_id,case_key,title,situation,category,seriousness,audience,allowed_roles,
@@ -151,6 +151,6 @@ BEGIN
  GET DIAGNOSTICS added=ROW_COUNT;
  RETURN added;
 END;
-$function$
+$function$;
 
 REVOKE ALL ON FUNCTION private.run_game_autopilot(uuid),private.seed_authored_event_bank(uuid) FROM PUBLIC,anon,authenticated;
