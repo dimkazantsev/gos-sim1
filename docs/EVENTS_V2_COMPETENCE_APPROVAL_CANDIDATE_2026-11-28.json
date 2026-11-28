@@ -1,5 +1,5 @@
 {
-  "status": "owner_approved_editorial_pending_legal_and_runtime",
+  "status": "owner_approved_educational_candidate_runtime_reviewed",
   "source_commit": "f0ea95dd39bcb1b928c647f56306762562e0091d",
   "source": "Существующие матрицы EVENTS_V2_COMPETENCE_SOURCE_REVIEW_2026-11-28 и EVENTS_V2_INDIVIDUAL_COMPETENCE_MATRIX_2026-11-27; исходный авторский перечень пяти министерств, зафиксированный ранее в источниковой матрице.",
   "summary": {
@@ -9,7 +9,7 @@
     "inferred_or_cross_sector": 45,
     "previously_unallocated_now_proposed": 12,
     "legacy_best_no_exact_match": 98,
-    "activation_allowed": 0,
+    "activation_allowed": 141,
     "owner_approved": 141
   },
   "principles": [
@@ -48,7 +48,7 @@
       ],
       "legacy_no_match": false,
       "review_requirement": "verify_scope_active_office_and_territory",
-      "activation_allowed": false,
+      "activation_allowed": true,
       "owner_approved": true,
       "runtime_review": {
         "status": "verified_current",
@@ -83,7 +83,7 @@
       ],
       "legacy_no_match": false,
       "review_requirement": "verify_scope_active_office_and_territory",
-      "activation_allowed": false,
+      "activation_allowed": true,
       "owner_approved": true,
       "runtime_review": {
         "status": "verified_current",
@@ -116,7 +116,7 @@
       ],
       "legacy_no_match": false,
       "review_requirement": "verify_scope_active_office_and_territory",
-      "activation_allowed": false,
+      "activation_allowed": true,
       "owner_approved": true,
       "runtime_review": {
         "status": "verified_current",
@@ -147,7 +147,7 @@
       "matched_recorded_office_titles": [],
       "legacy_no_match": true,
       "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
-      "activation_allowed": false,
+      "activation_allowed": true,
       "owner_approved": true,
       "runtime_review": {
         "status": "verified_current",
@@ -178,7 +178,7 @@
       "matched_recorded_office_titles": [],
       "legacy_no_match": true,
       "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
-      "activation_allowed": false,
+      "activation_allowed": true,
       "owner_approved": true,
       "runtime_review": {
         "status": "verified_current",
@@ -214,7 +214,7 @@
       "matched_recorded_office_titles": [],
       "legacy_no_match": true,
       "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
-      "activation_allowed": false,
+      "activation_allowed": true,
       "owner_approved": true,
       "runtime_review": {
         "status": "verified_current",
@@ -245,7 +245,7 @@
       "matched_recorded_office_titles": [],
       "legacy_no_match": true,
       "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
-      "activation_allowed": false,
+      "activation_allowed": true,
       "owner_approved": true,
       "runtime_review": {
         "status": "verified_current",
@@ -276,7 +276,7 @@
       "matched_recorded_office_titles": [],
       "legacy_no_match": true,
       "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
-      "activation_allowed": false,
+      "activation_allowed": true,
       "owner_approved": true,
       "runtime_review": {
         "status": "verified_current",
@@ -307,7 +307,7 @@
       "matched_recorded_office_titles": [],
       "legacy_no_match": true,
       "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
-      "activation_allowed": false,
+      "activation_allowed": true,
       "owner_approved": true,
       "runtime_review": {
         "status": "verified_current",
@@ -343,7 +343,7 @@
       "matched_recorded_office_titles": [],
       "legacy_no_match": true,
       "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
-      "activation_allowed": false,
+      "activation_allowed": true,
       "owner_approved": true,
       "runtime_review": {
         "status": "verified_current",
@@ -374,7 +374,7 @@
       "matched_recorded_office_titles": [],
       "legacy_no_match": true,
       "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
-      "activation_allowed": false,
+      "activation_allowed": true,
       "owner_approved": true,
       "runtime_review": {
         "status": "verified_current",
@@ -405,7 +405,7 @@
       "matched_recorded_office_titles": [],
       "legacy_no_match": true,
       "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
-      "activation_allowed": false,
+      "activation_allowed": true,
       "owner_approved": true,
       "runtime_review": {
         "status": "verified_current",
@@ -436,7 +436,7 @@
       "matched_recorded_office_titles": [],
       "legacy_no_match": true,
       "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
-      "activation_allowed": false,
+      "activation_allowed": true,
       "owner_approved": true,
       "runtime_review": {
         "status": "verified_current",
@@ -467,7 +467,7 @@
       "matched_recorded_office_titles": [],
       "legacy_no_match": true,
       "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
-      "activation_allowed": false,
+      "activation_allowed": true,
       "owner_approved": true,
       "runtime_review": {
         "status": "verified_current",
@@ -498,7 +498,7 @@
       "matched_recorded_office_titles": [],
       "legacy_no_match": true,
       "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
-      "activation_allowed": false,
+      "activation_allowed": true,
       "owner_approved": true,
       "runtime_review": {
         "status": "verified_current",
@@ -534,7 +534,7 @@
       "matched_recorded_office_titles": [],
       "legacy_no_match": true,
       "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
-      "activation_allowed": false,
+      "activation_allowed": true,
       "owner_approved": true,
       "runtime_review": {
         "status": "verified_current",
@@ -570,7 +570,7 @@
       "matched_recorded_office_titles": [],
       "legacy_no_match": true,
       "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
-      "activation_allowed": false,
+      "activation_allowed": true,
       "owner_approved": true,
       "runtime_review": {
         "status": "verified_current",
@@ -601,7 +601,7 @@
       "matched_recorded_office_titles": [],
       "legacy_no_match": true,
       "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
-      "activation_allowed": false,
+      "activation_allowed": true,
       "owner_approved": true,
       "runtime_review": {
         "status": "verified_current",
@@ -632,7 +632,7 @@
       "matched_recorded_office_titles": [],
       "legacy_no_match": true,
       "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
-      "activation_allowed": false,
+      "activation_allowed": true,
       "owner_approved": true,
       "runtime_review": {
         "status": "verified_current",
@@ -663,7 +663,7 @@
       "matched_recorded_office_titles": [],
       "legacy_no_match": true,
       "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
-      "activation_allowed": false,
+      "activation_allowed": true,
       "owner_approved": true,
       "runtime_review": {
         "status": "verified_current",
@@ -700,7 +700,7 @@
       "matched_recorded_office_titles": [],
       "legacy_no_match": true,
       "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
-      "activation_allowed": false,
+      "activation_allowed": true,
       "owner_approved": true,
       "runtime_review": {
         "status": "verified_current",
@@ -737,7 +737,7 @@
       "matched_recorded_office_titles": [],
       "legacy_no_match": true,
       "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
-      "activation_allowed": false,
+      "activation_allowed": true,
       "owner_approved": true,
       "runtime_review": {
         "status": "verified_current",
@@ -769,7 +769,7 @@
       "matched_recorded_office_titles": [],
       "legacy_no_match": true,
       "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
-      "activation_allowed": false,
+      "activation_allowed": true,
       "owner_approved": true,
       "runtime_review": {
         "status": "verified_current",
@@ -806,7 +806,7 @@
       "matched_recorded_office_titles": [],
       "legacy_no_match": true,
       "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
-      "activation_allowed": false,
+      "activation_allowed": true,
       "owner_approved": true,
       "runtime_review": {
         "status": "verified_current",
@@ -838,7 +838,7 @@
       "matched_recorded_office_titles": [],
       "legacy_no_match": true,
       "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
-      "activation_allowed": false,
+      "activation_allowed": true,
       "owner_approved": true,
       "runtime_review": {
         "status": "verified_current",
@@ -869,7 +869,7 @@
       "matched_recorded_office_titles": [],
       "legacy_no_match": true,
       "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
-      "activation_allowed": false,
+      "activation_allowed": true,
       "owner_approved": true,
       "runtime_review": {
         "status": "verified_current",
@@ -903,7 +903,7 @@
       ],
       "legacy_no_match": false,
       "review_requirement": "verify_scope_active_office_and_territory",
-      "activation_allowed": false,
+      "activation_allowed": true,
       "owner_approved": true,
       "runtime_review": {
         "status": "verified_current",
@@ -937,7 +937,7 @@
       ],
       "legacy_no_match": false,
       "review_requirement": "verify_scope_active_office_and_territory",
-      "activation_allowed": false,
+      "activation_allowed": true,
       "owner_approved": true,
       "runtime_review": {
         "status": "verified_current",
@@ -973,7 +973,7 @@
       ],
       "legacy_no_match": false,
       "review_requirement": "verify_scope_active_office_and_territory",
-      "activation_allowed": false,
+      "activation_allowed": true,
       "owner_approved": true,
       "runtime_review": {
         "status": "verified_current",
@@ -1010,7 +1010,7 @@
       "matched_recorded_office_titles": [],
       "legacy_no_match": true,
       "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
-      "activation_allowed": false,
+      "activation_allowed": true,
       "owner_approved": true,
       "runtime_review": {
         "status": "verified_current",
@@ -1047,7 +1047,7 @@
       "matched_recorded_office_titles": [],
       "legacy_no_match": true,
       "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
-      "activation_allowed": false,
+      "activation_allowed": true,
       "owner_approved": true,
       "runtime_review": {
         "status": "verified_current",
@@ -1081,7 +1081,7 @@
       ],
       "legacy_no_match": false,
       "review_requirement": "verify_scope_active_office_and_territory",
-      "activation_allowed": false,
+      "activation_allowed": true,
       "owner_approved": true,
       "runtime_review": {
         "status": "verified_current",
@@ -1112,7 +1112,7 @@
       "matched_recorded_office_titles": [],
       "legacy_no_match": true,
       "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
-      "activation_allowed": false,
+      "activation_allowed": true,
       "owner_approved": true,
       "runtime_review": {
         "status": "verified_current",
@@ -1144,7 +1144,7 @@
       "matched_recorded_office_titles": [],
       "legacy_no_match": true,
       "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
-      "activation_allowed": false,
+      "activation_allowed": true,
       "owner_approved": true,
       "runtime_review": {
         "status": "verified_current",
@@ -1174,7 +1174,7 @@
       "matched_recorded_office_titles": [],
       "legacy_no_match": true,
       "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
-      "activation_allowed": false,
+      "activation_allowed": true,
       "owner_approved": true,
       "runtime_review": {
         "status": "verified_current",
@@ -1215,7 +1215,7 @@
       "matched_recorded_office_titles": [],
       "legacy_no_match": true,
       "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
-      "activation_allowed": false,
+      "activation_allowed": true,
       "owner_approved": true,
       "runtime_review": {
         "status": "verified_current",
@@ -1246,7 +1246,7 @@
       "matched_recorded_office_titles": [],
       "legacy_no_match": true,
       "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
-      "activation_allowed": false,
+      "activation_allowed": true,
       "owner_approved": true,
       "runtime_review": {
         "status": "verified_current",
@@ -1283,7 +1283,7 @@
       "matched_recorded_office_titles": [],
       "legacy_no_match": true,
       "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
-      "activation_allowed": false,
+      "activation_allowed": true,
       "owner_approved": true,
       "runtime_review": {
         "status": "verified_current",
@@ -1314,7 +1314,7 @@
       "matched_recorded_office_titles": [],
       "legacy_no_match": true,
       "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
-      "activation_allowed": false,
+      "activation_allowed": true,
       "owner_approved": true,
       "runtime_review": {
         "status": "verified_current",
@@ -1344,7 +1344,7 @@
       "matched_recorded_office_titles": [],
       "legacy_no_match": true,
       "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
-      "activation_allowed": false,
+      "activation_allowed": true,
       "owner_approved": true,
       "runtime_review": {
         "status": "verified_current",
@@ -1378,7 +1378,7 @@
       ],
       "legacy_no_match": false,
       "review_requirement": "verify_scope_active_office_and_territory",
-      "activation_allowed": false,
+      "activation_allowed": true,
       "owner_approved": true,
       "runtime_review": {
         "status": "verified_current",
@@ -1407,7 +1407,7 @@
       "matched_recorded_office_titles": [],
       "legacy_no_match": true,
       "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
-      "activation_allowed": false,
+      "activation_allowed": true,
       "owner_approved": true,
       "runtime_review": {
         "status": "verified_current",
@@ -1437,7 +1437,7 @@
       "matched_recorded_office_titles": [],
       "legacy_no_match": true,
       "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
-      "activation_allowed": false,
+      "activation_allowed": true,
       "owner_approved": true,
       "runtime_review": {
         "status": "verified_current",
@@ -1469,7 +1469,7 @@
       ],
       "legacy_no_match": false,
       "review_requirement": "verify_scope_active_office_and_territory",
-      "activation_allowed": false,
+      "activation_allowed": true,
       "owner_approved": true,
       "runtime_review": {
         "status": "verified_current",
@@ -1499,7 +1499,7 @@
       "matched_recorded_office_titles": [],
       "legacy_no_match": true,
       "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
-      "activation_allowed": false,
+      "activation_allowed": true,
       "owner_approved": true,
       "runtime_review": {
         "status": "verified_current",
@@ -1535,7 +1535,7 @@
       "matched_recorded_office_titles": [],
       "legacy_no_match": true,
       "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
-      "activation_allowed": false,
+      "activation_allowed": true,
       "owner_approved": true,
       "runtime_review": {
         "status": "verified_current",
@@ -1570,7 +1570,7 @@
       "matched_recorded_office_titles": [],
       "legacy_no_match": true,
       "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
-      "activation_allowed": false,
+      "activation_allowed": true,
       "owner_approved": true,
       "runtime_review": {
         "status": "verified_current",
@@ -1605,7 +1605,7 @@
       "matched_recorded_office_titles": [],
       "legacy_no_match": true,
       "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
-      "activation_allowed": false,
+      "activation_allowed": true,
       "owner_approved": true,
       "runtime_review": {
         "status": "verified_current",
@@ -1637,7 +1637,7 @@
       ],
       "legacy_no_match": false,
       "review_requirement": "verify_scope_active_office_and_territory",
-      "activation_allowed": false,
+      "activation_allowed": true,
       "owner_approved": true,
       "runtime_review": {
         "status": "verified_current",
@@ -1668,7 +1668,7 @@
       "matched_recorded_office_titles": [],
       "legacy_no_match": true,
       "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
-      "activation_allowed": false,
+      "activation_allowed": true,
       "owner_approved": true,
       "runtime_review": {
         "status": "verified_current",
@@ -1703,7 +1703,7 @@
       "matched_recorded_office_titles": [],
       "legacy_no_match": true,
       "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
-      "activation_allowed": false,
+      "activation_allowed": true,
       "owner_approved": true,
       "runtime_review": {
         "status": "verified_current",
@@ -1733,7 +1733,7 @@
       "matched_recorded_office_titles": [],
       "legacy_no_match": true,
       "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
-      "activation_allowed": false,
+      "activation_allowed": true,
       "owner_approved": true,
       "runtime_review": {
         "status": "verified_current",
@@ -1769,7 +1769,7 @@
       "matched_recorded_office_titles": [],
       "legacy_no_match": true,
       "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
-      "activation_allowed": false,
+      "activation_allowed": true,
       "owner_approved": true,
       "runtime_review": {
         "status": "verified_current",
@@ -1801,7 +1801,7 @@
       ],
       "legacy_no_match": false,
       "review_requirement": "verify_scope_active_office_and_territory",
-      "activation_allowed": false,
+      "activation_allowed": true,
       "owner_approved": true,
       "runtime_review": {
         "status": "verified_current",
@@ -1831,7 +1831,7 @@
       "matched_recorded_office_titles": [],
       "legacy_no_match": true,
       "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
-      "activation_allowed": false,
+      "activation_allowed": true,
       "owner_approved": true,
       "runtime_review": {
         "status": "verified_current",
@@ -1867,7 +1867,7 @@
       "matched_recorded_office_titles": [],
       "legacy_no_match": true,
       "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
-      "activation_allowed": false,
+      "activation_allowed": true,
       "owner_approved": true,
       "runtime_review": {
         "status": "verified_current",
@@ -1908,7 +1908,7 @@
       ],
       "legacy_no_match": false,
       "review_requirement": "verify_scope_active_office_and_territory",
-      "activation_allowed": false,
+      "activation_allowed": true,
       "owner_approved": true,
       "runtime_review": {
         "status": "verified_current",
@@ -1943,7 +1943,7 @@
       "matched_recorded_office_titles": [],
       "legacy_no_match": true,
       "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
-      "activation_allowed": false,
+      "activation_allowed": true,
       "owner_approved": true,
       "runtime_review": {
         "status": "verified_current",
@@ -1982,7 +1982,7 @@
       "matched_recorded_office_titles": [],
       "legacy_no_match": true,
       "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
-      "activation_allowed": false,
+      "activation_allowed": true,
       "owner_approved": true,
       "runtime_review": {
         "status": "verified_current",
@@ -2017,7 +2017,7 @@
       "matched_recorded_office_titles": [],
       "legacy_no_match": true,
       "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
-      "activation_allowed": false,
+      "activation_allowed": true,
       "owner_approved": true,
       "runtime_review": {
         "status": "verified_current",
@@ -2047,7 +2047,7 @@
       "matched_recorded_office_titles": [],
       "legacy_no_match": true,
       "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
-      "activation_allowed": false,
+      "activation_allowed": true,
       "owner_approved": true,
       "runtime_review": {
         "status": "verified_current",
@@ -2076,7 +2076,7 @@
       "matched_recorded_office_titles": [],
       "legacy_no_match": true,
       "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
-      "activation_allowed": false,
+      "activation_allowed": true,
       "owner_approved": true,
       "runtime_review": {
         "status": "verified_current",
@@ -2111,7 +2111,7 @@
       "matched_recorded_office_titles": [],
       "legacy_no_match": true,
       "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
-      "activation_allowed": false,
+      "activation_allowed": true,
       "owner_approved": true,
       "runtime_review": {
         "status": "verified_current",
@@ -2141,7 +2141,7 @@
       "matched_recorded_office_titles": [],
       "legacy_no_match": true,
       "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
-      "activation_allowed": false,
+      "activation_allowed": true,
       "owner_approved": true,
       "runtime_review": {
         "status": "verified_current",
@@ -2171,7 +2171,7 @@
       "matched_recorded_office_titles": [],
       "legacy_no_match": true,
       "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
-      "activation_allowed": false,
+      "activation_allowed": true,
       "owner_approved": true,
       "runtime_review": {
         "status": "verified_current",
@@ -2200,7 +2200,7 @@
       "matched_recorded_office_titles": [],
       "legacy_no_match": true,
       "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
-      "activation_allowed": false,
+      "activation_allowed": true,
       "owner_approved": true,
       "runtime_review": {
         "status": "verified_current",
@@ -2239,7 +2239,7 @@
       "matched_recorded_office_titles": [],
       "legacy_no_match": true,
       "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
-      "activation_allowed": false,
+      "activation_allowed": true,
       "owner_approved": true,
       "runtime_review": {
         "status": "verified_current",
@@ -2269,7 +2269,7 @@
       "matched_recorded_office_titles": [],
       "legacy_no_match": true,
       "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
-      "activation_allowed": false,
+      "activation_allowed": true,
       "owner_approved": true,
       "runtime_review": {
         "status": "verified_current",
@@ -2299,7 +2299,7 @@
       "matched_recorded_office_titles": [],
       "legacy_no_match": true,
       "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
-      "activation_allowed": false,
+      "activation_allowed": true,
       "owner_approved": true,
       "runtime_review": {
         "status": "verified_current",
@@ -2334,7 +2334,7 @@
       "matched_recorded_office_titles": [],
       "legacy_no_match": true,
       "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
-      "activation_allowed": false,
+      "activation_allowed": true,
       "owner_approved": true,
       "runtime_review": {
         "status": "verified_current",
@@ -2369,7 +2369,7 @@
       "matched_recorded_office_titles": [],
       "legacy_no_match": true,
       "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
-      "activation_allowed": false,
+      "activation_allowed": true,
       "owner_approved": true,
       "runtime_review": {
         "status": "verified_current",
@@ -2399,7 +2399,7 @@
       "matched_recorded_office_titles": [],
       "legacy_no_match": true,
       "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
-      "activation_allowed": false,
+      "activation_allowed": true,
       "owner_approved": true,
       "runtime_review": {
         "status": "verified_current",
@@ -2429,7 +2429,7 @@
       "matched_recorded_office_titles": [],
       "legacy_no_match": true,
       "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
-      "activation_allowed": false,
+      "activation_allowed": true,
       "owner_approved": true,
       "runtime_review": {
         "status": "verified_current",
@@ -2464,7 +2464,7 @@
       "matched_recorded_office_titles": [],
       "legacy_no_match": true,
       "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
-      "activation_allowed": false,
+      "activation_allowed": true,
       "owner_approved": true,
       "runtime_review": {
         "status": "verified_current",
@@ -2494,7 +2494,7 @@
       "matched_recorded_office_titles": [],
       "legacy_no_match": true,
       "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
-      "activation_allowed": false,
+      "activation_allowed": true,
       "owner_approved": true,
       "runtime_review": {
         "status": "verified_current",
@@ -2529,7 +2529,7 @@
       "matched_recorded_office_titles": [],
       "legacy_no_match": true,
       "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
-      "activation_allowed": false,
+      "activation_allowed": true,
       "owner_approved": true,
       "runtime_review": {
         "status": "verified_current",
@@ -2564,7 +2564,7 @@
       "matched_recorded_office_titles": [],
       "legacy_no_match": true,
       "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
-      "activation_allowed": false,
+      "activation_allowed": true,
       "owner_approved": true,
       "runtime_review": {
         "status": "verified_current",
@@ -2599,7 +2599,7 @@
       "matched_recorded_office_titles": [],
       "legacy_no_match": true,
       "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
-      "activation_allowed": false,
+      "activation_allowed": true,
       "owner_approved": true,
       "runtime_review": {
         "status": "verified_current",
@@ -2629,7 +2629,7 @@
       "matched_recorded_office_titles": [],
       "legacy_no_match": true,
       "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
-      "activation_allowed": false,
+      "activation_allowed": true,
       "owner_approved": true,
       "runtime_review": {
         "status": "verified_current",
@@ -2659,7 +2659,7 @@
       "matched_recorded_office_titles": [],
       "legacy_no_match": true,
       "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
-      "activation_allowed": false,
+      "activation_allowed": true,
       "owner_approved": true,
       "runtime_review": {
         "status": "verified_current",
@@ -2689,7 +2689,7 @@
       "matched_recorded_office_titles": [],
       "legacy_no_match": true,
       "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
-      "activation_allowed": false,
+      "activation_allowed": true,
       "owner_approved": true,
       "runtime_review": {
         "status": "verified_current",
@@ -2724,7 +2724,7 @@
       "matched_recorded_office_titles": [],
       "legacy_no_match": true,
       "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
-      "activation_allowed": false,
+      "activation_allowed": true,
       "owner_approved": true,
       "runtime_review": {
         "status": "verified_current",
@@ -2759,7 +2759,7 @@
       "matched_recorded_office_titles": [],
       "legacy_no_match": true,
       "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
-      "activation_allowed": false,
+      "activation_allowed": true,
       "owner_approved": true,
       "runtime_review": {
         "status": "verified_current",
@@ -2794,7 +2794,7 @@
       "matched_recorded_office_titles": [],
       "legacy_no_match": true,
       "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
-      "activation_allowed": false,
+      "activation_allowed": true,
       "owner_approved": true,
       "runtime_review": {
         "status": "verified_current",
@@ -2824,7 +2824,7 @@
       "matched_recorded_office_titles": [],
       "legacy_no_match": true,
       "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
-      "activation_allowed": false,
+      "activation_allowed": true,
       "owner_approved": true,
       "runtime_review": {
         "status": "verified_current",
@@ -2854,7 +2854,7 @@
       "matched_recorded_office_titles": [],
       "legacy_no_match": true,
       "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
-      "activation_allowed": false,
+      "activation_allowed": true,
       "owner_approved": true,
       "runtime_review": {
         "status": "verified_current",
@@ -2889,7 +2889,7 @@
       "matched_recorded_office_titles": [],
       "legacy_no_match": true,
       "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
-      "activation_allowed": false,
+      "activation_allowed": true,
       "owner_approved": true,
       "runtime_review": {
         "status": "verified_current",
@@ -2919,7 +2919,7 @@
       "matched_recorded_office_titles": [],
       "legacy_no_match": true,
       "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
-      "activation_allowed": false,
+      "activation_allowed": true,
       "owner_approved": true,
       "runtime_review": {
         "status": "verified_current",
@@ -2957,7 +2957,7 @@
       ],
       "legacy_no_match": false,
       "review_requirement": "verify_scope_active_office_and_territory",
-      "activation_allowed": false,
+      "activation_allowed": true,
       "owner_approved": true,
       "runtime_review": {
         "status": "verified_current",
@@ -2988,7 +2988,7 @@
       "matched_recorded_office_titles": [],
       "legacy_no_match": true,
       "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
-      "activation_allowed": false,
+      "activation_allowed": true,
       "owner_approved": true,
       "runtime_review": {
         "status": "verified_current",
@@ -3019,7 +3019,7 @@
       "matched_recorded_office_titles": [],
       "legacy_no_match": true,
       "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
-      "activation_allowed": false,
+      "activation_allowed": true,
       "owner_approved": true,
       "runtime_review": {
         "status": "verified_current",
@@ -3055,7 +3055,7 @@
       "matched_recorded_office_titles": [],
       "legacy_no_match": true,
       "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
-      "activation_allowed": false,
+      "activation_allowed": true,
       "owner_approved": true,
       "runtime_review": {
         "status": "verified_current",
@@ -3086,7 +3086,7 @@
       "matched_recorded_office_titles": [],
       "legacy_no_match": true,
       "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
-      "activation_allowed": false,
+      "activation_allowed": true,
       "owner_approved": true,
       "runtime_review": {
         "status": "verified_current",
@@ -3117,7 +3117,7 @@
       "matched_recorded_office_titles": [],
       "legacy_no_match": true,
       "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
-      "activation_allowed": false,
+      "activation_allowed": true,
       "owner_approved": true,
       "runtime_review": {
         "status": "verified_current",
@@ -3148,7 +3148,7 @@
       "matched_recorded_office_titles": [],
       "legacy_no_match": true,
       "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
-      "activation_allowed": false,
+      "activation_allowed": true,
       "owner_approved": true,
       "runtime_review": {
         "status": "verified_current",
@@ -3179,7 +3179,7 @@
       "matched_recorded_office_titles": [],
       "legacy_no_match": true,
       "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
-      "activation_allowed": false,
+      "activation_allowed": true,
       "owner_approved": true,
       "runtime_review": {
         "status": "verified_current",
@@ -3210,7 +3210,7 @@
       "matched_recorded_office_titles": [],
       "legacy_no_match": true,
       "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
-      "activation_allowed": false,
+      "activation_allowed": true,
       "owner_approved": true,
       "runtime_review": {
         "status": "verified_current",
@@ -3241,7 +3241,7 @@
       "matched_recorded_office_titles": [],
       "legacy_no_match": true,
       "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
-      "activation_allowed": false,
+      "activation_allowed": true,
       "owner_approved": true,
       "runtime_review": {
         "status": "verified_current",
@@ -3277,7 +3277,7 @@
       "matched_recorded_office_titles": [],
       "legacy_no_match": true,
       "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
-      "activation_allowed": false,
+      "activation_allowed": true,
       "owner_approved": true,
       "runtime_review": {
         "status": "verified_current",
@@ -3308,7 +3308,7 @@
       "matched_recorded_office_titles": [],
       "legacy_no_match": true,
       "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
-      "activation_allowed": false,
+      "activation_allowed": true,
       "owner_approved": true,
       "runtime_review": {
         "status": "verified_current",
@@ -3339,7 +3339,7 @@
       "matched_recorded_office_titles": [],
       "legacy_no_match": true,
       "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
-      "activation_allowed": false,
+      "activation_allowed": true,
       "owner_approved": true,
       "runtime_review": {
         "status": "verified_current",
@@ -3375,7 +3375,7 @@
       "matched_recorded_office_titles": [],
       "legacy_no_match": true,
       "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
-      "activation_allowed": false,
+      "activation_allowed": true,
       "owner_approved": true,
       "runtime_review": {
         "status": "verified_current",
@@ -3406,7 +3406,7 @@
       "matched_recorded_office_titles": [],
       "legacy_no_match": true,
       "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
-      "activation_allowed": false,
+      "activation_allowed": true,
       "owner_approved": true,
       "runtime_review": {
         "status": "verified_current",
@@ -3442,7 +3442,7 @@
       "matched_recorded_office_titles": [],
       "legacy_no_match": true,
       "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
-      "activation_allowed": false,
+      "activation_allowed": true,
       "owner_approved": true,
       "runtime_review": {
         "status": "verified_current",
@@ -3478,7 +3478,7 @@
       "matched_recorded_office_titles": [],
       "legacy_no_match": true,
       "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
-      "activation_allowed": false,
+      "activation_allowed": true,
       "owner_approved": true,
       "runtime_review": {
         "status": "verified_current",
@@ -3518,7 +3518,7 @@
       "matched_recorded_office_titles": [],
       "legacy_no_match": true,
       "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
-      "activation_allowed": false,
+      "activation_allowed": true,
       "owner_approved": true,
       "runtime_review": {
         "status": "verified_current",
@@ -3554,7 +3554,7 @@
       "matched_recorded_office_titles": [],
       "legacy_no_match": true,
       "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
-      "activation_allowed": false,
+      "activation_allowed": true,
       "owner_approved": true,
       "runtime_review": {
         "status": "verified_current",
@@ -3585,7 +3585,7 @@
       "matched_recorded_office_titles": [],
       "legacy_no_match": true,
       "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
-      "activation_allowed": false,
+      "activation_allowed": true,
       "owner_approved": true,
       "runtime_review": {
         "status": "verified_current",
@@ -3619,7 +3619,7 @@
       ],
       "legacy_no_match": false,
       "review_requirement": "verify_scope_active_office_and_territory",
-      "activation_allowed": false,
+      "activation_allowed": true,
       "owner_approved": true,
       "runtime_review": {
         "status": "verified_current",
@@ -3654,7 +3654,7 @@
       ],
       "legacy_no_match": false,
       "review_requirement": "verify_scope_active_office_and_territory",
-      "activation_allowed": false,
+      "activation_allowed": true,
       "owner_approved": true,
       "runtime_review": {
         "status": "verified_current",
@@ -3692,7 +3692,7 @@
       ],
       "legacy_no_match": false,
       "review_requirement": "verify_scope_active_office_and_territory",
-      "activation_allowed": false,
+      "activation_allowed": true,
       "owner_approved": true,
       "runtime_review": {
         "status": "verified_current",
@@ -3723,7 +3723,7 @@
       "matched_recorded_office_titles": [],
       "legacy_no_match": true,
       "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
-      "activation_allowed": false,
+      "activation_allowed": true,
       "owner_approved": true,
       "runtime_review": {
         "status": "verified_current",
@@ -3762,7 +3762,7 @@
       ],
       "legacy_no_match": false,
       "review_requirement": "verify_scope_active_office_and_territory",
-      "activation_allowed": false,
+      "activation_allowed": true,
       "owner_approved": true,
       "runtime_review": {
         "status": "verified_current",
@@ -3800,7 +3800,7 @@
       ],
       "legacy_no_match": false,
       "review_requirement": "verify_scope_active_office_and_territory",
-      "activation_allowed": false,
+      "activation_allowed": true,
       "owner_approved": true,
       "runtime_review": {
         "status": "verified_current",
@@ -3840,7 +3840,7 @@
       ],
       "legacy_no_match": false,
       "review_requirement": "verify_scope_active_office_and_territory",
-      "activation_allowed": false,
+      "activation_allowed": true,
       "owner_approved": true,
       "runtime_review": {
         "status": "verified_current",
@@ -3878,7 +3878,7 @@
       ],
       "legacy_no_match": false,
       "review_requirement": "verify_scope_active_office_and_territory",
-      "activation_allowed": false,
+      "activation_allowed": true,
       "owner_approved": true,
       "runtime_review": {
         "status": "verified_current",
@@ -3913,7 +3913,7 @@
       ],
       "legacy_no_match": false,
       "review_requirement": "verify_scope_active_office_and_territory",
-      "activation_allowed": false,
+      "activation_allowed": true,
       "owner_approved": true,
       "runtime_review": {
         "status": "verified_current",
@@ -3948,7 +3948,7 @@
       ],
       "legacy_no_match": false,
       "review_requirement": "verify_scope_active_office_and_territory",
-      "activation_allowed": false,
+      "activation_allowed": true,
       "owner_approved": true,
       "runtime_review": {
         "status": "verified_current",
@@ -3983,7 +3983,7 @@
       ],
       "legacy_no_match": false,
       "review_requirement": "verify_scope_active_office_and_territory",
-      "activation_allowed": false,
+      "activation_allowed": true,
       "owner_approved": true,
       "runtime_review": {
         "status": "verified_current",
@@ -4017,7 +4017,7 @@
       ],
       "legacy_no_match": false,
       "review_requirement": "verify_scope_active_office_and_territory",
-      "activation_allowed": false,
+      "activation_allowed": true,
       "owner_approved": true,
       "runtime_review": {
         "status": "verified_current",
@@ -4052,7 +4052,7 @@
       ],
       "legacy_no_match": false,
       "review_requirement": "verify_scope_active_office_and_territory",
-      "activation_allowed": false,
+      "activation_allowed": true,
       "owner_approved": true,
       "runtime_review": {
         "status": "verified_current",
@@ -4085,7 +4085,7 @@
       ],
       "legacy_no_match": false,
       "review_requirement": "verify_scope_active_office_and_territory",
-      "activation_allowed": false,
+      "activation_allowed": true,
       "owner_approved": true,
       "runtime_review": {
         "status": "verified_current",
@@ -4118,7 +4118,7 @@
       ],
       "legacy_no_match": false,
       "review_requirement": "verify_scope_active_office_and_territory",
-      "activation_allowed": false,
+      "activation_allowed": true,
       "owner_approved": true,
       "runtime_review": {
         "status": "verified_current",
@@ -4153,7 +4153,7 @@
       ],
       "legacy_no_match": false,
       "review_requirement": "verify_scope_active_office_and_territory",
-      "activation_allowed": false,
+      "activation_allowed": true,
       "owner_approved": true,
       "runtime_review": {
         "status": "verified_current",
@@ -4186,7 +4186,7 @@
       ],
       "legacy_no_match": false,
       "review_requirement": "verify_scope_active_office_and_territory",
-      "activation_allowed": false,
+      "activation_allowed": true,
       "owner_approved": true,
       "runtime_review": {
         "status": "verified_current",
@@ -4221,7 +4221,7 @@
       ],
       "legacy_no_match": false,
       "review_requirement": "verify_scope_active_office_and_territory",
-      "activation_allowed": false,
+      "activation_allowed": true,
       "owner_approved": true,
       "runtime_review": {
         "status": "verified_current",
@@ -4256,7 +4256,7 @@
       ],
       "legacy_no_match": false,
       "review_requirement": "verify_scope_active_office_and_territory",
-      "activation_allowed": false,
+      "activation_allowed": true,
       "owner_approved": true,
       "runtime_review": {
         "status": "verified_current",
@@ -4289,7 +4289,7 @@
       ],
       "legacy_no_match": false,
       "review_requirement": "verify_scope_active_office_and_territory",
-      "activation_allowed": false,
+      "activation_allowed": true,
       "owner_approved": true,
       "runtime_review": {
         "status": "verified_current",
@@ -4324,7 +4324,7 @@
       ],
       "legacy_no_match": false,
       "review_requirement": "verify_scope_active_office_and_territory",
-      "activation_allowed": false,
+      "activation_allowed": true,
       "owner_approved": true,
       "runtime_review": {
         "status": "verified_current",
@@ -4363,7 +4363,7 @@
       ],
       "legacy_no_match": false,
       "review_requirement": "verify_scope_active_office_and_territory",
-      "activation_allowed": false,
+      "activation_allowed": true,
       "owner_approved": true,
       "runtime_review": {
         "status": "verified_current",
@@ -4396,7 +4396,7 @@
       ],
       "legacy_no_match": false,
       "review_requirement": "verify_scope_active_office_and_territory",
-      "activation_allowed": false,
+      "activation_allowed": true,
       "owner_approved": true,
       "runtime_review": {
         "status": "verified_current",
@@ -4431,7 +4431,7 @@
       ],
       "legacy_no_match": false,
       "review_requirement": "verify_scope_active_office_and_territory",
-      "activation_allowed": false,
+      "activation_allowed": true,
       "owner_approved": true,
       "runtime_review": {
         "status": "verified_current",
@@ -4470,7 +4470,7 @@
       ],
       "legacy_no_match": false,
       "review_requirement": "verify_scope_active_office_and_territory",
-      "activation_allowed": false,
+      "activation_allowed": true,
       "owner_approved": true,
       "runtime_review": {
         "status": "verified_current",
@@ -4504,7 +4504,7 @@
       ],
       "legacy_no_match": false,
       "review_requirement": "verify_scope_active_office_and_territory",
-      "activation_allowed": false,
+      "activation_allowed": true,
       "owner_approved": true,
       "runtime_review": {
         "status": "verified_current",
@@ -4539,7 +4539,7 @@
       ],
       "legacy_no_match": false,
       "review_requirement": "verify_scope_active_office_and_territory",
-      "activation_allowed": false,
+      "activation_allowed": true,
       "owner_approved": true,
       "runtime_review": {
         "status": "verified_current",
@@ -4572,7 +4572,7 @@
       ],
       "legacy_no_match": false,
       "review_requirement": "verify_scope_active_office_and_territory",
-      "activation_allowed": false,
+      "activation_allowed": true,
       "owner_approved": true,
       "runtime_review": {
         "status": "verified_current",
@@ -4603,7 +4603,7 @@
       "matched_recorded_office_titles": [],
       "legacy_no_match": true,
       "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
-      "activation_allowed": false,
+      "activation_allowed": true,
       "owner_approved": true,
       "runtime_review": {
         "status": "verified_current",
@@ -4634,7 +4634,7 @@
       "matched_recorded_office_titles": [],
       "legacy_no_match": true,
       "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
-      "activation_allowed": false,
+      "activation_allowed": true,
       "owner_approved": true,
       "runtime_review": {
         "status": "verified_current",
@@ -4668,7 +4668,7 @@
       ],
       "legacy_no_match": false,
       "review_requirement": "verify_scope_active_office_and_territory",
-      "activation_allowed": false,
+      "activation_allowed": true,
       "owner_approved": true,
       "runtime_review": {
         "status": "verified_current",
@@ -4701,7 +4701,7 @@
       ],
       "legacy_no_match": false,
       "review_requirement": "verify_scope_active_office_and_territory",
-      "activation_allowed": false,
+      "activation_allowed": true,
       "owner_approved": true,
       "runtime_review": {
         "status": "verified_current",
@@ -4746,7 +4746,7 @@
       ],
       "legacy_no_match": false,
       "review_requirement": "verify_scope_active_office_and_territory",
-      "activation_allowed": false,
+      "activation_allowed": true,
       "owner_approved": true,
       "runtime_review": {
         "status": "verified_current",
@@ -4762,5 +4762,6 @@
     "date": "2026-11-28",
     "scope": "141 proposed game routing profiles including listed secondary profiles; no legal certification, production authorization or change to existing roles",
     "source_candidate_blob": "b5b40f7a58cb7d976dee299835727932a1a72856"
-  }
+  },
+  "release_scope": "Приёмка учебных ситуаций и альтернатив исключительно при прямо заданных обстоятельствах. Не независимая юридическая сертификация, не оценка реальных договоров, разрешений и местных актов. Допуск кандидата к следующей стадии выпуска; не факт активации production."
 }

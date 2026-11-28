@@ -82,7 +82,7 @@ console.log(JSON.stringify({individualRecheckCount},null,2));
   assert.ok(p,c.case_key+' missing catalogue competence proposal');
   assert.equal(p.office_key,m.primary.office_key,c.case_key+' stale portfolio key');
   assert.equal(p.office_title,m.primary.office_title,c.case_key+' stale portfolio title');
-  assert.equal(competenceMatrix.status,'owner_approved_editorial_pending_legal_and_runtime');
+  assert.ok(['owner_approved_editorial_pending_legal_and_runtime','owner_approved_educational_candidate_runtime_reviewed'].includes(competenceMatrix.status));
   assert.equal(m.owner_approved,true,c.case_key);
   assert.equal(p.owner_approved,true,c.case_key);
   assert.equal(p.status,'owner_approved_editorial_not_authorization',c.case_key);
@@ -92,7 +92,7 @@ console.log(JSON.stringify({individualRecheckCount},null,2));
  for(const c of cases.filter(c=>c.audience==='single'))checkCompetenceProposal(c,competenceByKey.get(c.case_key));
  if(process.argv.includes('--release')){
   assert.notEqual(competenceMatrix.status,'owner_decision_candidate_not_for_import','Competence proposal still awaits owner approval');
-  assert.ok(competenceMatrix.cases.every(c=>c.activation_allowed===true),'Competence route activation not approved');
+  assert.ok(competenceMatrix.cases.every(c=>c.activation_allowed===true&&c.runtime_review?.status==='verified_current'),'Competence route activation not approved');
  }
 
 
@@ -222,7 +222,7 @@ for(const c of cases){
 console.log(JSON.stringify({registerActivationBlocked:registerBlocked},null,2));
 if(process.argv.includes('--release')){
  assert.equal(blocked,0,'Legal/editorial release gate: unverified cases must never be activated');
- assert.equal(registerBlocked,0,'Source register release gate: independent legal acceptance and activation permission required');
+ assert.equal(registerBlocked,0,'Source register release gate: documented educational legal acceptance and activation permission required');
  assert.equal(dominatedCases,0,'Collective consequences require final economic balance review');
 }
-console.log('PASS draft integrity (not legal certification or release authorization)');
+console.log(process.argv.includes('--release')?'PASS educational candidate release gates (not deployment or independent legal certification)':'PASS catalogue integrity (not deployment or independent legal certification)');

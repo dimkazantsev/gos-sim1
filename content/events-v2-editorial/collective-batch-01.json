@@ -1,5 +1,5 @@
 {
-  "status": "draft_not_for_production",
+  "status": "approved_educational_candidate_not_deployed",
   "cases": [
     {
       "case_key": "budget-region-2026-05-equalization",
@@ -139,8 +139,8 @@
         "activity": 0.005
       },
       "original_budget_reference": null,
-      "editorial_status": "draft",
-      "verified": false,
+      "editorial_status": "approved",
+      "verified": true,
       "history_protected": false,
       "legal_review": {
         "basis": "БК РФ, ст. 131 п. 1, 3, 4, 6, 8; Методика по постановлению Правительства РФ от 22.11.2004 № 670, п. 2–4. Сверка исходных данных проводится Минфином России с регионом до 20 августа; после этой даты менять их нельзя. Расчёт опирается на индексы налогового потенциала и бюджетных расходов, а не простую сумму фактических поступлений. Распределение утверждается федеральным законом о бюджете. 900 млн ₽ — условный предварительный расчёт, не результат воспроизведения государственной формулы.",
@@ -384,8 +384,8 @@
         "activity": -0.018
       },
       "original_budget_reference": null,
-      "editorial_status": "draft",
-      "verified": false,
+      "editorial_status": "approved",
+      "verified": true,
       "history_protected": false,
       "legal_review": {
         "basis": "БК РФ, п. 11 ст. 131, ст. 217, 217.1 и 219; постановление Правительства РФ от 13.04.2010 №231, п. 1–3 и 6: дотация для сбалансированности возможна при недостатке собственных доходов по установленной процедуре, но не гарантирована; кассовый план и бюджетное решение не отменяют обязательств.",
@@ -628,8 +628,8 @@
         "activity": -0.004
       },
       "original_budget_reference": null,
-      "editorial_status": "draft",
-      "verified": false,
+      "editorial_status": "approved",
+      "verified": true,
       "history_protected": false,
       "legal_review": {
         "basis": "БК РФ, ст. 38, 72, 132; 44-ФЗ, ст. 8 в пределах применимости: целевое финансирование, софинансирование по установленному порядку и конкурентные закупки. 323-ФЗ, ст. 10: доступность медицинской помощи, оснащение и транспортная доступность.",
@@ -871,8 +871,8 @@
         "enterprises": 7
       },
       "original_budget_reference": null,
-      "editorial_status": "draft",
-      "verified": false,
+      "editorial_status": "approved",
+      "verified": true,
       "history_protected": false,
       "legal_review": {
         "basis": "БК РФ, статьи 93.2, 93.3, 93.6, 95, 99, 103, 72: возвратность, источники финансирования дефицита, долговые обязательства, законность изменения договоров.",
@@ -1121,8 +1121,8 @@
         "enterprises": -30
       },
       "original_budget_reference": null,
-      "editorial_status": "draft",
-      "verified": false,
+      "editorial_status": "approved",
+      "verified": true,
       "history_protected": false,
       "legal_review": {
         "basis": "БК РФ, ст. 38, 72, 132; 44-ФЗ, ст. 8 в пределах применимости: целевое финансирование, софинансирование по установленному порядку и конкурентные закупки. 264-ФЗ, ст. 7: направления поддержки сельского хозяйства; конкретные меры и получатели устанавливаются соответствующим порядком.",
@@ -1364,8 +1364,8 @@
         "enterprises": -8
       },
       "original_budget_reference": null,
-      "editorial_status": "draft",
-      "verified": false,
+      "editorial_status": "approved",
+      "verified": true,
       "history_protected": false,
       "legal_review": {
         "basis": "БК РФ, ст. 38, 72, 132; 44-ФЗ, ст. 8 в пределах применимости: целевое финансирование, софинансирование по установленному порядку и конкурентные закупки. 257-ФЗ, ст. 17, 30: безопасность дороги, диагностика, ограничения и информирование об объезде.",
@@ -1610,8 +1610,8 @@
         "activity": 0.003
       },
       "original_budget_reference": null,
-      "editorial_status": "draft",
-      "verified": false,
+      "editorial_status": "approved",
+      "verified": true,
       "history_protected": true,
       "legal_review": {
         "basis": "БК РФ, п. 1 ст. 133; Закон №152-ФЗ, ст. 5, 6 и 19: расчёт субвенции основывается на применимой методике; точность, достаточность и законность обработки данных обязательны, а межведомственный обмен требует правового основания и защиты.",
@@ -1852,8 +1852,8 @@
         "expenditure": 70
       },
       "original_budget_reference": null,
-      "editorial_status": "draft",
-      "verified": false,
+      "editorial_status": "approved",
+      "verified": true,
       "history_protected": false,
       "legal_review": {
         "basis": "БК РФ, ст. 38, п. 4–6 ст. 81, ст. 219; Закон №68-ФЗ, ст. 11; Закон №44-ФЗ, ст. 8: резерв используется по решению высшего исполнительного органа и в соответствии с его порядком; неотложные работы отделяются от обычных инвестиций; финансирование и закупки не возникают из заявки автоматически.",
@@ -2096,8 +2096,8 @@
         "activity": -0.01
       },
       "original_budget_reference": null,
-      "editorial_status": "draft",
-      "verified": false,
+      "editorial_status": "approved",
+      "verified": true,
       "history_protected": false,
       "legal_review": {
         "basis": "БК РФ, ст. 38, 72, 132; 44-ФЗ, ст. 8 в пределах применимости: целевое финансирование, софинансирование по установленному порядку и конкурентные закупки. ЛК РФ, ст. 61, 62: воспроизводство лесов и естественное, искусственное либо комбинированное лесовосстановление в пределах обязанностей.",
@@ -2342,8 +2342,8 @@
         "activity": 0.002
       },
       "original_budget_reference": null,
-      "editorial_status": "draft",
-      "verified": false,
+      "editorial_status": "approved",
+      "verified": true,
       "history_protected": false,
       "legal_review": {
         "basis": "БК РФ, ст. 93.2 п. 1–2, ст. 93.3 п. 1, ст. 95, ст. 217. Возвратный кредит исполняется по действующему договору; неполученное решение о реструктуризации не меняет обязательство. Погашение основного долга отражается среди источников финансирования дефицита, а не как обычный расход. Перераспределение и рефинансирование требуют самостоятельного законного основания; права на автоматическое продление нет.",
@@ -2586,8 +2586,8 @@
         "enterprises": 8
       },
       "original_budget_reference": null,
-      "editorial_status": "draft",
-      "verified": false,
+      "editorial_status": "approved",
+      "verified": true,
       "history_protected": false,
       "legal_review": {
         "basis": "БК РФ, ст. 38, 72, 132; 44-ФЗ, ст. 8 в пределах применимости: целевое финансирование, софинансирование по установленному порядку и конкурентные закупки. 35-ФЗ, ст. 26: договорное технологическое присоединение и установленный порядок доступа к сетям.",
@@ -2833,8 +2833,8 @@
         "enterprises": -10
       },
       "original_budget_reference": null,
-      "editorial_status": "draft",
-      "verified": false,
+      "editorial_status": "approved",
+      "verified": true,
       "history_protected": false,
       "legal_review": {
         "basis": "БК РФ, ст. 38, 72, 132; 44-ФЗ, ст. 8 в пределах применимости: целевое финансирование, софинансирование по установленному порядку и конкурентные закупки. 565-ФЗ, ст. 30: организация профессионального обучения и дополнительного профессионального образования по направлению службы занятости.",
@@ -3076,8 +3076,8 @@
         "activity": -0.002
       },
       "original_budget_reference": null,
-      "editorial_status": "draft",
-      "verified": false,
+      "editorial_status": "approved",
+      "verified": true,
       "history_protected": false,
       "legal_review": {
         "basis": "БК РФ, ст. 38, 72, 132; 44-ФЗ, ст. 8 в пределах применимости: целевое финансирование, софинансирование по установленному порядку и конкурентные закупки. Основы законодательства РФ о культуре, ст. 12; 181-ФЗ, ст. 15: доступ к культурным услугам и доступность для инвалидов.",
@@ -3321,8 +3321,8 @@
         "activity": -0.002
       },
       "original_budget_reference": null,
-      "editorial_status": "draft",
-      "verified": false,
+      "editorial_status": "approved",
+      "verified": true,
       "history_protected": false,
       "legal_review": {
         "basis": "БК РФ, ст. 38, 72, 132; 44-ФЗ, ст. 8 в пределах применимости: целевое финансирование, софинансирование по установленному порядку и конкурентные закупки. 126-ФЗ, ст. 57, 58: универсальные услуги связи и оператор универсального обслуживания; проект не подменяет установленный режим.",
@@ -3570,8 +3570,8 @@
         "enterprises": 10
       },
       "original_budget_reference": null,
-      "editorial_status": "draft",
-      "verified": false,
+      "editorial_status": "approved",
+      "verified": true,
       "history_protected": false,
       "legal_review": {
         "basis": "БК РФ, ст. 38, 72, 132; 44-ФЗ, ст. 8 в пределах применимости: целевое финансирование, софинансирование по установленному порядку и конкурентные закупки. 135-ФЗ, ст. 15: запрет ограничивающих конкуренцию действий органов власти; предусмотренные законом исключения оцениваются отдельно.",
@@ -3822,8 +3822,8 @@
         "expenditure": 400
       },
       "original_budget_reference": null,
-      "editorial_status": "draft",
-      "verified": false,
+      "editorial_status": "approved",
+      "verified": true,
       "history_protected": false,
       "legal_review": {
         "basis": "БК РФ, ст. 38, п. 3 ст. 132, ст. 78, 78.5, 219; Закон №135-ФЗ, ст. 15; Закон №44-ФЗ, ст. 8: межбюджетная субсидия и субсидия производителю имеют разные основания; соблюдаются цель, показатели, полномочия, конкуренция и процедура отбора.",
@@ -4071,8 +4071,8 @@
         "activity": -0.003
       },
       "original_budget_reference": null,
-      "editorial_status": "draft",
-      "verified": false,
+      "editorial_status": "approved",
+      "verified": true,
       "history_protected": false,
       "legal_review": {
         "basis": "БК РФ, ст. 38, 72, 132; 44-ФЗ, ст. 8 в пределах применимости: целевое финансирование, софинансирование по установленному порядку и конкурентные закупки. 273-ФЗ, ст. 8, 9, 28: компетенция региона, местного самоуправления и образовательной организации.",
@@ -4321,8 +4321,8 @@
         "enterprises": -12
       },
       "original_budget_reference": null,
-      "editorial_status": "draft",
-      "verified": false,
+      "editorial_status": "approved",
+      "verified": true,
       "history_protected": false,
       "legal_review": {
         "basis": "БК РФ, ст. 38, 72, 132; 44-ФЗ, ст. 8 в пределах применимости: целевое финансирование, софинансирование по установленному порядку и конкурентные закупки. 68-ФЗ, ст. 11; ВК РФ, ст. 56: защита населения в пределах компетенции и соблюдение требований охраны водных объектов.",
@@ -4566,8 +4566,8 @@
         "cost": -0.003
       },
       "original_budget_reference": null,
-      "editorial_status": "draft",
-      "verified": false,
+      "editorial_status": "approved",
+      "verified": true,
       "history_protected": false,
       "legal_review": {
         "basis": "БК РФ, ст. 6 и ст. 21 п. 3–4. При консолидации исключаются трансферты между включёнными бюджетами; отдельные бюджеты сохраняют свои записи. Раздел 14 предназначен для трансфертов общего характера, а не для повторной записи любого целевого перечисления. Отнесение конкретной субсидии к разделу 05 прямо задано утверждённой классификацией учебного примера.",
@@ -4806,8 +4806,8 @@
         "activity": -0.007
       },
       "original_budget_reference": null,
-      "editorial_status": "draft",
-      "verified": false,
+      "editorial_status": "approved",
+      "verified": true,
       "history_protected": false,
       "legal_review": {
         "basis": "БК РФ, ст. 38, 72, 132; 44-ФЗ, ст. 8 в пределах применимости: целевое финансирование, софинансирование по установленному порядку и конкурентные закупки. 190-ФЗ, ст. 5, 6: разграничение регионального регулирования и организации надёжного теплоснабжения муниципалитетом.",
@@ -5057,8 +5057,8 @@
         "enterprises": 12
       },
       "original_budget_reference": null,
-      "editorial_status": "draft",
-      "verified": false,
+      "editorial_status": "approved",
+      "verified": true,
       "history_protected": false,
       "legal_review": {
         "basis": "БК РФ, ст. 38, 72, 132; 44-ФЗ, ст. 8 в пределах применимости: целевое финансирование, софинансирование по установленному порядку и конкурентные закупки. 273-ФЗ, ст. 8, 13, 28, 68: полномочия субъекта, реализация программ, практическая подготовка и СПО.",
@@ -5309,8 +5309,8 @@
         "activity": -0.007
       },
       "original_budget_reference": null,
-      "editorial_status": "draft",
-      "verified": false,
+      "editorial_status": "approved",
+      "verified": true,
       "history_protected": false,
       "legal_review": {
         "basis": "БК РФ, ст. 38, 72, 132; 44-ФЗ, ст. 8 в пределах применимости: целевое финансирование, софинансирование по установленному порядку и конкурентные закупки. ВК РФ, ст. 56; 7-ФЗ, ст. 16.3; 416-ФЗ, ст. 18: охрана водных объектов, расчёт платы за негативное воздействие и законный порядок подключения.",
@@ -5568,8 +5568,8 @@
         "activity": -0.009
       },
       "original_budget_reference": null,
-      "editorial_status": "draft",
-      "verified": false,
+      "editorial_status": "approved",
+      "verified": true,
       "history_protected": false,
       "legal_review": {
         "basis": "БК РФ, ст. 38, 72, 132; 44-ФЗ, ст. 8 в пределах применимости: целевое финансирование, софинансирование по установленному порядку и конкурентные закупки. ЖК РФ, ст. 32, 86, 87, 95: различные жилищные права собственников и нанимателей, основания временного размещения.",
@@ -5820,8 +5820,8 @@
         "expenditure": 30
       },
       "original_budget_reference": null,
-      "editorial_status": "draft",
-      "verified": false,
+      "editorial_status": "approved",
+      "verified": true,
       "history_protected": false,
       "legal_review": {
         "basis": "БК РФ, статья 78; Федеральный закон № 127-ФЗ, статьи 126, 142, 150, 154: возврат субсидии и конкурсный порядок, очередность, мировое соглашение.",
@@ -6062,8 +6062,8 @@
       "original_budget_reference": {
         "service": 25
       },
-      "editorial_status": "draft",
-      "verified": false,
+      "editorial_status": "approved",
+      "verified": true,
       "history_protected": false,
       "legal_review": {
         "basis": "ГК РФ, ст. 309, 819 п. 1; БК РФ, ст. 98 п. 2 и 4, ст. 103 п. 2–4, ст. 113. Отзыв лицензии сам по себе не прекращает кредитное обязательство. В заданной стадии используются подтверждённые официальные реквизиты, по разъяснению Банка России от 18.03.2024. Основной долг и расходы на его обслуживание учитываются раздельно; изменение графика или рефинансирование требуют законного основания и полномочий.",
@@ -6314,8 +6314,8 @@
         "service": 200,
         "fx_change": 0.15
       },
-      "editorial_status": "draft",
-      "verified": false,
+      "editorial_status": "approved",
+      "verified": true,
       "history_protected": false,
       "legal_review": {
         "basis": "БК РФ, статьи 94, 103, 217.1; ГК РФ, статья 317: внешние заимствования, кассовое планирование и денежные обязательства.",
@@ -6554,8 +6554,8 @@
       "original_budget_reference": {
         "service": 120
       },
-      "editorial_status": "draft",
-      "verified": false,
+      "editorial_status": "approved",
+      "verified": true,
       "history_protected": false,
       "legal_review": {
         "basis": "БК РФ, ст. 94 п. 1, 103 п. 2–4, 110, 113 п. 1–3, 121.6 п. 1, 121.7, 217.1. Реальное поступление от заимствований отражается среди источников финансирования дефицита, а не по сумме заявок или плану. Условия и решение о выпуске определяются эмитентом, кассовый план ведёт Федеральное казначейство. В заданном упрощённом примере отсутствуют погашения, дисконт, премия и НКД; поэтому 380 млн ₽ — неполученная часть планового чистого привлечения.",
@@ -6808,8 +6808,8 @@
       "original_budget_reference": {
         "service": 0
       },
-      "editorial_status": "draft",
-      "verified": false,
+      "editorial_status": "approved",
+      "verified": true,
       "history_protected": false,
       "legal_review": {
         "basis": "БК РФ, ст. 103 п. 2–4, 110, 113 п. 2, 121.6 п. 1 подп. 6, 121.7; ГК РФ, ст. 309. Размер дохода или порядок его определения устанавливается условиями эмиссии. Купон рассчитывается по предусмотренной формуле; агент не может односторонне включить неподтверждённую комиссию в купон. Возможная самостоятельная оплата услуг агента требует отдельного договорного основания. Будущие выпуски и бюджетные решения не изменяют действующие обязательства.",
@@ -7054,8 +7054,8 @@
       "original_budget_reference": {
         "revenue": -500
       },
-      "editorial_status": "draft",
-      "verified": false,
+      "editorial_status": "approved",
+      "verified": true,
       "history_protected": false,
       "legal_review": {
         "basis": "БК РФ, ст. 42 и 94 п. 1; Федеральный закон от 26.12.1995 №208-ФЗ, ст. 42 п. 5 и 7. Продажа федерального пакета является источником финансирования дефицита; дивиденды от принадлежащих РФ акций относятся к доходам от имущества. Право на объявленный дивиденд определяется на установленную дату; в заданных условиях переход акций состоялся раньше, и отдельное право продавца отсутствует. Исправление прогноза не создаёт нового платежа.",
@@ -7295,8 +7295,8 @@
         "reserve": -10000,
         "service": 90
       },
-      "editorial_status": "draft",
-      "verified": false,
+      "editorial_status": "approved",
+      "verified": true,
       "history_protected": false,
       "legal_review": {
         "basis": "БК РФ, статьи 96.10, 96.11, 94, 103, 217.1: назначение и управление средствами ФНБ с учётом действующих особенностей, источники финансирования и кассовый план.",
@@ -7531,8 +7531,8 @@
       "original_best": "option_3",
       "original_fiscal_reference": null,
       "original_budget_reference": null,
-      "editorial_status": "draft",
-      "verified": false,
+      "editorial_status": "approved",
+      "verified": true,
       "history_protected": false,
       "legal_review": {
         "basis": "152-ФЗ, статьи 19, 21 (часть 3.1); 149-ФЗ, статья 16; 59-ФЗ, статьи 8, 10, 12: защита информации, уведомления об инциденте и рассмотрение обращений.",
@@ -7768,8 +7768,8 @@
       "original_best": "option_1",
       "original_fiscal_reference": null,
       "original_budget_reference": null,
-      "editorial_status": "draft",
-      "verified": false,
+      "editorial_status": "approved",
+      "verified": true,
       "history_protected": false,
       "legal_review": {
         "basis": "68-ФЗ, статья 11; ЖК РФ, статьи 161, 95; 416-ФЗ, статья 6: полномочия при угрозах, содержание дома, временное жильё и организация водоотведения.",
@@ -7991,8 +7991,8 @@
       "original_best": "option_4",
       "original_fiscal_reference": null,
       "original_budget_reference": null,
-      "editorial_status": "draft",
-      "verified": false,
+      "editorial_status": "approved",
+      "verified": true,
       "history_protected": false,
       "legal_review": {
         "basis": "181-ФЗ, статья 15; 257-ФЗ, статьи 17, 30: доступность объектов и услуг, содержание дорог и допустимые ограничения движения.",
@@ -8196,8 +8196,8 @@
       "original_best": "option_4",
       "original_fiscal_reference": null,
       "original_budget_reference": null,
-      "editorial_status": "draft",
-      "verified": false,
+      "editorial_status": "approved",
+      "verified": true,
       "history_protected": false,
       "legal_review": {
         "basis": "323-ФЗ, статьи 10, 11; 68-ФЗ, статья 11: доступность и недопустимость отказа в экстренной помощи, полномочия защиты населения.",
@@ -8411,8 +8411,8 @@
       "original_best": "option_2",
       "original_fiscal_reference": null,
       "original_budget_reference": null,
-      "editorial_status": "draft",
-      "verified": false,
+      "editorial_status": "approved",
+      "verified": true,
       "history_protected": true,
       "legal_review": {
         "basis": "33-ФЗ от 20.03.2025, статья 46; Конституция РФ; 152-ФЗ, статья 19: муниципальный опрос, участие граждан и защита данных.",
@@ -8629,8 +8629,8 @@
       "original_best": "option_5",
       "original_fiscal_reference": null,
       "original_budget_reference": null,
-      "editorial_status": "draft",
-      "verified": false,
+      "editorial_status": "approved",
+      "verified": true,
       "history_protected": true,
       "legal_review": {
         "basis": "33-ФЗ от 20.03.2025, статья 46; Конституция РФ; БК РФ, статья 38: рекомендательность опроса и самостоятельность бюджетных оснований.",
@@ -8868,8 +8868,8 @@
       "original_best": "option_1",
       "original_fiscal_reference": null,
       "original_budget_reference": null,
-      "editorial_status": "draft",
-      "verified": false,
+      "editorial_status": "approved",
+      "verified": true,
       "history_protected": false,
       "legal_review": {
         "basis": "ЖК РФ, статьи 32, 86, 87, 95; 152-ФЗ, статья 19: изъятие жилья, права нанимателей, маневренный фонд и защита данных.",
@@ -9089,8 +9089,8 @@
       "original_best": "option_3",
       "original_fiscal_reference": null,
       "original_budget_reference": null,
-      "editorial_status": "draft",
-      "verified": false,
+      "editorial_status": "approved",
+      "verified": true,
       "history_protected": false,
       "legal_review": {
         "basis": "416-ФЗ, статьи 6, 23; 323-ФЗ, статья 10: организация водоснабжения, качество питьевой воды и доступность медицинской помощи.",
@@ -9299,8 +9299,8 @@
       "original_best": "option_4",
       "original_fiscal_reference": null,
       "original_budget_reference": null,
-      "editorial_status": "draft",
-      "verified": false,
+      "editorial_status": "approved",
+      "verified": true,
       "history_protected": true,
       "legal_review": {
         "basis": "190-ФЗ, статьи 5, 6; БК РФ, статья 72: организация теплоснабжения, полномочия и финансовое обеспечение договоров.",
@@ -9379,5 +9379,6 @@
         "approved_correction_count": 0
       }
     }
-  ]
+  ],
+  "release_scope": "Приёмка учебных ситуаций и альтернатив исключительно при прямо заданных обстоятельствах. Не независимая юридическая сертификация, не оценка реальных договоров, разрешений и местных актов. Допуск кандидата к следующей стадии выпуска; не факт активации production."
 }

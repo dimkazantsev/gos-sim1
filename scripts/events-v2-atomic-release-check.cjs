@@ -34,12 +34,14 @@ const synthetic=payload.map((c,i)=>({...c,case_key:'fixture-'+i,title:'Тест 
  await q("INSERT INTO event_assignments(case_id,game_id,recipient_id,stage_no,status) VALUES($1,$2,$3,7,'resolved')",[lc,game,sender]);
  await q("INSERT INTO event_case_outcomes(case_id,game_id,winner) VALUES($1,$2,'option_1')",[lc,game]);
  const history=await one("SELECT to_jsonb(c) c FROM event_cases c WHERE id=$1",[lc]);
- // First transaction intentionally fails with the actual blocked source.
+ // Positive gate uses the reviewed candidate. A copy with one revoked approval must still fail.
+ assertReleaseReady(payload);
+ const deniedPayload=payload.map((c,i)=>i===0?{...c,activation_allowed:false}:c);
  await db.exec('BEGIN');
  await install();
  const apply=(p)=>q("SELECT private.events_v2_apply_catalog_candidate($1::jsonb,'{}'::uuid[]) AS result",[JSON.stringify(p)]);
- assert.throws(()=>assertReleaseReady(payload),/release blocked/);
- await assert.rejects(()=>apply(payload),/release blocked/);
+ assert.throws(()=>assertReleaseReady(deniedPayload),/release blocked/);
+ await assert.rejects(()=>apply(deniedPayload),/release blocked/);
  await db.exec('ROLLBACK');
  assert.equal((await one("SELECT count(*)::int n FROM information_schema.columns WHERE table_schema='public' AND table_name='event_decisions' AND column_name='vote_round'")).n,0);
  // A deliberately fictional, legally irrelevant dataset tests the positive path.
@@ -107,5 +109,5 @@ const synthetic=payload.map((c,i)=>({...c,case_key:'fixture-'+i,title:'Тест 
  await as(guest);await assert.rejects(()=>q('SELECT public.get_event_v2_regional_assignment_context($1)',[game]),/преподавател/);
  await db.exec('RESET ROLE');
  console.log('PASS regional manual electorate, foreign party rejection, entire party, immutable direct client rows');
- console.log('PASS five candidates in a single transaction: actual blocked payload rollback, fictional 330 catalogue, two changed instances, protected legacy, verified seed, authenticated transfer and two-round vote, role isolation, temporary helper removed');
+ console.log('PASS five candidates in a single transaction: revoked-approval payload rollback, fictional 330 catalogue, two changed instances, protected legacy, verified seed, authenticated transfer and two-round vote, role isolation, temporary helper removed');
  }finally{await db.close()}})().catch(e=>{console.error(e.code??'ERROR',e.message,e.where??'');process.exitCode=1});

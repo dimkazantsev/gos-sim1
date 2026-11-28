@@ -38,9 +38,9 @@ jobs:
       - run: npm ci --no-audit --no-fund
       - run: npm run typecheck
       - run: node scripts/events-v2-individual-check.cjs
-      - run: node scripts/events-v2-editorial-check.cjs
+      - run: node scripts/events-v2-editorial-check.cjs --release
       - run: node scripts/events-v2-economic-projection-check.cjs
-      - run: node scripts/events-v2-catalog-integration-check.cjs
+      - run: node scripts/events-v2-catalog-integration-check.cjs --release
       - run: node scripts/events-v2-dispatch-check.cjs
       - run: node scripts/events-v2-rls-check.cjs
       - run: node scripts/events-v2-atomic-release-check.cjs

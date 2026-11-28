@@ -1,5 +1,5 @@
 {
-  "status": "draft_not_for_production",
+  "status": "approved_educational_candidate_not_deployed",
   "cases": [
     {
       "case_key": "bank-legal-2026-046",
@@ -150,8 +150,8 @@
       "source_note": "Учебная история. Участники и обстоятельства вымышлены; правовые основания приведены в разборе решения. Игровые эффекты являются условными.",
       "original_option_count": 5,
       "original_best": "option_4",
-      "editorial_status": "draft",
-      "verified": false,
+      "editorial_status": "approved",
+      "verified": true,
       "history_protected": false,
       "legal_review": {
         "basis": "БК РФ, статья 242, пункт 5.",
@@ -381,8 +381,8 @@
       "source_note": "Учебная история. Участники и обстоятельства вымышлены; правовые основания приведены в разборе решения. Игровые эффекты являются условными.",
       "original_option_count": 5,
       "original_best": "option_2",
-      "editorial_status": "draft",
-      "verified": false,
+      "editorial_status": "approved",
+      "verified": true,
       "history_protected": false,
       "legal_review": {
         "basis": "Конституция РФ, статья 132; 33-ФЗ, статьи 33–34; БК РФ, статьи 79.1, 86.",
@@ -628,8 +628,8 @@
       "source_note": "Учебная история. Участники и обстоятельства вымышлены; правовые основания приведены в разборе решения. Игровые эффекты являются условными.",
       "original_option_count": 5,
       "original_best": "option_1",
-      "editorial_status": "draft",
-      "verified": false,
+      "editorial_status": "approved",
+      "verified": true,
       "history_protected": false,
       "legal_review": {
         "basis": "БК РФ, ст. 78 п. 1, пп. 2 п. 2, п. 3, 3.1; ПП РФ от 25.10.2023 №1782 в ред. 14.11.2026, п. 3, 5–8. Пункты 3, 5–7 общих требований: результат, отчётность, мониторинг и возврат при нарушении. Проверяется установленное соглашением определение результата; независимые услуги не считаются новыми рабочими местами по этой программе. При наступлении срока применяются предусмотренные последствия недостижения.",
@@ -847,8 +847,8 @@
       "source_note": "Учебная история. Участники и обстоятельства вымышлены; правовые основания приведены в разборе решения. Игровые эффекты являются условными.",
       "original_option_count": 5,
       "original_best": "option_5",
-      "editorial_status": "draft",
-      "verified": false,
+      "editorial_status": "approved",
+      "verified": true,
       "history_protected": false,
       "legal_review": {
         "basis": "БК РФ, ст. 6, 33, 37: расчёт доходов и расходов должен основываться на реалистичном прогнозе. Ожидаемое налоговое поступление не тождественно источнику финансирования дефицита. Неопределённые предпосылки раскрываются в сценариях.",
@@ -1085,8 +1085,8 @@
       "source_note": "Учебная история. Участники и обстоятельства вымышлены; правовые основания приведены в разборе решения. Игровые эффекты являются условными.",
       "original_option_count": 5,
       "original_best": "option_5",
-      "editorial_status": "draft",
-      "verified": false,
+      "editorial_status": "approved",
+      "verified": true,
       "history_protected": false,
       "legal_review": {
         "basis": "НК РФ, ст. 45, п. 2 ст. 375, п. 15 ст. 378.2; 237-ФЗ, ст. 22.1; постановление КС РФ от 14.07.2026 №48-П: заявление не меняет действующую налоговую базу; специальная временная процедура по архивной стоимости для физлиц не переносится на данное юридическое лицо.",
@@ -1292,8 +1292,8 @@
       "source_note": "Учебная история. Участники и обстоятельства вымышлены; правовые основания приведены в разборе решения. Игровые эффекты являются условными.",
       "original_option_count": 5,
       "original_best": "option_1",
-      "editorial_status": "draft",
-      "verified": false,
+      "editorial_status": "approved",
+      "verified": true,
       "history_protected": true,
       "legal_review": {
         "basis": "44-ФЗ, статьи 95, 112.",
@@ -1492,8 +1492,8 @@
       "source_note": "Учебная история. Участники и обстоятельства вымышлены; правовые основания приведены в разборе решения. Игровые эффекты являются условными.",
       "original_option_count": 5,
       "original_best": "option_1",
-      "editorial_status": "draft",
-      "verified": false,
+      "editorial_status": "approved",
+      "verified": true,
       "history_protected": false,
       "legal_review": {
         "basis": "БК РФ, статья 78; ПП РФ №1782, пункт 11; 220-ФЗ, статья 14.",
@@ -1713,8 +1713,8 @@
       "source_note": "Учебная история. Участники и обстоятельства вымышлены; правовые основания приведены в разборе решения. Игровые эффекты являются условными.",
       "original_option_count": 5,
       "original_best": "option_2",
-      "editorial_status": "draft",
-      "verified": false,
+      "editorial_status": "approved",
+      "verified": true,
       "history_protected": false,
       "legal_review": {
         "basis": "БК РФ, статья 160.2-1; приказ Минфина России от 05.08.2020 №160н, приложение 2.",
@@ -1961,8 +1961,8 @@
       "source_note": "Учебная история. Участники и обстоятельства вымышлены; правовые основания приведены в разборе решения. Игровые эффекты являются условными.",
       "original_option_count": 5,
       "original_best": "option_5",
-      "editorial_status": "draft",
-      "verified": false,
+      "editorial_status": "approved",
+      "verified": true,
       "history_protected": false,
       "legal_review": {
         "basis": "БК РФ, ст. 78 п. 1, пп. 2 п. 2, п. 3, 3.1; ПП РФ от 25.10.2023 №1782 в ред. 14.11.2026, п. 3, 5–8. Пункт 15 постановления №1782 устанавливает специальные требования к субсидиям на гражданские НИОКР, включая применимые документы о софинансировании, охраноспособный результат и учёт сведений о работах. Замена результата или срока допускается лишь при наличии предусмотренного основания и надлежащем оформлении; реклама не подтверждает научный результат.",
@@ -2215,8 +2215,8 @@
       "source_note": "Учебная история. Участники и обстоятельства вымышлены; правовые основания приведены в разборе решения. Игровые эффекты являются условными.",
       "original_option_count": 5,
       "original_best": "option_3",
-      "editorial_status": "draft",
-      "verified": false,
+      "editorial_status": "approved",
+      "verified": true,
       "history_protected": false,
       "legal_review": {
         "basis": "115-ФЗ, статьи 10, 10.1, 13; БК РФ, статья 38.",
@@ -2454,8 +2454,8 @@
       "source_note": "Учебная история. Участники и обстоятельства вымышлены; правовые основания приведены в разборе решения. Игровые эффекты являются условными.",
       "original_option_count": 5,
       "original_best": "option_5",
-      "editorial_status": "draft",
-      "verified": false,
+      "editorial_status": "approved",
+      "verified": true,
       "history_protected": false,
       "legal_review": {
         "basis": "НК РФ, ст. 342, 342.4, 81: ставки и коэффициенты НДПИ выбираются для конкретного полезного ископаемого и обстоятельств добычи; ошибочная отчётность исправляется в установленном порядке.",
@@ -2681,8 +2681,8 @@
       "source_note": "Учебная история. Участники и обстоятельства вымышлены; правовые основания приведены в разборе решения. Игровые эффекты являются условными.",
       "original_option_count": 5,
       "original_best": "option_1",
-      "editorial_status": "draft",
-      "verified": false,
+      "editorial_status": "approved",
+      "verified": true,
       "history_protected": false,
       "legal_review": {
         "basis": "БК РФ, ст. 78, ст. 78.5 п. 2–4, 7; ПП РФ №1782, п. 20–22. П. 21 и 22 общих требований устанавливают опубликованные сроки и основания отклонения, в том числе фактическую просрочку. Устное указание не меняет опубликованную дату. Своевременность не означает автоматическую победу: заявка оценивается по всем законным критериям.",
@@ -2890,8 +2890,8 @@
       "source_note": "Учебная история. Участники и обстоятельства вымышлены; правовые основания приведены в разборе решения. Игровые эффекты являются условными.",
       "original_option_count": 5,
       "original_best": "option_5",
-      "editorial_status": "draft",
-      "verified": false,
+      "editorial_status": "approved",
+      "verified": true,
       "history_protected": true,
       "legal_review": {
         "basis": "БК РФ, ст. 78 п. 1–3; ПП РФ №1782, п. 3, п. 11. Ст. 28 Закона №164-ФЗ допускает включение выкупной цены в общую сумму лизингового договора, поэтому её нельзя считать всегда незаконной. Исключение в этой задаче вытекает именно из перечня допустимых затрат учебной программы. Неустойка также не входит в перечень.",
@@ -3112,8 +3112,8 @@
       "source_note": "Учебная история. Участники и обстоятельства вымышлены; правовые основания приведены в разборе решения. Игровые эффекты являются условными.",
       "original_option_count": 5,
       "original_best": "option_5",
-      "editorial_status": "draft",
-      "verified": false,
+      "editorial_status": "approved",
+      "verified": true,
       "history_protected": true,
       "legal_review": {
         "basis": "НК РФ, п. 4 ст. 12, ст. 394, ст. 5; БК РФ, ст. 78: местная ставка изменяется компетентным представительным органом в законных пределах; отдельное региональное финансирование требует самостоятельного основания.",
@@ -3331,8 +3331,8 @@
       "source_note": "Учебная история. Участники и обстоятельства вымышлены; правовые основания приведены в разборе решения. Игровые эффекты являются условными.",
       "original_option_count": 5,
       "original_best": "option_1",
-      "editorial_status": "draft",
-      "verified": false,
+      "editorial_status": "approved",
+      "verified": true,
       "history_protected": true,
       "legal_review": {
         "basis": "БК РФ, статьи 139, 139.1; статья 38.",
@@ -3558,8 +3558,8 @@
       "source_note": "Учебная история. Участники и обстоятельства вымышлены; правовые основания приведены в разборе решения. Игровые эффекты являются условными.",
       "original_option_count": 5,
       "original_best": "option_2",
-      "editorial_status": "draft",
-      "verified": false,
+      "editorial_status": "approved",
+      "verified": true,
       "history_protected": false,
       "legal_review": {
         "basis": "44-ФЗ, статьи 8, 31; 135-ФЗ, статья 17.",
@@ -3781,8 +3781,8 @@
       "source_note": "Учебная история. Участники и обстоятельства вымышлены; правовые основания приведены в разборе решения. Игровые эффекты являются условными.",
       "original_option_count": 5,
       "original_best": "option_5",
-      "editorial_status": "draft",
-      "verified": false,
+      "editorial_status": "approved",
+      "verified": true,
       "history_protected": false,
       "legal_review": {
         "basis": "БК РФ, ст. 36, 264.1: полнота и сопоставимость открытой информации, разграничение фактического исполнения и поясняющих данных; аналитическая таблица не подменяет бюджетную отчётность.",
@@ -3979,8 +3979,8 @@
       "source_note": "Учебная история. Участники и обстоятельства вымышлены; правовые основания приведены в разборе решения. Игровые эффекты являются условными.",
       "original_option_count": 5,
       "original_best": "option_3",
-      "editorial_status": "draft",
-      "verified": false,
+      "editorial_status": "approved",
+      "verified": true,
       "history_protected": false,
       "legal_review": {
         "basis": "НК РФ, ст. 63, 66, 67; БК РФ, ст. 78: инвестиционный налоговый кредит оформляется компетентным органом по договору при наличии законного основания, с последующим погашением и процентами; субсидия оформляется отдельно.",
@@ -4209,8 +4209,8 @@
       "source_note": "Учебная история. Участники и обстоятельства вымышлены; правовые основания приведены в разборе решения. Игровые эффекты являются условными.",
       "original_option_count": 5,
       "original_best": "option_5",
-      "editorial_status": "draft",
-      "verified": false,
+      "editorial_status": "approved",
+      "verified": true,
       "history_protected": false,
       "legal_review": {
         "basis": "БК РФ, ст. 72, п. 5 ст. 161, п. 3 ст. 219; 44-ФЗ, ст. 8: обязательства обеспечиваются лимитами, а выход за срок действия ЛБО возможен только при законном основании; новый год сам по себе не запрещает контракт.",
@@ -4448,8 +4448,8 @@
       "source_note": "Учебная история. Участники и обстоятельства вымышлены; правовые основания приведены в разборе решения. Игровые эффекты являются условными.",
       "original_option_count": 5,
       "original_best": "option_1",
-      "editorial_status": "draft",
-      "verified": false,
+      "editorial_status": "approved",
+      "verified": true,
       "history_protected": false,
       "legal_review": {
         "basis": "НК РФ, гл. 26.4, ст. 346.35, 346.37, 346.38: специальный режим для соответствующего соглашения; особенности НДПИ и налога на прибыль учитываются по установленному порядку.",
@@ -4662,8 +4662,8 @@
       "source_note": "Учебная история. Участники и обстоятельства вымышлены; правовые основания приведены в разборе решения. Игровые эффекты являются условными.",
       "original_option_count": 5,
       "original_best": "option_2",
-      "editorial_status": "draft",
-      "verified": false,
+      "editorial_status": "approved",
+      "verified": true,
       "history_protected": false,
       "legal_review": {
         "basis": "ГК РФ, статьи 125, 335.",
@@ -4886,8 +4886,8 @@
       "source_note": "Учебная история. Участники и обстоятельства вымышлены; правовые основания приведены в разборе решения. Игровые эффекты являются условными.",
       "original_option_count": 5,
       "original_best": "option_5",
-      "editorial_status": "draft",
-      "verified": false,
+      "editorial_status": "approved",
+      "verified": true,
       "history_protected": true,
       "legal_review": {
         "basis": "ГК РФ, статья 582; 44-ФЗ, статьи 8, 15.",
@@ -5097,8 +5097,8 @@
       "source_note": "Учебная история. Участники и обстоятельства вымышлены; правовые основания приведены в разборе решения. Игровые эффекты являются условными.",
       "original_option_count": 5,
       "original_best": "option_2",
-      "editorial_status": "draft",
-      "verified": false,
+      "editorial_status": "approved",
+      "verified": true,
       "history_protected": false,
       "legal_review": {
         "basis": "33-ФЗ, статьи 49, 70.",
@@ -5325,8 +5325,8 @@
       "source_note": "Учебная история. Участники и обстоятельства вымышлены; правовые основания приведены в разборе решения. Игровые эффекты являются условными.",
       "original_option_count": 5,
       "original_best": "option_2",
-      "editorial_status": "draft",
-      "verified": false,
+      "editorial_status": "approved",
+      "verified": true,
       "history_protected": false,
       "legal_review": {
         "basis": "БК РФ, п. 2–4 ст. 99, ст. 107: действующие обязательства из государственной гарантии включаются в долг субъекта; возможное исполнение гарантии и денежный отток оцениваются отдельно без двойного учёта.",
@@ -5542,8 +5542,8 @@
       "source_note": "Учебная история. Участники и обстоятельства вымышлены; правовые основания приведены в разборе решения. Игровые эффекты являются условными.",
       "original_option_count": 5,
       "original_best": "option_2",
-      "editorial_status": "draft",
-      "verified": false,
+      "editorial_status": "approved",
+      "verified": true,
       "history_protected": false,
       "legal_review": {
         "basis": "БК РФ, статья 80; ГК РФ, статьи 1229, 1233.",
@@ -5770,8 +5770,8 @@
       "source_note": "Учебная история. Участники и обстоятельства вымышлены; правовые основания приведены в разборе решения. Игровые эффекты являются условными.",
       "original_option_count": 5,
       "original_best": "option_3",
-      "editorial_status": "draft",
-      "verified": false,
+      "editorial_status": "approved",
+      "verified": true,
       "history_protected": false,
       "legal_review": {
         "basis": "44-ФЗ, статья 34, части 6–9; ПП РФ №783 в редакции от 02.10.2026.",
@@ -6013,8 +6013,8 @@
       "source_note": "Учебная история. Участники и обстоятельства вымышлены; правовые основания приведены в разборе решения. Игровые эффекты являются условными.",
       "original_option_count": 5,
       "original_best": "option_3",
-      "editorial_status": "draft",
-      "verified": false,
+      "editorial_status": "approved",
+      "verified": true,
       "history_protected": false,
       "legal_review": {
         "basis": "БК РФ, ст. 6, 14: отдельный бюджет субъекта и его консолидированный бюджет различаются. Дополнительный межрегиональный аналитический свод с заданным периметром нельзя выдавать за областной бюджет.",
@@ -6233,8 +6233,8 @@
       "source_note": "Учебная история. Участники и обстоятельства вымышлены; правовые основания приведены в разборе решения. Игровые эффекты являются условными.",
       "original_option_count": 5,
       "original_best": "option_1",
-      "editorial_status": "draft",
-      "verified": false,
+      "editorial_status": "approved",
+      "verified": true,
       "history_protected": true,
       "legal_review": {
         "basis": "БК РФ, ст. 78 п. 1–3; ПП РФ №1782, п. 3, п. 11. Возмещаются расходы конкретного надлежащего получателя по документам. Само вхождение в группу компаний не делает расходы одного юридического лица затратами другого. Иной режим совместных проектов может быть предусмотрен только самостоятельно и законно.",
@@ -6439,8 +6439,8 @@
       "source_note": "Учебная история. Участники и обстоятельства вымышлены; правовые основания приведены в разборе решения. Игровые эффекты являются условными.",
       "original_option_count": 5,
       "original_best": "option_3",
-      "editorial_status": "draft",
-      "verified": false,
+      "editorial_status": "approved",
+      "verified": true,
       "history_protected": true,
       "legal_review": {
         "basis": "БК РФ, статья 79; 44-ФЗ, статья 95.",
@@ -6661,8 +6661,8 @@
       "source_note": "Учебная история. Участники и обстоятельства вымышлены; правовые основания приведены в разборе решения. Игровые эффекты являются условными.",
       "original_option_count": 5,
       "original_best": "option_5",
-      "editorial_status": "draft",
-      "verified": false,
+      "editorial_status": "approved",
+      "verified": true,
       "history_protected": false,
       "legal_review": {
         "basis": "НК РФ, ст. 217, 211, 81; ТК РФ, ст. 169: налоговая квалификация определяется юридическим основанием выплаты, условиями освобождения и характером дохода.",
@@ -6878,8 +6878,8 @@
       "source_note": "Учебная история. Участники и обстоятельства вымышлены; правовые основания приведены в разборе решения. Игровые эффекты являются условными.",
       "original_option_count": 5,
       "original_best": "option_4",
-      "editorial_status": "draft",
-      "verified": false,
+      "editorial_status": "approved",
+      "verified": true,
       "history_protected": false,
       "legal_review": {
         "basis": "НК РФ, п. 4 и 6 ст. 12: налоги и сборы, отсутствующие в НК РФ, не могут устанавливаться письмом органа; добровольная услуга не превращается в основание обязательного платежа.",
@@ -7102,8 +7102,8 @@
       "source_note": "Учебная история. Участники и обстоятельства вымышлены; правовые основания приведены в разборе решения. Игровые эффекты являются условными.",
       "original_option_count": 5,
       "original_best": "option_3",
-      "editorial_status": "draft",
-      "verified": false,
+      "editorial_status": "approved",
+      "verified": true,
       "history_protected": false,
       "legal_review": {
         "basis": "НК РФ, гл. 33, ст. 415 и применимые определения площади торгового зала; действующее регулирование торгового сбора Москвы, разъяснения ФНС.",
@@ -7309,8 +7309,8 @@
       "source_note": "Учебная история. Участники и обстоятельства вымышлены; правовые основания приведены в разборе решения. Игровые эффекты являются условными.",
       "original_option_count": 5,
       "original_best": "option_2",
-      "editorial_status": "draft",
-      "verified": false,
+      "editorial_status": "approved",
+      "verified": true,
       "history_protected": false,
       "legal_review": {
         "basis": "73-ФЗ, статьи 45, 47.3; БК РФ, статья 78.",
@@ -7562,8 +7562,8 @@
       "source_note": "Учебная история. Участники и обстоятельства вымышлены; правовые основания приведены в разборе решения. Игровые эффекты являются условными.",
       "original_option_count": 5,
       "original_best": "option_3",
-      "editorial_status": "draft",
-      "verified": false,
+      "editorial_status": "approved",
+      "verified": true,
       "history_protected": false,
       "legal_review": {
         "basis": "БК РФ, п. 4 ст. 219; 44-ФЗ, ч. 1, 3, 7–8, 13 ст. 94: постоплата зависит от надлежащего подтверждения денежного обязательства и приёмки; обязательная экспертиза, подписанный документ или мотивированный отказ и применимый порядок ЕИС сохраняются.",
@@ -7773,8 +7773,8 @@
       "source_note": "Учебная история. Участники и обстоятельства вымышлены; правовые основания приведены в разборе решения. Игровые эффекты являются условными.",
       "original_option_count": 5,
       "original_best": "option_1",
-      "editorial_status": "draft",
-      "verified": false,
+      "editorial_status": "approved",
+      "verified": true,
       "history_protected": false,
       "legal_review": {
         "basis": "БК РФ, статья 58.",
@@ -8006,8 +8006,8 @@
       "source_note": "Учебная история. Участники и обстоятельства вымышлены; правовые основания приведены в разборе решения. Игровые эффекты являются условными.",
       "original_option_count": 5,
       "original_best": "option_2",
-      "editorial_status": "draft",
-      "verified": false,
+      "editorial_status": "approved",
+      "verified": true,
       "history_protected": false,
       "legal_review": {
         "basis": "БК РФ, ст. 78 п. 1, пп. 2 п. 2, п. 3, 3.1; ПП РФ от 25.10.2023 №1782 в ред. 14.11.2026, п. 3, 5–8. П. 3 подп. «ж», «з» общих требований определяет порядок соглашений и их изменений, в том числе при сокращении лимитов. Новые обязанности не возникают из произвольного письма; изменение возможно при наличии правового основания и надлежащей формы, а не только по желанию одной стороны.",
@@ -8241,8 +8241,8 @@
       "source_note": "Учебная история. Участники и обстоятельства вымышлены; правовые основания приведены в разборе решения. Игровые эффекты являются условными.",
       "original_option_count": 5,
       "original_best": "option_3",
-      "editorial_status": "draft",
-      "verified": false,
+      "editorial_status": "approved",
+      "verified": true,
       "history_protected": false,
       "legal_review": {
         "basis": "411-ФЗ, статьи 12, 16; БК РФ, статья 38.",
@@ -8464,8 +8464,8 @@
       "source_note": "Учебная история. Участники и обстоятельства вымышлены; правовые основания приведены в разборе решения. Игровые эффекты являются условными.",
       "original_option_count": 5,
       "original_best": "option_2",
-      "editorial_status": "draft",
-      "verified": false,
+      "editorial_status": "approved",
+      "verified": true,
       "history_protected": false,
       "legal_review": {
         "basis": "БК РФ, статья 78; ПП РФ №1782, пункты 10–11.",
@@ -8669,8 +8669,8 @@
       "source_note": "Учебная история. Участники и обстоятельства вымышлены; правовые основания приведены в разборе решения. Игровые эффекты являются условными.",
       "original_option_count": 5,
       "original_best": "option_5",
-      "editorial_status": "draft",
-      "verified": false,
+      "editorial_status": "approved",
+      "verified": true,
       "history_protected": true,
       "legal_review": {
         "basis": "НК РФ, п. 4 ст. 12, п. 3 ст. 418.3; Закон №152-ФЗ, ст. 5, 6, 19; БК РФ, ст. 78: отсутствие действующего местного налога в заданном месте не является общей налоговой льготой; в 2025–2026 годах предусмотрен специальный режим учёта объектов.",
@@ -8904,8 +8904,8 @@
       "source_note": "Учебная история. Участники и обстоятельства вымышлены; правовые основания приведены в разборе решения. Игровые эффекты являются условными.",
       "original_option_count": 5,
       "original_best": "option_1",
-      "editorial_status": "draft",
-      "verified": false,
+      "editorial_status": "approved",
+      "verified": true,
       "history_protected": false,
       "legal_review": {
         "basis": "НК РФ, п. 1–2 ст. 388: лицо, использующее участок исключительно на праве безвозмездного пользования, не признаётся плательщиком земельного налога по этому участку.",
@@ -9135,8 +9135,8 @@
       "source_note": "Учебная история. Участники и обстоятельства вымышлены; правовые основания приведены в разборе решения. Игровые эффекты являются условными.",
       "original_option_count": 5,
       "original_best": "option_2",
-      "editorial_status": "draft",
-      "verified": false,
+      "editorial_status": "approved",
+      "verified": true,
       "history_protected": false,
       "legal_review": {
         "basis": "БК РФ, статья 38.",
@@ -9352,8 +9352,8 @@
       "source_note": "Учебная история. Участники и обстоятельства вымышлены; правовые основания приведены в разборе решения. Игровые эффекты являются условными.",
       "original_option_count": 5,
       "original_best": "option_5",
-      "editorial_status": "draft",
-      "verified": false,
+      "editorial_status": "approved",
+      "verified": true,
       "history_protected": false,
       "legal_review": {
         "basis": "Ч. 1–2 ст. 11 Федерального закона от 21.11.2022 №443-ФЗ; ст. 5 НК РФ: для установленной категории и периодов с началом 30.09.2022–31.12.2023 предусмотрены обе формы отчётности; правительство вправе продлевать срок, иные периоды требуют самостоятельной проверки.",
@@ -9550,8 +9550,8 @@
       "source_note": "Учебная история. Участники и обстоятельства вымышлены; правовые основания приведены в разборе решения. Игровые эффекты являются условными.",
       "original_option_count": 5,
       "original_best": "option_4",
-      "editorial_status": "draft",
-      "verified": false,
+      "editorial_status": "approved",
+      "verified": true,
       "history_protected": false,
       "legal_review": {
         "basis": "Конституция РФ, ч. 2 ст. 132; БК РФ, п. 2.1, 3 и 6 ст. 140; Закон №33-ФЗ, ст. 33, 34 и 71: наделение муниципалитета государственными полномочиями осуществляется законом с необходимым финансовым и материальным обеспечением, распределение субвенции — по установленной методике.",
@@ -9763,8 +9763,8 @@
       "source_note": "Учебная история. Участники и обстоятельства вымышлены; правовые основания приведены в разборе решения. Игровые эффекты являются условными.",
       "original_option_count": 5,
       "original_best": "option_5",
-      "editorial_status": "draft",
-      "verified": false,
+      "editorial_status": "approved",
+      "verified": true,
       "history_protected": true,
       "legal_review": {
         "basis": "БК РФ, статьи 79, 79.1, 80; ГК РФ, статья 125.",
@@ -9853,5 +9853,6 @@
         "approved_correction_count": 0
       }
     }
-  ]
+  ],
+  "release_scope": "Приёмка учебных ситуаций и альтернатив исключительно при прямо заданных обстоятельствах. Не независимая юридическая сертификация, не оценка реальных договоров, разрешений и местных актов. Допуск кандидата к следующей стадии выпуска; не факт активации production."
 }
