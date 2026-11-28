@@ -63,6 +63,7 @@ CREATE TABLE public.event_collaboration_invites(case_id uuid);
 CREATE TABLE public.event_authority_evidence(case_id uuid);
 CREATE TABLE public.game_members(game_id uuid,user_id uuid,kind text,roster_archived_at timestamptz);
 CREATE TABLE public.game_stages(game_id uuid,stage_no int,status text);
+CREATE TABLE public.game_member_access_blocks(game_id uuid,user_id uuid);
 CREATE TABLE private.event_content_revisions(revision text,event_case_id uuid,snapshot jsonb,PRIMARY KEY(revision,event_case_id));
 `);
   await db.exec(fs.readFileSync('supabase/changes/events_v2_catalog_candidate.sql','utf8'));

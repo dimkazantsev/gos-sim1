@@ -45,7 +45,7 @@ BEGIN
  END IF;
  -- Bound lock waiting; never use this operation as a polling task.
  PERFORM set_config('lock_timeout','2s',true);
- LOCK TABLE private.authored_event_catalog,public.event_cases,public.event_assignments,public.event_decisions,public.event_case_outcomes,public.event_collaboration_invites,public.event_authority_evidence IN SHARE ROW EXCLUSIVE MODE;
+ LOCK TABLE public.game_members,public.game_stages,public.game_member_access_blocks,private.authored_event_catalog,public.event_cases,public.event_assignments,public.event_decisions,public.event_case_outcomes,public.event_collaboration_invites,public.event_authority_evidence IN SHARE ROW EXCLUSIVE MODE;
  IF (SELECT count(*) FROM private.authored_event_catalog)<>330 OR EXISTS(
   SELECT 1 FROM jsonb_array_elements(p_payload) x LEFT JOIN private.authored_event_catalog c ON c.case_key=x->>'case_key'
   WHERE c.case_key IS NULL OR c.content->>'title' IS DISTINCT FROM x->>'title'
@@ -71,6 +71,7 @@ BEGIN
        LEFT JOIN public.game_members m ON m.game_id=a.game_id AND m.user_id=a.recipient_id
        LEFT JOIN public.game_stages s ON s.game_id=a.game_id AND s.stage_no=a.stage_no
        WHERE a.case_id=c.id AND (a.game_id IS DISTINCT FROM c.game_id OR a.status IS DISTINCT FROM 'pending'
+        OR EXISTS(SELECT 1 FROM public.game_member_access_blocks b WHERE b.game_id=a.game_id AND b.user_id=a.recipient_id)
         OR a.stage_no IS NULL OR m.kind::text IS DISTINCT FROM 'student' OR m.roster_archived_at IS NOT NULL OR s.status::text IS DISTINCT FROM 'open'))))
  ),
  saved AS (INSERT INTO private.event_content_revisions(revision,event_case_id,snapshot)

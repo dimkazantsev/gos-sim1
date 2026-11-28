@@ -8,6 +8,8 @@ on:
       - 'supabase/changes/events_v2_catalog_candidate.sql'
       - 'supabase/changes/events_v2_dispatch_seed_candidate.sql'
       - 'scripts/events-v2-dispatch*'
+      - 'supabase/changes/events_v2_security_candidate.sql'
+      - 'scripts/events-v2-rls*'
       - 'scripts/events-v2-postgres-100-check.cjs'
       - 'scripts/events-v2-catalog-integration-check.cjs'
       - 'scripts/events-v2-individual*'
@@ -37,6 +39,8 @@ jobs:
       - run: node scripts/events-v2-economic-projection-check.cjs
       - run: node scripts/events-v2-catalog-integration-check.cjs
       - run: node scripts/events-v2-dispatch-check.cjs
+      - run: node scripts/events-v2-rls-check.cjs
+      - run: node scripts/event-answer-api-privacy-check.cjs
   postgres-concurrency:
     runs-on: ubuntu-24.04
     timeout-minutes: 10

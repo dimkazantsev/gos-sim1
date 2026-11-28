@@ -32,7 +32,55 @@ ALTER TABLE event_case_outcomes ADD COLUMN yes_votes int,ADD COLUMN no_votes int
 ALTER TABLE political_posts ALTER COLUMN id SET DEFAULT gen_random_uuid(),ADD COLUMN game_id uuid,ADD COLUMN author_id uuid,ADD COLUMN process_type text,ADD COLUMN actor_key text,ADD COLUMN actor_label text,ADD COLUMN title text,ADD COLUMN tags text[],ADD COLUMN internal_view text,ADD COLUMN internal_ref_id text,ADD COLUMN status text,ADD COLUMN comic_scene jsonb,ADD COLUMN effects_applied boolean;
 CREATE TABLE games(id uuid PRIMARY KEY,owner_id uuid);
 CREATE TABLE event_auto_settings(game_id uuid,trust_per_20 numeric,backlog_penalty numeric);
-CREATE FUNCTION private.is_game_teacher(g uuid) RETURNS boolean LANGUAGE sql AS $$SELECT EXISTS(SELECT 1 FROM public.game_members WHERE game_id=g AND user_id=auth.uid() AND kind='teacher')$$;
+CREATE TABLE public.game_member_access_blocks(game_id uuid,user_id uuid,PRIMARY KEY(game_id,user_id));
+CREATE TABLE public.platform_admins(user_id uuid PRIMARY KEY);
+CREATE OR REPLACE FUNCTION private.is_game_teacher(g uuid)
+ RETURNS boolean
+ LANGUAGE plpgsql
+ STABLE SECURITY DEFINER
+ SET search_path TO ''
+AS $function$
+declare
+  v_uid uuid := auth.uid();
+begin
+  if v_uid is null then
+    return false;
+  end if;
+
+  if exists (
+    select 1
+    from public.game_members gm
+    where gm.game_id = g
+      and gm.user_id = v_uid
+      and gm.kind = 'teacher'
+      and gm.roster_archived_at IS NULL
+      and not exists (select 1 from public.game_member_access_blocks b
+                      where b.game_id=gm.game_id and b.user_id=gm.user_id)
+  ) then
+    return true;
+  end if;
+
+  return exists (
+    select 1
+    from public.platform_admins pa
+    where pa.user_id = v_uid
+  );
+end;
+$function$;
+CREATE OR REPLACE FUNCTION private.is_game_member(g uuid)
+ RETURNS boolean
+ LANGUAGE sql
+ STABLE SECURITY DEFINER
+ SET search_path TO ''
+AS $function$
+ select auth.uid() is not null and (
+  exists(select 1 from public.platform_admins a where a.user_id=auth.uid())
+  or (
+   not exists(select 1 from public.game_member_access_blocks b where b.game_id=g and b.user_id=auth.uid())
+   and exists(select 1 from public.game_members m where m.game_id=g and m.user_id=auth.uid() and m.roster_archived_at is null)
+  )
+ );
+$function$;
 
 -- V2 exact institutional authority; fixture contains no real user data.
 CREATE TABLE public.event_case_routing(game_id uuid,case_id uuid,earliest_stage int,latest_stage int,destination text,region_code text,PRIMARY KEY(game_id,case_id));

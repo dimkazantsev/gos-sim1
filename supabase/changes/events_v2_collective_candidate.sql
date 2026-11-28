@@ -142,7 +142,7 @@ begin
  -- Every writer locks the case before an assignment, avoiding two-voter deadlocks.
  select * into c from public.event_cases where id=case_id for update;
  select * into a from public.event_assignments where id=p_assignment_id for update;
- if a.recipient_id<>auth.uid() or not exists(select 1 from public.game_members where game_id=a.game_id and user_id=auth.uid() and kind='student')
+ if a.id is null or c.id is null or a.game_id IS DISTINCT FROM c.game_id or a.recipient_id<>auth.uid() or not private.is_game_member(a.game_id) or not exists(select 1 from public.game_members where game_id=a.game_id and user_id=auth.uid() and kind='student')
  then raise exception 'Голосовать может назначенный участник';end if;
  if a.status<>'pending' or exists(select 1 from public.event_case_outcomes where event_case_outcomes.case_id=c.id)
  then raise exception 'Голосование уже завершено';end if;

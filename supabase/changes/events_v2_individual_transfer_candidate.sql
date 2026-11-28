@@ -15,6 +15,7 @@ RETURNS boolean LANGUAGE sql STABLE SECURITY DEFINER SET search_path TO '' AS $f
   WHERE c.id=p_case AND c.audience='single' AND c.effect_plan->>'rules_version'='2'
    AND p_stage BETWEEN r.earliest_stage AND r.latest_stage
    AND private.role_is_available(c.game_id,p_user)
+   AND NOT EXISTS(SELECT 1 FROM public.game_member_access_blocks b WHERE b.game_id=c.game_id AND b.user_id=p_user)
    AND CASE
     WHEN r.region_code IS NOT NULL THEN private.event_party_controls_region(c.id,p_user)
     WHEN r.destination<>'individual' THEN false
@@ -62,6 +63,7 @@ begin
  if not exists(select 1 from public.game_members where game_id=new.game_id and user_id=new.recipient_id and kind='student')
  then raise exception 'Получателем должен быть участник этой игры';end if;
  if tg_op='INSERT' then
+  IF c.effect_plan->>'rules_version'='2' AND NOT EXISTS(SELECT 1 FROM public.game_members m WHERE m.game_id=c.game_id AND m.user_id=new.recipient_id AND m.kind='student' AND m.roster_archived_at IS NULL AND NOT EXISTS(SELECT 1 FROM public.game_member_access_blocks b WHERE b.game_id=m.game_id AND b.user_id=m.user_id)) THEN RAISE EXCEPTION 'Получатель недоступен';END IF;
   if c.status<>'ready' or exists(select 1 from public.event_case_outcomes where case_id=c.id)
   then raise exception 'Нельзя назначать архивное или завершённое событие';end if;
   if exists(select 1 from public.event_decisions where case_id=c.id)
@@ -105,9 +107,9 @@ AS $function$
 declare c public.event_cases%rowtype;
 begin
  select * into c from public.event_cases where id=p_case for update;
- if c.id is null or not exists(select 1 from public.event_assignments where case_id=p_case and recipient_id=auth.uid()) or not exists(select 1 from public.game_members where game_id=c.game_id and user_id=auth.uid() and kind='student' and roster_archived_at is null) then raise exception 'Ситуация недоступна';end if;
+ if c.id is null or not private.is_game_member(c.game_id) or not exists(select 1 from public.event_assignments where case_id=p_case and recipient_id=auth.uid()) or not exists(select 1 from public.game_members where game_id=c.game_id and user_id=auth.uid() and kind='student' and roster_archived_at is null) then raise exception 'Ситуация недоступна';end if;
  if exists(select 1 from public.event_decisions where case_id=p_case) or exists(select 1 from public.event_case_outcomes where case_id=p_case) then raise exception 'После начала голосования приглашения закрыты';end if;
- if p_recipient=auth.uid() or exists(select 1 from public.event_assignments where case_id=p_case and recipient_id=p_recipient) or not exists(select 1 from public.game_members where game_id=c.game_id and user_id=p_recipient and kind='student' and roster_archived_at is null) then raise exception 'Выберите другого участника текущей игры';end if;
+ if p_recipient=auth.uid() or exists(select 1 from public.game_member_access_blocks b where b.game_id=c.game_id and b.user_id=p_recipient) or exists(select 1 from public.event_assignments where case_id=p_case and recipient_id=p_recipient) or not exists(select 1 from public.game_members where game_id=c.game_id and user_id=p_recipient and kind='student' and roster_archived_at is null) then raise exception 'Выберите другого участника текущей игры';end if;
  if (c.audience IN ('group','all') AND c.effect_plan->>'rules_version'='2') then raise exception 'Состав коллективного голосования уже определён';
  elsif (c.audience='single' AND c.effect_plan->>'rules_version'='2') then
   if not private.role_is_available(c.game_id,auth.uid()) then raise exception 'Полномочия участника приостановлены';end if;
@@ -134,6 +136,7 @@ begin
  if i.id is null then raise exception 'Приглашение недоступно';end if;
  select * into c from public.event_cases where id=i.case_id for update;
  select * into i from public.event_collaboration_invites where id=p_id for update;
+ if c.id is null or c.game_id IS DISTINCT FROM i.game_id or not private.is_game_member(i.game_id) then raise exception 'Приглашение недоступно';end if;
  if i.status<>'pending' or exists(select 1 from public.event_decisions where case_id=i.case_id)
  then raise exception 'Приглашение уже закрыто';end if;
  if (c.audience IN ('group','all') AND c.effect_plan->>'rules_version'='2') then raise exception 'Коллективный состав не меняется';end if;
@@ -151,6 +154,7 @@ begin
     then raise exception 'Передача ситуации недоступна';end if;
    if not exists(select 1 from public.game_members where game_id=c.game_id and user_id=i.inviter_id and kind='student' and roster_archived_at is null)
     or not private.role_is_available(c.game_id,i.inviter_id)
+    or exists(select 1 from public.game_member_access_blocks b where b.game_id=c.game_id and b.user_id=i.inviter_id)
     or private.event_v2_competent(c.id,i.inviter_id)
     or not private.event_v2_competent(c.id,auth.uid()) then
      update public.event_collaboration_invites set status='declined',responded_at=now(),transfer_errors=transfer_errors+1 where id=p_id;
@@ -179,8 +183,8 @@ declare a public.event_assignments%rowtype;c public.event_cases%rowtype;
 begin
  select * into c from public.event_cases where id=new.case_id for update;
  select * into a from public.event_assignments where id=new.assignment_id;
- if c.id is null or a.case_id<>c.id or a.game_id<>new.game_id or a.recipient_id<>new.actor_id or a.status<>'pending' or new.actor_id<>auth.uid() then raise exception 'Некорректное назначение';end if;
- if not exists(select 1 from public.game_members where game_id=c.game_id and user_id=auth.uid() and kind='student' and (c.effect_plan->>'rules_version' IS DISTINCT FROM '2' or roster_archived_at is null)) then raise exception 'Голосует только участник';end if;
+ if c.id is null or a.id is null or c.game_id IS DISTINCT FROM new.game_id or a.case_id<>c.id or a.game_id<>new.game_id or a.recipient_id<>new.actor_id or a.status<>'pending' or new.actor_id<>auth.uid() then raise exception 'Некорректное назначение';end if;
+ if not private.is_game_member(c.game_id) or not exists(select 1 from public.game_members where game_id=c.game_id and user_id=auth.uid() and kind='student' and (c.effect_plan->>'rules_version' IS DISTINCT FROM '2' or roster_archived_at is null)) then raise exception 'Голосует только участник';end if;
  if exists(select 1 from public.event_case_outcomes where case_id=c.id) or exists(select 1 from public.event_collaboration_invites where case_id=c.id and status='pending') then raise exception 'Дождитесь ответа на приглашения';end if;
  if new.choice!~'^option_[1-6]$' or substring(new.choice from 8)::int>jsonb_array_length(c.decision_options) then raise exception 'Вариант недоступен';end if;
  if (c.audience IN ('group','all') AND c.effect_plan->>'rules_version'='2') then
@@ -575,8 +579,8 @@ BEGIN
  v_winning:=private.event_winning_outcomes_visible(p_game_id,v_cases);
  RETURN jsonb_build_object(
   'assignments',coalesce((SELECT jsonb_agg(to_jsonb(x) ORDER BY x.id)
-   FROM (SELECT id,case_id,game_id,recipient_id,status,created_at,(SELECT coalesce((c.comic_scene->>'vote_round')::int,1) FROM public.event_cases c WHERE c.id=event_assignments.case_id) AS vote_round,(SELECT c.comic_scene->'runoff_options' FROM public.event_cases c WHERE c.id=event_assignments.case_id) AS runoff_options FROM public.event_assignments
-    WHERE game_id=p_game_id AND (v_full_view OR case_id=ANY(v_cases))) x),'[]'::jsonb),
+   FROM (SELECT a.id,a.case_id,a.game_id,a.recipient_id,a.status,a.created_at,coalesce((c.comic_scene->>'vote_round')::int,1) AS vote_round,c.comic_scene->'runoff_options' AS runoff_options FROM public.event_assignments a LEFT JOIN public.event_cases c ON c.id=a.case_id AND c.game_id=a.game_id
+    WHERE a.game_id=p_game_id AND (v_full_view OR a.case_id=ANY(v_cases))) x),'[]'::jsonb),
   'decisions',coalesce((SELECT jsonb_agg(to_jsonb(x) ORDER BY x.id)
    FROM (SELECT id,case_id,actor_id,choice,role_snapshot,vote_round FROM public.event_decisions
     WHERE game_id=p_game_id AND (v_full_view OR case_id=ANY(v_cases))) x),'[]'::jsonb),
