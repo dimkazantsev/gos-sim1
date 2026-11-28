@@ -51,5 +51,16 @@ assert.equal(collectiveReviewOptions,947,'Collective option review incomplete');
 
 const blocked=cases.filter(c=>c.verified!==true||c.editorial_status!=='approved'||c.legal_review.status!=='verified_current'||c.effect_plan.options.some(o=>typeof o.lawful!=='boolean')).length;
 console.log(JSON.stringify({cases:cases.length,options:count,individual,collective,longestCorrect:long,shortestCorrect:short,meanCorrectToOtherLength:ratio/individual,positions,unknownIndividualLawfulness:unknown,dominatedOptions:dominated,dominatedCases,activationBlocked:blocked,documentaryFull:reg.cases.filter(c=>c.source_status==='official_article_read_core_episode_confirmed').length,documentaryIndexed:reg.cases.filter(c=>c.source_status==='official_search_index_core_episode_confirmed_full_text_unavailable').length},null,2));
-if(process.argv.includes('--release')){assert.equal(blocked,0,'Legal/editorial release gate: unverified cases must never be activated');assert.equal(dominatedCases,0,'Collective consequences require final economic balance review');}
+const registerBlocked=reg.cases.filter(c=>c.activation_allowed!==true||c.legal_status!=='verified_current').length;
+for(const c of cases){
+ const source=registerByKey.get(c.case_key);
+ assert.equal(source.source_url??null,c.source_url??null,c.case_key+' documentary source mismatch');
+ assert.equal(source.audience,c.audience,c.case_key+' audience mismatch');
+}
+console.log(JSON.stringify({registerActivationBlocked:registerBlocked},null,2));
+if(process.argv.includes('--release')){
+ assert.equal(blocked,0,'Legal/editorial release gate: unverified cases must never be activated');
+ assert.equal(registerBlocked,0,'Source register release gate: independent legal acceptance and activation permission required');
+ assert.equal(dominatedCases,0,'Collective consequences require final economic balance review');
+}
 console.log('PASS draft integrity (not legal certification or release authorization)');
