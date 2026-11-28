@@ -82,7 +82,7 @@ CREATE OR REPLACE FUNCTION public.assign_event_case(p_case_id uuid, p_recipients
  SECURITY DEFINER
  SET search_path TO 'public', 'private', 'pg_temp'
 AS $function$
-declare c public.event_cases%rowtype;recipient uuid;n integer:=0;recipients uuid[];v_stage integer;v_v2 boolean;v_existing uuid[];
+declare c public.event_cases%rowtype;recipient uuid;n integer:=0;recipients uuid[];v_stage integer;v_v2 boolean;v_existing uuid[];v_region uuid[];v_regional boolean:=false;
 begin
  select * into c from public.event_cases where id=p_case_id for update;
  if c.id is null or not private.is_game_teacher(c.game_id) then raise exception 'Требуются права преподавателя';end if;
@@ -95,7 +95,12 @@ begin
  if c.audience='group' and cardinality(recipients) not between 2 and 3 then raise exception 'Выберите 2–3 участников';end if;
  if exists(select 1 from unnest(recipients) r where not exists(select 1 from public.game_members
   where game_id=c.game_id and user_id=r and kind='student' AND (NOT v_v2 OR (roster_archived_at IS NULL AND NOT EXISTS(SELECT 1 FROM public.game_member_access_blocks b WHERE b.game_id=c.game_id AND b.user_id=r))))) then raise exception 'Получатель недоступен';end if;
- if c.audience='all' and cardinality(recipients)<>(select count(*) from public.game_members where game_id=c.game_id and kind='student' AND (NOT v_v2 OR (roster_archived_at IS NULL AND NOT EXISTS(SELECT 1 FROM public.game_member_access_blocks b WHERE b.game_id=c.game_id AND b.user_id=game_members.user_id))))
+ IF v_v2 AND c.audience IN ('group','all') AND EXISTS(SELECT 1 FROM public.event_case_routing r WHERE r.game_id=c.game_id AND r.case_id=c.id AND r.destination IN ('regional','regional_joint')) THEN
+  v_regional:=true;v_region:=private.event_v2_regional_roster(c.game_id,c.id);
+  IF cardinality(v_region)<2 THEN RAISE EXCEPTION 'Недостаточно участников контролирующей партии';END IF;
+  IF NOT recipients <@ v_region OR (c.audience='all' AND recipients<>v_region) THEN RAISE EXCEPTION 'Назначение только участникам контролирующей партии, для общего голосования — всей партии';END IF;
+ END IF;
+ if not v_regional AND c.audience='all' and cardinality(recipients)<>(select count(*) from public.game_members where game_id=c.game_id and kind='student' AND (NOT v_v2 OR (roster_archived_at IS NULL AND NOT EXISTS(SELECT 1 FROM public.game_member_access_blocks b WHERE b.game_id=c.game_id AND b.user_id=game_members.user_id))))
  then raise exception 'Общее событие назначается всем участникам';end if;
  -- The stage comes from the teacher's assignment context, not the largest
  -- concurrently opened stage. Legacy clients use the explicit game round.
@@ -107,6 +112,7 @@ begin
      select 1 from public.game_stages s
      where s.game_id=c.game_id and s.stage_no=v_stage and s.status='open')
  then raise exception 'Для назначения ситуации выберите открытый этап игры' using errcode='23514';end if;
+ IF v_regional AND NOT EXISTS(SELECT 1 FROM public.event_case_routing r WHERE r.game_id=c.game_id AND r.case_id=c.id AND v_stage BETWEEN r.earliest_stage AND r.latest_stage) THEN RAISE EXCEPTION 'Региональная ситуация недоступна на этом этапе';END IF;
  IF v_v2 AND c.audience IN ('group','all') THEN
   SELECT array_agg(a.recipient_id ORDER BY a.recipient_id) INTO v_existing FROM public.event_assignments a WHERE a.case_id=c.id AND a.game_id=c.game_id;
   IF v_existing IS NOT NULL THEN
@@ -145,3 +151,13 @@ END
 $function$;
 REVOKE ALL ON FUNCTION public.assign_event_case(uuid,uuid[]),public.assign_event_case_at_stage(uuid,uuid[],integer) FROM PUBLIC,anon;
 GRANT EXECUTE ON FUNCTION public.assign_event_case(uuid,uuid[]),public.assign_event_case_at_stage(uuid,uuid[],integer) TO authenticated;
+
+CREATE OR REPLACE FUNCTION private.event_assignment_legacy(p_game uuid,p_case uuid)
+RETURNS boolean LANGUAGE sql STABLE SECURITY DEFINER SET search_path TO '' AS $f$
+ SELECT private.is_game_teacher(p_game) AND EXISTS(SELECT 1 FROM public.event_cases c WHERE c.game_id=p_game AND c.id=p_case AND NOT coalesce(c.effect_plan->>'rules_version'='2',false))
+$f$;
+REVOKE ALL ON FUNCTION private.event_assignment_legacy(uuid,uuid) FROM PUBLIC,anon;
+GRANT EXECUTE ON FUNCTION private.event_assignment_legacy(uuid,uuid) TO authenticated;
+CREATE POLICY event_assignment_legacy_insert ON public.event_assignments AS RESTRICTIVE FOR INSERT TO authenticated WITH CHECK(private.event_assignment_legacy(game_id,case_id));
+CREATE POLICY event_assignment_legacy_update ON public.event_assignments AS RESTRICTIVE FOR UPDATE TO authenticated USING(private.event_assignment_legacy(game_id,case_id)) WITH CHECK(private.event_assignment_legacy(game_id,case_id));
+CREATE POLICY event_assignment_legacy_delete ON public.event_assignments AS RESTRICTIVE FOR DELETE TO authenticated USING(private.event_assignment_legacy(game_id,case_id));

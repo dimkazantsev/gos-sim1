@@ -81,5 +81,28 @@ const synthetic=payload.map((c,i)=>({...c,case_key:'fixture-'+i,title:'Тест 
  assert.equal(Number((await one("SELECT value FROM state_metrics WHERE game_id=$1 AND metric_key='elite_support'",[game])).value),49);
  assert.equal((await one("SELECT count(*)::int n FROM private.event_content_revisions")).n,2);
  assert.equal((await one("SELECT to_regprocedure('private.events_v2_apply_catalog_candidate(jsonb,uuid[])') IS NULL gone")).gone,true);
+ // Regional group/all cases: same approved version, synthetic separate region.
+ const rg=id(401),ra=id(402),party=id(403),otherParty=id(404);
+ await q("INSERT INTO game_parties VALUES($1,$2,'А'),($3,$2,'Б')",[party,game,otherParty]);
+ await q("INSERT INTO game_region_party_control VALUES($1,'99',$2,now())",[game,party]);
+ await q("UPDATE game_members SET team=CASE WHEN user_id=$2 THEN 'Б' ELSE 'А' END WHERE game_id=$1",[game,third]);
+ const cp={rules_version:2,options:[{key:'option_1',lawful:true,trust:1},{key:'option_2',lawful:true,trust:0}]};
+ for(const [cid,aud,dest] of [[rg,'group','regional_joint'],[ra,'all','regional']]){
+  await q("INSERT INTO event_cases(id,game_id,case_key,title,audience,status,effect_plan,decision_options,comic_scene) VALUES($1,$2,$3,'Регион', $4,'ready',$5::jsonb,'[\"А\",\"Б\"]','{\"event_rules_version\":2,\"region_code\":\"99\"}')",[cid,game,'region-'+aud,aud,JSON.stringify(cp)]);
+  await q("INSERT INTO event_case_routing(game_id,case_id,earliest_stage,latest_stage,destination,region_code) VALUES($1,$2,4,15,$3,'99')",[game,cid,dest]);
+ }
+ await as(teacher);
+ await assert.rejects(()=>assign(rg,[sender,third]),/контролирующей партии/);
+ await assert.rejects(()=>assign(ra,[sender]),/контролирующей партии/);
+ assert.equal((await assign(rg,[sender,expert])).n,2);
+ assert.equal((await assign(ra,[sender,expert])).n,2);
+ await db.exec('RESET ROLE');
+ assert.deepEqual((await rows('SELECT recipient_id FROM event_assignments WHERE case_id=$1 ORDER BY recipient_id',[ra])).map(x=>x.recipient_id),[sender,expert]);
+ await db.exec('GRANT INSERT,UPDATE,DELETE ON event_assignments TO authenticated');
+ await as(teacher);
+ await assert.rejects(()=>q("INSERT INTO event_assignments(case_id,game_id,recipient_id,stage_no) VALUES($1,$2,$3,7)",[ra,game,third]),/row-level security|policy/i);
+ assert.equal((await q("DELETE FROM event_assignments WHERE case_id=$1",[ra])).affectedRows,0);
+ await db.exec('RESET ROLE');
+ console.log('PASS regional manual electorate, foreign party rejection, entire party, immutable direct client rows');
  console.log('PASS five candidates in a single transaction: actual blocked payload rollback, fictional 330 catalogue, two changed instances, protected legacy, verified seed, authenticated transfer and two-round vote, role isolation, temporary helper removed');
  }finally{await db.close()}})().catch(e=>{console.error(e.code??'ERROR',e.message,e.where??'');process.exitCode=1});

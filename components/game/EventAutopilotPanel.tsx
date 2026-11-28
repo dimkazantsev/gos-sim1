@@ -35,7 +35,10 @@ export default function EventAutopilotPanel({g,onChanged,readyCaseCount,panelMod
  const students=members.filter(m=>m.kind==='student'&&!m.roster_archived_at);
  const visible=useMemo(()=>bank.filter(c=>[c.title,c.category,c.situation].join(' ').toLowerCase().includes(search.trim().toLowerCase())),[bank,search]);
  const selected=bank.find(c=>c.id===chosen);
- const eligible=students;
+ const regionCode=selected?.comic_scene?.event_rules_version===2?selected.comic_scene.region_code:undefined;
+ const controllingParty=regionCode?g.parties.find(p=>p.id===g.regionalControl.find(r=>r.code===regionCode)?.party_id):undefined;
+ const eligible=regionCode?students.filter(m=>!!controllingParty&&m.team===controllingParty.name):students;
+ const regionalReady=!regionCode||eligible.length>=2;
  const effectiveInterval=settings.activity_weight===0?settings.interval_hours:Math.max(4,settings.interval_hours/(1+settings.activity_weight*2));
  async function loadSettings(){
   if(!game)return;
@@ -124,12 +127,12 @@ export default function EventAutopilotPanel({g,onChanged,readyCaseCount,panelMod
   if(openBank)await loadBank();await onChanged();setBusy(false);
  }
  async function assignAll(){
-  if(!game||!chosen||!teacher||busy||selected?.audience!=='all'||!chosenStage)return;
-  const pending=students.filter(m=>!assigned.some(a=>a.case_id===chosen&&a.recipient_id===m.user_id));
+  if(!game||!chosen||!teacher||busy||selected?.audience!=='all'||!chosenStage||!regionalReady)return;
+  const pending=eligible.filter(m=>!assigned.some(a=>a.case_id===chosen&&a.recipient_id===m.user_id));
   if(!pending.length){setNotice('Ситуация уже направлена всем участникам.');return}
   if(!window.confirm('Назначить ситуацию «'+selected.title+'» всем '+pending.length+' участникам?'))return;
   setBusy(true);setNotice('');
-  const r=await supabase.rpc('assign_event_case_at_stage',{p_case_id:chosen,p_recipients:students.map(m=>m.user_id),p_stage_no:chosenStage});
+  const r=await supabase.rpc('assign_event_case_at_stage',{p_case_id:chosen,p_recipients:eligible.map(m=>m.user_id),p_stage_no:chosenStage});
   setNotice(r.error?'Ошибка: '+userError(r.error):'Назначено новых заданий: '+r.data+'.');
   if(openBank)await loadBank();await onChanged();setBusy(false);
  }
@@ -173,15 +176,16 @@ export default function EventAutopilotPanel({g,onChanged,readyCaseCount,panelMod
      <button type="button" className="eventBankDeleteButton" disabled={busy||readOnly||!selectedForDelete.length} onClick={()=>void removeSelected()}><Trash2 size={16}/>Удалить выбранные</button>
     </div>
     {loadingBank?<p role="status">Загрузка банка ситуаций…</p>:<div className="eventBankWorkspace"><div className="eventBankTiles" role="group" aria-label="Выбор ситуации">{visible.slice(0,shown).map(c=><div key={c.id} className="eventBankSelectableTile"><label className="eventBankSelection"><input type="checkbox" aria-label={'Выделить для удаления: '+c.title} checked={selectedForDelete.includes(c.id)} disabled={busy||readOnly||protectedIds.includes(c.id)} onChange={e=>setSelectedForDelete(old=>e.target.checked?[...old,c.id]:old.filter(id=>id!==c.id))}/>{protectedIds.includes(c.id)?'Назначено / используется':'Выделить'}</label><EventCaseTile item={c} selected={chosen===c.id} summary meta={c.category+' · '+(c.seriousness==='light'?'Повседневное':'Серьёзное')} onClick={()=>{setChosen(c.id);setRecipient('');setGroupRecipients([])}}/></div>)}{!visible.length&&<p className="eventGridEmpty">Ситуации по вашему запросу не найдены.</p>}{visible.length>shown&&<button type="button" className="eventBankShowMore" onClick={()=>setShown(n=>n+30)}>Показать ещё 30 · {visible.length-shown} осталось</button>}</div>
-     <article className="eventBankDetail">{selected?<><small>{selected.category} · {selected.seriousness==='light'?'Повседневное':'Серьёзное'}{selected.audience==='all'?' · Вся аудитория':''}</small><h4>{selected.title}</h4><p>{selected.situation}</p>{selected.source_url&&<small><a href={selected.source_url} target="_blank" rel="noopener noreferrer">Официальный источник события ↗</a></small>}{!selected.source_url&&<small>Документальный источник события не подтверждён.</small>}
+     <article className="eventBankDetail">{selected?<><small>{selected.category} · {selected.seriousness==='light'?'Повседневное':'Серьёзное'}{selected.audience==='all'?(regionCode?' · Вся контролирующая партия':' · Вся аудитория'):''}</small><h4>{selected.title}</h4><p>{selected.situation}</p>{selected.source_url&&<small><a href={selected.source_url} target="_blank" rel="noopener noreferrer">Официальный источник события ↗</a></small>}{!selected.source_url&&<small>Документальный источник события не подтверждён.</small>}
        {openStages.length>1&&<div className="autoEventCaseAssign"><StyledSelect label="Этап назначения" value={assignmentStage} onChange={setAssignmentStage}
         options={[{value:'',label:'Выберите этап'},...openStages.map(s=>({value:String(s.stage_no),label:'Этап '+s.stage_no+' · '+s.title}))]}/></div>}
        {!openStages.length&&<p>Для назначения ситуации необходимо открыть этап.</p>}
+       {regionCode&&<p>{controllingParty?'Регион контролирует партия «'+controllingParty.name+'». Действующих участников: '+eligible.length:'Контролирующая партия не определена.'}{!regionalReady?' Назначение отложено: нужны не менее двух участников.':''}</p>}
        {selected.audience==='all'?<div className="autoEventCaseAssign">
-        <p>Ситуация для всей аудитории. При назначении каждый участник получает личное задание, а результаты объединяются в статистике.</p>
-        <button type="button" disabled={busy||!chosenStage||!students.length||students.every(m=>assigned.some(a=>a.case_id===chosen&&a.recipient_id===m.user_id))}
-          onClick={()=>void assignAll()}><Send size={16}/> Назначить всей аудитории</button></div>
-       :selected.audience==='group'?<div className="autoEventCaseAssign"><p>Выберите 2–3 участников для совместного голосования.</p><div className="eventGroupRecipients">{eligible.map(m=><label key={m.user_id}><input type="checkbox" checked={groupRecipients.includes(m.user_id)} disabled={!groupRecipients.includes(m.user_id)&&groupRecipients.length>=3} onChange={e=>setGroupRecipients(old=>e.target.checked?[...old,m.user_id]:old.filter(id=>id!==m.user_id))}/>{m.full_name}</label>)}</div><button type="button" disabled={busy||!chosenStage||groupRecipients.length<2} onClick={()=>void assign()}><Send size={16}/> Назначить группе</button></div>
+        <p>{regionCode?'Голосуют все действующие участники контролирующей партии. Состав фиксируется при назначении.':'Ситуация для всей аудитории. При назначении каждый участник получает личное задание, а результаты объединяются в статистике.'}</p>
+        <button type="button" disabled={busy||readOnly||!chosenStage||!regionalReady||!eligible.length||eligible.every(m=>assigned.some(a=>a.case_id===chosen&&a.recipient_id===m.user_id))}
+          onClick={()=>void assignAll()}><Send size={16}/> {regionCode?'Назначить всей партии':'Назначить всей аудитории'}</button></div>
+       :selected.audience==='group'?<div className="autoEventCaseAssign"><p>Выберите 2–3 участников для совместного голосования.</p><div className="eventGroupRecipients">{eligible.map(m=><label key={m.user_id}><input type="checkbox" checked={groupRecipients.includes(m.user_id)} disabled={!groupRecipients.includes(m.user_id)&&groupRecipients.length>=3} onChange={e=>setGroupRecipients(old=>e.target.checked?[...old,m.user_id]:old.filter(id=>id!==m.user_id))}/>{m.full_name}</label>)}</div><button type="button" disabled={busy||readOnly||!chosenStage||!regionalReady||groupRecipients.length<2} onClick={()=>void assign()}><Send size={16}/> Назначить группе</button></div>
        :<div className="autoEventCaseAssign"><StyledSelect label="Назначить участнику" value={recipient} onChange={setRecipient} options={[{value:'',label:'Выберите участника'},...eligible.map(m=>({value:m.user_id,label:m.full_name,disabled:assigned.some(a=>a.case_id===chosen&&a.recipient_id===m.user_id)}))]}/>
        <button type="button" disabled={busy||!chosenStage||!recipient||!eligible.some(m=>m.user_id===recipient)||assigned.some(a=>a.case_id===chosen&&a.recipient_id===recipient)} onClick={()=>void assign()}><Send size={16}/> Назначить</button></div>}
       </>:<p>Выберите плитку ситуации.</p>}</article></div>}
