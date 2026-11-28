@@ -7,10 +7,11 @@ import {resolveStoredAsset} from '@/lib/resolveStoredAsset';
 import {createScopedSignedAssetCache} from './scopedSignedAssetCache';
 import {createDocumentMetadataCache} from './documentMetadataCache';
 import type {ReturnTypeRepublic} from './viewTypes';
-import type {FormalDocument} from './types';
+import type {FormalDocument,FormalHistory} from './types';
 import {FORMAL_SUBJECTS,FORMAL_TYPES,inferFormal,formalSignature,ownerLabel,formalDocumentTypeLabel,formalDocumentTitle,formalSubjectDisplayLabel} from './formalInstitutions';
 import {chairVotingBodies,canReferenceVoteDocument,referenceDocumentMatchesBody,chairReferencePreset,votePresetForDocument} from './proceduralVoting';
 import {documentSigningAuthority} from './documentSignerTitle';
+import {documentRoute,governmentAgendaVotes} from './documentRoute';
 import {ArrowLeft,BookOpen,CheckCircle2,ChevronDown,CircleAlert,CircleDot,Clock3,ClipboardList,FilePlus2,FileText,Paperclip,Plus,Printer,Route,Search,Trash2,Undo2,Upload,Vote,X,XCircle} from 'lucide-react';
 import StyledSelect from '../ui/StyledSelect';
 import DocumentPaper from './DocumentPaper';
@@ -143,6 +144,7 @@ export default function DocumentsView({g,focusId,createTemplate,createStageNo,on
   const r=await supabase.rpc('get_formal_subjects',{p_game_id:g.game.id});
   if(alive.current&&ticket===subjectsRequest.current&&scope.current===requestedScope&&!r.error&&Array.isArray(r.data))setSubjectPermissions(r.data);
  },editorScope+':'+(me?.role_title||'')+':'+activeRoles.join('|'),undefined,750,120000);
+ const agendaVotes=useMemo(()=>governmentAgendaVotes(votes),[votes]);
  const filtered=useMemo(()=>formalDocuments.filter(d=>{
   const q=query.trim().toLowerCase();
   const voting=votes.some(v=>v.formal_document_id===d.id&&v.status==='open');
@@ -221,7 +223,7 @@ export default function DocumentsView({g,focusId,createTemplate,createStageNo,on
   return()=>{active=false};
  },[selected?.id,selected?.updated_at,localRefresh]);
  useEffect(()=>{
-  if(!selected?.id||!['gd','ksrf','central_bank'].includes(selected.subject_key)&&!['meeting_agenda','minutes'].includes(selected.doc_type)){setInstitutionSigners(null);return}
+  if(!selected?.id||!['gd','ksrf','central_bank'].includes(selected.subject_key)&&!['meeting_agenda','minutes'].includes(selected.doc_type)&&!(selected.doc_type==='state_program'&&selected.status_code==='published')){setInstitutionSigners(null);return}
   let alive=true;
   void (async()=>{
    try{
@@ -416,21 +418,34 @@ export default function DocumentsView({g,focusId,createTemplate,createStageNo,on
  const terminalDocumentText=selected?.status_code==='rejected'?'Документ отклонён. Дальнейшее рассмотрение, голосование и подписание прекращены.':selected?.status_code==='superseded'?'Проект утратил актуальность после принятия альтернативного решения. Дальнейшее рассмотрение прекращено.':'Документ отозван. Дальнейшее рассмотрение прекращено.';
  const isBillForPresidentialSignature=!!selected&&['fz_bill','fkz_bill','federal_budget'].includes(selected.doc_type)
   &&['president','veto_overridden'].includes(selected.status_code);
+ const route=selected?documentRoute(selected,agendaVotes.get(selected.id)):null;
  const isMeetingProcedureDocument=!!selected&&['meeting_agenda','minutes'].includes(selected.doc_type)
-  &&['institution_meeting_agenda','duma_session_agenda','institution_meeting_minutes'].includes(String(selected.metadata?.document_kind||''));
+  &&['institution_meeting_agenda','duma_session_agenda','institution_meeting_minutes','government_session_agenda'].includes(String(selected.metadata?.document_kind||''));
  // Meeting records are prepared/approved by their institution's meeting workspace,
  // never by the generic Council-submission action of a Duma resolution.
  const currentAction=isTerminalDocument||isMeetingProcedureDocument?null:selected?.workflow_steps[selected.current_step]?.action;
  const meetingProcedureHint=isMeetingProcedureDocument
-  ?selected?.status_code==='published'
+  ?route?.governmentAgenda?route.progress===100?'Повестка утверждена голосованием. Повторное утверждение не требуется.':route.status
+  :selected?.status_code==='published'
     ?'Документ утверждён. Его процедура завершена.'
     :'Документ утверждается в разделе заседания соответствующего органа.'
   :null;
- const progress=selected?Math.round((selected.current_step/Math.max(1,selected.workflow_steps.length-1))*100):0;
+ const progress=route?.progress??0;
+ function historyActor(h:FormalHistory){
+  if(!h.actor_id)return 'Система';
+  const signer=selected?.metadata;
+  const signing=h.action.startsWith('Подпис')||h.to_status==='signed'||/^подписан[оа]/i.test(h.note||'');
+  if(signing&&signer?.signed_by===h.actor_id&&typeof signer.signed_name==='string'&&signer.signed_name&&typeof signer.signed_role==='string'&&/^председатель\s+правительства/i.test(signer.signed_role))return signer.signed_name;
+  if(signing&&(/^председатель\s+правительства/i.test(h.note||'')||selected?.doc_type==='state_program')){
+   const roleSigner=institutionSigners?.required.find(x=>x.user_id===h.actor_id&&x.signed&&/^председатель\s+правительства/i.test(x.office));
+   if(roleSigner?.display_name&&documentSignatures.some(x=>x.history_id===h.id&&x.signer_id===h.actor_id))return roleSigner.display_name;
+  }
+  return members.find(m=>m.user_id===h.actor_id)?.full_name||'Участник';
+ }
  const showBudgetPreliminary=!!selected&&selected.workflow_key==='budget'&&['budget_registered','budget_committee','budget_council','revision'].includes(selected.status_code);
- const votePreset=selected&&!isTerminalDocument?votePresetForDocument(selected):null;
+ const votePreset=selected&&!isTerminalDocument&&!isMeetingProcedureDocument?votePresetForDocument(selected):null;
  const chairBodies=me?.kind==='student'&&!me.roster_archived_at?chairVotingBodies([me.role_title||'',...activeRoles]):[];
- const referenceBody=selected&&!votePreset&&canReferenceVoteDocument(selected,g.game?.current_round||0)?chairBodies.find(b=>referenceDocumentMatchesBody(selected,b)):undefined;
+ const referenceBody=selected&&!isMeetingProcedureDocument&&!votePreset&&canReferenceVoteDocument(selected,g.game?.current_round||0)?chairBodies.find(b=>referenceDocumentMatchesBody(selected,b)):undefined;
  const canOpenSelectedVote=!!votePreset&&!!selected&&(canManage(selected)||chairBodies.includes(votePreset.institutionKey)||(teacher&&selected.status_code==='sf_veto'));
  const isSfVetoConfirmation=selected?.workflow_key==='bill'&&selected?.doc_type==='fz_bill'&&selected.status_code==='veto_sf_pending';
  const isMandatorySignature=selected?.status_code==='veto_overridden';
@@ -645,21 +660,22 @@ export default function DocumentsView({g,focusId,createTemplate,createStageNo,on
 
     <div className="formalRegistryList legalRegistryRows registryCards">{filtered.length?filtered.map(d=>{
      const voting=votes.some(v=>v.formal_document_id===d.id&&v.status==='open');
-     const totalSteps=Math.max(1,d.workflow_steps.length);
-     const step=Math.min(totalSteps,Math.max(1,d.current_step+1));
-     const completion=Math.round(step/totalSteps*100);
+     const registryRoute=documentRoute(d,agendaVotes.get(d.id));
+     const totalSteps=Math.max(1,registryRoute.steps.length);
+     const step=registryRoute.step+1;
+     const completion=registryRoute.progress;
      return <article key={d.id} className={selected?.id===d.id?'formalRegistryRow legalDocumentRow registryCard active':'formalRegistryRow legalDocumentRow registryCard'} onClick={e=>{if((e.target as HTMLElement).closest('button,a,input,select'))return;openRegistryDocument(d.id)}}>
-      <header className="registryCardHead"><div className="registryCardIdentity"><span>{d.registry_no}</span><small>{typeLabel(d.doc_type)}</small></div><em className={'formalStatus '+statusTone(d.status_code)}>{d.status_label}</em></header>
+      <header className="registryCardHead"><div className="registryCardIdentity"><span>{d.registry_no}</span><small>{typeLabel(d.doc_type)}</small></div><em className={'formalStatus '+statusTone(registryRoute.governmentAgenda&&registryRoute.progress!==100?'draft':d.status_code)}>{registryRoute.status}</em></header>
       <div className="registryCardTitle"><h3>{formalDocumentTitle(d.title,d.doc_type)}</h3><p>{formalSubjectDisplayLabel(d.subject_key,d.subject_label)}</p></div>
-      <div className="registryCardProgress"><div><span>Шаг {step} из {totalSteps}</span><b>{ownerLabel(d.current_owner_key)}</b></div><div className="registryCardProgressTrack" aria-label={'Прогресс документа '+completion+'%'}><i style={{width:completion+'%'}}/></div></div>
+      <div className="registryCardProgress"><div><span>Шаг {step} из {totalSteps}</span><b>{ownerLabel(registryRoute.owner)}</b></div><div className="registryCardProgressTrack" aria-label={'Прогресс документа '+completion+'%'}><i style={{width:completion+'%'}}/></div></div>
       <div className="registryCardMeta"><span><Clock3 size={14}/> Обновлён {shortDate(d.updated_at)}</span>{voting&&<strong><Vote size={14}/> Идёт голосование</strong>}</div>
-       <footer className="formalRegistryRowActions"><span>Ответственный: {ownerLabel(d.current_owner_key)}</span><div className="formalRegistryActions">{votes.find(v=>v.formal_document_id===d.id&&v.status==='open')&&<button type="button" className="legalVoteShortcut" onClick={()=>onOpenVotes(votes.find(v=>v.formal_document_id===d.id&&v.status==='open')?.id)}>Голосование</button>}{canDeleteDocument(d)&&<button type="button" className="legalDeleteDocument" aria-label={'Удалить НПА «'+formalDocumentTitle(d.title,d.doc_type)+'»'} title="Удалить НПА" disabled={busy} onClick={()=>void removeRegistryDocument(d)}><Trash2 size={16}/><span>Удалить</span></button>}<button type="button" className="legalOpenDocument" onClick={()=>openRegistryDocument(d.id)}>Открыть документ →</button></div></footer>
+       <footer className="formalRegistryRowActions"><span>Ответственный: {ownerLabel(registryRoute.owner)}</span><div className="formalRegistryActions">{votes.find(v=>v.formal_document_id===d.id&&v.status==='open')&&<button type="button" className="legalVoteShortcut" onClick={()=>onOpenVotes(votes.find(v=>v.formal_document_id===d.id&&v.status==='open')?.id)}>Голосование</button>}{canDeleteDocument(d)&&<button type="button" className="legalDeleteDocument" aria-label={'Удалить НПА «'+formalDocumentTitle(d.title,d.doc_type)+'»'} title="Удалить НПА" disabled={busy} onClick={()=>void removeRegistryDocument(d)}><Trash2 size={16}/><span>Удалить</span></button>}<button type="button" className="legalOpenDocument" onClick={()=>openRegistryDocument(d.id)}>Открыть документ →</button></div></footer>
      </article>
     }):<div className="registryEmptyState"><Search size={26}/><div><b>Документы не найдены</b><span>Измените запрос или сбросьте фильтры.</span></div><button type="button" className="secondary" onClick={()=>{setQuery('');setFilterSubject('');setFilterStatus('')}}>Показать все</button></div>}</div>
    </aside>
 
    <article id="npa-document-workspace" className="formalDetail" hidden={!detailOpen} data-tab="unified"><div className="legalDetailToolbar legalUnifiedToolbar"><button type="button" className="secondary legalBackToRegistry" onClick={()=>{setDetailOpen(false);setSelectedId('');onSelectDocument?.();setEditing(false);setScrollOpenedDocument(false);if(detailReturn==='create')setMode('create')}}>{detailReturn==='create'?<FilePlus2 size={18}/>:<ArrowLeft size={18}/>} {detailReturn==='create'?'Создать документ':'Реестр НПА'}</button><div className="legalWorkspaceLabel"><small>Реестр НПА</small><b>Документ и процедура</b></div>{canEditSelected&&!editing?<button className="secondary legalEditDocument" onClick={()=>startEdit(selected)}>Редактировать текст</button>:editing?<span className="legalEditingBadge">Редактирование включено</span>:null}{selected&&teacher&&canDeleteDocument(selected)&&<button type="button" className="legalDeleteDocument" disabled={busy} onClick={()=>void removeRegistryDocument(selected)}><Trash2 size={16}/><span>Удалить</span></button>}</div>{!selected?detailPending?<div className="formalEmptyBig" role="status"><span>▤</span><h2>{detailLoadError?'Не удалось открыть документ':'Загрузка документа…'}</h2><p>{detailLoadError||'Получаем текст и историю выбранного НПА.'}</p>{detailLoadError&&<button type="button" className="secondary" onClick={()=>{if(!selectedSummary||typeof g.ensureFormalDocument!=='function')return;setDetailLoadError('');void g.ensureFormalDocument(selectedSummary.id,selectedSummary.updated_at).then(ok=>{if(!ok)setDetailLoadError('Не удалось получить текст документа. Повторите загрузку.')})}}>Повторить загрузку</button>}</div>:<div className="formalEmptyBig"><span>▤</span><h2>{formalDocuments.length?'Документы не найдены':'Реестр пока пуст'}</h2><p>{formalDocuments.length?'Измените запрос или фильтры, чтобы выбрать документ.':'Создайте нормативный документ — здесь будут текст, стадии и связанные голосования.'}</p>{formalDocuments.length>0&&<button className="secondary" onClick={()=>{setQuery('');setFilterSubject('');setFilterStatus('')}}>Сбросить фильтры</button>}<button className="primary" onClick={()=>setMode('create')}>Создать документ</button></div>:<>
-    <header className="documentSummaryHeader"><div><span>{selected.registry_no}</span><b>{typeLabel(selected.doc_type)}</b><small>Редакция {String(selected.metadata?.revision||1)} · {formalSubjectDisplayLabel(selected.subject_key,selected.subject_label)}</small></div><div className="documentSummaryState"><span className={'formalStatus '+statusTone(selected.status_code)}>{selected.status_label}</span><small>Ответственный: {ownerLabel(selected.current_owner_key)}</small></div></header>
+    <header className="documentSummaryHeader"><div><span>{selected.registry_no}</span><b>{typeLabel(selected.doc_type)}</b><small>Редакция {String(selected.metadata?.revision||1)} · {formalSubjectDisplayLabel(selected.subject_key,selected.subject_label)}</small></div><div className="documentSummaryState"><span className={'formalStatus '+statusTone(route?.governmentAgenda&&progress!==100?'draft':selected.status_code)}>{route?.status||selected.status_label}</span><small>Ответственный: {ownerLabel(route?.owner||selected.current_owner_key)}</small></div></header>
     {accessError&&<p className="error" role="alert">{accessError}</p>}
     {selected.workflow_key==='bill'&&<BillAmendmentsPanel g={g} document={selected} onOpenVotes={onOpenVotes} readOnly={readOnly} onPendingChange={gate=>setBillAmendmentGate(previous=>previous?.documentId===gate.documentId&&previous.pending===gate.pending&&previous.checked===gate.checked?previous:gate)}/>}
     {selected.workflow_key==='budget'&&<BudgetLawAmendmentsPanel g={g} document={selected} onOpenVotes={onOpenVotes} readOnly={readOnly} onPendingChange={gate=>setBillAmendmentGate(previous=>previous?.documentId===gate.documentId&&previous.pending===gate.pending&&previous.checked===gate.checked?previous:gate)}/>}
@@ -687,7 +703,7 @@ export default function DocumentsView({g,focusId,createTemplate,createStageNo,on
      </section>
      <aside className="legalControlRail" aria-label="Управление документом">
       <article className="surface formalActions"><div className="surfaceHead"><div><small>Текущая стадия</small><h2>Что нужно сделать сейчас</h2></div></div>
-       <div className="documentNextStep"><span>{isTerminalDocument?'Рассмотрение завершено':`${selected.current_step+1} из ${selected.workflow_steps.length}`}</span><h3>{isTerminalDocument?selected.status_label:selected.workflow_steps[selected.current_step]?.label||selected.status_label}</h3><p>Ответственный: <b>{selected.status_code==='sf'&&['bill','budget'].includes(selected.workflow_key)?'Совет Федерации (преподаватель)':ownerLabel(selected.current_owner_key)}</b>.</p>{!isTerminalDocument&&<p>Документ подписывает: <b>{selected.status_code==='sf'&&['bill','budget'].includes(selected.workflow_key)?'Преподаватель (решение Совета Федерации)':documentSigningAuthority(selected,institutionSigners?.required||[])}</b>.</p>}<p>{isTerminalDocument?terminalDocumentText:isMandatorySignature?'Вето преодолено обеими палатами. Президент обязан подписать закон без повторного вето.':isSfVetoConfirmation||selected.status_code==='sf'&&['bill','budget'].includes(selected.workflow_key)?'Ожидается решение Совета Федерации, которое принимает преподаватель. Закон ещё не опубликован.':isBillForPresidentialSignature?'Закон ожидает подписи Президента Российской Федерации. До назначения Президента подписание невозможно, документ сохраняет текущую стадию.':linkedOpenVote?(linkedOpenVote.formal_step_code==='reference'?"Завершите ознакомительное голосование. Его результат не изменит стадию документа.":"Завершите открытое голосование — его результат будет учтён по установленной процедуре."):votePreset?"Для перехода дальше требуется решение голосованием.":procedureBlocked?"Сначала подготовьте обязательный комплект законопроекта.":meetingProcedureHint|| (currentAction?"Доступное действие: "+currentAction+".":"Процедура завершена.")}</p>{!canManage(selected)&&currentAction&&!linkedOpenVote&&<small>Действие выполняет ответственный орган. Для ознакомления документ можно отправить из блока под его текстом.</small>}</div>
+       <div className="documentNextStep"><span>{isTerminalDocument?'Рассмотрение завершено':`${(route?.step??selected.current_step)+1} из ${route?.steps.length??selected.workflow_steps.length}`}</span><h3>{isTerminalDocument?selected.status_label:route?.steps[route.step]?.label||selected.status_label}</h3><p>Ответственный: <b>{selected.status_code==='sf'&&['bill','budget'].includes(selected.workflow_key)?'Совет Федерации (преподаватель)':ownerLabel(route?.owner||selected.current_owner_key)}</b>.</p>{!isTerminalDocument&&progress!==100&&<p>Документ подписывает: <b>{selected.status_code==='sf'&&['bill','budget'].includes(selected.workflow_key)?'Преподаватель (решение Совета Федерации)':documentSigningAuthority(selected,institutionSigners?.required||[])}</b>.</p>}<p>{isTerminalDocument?terminalDocumentText:isMandatorySignature?'Вето преодолено обеими палатами. Президент обязан подписать закон без повторного вето.':isSfVetoConfirmation||selected.status_code==='sf'&&['bill','budget'].includes(selected.workflow_key)?'Ожидается решение Совета Федерации, которое принимает преподаватель. Закон ещё не опубликован.':isBillForPresidentialSignature?'Закон ожидает подписи Президента Российской Федерации. До назначения Президента подписание невозможно, документ сохраняет текущую стадию.':linkedOpenVote?(route?.governmentAgenda?'Завершите голосование за повестку Правительства.':linkedOpenVote.formal_step_code==='reference'?"Завершите ознакомительное голосование. Его результат не изменит стадию документа.":"Завершите открытое голосование — его результат будет учтён по установленной процедуре."):votePreset?"Для перехода дальше требуется решение голосованием.":procedureBlocked?"Сначала подготовьте обязательный комплект законопроекта.":meetingProcedureHint|| (currentAction?"Доступное действие: "+currentAction+".":"Процедура завершена.")}</p>{!canManage(selected)&&currentAction&&!linkedOpenVote&&<small>Действие выполняет ответственный орган. Для ознакомления документ можно отправить из блока под его текстом.</small>}</div>
        {selected.metadata?.source_type==='ghost_voting_policies'&&Boolean(selected.metadata?.source_vote_id)&&<div className="formalVoteLink active" role="status"><small>● Решение этапа 05 принято</small><b>Постановление связано с итогами Goust Voting</b><span>Повторное голосование не требуется. Уполномоченное лицо оформляет и публикует постановление.</span><button type="button" className="secondary" onClick={()=>onOpenVotes(String(selected.metadata?.source_vote_id))}>Посмотреть принятое решение →</button></div>}
        {(selected.metadata?.cutoff_price_proposal===true||selected.workflow_key==='budget'&&selected.doc_type==='federal_budget')&&selected.status_code==='sf'&&teacher&&!readOnly&&<div className="formalBranchPanel" aria-label="Подтверждение решения Совета Федерации">
         <small>Совет Федерации · финансовое регулирование</small>
@@ -743,22 +759,22 @@ export default function DocumentsView({g,focusId,createTemplate,createStageNo,on
      <div className="legalProcedureBottomCol legalDocumentRouteCol"><section className="formalProgress legalRouting legalRouteBoard" aria-labelledby="legal-document-route-title">
       <header className="legalRouteBoardHead">
        <div><small>Процедурная карта</small><h2 id="legal-document-route-title">Маршрут документа</h2><p>Полная последовательность движения документа по установленной процедуре.</p></div>
-       <div className="legalRouteBoardStatus"><span>{selected.current_step+1} из {selected.workflow_steps.length}</span><b>{selected.status_label}</b></div>
+       <div className="legalRouteBoardStatus"><span>{(route?.step??selected.current_step)+1} из {route?.steps.length??selected.workflow_steps.length}</span><b>{route?.status||selected.status_label}</b></div>
       </header>
       <div className="legalRouteProgress" aria-label={'Процедура выполнена на '+progress+'%'}>
        <div><span>Начало процедуры</span><strong>{progress}%</strong><span>{progress===100?'Завершено':'Текущая стадия'}</span></div>
        <div className="legalRouteProgressTrack"><i style={{width:progress+'%'}}/></div>
       </div>
       <ol className="legalRouteTimeline" aria-label="Стадии маршрута документа">
-       {selected.workflow_steps.map((s,i)=>{
-        const routeFinished=progress===100;
-        const done=i<selected.current_step||(routeFinished&&i===selected.current_step);
-        const current=!routeFinished&&i===selected.current_step;
-        const event=[...history].reverse().find(h=>h.to_status===s.code);
-        const eventDate=event?.created_at||(i===0?selected.created_at:null);
-        const actor=event?.actor_id?members.find(m=>m.user_id===event.actor_id)?.full_name:null;
+       {(route?.steps||selected.workflow_steps).map((s,i)=>{
+        const routeFinished=progress===100,routeStep=route?.step??selected.current_step;
+        const done=i<routeStep||(routeFinished&&i===routeStep);
+        const current=!routeFinished&&i===routeStep;
+        const event=route?.governmentAgenda&&s.code==='signed'?history.find(h=>h.action==='Подписан документ уполномоченным лицом'&&documentSignatures.some(x=>x.history_id===h.id)):route?.governmentAgenda&&['agenda_vote','published'].includes(s.code)?undefined:[...history].reverse().find(h=>h.to_status===s.code);
+        const eventDate=route?.governmentAgenda&&['agenda_vote','published'].includes(s.code)?(route.vote?.closed_at||route.vote?.opened_at||null):event?.created_at||(i===0?selected.created_at:null);
+        const actor=event?.actor_id?historyActor(event):null;
         return <li key={s.code} className={'legalRouteStep '+(done?'done':current?'current':'pending')}>
-         <div className="legalRouteRail" aria-hidden="true"><span>{done?<CheckCircle2 size={20}/>:i+1}</span>{i<selected.workflow_steps.length-1&&<i/>}</div>
+         <div className="legalRouteRail" aria-hidden="true"><span>{done?<CheckCircle2 size={20}/>:i+1}</span>{i<(route?.steps.length??selected.workflow_steps.length)-1&&<i/>}</div>
          <div className="legalRouteStepBody">
           <div className="legalRouteStepTitle"><small>Шаг {i+1}</small><h3>{s.label}</h3></div>
           <div className="legalRouteStepDetails">
@@ -774,8 +790,8 @@ export default function DocumentsView({g,focusId,createTemplate,createStageNo,on
        })}
       </ol>
       <footer className="legalRouteBoardFoot">
-       <div><Route size={18}/><span><b>{progress===100?'Процедура завершена':'Документ находится в процедуре'}</b><small>{progress===100?'Все предусмотренные стадии пройдены.':'Сейчас документ находится у: '+ownerLabel(selected.current_owner_key)+'.'}</small></span></div>
-       <strong>{selected.workflow_steps.length} {selected.workflow_steps.length===1?'стадия':selected.workflow_steps.length<5?'стадии':'стадий'}</strong>
+       <div><Route size={18}/><span><b>{progress===100?'Процедура завершена':'Документ находится в процедуре'}</b><small>{progress===100?'Все предусмотренные стадии пройдены.':'Сейчас документ находится у: '+ownerLabel(route?.owner||selected.current_owner_key)+'.'}</small></span></div>
+       <strong>{route?.steps.length??selected.workflow_steps.length} {(route?.steps.length??selected.workflow_steps.length)===1?'стадия':(route?.steps.length??selected.workflow_steps.length)<5?'стадии':'стадий'}</strong>
       </footer>
      </section></div>
     </section>
@@ -858,7 +874,7 @@ export default function DocumentsView({g,focusId,createTemplate,createStageNo,on
        </section>}
       </div>}
      </section>}
-    <details className="surface formalHistoryDisclosure"><summary className="formalHistorySummary"><div className="formalHistorySummaryMain"><div><small>Журнал действий</small><h2>История изменений</h2></div><span className="formalHistoryCount">{history.length} записей</span></div><span className="formalHistoryChevron" aria-hidden="true"><ChevronDown size={18}/></span></summary><div className="formalHistoryBody"><div className="formalLinkedVotes">{votes.filter(v=>v.formal_document_id===selected.id).map(v=><button type="button" key={v.id} onClick={()=>onOpenVotes(v.id)}><b>{v.title}</b><span>{v.formal_step_code==='reference'?'Ознакомительное · ':''}{v.status==='open'?'Голосование открыто':v.result_label||'Голосование завершено'}</span></button>)}</div><div>{history.length?history.map(h=><div className="formalHistoryRow" key={h.id}><span/><div><time>{fmtDateTime(h.created_at)}</time><b>{h.action}</b><small>{h.actor_id?members.find(m=>m.user_id===h.actor_id)?.full_name||'Участник':'Система'}{h.note?' · '+h.note:''}</small></div></div>):<div className="emptyState">История пока пуста.</div>}</div></div></details>
+    <details className="surface formalHistoryDisclosure"><summary className="formalHistorySummary"><div className="formalHistorySummaryMain"><div><small>Журнал действий</small><h2>История изменений</h2></div><span className="formalHistoryCount">{history.length} записей</span></div><span className="formalHistoryChevron" aria-hidden="true"><ChevronDown size={18}/></span></summary><div className="formalHistoryBody"><div className="formalLinkedVotes">{votes.filter(v=>v.formal_document_id===selected.id).map(v=><button type="button" key={v.id} onClick={()=>onOpenVotes(v.id)}><b>{v.title}</b><span>{v.formal_step_code==='reference'&&v.procedure_key!=='government_agenda'?'Ознакомительное · ':''}{v.status==='open'?'Голосование открыто':v.result_label||'Голосование завершено'}</span></button>)}</div><div>{history.length?history.map(h=><div className="formalHistoryRow" key={h.id}><span/><div><time>{fmtDateTime(h.created_at)}</time><b>{h.action}</b><small>{historyActor(h)}{h.note?' · '+h.note:''}</small></div></div>):<div className="emptyState">История пока пуста.</div>}</div></div></details>
     <CivicDiscussion key={selected.id} kind="document" targetId={selected.id} g={g} readOnly={readOnly}/>
     {revisions.length>0&&<details className="documentRevisionList"><summary>Предыдущие редакции · {revisions.length}</summary>{revisions.map(r=><HistoricalRevisionItem key={r.id} revision={r} documentId={selected.id} canRestore={canEditSelected&&!editing} onRestore={(title,body,revision)=>{if(selectedDocument.current!==selected.id)return;setEditTitle(title);setEditBody(body);setEditNote('Восстановлен текст редакции '+revision);setEditRevision(Number(selected.metadata?.revision||1));setEditing(true)}}/>)}</details>}
    </>}</article>
