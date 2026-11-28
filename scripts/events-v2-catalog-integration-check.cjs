@@ -69,7 +69,7 @@ CREATE TABLE private.event_content_revisions(revision text,event_case_id uuid,sn
   // Entirely fictional fixture; no real legal gate is changed or accepted.
   const synthetic=payload.map((c,i)=>({case_key:'fixture-'+i,title:'Учебный тест '+i,category:'Тест',audience:c.audience,situation:'Новый тест',
    decision_options:c.decision_options.map((_,j)=>'Вариант '+j),
-   effect_plan:{rules_version:2,...(c.audience==='single'?{best_option_key:'option_1'}:{}),options:c.decision_options.map((_,j)=>({key:'option_'+(j+1),lawful:true,trust:0}))},
+   effect_plan:{rules_version:2,...(c.audience==='single'?{best_option_key:'option_1',competence:c.effect_plan.competence}:{}),options:c.decision_options.map((_,j)=>({key:'option_'+(j+1),lawful:true,trust:0}))},
    verified:true,editorial_status:'approved',legal_status:'verified_current',activation_allowed:true,competence_allowed:true,source_url:null,source_note:null}));
   await db.query("INSERT INTO private.authored_event_catalog SELECT x->>'case_key',jsonb_build_object('title',x->>'title','category',x->>'category','audience',x->>'audience','effect_plan','{}'::jsonb,'comic_scene',jsonb_build_object('scene_id','art'),'allowed_roles','[]'::jsonb,'seriousness','light') FROM jsonb_array_elements($1::jsonb) x",[JSON.stringify(synthetic)]);
   for(let n=0;n<9;n++){const c=synthetic[n];await db.query("INSERT INTO event_cases VALUES($1,$2,$3,$4,$5,$6,$7,'Старый тест','[]','{}','{\"scene_id\":\"art\"}',NULL,NULL,false)",[id(n+1),game,c.case_key,c.title,c.category,c.audience,n===8?'archived':'ready']);}

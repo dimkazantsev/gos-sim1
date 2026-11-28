@@ -41,8 +41,8 @@ const [game,other,sender,expert,wrong,archived,outsider,teacher]=[1,2,10,11,12,1
  const later=await create(120,sender,false,9);assert.equal(await entitled(later,expert),true);
  await query("UPDATE game_office_assignments SET status='ended' WHERE user_id=$1",[expert]);assert.equal(await entitled(later,expert),false);
  await query("UPDATE game_office_assignments SET status='active' WHERE user_id=$1",[expert]);
- const notEarly=await create(121,sender,false,7,{...plan,competence:{portfolio_keys:['economic'],committee_before_9:false}});
- assert.equal(await entitled(notEarly,expert),false);
+ await assert.rejects(()=>create(121,sender,false,7,{...plan,competence:{portfolio_keys:['economic'],committee_before_9:false}}),/нет компетентного участника/);
+ await assert.rejects(()=>query('UPDATE event_assignments SET stage_no=9 WHERE case_id=$1',[c]),/Исходный этап/);
  assert.equal((await rows("SELECT has_function_privilege('authenticated','private.event_v2_competent_at_stage(uuid,uuid,integer)','EXECUTE') AS ok"))[0].ok,false);
  await assert.rejects(()=>offer(c,sender,outsider),/другого участника/);
  await assert.rejects(()=>offer(c,sender,archived),/другого участника/);
@@ -103,6 +103,28 @@ const [game,other,sender,expert,wrong,archived,outsider,teacher]=[1,2,10,11,12,1
  for(const u of [sender,expert,wrong])assert.equal(await collectiveCount(u),3,'All participants receive one signal per distinct case, independent of majority and round');
  assert.equal(await collectiveCount(teacher),0);assert.equal(await collectiveCount(sender,8),0);assert.equal(await collectiveCount(sender,7,other),0);
  assert.equal((await rows("SELECT has_function_privilege('authenticated','private.event_v2_collective_participation(uuid,uuid,integer,timestamptz,timestamptz)','EXECUTE') AS ok"))[0].ok,false);
+ // 100 distinct simulated identities, actual SQL handler, sequential on one
+ // embedded PostgreSQL connection. This is a correctness test, not concurrency.
+ const largeGame=uid(900),largeCase=uid(901),largeTeacher=uid(902),voters=Array.from({length:100},(_,i)=>uid(1000+i));
+ await query("INSERT INTO games VALUES($1,$2)",[largeGame,largeTeacher]);
+ await query("INSERT INTO game_members(game_id,user_id,kind,role_title) VALUES($1,$2,'teacher','Преподаватель')",[largeGame,largeTeacher]);
+ await query("INSERT INTO game_members(game_id,user_id,kind,role_title) SELECT $1,unnest($2::uuid[]),'student','Депутат'",[largeGame,voters]);
+ await query("INSERT INTO game_stages(game_id,stage_no,status,deadline) VALUES($1,7,'open',now()+interval '1 day')",[largeGame]);
+ await query("INSERT INTO state_metrics(game_id,metric_key,value,min_value,max_value) VALUES($1,'lawfulness',50,0,100),($1,'elite_support',50,0,100)",[largeGame]);
+ await query("INSERT INTO event_cases(id,game_id,audience,status,effect_plan,decision_options,title) VALUES($1,$2,'all','ready',$3::jsonb,'[\"А\",\"Б\",\"В\"]','Тест 100')",[largeCase,largeGame,JSON.stringify(cp)]);
+ await query("INSERT INTO event_assignments(case_id,game_id,recipient_id,stage_no) SELECT $1,$2,unnest($3::uuid[]),7",[largeCase,largeGame,voters]);
+ const ids=new Map((await rows('SELECT id,recipient_id FROM event_assignments WHERE case_id=$1',[largeCase])).map(x=>[x.recipient_id,x.id]));
+ const started=performance.now();
+ for(let round=1;round<=2;round++){
+  for(let i=0;i<voters.length;i++){await auth(voters[i]);await query('SELECT public.submit_event_decision($1,$2,NULL)',[ids.get(voters[i]),(round===2?'round2:':'')+(i<(round===1?50:51)?'option_1':'option_2')]);}
+  if(round===1){assert.equal((await rows('SELECT count(*)::int n FROM event_case_outcomes WHERE case_id=$1',[largeCase]))[0].n,0);assert.equal((await rows("SELECT comic_scene->>'vote_round' AS r FROM event_cases WHERE id=$1",[largeCase]))[0].r,'2');}
+ }
+ assert.equal((await rows('SELECT count(*)::int n FROM event_decisions WHERE case_id=$1',[largeCase]))[0].n,200);
+ assert.equal((await rows('SELECT winner FROM event_case_outcomes WHERE case_id=$1',[largeCase]))[0].winner,'option_1');
+ assert.equal((await rows('SELECT count(*)::int n FROM event_authority_evidence WHERE case_id=$1',[largeCase]))[0].n,0);
+ assert.equal(Number((await rows("SELECT value FROM state_metrics WHERE game_id=$1 AND metric_key='lawfulness'",[largeGame]))[0].value),50);
+ assert.equal(Number((await rows("SELECT value FROM state_metrics WHERE game_id=$1 AND metric_key='elite_support'",[largeGame]))[0].value),48);
+ console.log(JSON.stringify({test:'100 sequential simulated participants',votes:200,elapsedMs:Math.round(performance.now()-started),round1:'50/50',round2:'51/49',result:'PASS'}));
  console.log('PASS collective participation: no duplicate rounds, minority and tie counted equally, stage and game isolated');
  console.log('PASS collective: two rounds, no interim outcome, stale ballot rejected, final effects once, lawfulness unchanged');
  console.log('PASS actual individual transfer SQL: wrong/archived/cross-game, refusal, one assignment, unchanged stage, independent credit, wrong/right answer, no repeat, legacy');

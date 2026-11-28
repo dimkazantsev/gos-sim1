@@ -6,6 +6,8 @@ on:
       - 'supabase/changes/events_v2_individual_transfer_candidate.sql'
       - 'supabase/changes/events_v2_collective_candidate.sql'
       - 'supabase/changes/events_v2_catalog_candidate.sql'
+      - 'supabase/changes/events_v2_dispatch_seed_candidate.sql'
+      - 'scripts/events-v2-dispatch*'
       - 'scripts/events-v2-catalog-integration-check.cjs'
       - 'scripts/events-v2-individual*'
       - 'scripts/events-v2-editorial*'
@@ -33,3 +35,4 @@ jobs:
       - run: node scripts/events-v2-editorial-check.cjs
       - run: node scripts/events-v2-economic-projection-check.cjs
       - run: node scripts/events-v2-catalog-integration-check.cjs
+      - run: node scripts/events-v2-dispatch-check.cjs

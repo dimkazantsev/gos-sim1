@@ -26,6 +26,14 @@ BEGIN
  IF (SELECT count(DISTINCT x->>'case_key') FROM jsonb_array_elements(p_payload) x)<>330
  OR (SELECT count(*) FROM jsonb_array_elements(p_payload) x WHERE x->>'audience'='single')<>141
  OR (SELECT count(*) FROM jsonb_array_elements(p_payload) x WHERE x->>'audience'='group')<>30
+ OR (SELECT count(*) FROM jsonb_array_elements(p_payload) x WHERE x->>'audience'='single' AND x->'effect_plan'->'competence'->'committee_before_9'='true'::jsonb)<>20
+ OR EXISTS(SELECT 1 FROM jsonb_array_elements(p_payload) x WHERE x->>'audience'='single' AND (
+  jsonb_typeof(x->'effect_plan'->'competence'->'portfolio_keys') IS DISTINCT FROM 'array'
+  OR jsonb_typeof(x->'effect_plan'->'competence'->'committee_before_9') IS DISTINCT FROM 'boolean'))
+ OR EXISTS(SELECT 1 FROM jsonb_array_elements(p_payload) x WHERE x->>'audience'='single' AND (
+  jsonb_array_length(x->'effect_plan'->'competence'->'portfolio_keys') NOT BETWEEN 1 AND 5
+  OR EXISTS(SELECT 1 FROM jsonb_array_elements_text(x->'effect_plan'->'competence'->'portfolio_keys') k WHERE k NOT IN ('social','economic','defence','foreign','internal'))))
+ OR EXISTS(SELECT 1 FROM jsonb_array_elements(p_payload) x WHERE x->>'audience'<>'single' AND x->'effect_plan' ? 'competence')
  OR (SELECT sum(jsonb_array_length(x->'decision_options')) FROM jsonb_array_elements(p_payload) x)<>1660
  OR EXISTS(SELECT 1 FROM jsonb_array_elements(p_payload) x
   WHERE jsonb_array_length(x->'decision_options') NOT BETWEEN 4 AND 6

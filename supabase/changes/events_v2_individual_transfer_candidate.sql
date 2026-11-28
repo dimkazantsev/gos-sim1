@@ -71,9 +71,17 @@ begin
     where case_id=c.id and recipient_id=new.recipient_id and status='accepted');
   if c.audience='single' and (((c.audience='single' AND c.effect_plan->>'rules_version'='2') and assigned>=1) or (not coalesce((c.audience='single' AND c.effect_plan->>'rules_version'='2'),false) and ((not invited and assigned>=1) or (invited and assigned>=3))))
   then raise exception 'Все места в этом событии уже назначены';end if;
+  IF c.audience='single' AND c.effect_plan->>'rules_version'='2' AND NOT EXISTS(
+   SELECT 1 FROM public.game_members m WHERE m.game_id=c.game_id AND m.kind='student' AND m.roster_archived_at IS NULL
+    AND private.event_v2_competent_at_stage(c.id,m.user_id,new.stage_no)) THEN
+   RAISE EXCEPTION 'На исходном этапе нет компетентного участника';
+  END IF;
   if c.audience='group' and assigned>=3
   then raise exception 'Все места в этом событии уже назначены';end if;
  end if;
+ IF tg_op='UPDATE' AND c.effect_plan->>'rules_version'='2' AND new.stage_no IS DISTINCT FROM old.stage_no THEN
+  RAISE EXCEPTION 'Исходный этап ситуации нельзя изменить';
+ END IF;
  if tg_op='UPDATE' and (new.game_id<>old.game_id or new.case_id<>old.case_id or new.recipient_id<>old.recipient_id) then
   if NOT coalesce((c.audience='single' AND c.effect_plan->>'rules_version'='2') AND new.game_id=old.game_id AND new.case_id=old.case_id
    AND new.id=old.id AND new.stage_no=old.stage_no AND old.status='pending' AND new.status='pending'
