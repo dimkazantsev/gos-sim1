@@ -700,8 +700,7 @@
         "review_date": "2026-11-27",
         "review_status": "option_analysis_draft",
         "checked_norm_urls": [
-          "https://www.consultant.ru/document/cons_doc_LAW_182659/2a81d1737eb14693e515423a77157b0fb20088c8/",
-          "https://base.garant.ru/71129200/888134b28b1397ffae87a0ab1e117954/"
+          "https://www.consultant.ru/document/cons_doc_LAW_182659/2a81d1737eb14693e515423a77157b0fb20088c8/"
         ],
         "source_scope": "specific_norm_and_related_search_results_partial",
         "competence_review": {
@@ -752,7 +751,11 @@
             "https://www.consultant.ru/document/cons_doc_LAW_182659/2a81d1737eb14693e515423a77157b0fb20088c8/"
           ],
           "approved_portfolio": "ministry_economic"
-        }
+        },
+        "pre_final_checked_norm_urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_182659/2a81d1737eb14693e515423a77157b0fb20088c8/",
+          "https://base.garant.ru/71129200/888134b28b1397ffae87a0ab1e117954/"
+        ]
       }
     },
     {
@@ -888,10 +891,10 @@
         "review_status": "option_analysis_draft",
         "checked_norm_urls": [
           "https://www.consultant.ru/document/cons_doc_LAW_61801/96fbc469f91f57235cc842a85e0516a99f23dc85/",
-          "https://www.consultant.ru/document/cons_doc_LAW_61801/a15bab6050028753706f22c32fe60627a7be79f9/",
-          "https://www.consultant.ru/document/cons_doc_LAW_5142/9c307a0f2164645c15ca4e3146ff5f6e56060b23/",
           "https://www.consultant.ru/document/cons_doc_LAW_61801/315f051396c88f1e4f827ba3f2ae313d999a1873/",
-          "https://www.consultant.ru/document/cons_doc_LAW_61801/d3fe43a7c415353b17faab255bc0de92bea127da/"
+          "https://www.consultant.ru/document/cons_doc_LAW_61801/a15bab6050028753706f22c32fe60627a7be79f9/",
+          "https://www.consultant.ru/document/cons_doc_LAW_61801/d3fe43a7c415353b17faab255bc0de92bea127da/",
+          "https://www.consultant.ru/document/cons_doc_LAW_5142/9c307a0f2164645c15ca4e3146ff5f6e56060b23/"
         ],
         "source_scope": "specific_norm_and_related_search_results_partial",
         "competence_review": {
@@ -935,7 +938,14 @@
             "https://www.consultant.ru/document/cons_doc_LAW_5142/9c307a0f2164645c15ca4e3146ff5f6e56060b23/"
           ],
           "approved_portfolio": "ministry_internal"
-        }
+        },
+        "pre_final_checked_norm_urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_61801/96fbc469f91f57235cc842a85e0516a99f23dc85/",
+          "https://www.consultant.ru/document/cons_doc_LAW_61801/a15bab6050028753706f22c32fe60627a7be79f9/",
+          "https://www.consultant.ru/document/cons_doc_LAW_5142/9c307a0f2164645c15ca4e3146ff5f6e56060b23/",
+          "https://www.consultant.ru/document/cons_doc_LAW_61801/315f051396c88f1e4f827ba3f2ae313d999a1873/",
+          "https://www.consultant.ru/document/cons_doc_LAW_61801/d3fe43a7c415353b17faab255bc0de92bea127da/"
+        ]
       }
     },
     {
@@ -1070,8 +1080,8 @@
         "review_date": "2026-11-27",
         "review_status": "option_analysis_draft",
         "checked_norm_urls": [
-          "https://www.consultant.ru/document/cons_doc_LAW_19702/9d0dc5bffbe52f6f95e97813e0ef420708952b4e/",
-          "https://www.consultant.ru/document/cons_doc_LAW_5142/1cd43e51fbd4129343b325971a466ec5cd32a425/"
+          "https://www.consultant.ru/document/cons_doc_LAW_5142/1cd43e51fbd4129343b325971a466ec5cd32a425/",
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/9d0dc5bffbe52f6f95e97813e0ef420708952b4e/"
         ],
         "source_scope": "specific_norm_and_related_search_results_partial",
         "competence_review": {
@@ -1114,7 +1124,11 @@
             "https://www.consultant.ru/document/cons_doc_LAW_19702/9d0dc5bffbe52f6f95e97813e0ef420708952b4e/"
           ],
           "approved_portfolio": "ministry_social"
-        }
+        },
+        "pre_final_checked_norm_urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/9d0dc5bffbe52f6f95e97813e0ef420708952b4e/",
+          "https://www.consultant.ru/document/cons_doc_LAW_5142/1cd43e51fbd4129343b325971a466ec5cd32a425/"
+        ]
       }
     },
     {
@@ -1249,9 +1263,9 @@
         "review_date": "2026-11-27",
         "review_status": "option_analysis_draft",
         "checked_norm_urls": [
-          "https://www.consultant.ru/document/cons_doc_LAW_64629/98ad2641f95945c4b7956150260564c8b44028d9/",
           "https://www.consultant.ru/document/cons_doc_LAW_5142/7b6abd47219e2aa6081ac21b41e9e83d80fb45df/",
           "https://www.consultant.ru/document/cons_doc_LAW_5142/cc856395792cdd3ebdb55d49f5f2f9b8d6cabced/",
+          "https://www.consultant.ru/document/cons_doc_LAW_64629/98ad2641f95945c4b7956150260564c8b44028d9/",
           "https://www.consultant.ru/document/cons_doc_LAW_64629/be05678dc42ddc67aae5be9ba9beebd367fb9a3f/",
           "https://www.consultant.ru/document/cons_doc_LAW_64629/dffcf0b87b80ff38f430dc822a0074e76ccd41a0/",
           "https://www.consultant.ru/document/cons_doc_LAW_64629/640cbca01ece35bc535ffe5e6d96b7988d2daf6b/"
@@ -1300,7 +1314,15 @@
             "https://www.consultant.ru/document/cons_doc_LAW_64629/640cbca01ece35bc535ffe5e6d96b7988d2daf6b/"
           ],
           "approved_portfolio": "ministry_social"
-        }
+        },
+        "pre_final_checked_norm_urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_64629/98ad2641f95945c4b7956150260564c8b44028d9/",
+          "https://www.consultant.ru/document/cons_doc_LAW_5142/7b6abd47219e2aa6081ac21b41e9e83d80fb45df/",
+          "https://www.consultant.ru/document/cons_doc_LAW_5142/cc856395792cdd3ebdb55d49f5f2f9b8d6cabced/",
+          "https://www.consultant.ru/document/cons_doc_LAW_64629/be05678dc42ddc67aae5be9ba9beebd367fb9a3f/",
+          "https://www.consultant.ru/document/cons_doc_LAW_64629/dffcf0b87b80ff38f430dc822a0074e76ccd41a0/",
+          "https://www.consultant.ru/document/cons_doc_LAW_64629/640cbca01ece35bc535ffe5e6d96b7988d2daf6b/"
+        ]
       }
     },
     {
@@ -1435,11 +1457,10 @@
         "review_date": "2026-11-27",
         "review_status": "option_analysis_draft",
         "checked_norm_urls": [
-          "https://minjust.gov.ru/ru/documents/8011/",
-          "https://www.consultant.ru/document/cons_doc_LAW_61801/a15bab6050028753706f22c32fe60627a7be79f9/",
-          "https://www.consultant.ru/document/cons_doc_LAW_61801/26edb2934b899bf9c74c3a8f7e574651c6565e6d/",
           "https://www.consultant.ru/document/cons_doc_LAW_61801/96fbc469f91f57235cc842a85e0516a99f23dc85/",
-          "https://www.consultant.ru/document/cons_doc_LAW_61801/315f051396c88f1e4f827ba3f2ae313d999a1873/"
+          "https://www.consultant.ru/document/cons_doc_LAW_61801/315f051396c88f1e4f827ba3f2ae313d999a1873/",
+          "https://www.consultant.ru/document/cons_doc_LAW_61801/a15bab6050028753706f22c32fe60627a7be79f9/",
+          "https://www.consultant.ru/document/cons_doc_LAW_61801/26edb2934b899bf9c74c3a8f7e574651c6565e6d/"
         ],
         "source_scope": "specific_norm_and_related_search_results_partial",
         "competence_review": {
@@ -1481,7 +1502,14 @@
             "https://www.consultant.ru/document/cons_doc_LAW_61801/26edb2934b899bf9c74c3a8f7e574651c6565e6d/"
           ],
           "approved_portfolio": "ministry_social"
-        }
+        },
+        "pre_final_checked_norm_urls": [
+          "https://minjust.gov.ru/ru/documents/8011/",
+          "https://www.consultant.ru/document/cons_doc_LAW_61801/a15bab6050028753706f22c32fe60627a7be79f9/",
+          "https://www.consultant.ru/document/cons_doc_LAW_61801/26edb2934b899bf9c74c3a8f7e574651c6565e6d/",
+          "https://www.consultant.ru/document/cons_doc_LAW_61801/96fbc469f91f57235cc842a85e0516a99f23dc85/",
+          "https://www.consultant.ru/document/cons_doc_LAW_61801/315f051396c88f1e4f827ba3f2ae313d999a1873/"
+        ]
       }
     },
     {
@@ -1791,7 +1819,6 @@
         "review_status": "option_analysis_draft",
         "checked_norm_urls": [
           "https://www.consultant.ru/document/cons_doc_LAW_8559/1f3d91284a26982ce51392b5fd178e392fe53404/",
-          "https://www.consultant.ru/document/cons_doc_LAW_64629/98ad2641f95945c4b7956150260564c8b44028d9/",
           "https://www.consultant.ru/document/cons_doc_LAW_64629/dffcf0b87b80ff38f430dc822a0074e76ccd41a0/",
           "https://www.consultant.ru/document/cons_doc_LAW_64629/7f64aff5b7b90ee3a76a6b3029412837b60372d8/",
           "https://www.consultant.ru/document/cons_doc_LAW_64629/1541b3ba8adbd507e26ac14ea50f83b1de8abcd7/",
@@ -1844,7 +1871,15 @@
             "https://www.consultant.ru/document/cons_doc_LAW_64629/e3366d4715d8841757b6545f7bcb1b7dcc0a1d97/"
           ],
           "approved_portfolio": "ministry_social"
-        }
+        },
+        "pre_final_checked_norm_urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_8559/1f3d91284a26982ce51392b5fd178e392fe53404/",
+          "https://www.consultant.ru/document/cons_doc_LAW_64629/98ad2641f95945c4b7956150260564c8b44028d9/",
+          "https://www.consultant.ru/document/cons_doc_LAW_64629/dffcf0b87b80ff38f430dc822a0074e76ccd41a0/",
+          "https://www.consultant.ru/document/cons_doc_LAW_64629/7f64aff5b7b90ee3a76a6b3029412837b60372d8/",
+          "https://www.consultant.ru/document/cons_doc_LAW_64629/1541b3ba8adbd507e26ac14ea50f83b1de8abcd7/",
+          "https://www.consultant.ru/document/cons_doc_LAW_64629/e3366d4715d8841757b6545f7bcb1b7dcc0a1d97/"
+        ]
       }
     },
     {
@@ -2153,9 +2188,10 @@
         "review_date": "2026-11-27",
         "review_status": "option_analysis_draft",
         "checked_norm_urls": [
-          "https://minjust.gov.ru/ru/documents/8011/",
+          "https://www.consultant.ru/document/cons_doc_LAW_59999/0c7123ee40ad90f89afa6fa544a87ffe76c084c0/",
           "https://www.consultant.ru/document/cons_doc_LAW_59999/ca24c3b3a2032a1f727146f988f406723bf9ea1a/",
-          "https://www.consultant.ru/document/cons_doc_LAW_59999/0c7123ee40ad90f89afa6fa544a87ffe76c084c0/"
+          "https://mintrud.gov.ru/docs/laws/108",
+          "https://base.garant.ru/12146661/31de5683116b8d79b08fa2d768e33df6/"
         ],
         "source_scope": "specific_norm_and_related_search_results_partial",
         "competence_review": {
@@ -2195,7 +2231,12 @@
             "https://base.garant.ru/12146661/31de5683116b8d79b08fa2d768e33df6/"
           ],
           "approved_portfolio": "ministry_internal"
-        }
+        },
+        "pre_final_checked_norm_urls": [
+          "https://minjust.gov.ru/ru/documents/8011/",
+          "https://www.consultant.ru/document/cons_doc_LAW_59999/ca24c3b3a2032a1f727146f988f406723bf9ea1a/",
+          "https://www.consultant.ru/document/cons_doc_LAW_59999/0c7123ee40ad90f89afa6fa544a87ffe76c084c0/"
+        ]
       }
     },
     {
@@ -3385,8 +3426,8 @@
         "review_date": "2026-11-27",
         "review_status": "option_analysis_draft",
         "checked_norm_urls": [
-          "https://www.consultant.ru/document/cons_doc_LAW_144624/17c58c1903f7b6212924ba9ce701489655e9a8e0/",
           "https://www.consultant.ru/document/cons_doc_LAW_144624/d6aec91603ff628ea274b8552ce2849e06e0aa4c/",
+          "https://www.consultant.ru/document/cons_doc_LAW_144624/17c58c1903f7b6212924ba9ce701489655e9a8e0/",
           "https://www.consultant.ru/document/cons_doc_LAW_144624/f4823c3311874efd0ecdfa668c9705968edbc47c/"
         ],
         "source_scope": "specific_norm_and_related_search_results_partial",
@@ -3427,7 +3468,12 @@
             "https://www.consultant.ru/document/cons_doc_LAW_144624/f4823c3311874efd0ecdfa668c9705968edbc47c/"
           ],
           "approved_portfolio": "ministry_economic"
-        }
+        },
+        "pre_final_checked_norm_urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_144624/17c58c1903f7b6212924ba9ce701489655e9a8e0/",
+          "https://www.consultant.ru/document/cons_doc_LAW_144624/d6aec91603ff628ea274b8552ce2849e06e0aa4c/",
+          "https://www.consultant.ru/document/cons_doc_LAW_144624/f4823c3311874efd0ecdfa668c9705968edbc47c/"
+        ]
       }
     },
     {
@@ -3562,9 +3608,9 @@
         "review_date": "2026-11-27",
         "review_status": "option_analysis_draft",
         "checked_norm_urls": [
-          "https://www.consultant.ru/document/cons_doc_LAW_61801/a15bab6050028753706f22c32fe60627a7be79f9/",
           "https://www.consultant.ru/document/cons_doc_LAW_61801/96fbc469f91f57235cc842a85e0516a99f23dc85/",
           "https://www.consultant.ru/document/cons_doc_LAW_61801/315f051396c88f1e4f827ba3f2ae313d999a1873/",
+          "https://www.consultant.ru/document/cons_doc_LAW_61801/a15bab6050028753706f22c32fe60627a7be79f9/",
           "https://www.consultant.ru/document/cons_doc_LAW_9027/afbf7746a8ab4a8753f6eeeca8749b7412f21e2a/",
           "https://www.consultant.ru/document/cons_doc_LAW_9027/8e46f85492bc9acc81b567455479b0c78a53ebe8/"
         ],
@@ -3610,7 +3656,14 @@
             "https://www.consultant.ru/document/cons_doc_LAW_9027/8e46f85492bc9acc81b567455479b0c78a53ebe8/"
           ],
           "approved_portfolio": "ministry_social"
-        }
+        },
+        "pre_final_checked_norm_urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_61801/a15bab6050028753706f22c32fe60627a7be79f9/",
+          "https://www.consultant.ru/document/cons_doc_LAW_61801/96fbc469f91f57235cc842a85e0516a99f23dc85/",
+          "https://www.consultant.ru/document/cons_doc_LAW_61801/315f051396c88f1e4f827ba3f2ae313d999a1873/",
+          "https://www.consultant.ru/document/cons_doc_LAW_9027/afbf7746a8ab4a8753f6eeeca8749b7412f21e2a/",
+          "https://www.consultant.ru/document/cons_doc_LAW_9027/8e46f85492bc9acc81b567455479b0c78a53ebe8/"
+        ]
       }
     },
     {
@@ -3750,9 +3803,9 @@
         "review_date": "2026-11-27",
         "review_status": "option_analysis_draft",
         "checked_norm_urls": [
-          "https://www.consultant.ru/document/cons_doc_LAW_156558/f496bba45a6529882c567252bb9eef69357470c1/",
           "https://www.consultant.ru/document/cons_doc_LAW_156558/43e5b97938c3c7ebd3bd9009104cf22d1f3da45e/",
-          "https://www.consultant.ru/document/cons_doc_LAW_156558/ef50b92ba884d530dda28070a67d3b412f3415bd/"
+          "https://www.consultant.ru/document/cons_doc_LAW_156558/ef50b92ba884d530dda28070a67d3b412f3415bd/",
+          "https://www.consultant.ru/document/cons_doc_LAW_156558/f496bba45a6529882c567252bb9eef69357470c1/"
         ],
         "source_scope": "specific_norm_and_related_search_results_partial",
         "competence_review": {
@@ -3797,7 +3850,12 @@
             "https://www.consultant.ru/document/cons_doc_LAW_156558/f496bba45a6529882c567252bb9eef69357470c1/"
           ],
           "approved_portfolio": "ministry_social"
-        }
+        },
+        "pre_final_checked_norm_urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_156558/f496bba45a6529882c567252bb9eef69357470c1/",
+          "https://www.consultant.ru/document/cons_doc_LAW_156558/43e5b97938c3c7ebd3bd9009104cf22d1f3da45e/",
+          "https://www.consultant.ru/document/cons_doc_LAW_156558/ef50b92ba884d530dda28070a67d3b412f3415bd/"
+        ]
       }
     },
     {
@@ -4677,8 +4735,7 @@
         "review_status": "option_analysis_draft",
         "checked_norm_urls": [
           "https://www.consultant.ru/document/cons_doc_LAW_61763/75fad2ba0bd186dad16ff04a2efe55ae3f9ff7e6/",
-          "https://www.consultant.ru/document/cons_doc_LAW_61763/dd1cb1470320c15ddb30d1033ae07c96f53aa1c3/",
-          "https://www.consultant.ru/document/cons_doc_LAW_61763/b9f9ac2e2e1424e9cd11b915828438b431f9009a/"
+          "https://www.consultant.ru/document/cons_doc_LAW_61763/dd1cb1470320c15ddb30d1033ae07c96f53aa1c3/"
         ],
         "source_scope": "specific_norm_and_related_search_results_partial",
         "competence_review": {
@@ -4716,7 +4773,12 @@
             "https://www.consultant.ru/document/cons_doc_LAW_61763/dd1cb1470320c15ddb30d1033ae07c96f53aa1c3/"
           ],
           "approved_portfolio": "ministry_economic"
-        }
+        },
+        "pre_final_checked_norm_urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_61763/75fad2ba0bd186dad16ff04a2efe55ae3f9ff7e6/",
+          "https://www.consultant.ru/document/cons_doc_LAW_61763/dd1cb1470320c15ddb30d1033ae07c96f53aa1c3/",
+          "https://www.consultant.ru/document/cons_doc_LAW_61763/b9f9ac2e2e1424e9cd11b915828438b431f9009a/"
+        ]
       }
     },
     {
@@ -5036,7 +5098,6 @@
         "review_date": "2026-11-27",
         "review_status": "option_analysis_draft",
         "checked_norm_urls": [
-          "https://base.garant.ru/70291362/3ac805f6d87af32d44de92b042d51285/",
           "https://www.consultant.ru/document/cons_doc_LAW_140174/e20e07c635fef774b363dcf3da4bc91d29368299/",
           "https://www.consultant.ru/document/cons_doc_LAW_140174/6b08530edad66747252fe4b34361d250e7af65ac/"
         ],
@@ -5076,7 +5137,12 @@
             "https://www.consultant.ru/document/cons_doc_LAW_140174/6b08530edad66747252fe4b34361d250e7af65ac/"
           ],
           "approved_portfolio": "ministry_social"
-        }
+        },
+        "pre_final_checked_norm_urls": [
+          "https://base.garant.ru/70291362/3ac805f6d87af32d44de92b042d51285/",
+          "https://www.consultant.ru/document/cons_doc_LAW_140174/e20e07c635fef774b363dcf3da4bc91d29368299/",
+          "https://www.consultant.ru/document/cons_doc_LAW_140174/6b08530edad66747252fe4b34361d250e7af65ac/"
+        ]
       }
     },
     {
@@ -5429,8 +5495,8 @@
         "review_date": "2026-11-27",
         "review_status": "option_analysis_draft",
         "checked_norm_urls": [
-          "https://www.consultant.ru/document/cons_doc_LAW_156558/f496bba45a6529882c567252bb9eef69357470c1/",
           "https://www.consultant.ru/document/cons_doc_LAW_156558/ef50b92ba884d530dda28070a67d3b412f3415bd/",
+          "https://www.consultant.ru/document/cons_doc_LAW_156558/f496bba45a6529882c567252bb9eef69357470c1/",
           "https://www.consultant.ru/document/cons_doc_LAW_121895/8e8caa29efb42dd54e3924ee7441f06d469f4a80/"
         ],
         "source_scope": "specific_norm_and_related_search_results_partial",
@@ -5476,7 +5542,12 @@
             "https://www.consultant.ru/document/cons_doc_LAW_121895/8e8caa29efb42dd54e3924ee7441f06d469f4a80/"
           ],
           "approved_portfolio": "ministry_social"
-        }
+        },
+        "pre_final_checked_norm_urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_156558/f496bba45a6529882c567252bb9eef69357470c1/",
+          "https://www.consultant.ru/document/cons_doc_LAW_156558/ef50b92ba884d530dda28070a67d3b412f3415bd/",
+          "https://www.consultant.ru/document/cons_doc_LAW_121895/8e8caa29efb42dd54e3924ee7441f06d469f4a80/"
+        ]
       }
     },
     {
@@ -5808,7 +5879,8 @@
         "review_status": "option_analysis_draft",
         "checked_norm_urls": [
           "https://www.consultant.ru/document/cons_doc_LAW_37119/60911d568233117a38ef1370b01d48417f47c4c9/",
-          "https://www.consultant.ru/document/cons_doc_LAW_37119/e8e63be9481f65dccf9fcce354ed9348bf8f4db1/"
+          "https://www.consultant.ru/document/cons_doc_LAW_37119/e8e63be9481f65dccf9fcce354ed9348bf8f4db1/",
+          "https://www.consultant.ru/document/cons_doc_LAW_501319/fa3b44e1c4c827fa1123259368666478868cfd6f/"
         ],
         "source_scope": "specific_norm_and_related_search_results_partial",
         "competence_review": {
@@ -5845,7 +5917,11 @@
             "https://www.consultant.ru/document/cons_doc_LAW_501319/fa3b44e1c4c827fa1123259368666478868cfd6f/"
           ],
           "approved_portfolio": "ministry_internal"
-        }
+        },
+        "pre_final_checked_norm_urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_37119/60911d568233117a38ef1370b01d48417f47c4c9/",
+          "https://www.consultant.ru/document/cons_doc_LAW_37119/e8e63be9481f65dccf9fcce354ed9348bf8f4db1/"
+        ]
       }
     },
     {
@@ -6331,8 +6407,8 @@
         "review_status": "option_analysis_draft",
         "checked_norm_urls": [
           "https://www.consultant.ru/document/cons_doc_LAW_72386/1692e755d61192abb296c96e101a443f4b701edf/",
-          "https://www.consultant.ru/document/cons_doc_LAW_8585/8b0fbe781750ca08f5bd5ce672747890f8878fb7/",
           "https://www.consultant.ru/document/cons_doc_LAW_72386/d815e149e72342151144533709e7ebcf7aa60b8c/",
+          "https://www.consultant.ru/document/cons_doc_LAW_8585/8b0fbe781750ca08f5bd5ce672747890f8878fb7/",
           "https://epp.genproc.gov.ru/ru/proc_28/mass-media/news/regional/e5664303/"
         ],
         "source_scope": "specific_norm_and_related_search_results_partial",
@@ -6384,7 +6460,13 @@
             "https://epp.genproc.gov.ru/ru/proc_28/mass-media/news/regional/e5664303/"
           ],
           "approved_portfolio": "ministry_economic"
-        }
+        },
+        "pre_final_checked_norm_urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_72386/1692e755d61192abb296c96e101a443f4b701edf/",
+          "https://www.consultant.ru/document/cons_doc_LAW_8585/8b0fbe781750ca08f5bd5ce672747890f8878fb7/",
+          "https://www.consultant.ru/document/cons_doc_LAW_72386/d815e149e72342151144533709e7ebcf7aa60b8c/",
+          "https://epp.genproc.gov.ru/ru/proc_28/mass-media/news/regional/e5664303/"
+        ]
       }
     },
     {
@@ -7432,7 +7514,8 @@
         "review_date": "2026-11-27",
         "review_status": "option_analysis_draft",
         "checked_norm_urls": [
-          "https://www.consultant.ru/document/cons_doc_LAW_37318/555d42c04d8e6d7d9874776c46e180043cc8cb0c/"
+          "https://www.consultant.ru/document/cons_doc_LAW_37318/555d42c04d8e6d7d9874776c46e180043cc8cb0c/",
+          "https://base.garant.ru/12127232/d83dadc1d9eb82a4be83885f2efeee52/"
         ],
         "source_scope": "specific_norm_and_related_search_results_partial",
         "competence_review": {
@@ -7469,7 +7552,10 @@
             "https://base.garant.ru/12127232/d83dadc1d9eb82a4be83885f2efeee52/"
           ],
           "approved_portfolio": "ministry_social"
-        }
+        },
+        "pre_final_checked_norm_urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_37318/555d42c04d8e6d7d9874776c46e180043cc8cb0c/"
+        ]
       }
     },
     {
@@ -7596,7 +7682,8 @@
         "checked_norm_urls": [
           "https://www.consultant.ru/document/cons_doc_LAW_99350/dbf1daffdda5622cd839fb6a36130a63324a3bdd/",
           "https://base.garant.ru/412109870/",
-          "https://roszdravnadzor.gov.ru/documents/87501"
+          "https://roszdravnadzor.gov.ru/documents/87501",
+          "https://www.roszdravnadzor.ru/drugs/documents/87501"
         ],
         "source_scope": "specific_norm_and_related_search_results_partial",
         "competence_review": {
@@ -7635,7 +7722,12 @@
             "https://www.roszdravnadzor.ru/drugs/documents/87501"
           ],
           "approved_portfolio": "ministry_social"
-        }
+        },
+        "pre_final_checked_norm_urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_99350/dbf1daffdda5622cd839fb6a36130a63324a3bdd/",
+          "https://base.garant.ru/412109870/",
+          "https://roszdravnadzor.gov.ru/documents/87501"
+        ]
       }
     },
     {
@@ -7766,8 +7858,8 @@
         "review_status": "option_analysis_draft",
         "checked_norm_urls": [
           "https://www.consultant.ru/document/cons_doc_LAW_34683/bd14cccf0a1f074ef104e82522f7e2dea04d651f/",
-          "https://www.consultant.ru/document/cons_doc_LAW_34683/d11de7be54026a50672948edfb583e5f37bc48b6/",
-          "https://www.consultant.ru/document/cons_doc_law_34683/a0a891ee650687026ef53d5d1194983419be6793/"
+          "https://www.consultant.ru/document/cons_doc_law_34683/a0a891ee650687026ef53d5d1194983419be6793/",
+          "https://www.consultant.ru/document/cons_doc_LAW_34683/d11de7be54026a50672948edfb583e5f37bc48b6/"
         ],
         "source_scope": "specific_federal_norm_checked_partial",
         "competence_review": {
@@ -7807,7 +7899,12 @@
             "https://www.consultant.ru/document/cons_doc_LAW_34683/d11de7be54026a50672948edfb583e5f37bc48b6/"
           ],
           "approved_portfolio": "ministry_social"
-        }
+        },
+        "pre_final_checked_norm_urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_34683/bd14cccf0a1f074ef104e82522f7e2dea04d651f/",
+          "https://www.consultant.ru/document/cons_doc_LAW_34683/d11de7be54026a50672948edfb583e5f37bc48b6/",
+          "https://www.consultant.ru/document/cons_doc_law_34683/a0a891ee650687026ef53d5d1194983419be6793/"
+        ]
       }
     },
     {
@@ -7939,7 +8036,8 @@
         "checked_norm_urls": [
           "https://www.consultant.ru/document/cons_doc_LAW_59999/1a1719408a99f43738c30a453a74ddaf6ccd7ae7/",
           "https://www.consultant.ru/document/cons_doc_LAW_59999/0c7123ee40ad90f89afa6fa544a87ffe76c084c0/",
-          "https://www.consultant.ru/document/cons_doc_LAW_84602/e4fb380d53822434913f8449aa9b9e6bdf9f67a4/"
+          "https://www.consultant.ru/document/cons_doc_LAW_84602/e4fb380d53822434913f8449aa9b9e6bdf9f67a4/",
+          "https://mintrud.gov.ru/docs/laws/108"
         ],
         "source_scope": "specific_norm_and_related_search_results_partial",
         "competence_review": {
@@ -7980,7 +8078,12 @@
             "https://mintrud.gov.ru/docs/laws/108"
           ],
           "approved_portfolio": "ministry_internal"
-        }
+        },
+        "pre_final_checked_norm_urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_59999/1a1719408a99f43738c30a453a74ddaf6ccd7ae7/",
+          "https://www.consultant.ru/document/cons_doc_LAW_59999/0c7123ee40ad90f89afa6fa544a87ffe76c084c0/",
+          "https://www.consultant.ru/document/cons_doc_LAW_84602/e4fb380d53822434913f8449aa9b9e6bdf9f67a4/"
+        ]
       }
     },
     {
@@ -8454,8 +8557,8 @@
         "review_date": "2026-11-27",
         "review_status": "option_analysis_draft",
         "checked_norm_urls": [
-          "https://www.consultant.ru/document/cons_doc_LAW_156558/f496bba45a6529882c567252bb9eef69357470c1/",
           "https://www.consultant.ru/document/cons_doc_LAW_156558/43e5b97938c3c7ebd3bd9009104cf22d1f3da45e/",
+          "https://www.consultant.ru/document/cons_doc_LAW_156558/f496bba45a6529882c567252bb9eef69357470c1/",
           "https://www.consultant.ru/document/cons_doc_LAW_61801/96fbc469f91f57235cc842a85e0516a99f23dc85/",
           "https://www.consultant.ru/document/cons_doc_LAW_61801/315f051396c88f1e4f827ba3f2ae313d999a1873/",
           "https://www.consultant.ru/document/cons_doc_LAW_61801/a15bab6050028753706f22c32fe60627a7be79f9/"
@@ -8507,7 +8610,14 @@
             "https://www.consultant.ru/document/cons_doc_LAW_61801/a15bab6050028753706f22c32fe60627a7be79f9/"
           ],
           "approved_portfolio": "ministry_social"
-        }
+        },
+        "pre_final_checked_norm_urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_156558/f496bba45a6529882c567252bb9eef69357470c1/",
+          "https://www.consultant.ru/document/cons_doc_LAW_156558/43e5b97938c3c7ebd3bd9009104cf22d1f3da45e/",
+          "https://www.consultant.ru/document/cons_doc_LAW_61801/96fbc469f91f57235cc842a85e0516a99f23dc85/",
+          "https://www.consultant.ru/document/cons_doc_LAW_61801/315f051396c88f1e4f827ba3f2ae313d999a1873/",
+          "https://www.consultant.ru/document/cons_doc_LAW_61801/a15bab6050028753706f22c32fe60627a7be79f9/"
+        ]
       }
     },
     {

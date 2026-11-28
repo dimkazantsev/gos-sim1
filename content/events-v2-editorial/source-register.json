@@ -1,10 +1,11 @@
 {
-  "review_date": "2026-11-27",
-  "status": "partial_legal_review_not_for_production",
+  "review_date": "2026-11-28",
+  "status": "case_specific_educational_review_complete_not_for_production",
   "notes": [
     "Проверка фактического первоисточника не подтверждает правомерность всех вариантов.",
     "Ссылки на нормы сохранены из исходного банка; проверка каждой редакции и применимости ещё не завершена.",
-    "Для вымышленных учебных ситуаций отдельный новостной источник не обязателен."
+    "Для вымышленных учебных ситуаций отдельный новостной источник не обязателен.",
+    "Итоговые записи учебной правовой приёмки имеются для всех 330 ситуаций; это не независимая сертификация законодательства, не утверждение фактических региональных актов и не разрешение на активацию."
   ],
   "cases": [
     {
@@ -6317,7 +6318,6 @@
       "review_date": "2026-11-28",
       "source_scope": "case_specific_current_norms_and_all_alternatives_reviewed_under_stated_facts",
       "checked_norm_urls": [
-        "https://minjust.gov.ru/ru/documents/8011/",
         "https://www.consultant.ru/document/cons_doc_LAW_28399/bdb6e3b84ca23ec909e111e3d18908e25a355111/",
         "https://www.consultant.ru/document/cons_doc_LAW_4172/25bcaf1c6e141578dae386be7e8318758255968d/",
         "https://www.consultant.ru/document/cons_doc_LAW_4172/066133e25b24c3e9f18a6e7b9ae5c35aa2e853d0/",
@@ -6342,7 +6342,15 @@
           "https://www.consultant.ru/document/cons_doc_LAW_4172/a4c4f81478205eed3eaa30bc9504b43386aa66f1/",
           "https://www.consultant.ru/document/cons_doc_LAW_4172/9d237861d35d929fa8659d9201a6e7af72d5a8ff/"
         ]
-      }
+      },
+      "pre_final_checked_norm_urls": [
+        "https://minjust.gov.ru/ru/documents/8011/",
+        "https://www.consultant.ru/document/cons_doc_LAW_28399/bdb6e3b84ca23ec909e111e3d18908e25a355111/",
+        "https://www.consultant.ru/document/cons_doc_LAW_4172/25bcaf1c6e141578dae386be7e8318758255968d/",
+        "https://www.consultant.ru/document/cons_doc_LAW_4172/066133e25b24c3e9f18a6e7b9ae5c35aa2e853d0/",
+        "https://www.consultant.ru/document/cons_doc_LAW_4172/a4c4f81478205eed3eaa30bc9504b43386aa66f1/",
+        "https://www.consultant.ru/document/cons_doc_LAW_4172/9d237861d35d929fa8659d9201a6e7af72d5a8ff/"
+      ]
     },
     {
       "case_key": "bank-legal-2026-097",

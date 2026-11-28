@@ -177,14 +177,42 @@ for(const c of cases){
  if(!followup)continue;
  const r=registerByKey.get(c.case_key);
  assert.deepEqual(followup,r.legal_followup_2026_11_28,c.case_key+' follow-up mismatch');
- assert.deepEqual(followup.urls,r.checked_norm_urls,c.case_key+' checked links mismatch');
- assert.deepEqual(followup.urls,c.legal_review.checked_norm_urls,c.case_key+' catalogue links mismatch');
+ // Historical evidence remains identical in both records; final review may add sources.
+ assert.ok(followup.urls.every(url=>r.checked_norm_urls.includes(url)),c.case_key+' historical source missing from register');
+ assert.ok(followup.urls.every(url=>c.legal_review.checked_norm_urls.includes(url)),c.case_key+' historical source missing from catalogue');
  assert.equal(followup.option_count,c.effect_plan.options.length,c.case_key);
  assert.equal(followup.status,'article_text_rechecked_specific_conditions_not_full_acceptance',c.case_key);
  legalFollowupCount++;
 }
 assert.equal(legalFollowupCount,10);
 console.log(JSON.stringify({legalFollowupCount,registerCheckedNormCoverage:reg.cases.length},null,2));
+// Educational review is not permission to activate or independent legal certification.
+const finalStatus='case_specific_legal_acceptance_under_explicit_educational_facts';
+function checkFinalReview(c,r){
+ assert.equal(c.legal_review.status,r.legal_status,c.case_key+' legal status mismatch');
+ if(r.legal_status!=='verified_current'){
+  assert.equal(r.activation_allowed,false,c.case_key+' unreviewed case activation');
+  return false;
+ }
+ const f=c.legal_review.final_case_review_2026_11_28;
+ assert.ok(f&&(f.status??f.scope)===finalStatus,c.case_key+' missing final evidence');
+ assert.deepEqual(f,r.final_case_review_2026_11_28,c.case_key+' final evidence mismatch');
+ assert.equal(f.option_count,c.effect_plan.options.length,c.case_key+' final option count');
+ assert.ok(typeof f.date==='string'&&f.date.trim()&&typeof f.remaining==='string'&&f.remaining.trim()&&typeof (f.finding??f.conclusion)==='string'&&(f.finding??f.conclusion).trim(),c.case_key+' incomplete final evidence');
+ assert.ok(Array.isArray(f.urls)&&f.urls.length>0&&f.urls.every(u=>typeof u==='string'&&(u.startsWith('https://')||u.startsWith('http://'))),c.case_key+' final source URLs missing');
+ assert.deepEqual(f.urls,r.checked_norm_urls,c.case_key+' final register source mismatch');
+ assert.deepEqual(f.urls,c.legal_review.checked_norm_urls,c.case_key+' final catalogue source mismatch');
+ return true;
+}
+let finalReviewCount=0,finalReviewOptions=0;
+for(const c of cases){
+ if(checkFinalReview(c,registerByKey.get(c.case_key))){
+  finalReviewCount++;finalReviewOptions+=c.effect_plan.options.length;
+ }
+}
+assert.equal(finalReviewCount,330,'Final educational review incomplete');
+assert.equal(finalReviewOptions,1660,'Final alternative review incomplete');
+console.log(JSON.stringify({finalReviewCount,finalReviewOptions},null,2));
 const registerBlocked=reg.cases.filter(c=>c.activation_allowed!==true||c.legal_status!=='verified_current').length;
 for(const c of cases){
  const source=registerByKey.get(c.case_key);

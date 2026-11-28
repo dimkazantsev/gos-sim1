@@ -1393,7 +1393,6 @@
         "status": "verified_current",
         "note": "Правовой вывод исходной задачи сохранён как условие; проверка окончательного текста и специальной процедуры обязательна.",
         "checked_norm_urls": [
-          "https://minjust.gov.ru/ru/documents/8011/",
           "https://www.consultant.ru/document/cons_doc_LAW_28399/bdb6e3b84ca23ec909e111e3d18908e25a355111/",
           "https://www.consultant.ru/document/cons_doc_LAW_4172/25bcaf1c6e141578dae386be7e8318758255968d/",
           "https://www.consultant.ru/document/cons_doc_LAW_4172/066133e25b24c3e9f18a6e7b9ae5c35aa2e853d0/",
@@ -1460,7 +1459,15 @@
             "https://www.consultant.ru/document/cons_doc_LAW_4172/a4c4f81478205eed3eaa30bc9504b43386aa66f1/",
             "https://www.consultant.ru/document/cons_doc_LAW_4172/9d237861d35d929fa8659d9201a6e7af72d5a8ff/"
           ]
-        }
+        },
+        "pre_final_checked_norm_urls": [
+          "https://minjust.gov.ru/ru/documents/8011/",
+          "https://www.consultant.ru/document/cons_doc_LAW_28399/bdb6e3b84ca23ec909e111e3d18908e25a355111/",
+          "https://www.consultant.ru/document/cons_doc_LAW_4172/25bcaf1c6e141578dae386be7e8318758255968d/",
+          "https://www.consultant.ru/document/cons_doc_LAW_4172/066133e25b24c3e9f18a6e7b9ae5c35aa2e853d0/",
+          "https://www.consultant.ru/document/cons_doc_LAW_4172/a4c4f81478205eed3eaa30bc9504b43386aa66f1/",
+          "https://www.consultant.ru/document/cons_doc_LAW_4172/9d237861d35d929fa8659d9201a6e7af72d5a8ff/"
+        ]
       },
       "implementation_review": {
         "status": "draft",
