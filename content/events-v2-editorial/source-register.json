@@ -3928,12 +3928,12 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "БК РФ, статья 242, пункт 5: завершение финансового года и режим неиспользованных остатков целевых трансфертов. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
+      "legal_basis": "БК РФ, статья 242, пункт 5.",
       "legal_urls": [
         "https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
         "https://www.consultant.ru/document/cons_doc_LAW_19702/200d8f9e0aed34b95bc6527693824cb356109b83/"
       ],
-      "legal_status": "requires_case_specific_current_law_review",
+      "legal_status": "verified_current",
       "activation_allowed": false,
       "legal_evidence": [
         {
@@ -3945,14 +3945,9 @@
         }
       ],
       "targeted_option_review": {
-        "date": "2026-11-27",
-        "norm": "БК РФ, ст. 242, п. 5",
-        "urls": [
-          "https://www.consultant.ru/document/cons_doc_LAW_19702/200d8f9e0aed34b95bc6527693824cb356109b83/"
-        ],
-        "options": 5,
-        "status": "specific_text_read_and_alternatives_reviewed_under_stated_conditions_not_full_case_acceptance",
-        "remaining": "Порядок возврата федеральных субсидий в конкретном случае и контрактные обязательства требуют самостоятельной проверки; 30-дневный срок для отдельных решений главного администратора не перенесён автоматически на федеральную конструкцию."
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
+        "option_count": 5,
+        "remaining": "Учебная квалификация при прямо заданных условиях. Конкретные региональные и местные акты, договоры, финансовые документы и вся официальная цепочка поправок независимо не проверены; активация запрещена."
       },
       "checked_norm_urls": [
         "https://www.consultant.ru/document/cons_doc_LAW_19702/200d8f9e0aed34b95bc6527693824cb356109b83/"
@@ -3965,6 +3960,18 @@
         ],
         "option_count": 5,
         "finding": "П. 5 ст. 242 БК РФ, ред. 02.11.2026: возврат обычного целевого остатка в первые 15 рабочих дней; 30-дневная процедура для указанных администраторов не переносится автоматически на федеральную субсидию. Порядок подтверждения потребности и исполнение контракта проверяются отдельно."
+      },
+      "review_date": "2026-11-28",
+      "final_case_review_2026_11_28": {
+        "date": "2026-11-28",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
+        "norm": "БК РФ, статья 242, пункт 5.",
+        "option_count": 5,
+        "finding": "Возврат и повторное предоставление не тождественны; обязательства по контракту не исчезают.",
+        "remaining": "Учебная квалификация при прямо заданных условиях. Конкретные региональные и местные акты, договоры, финансовые документы и вся официальная цепочка поправок независимо не проверены; активация запрещена.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/200d8f9e0aed34b95bc6527693824cb356109b83/"
+        ]
       }
     },
     {
@@ -3974,13 +3981,15 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "Конституция РФ, статья 132, часть 2; БК РФ, статьи 65 и 86: полномочия и расходные обязательства муниципального образования. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
+      "legal_basis": "Конституция РФ, статья 132; 33-ФЗ, статьи 33–34; БК РФ, статьи 79.1, 86.",
       "legal_urls": [
         "https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
         "https://www.consultant.ru/document/cons_doc_LAW_19702/4ce55543bc62fa4c4587fa50514b56aa0121a671/",
-        "https://www.consultant.ru/document/cons_doc_LAW_19702/ca20da6e9e9d1116bbcf04288c9656fcd121ab94/"
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/ca20da6e9e9d1116bbcf04288c9656fcd121ab94/",
+        "https://www.consultant.ru/document/cons_doc_LAW_501319/e46b2c9eca58d3afa1e973e2e8a7c188f390cdb2/",
+        "https://www.consultant.ru/document/cons_doc_LAW_501319/d76059a3a15193b837145d02058cd732dc0c4565/"
       ],
-      "legal_status": "requires_case_specific_current_law_review",
+      "legal_status": "verified_current",
       "activation_allowed": false,
       "legal_evidence": [
         {
@@ -3993,13 +4002,29 @@
       ],
       "checked_norm_urls": [
         "https://www.consultant.ru/document/cons_doc_LAW_19702/4ce55543bc62fa4c4587fa50514b56aa0121a671/",
-        "https://www.consultant.ru/document/cons_doc_LAW_19702/ca20da6e9e9d1116bbcf04288c9656fcd121ab94/"
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/ca20da6e9e9d1116bbcf04288c9656fcd121ab94/",
+        "https://www.consultant.ru/document/cons_doc_LAW_501319/e46b2c9eca58d3afa1e973e2e8a7c188f390cdb2/",
+        "https://www.consultant.ru/document/cons_doc_LAW_501319/d76059a3a15193b837145d02058cd732dc0c4565/"
       ],
       "review_date": "2026-11-28",
       "targeted_option_review": {
-        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
         "option_count": 5,
-        "remaining": "Право собственности, вид полномочия, действующий региональный закон и переходные положения законодательства о МСУ."
+        "remaining": "Учебная квалификация при прямо заданных условиях. Конкретные региональные и местные акты, договоры, финансовые документы и вся официальная цепочка поправок независимо не проверены; активация запрещена."
+      },
+      "final_case_review_2026_11_28": {
+        "date": "2026-11-28",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
+        "norm": "Конституция РФ, статья 132; 33-ФЗ, статьи 33–34; БК РФ, статьи 79.1, 86.",
+        "option_count": 5,
+        "finding": "Нахождение объекта на территории муниципалитета само по себе не создаёт муниципальное расходное обязательство.",
+        "remaining": "Учебная квалификация при прямо заданных условиях. Конкретные региональные и местные акты, договоры, финансовые документы и вся официальная цепочка поправок независимо не проверены; активация запрещена.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/4ce55543bc62fa4c4587fa50514b56aa0121a671/",
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/ca20da6e9e9d1116bbcf04288c9656fcd121ab94/",
+          "https://www.consultant.ru/document/cons_doc_LAW_501319/e46b2c9eca58d3afa1e973e2e8a7c188f390cdb2/",
+          "https://www.consultant.ru/document/cons_doc_LAW_501319/d76059a3a15193b837145d02058cd732dc0c4565/"
+        ]
       }
     },
     {
@@ -4151,21 +4176,35 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "Федеральный закон №44-ФЗ, статья 95: изменение и расторжение контракта в установленных случаях. Источники: https://pravo.gov.ru/",
+      "legal_basis": "44-ФЗ, статьи 95, 112.",
       "legal_urls": [
         "https://pravo.gov.ru/",
-        "https://www.consultant.ru/document/cons_doc_LAW_144624/f4823c3311874efd0ecdfa668c9705968edbc47c/"
+        "https://www.consultant.ru/document/cons_doc_LAW_144624/f4823c3311874efd0ecdfa668c9705968edbc47c/",
+        "https://www.consultant.ru/document/cons_doc_LAW_144624/14979ba8493a52d2aa29ae0930046cf6f81caea0/"
       ],
-      "legal_status": "requires_case_specific_current_law_review",
+      "legal_status": "verified_current",
       "activation_allowed": false,
       "checked_norm_urls": [
-        "https://www.consultant.ru/document/cons_doc_LAW_144624/f4823c3311874efd0ecdfa668c9705968edbc47c/"
+        "https://www.consultant.ru/document/cons_doc_LAW_144624/f4823c3311874efd0ecdfa668c9705968edbc47c/",
+        "https://www.consultant.ru/document/cons_doc_LAW_144624/14979ba8493a52d2aa29ae0930046cf6f81caea0/"
       ],
       "review_date": "2026-11-28",
       "targeted_option_review": {
-        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
         "option_count": 5,
-        "remaining": "Предмет контракта, сроки, применимый пункт статьи 95 и временные нормы статьи 112, полномочия заказчика."
+        "remaining": "Учебная квалификация при прямо заданных условиях. Конкретные региональные и местные акты, договоры, финансовые документы и вся официальная цепочка поправок независимо не проверены; активация запрещена."
+      },
+      "final_case_review_2026_11_28": {
+        "date": "2026-11-28",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
+        "norm": "44-ФЗ, статьи 95, 112.",
+        "option_count": 5,
+        "finding": "Экспертная оценка не создаёт права на увеличение цены; варианты учитывают возможное законное основание, не предполагают автоматической индексации.",
+        "remaining": "Учебная квалификация при прямо заданных условиях. Конкретные региональные и местные акты, договоры, финансовые документы и вся официальная цепочка поправок независимо не проверены; активация запрещена.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_144624/f4823c3311874efd0ecdfa668c9705968edbc47c/",
+          "https://www.consultant.ru/document/cons_doc_LAW_144624/14979ba8493a52d2aa29ae0930046cf6f81caea0/"
+        ]
       }
     },
     {
@@ -4175,7 +4214,7 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "БК РФ, ст. 78 п. 1–3; ПП РФ №1782, п. 3, п. 11. Размер возмещения определяется применимым нормативным порядком с обоснованной формулой и подтверждёнными данными. Учитывается специальный режим транспортного обслуживания по ст. 14 Закона №220-ФЗ, если он применим.",
+      "legal_basis": "БК РФ, статья 78; ПП РФ №1782, пункт 11; 220-ФЗ, статья 14.",
       "legal_urls": [
         "https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
         "https://www.consultant.ru/document/cons_doc_LAW_19702/1b6959f23cc516d0e11ddc2e213ca2dca83560df/",
@@ -4184,7 +4223,7 @@
         "https://www.consultant.ru/document/cons_doc_LAW_461663/f497ae12435f300be00468c6d8a0d058bc77955e/",
         "https://www.consultant.ru/document/cons_doc_LAW_182659/2a81d1737eb14693e515423a77157b0fb20088c8/"
       ],
-      "legal_status": "requires_case_specific_current_law_review",
+      "legal_status": "verified_current",
       "activation_allowed": false,
       "checked_norm_urls": [
         "https://www.consultant.ru/document/cons_doc_LAW_19702/1b6959f23cc516d0e11ddc2e213ca2dca83560df/",
@@ -4195,16 +4234,17 @@
       ],
       "review_date": "2026-11-28",
       "targeted_option_review": {
-        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
         "option_count": 5,
-        "remaining": "Установить льготный тариф, основания компенсации, вид маршрутов, оплату контракта и отсутствие дублирования."
+        "remaining": "Учебная квалификация при прямо заданных условиях. Конкретные региональные и местные акты, договоры, финансовые документы и вся официальная цепочка поправок независимо не проверены; активация запрещена."
       },
       "final_case_review_2026_11_28": {
         "date": "2026-11-28",
-        "scope": "specific_norm_followup_not_full_acceptance",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
+        "norm": "БК РФ, статья 78; ПП РФ №1782, пункт 11; 220-ФЗ, статья 14.",
         "option_count": 5,
-        "conclusion": "Различены субсидия на недополученный доход и контрактная оплата. Пять мер требуют проверки тарифных полномочий, льготных категорий и способа расчёта.",
-        "remaining": "Установить льготный тариф, основания компенсации, вид маршрутов, оплату контракта и отсутствие дублирования.",
+        "finding": "Формула возмещения и первичные данные обязательны; поэтапность и объективные различия маршрутов допустимы при установленной методике.",
+        "remaining": "Учебная квалификация при прямо заданных условиях. Конкретные региональные и местные акты, договоры, финансовые документы и вся официальная цепочка поправок независимо не проверены; активация запрещена.",
         "urls": [
           "https://www.consultant.ru/document/cons_doc_LAW_19702/1b6959f23cc516d0e11ddc2e213ca2dca83560df/",
           "https://www.consultant.ru/document/cons_doc_LAW_461663/92d969e26a4326c5d02fa79b8f9cf4994ee5633b/",
@@ -4221,13 +4261,13 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "БК РФ, статья 160.2-1; федеральные стандарты внутреннего финансового аудита: функциональная независимость аудита. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
+      "legal_basis": "БК РФ, статья 160.2-1; приказ Минфина России от 05.08.2020 №160н, приложение 2.",
       "legal_urls": [
         "https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
         "https://www.consultant.ru/document/cons_doc_LAW_19702/6fdfc424277aebba215512c7a68a5077c68e1337/",
         "https://sudact.ru/law/prikaz-minfina-rossii-ot-05082020-n-160n/federalnyi-standart-vnutrennego-finansovogo-audita/prilozhenie-n-2/"
       ],
-      "legal_status": "requires_case_specific_current_law_review",
+      "legal_status": "verified_current",
       "activation_allowed": false,
       "legal_evidence": [
         {
@@ -4239,14 +4279,9 @@
         }
       ],
       "targeted_option_review": {
-        "date": "2026-11-27",
-        "norm": "БК РФ, ст. 160.2-1, п. 3–5",
-        "urls": [
-          "https://www.consultant.ru/document/cons_doc_LAW_19702/6fdfc424277aebba215512c7a68a5077c68e1337/"
-        ],
-        "options": 5,
-        "status": "specific_text_read_and_alternatives_reviewed_under_stated_conditions_not_full_case_acceptance",
-        "remaining": "Сами федеральные стандарты, ведомственный акт, основания привлечения эксперта и объём проверки не проверены полностью."
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
+        "option_count": 5,
+        "remaining": "Учебная квалификация при прямо заданных условиях. Конкретные региональные и местные акты, договоры, финансовые документы и вся официальная цепочка поправок независимо не проверены; активация запрещена."
       },
       "checked_norm_urls": [
         "https://www.consultant.ru/document/cons_doc_LAW_19702/6fdfc424277aebba215512c7a68a5077c68e1337/",
@@ -4261,6 +4296,19 @@
         ],
         "option_count": 5,
         "finding": "П. 3–5 ст. 160.2-1 БК РФ, ред. 02.11.2026; приложение 2 к стандарту 160н, ред. 04.10.2023, п. 4–8, 11–13: эксперт получает предусмотренные права и обязанности участника группы, но не руководителя; ответственность за итог сохраняется у субъекта аудита. Ведомственный акт, программа и полный стандарт выборки не представлены. Раздел принципов 196н на КонсультантПлюс недоступен."
+      },
+      "review_date": "2026-11-28",
+      "final_case_review_2026_11_28": {
+        "date": "2026-11-28",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
+        "norm": "БК РФ, статья 160.2-1; приказ Минфина России от 05.08.2020 №160н, приложение 2.",
+        "option_count": 5,
+        "finding": "Все пять вариантов — дополнительные способы обеспечить независимый аудит; привлечение эксперта не переносит ответственность.",
+        "remaining": "Учебная квалификация при прямо заданных условиях. Конкретные региональные и местные акты, договоры, финансовые документы и вся официальная цепочка поправок независимо не проверены; активация запрещена.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/6fdfc424277aebba215512c7a68a5077c68e1337/",
+          "https://sudact.ru/law/prikaz-minfina-rossii-ot-05082020-n-160n/federalnyi-standart-vnutrennego-finansovogo-audita/prilozhenie-n-2/"
+        ]
       }
     },
     {
@@ -4323,14 +4371,15 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "Федеральный закон №115-ФЗ, статья 10: условия концессионного соглашения; БК РФ, статьи 34 и 38. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
+      "legal_basis": "115-ФЗ, статьи 10, 10.1, 13; БК РФ, статья 38.",
       "legal_urls": [
         "https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
         "https://www.consultant.ru/document/cons_doc_LAW_19702/9a0e8abcbe24837343cdcc599bccf0f09413968a/",
         "https://www.consultant.ru/document/cons_doc_LAW_54572/6886719982ec257c9ee66e2f8cd6f423c1629371/",
-        "https://www.consultant.ru/document/cons_doc_LAW_54572/2d340398c3243ee82f5596dd3c46d550d6674df3/"
+        "https://www.consultant.ru/document/cons_doc_LAW_54572/2d340398c3243ee82f5596dd3c46d550d6674df3/",
+        "https://www.consultant.ru/document/cons_doc_LAW_54572/ba67c462149814d62294f17cabecedae172e3aa2/"
       ],
-      "legal_status": "requires_case_specific_current_law_review",
+      "legal_status": "verified_current",
       "activation_allowed": false,
       "legal_evidence": [
         {
@@ -4343,13 +4392,29 @@
       ],
       "checked_norm_urls": [
         "https://www.consultant.ru/document/cons_doc_LAW_54572/6886719982ec257c9ee66e2f8cd6f423c1629371/",
-        "https://www.consultant.ru/document/cons_doc_LAW_54572/2d340398c3243ee82f5596dd3c46d550d6674df3/"
+        "https://www.consultant.ru/document/cons_doc_LAW_54572/2d340398c3243ee82f5596dd3c46d550d6674df3/",
+        "https://www.consultant.ru/document/cons_doc_LAW_54572/ba67c462149814d62294f17cabecedae172e3aa2/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/9a0e8abcbe24837343cdcc599bccf0f09413968a/"
       ],
       "review_date": "2026-11-28",
       "targeted_option_review": {
-        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
         "option_count": 5,
-        "remaining": "Форма финансового участия, условия обеих выплат, вид затрат, стадия соглашения; конкретные ограничения статьи 10.1 зависят от формы участия."
+        "remaining": "Учебная квалификация при прямо заданных условиях. Конкретные региональные и местные акты, договоры, финансовые документы и вся официальная цепочка поправок независимо не проверены; активация запрещена."
+      },
+      "final_case_review_2026_11_28": {
+        "date": "2026-11-28",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
+        "norm": "115-ФЗ, статьи 10, 10.1, 13; БК РФ, статья 38.",
+        "option_count": 5,
+        "finding": "Раздельное финансирование разных расходов допустимо; недопустимо повторно полностью возмещать одну затрату вопреки условиям соглашений.",
+        "remaining": "Учебная квалификация при прямо заданных условиях. Конкретные региональные и местные акты, договоры, финансовые документы и вся официальная цепочка поправок независимо не проверены; активация запрещена.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_54572/6886719982ec257c9ee66e2f8cd6f423c1629371/",
+          "https://www.consultant.ru/document/cons_doc_LAW_54572/2d340398c3243ee82f5596dd3c46d550d6674df3/",
+          "https://www.consultant.ru/document/cons_doc_LAW_54572/ba67c462149814d62294f17cabecedae172e3aa2/",
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/9a0e8abcbe24837343cdcc599bccf0f09413968a/"
+        ]
       }
     },
     {
@@ -4539,23 +4604,38 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "БК РФ, статьи 139, 140 и 139.1: формы межбюджетных трансфертов из бюджета субъекта РФ. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
+      "legal_basis": "БК РФ, статьи 139, 139.1; статья 38.",
       "legal_urls": [
         "https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
         "https://www.consultant.ru/document/cons_doc_LAW_19702/8196c04ca89900439f387e81fad411d6965f41cf/",
-        "https://www.consultant.ru/document/cons_doc_LAW_19702/0768764f9a71e5ee941a99e42ec40ceae905649e/"
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/0768764f9a71e5ee941a99e42ec40ceae905649e/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/9a0e8abcbe24837343cdcc599bccf0f09413968a/"
       ],
-      "legal_status": "requires_case_specific_current_law_review",
+      "legal_status": "verified_current",
       "activation_allowed": false,
       "checked_norm_urls": [
         "https://www.consultant.ru/document/cons_doc_LAW_19702/8196c04ca89900439f387e81fad411d6965f41cf/",
-        "https://www.consultant.ru/document/cons_doc_LAW_19702/0768764f9a71e5ee941a99e42ec40ceae905649e/"
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/0768764f9a71e5ee941a99e42ec40ceae905649e/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/9a0e8abcbe24837343cdcc599bccf0f09413968a/"
       ],
       "review_date": "2026-11-28",
       "targeted_option_review": {
-        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
         "option_count": 5,
-        "remaining": "Принадлежность моста, полномочие, конкретная форма трансферта; субвенция относится к переданному государственному полномочию, не к любому ремонту."
+        "remaining": "Учебная квалификация при прямо заданных условиях. Конкретные региональные и местные акты, договоры, финансовые документы и вся официальная цепочка поправок независимо не проверены; активация запрещена."
+      },
+      "final_case_review_2026_11_28": {
+        "date": "2026-11-28",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
+        "norm": "БК РФ, статьи 139, 139.1; статья 38.",
+        "option_count": 5,
+        "finding": "Целевое софинансирование требует надлежащей формы, условий и бюджетного решения; ремонтные приоритеты не меняют их автоматически.",
+        "remaining": "Учебная квалификация при прямо заданных условиях. Конкретные региональные и местные акты, договоры, финансовые документы и вся официальная цепочка поправок независимо не проверены; активация запрещена.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/8196c04ca89900439f387e81fad411d6965f41cf/",
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/0768764f9a71e5ee941a99e42ec40ceae905649e/",
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/9a0e8abcbe24837343cdcc599bccf0f09413968a/"
+        ]
       }
     },
     {
@@ -4565,13 +4645,14 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "Федеральный закон №44-ФЗ, статьи 8 и 31; Федеральный закон №135-ФЗ, статья 17. Источники: https://pravo.gov.ru/",
+      "legal_basis": "44-ФЗ, статьи 8, 31; 135-ФЗ, статья 17.",
       "legal_urls": [
         "https://pravo.gov.ru/",
         "https://www.consultant.ru/document/cons_doc_LAW_144624/0c4ec341947f98654432292ddfd7066e3200d7fd/",
-        "https://www.consultant.ru/document/cons_doc_LAW_144624/be7f337d9b35705ac035531878c8d15c2b09b36d/"
+        "https://www.consultant.ru/document/cons_doc_LAW_144624/be7f337d9b35705ac035531878c8d15c2b09b36d/",
+        "https://www.consultant.ru/document/cons_doc_LAW_61763/a4d5c37c3c12de09d807bb2985aedd6877418573/"
       ],
-      "legal_status": "requires_case_specific_current_law_review",
+      "legal_status": "verified_current",
       "activation_allowed": false,
       "legal_evidence": [
         {
@@ -4583,13 +4664,28 @@
         }
       ],
       "checked_norm_urls": [
-        "https://www.consultant.ru/document/cons_doc_LAW_144624/be7f337d9b35705ac035531878c8d15c2b09b36d/"
+        "https://www.consultant.ru/document/cons_doc_LAW_144624/be7f337d9b35705ac035531878c8d15c2b09b36d/",
+        "https://www.consultant.ru/document/cons_doc_LAW_144624/0c4ec341947f98654432292ddfd7066e3200d7fd/",
+        "https://www.consultant.ru/document/cons_doc_LAW_61763/a4d5c37c3c12de09d807bb2985aedd6877418573/"
       ],
       "review_date": "2026-11-28",
       "targeted_option_review": {
-        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
         "option_count": 5,
-        "remaining": "Стадия закупки, основания исправления извещения, конкретные требования и критерии, применимость статьи 17 135-ФЗ; источник статьи 31 проверен, прочие нормы требуют адресной сверки."
+        "remaining": "Учебная квалификация при прямо заданных условиях. Конкретные региональные и местные акты, договоры, финансовые документы и вся официальная цепочка поправок независимо не проверены; активация запрещена."
+      },
+      "final_case_review_2026_11_28": {
+        "date": "2026-11-28",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
+        "norm": "44-ФЗ, статьи 8, 31; 135-ФЗ, статья 17.",
+        "option_count": 5,
+        "finding": "Объективные условия исполнения не равны дискриминационному ограничению доступа. Местные фирмы не получают процедурных преимуществ.",
+        "remaining": "Учебная квалификация при прямо заданных условиях. Конкретные региональные и местные акты, договоры, финансовые документы и вся официальная цепочка поправок независимо не проверены; активация запрещена.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_144624/be7f337d9b35705ac035531878c8d15c2b09b36d/",
+          "https://www.consultant.ru/document/cons_doc_LAW_144624/0c4ec341947f98654432292ddfd7066e3200d7fd/",
+          "https://www.consultant.ru/document/cons_doc_LAW_61763/a4d5c37c3c12de09d807bb2985aedd6877418573/"
+        ]
       }
     },
     {
@@ -4802,13 +4898,13 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "ГК РФ, статьи 125, 209 и 335: публичный собственник и залог. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
+      "legal_basis": "ГК РФ, статьи 125, 335.",
       "legal_urls": [
         "https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
         "https://www.consultant.ru/document/cons_doc_LAW_5142/53408843126f2204aba45a6195da864ff0319198/",
         "https://www.consultant.ru/document/cons_doc_LAW_5142/6c9806513efd7fe1af7ed7137faa52abdf43f06a/"
       ],
-      "legal_status": "requires_case_specific_current_law_review",
+      "legal_status": "verified_current",
       "activation_allowed": false,
       "checked_norm_urls": [
         "https://www.consultant.ru/document/cons_doc_LAW_5142/53408843126f2204aba45a6195da864ff0319198/",
@@ -4816,9 +4912,21 @@
       ],
       "review_date": "2026-11-28",
       "targeted_option_review": {
-        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
         "option_count": 5,
-        "remaining": "Региональные правила распоряжения казной, оборотоспособность объекта, полномочия, оценка и условия предоставления поддержки."
+        "remaining": "Учебная квалификация при прямо заданных условиях. Конкретные региональные и местные акты, договоры, финансовые документы и вся официальная цепочка поправок независимо не проверены; активация запрещена."
+      },
+      "final_case_review_2026_11_28": {
+        "date": "2026-11-28",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
+        "norm": "ГК РФ, статьи 125, 335.",
+        "option_count": 5,
+        "finding": "Нет автоматического права на залог имущества казны за частный долг. Даже положительная оценка риска не заменяет полномочия и надлежащее оформление.",
+        "remaining": "Учебная квалификация при прямо заданных условиях. Конкретные региональные и местные акты, договоры, финансовые документы и вся официальная цепочка поправок независимо не проверены; активация запрещена.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_5142/53408843126f2204aba45a6195da864ff0319198/",
+          "https://www.consultant.ru/document/cons_doc_LAW_5142/6c9806513efd7fe1af7ed7137faa52abdf43f06a/"
+        ]
       }
     },
     {
@@ -4828,14 +4936,14 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "ГК РФ, ст. 582; 44-ФЗ, ст. 15, 8 и 34: целевое пожертвование не отменяет применимого закупочного режима; в условии исключено основание перехода на 223-ФЗ.",
+      "legal_basis": "ГК РФ, статья 582; 44-ФЗ, статьи 8, 15.",
       "legal_urls": [
         "https://pravo.gov.ru/",
         "https://www.consultant.ru/document/cons_doc_LAW_144624/0c4ec341947f98654432292ddfd7066e3200d7fd/",
         "https://www.consultant.ru/document/cons_doc_LAW_9027/a0e91c7e19fe89bcaec22682e719eebc0777ba59/",
         "https://www.consultant.ru/document/cons_doc_LAW_144624/df3ace0ea577a92ea8b71c0d4363fbbe79da7160/"
       ],
-      "legal_status": "requires_case_specific_current_law_review",
+      "legal_status": "verified_current",
       "activation_allowed": false,
       "legal_evidence": [
         {
@@ -4848,13 +4956,27 @@
       ],
       "checked_norm_urls": [
         "https://www.consultant.ru/document/cons_doc_LAW_9027/a0e91c7e19fe89bcaec22682e719eebc0777ba59/",
-        "https://www.consultant.ru/document/cons_doc_LAW_144624/df3ace0ea577a92ea8b71c0d4363fbbe79da7160/"
+        "https://www.consultant.ru/document/cons_doc_LAW_144624/df3ace0ea577a92ea8b71c0d4363fbbe79da7160/",
+        "https://www.consultant.ru/document/cons_doc_LAW_144624/0c4ec341947f98654432292ddfd7066e3200d7fd/"
       ],
       "review_date": "2026-11-28",
       "targeted_option_review": {
-        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
         "option_count": 5,
-        "remaining": "Тип учреждения, условия дара, применимость 44-ФЗ или 223-ФЗ, полномочия и правила закупки; целевое назначение дара само по себе разрешено."
+        "remaining": "Учебная квалификация при прямо заданных условиях. Конкретные региональные и местные акты, договоры, финансовые документы и вся официальная цепочка поправок независимо не проверены; активация запрещена."
+      },
+      "final_case_review_2026_11_28": {
+        "date": "2026-11-28",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
+        "norm": "ГК РФ, статья 582; 44-ФЗ, статьи 8, 15.",
+        "option_count": 5,
+        "finding": "Условие цели пожертвования отличается от необоснованного ограничения конкуренции. Все варианты исключают навязанного поставщика.",
+        "remaining": "Учебная квалификация при прямо заданных условиях. Конкретные региональные и местные акты, договоры, финансовые документы и вся официальная цепочка поправок независимо не проверены; активация запрещена.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_9027/a0e91c7e19fe89bcaec22682e719eebc0777ba59/",
+          "https://www.consultant.ru/document/cons_doc_LAW_144624/df3ace0ea577a92ea8b71c0d4363fbbe79da7160/",
+          "https://www.consultant.ru/document/cons_doc_LAW_144624/0c4ec341947f98654432292ddfd7066e3200d7fd/"
+        ]
       }
     },
     {
@@ -4864,14 +4986,14 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "Конституция РФ, статья 130; БК РФ, статья 86; установленный муниципальный порядок инициативных проектов. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
+      "legal_basis": "33-ФЗ, статьи 49, 70.",
       "legal_urls": [
         "https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
         "https://www.consultant.ru/document/cons_doc_LAW_19702/4ce55543bc62fa4c4587fa50514b56aa0121a671/",
         "https://www.consultant.ru/document/cons_doc_LAW_501319/07d01c5cc986e77d47e5b098e7a80cb185dde940/",
         "https://www.consultant.ru/document/cons_doc_LAW_501319/cdbe6b2b737a57e9534c5dcb9cd1b89a66837956/"
       ],
-      "legal_status": "requires_case_specific_current_law_review",
+      "legal_status": "verified_current",
       "activation_allowed": false,
       "legal_evidence": [
         {
@@ -4888,9 +5010,21 @@
       ],
       "review_date": "2026-11-28",
       "targeted_option_review": {
-        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
         "option_count": 5,
-        "remaining": "Местный порядок, стадия отбора, наличие инициативных платежей и правила возврата; применимость статей 49 и 70 33-ФЗ с учётом переходных норм."
+        "remaining": "Учебная квалификация при прямо заданных условиях. Конкретные региональные и местные акты, договоры, финансовые документы и вся официальная цепочка поправок независимо не проверены; активация запрещена."
+      },
+      "final_case_review_2026_11_28": {
+        "date": "2026-11-28",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
+        "norm": "33-ФЗ, статьи 49, 70.",
+        "option_count": 5,
+        "finding": "Выбор жителей не заменяет бюджетное решение, но администрация не вправе самовольно подменять объект. Дополнительные меры сохраняют предусмотренное участие инициаторов.",
+        "remaining": "Учебная квалификация при прямо заданных условиях. Конкретные региональные и местные акты, договоры, финансовые документы и вся официальная цепочка поправок независимо не проверены; активация запрещена.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_501319/07d01c5cc986e77d47e5b098e7a80cb185dde940/",
+          "https://www.consultant.ru/document/cons_doc_LAW_501319/cdbe6b2b737a57e9534c5dcb9cd1b89a66837956/"
+        ]
       }
     },
     {
@@ -4957,14 +5091,14 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "БК РФ, статья 80; ГК РФ, статьи 1229 и 1234: бюджетные инвестиции и исключительные права. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
+      "legal_basis": "БК РФ, статья 80; ГК РФ, статьи 1229, 1233.",
       "legal_urls": [
         "https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
         "https://www.consultant.ru/document/cons_doc_LAW_19702/7ebbdc1002901f697dff4bd07218cb6623bc131c/",
         "https://www.consultant.ru/document/cons_doc_LAW_64629/98ad2641f95945c4b7956150260564c8b44028d9/",
         "https://www.consultant.ru/document/cons_doc_LAW_64629/2ef636aadd9bee02a47d69d5393d32dbd576797d/"
       ],
-      "legal_status": "requires_case_specific_current_law_review",
+      "legal_status": "verified_current",
       "activation_allowed": false,
       "checked_norm_urls": [
         "https://www.consultant.ru/document/cons_doc_LAW_19702/7ebbdc1002901f697dff4bd07218cb6623bc131c/",
@@ -4973,9 +5107,22 @@
       ],
       "review_date": "2026-11-28",
       "targeted_option_review": {
-        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
         "option_count": 5,
-        "remaining": "Вид юридического лица, права на конкретный результат, форма бюджетной поддержки, оценка капитала и решение о публичном участии."
+        "remaining": "Учебная квалификация при прямо заданных условиях. Конкретные региональные и местные акты, договоры, финансовые документы и вся официальная цепочка поправок независимо не проверены; активация запрещена."
+      },
+      "final_case_review_2026_11_28": {
+        "date": "2026-11-28",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
+        "norm": "БК РФ, статья 80; ГК РФ, статьи 1229, 1233.",
+        "option_count": 5,
+        "finding": "Разграничены инвестиция, лицензия и конкурсная поддержка. Оценка технологии не подтверждает права на неё.",
+        "remaining": "Учебная квалификация при прямо заданных условиях. Конкретные региональные и местные акты, договоры, финансовые документы и вся официальная цепочка поправок независимо не проверены; активация запрещена.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/7ebbdc1002901f697dff4bd07218cb6623bc131c/",
+          "https://www.consultant.ru/document/cons_doc_LAW_64629/98ad2641f95945c4b7956150260564c8b44028d9/",
+          "https://www.consultant.ru/document/cons_doc_LAW_64629/2ef636aadd9bee02a47d69d5393d32dbd576797d/"
+        ]
       }
     },
     {
@@ -4985,13 +5132,13 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "Федеральный закон №44-ФЗ, статья 34, части 6 и 9: ответственность поставщика. Источники: https://pravo.gov.ru/",
+      "legal_basis": "44-ФЗ, статья 34, части 6–9; ПП РФ №783 в редакции от 02.10.2026.",
       "legal_urls": [
         "https://pravo.gov.ru/",
         "https://www.consultant.ru/document/cons_doc_LAW_144624/c5cbc4acc59ffed792a3921dbc18900d2d0f7eb1/",
         "https://www.consultant.ru/document/cons_doc_LAW_301797/b1b1099a3d491e5432b9f3be6b3cb9f94b9b8598/"
       ],
-      "legal_status": "requires_case_specific_current_law_review",
+      "legal_status": "verified_current",
       "activation_allowed": false,
       "legal_evidence": [
         {
@@ -5003,14 +5150,9 @@
         }
       ],
       "targeted_option_review": {
-        "date": "2026-11-27",
-        "norm": "44-ФЗ, ст. 34, ч. 6–9, 9.1, 14–15",
-        "urls": [
-          "https://www.consultant.ru/document/cons_doc_LAW_144624/c5cbc4acc59ffed792a3921dbc18900d2d0f7eb1/"
-        ],
-        "options": 5,
-        "status": "specific_text_read_and_alternatives_reviewed_under_stated_conditions_not_full_case_acceptance",
-        "remaining": "Не определены цена контракта, объём исполнения и ставка на дату уплаты; сумму пени не выдумывать."
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
+        "option_count": 5,
+        "remaining": "Учебная квалификация при прямо заданных условиях. Конкретные региональные и местные акты, договоры, финансовые документы и вся официальная цепочка поправок независимо не проверены; активация запрещена."
       },
       "checked_norm_urls": [
         "https://www.consultant.ru/document/cons_doc_LAW_144624/c5cbc4acc59ffed792a3921dbc18900d2d0f7eb1/",
@@ -5025,6 +5167,19 @@
         ],
         "option_count": 5,
         "finding": "Ч. 6–9.1 ст. 34 44-ФЗ, ред. 04.08.2026, изменения с 01.10.2026; п. 2–3 Правил ПП РФ №783, ред. 02.10.2026: требование и списание — разные процедуры. Полное исполнение и неустойка не выше 5% цены обычно требуют списания; при сумме свыше 5% до 20% предусмотрено частичное списание при соблюдении условий. Уточнено незавершение наладки и отсутствие исключений п. 2; цена не выдумана."
+      },
+      "review_date": "2026-11-28",
+      "final_case_review_2026_11_28": {
+        "date": "2026-11-28",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
+        "norm": "44-ФЗ, статья 34, части 6–9; ПП РФ №783 в редакции от 02.10.2026.",
+        "option_count": 5,
+        "finding": "Дружеское письмо не является основанием освобождения; требование и предусмотренное законом списание различаются.",
+        "remaining": "Учебная квалификация при прямо заданных условиях. Конкретные региональные и местные акты, договоры, финансовые документы и вся официальная цепочка поправок независимо не проверены; активация запрещена.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_144624/c5cbc4acc59ffed792a3921dbc18900d2d0f7eb1/",
+          "https://www.consultant.ru/document/cons_doc_LAW_301797/b1b1099a3d491e5432b9f3be6b3cb9f94b9b8598/"
+        ]
       }
     },
     {
@@ -5125,13 +5280,13 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "БК РФ, статья 79: решения о бюджетных инвестициях. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
+      "legal_basis": "БК РФ, статья 79; 44-ФЗ, статья 95.",
       "legal_urls": [
         "https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
         "https://www.consultant.ru/document/cons_doc_LAW_19702/ac6c532ee1f365c6e1ff222f22b3f10587918494/",
         "https://www.consultant.ru/document/cons_doc_LAW_144624/f4823c3311874efd0ecdfa668c9705968edbc47c/"
       ],
-      "legal_status": "requires_case_specific_current_law_review",
+      "legal_status": "verified_current",
       "activation_allowed": false,
       "legal_evidence": [
         {
@@ -5148,9 +5303,21 @@
       ],
       "review_date": "2026-11-28",
       "targeted_option_review": {
-        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
         "option_count": 5,
-        "remaining": "Собственник, вид объекта, экспертиза, изменение инвестиционного решения, лимиты и законное изменение контракта."
+        "remaining": "Учебная квалификация при прямо заданных условиях. Конкретные региональные и местные акты, договоры, финансовые документы и вся официальная цепочка поправок независимо не проверены; активация запрещена."
+      },
+      "final_case_review_2026_11_28": {
+        "date": "2026-11-28",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
+        "norm": "БК РФ, статья 79; 44-ФЗ, статья 95.",
+        "option_count": 5,
+        "finding": "Рост сметы не разрешает выплату сверх обеспечения. Альтернативы требуют собственных проектных и финансовых оснований.",
+        "remaining": "Учебная квалификация при прямо заданных условиях. Конкретные региональные и местные акты, договоры, финансовые документы и вся официальная цепочка поправок независимо не проверены; активация запрещена.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/ac6c532ee1f365c6e1ff222f22b3f10587918494/",
+          "https://www.consultant.ru/document/cons_doc_LAW_144624/f4823c3311874efd0ecdfa668c9705968edbc47c/"
+        ]
       }
     },
     {
@@ -5290,14 +5457,14 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "Федеральный закон №73-ФЗ, статьи 45 и 47.3; БК РФ, статья 78. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
+      "legal_basis": "73-ФЗ, статьи 45, 47.3; БК РФ, статья 78.",
       "legal_urls": [
         "https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
         "https://www.consultant.ru/document/cons_doc_LAW_37318/774d929a1d0aa7f267ba8d331134193b354f8137/",
         "https://www.consultant.ru/document/cons_doc_LAW_37318/7e5263508065701505bcdcd34b82459f32e36228/",
         "https://www.consultant.ru/document/cons_doc_LAW_19702/1b6959f23cc516d0e11ddc2e213ca2dca83560df/"
       ],
-      "legal_status": "requires_case_specific_current_law_review",
+      "legal_status": "verified_current",
       "activation_allowed": false,
       "checked_norm_urls": [
         "https://www.consultant.ru/document/cons_doc_LAW_37318/774d929a1d0aa7f267ba8d331134193b354f8137/",
@@ -5306,9 +5473,22 @@
       ],
       "review_date": "2026-11-28",
       "targeted_option_review": {
-        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
         "option_count": 5,
-        "remaining": "Предмет охраны, вид работ (содержание или сохранение), уполномоченный орган, разрешения, статус подрядчика и порядок субсидии."
+        "remaining": "Учебная квалификация при прямо заданных условиях. Конкретные региональные и местные акты, договоры, финансовые документы и вся официальная цепочка поправок независимо не проверены; активация запрещена."
+      },
+      "final_case_review_2026_11_28": {
+        "date": "2026-11-28",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
+        "norm": "73-ФЗ, статьи 45, 47.3; БК РФ, статья 78.",
+        "option_count": 5,
+        "finding": "Частная собственность и бюджетная поддержка не отменяют охранный режим; этапность, контроль и софинансирование не заменяют обязательные разрешения.",
+        "remaining": "Учебная квалификация при прямо заданных условиях. Конкретные региональные и местные акты, договоры, финансовые документы и вся официальная цепочка поправок независимо не проверены; активация запрещена.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_37318/774d929a1d0aa7f267ba8d331134193b354f8137/",
+          "https://www.consultant.ru/document/cons_doc_LAW_37318/7e5263508065701505bcdcd34b82459f32e36228/",
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/1b6959f23cc516d0e11ddc2e213ca2dca83560df/"
+        ]
       }
     },
     {
@@ -5356,13 +5536,13 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "БК РФ, статьи 58 и 63: нормативы отчислений в местные бюджеты. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
+      "legal_basis": "БК РФ, статья 58.",
       "legal_urls": [
         "https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
         "https://www.consultant.ru/document/cons_doc_LAW_19702/1e231e90031b99643b29b6eb4579016c2a06533f/",
         "https://www.consultant.ru/document/cons_doc_LAW_19702/3cedc4b0d2eb9a888fea5ee932ae8694bfcf931a/"
       ],
-      "legal_status": "requires_case_specific_current_law_review",
+      "legal_status": "verified_current",
       "activation_allowed": false,
       "legal_evidence": [
         {
@@ -5381,14 +5561,9 @@
         }
       ],
       "targeted_option_review": {
-        "date": "2026-11-27",
-        "norm": "БК РФ, ст. 58",
-        "urls": [
-          "https://www.consultant.ru/document/cons_doc_LAW_19702/1e231e90031b99643b29b6eb4579016c2a06533f/"
-        ],
-        "options": 5,
-        "status": "specific_text_read_and_alternatives_reviewed_under_stated_conditions_not_full_case_acceptance",
-        "remaining": "Конкретный вид регионального норматива, налог, муниципальная структура и действующий акт не определены; специальный режим не считается полностью проверенным."
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
+        "option_count": 5,
+        "remaining": "Учебная квалификация при прямо заданных условиях. Конкретные региональные и местные акты, договоры, финансовые документы и вся официальная цепочка поправок независимо не проверены; активация запрещена."
       },
       "checked_norm_urls": [
         "https://www.consultant.ru/document/cons_doc_LAW_19702/1e231e90031b99643b29b6eb4579016c2a06533f/"
@@ -5401,6 +5576,18 @@
         ],
         "option_count": 5,
         "finding": "Ст. 58 БК РФ, ред. 02.11.2026: отдельные единые нормативы устанавливаются законом субъекта, не обычным законом о бюджете или законом на ограниченный срок; дополнительные нормативы имеют отдельный режим. Налог и вид норматива не заданы."
+      },
+      "review_date": "2026-11-28",
+      "final_case_review_2026_11_28": {
+        "date": "2026-11-28",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
+        "norm": "БК РФ, статья 58.",
+        "option_count": 5,
+        "finding": "Сценарный прогноз возможен, но обещание не создаёт действующего норматива. Иная бюджетная поддержка оформляется отдельно.",
+        "remaining": "Учебная квалификация при прямо заданных условиях. Конкретные региональные и местные акты, договоры, финансовые документы и вся официальная цепочка поправок независимо не проверены; активация запрещена.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/1e231e90031b99643b29b6eb4579016c2a06533f/"
+        ]
       }
     },
     {
@@ -5457,14 +5644,14 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "Федеральный закон от 04.08.2023 №411-ФЗ о северном завозе; БК РФ, статьи 38 и 78. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
+      "legal_basis": "411-ФЗ, статьи 12, 16; БК РФ, статья 38.",
       "legal_urls": [
         "https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
         "https://www.consultant.ru/document/cons_doc_LAW_19702/9a0e8abcbe24837343cdcc599bccf0f09413968a/",
         "https://www.consultant.ru/document/cons_doc_LAW_453883/be77c0da5cae1ad8f0982641fac42b0aa00a5757/",
         "https://www.consultant.ru/document/cons_doc_LAW_453883/d6d19db3e0347bb6ad6a7a9b57e3a7f0ba70089e/"
       ],
-      "legal_status": "requires_case_specific_current_law_review",
+      "legal_status": "verified_current",
       "activation_allowed": false,
       "legal_evidence": [
         {
@@ -5482,9 +5669,22 @@
       ],
       "review_date": "2026-11-28",
       "targeted_option_review": {
-        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
         "option_count": 5,
-        "remaining": "Категория груза, действующий план, участник завоза, вид субсидии, условия оплаты и подтверждения; аванс не всегда запрещён."
+        "remaining": "Учебная квалификация при прямо заданных условиях. Конкретные региональные и местные акты, договоры, финансовые документы и вся официальная цепочка поправок независимо не проверены; активация запрещена."
+      },
+      "final_case_review_2026_11_28": {
+        "date": "2026-11-28",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
+        "norm": "411-ФЗ, статьи 12, 16; БК РФ, статья 38.",
+        "option_count": 5,
+        "finding": "Планирование, перевозка и подтверждение целевых расходов разграничены; изменение маршрута не меняет утверждённые условия автоматически.",
+        "remaining": "Учебная квалификация при прямо заданных условиях. Конкретные региональные и местные акты, договоры, финансовые документы и вся официальная цепочка поправок независимо не проверены; активация запрещена.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_453883/be77c0da5cae1ad8f0982641fac42b0aa00a5757/",
+          "https://www.consultant.ru/document/cons_doc_LAW_453883/d6d19db3e0347bb6ad6a7a9b57e3a7f0ba70089e/",
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/9a0e8abcbe24837343cdcc599bccf0f09413968a/"
+        ]
       }
     },
     {
@@ -5494,7 +5694,7 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "БК РФ, ст. 78 п. 1, пп. 2 п. 2, п. 3, 3.1; ПП РФ от 25.10.2023 №1782 в ред. 14.11.2026, п. 3, 5–8. П. 10 подп. «а» общих требований и п. 11 подп. «б» разграничивают счета получателей и возможные специальные режимы. Смена получателя или платёж третьему лицу не могут служить обходом законного ареста. Последствия конкретного исполнительного ограничения требуют отдельной проверки.",
+      "legal_basis": "БК РФ, статья 78; ПП РФ №1782, пункты 10–11.",
       "legal_urls": [
         "https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
         "https://www.consultant.ru/document/cons_doc_LAW_19702/1b6959f23cc516d0e11ddc2e213ca2dca83560df/",
@@ -5502,7 +5702,7 @@
         "https://www.consultant.ru/document/cons_doc_LAW_461663/a1a45a1ff2c85c2136aa42b1b36f0bd1a62de4c0/",
         "https://www.consultant.ru/document/cons_doc_LAW_461663/21a16253b3660f098ca5f0433fe7166d356e2714/"
       ],
-      "legal_status": "requires_case_specific_current_law_review",
+      "legal_status": "verified_current",
       "activation_allowed": false,
       "checked_norm_urls": [
         "https://www.consultant.ru/document/cons_doc_LAW_19702/1b6959f23cc516d0e11ddc2e213ca2dca83560df/",
@@ -5512,16 +5712,17 @@
       ],
       "review_date": "2026-11-28",
       "targeted_option_review": {
-        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
         "option_count": 5,
-        "remaining": "Установить исполнительный документ, объект ареста, режим счёта, допустимость изменения получателя и правопреемство."
+        "remaining": "Учебная квалификация при прямо заданных условиях. Конкретные региональные и местные акты, договоры, финансовые документы и вся официальная цепочка поправок независимо не проверены; активация запрещена."
       },
       "final_case_review_2026_11_28": {
         "date": "2026-11-28",
-        "scope": "specific_norm_followup_not_full_acceptance",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
+        "norm": "БК РФ, статья 78; ПП РФ №1782, пункты 10–11.",
         "option_count": 5,
-        "conclusion": "Уточнено, что третья фирма не является установленным получателем. Пять мер требуют проверки вида ареста и правопреемства; статус не повышен.",
-        "remaining": "Установить исполнительный документ, объект ареста, режим счёта, допустимость изменения получателя и правопреемство.",
+        "finding": "Арест не означает автоматического нарушения субсидии, но не разрешает перевод непричастной фирме. Возможные решения принимаются законно, без двойного финансирования.",
+        "remaining": "Учебная квалификация при прямо заданных условиях. Конкретные региональные и местные акты, договоры, финансовые документы и вся официальная цепочка поправок независимо не проверены; активация запрещена.",
         "urls": [
           "https://www.consultant.ru/document/cons_doc_LAW_19702/1b6959f23cc516d0e11ddc2e213ca2dca83560df/",
           "https://www.consultant.ru/document/cons_doc_LAW_461663/92d969e26a4326c5d02fa79b8f9cf4994ee5633b/",
@@ -5655,12 +5856,12 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "БК РФ, статья 38: адресность и целевой характер бюджетных средств. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
+      "legal_basis": "БК РФ, статья 38.",
       "legal_urls": [
         "https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
         "https://www.consultant.ru/document/cons_doc_LAW_19702/9a0e8abcbe24837343cdcc599bccf0f09413968a/"
       ],
-      "legal_status": "requires_case_specific_current_law_review",
+      "legal_status": "verified_current",
       "activation_allowed": false,
       "legal_evidence": [
         {
@@ -5676,9 +5877,20 @@
       ],
       "review_date": "2026-11-28",
       "targeted_option_review": {
-        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
         "option_count": 5,
-        "remaining": "Конкретный вид трансферта, соглашение, получатель, допустимые затраты и изменение сметы."
+        "remaining": "Учебная квалификация при прямо заданных условиях. Конкретные региональные и местные акты, договоры, финансовые документы и вся официальная цепочка поправок независимо не проверены; активация запрещена."
+      },
+      "final_case_review_2026_11_28": {
+        "date": "2026-11-28",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
+        "norm": "БК РФ, статья 38.",
+        "option_count": 5,
+        "finding": "Исключён нецелевой расход 1,2 млн ₽; приоритеты восстановления и контроль не расширяют цель трансферта.",
+        "remaining": "Учебная квалификация при прямо заданных условиях. Конкретные региональные и местные акты, договоры, финансовые документы и вся официальная цепочка поправок независимо не проверены; активация запрещена.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/9a0e8abcbe24837343cdcc599bccf0f09413968a/"
+        ]
       }
     },
     {
@@ -5774,7 +5986,7 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "БК РФ, статьи 79–80; ГК РФ, статья 125: формы бюджетных инвестиций и полномочия публичного собственника. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
+      "legal_basis": "БК РФ, статьи 79, 79.1, 80; ГК РФ, статья 125.",
       "legal_urls": [
         "https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
         "https://www.consultant.ru/document/cons_doc_LAW_19702/ac6c532ee1f365c6e1ff222f22b3f10587918494/",
@@ -5782,7 +5994,7 @@
         "https://www.consultant.ru/document/cons_doc_LAW_19702/ca20da6e9e9d1116bbcf04288c9656fcd121ab94/",
         "https://www.consultant.ru/document/cons_doc_LAW_5142/53408843126f2204aba45a6195da864ff0319198/"
       ],
-      "legal_status": "requires_case_specific_current_law_review",
+      "legal_status": "verified_current",
       "activation_allowed": false,
       "legal_evidence": [
         {
@@ -5801,9 +6013,23 @@
       ],
       "review_date": "2026-11-28",
       "targeted_option_review": {
-        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
         "option_count": 5,
-        "remaining": "Правовой статус имущества, вид получателя, форма по ст. 79, 79.1 или 80, бюджетное решение и полномочия публичного собственника."
+        "remaining": "Учебная квалификация при прямо заданных условиях. Конкретные региональные и местные акты, договоры, финансовые документы и вся официальная цепочка поправок независимо не проверены; активация запрещена."
+      },
+      "final_case_review_2026_11_28": {
+        "date": "2026-11-28",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
+        "norm": "БК РФ, статьи 79, 79.1, 80; ГК РФ, статья 125.",
+        "option_count": 5,
+        "finding": "Разграничены инвестиции в публичную собственность и участие в капитале иных юридических лиц. Сверка реестров и оценка не заменяют правового решения.",
+        "remaining": "Учебная квалификация при прямо заданных условиях. Конкретные региональные и местные акты, договоры, финансовые документы и вся официальная цепочка поправок независимо не проверены; активация запрещена.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/ac6c532ee1f365c6e1ff222f22b3f10587918494/",
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/7ebbdc1002901f697dff4bd07218cb6623bc131c/",
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/ca20da6e9e9d1116bbcf04288c9656fcd121ab94/",
+          "https://www.consultant.ru/document/cons_doc_LAW_5142/53408843126f2204aba45a6195da864ff0319198/"
+        ]
       }
     },
     {
