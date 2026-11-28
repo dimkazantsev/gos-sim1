@@ -5247,14 +5247,22 @@
       "source_url": "https://67.mchs.gov.ru/deyatelnost/press-centr/novosti/5250655",
       "source_status": "official_article_read_core_episode_confirmed",
       "resolved_source_url": "https://67.mchs.gov.ru/deyatelnost/press-centr/novosti/5250655",
-      "legal_basis": "257-ФЗ, ст. 30: ограничение или прекращение движения и информирование об объезде осуществляются по компетенции владельца дороги и уполномоченных органов; статья не регулирует все спасательные полномочия. 68-ФЗ и специальные правила спасательных работ требуют отдельной проверки. В учебном выборе оценивается организационный план, а не самостоятельное распоряжение депутата аварийными службами.",
+      "legal_basis": "257-ФЗ от 08.11.2007, ст. 30; 196-ФЗ, ст. 14; 68-ФЗ, ст. 11; 151-ФЗ, ст. 14, 26. Ограничение движения по категории дороги и информирование об объезде, компетенция по организации аварийно-спасательных работ, руководство ликвидацией ЧС и содействие спасателям.",
       "legal_urls": [
-        "https://www.consultant.ru/document/cons_doc_LAW_72386/d815e149e72342151144533709e7ebcf7aa60b8c/"
+        "https://www.consultant.ru/document/cons_doc_LAW_72386/d815e149e72342151144533709e7ebcf7aa60b8c/",
+        "https://www.consultant.ru/document/cons_doc_LAW_8585/17c216cbd3011b1dc11ce6072fb90984cffcc9e4/",
+        "https://www.consultant.ru/document/cons_doc_LAW_5295/cf148e8662eafdb9539fb6f19024dfdb5c33aaa2/",
+        "https://www.consultant.ru/document/cons_doc_LAW_7746/5f9ee3efa7c5ed91f6750307819b88afa2cbcac0/",
+        "https://www.consultant.ru/document/cons_doc_LAW_7746/b7a756f310958b28e741942fe0b0b049df899fd1/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
       "checked_norm_urls": [
-        "https://www.consultant.ru/document/cons_doc_LAW_72386/d815e149e72342151144533709e7ebcf7aa60b8c/"
+        "https://www.consultant.ru/document/cons_doc_LAW_72386/d815e149e72342151144533709e7ebcf7aa60b8c/",
+        "https://www.consultant.ru/document/cons_doc_LAW_8585/17c216cbd3011b1dc11ce6072fb90984cffcc9e4/",
+        "https://www.consultant.ru/document/cons_doc_LAW_5295/cf148e8662eafdb9539fb6f19024dfdb5c33aaa2/",
+        "https://www.consultant.ru/document/cons_doc_LAW_7746/5f9ee3efa7c5ed91f6750307819b88afa2cbcac0/",
+        "https://www.consultant.ru/document/cons_doc_LAW_7746/b7a756f310958b28e741942fe0b0b049df899fd1/"
       ],
       "option_analysis_status": "draft",
       "source_scope": "specific_norm_and_related_search_results_partial",
@@ -5268,12 +5276,17 @@
         ]
       },
       "norm_recheck_2026_11_28": {
-        "status": "specific_articles_read_not_full_case_verification",
-        "basis": "Статья 30 ч. 1 п. 2, ч. 2–4 №257-ФЗ (ред. 25.05.2026): ограничение движения допускается ради безопасности; порядок зависит от категории дороги; организация объезда относится к компетентным органам, информирование — к владельцу дороги. Полномочия спасательных служб и региональный порядок не подтверждены этой статьёй.",
+        "status": "targeted_norm_and_all_individual_alternatives_reviewed_not_full_acceptance",
+        "basis": "257-ФЗ от 08.11.2007, ст. 30; 196-ФЗ, ст. 14; 68-ФЗ, ст. 11; 151-ФЗ, ст. 14, 26. Ограничение движения по категории дороги и информирование об объезде, компетенция по организации аварийно-спасательных работ, руководство ликвидацией ЧС и содействие спасателям.",
         "urls": [
-          "https://www.consultant.ru/document/cons_doc_LAW_72386/d815e149e72342151144533709e7ebcf7aa60b8c/"
+          "https://www.consultant.ru/document/cons_doc_LAW_72386/d815e149e72342151144533709e7ebcf7aa60b8c/",
+          "https://www.consultant.ru/document/cons_doc_LAW_8585/17c216cbd3011b1dc11ce6072fb90984cffcc9e4/",
+          "https://www.consultant.ru/document/cons_doc_LAW_5295/cf148e8662eafdb9539fb6f19024dfdb5c33aaa2/",
+          "https://www.consultant.ru/document/cons_doc_LAW_7746/5f9ee3efa7c5ed91f6750307819b88afa2cbcac0/",
+          "https://www.consultant.ru/document/cons_doc_LAW_7746/b7a756f310958b28e741942fe0b0b049df899fd1/"
         ],
-        "limitation": "Справочная консолидированная редакция; первичная публикация поправок и все варианты ответа отдельно не проверены."
+        "limitation": "Нормы проверены для учебного решения, а не как установление правовой оценки действий в апреле 2024 года. Категория дороги, уровень ЧС, региональные процедуры и правовое основание расходов требуют отдельного установления.",
+        "source_scope": "Тексты и поисковые извлечения действующих отдельных статей, 28.11.2026; историческая редакция и все специальные нормы отдельно не подтверждены."
       }
     },
     {
@@ -5314,9 +5327,10 @@
       "source_url": "https://epp.genproc.gov.ru/ru/proc_63/mass-media/news/regional/e5982928/",
       "source_status": "official_search_index_core_episode_confirmed_full_text_unavailable",
       "resolved_source_url": null,
-      "legal_basis": "273-ФЗ от 29.12.2012, ст. 28, ч. 6 п. 2, ст. 41: школа обязана обеспечивать безопасные условия обучения и охрану здоровья. Технические и финансовые решения принимаются в применимой компетенции; в учебной постановке нельзя продолжать занятия в признанных опасными помещениях.",
+      "legal_basis": "273-ФЗ от 29.12.2012, ст. 28 ч. 6 п. 2, ч. 7 и ст. 41 ч. 1 п. 8, ч. 2: безопасные условия обучения и охрана здоровья обучающихся; исполнение обязанностей образовательной организацией.",
       "legal_urls": [
-        "https://www.consultant.ru/document/cons_doc_LAW_140174/552097cad5942f36c9484dbde7ebf92db1f783f3/"
+        "https://www.consultant.ru/document/cons_doc_LAW_140174/552097cad5942f36c9484dbde7ebf92db1f783f3/",
+        "https://www.consultant.ru/document/cons_doc_LAW_140174/48b9101fff215f3aeb122d86593a129a34d96d3c/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
@@ -5337,13 +5351,14 @@
         ]
       },
       "norm_recheck_2026_11_28": {
-        "status": "specific_articles_read_not_full_case_verification",
-        "basis": "№273-ФЗ от 29.12.2012 (ред. 04.08.2026, изменения с 01.09.2026): ст. 28 ч. 6 п. 2, ч. 7; ст. 41 ч. 1 п. 8 и ч. 2. Безопасность и организация охраны здоровья — обязанность образовательной организации; финансирование учредителем в конкретной истории подтверждено судебным результатом, но общая норма не даёт депутату полномочий самостоятельно закрывать школу.",
+        "status": "targeted_norm_and_all_individual_alternatives_reviewed_not_full_acceptance",
+        "basis": "273-ФЗ от 29.12.2012, ст. 28 ч. 6 п. 2, ч. 7 и ст. 41 ч. 1 п. 8, ч. 2: безопасные условия обучения и охрана здоровья обучающихся; исполнение обязанностей образовательной организацией.",
         "urls": [
           "https://www.consultant.ru/document/cons_doc_LAW_140174/552097cad5942f36c9484dbde7ebf92db1f783f3/",
           "https://www.consultant.ru/document/cons_doc_LAW_140174/48b9101fff215f3aeb122d86593a129a34d96d3c/"
         ],
-        "limitation": "Справочная консолидированная редакция; первичная публикация поправок и все варианты ответа отдельно не проверены."
+        "limitation": "Технический акт об опасности является отдельно обозначенным учебным условием, не новым фактом исторического дела. Решение о ремонте и финансировании принимают компетентные лица по применимому порядку.",
+        "source_scope": "Тексты и поисковые извлечения действующих отдельных статей, 28.11.2026; историческая редакция и все специальные нормы отдельно не подтверждены."
       }
     },
     {
@@ -5353,7 +5368,7 @@
       "source_url": "https://epp.genproc.gov.ru/ru/gprf/mass-media/news/archive/e476430/",
       "source_status": "official_search_index_core_episode_confirmed_full_text_unavailable",
       "resolved_source_url": null,
-      "legal_basis": "220-ФЗ, ст. 14: при регулируемых тарифах перевозки организуются на предусмотренном законом договорном основании; конкретное изменение расписания и маршрута зависит от вида маршрута, договора и компетенции. Фактическое исполнение нельзя подменять опубликованным графиком. Вид тарифа исторического маршрута не подтверждён в данном проходе.",
+      "legal_basis": "220-ФЗ, ст. 14 ч. 1–3: регулярные перевозки по регулируемым тарифам организуются посредством государственного или муниципального контракта либо иных специально предусмотренных соглашений; в учебном условии выбран контракт.",
       "legal_urls": [
         "https://www.consultant.ru/document/cons_doc_LAW_182659/2a81d1737eb14693e515423a77157b0fb20088c8/",
         "https://base.garant.ru/71129200/888134b28b1397ffae87a0ab1e117954/"
@@ -5377,12 +5392,13 @@
         ]
       },
       "norm_recheck_2026_11_28": {
-        "status": "specific_articles_read_not_full_case_verification",
-        "basis": "№220-ФЗ (ред. 31.07.2025), ст. 14 ч. 1–3: компетентный орган устанавливает маршруты с регулируемыми тарифами; допускаются контракт и специально предусмотренные законом концессионные/партнёрские соглашения. В заданной контрактной ситуации заказчик устанавливает требования, перевозчик исполняет; не распространять единственную форму договора на все перевозки.",
+        "status": "targeted_norm_and_all_individual_alternatives_reviewed_not_full_acceptance",
+        "basis": "220-ФЗ, ст. 14 ч. 1–3: регулярные перевозки по регулируемым тарифам организуются посредством государственного или муниципального контракта либо иных специально предусмотренных соглашений; в учебном условии выбран контракт.",
         "urls": [
           "https://www.consultant.ru/document/cons_doc_LAW_182659/2a81d1737eb14693e515423a77157b0fb20088c8/"
         ],
-        "limitation": "Справочная консолидированная редакция; первичная публикация поправок и все варианты ответа отдельно не проверены."
+        "limitation": "Тариф и форма договора исторического маршрута не подтверждены первичным полным текстом. Конкретные полномочия и порядок изменения маршрута определяются региональным актом и контрактом. Опубликованное расписание не является доказательством исполнения.",
+        "source_scope": "Тексты и поисковые извлечения действующих отдельных статей, 28.11.2026; историческая редакция и все специальные нормы отдельно не подтверждены."
       }
     },
     {

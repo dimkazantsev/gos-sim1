@@ -31,6 +31,19 @@ const reg=JSON.parse(fs.readFileSync(dir+'/source-register.json','utf8'));assert
 // The register has two historical names for the number of explicitly reviewed alternatives.
 // Accept both without rewriting older evidence; the review itself is still not legal certification.
 const registerByKey=new Map(reg.cases.map(c=>[c.case_key,c]));
+// Keep dated, case-specific evidence in both the catalogue and the source register.
+const acceptedRecheckStatuses=new Set(['targeted_norm_and_all_individual_alternatives_reviewed_not_full_acceptance','targeted_norm_and_individual_alternatives_reviewed_not_full_acceptance']);
+let individualRecheckCount=0;
+for(const c of cases.filter(c=>c.audience==='single')){
+ const evidence=c.legal_review.norm_recheck_2026_11_28;
+ assert.ok(evidence&&acceptedRecheckStatuses.has(evidence.status),c.case_key+' individual recheck missing');
+ assert.ok(typeof evidence.limitation==='string'&&evidence.limitation.trim(),c.case_key+' missing limitations');
+ assert.ok(Array.isArray(evidence.urls)&&evidence.urls.length>0,c.case_key+' missing checked norm source');
+ assert.deepEqual(registerByKey.get(c.case_key)?.norm_recheck_2026_11_28,evidence,c.case_key+' individual source evidence mismatch');
+ individualRecheckCount++;
+}
+assert.equal(individualRecheckCount,141);
+console.log(JSON.stringify({individualRecheckCount},null,2));
 let collectiveReviewCount=0,collectiveReviewOptions=0;
 for(const c of cases){
  const review=c.legal_review.collective_option_analysis;
