@@ -3766,18 +3766,29 @@
         "https://minjust.gov.ru/ru/documents/8011/",
         "https://www.consultant.ru/document/cons_doc_LAW_34661/91a591b505fde94f1d7015578d2ae37f3d6e20ac/"
       ],
-      "legal_status": "requires_case_specific_current_law_review",
+      "legal_status": "verified_current",
       "activation_allowed": false,
       "review_date": "2026-11-28",
-      "source_scope": "specific_norm_checked_partial",
+      "source_scope": "case_specific_current_norms_and_all_alternatives_reviewed_under_stated_facts",
       "checked_norm_urls": [
         "https://minjust.gov.ru/ru/documents/8011/",
         "https://www.consultant.ru/document/cons_doc_LAW_34661/91a591b505fde94f1d7015578d2ae37f3d6e20ac/"
       ],
       "targeted_option_review": {
-        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
         "option_count": 5,
-        "remaining": "Компетентный орган производства; проверка не подменяет предусмотренный КоАП пересмотр постановлений."
+        "remaining": "Правовая граница и все пять вариантов проверены для прямо заданной учебной гипотезы; конкретные факты исполнения и специальные процедуры вне задания не сертифицированы."
+      },
+      "final_case_review_2026_11_28": {
+        "date": "2026-11-28",
+        "scope": "case_specific_legal_acceptance_under_explicit_educational_facts",
+        "option_count": 5,
+        "conclusion": "Ст. 54 Конституции и ст. 1.7 КоАП проверены: усиление ответственности не имеет обратной силы; благоприятная норма применяется при предусмотренных ч. 2 условиях. Все пять дополнительных мер допустимы при разграничении контрольной работы и полномочий по производству.",
+        "remaining": "Правовая граница и все пять вариантов проверены для прямо заданной учебной гипотезы; конкретные факты исполнения и специальные процедуры вне задания не сертифицированы.",
+        "urls": [
+          "https://minjust.gov.ru/ru/documents/8011/",
+          "https://www.consultant.ru/document/cons_doc_LAW_34661/91a591b505fde94f1d7015578d2ae37f3d6e20ac/"
+        ]
       }
     },
     {
@@ -4144,17 +4155,27 @@
       "legal_urls": [
         "https://www.consultant.ru/document/cons_doc_LAW_37119/98350fd66c4cbf9004bed8bb8e5a02926f98f246/"
       ],
-      "legal_status": "requires_case_specific_current_law_review",
+      "legal_status": "verified_current",
       "activation_allowed": false,
       "review_date": "2026-11-28",
-      "source_scope": "specific_norm_and_related_search_results_partial",
+      "source_scope": "case_specific_current_norms_and_all_alternatives_reviewed_under_stated_facts",
       "checked_norm_urls": [
         "https://www.consultant.ru/document/cons_doc_LAW_37119/98350fd66c4cbf9004bed8bb8e5a02926f98f246/"
       ],
       "targeted_option_review": {
-        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
         "option_count": 5,
-        "remaining": "Вид выборов, специальный закон, условия договора и решение комиссии проверяются отдельно; не переносить правила печати на любые форматы СМИ."
+        "remaining": "Правовая граница и все пять вариантов проверены для прямо заданной учебной гипотезы; конкретные факты исполнения и специальные процедуры вне задания не сертифицированы."
+      },
+      "final_case_review_2026_11_28": {
+        "date": "2026-11-28",
+        "scope": "case_specific_legal_acceptance_under_explicit_educational_facts",
+        "option_count": 5,
+        "conclusion": "Ст. 52 п. 6 №67-ФЗ: указание источника оплаты обязательно, ответственность за выполнение требования несёт редакция. Проверены пять нейтральных организационных мер, не заменяющих устранение нарушения; публичное разъяснение отдельно от агитационного материала.",
+        "remaining": "Правовая граница и все пять вариантов проверены для прямо заданной учебной гипотезы; конкретные факты исполнения и специальные процедуры вне задания не сертифицированы.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_37119/98350fd66c4cbf9004bed8bb8e5a02926f98f246/"
+        ]
       }
     },
     {
@@ -4168,17 +4189,27 @@
       "legal_urls": [
         "https://www.consultant.ru/document/cons_doc_LAW_37119/22a78fa701a7800e0ecb87a4097c4de1a1f4e3eb/"
       ],
-      "legal_status": "requires_case_specific_current_law_review",
+      "legal_status": "verified_current",
       "activation_allowed": false,
       "review_date": "2026-11-28",
-      "source_scope": "specific_norm_and_related_search_results_partial",
+      "source_scope": "case_specific_current_norms_and_all_alternatives_reviewed_under_stated_facts",
       "checked_norm_urls": [
         "https://www.consultant.ru/document/cons_doc_LAW_37119/22a78fa701a7800e0ecb87a4097c4de1a1f4e3eb/"
       ],
       "targeted_option_review": {
-        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
         "option_count": 5,
-        "remaining": "Иные способы голосования, допустимая помощь при заполнении и специальные процедуры регулируются отдельно; в учебных условиях они не применяются."
+        "remaining": "Правовая граница и все пять вариантов проверены для прямо заданной учебной гипотезы; конкретные факты исполнения и специальные процедуры вне задания не сертифицированы."
+      },
+      "final_case_review_2026_11_28": {
+        "date": "2026-11-28",
+        "scope": "case_specific_legal_acceptance_under_explicit_educational_facts",
+        "option_count": 5,
+        "conclusion": "Ст. 64 п. 4–6 №67-ФЗ: личное голосование, выдача бюллетеня включённому в список гражданину по установленному документу. Условия исключают выдачу за отсутствующего соседа. Все пять мер допустимы без изменения процедуры, тайны голосования и компетенции комиссии.",
+        "remaining": "Правовая граница и все пять вариантов проверены для прямо заданной учебной гипотезы; конкретные факты исполнения и специальные процедуры вне задания не сертифицированы.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_37119/22a78fa701a7800e0ecb87a4097c4de1a1f4e3eb/"
+        ]
       }
     },
     {
@@ -4440,19 +4471,34 @@
       "legal_basis": "Закон №2300-1, ст. 18, п. 5–6: товар принимается, при необходимости проверяется качество; при споре о причинах проводится экспертиза первоначально за счёт продавца. Возмещение расходов потребителем зависит от результата. Сроки связаны с выбранным требованием; в задаче заявлен ремонт.",
       "legal_urls": [
         "https://www.consultant.ru/document/cons_doc_LAW_305/76ae101b731ecc22467fd9f1f14cb9e2b8799026/",
-        "https://zpp.rospotrebnadzor.ru/news/federal/576544"
+        "https://zpp.rospotrebnadzor.ru/news/federal/576544",
+        "https://www.consultant.ru/document/Cons_doc_LAW_305/c771be122fddbc6e3087cbf43aa39a85a960a296/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
       "review_date": "2026-11-28",
       "source_scope": "specific_norm_and_related_search_results_partial",
       "checked_norm_urls": [
-        "https://www.consultant.ru/document/cons_doc_LAW_305/76ae101b731ecc22467fd9f1f14cb9e2b8799026/"
+        "https://www.consultant.ru/document/cons_doc_LAW_305/76ae101b731ecc22467fd9f1f14cb9e2b8799026/",
+        "https://zpp.rospotrebnadzor.ru/news/federal/576544",
+        "https://www.consultant.ru/document/Cons_doc_LAW_305/c771be122fddbc6e3087cbf43aa39a85a960a296/"
       ],
       "targeted_option_review": {
         "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
         "option_count": 5,
-        "remaining": "Конкретные сроки ремонта по ст. 20, результаты экспертизы и специальные правила технически сложного товара требуют отдельной проверки; возврат цены не обещается."
+        "remaining": "Уточнить применимость специальных норм защиты потребителей и союзного регулирования к выбранной дате, сроку гарантии и заявленному требованию. Не устанавливать автоматически возврат цены."
+      },
+      "final_case_review_2026_11_28": {
+        "date": "2026-11-28",
+        "scope": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "option_count": 5,
+        "conclusion": "Ст. 18 и 20 Закона №2300-1 проверены: при споре о причинах недостатка экспертиза первоначально за счёт обязанного лица; при письменном согласовании срока ремонта действует предел 45 дней. Все пять мер не заменяют обязательные действия. Дополнительная проверка специальных правил, включая применимость союзного регулирования, не завершена.",
+        "remaining": "Уточнить применимость специальных норм защиты потребителей и союзного регулирования к выбранной дате, сроку гарантии и заявленному требованию. Не устанавливать автоматически возврат цены.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_305/76ae101b731ecc22467fd9f1f14cb9e2b8799026/",
+          "https://zpp.rospotrebnadzor.ru/news/federal/576544",
+          "https://www.consultant.ru/document/Cons_doc_LAW_305/c771be122fddbc6e3087cbf43aa39a85a960a296/"
+        ]
       }
     },
     {
@@ -4468,17 +4514,31 @@
         "https://www.consultant.ru/document/cons_doc_LAW_305/",
         "https://www.consultant.ru/document/cons_doc_LAW_305/287ba272fb77db736b18354d3eec00164e7fd104/"
       ],
-      "legal_status": "requires_case_specific_current_law_review",
+      "legal_status": "verified_current",
       "activation_allowed": false,
       "review_date": "2026-11-28",
-      "source_scope": "specific_norm_and_related_search_results_partial",
+      "source_scope": "case_specific_current_norms_and_all_alternatives_reviewed_under_stated_facts",
       "checked_norm_urls": [
+        "https://44.rospotrebnadzor.ru/osnovnye_napravlenij/zacshita_prav_potreb/6948/",
+        "https://www.consultant.ru/document/cons_doc_LAW_305/",
         "https://www.consultant.ru/document/cons_doc_LAW_305/287ba272fb77db736b18354d3eec00164e7fd104/"
       ],
       "targeted_option_review": {
-        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
         "option_count": 5,
-        "remaining": "Возврат спорных платежей и последствия прекращения договора определяются конкретными требованиями и обстоятельствами; не обещать возврат любых старых платежей."
+        "remaining": "Правовая граница и все пять вариантов проверены для прямо заданной учебной гипотезы; конкретные факты исполнения и специальные процедуры вне задания не сертифицированы."
+      },
+      "final_case_review_2026_11_28": {
+        "date": "2026-11-28",
+        "scope": "case_specific_legal_acceptance_under_explicit_educational_facts",
+        "option_count": 5,
+        "conclusion": "П. 4.2 ст. 16.1 Закона №2300-1 действует с 01.03.2026; запрет использования реквизитов после отказа и возможность электронного отказа подтверждены. Уточнён абонентский характер договора и дата. Пять мер допустимы; возврат спорных платежей не объявлен автоматическим.",
+        "remaining": "Правовая граница и все пять вариантов проверены для прямо заданной учебной гипотезы; конкретные факты исполнения и специальные процедуры вне задания не сертифицированы.",
+        "urls": [
+          "https://44.rospotrebnadzor.ru/osnovnye_napravlenij/zacshita_prav_potreb/6948/",
+          "https://www.consultant.ru/document/cons_doc_LAW_305/",
+          "https://www.consultant.ru/document/cons_doc_LAW_305/287ba272fb77db736b18354d3eec00164e7fd104/"
+        ]
       }
     },
     {
@@ -4490,19 +4550,32 @@
       "resolved_source_url": null,
       "legal_basis": "ТК РФ, ст. 81, ч. 6: увольнение по сокращению во время болезни недопустимо при заданных обстоятельствах. Наличие подходящих вакансий и соблюдение прочих гарантий проверяются отдельно. Голосованием нельзя разрешить запрещённое увольнение.",
       "legal_urls": [
-        "https://www.consultant.ru/document/cons_doc_LAW_34683/6a7ba42d8fda3a1ba186a9eb5c806921998ae7d1/"
+        "https://www.consultant.ru/document/cons_doc_LAW_34683/6a7ba42d8fda3a1ba186a9eb5c806921998ae7d1/",
+        "https://www.consultant.ru/document/cons_doc_LAW_34683/6887e2fd9f9775c467fb9cc45fbc5874a04174cc/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
-      "review_date": "2026-11-27",
+      "review_date": "2026-11-28",
       "source_scope": "specific_norm_and_related_search_results_partial",
       "checked_norm_urls": [
-        "https://www.consultant.ru/document/cons_doc_LAW_34683/6a7ba42d8fda3a1ba186a9eb5c806921998ae7d1/"
+        "https://www.consultant.ru/document/cons_doc_LAW_34683/6a7ba42d8fda3a1ba186a9eb5c806921998ae7d1/",
+        "https://www.consultant.ru/document/cons_doc_LAW_34683/6887e2fd9f9775c467fb9cc45fbc5874a04174cc/"
       ],
       "targeted_option_review": {
         "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
         "option_count": 5,
-        "remaining": "Применимость ст. 178–180 ТК, преимущественное право, сроки уведомлений, коллективные и индивидуальные обстоятельства."
+        "remaining": "Проверить применимые ст. 178–179 ТК, гарантии конкретного работника, сроки, вакансии и выплаты. Дата увольнения сама по себе не подтверждает законность дальнейшего сокращения."
+      },
+      "final_case_review_2026_11_28": {
+        "date": "2026-11-28",
+        "scope": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "option_count": 5,
+        "conclusion": "Ч. 6 ст. 81 ТК запрещает увольнение по сокращению в период болезни; ст. 180 предусматривает предложение вакансий и гарантии предупреждения. Все пять мер условно допустимы сверх обязательных гарантий. Полная проверка дальнейшей процедуры сокращения не завершена.",
+        "remaining": "Проверить применимые ст. 178–179 ТК, гарантии конкретного работника, сроки, вакансии и выплаты. Дата увольнения сама по себе не подтверждает законность дальнейшего сокращения.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_34683/6a7ba42d8fda3a1ba186a9eb5c806921998ae7d1/",
+          "https://www.consultant.ru/document/cons_doc_LAW_34683/6887e2fd9f9775c467fb9cc45fbc5874a04174cc/"
+        ]
       }
     },
     {
@@ -4517,18 +4590,29 @@
         "https://www.consultant.ru/document/cons_doc_LAW_34683/cc065f088bd92d312b5fae714377b25f557ac44a/",
         "https://www.consultant.ru/document/cons_doc_LAW_34683/ede188a86ee930ba7b9e1163bc567d7897a43921/"
       ],
-      "legal_status": "requires_case_specific_current_law_review",
+      "legal_status": "verified_current",
       "activation_allowed": false,
-      "review_date": "2026-11-27",
-      "source_scope": "specific_norm_and_related_search_results_partial",
+      "review_date": "2026-11-28",
+      "source_scope": "case_specific_current_norms_and_all_alternatives_reviewed_under_stated_facts",
       "checked_norm_urls": [
         "https://www.consultant.ru/document/cons_doc_LAW_34683/cc065f088bd92d312b5fae714377b25f557ac44a/",
         "https://www.consultant.ru/document/cons_doc_LAW_34683/ede188a86ee930ba7b9e1163bc567d7897a43921/"
       ],
       "targeted_option_review": {
-        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
         "option_count": 5,
-        "remaining": "Оформление исправлений договора, конкретная редакция перечня иных категорий, режим персональных данных."
+        "remaining": "Правовая граница и все пять вариантов проверены для прямо заданной учебной гипотезы; конкретные факты исполнения и специальные процедуры вне задания не сертифицированы."
+      },
+      "final_case_review_2026_11_28": {
+        "date": "2026-11-28",
+        "scope": "case_specific_legal_acceptance_under_explicit_educational_facts",
+        "option_count": 5,
+        "conclusion": "Ст. 70 и 261 ТК подтверждают запрет испытания беременной и увольнения по этому основанию. Подпись не снимает гарантии. Все пять профилактических мер допустимы; обычная адаптация не может служить скрытым испытанием, данные работницы защищаются.",
+        "remaining": "Правовая граница и все пять вариантов проверены для прямо заданной учебной гипотезы; конкретные факты исполнения и специальные процедуры вне задания не сертифицированы.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_34683/cc065f088bd92d312b5fae714377b25f557ac44a/",
+          "https://www.consultant.ru/document/cons_doc_LAW_34683/ede188a86ee930ba7b9e1163bc567d7897a43921/"
+        ]
       }
     },
     {
@@ -4545,10 +4629,10 @@
         "https://www.consultant.ru/document/cons_doc_LAW_34683/cfa9a86846908928276ee2f2274d3d4a0a6c8640/",
         "https://www.consultant.ru/document/cons_doc_LAW_34683/a0a891ee650687026ef53d5d1194983419be6793/"
       ],
-      "legal_status": "requires_case_specific_current_law_review",
+      "legal_status": "verified_current",
       "activation_allowed": false,
-      "review_date": "2026-11-27",
-      "source_scope": "specific_norm_and_related_search_results_partial",
+      "review_date": "2026-11-28",
+      "source_scope": "case_specific_current_norms_and_all_alternatives_reviewed_under_stated_facts",
       "checked_norm_urls": [
         "https://www.consultant.ru/document/cons_doc_LAW_34683/7c8d2fe49f0c8b8d13723803f2e82228f99b6d7e/",
         "https://www.consultant.ru/document/cons_doc_LAW_34683/",
@@ -4556,9 +4640,22 @@
         "https://www.consultant.ru/document/cons_doc_LAW_34683/a0a891ee650687026ef53d5d1194983419be6793/"
       ],
       "targeted_option_review": {
-        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
         "option_count": 5,
-        "remaining": "Даты каждой выплаты, история ключевой ставки, размер частичных платежей, правовой статус работодателя и источник средств; точный размер компенсации не рассчитан."
+        "remaining": "Правовая граница и все пять вариантов проверены для прямо заданной учебной гипотезы; конкретные факты исполнения и специальные процедуры вне задания не сертифицированы."
+      },
+      "final_case_review_2026_11_28": {
+        "date": "2026-11-28",
+        "scope": "case_specific_legal_acceptance_under_explicit_educational_facts",
+        "option_count": 5,
+        "conclusion": "Ст. 114, 136, 236 ТК проверены. Долг и компенсация обязательны независимо от вины работодателя; при частичных выплатах расчёт ведётся от реально просроченной суммы. Все пять мер допустимы при немедленном исполнении обязательства и законном финансировании. Точная сумма компенсации не требуется и без дат не вычисляется.",
+        "remaining": "Правовая граница и все пять вариантов проверены для прямо заданной учебной гипотезы; конкретные факты исполнения и специальные процедуры вне задания не сертифицированы.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_34683/7c8d2fe49f0c8b8d13723803f2e82228f99b6d7e/",
+          "https://www.consultant.ru/document/cons_doc_LAW_34683/",
+          "https://www.consultant.ru/document/cons_doc_LAW_34683/cfa9a86846908928276ee2f2274d3d4a0a6c8640/",
+          "https://www.consultant.ru/document/cons_doc_LAW_34683/a0a891ee650687026ef53d5d1194983419be6793/"
+        ]
       }
     },
     {
@@ -4568,23 +4665,37 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "ТК РФ, ст. 99, 259: для матери ребёнка двух лет нужны письменное согласие, отсутствие медицинского запрета и письменное ознакомление с правом отказа. В заданной неаварийной ситуации принуждение недопустимо. Остальные работники также привлекаются только с соблюдением применимых норм и ограничений.",
+      "legal_basis": "ТК РФ, ст. 99, 259, 152: для сверхурочной работы матери ребёнка двух лет необходимы письменное согласие, отсутствие медицинского запрета и письменное ознакомление с правом отказа; применяются также общие основания, ограничения, учёт времени и правила оплаты в действующей редакции. В неаварийной ситуации принуждение недопустимо.",
       "legal_urls": [
         "https://www.consultant.ru/document/cons_doc_LAW_34683/b3b98c8b54f919c352560aadad5f95df943fd9fe/",
-        "https://www.consultant.ru/document/cons_doc_LAW_34683/ff4c79fea2e01934abc407be13af36cc7a15054c/"
+        "https://www.consultant.ru/document/cons_doc_LAW_34683/ff4c79fea2e01934abc407be13af36cc7a15054c/",
+        "https://www.consultant.ru/document/cons_doc_LAW_34683/c6eeef5fbf30c0b7f380760295dd5d0b47730bdb/"
       ],
-      "legal_status": "requires_case_specific_current_law_review",
+      "legal_status": "verified_current",
       "activation_allowed": false,
-      "review_date": "2026-11-27",
-      "source_scope": "specific_norm_and_related_search_results_partial",
+      "review_date": "2026-11-28",
+      "source_scope": "case_specific_current_norms_and_all_alternatives_reviewed_under_stated_facts",
       "checked_norm_urls": [
         "https://www.consultant.ru/document/cons_doc_LAW_34683/b3b98c8b54f919c352560aadad5f95df943fd9fe/",
-        "https://www.consultant.ru/document/cons_doc_LAW_34683/ff4c79fea2e01934abc407be13af36cc7a15054c/"
+        "https://www.consultant.ru/document/cons_doc_LAW_34683/ff4c79fea2e01934abc407be13af36cc7a15054c/",
+        "https://www.consultant.ru/document/cons_doc_LAW_34683/c6eeef5fbf30c0b7f380760295dd5d0b47730bdb/"
       ],
       "targeted_option_review": {
-        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
         "option_count": 5,
-        "remaining": "Конкретные лимиты сверхурочной работы по действующей на дату исполнения редакции, оплата, графики, основания срочных договоров."
+        "remaining": "Правовая граница и все пять вариантов проверены для прямо заданной учебной гипотезы; конкретные факты исполнения и специальные процедуры вне задания не сертифицированы."
+      },
+      "final_case_review_2026_11_28": {
+        "date": "2026-11-28",
+        "scope": "case_specific_legal_acceptance_under_explicit_educational_facts",
+        "option_count": 5,
+        "conclusion": "Ст. 99, 259 и 152 ТК проверены в редакции 25.05.2026 с действующими изменениями 01.09.2026. Для матери ребёнка до трёх лет требуются специальные гарантии; общие пределы, основания привлечения и оплата сохраняются. Не предполагается безусловная допустимость 240 часов. Все пять мер допустимы только при законном оформлении и соблюдении гарантий.",
+        "remaining": "Правовая граница и все пять вариантов проверены для прямо заданной учебной гипотезы; конкретные факты исполнения и специальные процедуры вне задания не сертифицированы.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_34683/b3b98c8b54f919c352560aadad5f95df943fd9fe/",
+          "https://www.consultant.ru/document/cons_doc_LAW_34683/ff4c79fea2e01934abc407be13af36cc7a15054c/",
+          "https://www.consultant.ru/document/cons_doc_LAW_34683/c6eeef5fbf30c0b7f380760295dd5d0b47730bdb/"
+        ]
       }
     },
     {
