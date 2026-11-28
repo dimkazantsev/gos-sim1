@@ -18,10 +18,15 @@ function compile(cases,registry,matrix){
   assert.equal(c.effect_plan.rules_version,2,c.case_key);
   const options=c.effect_plan.options.map((o,i)=>{
    assert.equal(o.key,'option_'+(i+1),c.case_key);assert.equal(typeof o.lawful,'boolean');
-   return Object.fromEntries(Object.entries(o).filter(([k])=>allowed.has(k)));
+   const clean=Object.fromEntries(Object.entries(o).filter(([k])=>allowed.has(k)));
+   const levels=new Map([[0,0],[.011236,.1],[.022472,.2],[.033708,.3],[.044944,.4],[.0625,.5],[.125,1],[.1875,1.5]]);
+   const scale=v=>{assert.ok(levels.has(Math.abs(v)),c.case_key+' unknown effect '+v);return Math.sign(v)*levels.get(Math.abs(v));};
+   if(c.audience==='single'){assert.ok(clean.trust===0||clean.trust===2,c.case_key);clean.trust=clean.trust===2?.5:0;}
+   else{clean.trust=scale(clean.trust);clean.metric_effects=Object.fromEntries(Object.entries(clean.metric_effects).map(([k,v])=>[k,scale(v)]));}
+   return clean;
   });
   assert.equal(options.length,c.decision_options.length);
-  const effect_plan={rules_version:2,options};
+  const effect_plan={rules_version:2,balance_revision:'2026-11-28-balance-1',options};
   if(c.audience==='single'){
    assert.ok(route?.owner_approved&&route.best_option===c.effect_plan.best_option_key,c.case_key);
    assert.ok(options.find(o=>o.key===route.best_option)?.lawful,c.case_key);
