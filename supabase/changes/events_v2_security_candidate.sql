@@ -75,3 +75,73 @@ END;
 $function$;
 REVOKE ALL ON FUNCTION public.invite_event_collaborator(uuid,uuid),public.respond_event_invitation(uuid,boolean),public.cancel_event_invitation(uuid),public.send_event_discussion(uuid,text),public.submit_event_decision(uuid,text,text),public.finalize_event_case(uuid),public.get_event_decision_feedback(uuid),public.get_event_workspace_projection(uuid,boolean) FROM PUBLIC,anon;
 GRANT EXECUTE ON FUNCTION public.invite_event_collaborator(uuid,uuid),public.respond_event_invitation(uuid,boolean),public.cancel_event_invitation(uuid),public.send_event_discussion(uuid,text),public.submit_event_decision(uuid,text,text),public.finalize_event_case(uuid),public.get_event_decision_feedback(uuid),public.get_event_workspace_projection(uuid,boolean) TO authenticated;
+
+CREATE OR REPLACE FUNCTION public.assign_event_case(p_case_id uuid, p_recipients uuid[])
+ RETURNS integer
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+ SET search_path TO 'public', 'private', 'pg_temp'
+AS $function$
+declare c public.event_cases%rowtype;recipient uuid;n integer:=0;recipients uuid[];v_stage integer;v_v2 boolean;v_existing uuid[];
+begin
+ select * into c from public.event_cases where id=p_case_id for update;
+ if c.id is null or not private.is_game_teacher(c.game_id) then raise exception 'Требуются права преподавателя';end if;
+ if c.status<>'ready' or exists(select 1 from public.event_case_outcomes where case_id=c.id)
+ then raise exception 'Событие недоступно для назначения';end if;
+ v_v2:=coalesce(c.effect_plan->>'rules_version'='2',false);
+ select array_agg(distinct v order by v) into recipients from unnest(p_recipients) v where v is not null;
+ if coalesce(cardinality(recipients),0)=0 then raise exception 'Выберите получателей';end if;
+ if c.audience='single' and cardinality(recipients)<>1 then raise exception 'Выберите одного участника';end if;
+ if c.audience='group' and cardinality(recipients) not between 2 and 3 then raise exception 'Выберите 2–3 участников';end if;
+ if exists(select 1 from unnest(recipients) r where not exists(select 1 from public.game_members
+  where game_id=c.game_id and user_id=r and kind='student' AND (NOT v_v2 OR (roster_archived_at IS NULL AND NOT EXISTS(SELECT 1 FROM public.game_member_access_blocks b WHERE b.game_id=c.game_id AND b.user_id=r))))) then raise exception 'Получатель недоступен';end if;
+ if c.audience='all' and cardinality(recipients)<>(select count(*) from public.game_members where game_id=c.game_id and kind='student' AND (NOT v_v2 OR (roster_archived_at IS NULL AND NOT EXISTS(SELECT 1 FROM public.game_member_access_blocks b WHERE b.game_id=c.game_id AND b.user_id=game_members.user_id))))
+ then raise exception 'Общее событие назначается всем участникам';end if;
+ -- The stage comes from the teacher's assignment context, not the largest
+ -- concurrently opened stage. Legacy clients use the explicit game round.
+ v_stage:=nullif(current_setting('app.gos_event_stage',true),'')::integer;
+ if v_stage is null then
+   select g.current_round into v_stage from public.games g where g.id=c.game_id;
+ end if;
+ if v_stage not between 1 and 16 or not exists(
+     select 1 from public.game_stages s
+     where s.game_id=c.game_id and s.stage_no=v_stage and s.status='open')
+ then raise exception 'Для назначения ситуации выберите открытый этап игры' using errcode='23514';end if;
+ IF v_v2 AND c.audience IN ('group','all') THEN
+  SELECT array_agg(a.recipient_id ORDER BY a.recipient_id) INTO v_existing FROM public.event_assignments a WHERE a.case_id=c.id AND a.game_id=c.game_id;
+  IF v_existing IS NOT NULL THEN
+   IF v_existing=recipients AND NOT EXISTS(SELECT 1 FROM public.event_assignments a WHERE a.case_id=c.id AND a.stage_no IS DISTINCT FROM v_stage) THEN RETURN 0;END IF;
+   RAISE EXCEPTION 'Состав коллективного голосования уже зафиксирован';
+  END IF;
+ END IF;
+ -- One set-based INSERT statement for all recipients: one trigger broadcast
+ -- and one database round of assignment checks instead of up to 100 statements.
+ INSERT INTO public.event_assignments(case_id,game_id,recipient_id,created_by,stage_no)
+ SELECT c.id,c.game_id,r.user_id,auth.uid(),v_stage
+ FROM unnest(recipients) AS r(user_id)
+ ON CONFLICT(case_id,recipient_id) DO NOTHING;
+ GET DIAGNOSTICS n=ROW_COUNT;
+ return n;
+end;
+$function$;
+CREATE OR REPLACE FUNCTION public.assign_event_case_at_stage(p_case_id uuid, p_recipients uuid[], p_stage_no integer)
+ RETURNS integer
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+ SET search_path TO 'public', 'private', 'pg_temp'
+AS $function$
+DECLARE v_game uuid;
+BEGIN
+ SELECT game_id INTO v_game FROM public.event_cases WHERE id=p_case_id;
+ IF v_game IS NULL OR NOT private.is_game_teacher(v_game) THEN
+   RAISE EXCEPTION 'Требуются права преподавателя' USING ERRCODE='42501';
+ END IF;
+ IF p_stage_no NOT BETWEEN 1 AND 16 OR NOT EXISTS(
+   SELECT 1 FROM public.game_stages s WHERE s.game_id=v_game AND s.stage_no=p_stage_no AND s.status='open')
+ THEN RAISE EXCEPTION 'Выберите открытый этап для этой ситуации' USING ERRCODE='23514';END IF;
+ PERFORM set_config('app.gos_event_stage',p_stage_no::text,true);
+ RETURN public.assign_event_case(p_case_id,p_recipients);
+END
+$function$;
+REVOKE ALL ON FUNCTION public.assign_event_case(uuid,uuid[]),public.assign_event_case_at_stage(uuid,uuid[],integer) FROM PUBLIC,anon;
+GRANT EXECUTE ON FUNCTION public.assign_event_case(uuid,uuid[]),public.assign_event_case_at_stage(uuid,uuid[],integer) TO authenticated;

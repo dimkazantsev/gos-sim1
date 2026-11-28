@@ -53,7 +53,8 @@ assert.equal(payload.filter(c=>c.audience!=='single'&&c.situation.endsWith(origi
 assert.ok(payload.filter(c=>c.audience==='single').every(c=>c.situation===originalByKey.get(c.case_key).original_situation));
 const blocked=payload.filter(c=>!(c.verified&&c.editorial_status==='approved'&&c.legal_status==='verified_current'&&c.activation_allowed&&c.competence_allowed)).length;
 console.log(JSON.stringify({catalogueCases:payload.length,options:1660,blocked,editorialBytes:Buffer.byteLength(JSON.stringify(cases)),candidateBytes:Buffer.byteLength(JSON.stringify(payload))}));
-if(process.argv.includes('--release'))assertReleaseReady(payload);
+if(require.main===module&&process.argv.includes('--release'))assertReleaseReady(payload);
+module.exports={payload,assertReleaseReady};
 async function main(){
  const db=new PGlite(),id=n=>'23000000-0000-4000-8000-'+String(n).padStart(12,'0'),game=id(999),user=id(998);
  try{
@@ -99,4 +100,4 @@ CREATE TABLE private.event_content_revisions(revision text,event_case_id uuid,sn
   console.log('PASS isolated SQL catalogue candidate: release denial, 330 synthetic templates, two safe instances, seven preserved, markers, snapshots, privilege, repeat denied');
  }finally{await db.close();}
 }
-main().catch(e=>{console.error(e.code??'ERROR',e.message,e.where??'');process.exitCode=1});
+if(require.main===module)main().catch(e=>{console.error(e.code??'ERROR',e.message,e.where??'');process.exitCode=1});

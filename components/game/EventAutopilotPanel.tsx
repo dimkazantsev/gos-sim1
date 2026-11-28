@@ -32,7 +32,7 @@ export default function EventAutopilotPanel({g,onChanged,readyCaseCount,panelMod
  const openStages=g.stages.filter(s=>s.status==='open');
  const chosenStage=openStages.length===1?openStages[0].stage_no:
   openStages.find(s=>String(s.stage_no)===assignmentStage)?.stage_no??null;
- const students=members.filter(m=>m.kind==='student');
+ const students=members.filter(m=>m.kind==='student'&&!m.roster_archived_at);
  const visible=useMemo(()=>bank.filter(c=>[c.title,c.category,c.situation].join(' ').toLowerCase().includes(search.trim().toLowerCase())),[bank,search]);
  const selected=bank.find(c=>c.id===chosen);
  const eligible=students;
