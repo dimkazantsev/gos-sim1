@@ -59,7 +59,12 @@ export default function Fixture(){const [uid,setUid]=useState('');useEffect(()=>
   return {ctx,page};
  }
  async function open(p,title){await p.bringToFront();await p.getByRole('button',{name:'Открыть ситуацию «'+title+'»',exact:true}).click();await p.getByRole('dialog').waitFor();}
- async function refresh(p){await p.bringToFront();await p.getByRole('button',{name:'Обновить список событий и результаты'}).click();}
+ async function refresh(p){
+  await p.bringToFront();
+  // The production game shell dispatches this event on metadata-only Broadcast.
+  // Simulate that delivery, not a click through the modal backdrop.
+  await p.evaluate(g=>window.dispatchEvent(new CustomEvent('gos-sims:refresh',{detail:{gameId:g,table:'event_decisions'}})),game);
+ }
  async function clickChoice(p,n){await p.getByRole('dialog').getByRole('button',{name:new RegExp('^Вариант '+n+'(?:\\s|$)')}).click();}
  async function waitText(p,s){await p.getByRole('dialog').getByText(s,{exact:false}).first().waitFor();}
  async function close(p){await p.getByRole('button',{name:'Закрыть событие'}).click();}
@@ -86,7 +91,10 @@ export default function Fixture(){const [uid,setUid]=useState('');useEffect(()=>
   assert.equal(await p.locator('.eventAnswerChoice:enabled').count(),0);
   await close(p);await close(e);
   const {page:t}=await context(third,1440);
-  for(const [page,n] of [[p,1],[e,2],[t,3]]){await open(page,allTitle);await clickChoice(page,n);await page.locator('.eventAnswerChoice:disabled').first().waitFor();}
+  for(const [page,n] of [[p,1],[e,2],[t,3]]){
+   await open(page,allTitle);await clickChoice(page,n);
+   if(n===3)await waitText(page,'Второй тур голосования');else await waitText(page,'Ваш голос:');
+  }
   for(const [page,n] of [[p,1],[e,1],[t,2]]){await refresh(page);await waitText(page,'Второй тур голосования');await page.locator('.eventAnswerChoice:enabled').first().waitFor();await clickChoice(page,n);}
   await waitText(t,'Итог голосования:');assert.equal(await t.locator('[data-best-option]').count(),0);
   const {page:v}=await context(guest,320);await open(v,allTitle);assert.equal(await v.locator('.eventAnswerChoice:enabled').count(),0);
