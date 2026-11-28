@@ -3798,33 +3798,46 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "Конституция РФ, ст. 15 и 57; 210-ФЗ, ст. 8, ч. 1–3. По условию услуга не имеет установленного платного основания; ведомственное письмо не создаёт его. Бесплатный приём и законное решение по заявлению обязательны независимо от голосования.",
+      "legal_basis": "№210-ФЗ ст. 8 ч. 1–3; ГрК РФ ст. 51 ч. 15; №191-ФЗ ст. 8.1 ч. 3; БК РФ ст. 72, 217; №44-ФЗ ст. 25. Выдача разрешения на строительство бесплатна. Ведомственное письмо не вводит сбор; необходимый результат и приём документов не обусловлены оплатой. Переходный порядок задан учебным условием, а не утверждением о реально принятом региональном акте. Перераспределение предлагается компетентному финансовому органу при законном основании; электронный канал — в пределах действующего порядка; совместная закупка — только при закупке одинаковых товаров и оформленном соглашении; информирование и бюджетное обоснование не заменяют обязательный приём.",
       "legal_urls": [
         "https://minjust.gov.ru/ru/documents/8011/",
-        "https://www.consultant.ru/document/cons_doc_LAW_103023/780c9842ff82f94d415db6b22a625ea65f69b662/"
+        "https://www.consultant.ru/document/cons_doc_LAW_103023/780c9842ff82f94d415db6b22a625ea65f69b662/",
+        "https://www.consultant.ru/document/cons_doc_LAW_51040/570afc6feff03328459242886307d6aebe1ccb6b/",
+        "https://www.consultant.ru/document/cons_doc_LAW_51015/d5e192c797f51b053ec3b19f9c62a2c569e7e694/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/aa129af3559dd1fc2b3201c05ced33582fe3d193/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/cf2863695f409dd40e50baa388ab6ae07175b29e/",
+        "https://www.consultant.ru/document/cons_doc_LAW_144624/7198f814047a8a6b1068ed6ac79fd008ba38d1a0/"
       ],
-      "legal_status": "requires_case_specific_current_law_review",
+      "legal_status": "verified_current",
       "activation_allowed": false,
       "review_date": "2026-11-28",
-      "source_scope": "specific_norm_checked_partial",
+      "source_scope": "case_specific_current_norms_and_all_alternatives_reviewed_under_stated_facts",
       "checked_norm_urls": [
-        "https://minjust.gov.ru/ru/documents/8011/",
-        "https://www.consultant.ru/document/cons_doc_LAW_103023/780c9842ff82f94d415db6b22a625ea65f69b662/"
+        "https://www.consultant.ru/document/cons_doc_LAW_103023/780c9842ff82f94d415db6b22a625ea65f69b662/",
+        "https://www.consultant.ru/document/cons_doc_LAW_51040/570afc6feff03328459242886307d6aebe1ccb6b/",
+        "https://www.consultant.ru/document/cons_doc_LAW_51015/d5e192c797f51b053ec3b19f9c62a2c569e7e694/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/aa129af3559dd1fc2b3201c05ced33582fe3d193/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/cf2863695f409dd40e50baa388ab6ae07175b29e/",
+        "https://www.consultant.ru/document/cons_doc_LAW_144624/7198f814047a8a6b1068ed6ac79fd008ba38d1a0/"
       ],
       "targeted_option_review": {
-        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
         "option_count": 5,
-        "remaining": "Вид разрешения, применимый специальный регламент и основания закупки не конкретизированы; статус полного допуска не меняется."
+        "remaining": "Проверено для прямо заданных учебных обстоятельств. Реальное индивидуальное исполнение не сертифицировано; использованы доступные справочные редакции и конкретные нормы, не полная независимая сверка цепочки поправок."
       },
       "final_case_review_2026_11_28": {
         "date": "2026-11-28",
-        "scope": "specific_norm_followup_not_full_acceptance",
+        "scope": "case_specific_legal_acceptance_under_explicit_educational_facts",
         "option_count": 5,
-        "conclusion": "Прочитана ст. 8 ч. 1–3 №210-ФЗ (ред. 04.08.2026, действует с 01.11.2026). Бесплатность не абсолютна: ч. 3 учитывает законно установленные случаи оплаты. В учебной истории прямо отсутствует законное основание. Все пять вариантов — предложения по финансированию, каналу обслуживания или информированию; ни один не вводит сбор.",
-        "remaining": "Вид разрешения, применимый специальный регламент и основания закупки не конкретизированы; статус полного допуска не меняется.",
+        "conclusion": "Конкретизированы разрешение и переходная модель. Все пять мер — рекомендации, не самостоятельное изменение бюджета, порядка выдачи или способа закупки. Действующий федеральный переходный механизм проверен. Параметры вымышленного регионального решения заданы условием; его реальное существование не утверждается.",
+        "remaining": "Проверено для прямо заданных учебных обстоятельств. Реальное индивидуальное исполнение не сертифицировано; использованы доступные справочные редакции и конкретные нормы, не полная независимая сверка цепочки поправок.",
         "urls": [
-          "https://minjust.gov.ru/ru/documents/8011/",
-          "https://www.consultant.ru/document/cons_doc_LAW_103023/780c9842ff82f94d415db6b22a625ea65f69b662/"
+          "https://www.consultant.ru/document/cons_doc_LAW_103023/780c9842ff82f94d415db6b22a625ea65f69b662/",
+          "https://www.consultant.ru/document/cons_doc_LAW_51040/570afc6feff03328459242886307d6aebe1ccb6b/",
+          "https://www.consultant.ru/document/cons_doc_LAW_51015/d5e192c797f51b053ec3b19f9c62a2c569e7e694/",
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/aa129af3559dd1fc2b3201c05ced33582fe3d193/",
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/cf2863695f409dd40e50baa388ab6ae07175b29e/",
+          "https://www.consultant.ru/document/cons_doc_LAW_144624/7198f814047a8a6b1068ed6ac79fd008ba38d1a0/"
         ]
       }
     },
@@ -4468,33 +4481,42 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "ГК РФ, ст. 182–183: учитываются источник полномочия, обстоятельства представительства и допустимость последующего одобрения. Бланк не доказывает полномочие. Для муниципальной закупки одобрение не может обходить обязательную закупочную или бюджетную процедуру; конкретные последствия требуют квалификации договора.",
+      "legal_basis": "ГК РФ ст. 182–183; п. 123 постановления Пленума ВС РФ от 23.06.2015 №25; №44-ФЗ п. 4 ч. 1 ст. 93; БК РФ ст. 72. Правовое основание закупки и полномочия подписанта — разные условия. Отсутствие полномочия нельзя исправлять фиктивной доверенностью. Возможное последующее одобрение оценивается компетентным лицом с учётом закупочного и бюджетного порядка; не предрешается его допустимость или обязанность оплатить товар. Фактическое поступление на хранение не означает автоматически одобрение. Проверка стоимости и урегулирование не дают права принимать новые неразрешённые обязательства.",
       "legal_urls": [
         "https://www.consultant.ru/document/cons_doc_LAW_5142/b76233cd456b40e2f35c7980c40e071767ffa16a/",
-        "https://www.consultant.ru/document/cons_doc_LAW_5142/0cf4748cf87a798af8d1bcc2115eb1bcc4cede31/"
+        "https://www.consultant.ru/document/cons_doc_LAW_5142/0cf4748cf87a798af8d1bcc2115eb1bcc4cede31/",
+        "https://www.vsrf.ru/documents/all/8435",
+        "https://www.consultant.ru/document/cons_doc_LAW_144624/ab3273e757a9e718cbb3741596bc36eb8138e4f6/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/aa129af3559dd1fc2b3201c05ced33582fe3d193/"
       ],
-      "legal_status": "requires_case_specific_current_law_review",
+      "legal_status": "verified_current",
       "activation_allowed": false,
       "review_date": "2026-11-28",
-      "source_scope": "specific_norm_and_related_search_results_partial",
+      "source_scope": "case_specific_current_norms_and_all_alternatives_reviewed_under_stated_facts",
       "checked_norm_urls": [
         "https://www.consultant.ru/document/cons_doc_LAW_5142/0cf4748cf87a798af8d1bcc2115eb1bcc4cede31/",
-        "https://www.consultant.ru/document/cons_doc_LAW_5142/b76233cd456b40e2f35c7980c40e071767ffa16a/"
+        "https://www.consultant.ru/document/cons_doc_LAW_5142/b76233cd456b40e2f35c7980c40e071767ffa16a/",
+        "https://www.vsrf.ru/documents/all/8435",
+        "https://www.consultant.ru/document/cons_doc_LAW_144624/ab3273e757a9e718cbb3741596bc36eb8138e4f6/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/aa129af3559dd1fc2b3201c05ced33582fe3d193/"
       ],
       "targeted_option_review": {
-        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
         "option_count": 5,
-        "remaining": "Установить специальный режим муниципального договора, источник полномочий, основания получения имущества и допустимость последующего одобрения; не признавать сделку автоматически действительной."
+        "remaining": "Проверено для прямо заданных учебных обстоятельств. Реальное индивидуальное исполнение не сертифицировано; использованы доступные справочные редакции и конкретные нормы, не полная независимая сверка цепочки поправок."
       },
       "final_case_review_2026_11_28": {
         "date": "2026-11-28",
-        "scope": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "scope": "case_specific_legal_acceptance_under_explicit_educational_facts",
         "option_count": 5,
-        "conclusion": "Ст. 182–183 ГК проверены, включая полномочие из обстановки и последствия одобрения. Пять мер допустимы только условно. Специальная закупочная и бюджетная квалификация сделки муниципалитета, возможность одобрения и расчётов не установлены.",
-        "remaining": "Установить специальный режим муниципального договора, источник полномочий, основания получения имущества и допустимость последующего одобрения; не признавать сделку автоматически действительной.",
+        "conclusion": "Уточнены режим закупки, предмет, условная цена, лимиты, отсутствие полномочия и правовые обстоятельства получения товара. Все пять вариантов допустимы как проверочные или профилактические меры, не как разрешение на одобрение, оплату или дальнейшее исполнение. Действительность контракта и конкретный способ урегулирования не определяются голосованием.",
+        "remaining": "Проверено для прямо заданных учебных обстоятельств. Реальное индивидуальное исполнение не сертифицировано; использованы доступные справочные редакции и конкретные нормы, не полная независимая сверка цепочки поправок.",
         "urls": [
           "https://www.consultant.ru/document/cons_doc_LAW_5142/0cf4748cf87a798af8d1bcc2115eb1bcc4cede31/",
-          "https://www.consultant.ru/document/cons_doc_LAW_5142/b76233cd456b40e2f35c7980c40e071767ffa16a/"
+          "https://www.consultant.ru/document/cons_doc_LAW_5142/b76233cd456b40e2f35c7980c40e071767ffa16a/",
+          "https://www.vsrf.ru/documents/all/8435",
+          "https://www.consultant.ru/document/cons_doc_LAW_144624/ab3273e757a9e718cbb3741596bc36eb8138e4f6/",
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/aa129af3559dd1fc2b3201c05ced33582fe3d193/"
         ]
       }
     },
@@ -5144,36 +5166,52 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "НК РФ, ст. 3, 17: налоговое обязательство и элементы налога определяются законодательством, а не информационной памяткой. Ставка 2% дана только как параметр конкретной учебной истории; вид налога, территория и период не названы, поэтому утверждать реальную универсальную ставку нельзя. Для точного расчёта нужны эти условия.",
+      "legal_basis": "НК РФ ст. 3, 17, 378.2, 380 п. 1.1, 382; Закон Алтайского края от 27.11.2003 №58-ЗС, ст. 1, 1.1 ч. 2. Для заданного объекта в 2026 году применяется годовая ставка 2%, а авансовый платёж рассчитывается по установленной законом формуле. Ведомственная памятка не устанавливает налоговую ставку. Ошибочное предварительное обращение исправляется по компетенции, а если обнаружены отдельные формальные решения или требования — применяются соответствующие самостоятельные процедуры. Все пять мер являются дополнительными инструментами профилактики ошибок.",
       "legal_urls": [
         "https://www.consultant.ru/document/cons_doc_LAW_19671/d03926665a6af79635a902fe666ce607ad1cdab0/",
         "https://www.consultant.ru/document/cons_doc_LAW_19671/",
-        "https://www.consultant.ru/document/cons_doc_LAW_19671/27c48775695f5049e317dfe269ede10c3394b4ae/"
+        "https://www.consultant.ru/document/cons_doc_LAW_19671/27c48775695f5049e317dfe269ede10c3394b4ae/",
+        "https://www.consultant.ru/document/cons_doc_LAW_28165/f6758978b92339b7e996fde13e5104caec7531d2/",
+        "https://www.consultant.ru/document/cons_doc_LAW_28165/ce7353ef8711e5b40f860860b7b77e724c028b65/",
+        "https://www.consultant.ru/document/cons_doc_LAW_28165/098366da40bb05d99c49c9d443a782c1f5643f7a/",
+        "https://www.kontur-extern.ru/info/normativ/document/122/31943-zakon-altayskogo-kraya-ot-27-11-2003-n-58-zs",
+        "https://www.consultant.ru/document/cons_doc_LAW_157394/bfa5d012b1d71dce6d3a8cd8283f1549a6299c57/",
+        "https://www.nalog.gov.ru/rn22/news/activities_fts/16640733/"
       ],
-      "legal_status": "requires_case_specific_current_law_review",
+      "legal_status": "verified_current",
       "activation_allowed": false,
       "review_date": "2026-11-28",
-      "source_scope": "specific_norm_and_related_search_results_partial",
+      "source_scope": "case_specific_current_norms_and_all_alternatives_reviewed_under_stated_facts",
       "checked_norm_urls": [
         "https://www.consultant.ru/document/cons_doc_LAW_19671/d03926665a6af79635a902fe666ce607ad1cdab0/",
         "https://www.consultant.ru/document/cons_doc_LAW_19671/27c48775695f5049e317dfe269ede10c3394b4ae/",
-        "https://www.consultant.ru/document/cons_doc_LAW_19671/"
+        "https://www.consultant.ru/document/cons_doc_LAW_28165/f6758978b92339b7e996fde13e5104caec7531d2/",
+        "https://www.consultant.ru/document/cons_doc_LAW_28165/ce7353ef8711e5b40f860860b7b77e724c028b65/",
+        "https://www.consultant.ru/document/cons_doc_LAW_28165/098366da40bb05d99c49c9d443a782c1f5643f7a/",
+        "https://www.kontur-extern.ru/info/normativ/document/122/31943-zakon-altayskogo-kraya-ot-27-11-2003-n-58-zs",
+        "https://www.consultant.ru/document/cons_doc_LAW_157394/bfa5d012b1d71dce6d3a8cd8283f1549a6299c57/",
+        "https://www.nalog.gov.ru/rn22/news/activities_fts/16640733/"
       ],
       "targeted_option_review": {
-        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
         "option_count": 5,
-        "remaining": "Определить вид налога, налоговый период, территорию и реальную применимую ставку либо явно согласовать полностью условный числовой пример; процедура исправления зависит от вида требования."
+        "remaining": "Проверено для прямо заданных учебных обстоятельств. Реальное индивидуальное исполнение не сертифицировано; использованы доступные справочные редакции и конкретные нормы, не полная независимая сверка цепочки поправок."
       },
       "final_case_review_2026_11_28": {
         "date": "2026-11-28",
-        "scope": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "scope": "case_specific_legal_acceptance_under_explicit_educational_facts",
         "option_count": 5,
-        "conclusion": "Ст. 3 и 17 НК проверены: ставка устанавливается законодательством, не памяткой. Все пять дополнительных мер допустимы при исходной учебной ставке. Конкретный налог и применимая норма о ставке не установлены.",
-        "remaining": "Определить вид налога, налоговый период, территорию и реальную применимую ставку либо явно согласовать полностью условный числовой пример; процедура исправления зависит от вида требования.",
+        "conclusion": "Ставки 2% и ошибочные 3% сохранены, вместо абстрактного налога задан конкретный налог, объект, регион и отчётный период. Статья 1.1 в редакции 01.11.2025 сверена со справкой на 01.11.2026; изменение 19.06.2026 относится к статье 2.3 и льготам для краевых учреждений здравоохранения, а не ставке выбранной коммерческой организации. Не указан вымышленный кадастровый номер или сумма налога. Все пять мер допустимы при сохранении компетенции и процессуальных требований.",
+        "remaining": "Проверено для прямо заданных учебных обстоятельств. Реальное индивидуальное исполнение не сертифицировано; использованы доступные справочные редакции и конкретные нормы, не полная независимая сверка цепочки поправок.",
         "urls": [
           "https://www.consultant.ru/document/cons_doc_LAW_19671/d03926665a6af79635a902fe666ce607ad1cdab0/",
           "https://www.consultant.ru/document/cons_doc_LAW_19671/27c48775695f5049e317dfe269ede10c3394b4ae/",
-          "https://www.consultant.ru/document/cons_doc_LAW_19671/"
+          "https://www.consultant.ru/document/cons_doc_LAW_28165/f6758978b92339b7e996fde13e5104caec7531d2/",
+          "https://www.consultant.ru/document/cons_doc_LAW_28165/ce7353ef8711e5b40f860860b7b77e724c028b65/",
+          "https://www.consultant.ru/document/cons_doc_LAW_28165/098366da40bb05d99c49c9d443a782c1f5643f7a/",
+          "https://www.kontur-extern.ru/info/normativ/document/122/31943-zakon-altayskogo-kraya-ot-27-11-2003-n-58-zs",
+          "https://www.consultant.ru/document/cons_doc_LAW_157394/bfa5d012b1d71dce6d3a8cd8283f1549a6299c57/",
+          "https://www.nalog.gov.ru/rn22/news/activities_fts/16640733/"
         ]
       }
     },
