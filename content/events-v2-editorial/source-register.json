@@ -7491,7 +7491,8 @@
         "https://www.consultant.ru/document/cons_doc_LAW_9027/e92736ea135e1b4b4f24d328a683d6954e73a27c/",
         "https://www.consultant.ru/document/cons_doc_LAW_9027/a0e91c7e19fe89bcaec22682e719eebc0777ba59/",
         "https://www.consultant.ru/document/cons_doc_LAW_19702/9d0dc5bffbe52f6f95e97813e0ef420708952b4e/",
-        "https://www.consultant.ru/law/hotdocs/94321.html"
+        "https://www.consultant.ru/law/hotdocs/94321.html",
+        "https://www.garant.ru/products/ipo/prime/doc/414226533/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
@@ -7502,22 +7503,24 @@
         "https://www.consultant.ru/document/cons_doc_LAW_9027/e92736ea135e1b4b4f24d328a683d6954e73a27c/",
         "https://www.consultant.ru/document/cons_doc_LAW_9027/a0e91c7e19fe89bcaec22682e719eebc0777ba59/",
         "https://www.consultant.ru/document/cons_doc_LAW_19702/9d0dc5bffbe52f6f95e97813e0ef420708952b4e/",
-        "https://www.consultant.ru/law/hotdocs/94321.html"
+        "https://www.consultant.ru/law/hotdocs/94321.html",
+        "https://www.garant.ru/products/ipo/prime/doc/414226533/"
       ],
       "norm_recheck_2026_11_28": {
         "status": "targeted_norm_and_individual_alternatives_reviewed_not_full_acceptance",
-        "limitation": "Порядок принятия имущества, регистрации и допуска автобуса, условия организованной перевозки детей и конкретное финансирование отдельно не проверены.",
+        "limitation": "Прочитано постановление Правительства РФ №680 от 02.06.2026 (с 01.09.2026): при организованной перевозке применяются специальные требования к автобусу, водителю, сопровождению и документам. Порядок принятия имущества, регистрации, фактический допуск автобуса, признаки конкретной перевозки и финансирование отдельно не установлены.",
         "urls": [
           "https://www.consultant.ru/document/cons_doc_LAW_9027/e92736ea135e1b4b4f24d328a683d6954e73a27c/",
           "https://www.consultant.ru/document/cons_doc_LAW_9027/a0e91c7e19fe89bcaec22682e719eebc0777ba59/",
           "https://www.consultant.ru/document/cons_doc_LAW_19702/9d0dc5bffbe52f6f95e97813e0ef420708952b4e/",
-          "https://www.consultant.ru/law/hotdocs/94321.html"
+          "https://www.consultant.ru/law/hotdocs/94321.html",
+          "https://www.garant.ru/products/ipo/prime/doc/414226533/"
         ]
       },
       "targeted_individual_review": {
         "status": "targeted_norm_and_individual_alternatives_reviewed_not_full_acceptance",
         "option_count": 5,
-        "remaining": "Порядок принятия имущества, регистрации и допуска автобуса, условия организованной перевозки детей и конкретное финансирование отдельно не проверены."
+        "remaining": "Прочитано постановление Правительства РФ №680 от 02.06.2026 (с 01.09.2026): при организованной перевозке применяются специальные требования к автобусу, водителю, сопровождению и документам. Порядок принятия имущества, регистрации, фактический допуск автобуса, признаки конкретной перевозки и финансирование отдельно не установлены."
       }
     },
     {
@@ -8084,7 +8087,7 @@
       "legal_urls": [
         "https://www.consultant.ru/document/cons_doc_LAW_305/030ee6c590df5a57ef7c36c7cc5c6a59e5373ecc/",
         "https://www.consultant.ru/document/cons_doc_LAW_305/0b3cc6d567f2c728bfe4c61b25a2bd8f1c0297c7/",
-        "https://www.consultant.ru/document/cons_doc_LAW_305/f190d8f6c0d4f03af399cc0efcc722d87a0f83a6/"
+        "https://www.consultant.ru/document/cons_doc_LAW_305/41fd88c62c89ddba445ff85149b17a63b9679810/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
@@ -8094,7 +8097,7 @@
       "checked_norm_urls": [
         "https://www.consultant.ru/document/cons_doc_LAW_305/030ee6c590df5a57ef7c36c7cc5c6a59e5373ecc/",
         "https://www.consultant.ru/document/cons_doc_LAW_305/0b3cc6d567f2c728bfe4c61b25a2bd8f1c0297c7/",
-        "https://www.consultant.ru/document/cons_doc_LAW_305/f190d8f6c0d4f03af399cc0efcc722d87a0f83a6/"
+        "https://www.consultant.ru/document/cons_doc_LAW_305/41fd88c62c89ddba445ff85149b17a63b9679810/"
       ],
       "norm_recheck_2026_11_28": {
         "status": "targeted_norm_and_individual_alternatives_reviewed_not_full_acceptance",
@@ -8102,7 +8105,7 @@
         "urls": [
           "https://www.consultant.ru/document/cons_doc_LAW_305/030ee6c590df5a57ef7c36c7cc5c6a59e5373ecc/",
           "https://www.consultant.ru/document/cons_doc_LAW_305/0b3cc6d567f2c728bfe4c61b25a2bd8f1c0297c7/",
-          "https://www.consultant.ru/document/cons_doc_LAW_305/f190d8f6c0d4f03af399cc0efcc722d87a0f83a6/"
+          "https://www.consultant.ru/document/cons_doc_LAW_305/41fd88c62c89ddba445ff85149b17a63b9679810/"
         ]
       },
       "targeted_individual_review": {
