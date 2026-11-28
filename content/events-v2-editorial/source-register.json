@@ -4225,10 +4225,10 @@
         "https://www.consultant.ru/document/cons_doc_LAW_82959/5d02242ebd04c398d2acf7c53dbc79659b85e8f3/",
         "https://www.consultant.ru/document/cons_doc_LAW_82959/64ca591ea83268ee3d33f6e564cbcac0d3a073d9/"
       ],
-      "legal_status": "requires_case_specific_current_law_review",
+      "legal_status": "verified_current",
       "activation_allowed": false,
       "review_date": "2026-11-28",
-      "source_scope": "specific_norm_and_related_search_results_partial",
+      "source_scope": "case_specific_current_norms_and_all_alternatives_reviewed_under_stated_facts",
       "legal_evidence": [
         {
           "norm": "273-ФЗ от 25.12.2008, ст. 10",
@@ -4250,9 +4250,20 @@
         "https://www.consultant.ru/document/cons_doc_LAW_82959/5d02242ebd04c398d2acf7c53dbc79659b85e8f3/"
       ],
       "targeted_option_review": {
-        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
         "option_count": 5,
-        "remaining": "Кадровый резерв — организационный инструмент, не самостоятельное назначение; конкретные внутренние документы и состав комиссии проверяются отдельно."
+        "remaining": "Правовая граница и пять вариантов проверены для прямо заданных учебных обстоятельств; конкретное исполнение и процедуры за пределами задания не сертифицированы."
+      },
+      "final_case_review_2026_11_28": {
+        "date": "2026-11-28",
+        "scope": "case_specific_legal_acceptance_under_explicit_educational_facts",
+        "option_count": 5,
+        "conclusion": "Ст. 39 ч. 6 п. 2, ч. 7 №44-ФЗ и ст. 10 №273-ФЗ подтверждены. Уточнены адресат уведомления, незамедлительность и компетенция замены. Все пять мер допустимы сверх обязательной замены, без раскрытия защищённых сведений и нарушения состава комиссии.",
+        "remaining": "Правовая граница и пять вариантов проверены для прямо заданных учебных обстоятельств; конкретное исполнение и процедуры за пределами задания не сертифицированы.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_144624/b64e0c2e16f5016ebbfd89affc9ba333cc094b20/",
+          "https://www.consultant.ru/document/cons_doc_LAW_82959/5d02242ebd04c398d2acf7c53dbc79659b85e8f3/"
+        ]
       }
     },
     {
@@ -4269,19 +4280,33 @@
         "https://www.consultant.ru/document/cons_doc_LAW_144624/1a53d0d0a68bafedeba16e5a1d0b19e4ad8c2a76/",
         "https://www.consultant.ru/document/cons_doc_LAW_144624/ab3273e757a9e718cbb3741596bc36eb8138e4f6/"
       ],
-      "legal_status": "requires_case_specific_current_law_review",
+      "legal_status": "verified_current",
       "activation_allowed": false,
       "review_date": "2026-11-28",
-      "source_scope": "specific_norm_and_related_search_results_partial",
+      "source_scope": "case_specific_current_norms_and_all_alternatives_reviewed_under_stated_facts",
       "checked_norm_urls": [
         "https://www.consultant.ru/document/cons_doc_LAW_144624/0c4ec341947f98654432292ddfd7066e3200d7fd/",
         "https://www.consultant.ru/document/cons_doc_LAW_144624/1a53d0d0a68bafedeba16e5a1d0b19e4ad8c2a76/",
-        "https://www.consultant.ru/document/cons_doc_LAW_144624/ab3273e757a9e718cbb3741596bc36eb8138e4f6/"
+        "https://www.consultant.ru/document/cons_doc_LAW_144624/ab3273e757a9e718cbb3741596bc36eb8138e4f6/",
+        "https://www.consultant.ru/document/cons_doc_LAW_144624/"
       ],
       "targeted_option_review": {
-        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
         "option_count": 5,
-        "remaining": "Заказчик определяет способ в пределах закона; цена, лимиты и специальные основания не заданы."
+        "remaining": "Правовая граница и пять вариантов проверены для прямо заданных учебных обстоятельств; конкретное исполнение и процедуры за пределами задания не сертифицированы."
+      },
+      "final_case_review_2026_11_28": {
+        "date": "2026-11-28",
+        "scope": "case_specific_legal_acceptance_under_explicit_educational_facts",
+        "option_count": 5,
+        "conclusion": "Ст. 8, 24, 93 №44-ФЗ проверены. Не любая малая закупка запрещена: в заданной ситуации исключено самостоятельное законное основание и задан обход конкуренции. Пять мер допустимы без подмены процедуры; график и очерёдность предусмотрены до заключения договора либо изменяются только законно.",
+        "remaining": "Правовая граница и пять вариантов проверены для прямо заданных учебных обстоятельств; конкретное исполнение и процедуры за пределами задания не сертифицированы.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_144624/0c4ec341947f98654432292ddfd7066e3200d7fd/",
+          "https://www.consultant.ru/document/cons_doc_LAW_144624/1a53d0d0a68bafedeba16e5a1d0b19e4ad8c2a76/",
+          "https://www.consultant.ru/document/cons_doc_LAW_144624/ab3273e757a9e718cbb3741596bc36eb8138e4f6/",
+          "https://www.consultant.ru/document/cons_doc_LAW_144624/"
+        ]
       }
     },
     {
@@ -4295,10 +4320,10 @@
       "legal_urls": [
         "https://www.consultant.ru/document/cons_doc_LAW_144624/d6aec91603ff628ea274b8552ce2849e06e0aa4c/"
       ],
-      "legal_status": "requires_case_specific_current_law_review",
+      "legal_status": "verified_current",
       "activation_allowed": false,
-      "review_date": "2026-11-27",
-      "source_scope": "specific_norm_and_related_search_results_partial",
+      "review_date": "2026-11-28",
+      "source_scope": "case_specific_current_norms_and_all_alternatives_reviewed_under_stated_facts",
       "legal_evidence": [
         {
           "norm": "44-ФЗ, п. 1 ч. 1 ст. 33",
@@ -4309,14 +4334,9 @@
         }
       ],
       "targeted_option_review": {
-        "date": "2026-11-27",
-        "norm": "44-ФЗ, ст. 33, ч. 1",
-        "urls": [
-          "https://www.consultant.ru/document/cons_doc_LAW_144624/d6aec91603ff628ea274b8552ce2849e06e0aa4c/"
-        ],
-        "options": 5,
-        "status": "specific_text_read_and_alternatives_reviewed_under_stated_conditions_not_full_case_acceptance",
-        "remaining": "Применимый национальный режим, стандарты, закупочная документация и правила обучения проверяются отдельно."
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
+        "option_count": 5,
+        "remaining": "Правовая граница и пять вариантов проверены для прямо заданных учебных обстоятельств; конкретное исполнение и процедуры за пределами задания не сертифицированы."
       },
       "checked_norm_urls": [
         "https://www.consultant.ru/document/cons_doc_LAW_144624/d6aec91603ff628ea274b8552ce2849e06e0aa4c/"
@@ -4329,6 +4349,16 @@
         ],
         "option_count": 5,
         "finding": "Ч. 1 ст. 33 44-ФЗ, ред. 04.08.2026, изменения с 01.10.2026: объективные характеристики и ограничения указания марки. В условии отсутствуют основания запретить эквивалент; предзакупочный тест не критерий допуска. Национальный режим и документация проверяются отдельно."
+      },
+      "final_case_review_2026_11_28": {
+        "date": "2026-11-28",
+        "scope": "case_specific_legal_acceptance_under_explicit_educational_facts",
+        "option_count": 5,
+        "conclusion": "Ст. 33 ч. 1 №44-ФЗ проверена; необоснованное ограничение участников исключено, предусмотренные законом исключения в истории отсутствуют. Все пять мер допустимы как объективная подготовка либо освоение товара, без заранее выбранной марки и без дополнительного барьера; применимый национальный режим не является предметом выбора.",
+        "remaining": "Правовая граница и пять вариантов проверены для прямо заданных учебных обстоятельств; конкретное исполнение и процедуры за пределами задания не сертифицированы.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_144624/d6aec91603ff628ea274b8552ce2849e06e0aa4c/"
+        ]
       }
     },
     {
@@ -4343,18 +4373,29 @@
         "https://www.consultant.ru/document/cons_doc_LAW_144624/17c58c1903f7b6212924ba9ce701489655e9a8e0/",
         "https://www.consultant.ru/document/cons_doc_LAW_144624/c5cbc4acc59ffed792a3921dbc18900d2d0f7eb1/"
       ],
-      "legal_status": "requires_case_specific_current_law_review",
+      "legal_status": "verified_current",
       "activation_allowed": false,
       "review_date": "2026-11-28",
-      "source_scope": "specific_norm_and_related_search_results_partial",
+      "source_scope": "case_specific_current_norms_and_all_alternatives_reviewed_under_stated_facts",
       "checked_norm_urls": [
         "https://www.consultant.ru/document/cons_doc_LAW_144624/17c58c1903f7b6212924ba9ce701489655e9a8e0/",
         "https://www.consultant.ru/document/cons_doc_LAW_144624/c5cbc4acc59ffed792a3921dbc18900d2d0f7eb1/"
       ],
       "targeted_option_review": {
-        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
         "option_count": 5,
-        "remaining": "Заказчик и уполномоченные лица обеспечивают приёмку; обязательные претензионные действия и допустимость изменения или прекращения контракта проверяются по конкретному договору."
+        "remaining": "Правовая граница и пять вариантов проверены для прямо заданных учебных обстоятельств; конкретное исполнение и процедуры за пределами задания не сертифицированы."
+      },
+      "final_case_review_2026_11_28": {
+        "date": "2026-11-28",
+        "scope": "case_specific_legal_acceptance_under_explicit_educational_facts",
+        "option_count": 5,
+        "conclusion": "Ст. 94 и ст. 34 ч. 6–7 №44-ФЗ проверены: приёмка фактически поставленного товара, экспертиза и требование неустойки при просрочке не заменяются голосованием. Все пять мер допустимы сверх обязательных действий. Не решается вопрос изменения контракта или конкретной суммы.",
+        "remaining": "Правовая граница и пять вариантов проверены для прямо заданных учебных обстоятельств; конкретное исполнение и процедуры за пределами задания не сертифицированы.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_144624/17c58c1903f7b6212924ba9ce701489655e9a8e0/",
+          "https://www.consultant.ru/document/cons_doc_LAW_144624/c5cbc4acc59ffed792a3921dbc18900d2d0f7eb1/"
+        ]
       }
     },
     {
@@ -4369,18 +4410,29 @@
         "https://www.consultant.ru/document/cons_doc_LAW_144624/e8d320a00429957ef17314fadbfcaf6d7537be39/",
         "https://www.consultant.ru/document/cons_doc_LAW_144624/ac94bc0b90bc7c6c0376c2b9e3d5bf36a138ec1b/"
       ],
-      "legal_status": "requires_case_specific_current_law_review",
+      "legal_status": "verified_current",
       "activation_allowed": false,
       "review_date": "2026-11-28",
-      "source_scope": "specific_norm_and_related_search_results_partial",
+      "source_scope": "case_specific_current_norms_and_all_alternatives_reviewed_under_stated_facts",
       "checked_norm_urls": [
         "https://www.consultant.ru/document/cons_doc_LAW_144624/e8d320a00429957ef17314fadbfcaf6d7537be39/",
         "https://www.consultant.ru/document/cons_doc_LAW_144624/ac94bc0b90bc7c6c0376c2b9e3d5bf36a138ec1b/"
       ],
       "targeted_option_review": {
-        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
         "option_count": 5,
-        "remaining": "Судебный маршрут зависит от требования, подсудности и статуса заявителя; контрольное обращение не гарантирует отмену контракта."
+        "remaining": "Правовая граница и пять вариантов проверены для прямо заданных учебных обстоятельств; конкретное исполнение и процедуры за пределами задания не сертифицированы."
+      },
+      "final_case_review_2026_11_28": {
+        "date": "2026-11-28",
+        "scope": "case_specific_legal_acceptance_under_explicit_educational_facts",
+        "option_count": 5,
+        "conclusion": "Ст. 105–106 №44-ФЗ проверены. Истечение срока и заключение контракта заданы, письмо не является автоматически принятой жалобой и не приостанавливает исполнение; судебная защита сохраняется по применимому процессу. Пять рекомендаций допустимы без вмешательства в исполнение и без гарантии судебного исхода.",
+        "remaining": "Правовая граница и пять вариантов проверены для прямо заданных учебных обстоятельств; конкретное исполнение и процедуры за пределами задания не сертифицированы.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_144624/e8d320a00429957ef17314fadbfcaf6d7537be39/",
+          "https://www.consultant.ru/document/cons_doc_LAW_144624/ac94bc0b90bc7c6c0376c2b9e3d5bf36a138ec1b/"
+        ]
       }
     },
     {
@@ -4406,7 +4458,18 @@
       "targeted_option_review": {
         "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
         "option_count": 5,
-        "remaining": "Конкретное закупочное и бюджетное основание не установлено; одобрение не должно обходить специальные правила. Не обещать автоматическую оплату полученного имущества."
+        "remaining": "Установить специальный режим муниципального договора, источник полномочий, основания получения имущества и допустимость последующего одобрения; не признавать сделку автоматически действительной."
+      },
+      "final_case_review_2026_11_28": {
+        "date": "2026-11-28",
+        "scope": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "option_count": 5,
+        "conclusion": "Ст. 182–183 ГК проверены, включая полномочие из обстановки и последствия одобрения. Пять мер допустимы только условно. Специальная закупочная и бюджетная квалификация сделки муниципалитета, возможность одобрения и расчётов не установлены.",
+        "remaining": "Установить специальный режим муниципального договора, источник полномочий, основания получения имущества и допустимость последующего одобрения; не признавать сделку автоматически действительной.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_5142/0cf4748cf87a798af8d1bcc2115eb1bcc4cede31/",
+          "https://www.consultant.ru/document/cons_doc_LAW_5142/b76233cd456b40e2f35c7980c40e071767ffa16a/"
+        ]
       }
     },
     {
@@ -4432,7 +4495,18 @@
       "targeted_option_review": {
         "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
         "option_count": 5,
-        "remaining": "Нужны исходный договор, режим имущества, правомочия арендодателя, основания предоставления, условия продления и исключения. Продажу регулирует отдельный режим."
+        "remaining": "Проверить специальные основания продления аренды публичного имущества, условия исходного договора и правомочия; не обещать продление без торгов."
+      },
+      "final_case_review_2026_11_28": {
+        "date": "2026-11-28",
+        "scope": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "option_count": 5,
+        "conclusion": "Ст. 621 ГК и ст. 17.1 №135-ФЗ проверены. Продолжение пользования не является переходом собственности. Возможность продолжения аренды и торгов зависит от режима имущества и условий. Все пять мер сохраняют эту границу.",
+        "remaining": "Проверить специальные основания продления аренды публичного имущества, условия исходного договора и правомочия; не обещать продление без торгов.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_9027/c22a45bebe759e5aecca241ce6e591612a842eb2/",
+          "https://www.consultant.ru/document/cons_doc_LAW_61763/eeb8f51df68fc096ecadf011932a85ef5e6a0ee1/"
+        ]
       }
     },
     {
@@ -4447,18 +4521,29 @@
         "https://www.consultant.ru/document/cons_doc_LAW_5142/b4e192e502ea85e2cf31e682d6dbd8ad395a5012/",
         "https://www.consultant.ru/document/cons_doc_LAW_5142/b49c53f9ae2d68d36e5ccec52d23bb843468a91b/"
       ],
-      "legal_status": "requires_case_specific_current_law_review",
+      "legal_status": "verified_current",
       "activation_allowed": false,
       "review_date": "2026-11-28",
-      "source_scope": "specific_norm_and_related_search_results_partial",
+      "source_scope": "case_specific_current_norms_and_all_alternatives_reviewed_under_stated_facts",
       "checked_norm_urls": [
         "https://www.consultant.ru/document/cons_doc_LAW_5142/b4e192e502ea85e2cf31e682d6dbd8ad395a5012/",
         "https://www.consultant.ru/document/cons_doc_LAW_5142/b49c53f9ae2d68d36e5ccec52d23bb843468a91b/"
       ],
       "targeted_option_review": {
-        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
         "option_count": 5,
-        "remaining": "Точная сумма зависит от формулы, ответственности должника, возможного специального режима, сроков и условий договора."
+        "remaining": "Правовая граница и пять вариантов проверены для прямо заданных учебных обстоятельств; конкретное исполнение и процедуры за пределами задания не сертифицированы."
+      },
+      "final_case_review_2026_11_28": {
+        "date": "2026-11-28",
+        "scope": "case_specific_legal_acceptance_under_explicit_educational_facts",
+        "option_count": 5,
+        "conclusion": "Ст. 330 и 408 ГК проверены. Установлено надлежащее исполнение и ответственность должника, специальный режим исключён условием. Внутренняя задержка претензии не продолжает просрочку выполненного обязательства. Все пять мер допустимы после корректного расчёта; сумма и исход суда не гарантируются.",
+        "remaining": "Правовая граница и пять вариантов проверены для прямо заданных учебных обстоятельств; конкретное исполнение и процедуры за пределами задания не сертифицированы.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_5142/b4e192e502ea85e2cf31e682d6dbd8ad395a5012/",
+          "https://www.consultant.ru/document/cons_doc_LAW_5142/b49c53f9ae2d68d36e5ccec52d23bb843468a91b/"
+        ]
       }
     },
     {
