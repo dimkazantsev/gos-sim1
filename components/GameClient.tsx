@@ -45,6 +45,8 @@ import {supabase} from '@/lib/supabase';
 import MobileDock from './game/MobileDock';
 import GameHeader,{TeacherNavigationProvider} from './game/GameHeader';
 import {useSavedGameState,savedString} from './game/useSavedGameState';
+import {useBrowserSectionHistory} from './game/useBrowserSectionHistory';
+import type {SectionHistory} from './game/browserSectionHistory';
 
 // Keep the main overview, session/role gate and always-mounted live overlays
 // immediately available. Inactive panels must not inflate initial JavaScript
@@ -66,12 +68,34 @@ const BudgetView=dynamic(()=>import('./game/BudgetView'),{loading:sectionLoading
 
 const GENERIC_STUDENT='__generic_student_preview__';
 const GENERIC_GUEST='__generic_guest_preview__';
-type ScreenLocation={view:View;stageNo:number;documentId:string;voteId?:string;templateKey?:string};
+type ScreenLocation={view:View;stageNo:number;documentId:string;voteId?:string;templateKey?:string;browserPosition?:number};
 const SCREEN_VIEWS=['dashboard','stages','parties','votes','documents','grades','actions','profile','events','teacher','budget'];
+function validScreen(value:unknown):value is ScreenLocation{
+ if(!value||typeof value!=='object')return false;
+ const e=value as ScreenLocation;
+ return SCREEN_VIEWS.includes(e.view)&&Number.isInteger(e.stageNo)&&e.stageNo>=0&&e.stageNo<=16&&typeof e.documentId==='string'&&e.documentId.length<=100&&(!e.voteId||typeof e.voteId==='string'&&e.voteId.length<=100)&&(!e.templateKey||typeof e.templateKey==='string'&&e.templateKey.length<=80)&&(e.browserPosition===undefined||Number.isSafeInteger(e.browserPosition)&&e.browserPosition>=0);
+}
 function validScreenHistory(value:unknown){
  if(!value||typeof value!=='object')return false;
- const history=value as {entries?:ScreenLocation[];index?:number};
- return Array.isArray(history.entries)&&history.entries.length>0&&history.entries.length<=60&&Number.isInteger(history.index)&&Number(history.index)>=0&&Number(history.index)<history.entries.length&&history.entries.every(e=>e&&SCREEN_VIEWS.includes(e.view)&&Number.isInteger(e.stageNo)&&e.stageNo>=0&&e.stageNo<=16&&typeof e.documentId==='string'&&e.documentId.length<=100&&(!e.voteId||typeof e.voteId==='string'&&e.voteId.length<=100)&&(!e.templateKey||typeof e.templateKey==='string'&&e.templateKey.length<=80));
+ const history=value as SectionHistory<ScreenLocation>;
+ return Array.isArray(history.entries)&&history.entries.length>0&&history.entries.length<=60&&Number.isInteger(history.index)&&history.index>=0&&history.index<history.entries.length&&history.entries.every(validScreen);
+}
+function sameScreen(a:ScreenLocation,b:ScreenLocation){
+ return a.view===b.view&&a.stageNo===b.stageNo&&a.documentId===b.documentId&&(a.voteId||'')===(b.voteId||'')&&(a.templateKey||'')===(b.templateKey||'');
+}
+function initialGameScreen(saved:ScreenLocation):ScreenLocation{
+ const q=new URLSearchParams(window.location.search),section=q.get('section');
+ if(!section||!SCREEN_VIEWS.includes(section)||section==='teacher')return saved;
+ const id=q.get('document')||'',vote=q.get('vote')||'',step=Number(q.get('stage')||0);
+ return {view:section as View,stageNo:Number.isInteger(step)&&step>=1&&step<=16?step:0,documentId:/^[0-9a-f-]{36}$/i.test(id)?id:'',voteId:/^[0-9a-f-]{36}$/i.test(vote)?vote:''};
+}
+function gameScreenUrl(screen:ScreenLocation){
+ const u=new URL(window.location.href);
+ u.searchParams.set('section',screen.view);
+ for(const [key,value] of [['stage',screen.stageNo?String(screen.stageNo):''],['document',screen.documentId],['vote',screen.voteId||'']]){
+  if(value)u.searchParams.set(key,value);else u.searchParams.delete(key);
+ }
+ return u.pathname+u.search+u.hash;
 }
 function adjacentScreen(entries:ScreenLocation[],index:number,direction:-1|1,skipTeacher:boolean){
  for(let next=index+direction;next>=0&&next<entries.length;next+=direction){
@@ -249,21 +273,9 @@ function buildStudentPreview(g:ReturnTypeRepublic,student:Member){
 
 export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:string;initialMobileMenuOpen?:boolean}){
  const g=useRepublicGame(gameId);
- const [screenHistory,setScreenHistory,navigationHydrated,navigationRestored]=useSavedGameState<{entries:ScreenLocation[];index:number}>(gameId,g.me?.user_id,'navigation',{
+ const [screenHistory,setScreenHistory,navigationHydrated,navigationRestored]=useSavedGameState<SectionHistory<ScreenLocation>>(gameId,g.me?.user_id,'navigation',{
   entries:[{view:'dashboard',stageNo:0,documentId:''}],index:0
  },validScreenHistory);
- const sharedLinkHandled=useRef(false);
- useEffect(()=>{
-  if(!navigationHydrated||!g.me?.user_id||sharedLinkHandled.current)return;
-  sharedLinkHandled.current=true;
-  if(typeof URLSearchParams==='undefined'||!window.location?.search)return;
-  const q=new URLSearchParams(window.location.search);
-  const section=q.get('section');
-  if(!section||!SCREEN_VIEWS.includes(section)||section==='teacher')return;
-  const id=q.get('document')||'',vote=q.get('vote')||'',step=Number(q.get('stage')||0);
-  const target:ScreenLocation={view:section as View,stageNo:Number.isInteger(step)&&step>=1&&step<=16?step:0,documentId:/^[0-9a-f-]{36}$/i.test(id)?id:'',voteId:/^[0-9a-f-]{36}$/i.test(vote)?vote:''};
-  setScreenHistory(prev=>({entries:[target],index:0}));
- },[navigationHydrated,g.me?.user_id,gameId]);
  const sharedChatHandled=useRef(false);
  useEffect(()=>{
   if(sharedChatHandled.current||!navigationHydrated||!g.me||g.me.kind==='observer'||typeof window==='undefined'||typeof URLSearchParams==='undefined')return;
@@ -420,20 +432,18 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
    }
   }
   const destination:ScreenLocation={view:next,stageNo:target?.stageNo??0,documentId:target?.documentId??'',voteId:target?.voteId??'',templateKey:target?.templateKey??''};
-  setScreenHistory(previous=>{
-   const current=previous.entries[previous.index];
-   if(current.view===destination.view&&current.stageNo===destination.stageNo&&current.documentId===destination.documentId&&current.voteId===destination.voteId&&current.templateKey===destination.templateKey)return previous;
-   const entries=[...previous.entries.slice(0,previous.index+1),destination].slice(-60);
-   return {entries,index:entries.length-1};
-  });
+  browserNavigation.push(destination);
   finishScreenNavigation();
  }
  function navigateProfile(id:string){setSelectedProfileId(id);navigate('profile')}
  function rememberDocument(id?:string){
-  setScreenHistory(previous=>({entries:previous.entries.map((screen,index)=>index===previous.index&&screen.view==='documents'?{...screen,documentId:id||'',templateKey:''}:screen),index:previous.index}));
+  if(currentScreen.view==='documents')browserNavigation.push({...currentScreen,documentId:id||'',templateKey:''});
+ }
+ function rememberStage(stageNo:number){
+  if(currentScreen.view==='stages')browserNavigation.push({...currentScreen,stageNo});
  }
  function clearVoteFocus(){
-  setScreenHistory(previous=>({entries:previous.entries.map((screen,index)=>index===previous.index&&screen.view==='votes'?{...screen,voteId:''}:screen),index:previous.index}));
+  if(currentScreen.view==='votes')browserNavigation.push({...currentScreen,voteId:''});
  }
  const {game,me,currentStage,teacher,chatOpen,setChatOpen,loading,error,setError,logout,touchPresence,logActivity}=g;
  // The global turn deadline is the earliest of all open stages, not the stage in the header.
@@ -646,12 +656,20 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
   return()=>window.removeEventListener('blitz:updated',changed);
  },[game?.id,me?.user_id,previewMode,me?.kind]);
 
+ const browserNavigation=useBrowserSectionHistory<ScreenLocation>({
+  scope:profileScope,enabled:navigationHydrated&&!!me?.user_id,state:screenHistory,setState:setScreenHistory,
+  valid:validScreen,same:sameScreen,initial:initialGameScreen,url:gameScreenUrl,
+  normalize:(screen,fromPop)=>{
+   if(screen.view==='teacher'&&(!teacher||previewMode))return {view:'dashboard',stageNo:0,documentId:''};
+   if(fromPop&&onboardingRequired&&!introOpen&&tourMode!=='tour')return {view:'profile',stageNo:0,documentId:''};
+   return screen;
+  },onPop:()=>finishScreenNavigation(false)
+ });
  const backIndex=onboardingRequired?-1:adjacentScreen(screenHistory.entries,screenHistory.index,-1,previewMode);
  const forwardIndex=onboardingRequired?-1:adjacentScreen(screenHistory.entries,screenHistory.index,1,previewMode);
  function moveHistory(index:number){
   if(index<0||onboardingRequired)return;
-  setScreenHistory(previous=>({...previous,index}));
-  finishScreenNavigation(false);
+  browserNavigation.move(index);
  }
  const vg=previewStudent?buildStudentPreview(g,previewStudent):observer&&me?{...buildStudentPreview(g,me),logout:g.logout} as ReturnTypeRepublic:g;
  const shownMe=vg.me||me;
@@ -693,7 +711,7 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
  },[previewStudent?.user_id]);
 
 
- if(loading||!game||!me||!shownMe||!navigationHydrated)return <main className="connectionPage"><section className="connectionCard" aria-live="polite"><span className="wordmark"><BrandName/></span>{!error&&<div className="spinner"/>}<h1>{error?'Не удалось открыть игру':'Подключаемся к республике'}</h1><p>{error||'Загружаем этапы, команды и последние события.'}</p>{error&&<div><button className="primary" onClick={()=>window.location.reload()}>Попробовать снова</button><a className="secondary" href="/">Вернуться ко входу</a></div>}</section></main>;
+ if(loading||!game||!me||!shownMe||!navigationHydrated||!browserNavigation.ready)return <main className="connectionPage"><section className="connectionCard" aria-live="polite"><span className="wordmark"><BrandName/></span>{!error&&<div className="spinner"/>}<h1>{error?'Не удалось открыть игру':'Подключаемся к республике'}</h1><p>{error||'Загружаем этапы, команды и последние события.'}</p>{error&&<div><button className="primary" onClick={()=>window.location.reload()}>Попробовать снова</button><a className="secondary" href="/">Вернуться ко входу</a></div>}</section></main>;
 
  const nav:[View,string][]=[['dashboard','Обзор игры'],['stages','Этапы и задачи'],['actions','Политический процесс'],['parties',teacher&&!previewMode?'Партии':'Моя партия'],['votes','Голосования'],['documents','Реестр НПА'],['budget','Бюджет'],['grades','Оценки и разбор'],['events','События и ситуации'],...(teacher&&!previewMode?[['teacher','Управление'] as [View,string]]:[]),['profile','Мой профиль']];
 
@@ -834,7 +852,7 @@ export default function GameClient({gameId,initialMobileMenuOpen=false}:{gameId:
        </section>
       </div>)}
      {view!=='dashboard'&&!g.coreLoaded&&!teacher&&sectionLoading()}
-     {view==='stages'&&(g.coreLoaded||teacher)&&<StagesView g={vg} readOnly={previewMode||observer} focusStageNo={focusStage} onOpenVotes={voteId=>navigate('votes',voteId?{voteId}:undefined)} onOpenDocument={id=>navigate('documents',{documentId:id})} onCreateDocument={(templateKey,stageNo)=>navigate('documents',{templateKey,stageNo})} onNavigate={v=>navigate(v)}/>}
+     {view==='stages'&&(g.coreLoaded||teacher)&&<StagesView g={vg} readOnly={previewMode||observer} focusStageNo={focusStage} onSelectStage={rememberStage} onOpenVotes={voteId=>navigate('votes',voteId?{voteId}:undefined)} onOpenDocument={id=>navigate('documents',{documentId:id})} onCreateDocument={(templateKey,stageNo)=>navigate('documents',{templateKey,stageNo})} onNavigate={v=>navigate(v)}/>}
      {view==='parties'&&(g.coreLoaded||teacher)&&<PartiesView g={vg}/>}
      {view==='votes'&&(g.coreLoaded||teacher)&&<VotesView g={vg} focusId={currentScreen.voteId} onClearFocus={clearVoteFocus} onOpenDocument={id=>navigate('documents',{documentId:id})} onOpenStages={()=>navigate('stages')}/>}
      {view==='budget'&&(g.coreLoaded||teacher)&&<BudgetView g={vg} readOnly={previewMode||observer} onOpenDocument={id=>navigate('documents',{documentId:id})} onOpenEvents={()=>navigate('events')} onOpenVotes={voteId=>navigate('votes',{voteId})} onOpenStage={stageNo=>navigate('stages',{stageNo})}/>}

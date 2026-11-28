@@ -1,0 +1,32 @@
+'use strict';
+const assert=require('node:assert/strict'),fs=require('node:fs'),ts=require('typescript');
+const path='components/game/browserSectionHistory.ts';
+const compiled=ts.transpileModule(fs.readFileSync(path,'utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022},reportDiagnostics:true});
+assert(!compiled.diagnostics?.some(d=>d.category===ts.DiagnosticCategory.Error));
+const m={exports:{}};new Function('exports','module',compiled.outputText)(m.exports,m);
+const {startHistory,appendHistory,restoreHistory,browserMarker,readBrowserScreen,historyDistance,BROWSER_SECTION_KEY}=m.exports;
+const same=(a,b)=>a.view===b.view&&a.stageNo===b.stageNo&&a.documentId===b.documentId;
+const make=(view,stageNo=0,documentId='')=>({view,stageNo,documentId});
+const scope='game:student',chain='tab-1',valid=s=>!!s&&typeof s.view==='string';
+let h=startHistory(make('dashboard'),chain);const first=browserMarker(h,scope);
+h=appendHistory(h,make('stages',4),same);const stage=browserMarker(h,scope);
+h=appendHistory(h,make('documents',0,'doc'),same);const doc=browserMarker(h,scope);
+assert.equal(h.entries.length,3);assert.equal(historyDistance(h,0),-2);
+assert.equal(appendHistory(h,make('documents',0,'doc'),same),h,'same screen does not push');
+h=restoreHistory(h,stage);assert.equal(h.index,1);assert.equal(historyDistance(h,2),1);
+h=restoreHistory(h,doc);assert.equal(h.index,2);assert.equal(h.entries[h.index].documentId,'doc');
+h=restoreHistory(h,first);h=appendHistory(h,make('budget'),same);assert.equal(h.entries.length,2);assert.equal(h.entries[1].view,'budget');
+assert.equal(readBrowserScreen({[BROWSER_SECTION_KEY]:doc},'other-game:student',valid),null);
+assert.equal(readBrowserScreen({[BROWSER_SECTION_KEY]:doc},'game:teacher',valid),null);
+assert.equal(readBrowserScreen({[BROWSER_SECTION_KEY]:doc},scope,valid).position,2);
+const guest=restoreHistory(null,doc,make('dashboard'));assert.equal(guest.entries[0].view,'dashboard');
+assert.equal(guest.entries[0].browserPosition,2);
+for(let i=0;i<100;i++)h=appendHistory(h,make('stage-'+i),same);
+assert.equal(h.entries.length,60);assert.equal(historyDistance(h,0),-59);
+for(const file of ['components/GameClient.tsx','components/game/useBrowserSectionHistory.ts','components/game/StagesView.tsx','components/game/DocumentsView.tsx','app/teacher/page.tsx']){
+ const result=ts.transpileModule(fs.readFileSync(file,'utf8'),{fileName:file,compilerOptions:{jsx:ts.JsxEmit.ReactJSX,module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022},reportDiagnostics:true});
+ assert(!result.diagnostics?.some(d=>d.category===ts.DiagnosticCategory.Error),file+' syntax');
+}
+const hook=fs.readFileSync('components/game/useBrowserSectionHistory.ts','utf8');
+assert(!/supabase|router\.(push|replace)|setInterval/.test(hook.replace(/\/\/[^\n]*/g,'')));
+console.log('PASS browser section history: backward/forward, branch, deep link state, scope, cap, no new network calls, TS/TSX syntax.');

@@ -18,16 +18,17 @@ import {useSavedGameState} from './useSavedGameState';
 const STAGE_ICONS=[UsersRound,SlidersHorizontal,Map,Landmark,UserRoundX,ClipboardCheck,Vote,Building2,Network,Target,ClipboardList,Scale,Wallet,MapPin,ShieldAlert,ChartNoAxesCombined] as const;
 type StageFilter='all'|'open'|'voting'|'completed'|'locked';
 
-export default function StagesView({g,onOpenVotes,onOpenDocument,onCreateDocument,onNavigate,focusStageNo=0,readOnly=false}:{g:ReturnTypeRepublic;onOpenVotes:(voteId?:string)=>void;onOpenDocument?:(id:string)=>void;onCreateDocument?:(key:string,stageNo:number)=>void;onNavigate?:(view:import('./types').View)=>void;focusStageNo?:number;readOnly?:boolean}){
+export default function StagesView({g,onOpenVotes,onOpenDocument,onCreateDocument,onNavigate,onSelectStage,focusStageNo,readOnly=false}:{g:ReturnTypeRepublic;onOpenVotes:(voteId?:string)=>void;onOpenDocument?:(id:string)=>void;onCreateDocument?:(key:string,stageNo:number)=>void;onNavigate?:(view:import('./types').View)=>void;focusStageNo?:number;onSelectStage?:(stageNo:number)=>void;readOnly?:boolean}){
  const {stages,votes,teacher,nextStage}=g;
  const [openMaterialsForStage,setOpenMaterialsForStage]=useState(0);
  const [documentHolds,setDocumentHolds]=useState<{source_stage:number;blocked_stage:number;missing_documents:{title:string}[];penalty_points:number}[]>([]);
  const [holdError,setHoldError]=useState('');
  const [focusProgramId,setFocusProgramId]=useState('');
- const [selectedStageNo,setSelectedStageNo]=useSavedGameState(g.game?.id,g.me?.user_id,'stage-selected',0,value=>Number.isInteger(value)&&Number(value)>=0&&Number(value)<=16);
+ const [selectedStageNo,setSelectedStageNo,stageSelectionHydrated]=useSavedGameState(g.game?.id,g.me?.user_id,'stage-selected',0,value=>Number.isInteger(value)&&Number(value)>=0&&Number(value)<=16);
  const selected=stages.find(s=>s.stage_no===selectedStageNo)||null;
  function setSelected(stage:Stage|null,scroll=true){
   setSelectedStageNo(stage?.stage_no||0);
+  if(scroll)onSelectStage?.(stage?.stage_no||0);
   setOpenMaterialsForStage(0);
   if(scroll&&typeof window!=='undefined')requestAnimationFrame(()=>{
    document.querySelector?.<HTMLElement>('.simContentFlow')?.scrollTo?.({top:0});
@@ -43,7 +44,7 @@ export default function StagesView({g,onOpenVotes,onOpenDocument,onCreateDocumen
  const [stageFilter,setStageFilter]=useState<StageFilter>('all');
  const [phaseFilter,setPhaseFilter]=useState<string|null>(null);
  const [stageSearch,setStageSearch]=useState('');
- useEffect(()=>{if(focusStageNo)setSelected(stages.find(s=>s.stage_no===focusStageNo)||null,false)},[focusStageNo]);
+ useEffect(()=>{if(stageSelectionHydrated&&focusStageNo!==undefined&&focusStageNo!==selectedStageNo){setSelectedStageNo(focusStageNo);setOpenMaterialsForStage(0)}},[focusStageNo,stageSelectionHydrated]);
  const detail=selected?STAGE_DETAILS[selected.stage_no]:null;
  const stageStatuses=stages.map(s=>s.stage_no+':'+s.status).join('|');
  const documentStates=g.formalDocuments.map(d=>d.id+':'+d.status_code).sort().join('|');

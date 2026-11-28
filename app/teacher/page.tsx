@@ -1,6 +1,8 @@
 'use client';
 import {useCallback,useEffect,useRef,useState} from 'react';
 import {useRouter} from 'next/navigation';
+import {useBrowserSectionHistory} from '@/components/game/useBrowserSectionHistory';
+import type {SectionHistory} from '@/components/game/browserSectionHistory';
 import {BookOpenText,Camera,ChevronLeft,ChevronRight,FileText,GraduationCap,GripVertical,Landmark,LayoutDashboard,LogOut,Menu,Radio,Settings2,UserRound,Vote as VoteIcon,Wallet} from 'lucide-react';
 import {BrandIdentity} from '@/components/ui/BrandIdentity';
 import StyledSelect from '@/components/ui/StyledSelect';
@@ -35,8 +37,10 @@ export default function TeacherPortal(){
  const [gender,setGender]=useState<'male'|'female'|'unspecified'>('unspecified');
  const [avatarUrl,setAvatarUrl]=useState<string|null>(null),[signatureUrl,setSignatureUrl]=useState<string|null>(null);
  const [saveBusy,setSaveBusy]=useState(false),[photoBusy,setPhotoBusy]=useState(false),[notice,setNotice]=useState('');
- const [mobileOpen,setMobileOpen]=useState(false),[section,setSection]=useState<Section>('profile');
- const [stageNo,setStageNo]=useState<number|null>(null);
+ const [mobileOpen,setMobileOpen]=useState(false);
+ type TeacherScreen={view:Section;stageNo:number;browserPosition?:number};
+ const [navigation,setNavigation]=useState<SectionHistory<TeacherScreen>>({entries:[{view:'profile',stageNo:0}],index:0});
+ const screen=navigation.entries[navigation.index],section=screen.view,stageNo=screen.stageNo||null;
  const photoInput=useRef<HTMLInputElement>(null);
  const authorized=!!userId&&!!profile;
  const load=useCallback(async()=>{
@@ -105,8 +109,16 @@ export default function TeacherPortal(){
   finally{setPhotoBusy(false)}
  }
  async function logout(){await supabase.auth.signOut();router.replace('/?teacher=1')}
- function choose(id:Section){setSection(id);setStageNo(null);setMobileOpen(false)}
- if(loading||!authorized)return <div className="simShell teacherZeroShell teacherZeroLoadingShell" aria-busy={loading}>
+ const browserNavigation=useBrowserSectionHistory<TeacherScreen>({
+  scope:'teacher:'+userId,enabled:authorized,state:navigation,setState:setNavigation,
+  valid:value=>{const s=value as TeacherScreen|undefined;return !!s&&SECTIONS.some(x=>x.id===s.view)&&Number.isInteger(s.stageNo)&&s.stageNo>=0&&s.stageNo<=16;},
+  same:(a,b)=>a.view===b.view&&a.stageNo===b.stageNo,
+  initial:saved=>{const q=new URLSearchParams(window.location.search),view=q.get('section'),n=Number(q.get('stage')||0);return SECTIONS.some(s=>s.id===view)?{view:view as Section,stageNo:Number.isInteger(n)&&n>=1&&n<=16?n:0}:saved;},
+  normalize:s=>s,url:s=>{const u=new URL(window.location.href);u.searchParams.set('section',s.view);if(s.stageNo)u.searchParams.set('stage',String(s.stageNo));else u.searchParams.delete('stage');return u.pathname+u.search+u.hash;},
+  onPop:()=>setMobileOpen(false)
+ });
+ function choose(id:Section){browserNavigation.push({view:id,stageNo:0});setMobileOpen(false)}
+ if(loading||!authorized||!browserNavigation.ready)return <div className="simShell teacherZeroShell teacherZeroLoadingShell" aria-busy={loading}>
   <aside className="simSidebar">
    <div className="sidebarBrand"><BrandIdentity tagline/></div>
    <section className="sidebarStage teacherZeroStage">
@@ -160,7 +172,7 @@ export default function TeacherPortal(){
   <div className="simWorkspace">
    <header className="simTop">
     <div className="mobileBrand"><BrandIdentity tagline/></div>
-    <nav className="topScreenHistory" aria-label="История разделов"><button className="screenHistoryButton" type="button" aria-label="Вернуться к профилю" disabled={section==='profile'} onClick={()=>choose('profile')}><ChevronLeft/></button><button className="screenHistoryButton" type="button" disabled aria-label="Следующий раздел"><ChevronRight/></button></nav>
+    <nav className="topScreenHistory" aria-label="История разделов"><button className="screenHistoryButton" type="button" aria-label="Предыдущий раздел" disabled={navigation.index===0} onClick={()=>browserNavigation.move(navigation.index-1)}><ChevronLeft/></button><button className="screenHistoryButton" type="button" disabled={navigation.index===navigation.entries.length-1} onClick={()=>browserNavigation.move(navigation.index+1)} aria-label="Следующий раздел"><ChevronRight/></button></nav>
     <div className="simTopCenter"><div className="topStageCopy"><small>ПОСТОЯННЫЙ КАБИНЕТ</small><strong>{label}</strong></div><div className="topIndicators"><span className="livePill off"><Radio aria-hidden="true"/><span className="livePillText">Игра не создана</span></span></div></div>
     <button type="button" className="teacherZeroMobileMenu" aria-expanded={mobileOpen} aria-label="Разделы" onClick={()=>setMobileOpen(v=>!v)}><Menu size={21}/></button>
    </header>
@@ -194,7 +206,7 @@ export default function TeacherPortal(){
      <TeacherGameSessions displayName={profile.full_name}/>
     </div>:section==='stages'?<section className="teacherZeroPanel surface">
      <small>ЭТАПЫ И ЗАДАЧИ</small><h1>Все 16 этапов</h1><p>Этапы доступны для просмотра. До создания игровой сессии участники, решения и результаты отсутствуют.</p>
-     <div className="teacherEmptyStageGrid">{stages.map(item=><button type="button" key={item.no} className={stageNo===item.no?'selected':''} onClick={()=>setStageNo(v=>v===item.no?null:item.no)}><span>{String(item.no).padStart(2,'0')}</span><b>{item.title}</b><small>{stageNo===item.no?item.action:'Не запущен'}</small></button>)}</div>
+     <div className="teacherEmptyStageGrid">{stages.map(item=><button type="button" key={item.no} className={stageNo===item.no?'selected':''} onClick={()=>browserNavigation.push({view:'stages',stageNo:stageNo===item.no?0:item.no})}><span>{String(item.no).padStart(2,'0')}</span><b>{item.title}</b><small>{stageNo===item.no?item.action:'Не запущен'}</small></button>)}</div>
     </section>:<section className="teacherZeroPanel surface">
       <small>ПОСТОЯННАЯ СРЕДА ГОС.ID</small><h1>{label}</h1>
       <p>Игровых данных нет: сеанс не создан или не выбран. Сведения о других играх сюда не переносятся.</p>

@@ -85,8 +85,8 @@ export default function DocumentsView({g,focusId,createTemplate,createStageNo,on
     const {data,error}=await supabase.storage.from(location.bucket).createSignedUrl(location.path,3600);
   return error?null:data?.signedUrl||null;
  }),[g.game?.id,me?.user_id]);
- const [mode,setMode]=useSavedGameState<'registry'|'create'>(g.game?.id,g.me?.user_id,'documents-mode','registry',savedChoice('registry','create')),[selectedId,setSelectedId]=useSavedGameState(g.game?.id,g.me?.user_id,'documents-selected',focusId||'',savedString),[query,setQuery]=useState(''),[filterSubject,setFilterSubject]=useState(''),[filterStatus,setFilterStatus]=useState(''),[sortOrder,setSortOrder]=useState('updated');
- const [detailOpen,setDetailOpen]=useSavedGameState(g.game?.id,g.me?.user_id,'documents-detail',!!focusId,savedBoolean),[detailTab,setDetailTab]=useSavedGameState<'text'|'procedure'|'package'>(g.game?.id,g.me?.user_id,'documents-tab',initialDetailTab,savedChoice('text','procedure','package'));
+ const [mode,setMode]=useSavedGameState<'registry'|'create'>(g.game?.id,g.me?.user_id,'documents-mode','registry',savedChoice('registry','create')),[selectedId,setSelectedId,documentSelectionHydrated]=useSavedGameState(g.game?.id,g.me?.user_id,'documents-selected',focusId||'',savedString),[query,setQuery]=useState(''),[filterSubject,setFilterSubject]=useState(''),[filterStatus,setFilterStatus]=useState(''),[sortOrder,setSortOrder]=useState('updated');
+ const [detailOpen,setDetailOpen,documentDetailHydrated]=useSavedGameState(g.game?.id,g.me?.user_id,'documents-detail',!!focusId,savedBoolean),[detailTab,setDetailTab]=useSavedGameState<'text'|'procedure'|'package'>(g.game?.id,g.me?.user_id,'documents-tab',initialDetailTab,savedChoice('text','procedure','package'));
  const [detailReturn,setDetailReturn]=useState<'registry'|'create'>('registry');
  const [scrollOpenedDocument,setScrollOpenedDocument]=useState(false);
  const [title,setTitle]=useState(''),[body,setBody]=useState(''),[subjectKey,setSubjectKey]=useState('gd_deputy'),[docType,setDocType]=useState('fz_bill'),[file,setFile]=useState<File|null>(null),[extracting,setExtracting]=useState(false),[recognized,setRecognized]=useState(''),[busy,setBusy]=useState(false);
@@ -249,7 +249,12 @@ export default function DocumentsView({g,focusId,createTemplate,createStageNo,on
    .then(r=>{if(active&&!r.error)setCommitteeUnits(r.data||[])});
   return()=>{active=false};
  },[needsCommitteeUnits,editorScope,me?.role_title,activeRoles.join('|')]);
- useEffect(()=>{if(focusId&&formalDocuments.some(d=>d.id===focusId)){setQuery('');setFilterSubject('');setFilterStatus('');setSelectedId(focusId);setDetailReturn('registry');setDetailOpen(true);setMode('registry')}},[focusId]);
+ const focusedDocumentExists=!!focusId&&formalDocuments.some(d=>d.id===focusId);
+ useEffect(()=>{
+  if(!documentSelectionHydrated||!documentDetailHydrated||focusId===undefined)return;
+  if(!focusId){setDetailOpen(false);setSelectedId('');return;}
+  if(focusedDocumentExists){setQuery('');setFilterSubject('');setFilterStatus('');setSelectedId(focusId);setDetailReturn('registry');setDetailOpen(true);setMode('registry')}
+ },[focusId,focusedDocumentExists,documentSelectionHydrated,documentDetailHydrated]);
  useEffect(()=>{
   if(!selected||selected.workflow_key!=='bill'){setBillProfile(null);setBillFiles([]);setBillConclusion(null);setBillReadiness(null);return}
   let active=true;const documentId=selected.id,current=()=>active&&alive.current&&scope.current===editorScope&&selectedDocument.current===documentId;
