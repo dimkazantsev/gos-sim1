@@ -1432,27 +1432,44 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "НК РФ, ст. 12, 56, 284: региональные полномочия ограничены НК РФ; индивидуальная льгота недопустима. Снижение ставки по региональной части налога на прибыль возможно лишь в предусмотренных НК РФ случаях.",
+      "legal_basis": "НК РФ, ст. 5, 12, 56, п. 1 ст. 284; БК РФ, ст. 78: снижение региональной части ставки возможно только в прямо предусмотренных главой 25 случаях и по закону субъекта; индивидуальная льгота письмом исключена.",
       "legal_urls": [
         "https://www.nalog.gov.ru/rn77/taxation/tax_legislation/",
         "https://www.consultant.ru/document/cons_doc_LAW_19671/ab54b1f6e016638e006428e90971b05636b17cbf/",
         "https://www.consultant.ru/document/cons_doc_LAW_19671/4cada6c7ce0d8a4a287f0eeb6d5c1ed5f4d08045/",
         "https://www.consultant.ru/document/cons_doc_LAW_28165/eb9180fc785448d58fe76ef323fb67d1832b9363/",
-        "https://www.consultant.ru/document/cons_doc_LAW_19702/1b6959f23cc516d0e11ddc2e213ca2dca83560df/"
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/1b6959f23cc516d0e11ddc2e213ca2dca83560df/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19671/431ac8ed77136ef53561af7f6977bc09ec0595a7/"
       ],
-      "legal_status": "requires_case_specific_current_law_review",
+      "legal_status": "verified_current",
       "activation_allowed": false,
       "review_date": "2026-11-28",
       "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_19671/431ac8ed77136ef53561af7f6977bc09ec0595a7/",
         "https://www.consultant.ru/document/cons_doc_LAW_19671/ab54b1f6e016638e006428e90971b05636b17cbf/",
         "https://www.consultant.ru/document/cons_doc_LAW_19671/4cada6c7ce0d8a4a287f0eeb6d5c1ed5f4d08045/",
         "https://www.consultant.ru/document/cons_doc_LAW_28165/eb9180fc785448d58fe76ef323fb67d1832b9363/",
         "https://www.consultant.ru/document/cons_doc_LAW_19702/1b6959f23cc516d0e11ddc2e213ca2dca83560df/"
       ],
       "targeted_option_review": {
-        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
         "option_count": 5,
-        "remaining": "Конкретная категория, региональный закон, пределы ставки, условия и бюджетный расчёт; письмо губернатора льготу не создаёт."
+        "remaining": "Вывод ограничен указанными вымышленными учебными обстоятельствами и рекомендательными действиями. Реальные региональные и муниципальные акты, соглашения, специальные режимы и полная официальная цепочка поправок независимо не подтверждены. Активация запрещена."
+      },
+      "final_case_review_2026_11_28": {
+        "date": "2026-11-28",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
+        "norm": "НК РФ, ст. 5, 12, 56, п. 1 ст. 284; БК РФ, ст. 78: снижение региональной части ставки возможно только в прямо предусмотренных главой 25 случаях и по закону субъекта; индивидуальная льгота письмом исключена.",
+        "option_count": 5,
+        "finding": "Общая ставка на прибыль в 2026 году — 25% при отсутствии специальных оснований (8% федеральная и 17% региональная составляющая). Ни один вариант не изменяет ближайший платёж. Конкретная категория будущей льготы не утверждается.",
+        "remaining": "Вывод ограничен указанными вымышленными учебными обстоятельствами и рекомендательными действиями. Реальные региональные и муниципальные акты, соглашения, специальные режимы и полная официальная цепочка поправок независимо не подтверждены. Активация запрещена.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_19671/431ac8ed77136ef53561af7f6977bc09ec0595a7/",
+          "https://www.consultant.ru/document/cons_doc_LAW_19671/ab54b1f6e016638e006428e90971b05636b17cbf/",
+          "https://www.consultant.ru/document/cons_doc_LAW_19671/4cada6c7ce0d8a4a287f0eeb6d5c1ed5f4d08045/",
+          "https://www.consultant.ru/document/cons_doc_LAW_28165/eb9180fc785448d58fe76ef323fb67d1832b9363/",
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/1b6959f23cc516d0e11ddc2e213ca2dca83560df/"
+        ]
       }
     },
     {
@@ -1512,23 +1529,38 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "НК РФ, статья 418.5: предельная ставка туристического налога в 2026 году — 2 процента. Источники: https://www.nalog.gov.ru/rn77/taxation/tax_legislation/",
+      "legal_basis": "НК РФ, ст. 5, 418.5, 418.7 (правило расчёта по разъяснению ФНС): в 2026 году предел ставки 2%; дифференциация — по сезонности, типу и категории средства размещения; минимум для облагаемой услуги — 100 рублей за сутки.",
       "legal_urls": [
         "https://www.nalog.gov.ru/rn77/taxation/tax_legislation/",
         "https://www.consultant.ru/document/cons_doc_LAW_28165/58051460fe04ca74ab709af54bb5768dc71ed783/",
-        "https://www.nalog.gov.ru/rn78/taxation/taxes/tourist_tax/"
+        "https://www.nalog.gov.ru/rn78/taxation/taxes/tourist_tax/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19671/431ac8ed77136ef53561af7f6977bc09ec0595a7/"
       ],
-      "legal_status": "requires_case_specific_current_law_review",
+      "legal_status": "verified_current",
       "activation_allowed": false,
       "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_19671/431ac8ed77136ef53561af7f6977bc09ec0595a7/",
         "https://www.consultant.ru/document/cons_doc_LAW_28165/58051460fe04ca74ab709af54bb5768dc71ed783/",
         "https://www.nalog.gov.ru/rn78/taxation/taxes/tourist_tax/"
       ],
       "review_date": "2026-11-28",
       "targeted_option_review": {
-        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
         "option_count": 5,
-        "remaining": "Муниципальный акт, минимальный налог, льготы и договор с гостем. Налогоплательщик — поставщик услуги, не турист."
+        "remaining": "Вывод ограничен указанными вымышленными учебными обстоятельствами и рекомендательными действиями. Реальные региональные и муниципальные акты, соглашения, специальные режимы и полная официальная цепочка поправок независимо не подтверждены. Активация запрещена."
+      },
+      "final_case_review_2026_11_28": {
+        "date": "2026-11-28",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
+        "norm": "НК РФ, ст. 5, 418.5, 418.7 (правило расчёта по разъяснению ФНС): в 2026 году предел ставки 2%; дифференциация — по сезонности, типу и категории средства размещения; минимум для облагаемой услуги — 100 рублей за сутки.",
+        "option_count": 5,
+        "finding": "Проект 5% в 2026 году недопустим; 5% является федеральным пределом начиная с 2029 года, а не обязательной ставкой. Минимальный налог не равен минимальной процентной ставке. Перспективное изменение акта не изменяет ранее возникший расчёт.",
+        "remaining": "Вывод ограничен указанными вымышленными учебными обстоятельствами и рекомендательными действиями. Реальные региональные и муниципальные акты, соглашения, специальные режимы и полная официальная цепочка поправок независимо не подтверждены. Активация запрещена.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_19671/431ac8ed77136ef53561af7f6977bc09ec0595a7/",
+          "https://www.consultant.ru/document/cons_doc_LAW_28165/58051460fe04ca74ab709af54bb5768dc71ed783/",
+          "https://www.nalog.gov.ru/rn78/taxation/taxes/tourist_tax/"
+        ]
       }
     },
     {
@@ -1669,23 +1701,42 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "НК РФ, статья 394: ставки земельного налога с учётом категории и использования участка. Источники: https://www.nalog.gov.ru/rn77/taxation/tax_legislation/",
+      "legal_basis": "НК РФ, ст. 12, подп. 1 п. 1 и п. 2 ст. 394; официальное разъяснение ФНС о налоговом уведомлении 2026: для сельхозземель, используемых для сельхозпроизводства, предел 0,3%, а конкретная ставка устанавливается компетентным представительным органом.",
       "legal_urls": [
         "https://www.nalog.gov.ru/rn77/taxation/tax_legislation/",
         "https://www.consultant.ru/document/cons_doc_LAW_28165/fd2ac88b2311a6053a128cfa43aa07672e826213/",
-        "https://www.nalog.gov.ru/rn77/news/activities_fts/16639383/"
+        "https://www.nalog.gov.ru/rn77/news/activities_fts/16639383/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19671/ab54b1f6e016638e006428e90971b05636b17cbf/",
+        "https://www.nalog.gov.ru/nu/",
+        "https://www.nalog.gov.ru/rn77/about_fts/docs/16653145/"
       ],
-      "legal_status": "requires_case_specific_current_law_review",
+      "legal_status": "verified_current",
       "activation_allowed": false,
       "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_19671/ab54b1f6e016638e006428e90971b05636b17cbf/",
         "https://www.consultant.ru/document/cons_doc_LAW_28165/fd2ac88b2311a6053a128cfa43aa07672e826213/",
-        "https://www.nalog.gov.ru/rn77/news/activities_fts/16639383/"
+        "https://www.nalog.gov.ru/nu/",
+        "https://www.nalog.gov.ru/rn77/about_fts/docs/16653145/"
       ],
       "review_date": "2026-11-28",
       "targeted_option_review": {
-        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
         "option_count": 5,
-        "remaining": "Муниципальные ставки, подтверждение сельхозиспользования, компетенция налогового органа; позиция КС 52-П об ИЖС не переносится автоматически на пастбище."
+        "remaining": "Вывод ограничен указанными вымышленными учебными обстоятельствами и рекомендательными действиями. Реальные региональные и муниципальные акты, соглашения, специальные режимы и полная официальная цепочка поправок независимо не подтверждены. Активация запрещена."
+      },
+      "final_case_review_2026_11_28": {
+        "date": "2026-11-28",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
+        "norm": "НК РФ, ст. 12, подп. 1 п. 1 и п. 2 ст. 394; официальное разъяснение ФНС о налоговом уведомлении 2026: для сельхозземель, используемых для сельхозпроизводства, предел 0,3%, а конкретная ставка устанавливается компетентным представительным органом.",
+        "option_count": 5,
+        "finding": "Исправлена компетенция: уведомление сформировал налоговый орган, не муниципалитет. Позиция КС №52-П об ИЖС и повышающих коэффициентах не переносится на сельхозпастбище.",
+        "remaining": "Вывод ограничен указанными вымышленными учебными обстоятельствами и рекомендательными действиями. Реальные региональные и муниципальные акты, соглашения, специальные режимы и полная официальная цепочка поправок независимо не подтверждены. Активация запрещена.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_19671/ab54b1f6e016638e006428e90971b05636b17cbf/",
+          "https://www.consultant.ru/document/cons_doc_LAW_28165/fd2ac88b2311a6053a128cfa43aa07672e826213/",
+          "https://www.nalog.gov.ru/nu/",
+          "https://www.nalog.gov.ru/rn77/about_fts/docs/16653145/"
+        ]
       }
     },
     {
@@ -1830,21 +1881,41 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "НК РФ, статья 374: объект налогообложения налогом на имущество организаций. Источники: https://www.nalog.gov.ru/rn77/taxation/tax_legislation/",
+      "legal_basis": "НК РФ, п. 1 ст. 374, ст. 375, п. 1 ст. 81; БК РФ, ст. 78: самостоятельное исключительное право на программу не является недвижимостью и объектом этого налога; законная поддержка цифровизации оформляется отдельно.",
       "legal_urls": [
         "https://www.nalog.gov.ru/rn77/taxation/tax_legislation/",
-        "https://www.consultant.ru/document/cons_doc_LAW_28165/d396a8e0699c51393ab5f6b8ad4c2ad8d408c553/"
+        "https://www.consultant.ru/document/cons_doc_LAW_28165/d396a8e0699c51393ab5f6b8ad4c2ad8d408c553/",
+        "https://www.consultant.ru/document/cons_doc_LAW_28165/997c77e155a52721fe302be0fcf80e1fc2a80173/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19671/47b9619255352b248d98fdecc89f4eaa36a85018/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/1b6959f23cc516d0e11ddc2e213ca2dca83560df/"
       ],
-      "legal_status": "requires_case_specific_current_law_review",
+      "legal_status": "verified_current",
       "activation_allowed": false,
       "checked_norm_urls": [
-        "https://www.consultant.ru/document/cons_doc_LAW_28165/d396a8e0699c51393ab5f6b8ad4c2ad8d408c553/"
+        "https://www.consultant.ru/document/cons_doc_LAW_28165/d396a8e0699c51393ab5f6b8ad4c2ad8d408c553/",
+        "https://www.consultant.ru/document/cons_doc_LAW_28165/997c77e155a52721fe302be0fcf80e1fc2a80173/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19671/47b9619255352b248d98fdecc89f4eaa36a85018/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/1b6959f23cc516d0e11ddc2e213ca2dca83560df/"
       ],
       "review_date": "2026-11-28",
       "targeted_option_review": {
-        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
         "option_count": 5,
-        "remaining": "Вид собственности и базы для здания, налоговые регистры и порядок корректировки."
+        "remaining": "Вывод ограничен указанными вымышленными учебными обстоятельствами и рекомендательными действиями. Реальные региональные и муниципальные акты, соглашения, специальные режимы и полная официальная цепочка поправок независимо не подтверждены. Активация запрещена."
+      },
+      "final_case_review_2026_11_28": {
+        "date": "2026-11-28",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
+        "norm": "НК РФ, п. 1 ст. 374, ст. 375, п. 1 ст. 81; БК РФ, ст. 78: самостоятельное исключительное право на программу не является недвижимостью и объектом этого налога; законная поддержка цифровизации оформляется отдельно.",
+        "option_count": 5,
+        "finding": "Уточнено отличие отдельного нематериального актива от элементов стоимости здания. Налоговый статус здания проверяется отдельно; исключение права из базы не означает освобождения всей компании.",
+        "remaining": "Вывод ограничен указанными вымышленными учебными обстоятельствами и рекомендательными действиями. Реальные региональные и муниципальные акты, соглашения, специальные режимы и полная официальная цепочка поправок независимо не подтверждены. Активация запрещена.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_28165/d396a8e0699c51393ab5f6b8ad4c2ad8d408c553/",
+          "https://www.consultant.ru/document/cons_doc_LAW_28165/997c77e155a52721fe302be0fcf80e1fc2a80173/",
+          "https://www.consultant.ru/document/cons_doc_LAW_19671/47b9619255352b248d98fdecc89f4eaa36a85018/",
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/1b6959f23cc516d0e11ddc2e213ca2dca83560df/"
+        ]
       }
     },
     {
@@ -2255,23 +2326,41 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "НК РФ, статьи 12 и 56: разграничение налоговых полномочий и установление льгот. Источники: https://www.nalog.gov.ru/rn77/taxation/tax_legislation/",
+      "legal_basis": "НК РФ, ст. 5, 12 и 56; БК РФ, ст. 78: освобождение от федеральных налогов не устанавливается региональным соглашением; региональные полномочия реализуются лишь в пределах НК РФ, самостоятельные субсидии — по предусмотренному порядку.",
       "legal_urls": [
         "https://www.nalog.gov.ru/rn77/taxation/tax_legislation/",
         "https://www.consultant.ru/document/cons_doc_LAW_19671/ab54b1f6e016638e006428e90971b05636b17cbf/",
-        "https://www.consultant.ru/document/cons_doc_LAW_19671/4cada6c7ce0d8a4a287f0eeb6d5c1ed5f4d08045/"
+        "https://www.consultant.ru/document/cons_doc_LAW_19671/4cada6c7ce0d8a4a287f0eeb6d5c1ed5f4d08045/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19671/431ac8ed77136ef53561af7f6977bc09ec0595a7/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/1b6959f23cc516d0e11ddc2e213ca2dca83560df/"
       ],
-      "legal_status": "requires_case_specific_current_law_review",
+      "legal_status": "verified_current",
       "activation_allowed": false,
       "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_19671/431ac8ed77136ef53561af7f6977bc09ec0595a7/",
         "https://www.consultant.ru/document/cons_doc_LAW_19671/ab54b1f6e016638e006428e90971b05636b17cbf/",
-        "https://www.consultant.ru/document/cons_doc_LAW_19671/4cada6c7ce0d8a4a287f0eeb6d5c1ed5f4d08045/"
+        "https://www.consultant.ru/document/cons_doc_LAW_19671/4cada6c7ce0d8a4a287f0eeb6d5c1ed5f4d08045/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/1b6959f23cc516d0e11ddc2e213ca2dca83560df/"
       ],
       "review_date": "2026-11-28",
       "targeted_option_review": {
-        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
         "option_count": 5,
-        "remaining": "Конкретные налоги, полномочия регионального законодательного органа по НК РФ, условия программы и наличие уже принятых обязательств."
+        "remaining": "Вывод ограничен указанными вымышленными учебными обстоятельствами и рекомендательными действиями. Реальные региональные и муниципальные акты, соглашения, специальные режимы и полная официальная цепочка поправок независимо не подтверждены. Активация запрещена."
+      },
+      "final_case_review_2026_11_28": {
+        "date": "2026-11-28",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
+        "norm": "НК РФ, ст. 5, 12 и 56; БК РФ, ст. 78: освобождение от федеральных налогов не устанавливается региональным соглашением; региональные полномочия реализуются лишь в пределах НК РФ, самостоятельные субсидии — по предусмотренному порядку.",
+        "option_count": 5,
+        "finding": "Разграничены обещание в инвестиционном соглашении, федеральное основание налогового преимущества и самостоятельная бюджетная поддержка. Не исключаются специальные режимы, прямо предусмотренные федеральным законом.",
+        "remaining": "Вывод ограничен указанными вымышленными учебными обстоятельствами и рекомендательными действиями. Реальные региональные и муниципальные акты, соглашения, специальные режимы и полная официальная цепочка поправок независимо не подтверждены. Активация запрещена.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_19671/431ac8ed77136ef53561af7f6977bc09ec0595a7/",
+          "https://www.consultant.ru/document/cons_doc_LAW_19671/ab54b1f6e016638e006428e90971b05636b17cbf/",
+          "https://www.consultant.ru/document/cons_doc_LAW_19671/4cada6c7ce0d8a4a287f0eeb6d5c1ed5f4d08045/",
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/1b6959f23cc516d0e11ddc2e213ca2dca83560df/"
+        ]
       }
     },
     {
@@ -2281,25 +2370,51 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "НК РФ, статья 418.4, пункты 2–3: федеральные исключения при подтверждении статуса действуют независимо от местного перечня; муниципалитет может установить дополнительные категории. Налогоплательщик — гостиница; изменение договорной цены отдельно.",
+      "legal_basis": "НК РФ, п. 1–3 ст. 418.4, ст. 418.5, ст. 81; 152-ФЗ, ст. 5, 6, 19: подтверждённая стоимость отдельной услуги не входит в налоговую базу независимо от местного перечня; обработка документов ограничена законной целью.",
       "legal_urls": [
         "https://www.nalog.gov.ru/rn77/taxation/tax_legislation/",
         "https://www.consultant.ru/document/cons_doc_LAW_28165/470b3df9e81deabdd0170e0a9f0fe7a5f2513a3d/",
         "https://www.nalog.gov.ru/rn78/taxation/taxes/tourist_tax/",
-        "https://www.nalog.gov.ru/rn26/news/activities_fts/15352094/"
+        "https://www.nalog.gov.ru/rn26/news/activities_fts/15352094/",
+        "https://www.consultant.ru/document/cons_doc_LAW_28165/58051460fe04ca74ab709af54bb5768dc71ed783/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19671/47b9619255352b248d98fdecc89f4eaa36a85018/",
+        "https://www.consultant.ru/document/cons_doc_LAW_61801/96fbc469f91f57235cc842a85e0516a99f23dc85/",
+        "https://www.consultant.ru/document/cons_doc_LAW_61801/315f051396c88f1e4f827ba3f2ae313d999a1873/",
+        "https://www.consultant.ru/document/cons_doc_LAW_61801/ca9e5658710519f09ab2fdb8196fcb3eb024a051/"
       ],
-      "legal_status": "requires_case_specific_current_law_review",
+      "legal_status": "verified_current",
       "activation_allowed": false,
       "checked_norm_urls": [
         "https://www.consultant.ru/document/cons_doc_LAW_28165/470b3df9e81deabdd0170e0a9f0fe7a5f2513a3d/",
+        "https://www.consultant.ru/document/cons_doc_LAW_28165/58051460fe04ca74ab709af54bb5768dc71ed783/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19671/47b9619255352b248d98fdecc89f4eaa36a85018/",
         "https://www.nalog.gov.ru/rn78/taxation/taxes/tourist_tax/",
-        "https://www.nalog.gov.ru/rn26/news/activities_fts/15352094/"
+        "https://www.consultant.ru/document/cons_doc_LAW_61801/96fbc469f91f57235cc842a85e0516a99f23dc85/",
+        "https://www.consultant.ru/document/cons_doc_LAW_61801/315f051396c88f1e4f827ba3f2ae313d999a1873/",
+        "https://www.consultant.ru/document/cons_doc_LAW_61801/ca9e5658710519f09ab2fdb8196fcb3eb024a051/"
       ],
       "review_date": "2026-11-28",
       "targeted_option_review": {
-        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
         "option_count": 5,
-        "remaining": "Категория лица, договор и состав услуги, документы, налоговый и договорный порядок корректировки."
+        "remaining": "Вывод ограничен указанными вымышленными учебными обстоятельствами и рекомендательными действиями. Реальные региональные и муниципальные акты, соглашения, специальные режимы и полная официальная цепочка поправок независимо не подтверждены. Активация запрещена."
+      },
+      "final_case_review_2026_11_28": {
+        "date": "2026-11-28",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
+        "norm": "НК РФ, п. 1–3 ст. 418.4, ст. 418.5, ст. 81; 152-ФЗ, ст. 5, 6, 19: подтверждённая стоимость отдельной услуги не входит в налоговую базу независимо от местного перечня; обработка документов ограничена законной целью.",
+        "option_count": 5,
+        "finding": "Названа конкретная федеральная категория, а не неопределённый льготный статус. Налогоплательщик — поставщик услуги, не гость. Не обещается автоматический возврат договорной цены.",
+        "remaining": "Вывод ограничен указанными вымышленными учебными обстоятельствами и рекомендательными действиями. Реальные региональные и муниципальные акты, соглашения, специальные режимы и полная официальная цепочка поправок независимо не подтверждены. Активация запрещена.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_28165/470b3df9e81deabdd0170e0a9f0fe7a5f2513a3d/",
+          "https://www.consultant.ru/document/cons_doc_LAW_28165/58051460fe04ca74ab709af54bb5768dc71ed783/",
+          "https://www.consultant.ru/document/cons_doc_LAW_19671/47b9619255352b248d98fdecc89f4eaa36a85018/",
+          "https://www.nalog.gov.ru/rn78/taxation/taxes/tourist_tax/",
+          "https://www.consultant.ru/document/cons_doc_LAW_61801/96fbc469f91f57235cc842a85e0516a99f23dc85/",
+          "https://www.consultant.ru/document/cons_doc_LAW_61801/315f051396c88f1e4f827ba3f2ae313d999a1873/",
+          "https://www.consultant.ru/document/cons_doc_LAW_61801/ca9e5658710519f09ab2fdb8196fcb3eb024a051/"
+        ]
       }
     },
     {
@@ -2605,21 +2720,38 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "НК РФ, статья 378.2: особенности определения налоговой базы по кадастровой стоимости. Источники: https://www.nalog.gov.ru/rn77/taxation/tax_legislation/",
+      "legal_basis": "НК РФ, п. 2 ст. 375, подп. 1 п. 1, п. 2, 3, 7, 12, 15 ст. 378.2; 237-ФЗ, ст. 22.1: кадастровая база для соответствующего объекта применяется по установленным условиям; изменение стоимости учитывается по законным основаниям.",
       "legal_urls": [
         "https://www.nalog.gov.ru/rn77/taxation/tax_legislation/",
-        "https://www.consultant.ru/document/cons_doc_LAW_28165/f6758978b92339b7e996fde13e5104caec7531d2/"
+        "https://www.consultant.ru/document/cons_doc_LAW_28165/f6758978b92339b7e996fde13e5104caec7531d2/",
+        "https://www.consultant.ru/document/cons_doc_LAW_28165/997c77e155a52721fe302be0fcf80e1fc2a80173/",
+        "https://www.consultant.ru/document/cons_doc_LAW_200504/135e0b9c50769c66cfa8e7e5fb71b918a70702e4/"
       ],
-      "legal_status": "requires_case_specific_current_law_review",
+      "legal_status": "verified_current",
       "activation_allowed": false,
       "checked_norm_urls": [
-        "https://www.consultant.ru/document/cons_doc_LAW_28165/f6758978b92339b7e996fde13e5104caec7531d2/"
+        "https://www.consultant.ru/document/cons_doc_LAW_28165/997c77e155a52721fe302be0fcf80e1fc2a80173/",
+        "https://www.consultant.ru/document/cons_doc_LAW_28165/f6758978b92339b7e996fde13e5104caec7531d2/",
+        "https://www.consultant.ru/document/cons_doc_LAW_200504/135e0b9c50769c66cfa8e7e5fb71b918a70702e4/"
       ],
       "review_date": "2026-11-28",
       "targeted_option_review": {
-        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
         "option_count": 5,
-        "remaining": "Региональный закон, тип объекта, перечень соответствующего периода, дата определения кадастровой стоимости и основания пересмотра."
+        "remaining": "Вывод ограничен указанными вымышленными учебными обстоятельствами и рекомендательными действиями. Реальные региональные и муниципальные акты, соглашения, специальные режимы и полная официальная цепочка поправок независимо не подтверждены. Активация запрещена."
+      },
+      "final_case_review_2026_11_28": {
+        "date": "2026-11-28",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
+        "norm": "НК РФ, п. 2 ст. 375, подп. 1 п. 1, п. 2, 3, 7, 12, 15 ст. 378.2; 237-ФЗ, ст. 22.1: кадастровая база для соответствующего объекта применяется по установленным условиям; изменение стоимости учитывается по законным основаниям.",
+        "option_count": 5,
+        "finding": "Уточнено, что речь об офисном здании, а не о любом производственном корпусе завода. Само наличие записи в перечне без соответствия критериям не объявляется достаточным универсальным основанием.",
+        "remaining": "Вывод ограничен указанными вымышленными учебными обстоятельствами и рекомендательными действиями. Реальные региональные и муниципальные акты, соглашения, специальные режимы и полная официальная цепочка поправок независимо не подтверждены. Активация запрещена.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_28165/997c77e155a52721fe302be0fcf80e1fc2a80173/",
+          "https://www.consultant.ru/document/cons_doc_LAW_28165/f6758978b92339b7e996fde13e5104caec7531d2/",
+          "https://www.consultant.ru/document/cons_doc_LAW_200504/135e0b9c50769c66cfa8e7e5fb71b918a70702e4/"
+        ]
       }
     },
     {
@@ -2629,23 +2761,39 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "НК РФ, статья 394: дифференциация земельных ставок и условия применения пониженной ставки. Источники: https://www.nalog.gov.ru/rn77/taxation/tax_legislation/",
+      "legal_basis": "НК РФ, подп. 1–2 п. 1, п. 2 ст. 394; БК РФ, ст. 78: условие неиспользования садового участка в предпринимательской деятельности для соответствующего предела 0,3% не выполнено; для прочих участков предел 1,5%, конкретная ставка определяется местным актом.",
       "legal_urls": [
         "https://www.nalog.gov.ru/rn77/taxation/tax_legislation/",
         "https://www.consultant.ru/document/cons_doc_LAW_28165/fd2ac88b2311a6053a128cfa43aa07672e826213/",
-        "https://www.nalog.gov.ru/rn77/news/activities_fts/16639383/"
+        "https://www.nalog.gov.ru/rn77/news/activities_fts/16639383/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/1b6959f23cc516d0e11ddc2e213ca2dca83560df/",
+        "https://www.nalog.gov.ru/rn77/about_fts/docs/16653145/"
       ],
-      "legal_status": "requires_case_specific_current_law_review",
+      "legal_status": "verified_current",
       "activation_allowed": false,
       "checked_norm_urls": [
         "https://www.consultant.ru/document/cons_doc_LAW_28165/fd2ac88b2311a6053a128cfa43aa07672e826213/",
-        "https://www.nalog.gov.ru/rn77/news/activities_fts/16639383/"
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/1b6959f23cc516d0e11ddc2e213ca2dca83560df/",
+        "https://www.nalog.gov.ru/rn77/about_fts/docs/16653145/"
       ],
       "review_date": "2026-11-28",
       "targeted_option_review": {
-        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
         "option_count": 5,
-        "remaining": "Категория, разрешённое и фактическое использование, муниципальный акт, кадастровая стоимость и отдельные ограничения статьи 394; КС 52-П касается ИЖС и не переносится автоматически."
+        "remaining": "Вывод ограничен указанными вымышленными учебными обстоятельствами и рекомендательными действиями. Реальные региональные и муниципальные акты, соглашения, специальные режимы и полная официальная цепочка поправок независимо не подтверждены. Активация запрещена."
+      },
+      "final_case_review_2026_11_28": {
+        "date": "2026-11-28",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
+        "norm": "НК РФ, подп. 1–2 п. 1, п. 2 ст. 394; БК РФ, ст. 78: условие неиспользования садового участка в предпринимательской деятельности для соответствующего предела 0,3% не выполнено; для прочих участков предел 1,5%, конкретная ставка определяется местным актом.",
+        "option_count": 5,
+        "finding": "Чётко отделено садоводство для собственных нужд от коммерческого склада. Не утверждается автоматическое применение максимальной ставки 1,5% или повышающих коэффициентов ИЖС.",
+        "remaining": "Вывод ограничен указанными вымышленными учебными обстоятельствами и рекомендательными действиями. Реальные региональные и муниципальные акты, соглашения, специальные режимы и полная официальная цепочка поправок независимо не подтверждены. Активация запрещена.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_28165/fd2ac88b2311a6053a128cfa43aa07672e826213/",
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/1b6959f23cc516d0e11ddc2e213ca2dca83560df/",
+          "https://www.nalog.gov.ru/rn77/about_fts/docs/16653145/"
+        ]
       }
     },
     {
@@ -3109,27 +3257,45 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "НК РФ, статьи 378.2 и 391; Федеральный закон №237-ФЗ, статьи 22 и 22.1: предусмотренные процедуры изменения кадастровой стоимости. Источники: https://www.nalog.gov.ru/rn77/taxation/tax_legislation/",
+      "legal_basis": "НК РФ, ст. 45, п. 2 ст. 375, п. 15 ст. 378.2; 237-ФЗ, ст. 22.1; постановление КС РФ от 14.07.2026 №48-П: заявление не меняет действующую налоговую базу; специальная временная процедура по архивной стоимости для физлиц не переносится на данное юридическое лицо.",
       "legal_urls": [
         "https://www.nalog.gov.ru/rn77/taxation/tax_legislation/",
         "https://www.consultant.ru/document/cons_doc_LAW_28165/f6758978b92339b7e996fde13e5104caec7531d2/",
         "https://www.consultant.ru/document/cons_doc_LAW_28165/d36363d427eab17744e49ef6f68eae5481107a64/",
         "https://www.consultant.ru/document/cons_doc_LAW_200504/135e0b9c50769c66cfa8e7e5fb71b918a70702e4/",
-        "https://www.consultant.ru/document/cons_doc_LAW_539371/"
+        "https://www.consultant.ru/document/cons_doc_LAW_539371/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19671/6260761a81d7b15d58997b97c292db75828e1b1f/",
+        "https://www.consultant.ru/document/cons_doc_LAW_28165/997c77e155a52721fe302be0fcf80e1fc2a80173/"
       ],
-      "legal_status": "requires_case_specific_current_law_review",
+      "legal_status": "verified_current",
       "activation_allowed": false,
       "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_19671/6260761a81d7b15d58997b97c292db75828e1b1f/",
+        "https://www.consultant.ru/document/cons_doc_LAW_28165/997c77e155a52721fe302be0fcf80e1fc2a80173/",
         "https://www.consultant.ru/document/cons_doc_LAW_28165/f6758978b92339b7e996fde13e5104caec7531d2/",
-        "https://www.consultant.ru/document/cons_doc_LAW_28165/d36363d427eab17744e49ef6f68eae5481107a64/",
         "https://www.consultant.ru/document/cons_doc_LAW_200504/135e0b9c50769c66cfa8e7e5fb71b918a70702e4/",
         "https://www.consultant.ru/document/cons_doc_LAW_539371/"
       ],
       "review_date": "2026-11-28",
       "targeted_option_review": {
-        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
         "option_count": 5,
-        "remaining": "Вид имущества, налог, период, запись ЕГРН и применимость статьи 22.1. КС РФ 48-П от 14.07.2026 касается специальной ситуации физлица, не ИП; не переносить её автоматически на компанию."
+        "remaining": "Вывод ограничен указанными вымышленными учебными обстоятельствами и рекомендательными действиями. Реальные региональные и муниципальные акты, соглашения, специальные режимы и полная официальная цепочка поправок независимо не подтверждены. Активация запрещена."
+      },
+      "final_case_review_2026_11_28": {
+        "date": "2026-11-28",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
+        "norm": "НК РФ, ст. 45, п. 2 ст. 375, п. 15 ст. 378.2; 237-ФЗ, ст. 22.1; постановление КС РФ от 14.07.2026 №48-П: заявление не меняет действующую налоговую базу; специальная временная процедура по архивной стоимости для физлиц не переносится на данное юридическое лицо.",
+        "option_count": 5,
+        "finding": "Уточнены налог и объект, исключены архивная стоимость и специальные основания приостановления. Период перерасчёта при установлении рыночной стоимости определяется по п. 15 ст. 378.2, а не произвольной датой подачи жалобы.",
+        "remaining": "Вывод ограничен указанными вымышленными учебными обстоятельствами и рекомендательными действиями. Реальные региональные и муниципальные акты, соглашения, специальные режимы и полная официальная цепочка поправок независимо не подтверждены. Активация запрещена.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_19671/6260761a81d7b15d58997b97c292db75828e1b1f/",
+          "https://www.consultant.ru/document/cons_doc_LAW_28165/997c77e155a52721fe302be0fcf80e1fc2a80173/",
+          "https://www.consultant.ru/document/cons_doc_LAW_28165/f6758978b92339b7e996fde13e5104caec7531d2/",
+          "https://www.consultant.ru/document/cons_doc_LAW_200504/135e0b9c50769c66cfa8e7e5fb71b918a70702e4/",
+          "https://www.consultant.ru/document/cons_doc_LAW_539371/"
+        ]
       }
     },
     {
@@ -3467,21 +3633,41 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "НК РФ, статья 12: компетенция по установлению налогов и соответствующих элементов налогообложения. Источники: https://www.nalog.gov.ru/rn77/taxation/tax_legislation/",
+      "legal_basis": "НК РФ, п. 4 ст. 12, ст. 394, ст. 5; БК РФ, ст. 78: местная ставка изменяется компетентным представительным органом в законных пределах; отдельное региональное финансирование требует самостоятельного основания.",
       "legal_urls": [
         "https://www.nalog.gov.ru/rn77/taxation/tax_legislation/",
-        "https://www.consultant.ru/document/cons_doc_LAW_19671/ab54b1f6e016638e006428e90971b05636b17cbf/"
+        "https://www.consultant.ru/document/cons_doc_LAW_19671/ab54b1f6e016638e006428e90971b05636b17cbf/",
+        "https://www.consultant.ru/document/cons_doc_LAW_28165/fd2ac88b2311a6053a128cfa43aa07672e826213/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19671/431ac8ed77136ef53561af7f6977bc09ec0595a7/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/1b6959f23cc516d0e11ddc2e213ca2dca83560df/"
       ],
-      "legal_status": "requires_case_specific_current_law_review",
+      "legal_status": "verified_current",
       "activation_allowed": false,
       "checked_norm_urls": [
-        "https://www.consultant.ru/document/cons_doc_LAW_19671/ab54b1f6e016638e006428e90971b05636b17cbf/"
+        "https://www.consultant.ru/document/cons_doc_LAW_19671/ab54b1f6e016638e006428e90971b05636b17cbf/",
+        "https://www.consultant.ru/document/cons_doc_LAW_28165/fd2ac88b2311a6053a128cfa43aa07672e826213/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19671/431ac8ed77136ef53561af7f6977bc09ec0595a7/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/1b6959f23cc516d0e11ddc2e213ca2dca83560df/"
       ],
       "review_date": "2026-11-28",
       "targeted_option_review": {
-        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
         "option_count": 5,
-        "remaining": "Муниципальный акт, специальный инвестиционный режим при наличии, содержание компенсационного обещания и компетенция подписанта."
+        "remaining": "Вывод ограничен указанными вымышленными учебными обстоятельствами и рекомендательными действиями. Реальные региональные и муниципальные акты, соглашения, специальные режимы и полная официальная цепочка поправок независимо не подтверждены. Активация запрещена."
+      },
+      "final_case_review_2026_11_28": {
+        "date": "2026-11-28",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
+        "norm": "НК РФ, п. 4 ст. 12, ст. 394, ст. 5; БК РФ, ст. 78: местная ставка изменяется компетентным представительным органом в законных пределах; отдельное региональное финансирование требует самостоятельного основания.",
+        "option_count": 5,
+        "finding": "Разграничены муниципальный налоговый акт и региональное соглашение. Исключены специальные предусмотренные законом стабилизационные гарантии; отказ от неоформленной гарантии не означает самовольного прекращения иных действующих договорных обязательств.",
+        "remaining": "Вывод ограничен указанными вымышленными учебными обстоятельствами и рекомендательными действиями. Реальные региональные и муниципальные акты, соглашения, специальные режимы и полная официальная цепочка поправок независимо не подтверждены. Активация запрещена.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_19671/ab54b1f6e016638e006428e90971b05636b17cbf/",
+          "https://www.consultant.ru/document/cons_doc_LAW_28165/fd2ac88b2311a6053a128cfa43aa07672e826213/",
+          "https://www.consultant.ru/document/cons_doc_LAW_19671/431ac8ed77136ef53561af7f6977bc09ec0595a7/",
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/1b6959f23cc516d0e11ddc2e213ca2dca83560df/"
+        ]
       }
     },
     {
@@ -4107,23 +4293,36 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "НК РФ, статьи 12–15: система налогов и полномочия по их установлению. Источники: https://www.nalog.gov.ru/rn77/taxation/tax_legislation/",
+      "legal_basis": "НК РФ, п. 4 и 6 ст. 12: налоги и сборы, отсутствующие в НК РФ, не могут устанавливаться письмом органа; добровольная услуга не превращается в основание обязательного платежа.",
       "legal_urls": [
         "https://www.nalog.gov.ru/rn77/taxation/tax_legislation/",
         "https://www.consultant.ru/document/cons_doc_LAW_19671/ab54b1f6e016638e006428e90971b05636b17cbf/",
-        "https://www.consultant.ru/document/cons_doc_LAW_19671/a96566c217a4dcd2d92872193965c95256f42062/"
+        "https://www.consultant.ru/document/cons_doc_LAW_19671/a96566c217a4dcd2d92872193965c95256f42062/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19671/431ac8ed77136ef53561af7f6977bc09ec0595a7/"
       ],
-      "legal_status": "requires_case_specific_current_law_review",
+      "legal_status": "verified_current",
       "activation_allowed": false,
       "checked_norm_urls": [
         "https://www.consultant.ru/document/cons_doc_LAW_19671/ab54b1f6e016638e006428e90971b05636b17cbf/",
-        "https://www.consultant.ru/document/cons_doc_LAW_19671/a96566c217a4dcd2d92872193965c95256f42062/"
+        "https://www.consultant.ru/document/cons_doc_LAW_19671/431ac8ed77136ef53561af7f6977bc09ec0595a7/"
       ],
       "review_date": "2026-11-28",
       "targeted_option_review": {
-        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
         "option_count": 5,
-        "remaining": "Местный порядок вывесок, отличие налога от неналоговой платы и реальной услуги, процедура отмены спорного требования."
+        "remaining": "Вывод ограничен указанными вымышленными учебными обстоятельствами и рекомендательными действиями. Реальные региональные и муниципальные акты, соглашения, специальные режимы и полная официальная цепочка поправок независимо не подтверждены. Активация запрещена."
+      },
+      "final_case_review_2026_11_28": {
+        "date": "2026-11-28",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
+        "norm": "НК РФ, п. 4 и 6 ст. 12: налоги и сборы, отсутствующие в НК РФ, не могут устанавливаться письмом органа; добровольная услуга не превращается в основание обязательного платежа.",
+        "option_count": 5,
+        "finding": "Ограничена квалификация: не утверждается запрет любых законных неналоговых платежей за размещение конструкций. Согласование вывески не связывается с оплатой вымышленного налога.",
+        "remaining": "Вывод ограничен указанными вымышленными учебными обстоятельствами и рекомендательными действиями. Реальные региональные и муниципальные акты, соглашения, специальные режимы и полная официальная цепочка поправок независимо не подтверждены. Активация запрещена.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_19671/ab54b1f6e016638e006428e90971b05636b17cbf/",
+          "https://www.consultant.ru/document/cons_doc_LAW_19671/431ac8ed77136ef53561af7f6977bc09ec0595a7/"
+        ]
       }
     },
     {
@@ -4415,25 +4614,36 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "НК РФ, статьи 418.1–418.4: введение туристического налога зависит от действующего муниципального акта; пункт 3 статьи 418.3 регулирует особый порядок сведений в 2025–2026 годах. Отсутствие налога в данном муниципалитете задано как учебное условие, не утверждение обо всём регионе. Иные налоги проверяются отдельно.",
+      "legal_basis": "НК РФ, п. 4 ст. 12, п. 3 ст. 418.3; Закон №152-ФЗ, ст. 5, 6, 19; БК РФ, ст. 78: отсутствие действующего местного налога в заданном месте не является общей налоговой льготой; в 2025–2026 годах предусмотрен специальный режим учёта объектов.",
       "legal_urls": [
         "https://www.nalog.gov.ru/rn77/taxation/tax_legislation/",
         "https://www.nalog.gov.ru/rn91/taxation/taxes/tourist_tax/",
         "https://www.consultant.ru/document/cons_doc_LAW_28165/82271d8942a9fac4206809bca98ddcbb584a4803/",
         "https://voikovosovet.ru/resheniya-soveta-deputatov/",
-        "https://its.1c.ru/db/content/taxtour/src/stavk26/reg91.htm"
+        "https://its.1c.ru/db/content/taxtour/src/stavk26/reg91.htm",
+        "https://www.consultant.ru/document/cons_doc_LAW_19671/ab54b1f6e016638e006428e90971b05636b17cbf/",
+        "https://www.nalog.gov.ru/rn78/taxation/taxes/tourist_tax/",
+        "https://www.consultant.ru/document/cons_doc_LAW_61801/96fbc469f91f57235cc842a85e0516a99f23dc85/",
+        "https://www.consultant.ru/document/cons_doc_LAW_61801/315f051396c88f1e4f827ba3f2ae313d999a1873/",
+        "https://www.consultant.ru/document/cons_doc_LAW_61801/ca9e5658710519f09ab2fdb8196fcb3eb024a051/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/1b6959f23cc516d0e11ddc2e213ca2dca83560df/"
       ],
-      "legal_status": "requires_case_specific_current_law_review",
+      "legal_status": "verified_current",
       "activation_allowed": false,
       "checked_norm_urls": [
-        "https://www.nalog.gov.ru/rn91/taxation/taxes/tourist_tax/",
-        "https://www.consultant.ru/document/cons_doc_LAW_28165/82271d8942a9fac4206809bca98ddcbb584a4803/"
+        "https://www.consultant.ru/document/cons_doc_LAW_19671/ab54b1f6e016638e006428e90971b05636b17cbf/",
+        "https://www.consultant.ru/document/cons_doc_LAW_28165/82271d8942a9fac4206809bca98ddcbb584a4803/",
+        "https://www.nalog.gov.ru/rn78/taxation/taxes/tourist_tax/",
+        "https://www.consultant.ru/document/cons_doc_LAW_61801/96fbc469f91f57235cc842a85e0516a99f23dc85/",
+        "https://www.consultant.ru/document/cons_doc_LAW_61801/315f051396c88f1e4f827ba3f2ae313d999a1873/",
+        "https://www.consultant.ru/document/cons_doc_LAW_61801/ca9e5658710519f09ab2fdb8196fcb3eb024a051/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/1b6959f23cc516d0e11ddc2e213ca2dca83560df/"
       ],
       "review_date": "2026-11-28",
       "targeted_option_review": {
-        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
         "option_count": 5,
-        "remaining": "Учебное отсутствие налога задано явно. Для документального утверждения необходимо проверить действующий акт конкретного муниципалитета и период; для иных налогов — статус и режим плательщика. ФНС и муниципальный перечень требуют сверки."
+        "remaining": "Вывод ограничен указанными вымышленными учебными обстоятельствами и рекомендательными действиями. Реальные региональные и муниципальные акты, соглашения, специальные режимы и полная официальная цепочка поправок независимо не подтверждены. Активация запрещена."
       },
       "source_conflict_2026_11_28": {
         "status": "unresolved_not_release",
@@ -4442,6 +4652,23 @@
           "https://voikovosovet.ru/resheniya-soveta-deputatov/",
           "https://its.1c.ru/db/content/taxtour/src/stavk26/reg91.htm",
           "https://www.nalog.gov.ru/rn91/taxation/taxes/tourist_tax/"
+        ]
+      },
+      "final_case_review_2026_11_28": {
+        "date": "2026-11-28",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
+        "norm": "НК РФ, п. 4 ст. 12, п. 3 ст. 418.3; Закон №152-ФЗ, ст. 5, 6, 19; БК РФ, ст. 78: отсутствие действующего местного налога в заданном месте не является общей налоговой льготой; в 2025–2026 годах предусмотрен специальный режим учёта объектов.",
+        "option_count": 5,
+        "finding": "Отсутствие местного акта задано только как вымышленное условие. Учтён специальный механизм признания объекта включённым в реестр с даты публикации сведений; отсутствие записи не всегда достаточно для вывода о туристическом налоге.",
+        "remaining": "Вывод ограничен указанными вымышленными учебными обстоятельствами и рекомендательными действиями. Реальные региональные и муниципальные акты, соглашения, специальные режимы и полная официальная цепочка поправок независимо не подтверждены. Активация запрещена.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_19671/ab54b1f6e016638e006428e90971b05636b17cbf/",
+          "https://www.consultant.ru/document/cons_doc_LAW_28165/82271d8942a9fac4206809bca98ddcbb584a4803/",
+          "https://www.nalog.gov.ru/rn78/taxation/taxes/tourist_tax/",
+          "https://www.consultant.ru/document/cons_doc_LAW_61801/96fbc469f91f57235cc842a85e0516a99f23dc85/",
+          "https://www.consultant.ru/document/cons_doc_LAW_61801/315f051396c88f1e4f827ba3f2ae313d999a1873/",
+          "https://www.consultant.ru/document/cons_doc_LAW_61801/ca9e5658710519f09ab2fdb8196fcb3eb024a051/",
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/1b6959f23cc516d0e11ddc2e213ca2dca83560df/"
         ]
       }
     },
@@ -4452,12 +4679,12 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "НК РФ, статья 388: плательщики земельного налога и предусмотренные виды прав. Источники: https://www.nalog.gov.ru/rn77/taxation/tax_legislation/",
+      "legal_basis": "НК РФ, п. 1–2 ст. 388: лицо, использующее участок исключительно на праве безвозмездного пользования, не признаётся плательщиком земельного налога по этому участку.",
       "legal_urls": [
         "https://www.nalog.gov.ru/rn77/taxation/tax_legislation/",
         "https://www.consultant.ru/document/cons_doc_LAW_28165/7266761567c503394be534d7d5d98b99a18b5816/"
       ],
-      "legal_status": "requires_case_specific_current_law_review",
+      "legal_status": "verified_current",
       "activation_allowed": false,
       "legal_evidence": [
         {
@@ -4469,14 +4696,9 @@
         }
       ],
       "targeted_option_review": {
-        "date": "2026-11-27",
-        "norm": "НК РФ, ст. 388, п. 1–2",
-        "urls": [
-          "https://www.consultant.ru/document/cons_doc_LAW_28165/7266761567c503394be534d7d5d98b99a18b5816/"
-        ],
-        "options": 5,
-        "status": "specific_text_read_and_alternatives_reviewed_under_stated_conditions_not_full_case_acceptance",
-        "remaining": "Подтверждён вывод о плательщике по условиям истории; порядок исправления и местные ставки требуют самостоятельной проверки."
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
+        "option_count": 5,
+        "remaining": "Вывод ограничен указанными вымышленными учебными обстоятельствами и рекомендательными действиями. Реальные региональные и муниципальные акты, соглашения, специальные режимы и полная официальная цепочка поправок независимо не подтверждены. Активация запрещена."
       },
       "checked_norm_urls": [
         "https://www.consultant.ru/document/cons_doc_LAW_28165/7266761567c503394be534d7d5d98b99a18b5816/"
@@ -4489,6 +4711,18 @@
         ],
         "option_count": 5,
         "finding": "П. 1–2 ст. 388 НК РФ, ред. 04.08.2026, изменения с 01.10.2026: безвозмездное пользование не образует статус плательщика земельного налога. Сверка регистрации допустима; местные ставки и процедура не заданы."
+      },
+      "review_date": "2026-11-28",
+      "final_case_review_2026_11_28": {
+        "date": "2026-11-28",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
+        "norm": "НК РФ, п. 1–2 ст. 388: лицо, использующее участок исключительно на праве безвозмездного пользования, не признаётся плательщиком земельного налога по этому участку.",
+        "option_count": 5,
+        "finding": "Разграничены отсутствие статуса налогоплательщика по конкретному участку и предоставление налоговой льготы. Не утверждается освобождение организации по иным участкам.",
+        "remaining": "Вывод ограничен указанными вымышленными учебными обстоятельствами и рекомендательными действиями. Реальные региональные и муниципальные акты, соглашения, специальные режимы и полная официальная цепочка поправок независимо не подтверждены. Активация запрещена.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_28165/7266761567c503394be534d7d5d98b99a18b5816/"
+        ]
       }
     },
     {
@@ -4531,13 +4765,13 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "НК РФ, ст. 5; 443-ФЗ от 21.11.2022, ст. 11: специальная возможность бумажной или электронной подачи для указанных плательщиков и периодов с началом до 31.12.2023 включительно.",
+      "legal_basis": "Ч. 1–2 ст. 11 Федерального закона от 21.11.2022 №443-ФЗ; ст. 5 НК РФ: для установленной категории и периодов с началом 30.09.2022–31.12.2023 предусмотрены обе формы отчётности; правительство вправе продлевать срок, иные периоды требуют самостоятельной проверки.",
       "legal_urls": [
         "https://www.nalog.gov.ru/rn77/taxation/tax_legislation/",
         "https://www.consultant.ru/document/cons_doc_LAW_431755/3eeafbd3bdb64673818bd5cba64081209bddc7a4/",
         "https://www.consultant.ru/document/cons_doc_LAW_19671/431ac8ed77136ef53561af7f6977bc09ec0595a7/"
       ],
-      "legal_status": "requires_case_specific_current_law_review",
+      "legal_status": "verified_current",
       "activation_allowed": false,
       "checked_norm_urls": [
         "https://www.consultant.ru/document/cons_doc_LAW_431755/3eeafbd3bdb64673818bd5cba64081209bddc7a4/",
@@ -4545,9 +4779,21 @@
       ],
       "review_date": "2026-11-28",
       "targeted_option_review": {
-        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
         "option_count": 5,
-        "remaining": "Конкретная декларация, статус на предусмотренную законом дату, начало периода, историческая редакция и отдельный расчёт налогового обязательства."
+        "remaining": "Вывод ограничен указанными вымышленными учебными обстоятельствами и рекомендательными действиями. Реальные региональные и муниципальные акты, соглашения, специальные режимы и полная официальная цепочка поправок независимо не подтверждены. Активация запрещена."
+      },
+      "final_case_review_2026_11_28": {
+        "date": "2026-11-28",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
+        "norm": "Ч. 1–2 ст. 11 Федерального закона от 21.11.2022 №443-ФЗ; ст. 5 НК РФ: для установленной категории и периодов с началом 30.09.2022–31.12.2023 предусмотрены обе формы отчётности; правительство вправе продлевать срок, иные периоды требуют самостоятельной проверки.",
+        "option_count": 5,
+        "finding": "Историческая норма проверена непосредственно в статье 11. Не делается утверждение о текущем территориальном статусе, сроках специальных продлений или размере налогов.",
+        "remaining": "Вывод ограничен указанными вымышленными учебными обстоятельствами и рекомендательными действиями. Реальные региональные и муниципальные акты, соглашения, специальные режимы и полная официальная цепочка поправок независимо не подтверждены. Активация запрещена.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_431755/3eeafbd3bdb64673818bd5cba64081209bddc7a4/",
+          "https://www.consultant.ru/document/cons_doc_LAW_19671/431ac8ed77136ef53561af7f6977bc09ec0595a7/"
+        ]
       }
     },
     {
