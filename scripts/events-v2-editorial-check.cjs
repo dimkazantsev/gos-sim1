@@ -68,6 +68,32 @@ for(const c of cases.filter(c=>c.audience==='single')){
 }
 assert.equal(individualRecheckCount,141);
 console.log(JSON.stringify({individualRecheckCount},null,2));
+
+ // A single current proposal is authoritative for editorial routing, never for authorization.
+ const competenceMatrix=JSON.parse(fs.readFileSync('docs/EVENTS_V2_COMPETENCE_APPROVAL_CANDIDATE_2026-11-28.json','utf8'));
+ const competenceByKey=new Map(competenceMatrix.cases.map(c=>[c.case_key,c]));
+ assert.equal(competenceMatrix.cases.length,141,'Competence matrix coverage');
+ assert.equal(competenceByKey.size,141,'Duplicate competence matrix key');
+ function checkCompetenceProposal(c,m){
+  assert.ok(m,c.case_key+' missing competence proposal');
+  assert.equal(m.title,c.title,c.case_key+' competence title mismatch');
+  assert.equal(m.best_option,c.effect_plan.best_option_key,c.case_key+' competence best option mismatch');
+  const p=c.legal_review.competence_review?.game_portfolio_candidate;
+  assert.ok(p,c.case_key+' missing catalogue competence proposal');
+  assert.equal(p.office_key,m.primary.office_key,c.case_key+' stale portfolio key');
+  assert.equal(p.office_title,m.primary.office_title,c.case_key+' stale portfolio title');
+  if(competenceMatrix.status==='owner_decision_candidate_not_for_import'){
+   assert.equal(p.status,'proposed_not_authorization',c.case_key);
+   assert.equal(m.activation_allowed,false,c.case_key);
+   assert.equal(c.verified,false,c.case_key);
+  }
+ }
+ for(const c of cases.filter(c=>c.audience==='single'))checkCompetenceProposal(c,competenceByKey.get(c.case_key));
+ if(process.argv.includes('--release')){
+  assert.notEqual(competenceMatrix.status,'owner_decision_candidate_not_for_import','Competence proposal still awaits owner approval');
+  assert.ok(competenceMatrix.cases.every(c=>c.activation_allowed===true),'Competence route activation not approved');
+ }
+
 let collectiveReviewCount=0,collectiveReviewOptions=0;
 for(const c of cases){
  const review=c.legal_review.collective_option_analysis;
