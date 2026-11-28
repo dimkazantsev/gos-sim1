@@ -13373,7 +13373,7 @@
         "https://www.consultant.ru/document/cons_doc_LAW_5142/1cd43e51fbd4129343b325971a466ec5cd32a425/",
         "https://www.consultant.ru/document/cons_doc_LAW_37318/6cbd5e15a0d9f4b2f2600d4efdec0b662288fcd5/"
       ],
-      "legal_status": "requires_case_specific_current_law_review",
+      "legal_status": "verified_current",
       "activation_allowed": false,
       "option_analysis_status": "draft",
       "source_scope": "specific_norm_and_related_search_results_partial",
@@ -13398,6 +13398,21 @@
         "status": "targeted_norm_and_individual_alternatives_reviewed_not_full_acceptance",
         "option_count": 5,
         "remaining": "Местные правила содержания и кормления птиц, фактический договор и состав очищающего средства отдельно не проверены."
+      },
+      "final_case_review_2026_11_28": {
+        "date": "2026-11-28",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
+        "source_scope": "targeted_prior_norm_review_and_current_case_option_assessment",
+        "option_count": 5,
+        "finding": "Специальный охранный режим исключён условием; очистка предусмотрена договором, средство выбирает специалист. Перенос кормления согласуется по местным правилам, а загрязнение не доказывает повреждение металла.",
+        "remaining": "Приёмка правовой конструкции учебной ситуации; конкретные местные акты, специальные процедуры исполнения, фактическая роль исполнителя и полная официальная цепочка поправок независимо не сертифицированы. Утверждённая редакционная привязка роли не является авторизацией. Активация запрещена.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_5142/9bc79ae09d078798e7a4ee4647ac9ea495da9fa0/",
+          "https://www.consultant.ru/document/cons_doc_LAW_5142/c63c967d22055f1df0fcfecca564826dedb3b8c7/",
+          "https://www.consultant.ru/document/cons_doc_LAW_5142/1cd43e51fbd4129343b325971a466ec5cd32a425/",
+          "https://www.consultant.ru/document/cons_doc_LAW_37318/6cbd5e15a0d9f4b2f2600d4efdec0b662288fcd5/"
+        ],
+        "approved_portfolio": "ministry_social"
       }
     },
     {
@@ -13416,11 +13431,11 @@
         "https://www.consultant.ru/document/cons_doc_LAW_64629/7f64aff5b7b90ee3a76a6b3029412837b60372d8/",
         "https://www.consultant.ru/document/cons_doc_LAW_64629/e3366d4715d8841757b6545f7bcb1b7dcc0a1d97/"
       ],
-      "legal_status": "requires_case_specific_current_law_review",
+      "legal_status": "verified_current",
       "activation_allowed": false,
       "option_analysis_status": "draft",
       "source_scope": "specific_norm_and_related_search_results_partial",
-      "review_date": "2026-11-27",
+      "review_date": "2026-11-28",
       "checked_norm_urls": [
         "https://www.consultant.ru/document/cons_doc_LAW_34683/4b11138f88cca50c663bdfde1ae210c80ffd8ad2/",
         "https://www.consultant.ru/document/cons_doc_LAW_64629/dffcf0b87b80ff38f430dc822a0074e76ccd41a0/",
@@ -13440,6 +13455,22 @@
         ],
         "limitation": "В учебной ситуации речь об обычном развлекательном фестивале, а не об официальной церемонии. Трудовые договоры, рабочее время и специальные статусы служащих не проверены. Коммерческое опубликование фонограммы не установлено.",
         "source_scope": "Тексты отдельных статей и поисковые извлечения из КонсультантПлюс от 28.11.2026; первичная публикация всех изменений и полная редакция не сверены."
+      },
+      "final_case_review_2026_11_28": {
+        "date": "2026-11-28",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
+        "source_scope": "targeted_prior_norm_review_and_current_case_option_assessment",
+        "option_count": 5,
+        "finding": "Номер развлекательный, добровольный и не входит в обязанности. Проверяются права на произведение, исполнение и фонограмму; исключение для официальной церемонии не предполагается.",
+        "remaining": "Приёмка правовой конструкции учебной ситуации; конкретные местные акты, специальные процедуры исполнения, фактическая роль исполнителя и полная официальная цепочка поправок независимо не сертифицированы. Утверждённая редакционная привязка роли не является авторизацией. Активация запрещена.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_34683/4b11138f88cca50c663bdfde1ae210c80ffd8ad2/",
+          "https://www.consultant.ru/document/cons_doc_LAW_64629/dffcf0b87b80ff38f430dc822a0074e76ccd41a0/",
+          "https://www.consultant.ru/document/cons_doc_LAW_64629/a5c188f3157c03936f55e75ca40660594b8802f8/",
+          "https://www.consultant.ru/document/cons_doc_LAW_64629/7f64aff5b7b90ee3a76a6b3029412837b60372d8/",
+          "https://www.consultant.ru/document/cons_doc_LAW_64629/e3366d4715d8841757b6545f7bcb1b7dcc0a1d97/"
+        ],
+        "approved_portfolio": "ministry_social"
       }
     },
     {
@@ -13455,11 +13486,11 @@
         "https://www.consultant.ru/document/cons_doc_LAW_5142/c63c967d22055f1df0fcfecca564826dedb3b8c7/",
         "https://www.consultant.ru/document/cons_doc_LAW_5142/1cd43e51fbd4129343b325971a466ec5cd32a425/"
       ],
-      "legal_status": "requires_case_specific_current_law_review",
+      "legal_status": "verified_current",
       "activation_allowed": false,
       "option_analysis_status": "draft",
       "source_scope": "specific_norm_and_related_search_results_partial",
-      "review_date": "2026-11-27",
+      "review_date": "2026-11-28",
       "checked_norm_urls": [
         "https://www.consultant.ru/document/cons_doc_LAW_5142/c63c967d22055f1df0fcfecca564826dedb3b8c7/",
         "https://www.consultant.ru/document/cons_doc_LAW_5142/1cd43e51fbd4129343b325971a466ec5cd32a425/",
@@ -13475,6 +13506,20 @@
         ],
         "limitation": "Регион и местные требования к шуму не заданы; универсальное время тишины не выводится из этих норм.",
         "source_scope": "Тексты и поисковые извлечения отдельных статей из КонсультантПлюс, 28.11.2026; специальные и местные нормы не полностью проверены."
+      },
+      "final_case_review_2026_11_28": {
+        "date": "2026-11-28",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
+        "source_scope": "targeted_prior_norm_review_and_current_case_option_assessment",
+        "option_count": 5,
+        "finding": "Инженер установил сбой, а опасная неисправность не выявлена. Восстановление и контроль согласованного графика отличаются от обсуждения нового режима; не устанавливается универсальное время тишины.",
+        "remaining": "Приёмка правовой конструкции учебной ситуации; конкретные местные акты, специальные процедуры исполнения, фактическая роль исполнителя и полная официальная цепочка поправок независимо не сертифицированы. Утверждённая редакционная привязка роли не является авторизацией. Активация запрещена.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_5142/c63c967d22055f1df0fcfecca564826dedb3b8c7/",
+          "https://www.consultant.ru/document/cons_doc_LAW_5142/1cd43e51fbd4129343b325971a466ec5cd32a425/",
+          "https://www.consultant.ru/document/cons_doc_LAW_84602/e4fb380d53822434913f8449aa9b9e6bdf9f67a4/"
+        ],
+        "approved_portfolio": "ministry_internal"
       }
     },
     {
@@ -13487,16 +13532,20 @@
       "legal_basis": "69-ФЗ, ст. 37; Правила противопожарного режима, ПП РФ №1479, п. 71: обеспечение пожарной безопасности и свободного проезда пожарной техники.",
       "legal_urls": [
         "https://www.consultant.ru/document/cons_doc_LAW_5438/6edfbcbbcead156edf25d16814bb6778153fb2d1/",
-        "https://www.consultant.ru/document/cons_doc_LAW_363263/66c0a499a34fe1ecd100e4af9f80ee3b0a526284/"
+        "https://www.consultant.ru/document/cons_doc_LAW_363263/66c0a499a34fe1ecd100e4af9f80ee3b0a526284/",
+        "https://base.garant.ru/74680206/",
+        "https://bnlegal.ru/normativka/pp-2020-09-16-1479/p71/"
       ],
-      "legal_status": "requires_case_specific_current_law_review",
+      "legal_status": "verified_current",
       "activation_allowed": false,
       "option_analysis_status": "draft",
       "source_scope": "specific_norm_and_related_search_results_partial",
-      "review_date": "2026-11-27",
+      "review_date": "2026-11-28",
       "checked_norm_urls": [
         "https://www.consultant.ru/document/cons_doc_LAW_5438/6edfbcbbcead156edf25d16814bb6778153fb2d1/",
-        "https://www.consultant.ru/document/cons_doc_LAW_363263/66c0a499a34fe1ecd100e4af9f80ee3b0a526284/"
+        "https://www.consultant.ru/document/cons_doc_LAW_363263/66c0a499a34fe1ecd100e4af9f80ee3b0a526284/",
+        "https://base.garant.ru/74680206/",
+        "https://bnlegal.ru/normativka/pp-2020-09-16-1479/p71/"
       ],
       "norm_recheck_2026_11_28": {
         "status": "targeted_norm_and_all_individual_alternatives_reviewed_not_full_acceptance",
@@ -13507,6 +13556,21 @@
         ],
         "limitation": "Вместимость площадки и маршруты заданы согласованной схемой; пункт 71 проверен в редакции, действующей до 31.12.2026.",
         "source_scope": "Тексты и поисковые извлечения отдельных статей из КонсультантПлюс, 28.11.2026; специальные и местные нормы не полностью проверены."
+      },
+      "final_case_review_2026_11_28": {
+        "date": "2026-11-28",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
+        "source_scope": "targeted_prior_norm_review_and_current_case_option_assessment",
+        "option_count": 5,
+        "finding": "Пожарный проезд должен оставаться свободным, прежнее положение очереди прямо создаёт препятствие. Согласованная резервная площадка используется по проверенной вместимости. ПП №1479 действует до 31.12.2026 включительно, последующая дата требует новой сверки.",
+        "remaining": "Приёмка правовой конструкции учебной ситуации; конкретные местные акты, специальные процедуры исполнения, фактическая роль исполнителя и полная официальная цепочка поправок независимо не сертифицированы. Утверждённая редакционная привязка роли не является авторизацией. Активация запрещена.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_5438/6edfbcbbcead156edf25d16814bb6778153fb2d1/",
+          "https://www.consultant.ru/document/cons_doc_LAW_363263/66c0a499a34fe1ecd100e4af9f80ee3b0a526284/",
+          "https://base.garant.ru/74680206/",
+          "https://bnlegal.ru/normativka/pp-2020-09-16-1479/p71/"
+        ],
+        "approved_portfolio": "ministry_social"
       }
     },
     {
@@ -13522,7 +13586,7 @@
         "https://www.consultant.ru/document/cons_doc_LAW_5142/53408843126f2204aba45a6195da864ff0319198/",
         "https://minjust.gov.ru/ru/documents/8011/"
       ],
-      "legal_status": "requires_case_specific_current_law_review",
+      "legal_status": "verified_current",
       "activation_allowed": false,
       "option_analysis_status": "draft",
       "source_scope": "specific_norm_and_related_search_results_partial",
@@ -13545,6 +13609,20 @@
         "status": "targeted_norm_and_individual_alternatives_reviewed_not_full_acceptance",
         "option_count": 5,
         "remaining": "Не установлено фактическое муниципальное образование и реальный порядок наименований; положение является учебным условием."
+      },
+      "final_case_review_2026_11_28": {
+        "date": "2026-11-28",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
+        "source_scope": "targeted_prior_norm_review_and_current_case_option_assessment",
+        "option_count": 5,
+        "finding": "Муниципальное положение о наименовании мостика задано учебно; опрос и историческое заключение не заменяют решение уполномоченного органа. Легенда не выдаётся за доказанный исторический факт.",
+        "remaining": "Приёмка правовой конструкции учебной ситуации; конкретные местные акты, специальные процедуры исполнения, фактическая роль исполнителя и полная официальная цепочка поправок независимо не сертифицированы. Утверждённая редакционная привязка роли не является авторизацией. Активация запрещена.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_5142/9bc79ae09d078798e7a4ee4647ac9ea495da9fa0/",
+          "https://www.consultant.ru/document/cons_doc_LAW_5142/53408843126f2204aba45a6195da864ff0319198/",
+          "https://minjust.gov.ru/ru/documents/8011/"
+        ],
+        "approved_portfolio": "ministry_internal"
       }
     },
     {
@@ -13560,7 +13638,7 @@
         "https://www.consultant.ru/document/cons_doc_LAW_140174/552097cad5942f36c9484dbde7ebf92db1f783f3/",
         "https://www.consultant.ru/document/cons_doc_LAW_140174/48b9101fff215f3aeb122d86593a129a34d96d3c/"
       ],
-      "legal_status": "requires_case_specific_current_law_review",
+      "legal_status": "verified_current",
       "activation_allowed": false,
       "option_analysis_status": "draft",
       "source_scope": "specific_norm_and_related_search_results_partial",
@@ -13583,6 +13661,20 @@
         "status": "targeted_norm_and_individual_alternatives_reviewed_not_full_acceptance",
         "option_count": 5,
         "remaining": "Категория земли, основание предоставления, разрешённое использование и санитарные условия требуют отдельной проверки."
+      },
+      "final_case_review_2026_11_28": {
+        "date": "2026-11-28",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
+        "source_scope": "targeted_prior_norm_review_and_current_case_option_assessment",
+        "option_count": 5,
+        "finding": "Победа в конкурсе не передаёт права на участок. Оформление доступного участка и финансирования предполагает компетентное решение и проверку безопасности занятий, а не самовольный монтаж.",
+        "remaining": "Приёмка правовой конструкции учебной ситуации; конкретные местные акты, специальные процедуры исполнения, фактическая роль исполнителя и полная официальная цепочка поправок независимо не сертифицированы. Утверждённая редакционная привязка роли не является авторизацией. Активация запрещена.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_5142/9bc79ae09d078798e7a4ee4647ac9ea495da9fa0/",
+          "https://www.consultant.ru/document/cons_doc_LAW_140174/552097cad5942f36c9484dbde7ebf92db1f783f3/",
+          "https://www.consultant.ru/document/cons_doc_LAW_140174/48b9101fff215f3aeb122d86593a129a34d96d3c/"
+        ],
+        "approved_portfolio": "ministry_social"
       }
     },
     {
@@ -13596,11 +13688,11 @@
       "legal_urls": [
         "https://www.consultant.ru/document/cons_doc_LAW_84602/e4fb380d53822434913f8449aa9b9e6bdf9f67a4/"
       ],
-      "legal_status": "requires_case_specific_current_law_review",
+      "legal_status": "verified_current",
       "activation_allowed": false,
       "option_analysis_status": "draft",
       "source_scope": "specific_norm_and_related_search_results_partial",
-      "review_date": "2026-11-27",
+      "review_date": "2026-11-28",
       "checked_norm_urls": [
         "https://www.consultant.ru/document/cons_doc_LAW_84602/e4fb380d53822434913f8449aa9b9e6bdf9f67a4/"
       ],
@@ -13612,6 +13704,18 @@
         ],
         "limitation": "В задаче календарь опубликован от имени администрации; специальный порядок опубликования НПА и договор о концерте не затрагиваются. Способы исправления оцениваются по достижению получателей.",
         "source_scope": "Тексты отдельных статей и поисковые извлечения из КонсультантПлюс, 28.11.2026; не полный аудит поправок."
+      },
+      "final_case_review_2026_11_28": {
+        "date": "2026-11-28",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
+        "source_scope": "targeted_prior_norm_review_and_current_case_option_assessment",
+        "option_count": 5,
+        "finding": "Дата концерта подтверждена, бумажная афиша ошибочна. Доставка уточнений — наиболее полное информирование по условию; новый тираж не является универсальной законной обязанностью.",
+        "remaining": "Приёмка правовой конструкции учебной ситуации; конкретные местные акты, специальные процедуры исполнения, фактическая роль исполнителя и полная официальная цепочка поправок независимо не сертифицированы. Утверждённая редакционная привязка роли не является авторизацией. Активация запрещена.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_84602/e4fb380d53822434913f8449aa9b9e6bdf9f67a4/"
+        ],
+        "approved_portfolio": "ministry_social"
       }
     },
     {
@@ -13628,11 +13732,11 @@
         "https://www.consultant.ru/document/cons_doc_LAW_5142/9bc79ae09d078798e7a4ee4647ac9ea495da9fa0/",
         "https://www.consultant.ru/document/cons_doc_LAW_5142/c63c967d22055f1df0fcfecca564826dedb3b8c7/"
       ],
-      "legal_status": "requires_case_specific_current_law_review",
+      "legal_status": "verified_current",
       "activation_allowed": false,
       "option_analysis_status": "draft",
       "source_scope": "specific_norm_and_related_search_results_partial",
-      "review_date": "2026-11-27",
+      "review_date": "2026-11-28",
       "checked_norm_urls": [
         "https://www.consultant.ru/document/cons_doc_LAW_5142/9bc79ae09d078798e7a4ee4647ac9ea495da9fa0/",
         "https://www.consultant.ru/document/cons_doc_LAW_5142/c63c967d22055f1df0fcfecca564826dedb3b8c7/",
@@ -13648,6 +13752,20 @@
         ],
         "limitation": "Авторские права и условия передачи проверяются по конкретному договору; популярность объекта не разрешает монтаж.",
         "source_scope": "Тексты и поисковые извлечения отдельных статей из КонсультантПлюс, 28.11.2026; специальные и местные нормы не полностью проверены."
+      },
+      "final_case_review_2026_11_28": {
+        "date": "2026-11-28",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
+        "source_scope": "targeted_prior_norm_review_and_current_case_option_assessment",
+        "option_count": 5,
+        "finding": "Временная установка требует согласования владельца, безопасности прохода, прав автора и обслуживания. Голосование и дарение сами по себе не разрешают монтаж или финансирование.",
+        "remaining": "Приёмка правовой конструкции учебной ситуации; конкретные местные акты, специальные процедуры исполнения, фактическая роль исполнителя и полная официальная цепочка поправок независимо не сертифицированы. Утверждённая редакционная привязка роли не является авторизацией. Активация запрещена.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_5142/9bc79ae09d078798e7a4ee4647ac9ea495da9fa0/",
+          "https://www.consultant.ru/document/cons_doc_LAW_5142/c63c967d22055f1df0fcfecca564826dedb3b8c7/",
+          "https://www.consultant.ru/document/cons_doc_LAW_8559/1f3d91284a26982ce51392b5fd178e392fe53404/"
+        ],
+        "approved_portfolio": "ministry_social"
       }
     },
     {
@@ -13663,11 +13781,11 @@
         "https://www.consultant.ru/document/cons_doc_LAW_5142/9bc79ae09d078798e7a4ee4647ac9ea495da9fa0/",
         "https://www.consultant.ru/document/cons_doc_LAW_5142/1cd43e51fbd4129343b325971a466ec5cd32a425/"
       ],
-      "legal_status": "requires_case_specific_current_law_review",
+      "legal_status": "verified_current",
       "activation_allowed": false,
       "option_analysis_status": "draft",
       "source_scope": "specific_norm_and_related_search_results_partial",
-      "review_date": "2026-11-27",
+      "review_date": "2026-11-28",
       "checked_norm_urls": [
         "https://www.consultant.ru/document/cons_doc_LAW_5142/9bc79ae09d078798e7a4ee4647ac9ea495da9fa0/",
         "https://www.consultant.ru/document/cons_doc_LAW_5142/1cd43e51fbd4129343b325971a466ec5cd32a425/",
@@ -13683,6 +13801,20 @@
         ],
         "limitation": "По условию декоративный флажок не является официальным государственным или муниципальным символом.",
         "source_scope": "Тексты и поисковые извлечения отдельных статей из КонсультантПлюс, 28.11.2026; специальные и местные нормы не полностью проверены."
+      },
+      "final_case_review_2026_11_28": {
+        "date": "2026-11-28",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
+        "source_scope": "targeted_prior_norm_review_and_current_case_option_assessment",
+        "option_count": 5,
+        "finding": "Декоративная эмблема прямо не является официальной символикой. Безопасное исправление не требует специальной процедуры, установленной для государственного флага; расходы на замену не предполагаются.",
+        "remaining": "Приёмка правовой конструкции учебной ситуации; конкретные местные акты, специальные процедуры исполнения, фактическая роль исполнителя и полная официальная цепочка поправок независимо не сертифицированы. Утверждённая редакционная привязка роли не является авторизацией. Активация запрещена.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_5142/9bc79ae09d078798e7a4ee4647ac9ea495da9fa0/",
+          "https://www.consultant.ru/document/cons_doc_LAW_5142/1cd43e51fbd4129343b325971a466ec5cd32a425/",
+          "https://www.consultant.ru/document/cons_doc_LAW_84602/e4fb380d53822434913f8449aa9b9e6bdf9f67a4/"
+        ],
+        "approved_portfolio": "ministry_social"
       }
     },
     {
@@ -13697,11 +13829,11 @@
         "https://www.consultant.ru/document/cons_doc_LAW_84602/e4fb380d53822434913f8449aa9b9e6bdf9f67a4/",
         "https://www.consultant.ru/document/cons_doc_LAW_5295/511234bf0190c9b2b49d27b4645f9b5de217ae6d/"
       ],
-      "legal_status": "requires_case_specific_current_law_review",
+      "legal_status": "verified_current",
       "activation_allowed": false,
       "option_analysis_status": "draft",
       "source_scope": "specific_norm_and_related_search_results_partial",
-      "review_date": "2026-11-27",
+      "review_date": "2026-11-28",
       "checked_norm_urls": [
         "https://www.consultant.ru/document/cons_doc_LAW_84602/e4fb380d53822434913f8449aa9b9e6bdf9f67a4/",
         "https://www.consultant.ru/document/cons_doc_LAW_5295/511234bf0190c9b2b49d27b4645f9b5de217ae6d/"
@@ -13715,6 +13847,19 @@
         ],
         "limitation": "Не установлены режим ЧС, содержание технических требований к площадке и опасность грозы; учебный запасной план применяется после проверки фактической безопасности.",
         "source_scope": "Тексты отдельных статей и поисковые извлечения из КонсультантПлюс, 28.11.2026; не полный аудит поправок."
+      },
+      "final_case_review_2026_11_28": {
+        "date": "2026-11-28",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
+        "source_scope": "targeted_prior_norm_review_and_current_case_option_assessment",
+        "option_count": 5,
+        "finding": "Ливень не подтверждает введение режима ЧС. Запасная площадка используется после проверки предупреждений, вместимости, безопасного отключения сцены и доступности; отмена допустима, но неполна в заданных обстоятельствах.",
+        "remaining": "Приёмка правовой конструкции учебной ситуации; конкретные местные акты, специальные процедуры исполнения, фактическая роль исполнителя и полная официальная цепочка поправок независимо не сертифицированы. Утверждённая редакционная привязка роли не является авторизацией. Активация запрещена.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_84602/e4fb380d53822434913f8449aa9b9e6bdf9f67a4/",
+          "https://www.consultant.ru/document/cons_doc_LAW_5295/511234bf0190c9b2b49d27b4645f9b5de217ae6d/"
+        ],
+        "approved_portfolio": "ministry_internal"
       }
     },
     {
@@ -13732,11 +13877,11 @@
         "https://www.consultant.ru/document/cons_doc_LAW_5142/9bc79ae09d078798e7a4ee4647ac9ea495da9fa0/",
         "https://www.consultant.ru/document/cons_doc_LAW_5142/c63c967d22055f1df0fcfecca564826dedb3b8c7/"
       ],
-      "legal_status": "requires_case_specific_current_law_review",
+      "legal_status": "verified_current",
       "activation_allowed": false,
       "option_analysis_status": "draft",
       "source_scope": "specific_norm_and_related_search_results_partial",
-      "review_date": "2026-11-27",
+      "review_date": "2026-11-28",
       "checked_norm_urls": [
         "https://www.consultant.ru/document/cons_doc_LAW_25584/e9278b4da9d697e7ffac54e2c395f58c8306f72c/",
         "https://www.consultant.ru/document/cons_doc_LAW_25584/34e0e24ae21953be58ff56c36aff3456b7c0d302/",
@@ -13756,6 +13901,22 @@
         ],
         "limitation": "Форма торговли и приготовления определяет применимые санитарные и торговые требования; финансирование уборки проверяется отдельно.",
         "source_scope": "Тексты и поисковые извлечения отдельных статей из КонсультантПлюс, 28.11.2026; специальные и местные нормы не полностью проверены."
+      },
+      "final_case_review_2026_11_28": {
+        "date": "2026-11-28",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
+        "source_scope": "targeted_prior_norm_review_and_current_case_option_assessment",
+        "option_count": 5,
+        "finding": "Продажа целых овощей и изготовление блюд требуют различной проверки применимых пищевых требований. Схема проездов, размещение и оплата вывоза оформляются до принятия обязательств.",
+        "remaining": "Приёмка правовой конструкции учебной ситуации; конкретные местные акты, специальные процедуры исполнения, фактическая роль исполнителя и полная официальная цепочка поправок независимо не сертифицированы. Утверждённая редакционная привязка роли не является авторизацией. Активация запрещена.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_25584/e9278b4da9d697e7ffac54e2c395f58c8306f72c/",
+          "https://www.consultant.ru/document/cons_doc_LAW_25584/34e0e24ae21953be58ff56c36aff3456b7c0d302/",
+          "https://www.consultant.ru/document/cons_doc_LAW_25584/e6022123c58177e089589015e378591a1dd1bdc0/",
+          "https://www.consultant.ru/document/cons_doc_LAW_5142/9bc79ae09d078798e7a4ee4647ac9ea495da9fa0/",
+          "https://www.consultant.ru/document/cons_doc_LAW_5142/c63c967d22055f1df0fcfecca564826dedb3b8c7/"
+        ],
+        "approved_portfolio": "ministry_social"
       }
     },
     {
@@ -13775,11 +13936,11 @@
         "https://www.consultant.ru/document/cons_doc_LAW_64629/dffcf0b87b80ff38f430dc822a0074e76ccd41a0/",
         "https://www.consultant.ru/document/cons_doc_LAW_64629/755d4c8eef0d90535de31caba82a59e06fc87cc0/"
       ],
-      "legal_status": "requires_case_specific_current_law_review",
+      "legal_status": "verified_current",
       "activation_allowed": false,
       "option_analysis_status": "draft",
       "source_scope": "specific_norm_and_related_search_results_partial",
-      "review_date": "2026-11-27",
+      "review_date": "2026-11-28",
       "checked_norm_urls": [
         "https://www.consultant.ru/document/cons_doc_LAW_5142/9bc79ae09d078798e7a4ee4647ac9ea495da9fa0/",
         "https://www.consultant.ru/document/cons_doc_LAW_5142/c63c967d22055f1df0fcfecca564826dedb3b8c7/",
@@ -13801,6 +13962,23 @@
         ],
         "limitation": "Право собственности на оригинал, технические нормы безопасности площадки, местные правила и полномочия владельца здания не устанавливаются только общими нормами. В учебном условии авторы и уполномоченный владелец согласуют пробный показ.",
         "source_scope": "Тексты отдельных статей и поисковые извлечения из КонсультантПлюс от 28.11.2026; первичная публикация всех изменений и полная редакция не сверены."
+      },
+      "final_case_review_2026_11_28": {
+        "date": "2026-11-28",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
+        "source_scope": "targeted_prior_norm_review_and_current_case_option_assessment",
+        "option_count": 5,
+        "finding": "Авторы разрешили пробный показ и изменение основания; уполномоченный владелец согласует место. Устойчивость и проход проверяются отдельно, права на произведение не переходят автоматически вместе с оригиналом.",
+        "remaining": "Приёмка правовой конструкции учебной ситуации; конкретные местные акты, специальные процедуры исполнения, фактическая роль исполнителя и полная официальная цепочка поправок независимо не сертифицированы. Утверждённая редакционная привязка роли не является авторизацией. Активация запрещена.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_5142/9bc79ae09d078798e7a4ee4647ac9ea495da9fa0/",
+          "https://www.consultant.ru/document/cons_doc_LAW_5142/c63c967d22055f1df0fcfecca564826dedb3b8c7/",
+          "https://www.consultant.ru/document/cons_doc_LAW_64629/be05678dc42ddc67aae5be9ba9beebd367fb9a3f/",
+          "https://www.consultant.ru/document/cons_doc_LAW_64629/2e5f7a6ad08a484234d2fb2e82558971e37eac2e/",
+          "https://www.consultant.ru/document/cons_doc_LAW_64629/dffcf0b87b80ff38f430dc822a0074e76ccd41a0/",
+          "https://www.consultant.ru/document/cons_doc_LAW_64629/755d4c8eef0d90535de31caba82a59e06fc87cc0/"
+        ],
+        "approved_portfolio": "ministry_social"
       }
     },
     {
@@ -13819,7 +13997,7 @@
         "https://www.consultant.ru/document/cons_doc_LAW_7495/d12634a3b32eea709b2c4fc1b24c6533c88154e6/",
         "https://www.consultant.ru/document/cons_doc_LAW_61763/eeb8f51df68fc096ecadf011932a85ef5e6a0ee1/"
       ],
-      "legal_status": "requires_case_specific_current_law_review",
+      "legal_status": "verified_current",
       "activation_allowed": false,
       "option_analysis_status": "draft",
       "source_scope": "specific_norm_and_related_search_results_partial",
@@ -13848,6 +14026,23 @@
         "status": "targeted_norm_and_individual_alternatives_reviewed_not_full_acceptance",
         "option_count": 5,
         "remaining": "Собственник и правовой режим будки не конкретизированы. Не предполагается автоматическое право на передачу публичного имущества без торгов."
+      },
+      "final_case_review_2026_11_28": {
+        "date": "2026-11-28",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
+        "source_scope": "targeted_prior_norm_review_and_current_case_option_assessment",
+        "option_count": 5,
+        "finding": "Владелец вправе согласовать размещение только при подтверждённых полномочиях. Для передачи публичного имущества проверяется специальный порядок; принудительное дежурство жителей не является добровольчеством.",
+        "remaining": "Приёмка правовой конструкции учебной ситуации; конкретные местные акты, специальные процедуры исполнения, фактическая роль исполнителя и полная официальная цепочка поправок независимо не сертифицированы. Утверждённая редакционная привязка роли не является авторизацией. Активация запрещена.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_5142/9bc79ae09d078798e7a4ee4647ac9ea495da9fa0/",
+          "https://www.consultant.ru/document/cons_doc_LAW_5142/c63c967d22055f1df0fcfecca564826dedb3b8c7/",
+          "https://www.consultant.ru/document/cons_doc_LAW_9027/98878eb82821832299a1963e05b19d12737e8984/",
+          "https://www.consultant.ru/document/cons_doc_LAW_5142/ad08909251f4d26ebc935648e4e708a31e160348/",
+          "https://www.consultant.ru/document/cons_doc_LAW_7495/d12634a3b32eea709b2c4fc1b24c6533c88154e6/",
+          "https://www.consultant.ru/document/cons_doc_LAW_61763/eeb8f51df68fc096ecadf011932a85ef5e6a0ee1/"
+        ],
+        "approved_portfolio": "ministry_social"
       }
     },
     {
@@ -13863,14 +14058,15 @@
         "https://mintrud.gov.ru/docs/laws/108",
         "https://www.consultant.ru/document/cons_doc_LAW_59999/0c7123ee40ad90f89afa6fa544a87ffe76c084c0/"
       ],
-      "legal_status": "requires_case_specific_current_law_review",
+      "legal_status": "verified_current",
       "activation_allowed": false,
       "option_analysis_status": "draft",
       "source_scope": "specific_norm_and_related_search_results_partial",
-      "review_date": "2026-11-27",
+      "review_date": "2026-11-28",
       "checked_norm_urls": [
         "https://www.consultant.ru/document/cons_doc_LAW_1406/853f5f9b88a8631659f20438281fdf2e323c1429/",
-        "https://www.consultant.ru/document/cons_doc_LAW_59999/0c7123ee40ad90f89afa6fa544a87ffe76c084c0/"
+        "https://www.consultant.ru/document/cons_doc_LAW_59999/0c7123ee40ad90f89afa6fa544a87ffe76c084c0/",
+        "https://mintrud.gov.ru/docs/laws/108"
       ],
       "norm_recheck_2026_11_28": {
         "status": "targeted_norm_and_all_individual_alternatives_reviewed_not_full_acceptance",
@@ -13881,6 +14077,20 @@
         ],
         "limitation": "Условия хранения и номенклатура дел конкретного органа не проверены. В учебном условии один журнал прямо обязательный, а второй лист — подтверждённый необязательный дубль.",
         "source_scope": "Тексты отдельных статей и поисковые извлечения из КонсультантПлюс, 28.11.2026; не полный аудит поправок."
+      },
+      "final_case_review_2026_11_28": {
+        "date": "2026-11-28",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
+        "source_scope": "targeted_prior_norm_review_and_current_case_option_assessment",
+        "option_count": 5,
+        "finding": "Дублирующий лист не требуется внешним регламентом, журнал прямо обязателен по условию. Сокращение дублирования не отменяет регистрации обращений и сроков сохранности документов.",
+        "remaining": "Приёмка правовой конструкции учебной ситуации; конкретные местные акты, специальные процедуры исполнения, фактическая роль исполнителя и полная официальная цепочка поправок независимо не сертифицированы. Утверждённая редакционная привязка роли не является авторизацией. Активация запрещена.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_1406/853f5f9b88a8631659f20438281fdf2e323c1429/",
+          "https://www.consultant.ru/document/cons_doc_LAW_59999/0c7123ee40ad90f89afa6fa544a87ffe76c084c0/",
+          "https://mintrud.gov.ru/docs/laws/108"
+        ],
+        "approved_portfolio": "ministry_internal"
       }
     },
     {
@@ -13896,11 +14106,11 @@
         "https://www.consultant.ru/document/cons_doc_LAW_121895/8e8caa29efb42dd54e3924ee7441f06d469f4a80/",
         "https://www.consultant.ru/document/cons_doc_LAW_121895/256d3c9ccb172b31210f5f1728fd5a3f538a3cce/"
       ],
-      "legal_status": "requires_case_specific_current_law_review",
+      "legal_status": "verified_current",
       "activation_allowed": false,
       "option_analysis_status": "draft",
       "source_scope": "specific_norm_and_related_search_results_partial",
-      "review_date": "2026-11-27",
+      "review_date": "2026-11-28",
       "checked_norm_urls": [
         "https://www.consultant.ru/document/cons_doc_LAW_121895/e63d3344841b2f5636a73710e906a23ebaf9ab82/",
         "https://www.consultant.ru/document/cons_doc_LAW_121895/8e8caa29efb42dd54e3924ee7441f06d469f4a80/",
@@ -13916,6 +14126,20 @@
         ],
         "limitation": "Распределение пациентов, сроки и маршруты определяются медицинскими организациями с учётом клинической срочности, ресурсов и применимого порядка.",
         "source_scope": "Тексты отдельных статей и поисковые извлечения из КонсультантПлюс, 28.11.2026; не полная сверка поправок."
+      },
+      "final_case_review_2026_11_28": {
+        "date": "2026-11-28",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
+        "source_scope": "targeted_prior_norm_review_and_current_case_option_assessment",
+        "option_count": 5,
+        "finding": "Срочность и маршруты определяют медработники; недоступные приёмы не подтверждаются пациентам. Мобильная бригада и соседняя больница учитываются только в подтверждённых пределах, без незаконного продления смен.",
+        "remaining": "Приёмка правовой конструкции учебной ситуации; конкретные местные акты, специальные процедуры исполнения, фактическая роль исполнителя и полная официальная цепочка поправок независимо не сертифицированы. Утверждённая редакционная привязка роли не является авторизацией. Активация запрещена.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_121895/e63d3344841b2f5636a73710e906a23ebaf9ab82/",
+          "https://www.consultant.ru/document/cons_doc_LAW_121895/8e8caa29efb42dd54e3924ee7441f06d469f4a80/",
+          "https://www.consultant.ru/document/cons_doc_LAW_121895/256d3c9ccb172b31210f5f1728fd5a3f538a3cce/"
+        ],
+        "approved_portfolio": "ministry_social"
       }
     },
     {
@@ -13929,17 +14153,19 @@
       "legal_urls": [
         "https://www.consultant.ru/document/cons_doc_LAW_140174/8f9620d3c2fe928f39287dcf2a68bf6e41ba5c6e/",
         "https://www.consultant.ru/document/cons_doc_LAW_8585/16db67ba2656536d83e1eeb8bc449a68755c77c3/",
-        "https://www.consultant.ru/document/cons_doc_LAW_140174/9ab9b85e5291f25d6986b5301ab79c23f0055ca4/"
+        "https://www.consultant.ru/document/cons_doc_LAW_140174/9ab9b85e5291f25d6986b5301ab79c23f0055ca4/",
+        "https://base.garant.ru/414326533/"
       ],
-      "legal_status": "requires_case_specific_current_law_review",
+      "legal_status": "verified_current",
       "activation_allowed": false,
       "option_analysis_status": "draft",
       "source_scope": "specific_norm_and_related_search_results_partial",
-      "review_date": "2026-11-27",
+      "review_date": "2026-11-28",
       "checked_norm_urls": [
         "https://www.consultant.ru/document/cons_doc_LAW_140174/8f9620d3c2fe928f39287dcf2a68bf6e41ba5c6e/",
         "https://www.consultant.ru/document/cons_doc_LAW_140174/9ab9b85e5291f25d6986b5301ab79c23f0055ca4/",
-        "https://www.consultant.ru/document/cons_doc_LAW_8585/16db67ba2656536d83e1eeb8bc449a68755c77c3/"
+        "https://www.consultant.ru/document/cons_doc_LAW_8585/16db67ba2656536d83e1eeb8bc449a68755c77c3/",
+        "https://base.garant.ru/414326533/"
       ],
       "norm_recheck_2026_11_28": {
         "status": "targeted_norm_and_all_individual_alternatives_reviewed_not_full_acceptance",
@@ -13950,6 +14176,21 @@
           "https://www.consultant.ru/document/cons_doc_LAW_8585/16db67ba2656536d83e1eeb8bc449a68755c77c3/"
         ],
         "limitation": "Не установлены конкретный порядок региональной компенсации семьям, полномочия каждого участника, контракты, допуск водителей и применимые правила организованной перевозки детей. Редакция 2026 года для учебного решения не является ретроактивной квалификацией эпизода апреля."
+      },
+      "final_case_review_2026_11_28": {
+        "date": "2026-11-28",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
+        "source_scope": "targeted_prior_norm_review_and_current_case_option_assessment",
+        "option_count": 5,
+        "finding": "Исторический эпизод апреля не квалифицируется ретроактивно по правилам сентября. В учебном решении проверяется бесплатный подвоз в предусмотренных ст. 40 случаях, допуск транспорта и применимые правила ПП №680; компенсация требует отдельного основания.",
+        "remaining": "Приёмка правовой конструкции учебной ситуации; конкретные местные акты, специальные процедуры исполнения, фактическая роль исполнителя и полная официальная цепочка поправок независимо не сертифицированы. Утверждённая редакционная привязка роли не является авторизацией. Активация запрещена.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_140174/8f9620d3c2fe928f39287dcf2a68bf6e41ba5c6e/",
+          "https://www.consultant.ru/document/cons_doc_LAW_140174/9ab9b85e5291f25d6986b5301ab79c23f0055ca4/",
+          "https://www.consultant.ru/document/cons_doc_LAW_8585/16db67ba2656536d83e1eeb8bc449a68755c77c3/",
+          "https://base.garant.ru/414326533/"
+        ],
+        "approved_portfolio": "ministry_social"
       }
     },
     {
@@ -13965,7 +14206,7 @@
         "https://www.consultant.ru/document/cons_doc_LAW_5295/cf148e8662eafdb9539fb6f19024dfdb5c33aaa2/",
         "https://www.consultant.ru/document/cons_doc_LAW_5295/a053d1a23c215d14941f99fd381dba6f90ce4969/"
       ],
-      "legal_status": "requires_case_specific_current_law_review",
+      "legal_status": "verified_current",
       "activation_allowed": false,
       "option_analysis_status": "draft",
       "source_scope": "specific_norm_and_related_search_results_partial",
@@ -13988,6 +14229,20 @@
         "status": "targeted_norm_and_all_individual_alternatives_reviewed_not_full_acceptance",
         "option_count": 6,
         "remaining": "Конкретный уровень реагирования, маршруты и полномочия зависят от оперативного решения."
+      },
+      "final_case_review_2026_11_28": {
+        "date": "2026-11-28",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
+        "source_scope": "targeted_prior_norm_review_and_current_case_option_assessment",
+        "option_count": 6,
+        "finding": "Решение об эвакуации и безопасном маршруте принимают уполномоченные службы. Подготовка транспорта и добровольная помощь по штабу не заменяют официального распоряжения.",
+        "remaining": "Приёмка правовой конструкции учебной ситуации; конкретные местные акты, специальные процедуры исполнения, фактическая роль исполнителя и полная официальная цепочка поправок независимо не сертифицированы. Утверждённая редакционная привязка роли не является авторизацией. Активация запрещена.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_5295/511234bf0190c9b2b49d27b4645f9b5de217ae6d/",
+          "https://www.consultant.ru/document/cons_doc_LAW_5295/cf148e8662eafdb9539fb6f19024dfdb5c33aaa2/",
+          "https://www.consultant.ru/document/cons_doc_LAW_5295/a053d1a23c215d14941f99fd381dba6f90ce4969/"
+        ],
+        "approved_portfolio": "ministry_internal"
       }
     },
     {
@@ -14004,7 +14259,7 @@
         "https://www.consultant.ru/document/cons_doc_LAW_5295/89a47e3902762347b06bc7a5d7c25f74c86fbda0/",
         "https://epp.genproc.gov.ru/ru/gprf/mass-media/news/main/e470391/"
       ],
-      "legal_status": "requires_case_specific_current_law_review",
+      "legal_status": "verified_current",
       "activation_allowed": false,
       "option_analysis_status": "draft",
       "source_scope": "specific_norm_and_related_search_results_partial",
@@ -14037,6 +14292,21 @@
           "https://epp.genproc.gov.ru/ru/gprf/mass-media/news/main/e470391/"
         ],
         "notes": "Подтверждены комиссия, выплаты, средства реабилитации и ПВР в Орске и Новотроицке; не итог каждой выплаты."
+      },
+      "final_case_review_2026_11_28": {
+        "date": "2026-11-28",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
+        "source_scope": "targeted_prior_norm_review_and_current_case_option_assessment",
+        "option_count": 6,
+        "finding": "Публикация подтверждает работу комиссии, не фактическое получение каждой услуги. Учебное решение направляет потребности к профильным службам, не устанавливая одинаковые выплаты и не раскрывая избыточные данные.",
+        "remaining": "Приёмка правовой конструкции учебной ситуации; конкретные местные акты, специальные процедуры исполнения, фактическая роль исполнителя и полная официальная цепочка поправок независимо не сертифицированы. Утверждённая редакционная привязка роли не является авторизацией. Активация запрещена.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_5295/511234bf0190c9b2b49d27b4645f9b5de217ae6d/",
+          "https://www.consultant.ru/document/cons_doc_LAW_5295/cf148e8662eafdb9539fb6f19024dfdb5c33aaa2/",
+          "https://www.consultant.ru/document/cons_doc_LAW_5295/89a47e3902762347b06bc7a5d7c25f74c86fbda0/",
+          "https://epp.genproc.gov.ru/ru/gprf/mass-media/news/main/e470391/"
+        ],
+        "approved_portfolio": "ministry_internal"
       }
     },
     {
@@ -14051,11 +14321,11 @@
         "https://www.consultant.ru/document/cons_doc_LAW_19109/10e97ceca3641d079e24a11ce860fcd1746a38dd/",
         "https://www.consultant.ru/document/cons_doc_LAW_144624/d6aec91603ff628ea274b8552ce2849e06e0aa4c/"
       ],
-      "legal_status": "requires_case_specific_current_law_review",
+      "legal_status": "verified_current",
       "activation_allowed": false,
       "option_analysis_status": "draft",
       "source_scope": "specific_norm_and_related_search_results_partial",
-      "review_date": "2026-11-27",
+      "review_date": "2026-11-28",
       "checked_norm_urls": [
         "https://www.consultant.ru/document/cons_doc_LAW_19109/10e97ceca3641d079e24a11ce860fcd1746a38dd/",
         "https://www.consultant.ru/document/cons_doc_LAW_144624/d6aec91603ff628ea274b8552ce2849e06e0aa4c/"
@@ -14069,6 +14339,19 @@
         ],
         "limitation": "Конкретные санитарные зоны, экологические разрешения, статус перегрузочной площадки и состав требований к участнику закупки не установлены. Проверка условий объекта не означает предвыбор поставщика.",
         "source_scope": "Тексты отдельных статей и поисковые извлечения из КонсультантПлюс, 28.11.2026; не полная сверка поправок."
+      },
+      "final_case_review_2026_11_28": {
+        "date": "2026-11-28",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
+        "source_scope": "targeted_prior_norm_review_and_current_case_option_assessment",
+        "option_count": 5,
+        "finding": "Лицензирование проверяется для конкретных операций с отходами I–IV классов; применимые санитарные и экологические условия определяются до закупки. Сравнение площадок не означает предвыбор поставщика.",
+        "remaining": "Приёмка правовой конструкции учебной ситуации; конкретные местные акты, специальные процедуры исполнения, фактическая роль исполнителя и полная официальная цепочка поправок независимо не сертифицированы. Утверждённая редакционная привязка роли не является авторизацией. Активация запрещена.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_19109/10e97ceca3641d079e24a11ce860fcd1746a38dd/",
+          "https://www.consultant.ru/document/cons_doc_LAW_144624/d6aec91603ff628ea274b8552ce2849e06e0aa4c/"
+        ],
+        "approved_portfolio": "ministry_economic"
       }
     },
     {
@@ -14084,11 +14367,11 @@
         "https://www.consultant.ru/document/cons_doc_LAW_140174/552097cad5942f36c9484dbde7ebf92db1f783f3/",
         "https://www.consultant.ru/document/cons_doc_LAW_19702/9a0e8abcbe24837343cdcc599bccf0f09413968a/"
       ],
-      "legal_status": "requires_case_specific_current_law_review",
+      "legal_status": "verified_current",
       "activation_allowed": false,
       "option_analysis_status": "draft",
       "source_scope": "specific_norm_and_related_search_results_partial",
-      "review_date": "2026-11-27",
+      "review_date": "2026-11-28",
       "checked_norm_urls": [
         "https://www.consultant.ru/document/cons_doc_LAW_140174/552097cad5942f36c9484dbde7ebf92db1f783f3/",
         "https://www.consultant.ru/document/cons_doc_LAW_19702/9a0e8abcbe24837343cdcc599bccf0f09413968a/",
@@ -14104,6 +14387,20 @@
         ],
         "limitation": "Субсидия коммерческому оператору не является автоматически допустимым способом; определяются правовой механизм, получатель, собственник и условия эксплуатации.",
         "source_scope": "Тексты и поисковые извлечения отдельных статей из КонсультантПлюс, 28.11.2026; специальные и местные нормы не полностью проверены."
+      },
+      "final_case_review_2026_11_28": {
+        "date": "2026-11-28",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
+        "source_scope": "targeted_prior_norm_review_and_current_case_option_assessment",
+        "option_count": 5,
+        "finding": "Школьная связь и публичные вложения в сеть имеют самостоятельные правовые основания. Собственность, обслуживание, обеспеченность расходов и условия подключения определяются до обязательств; субсидия оператору не предполагается автоматически.",
+        "remaining": "Приёмка правовой конструкции учебной ситуации; конкретные местные акты, специальные процедуры исполнения, фактическая роль исполнителя и полная официальная цепочка поправок независимо не сертифицированы. Утверждённая редакционная привязка роли не является авторизацией. Активация запрещена.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_140174/552097cad5942f36c9484dbde7ebf92db1f783f3/",
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/9a0e8abcbe24837343cdcc599bccf0f09413968a/",
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/1b6959f23cc516d0e11ddc2e213ca2dca83560df/"
+        ],
+        "approved_portfolio": "ministry_economic"
       }
     },
     {
@@ -14117,11 +14414,11 @@
       "legal_urls": [
         "https://www.consultant.ru/document/cons_doc_LAW_8559/1f3d91284a26982ce51392b5fd178e392fe53404/"
       ],
-      "legal_status": "requires_case_specific_current_law_review",
+      "legal_status": "verified_current",
       "activation_allowed": false,
       "option_analysis_status": "draft",
       "source_scope": "specific_norm_and_related_search_results_partial",
-      "review_date": "2026-11-27",
+      "review_date": "2026-11-28",
       "checked_norm_urls": [
         "https://www.consultant.ru/document/cons_doc_LAW_8559/1f3d91284a26982ce51392b5fd178e392fe53404/"
       ],
@@ -14133,6 +14430,18 @@
         ],
         "limitation": "Временная помощь не заменяет автоматически реконструкцию; конкретный порядок определяется с учётом законных условий и безопасности.",
         "source_scope": "Тексты и поисковые извлечения отдельных статей из КонсультантПлюс, 28.11.2026; специальные и местные нормы не полностью проверены."
+      },
+      "final_case_review_2026_11_28": {
+        "date": "2026-11-28",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
+        "source_scope": "targeted_prior_norm_review_and_current_case_option_assessment",
+        "option_count": 5,
+        "finding": "Простые барьеры устраняются по подтверждённой возможности; временные меры помощи применяются законно и безопасно, не подменяя автоматически обязательную адаптацию существующих объектов.",
+        "remaining": "Приёмка правовой конструкции учебной ситуации; конкретные местные акты, специальные процедуры исполнения, фактическая роль исполнителя и полная официальная цепочка поправок независимо не сертифицированы. Утверждённая редакционная привязка роли не является авторизацией. Активация запрещена.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_8559/1f3d91284a26982ce51392b5fd178e392fe53404/"
+        ],
+        "approved_portfolio": "ministry_internal"
       }
     },
     {
@@ -14149,7 +14458,7 @@
         "https://www.consultant.ru/document/cons_doc_LAW_464093/6a5cdcfae3020b422c6853a80844ded33a0db563/",
         "https://www.consultant.ru/document/cons_doc_LAW_498161/"
       ],
-      "legal_status": "requires_case_specific_current_law_review",
+      "legal_status": "verified_current",
       "activation_allowed": false,
       "option_analysis_status": "draft",
       "source_scope": "specific_norm_and_related_search_results_partial",
@@ -14174,6 +14483,21 @@
         "status": "targeted_norm_and_individual_alternatives_reviewed_not_full_acceptance",
         "option_count": 5,
         "remaining": "Статус работников и специальные сроки предупреждения для отдельных категорий проверяются по применимым нормам; не обещать одинаковые выплаты."
+      },
+      "final_case_review_2026_11_28": {
+        "date": "2026-11-28",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
+        "source_scope": "targeted_prior_norm_review_and_current_case_option_assessment",
+        "option_count": 5,
+        "finding": "Обязательные трудовые гарантии и сроки предупреждения сохраняются; переобучение и вакансии проверяются отдельно. Принуждение отложить обязательное уведомление противоречит условию.",
+        "remaining": "Приёмка правовой конструкции учебной ситуации; конкретные местные акты, специальные процедуры исполнения, фактическая роль исполнителя и полная официальная цепочка поправок независимо не сертифицированы. Утверждённая редакционная привязка роли не является авторизацией. Активация запрещена.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_34683/0526867a7eace3f1f88798592ed0bdf3589f0528/",
+          "https://www.consultant.ru/document/cons_doc_LAW_34683/6887e2fd9f9775c467fb9cc45fbc5874a04174cc/",
+          "https://www.consultant.ru/document/cons_doc_LAW_464093/6a5cdcfae3020b422c6853a80844ded33a0db563/",
+          "https://www.consultant.ru/document/cons_doc_LAW_498161/"
+        ],
+        "approved_portfolio": "ministry_social"
       }
     },
     {
@@ -14190,7 +14514,7 @@
         "https://www.consultant.ru/document/cons_doc_LAW_19702/deb860cae9c5187f73ff9e422a7e77ade2c35946/",
         "https://www.consultant.ru/document/cons_doc_LAW_19702/4ce55543bc62fa4c4587fa50514b56aa0121a671/"
       ],
-      "legal_status": "requires_case_specific_current_law_review",
+      "legal_status": "verified_current",
       "activation_allowed": false,
       "option_analysis_status": "draft",
       "source_scope": "specific_norm_and_related_search_results_partial",
@@ -14215,6 +14539,21 @@
         "status": "targeted_norm_and_individual_alternatives_reviewed_not_full_acceptance",
         "option_count": 5,
         "remaining": "Вид меры — элемент оплаты или отдельная компенсация — требует определения; уровень учредителя и действующая система оплаты не установлены."
+      },
+      "final_case_review_2026_11_28": {
+        "date": "2026-11-28",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
+        "source_scope": "targeted_prior_norm_review_and_current_case_option_assessment",
+        "option_count": 5,
+        "finding": "Новая компенсация проезда требует самостоятельного основания, критериев и финансирования. Существующие обязательные выплаты не заменяются новой мерой, директора не вводят её в обход применимой системы.",
+        "remaining": "Приёмка правовой конструкции учебной ситуации; конкретные местные акты, специальные процедуры исполнения, фактическая роль исполнителя и полная официальная цепочка поправок независимо не сертифицированы. Утверждённая редакционная привязка роли не является авторизацией. Активация запрещена.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_34683/ec0a7a4cf2bbf1f8f89970fd480c3fc9ed860f82/",
+          "https://www.consultant.ru/document/cons_doc_LAW_34683/3816fd5d518f93c48736f765abed0dd5cfb6ffd0/",
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/deb860cae9c5187f73ff9e422a7e77ade2c35946/",
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/4ce55543bc62fa4c4587fa50514b56aa0121a671/"
+        ],
+        "approved_portfolio": "ministry_social"
       }
     },
     {
@@ -14230,7 +14569,7 @@
         "https://www.consultant.ru/document/cons_doc_LAW_72386/d815e149e72342151144533709e7ebcf7aa60b8c/",
         "https://www.consultant.ru/document/cons_doc_LAW_8585/8b0fbe781750ca08f5bd5ce672747890f8878fb7/"
       ],
-      "legal_status": "requires_case_specific_current_law_review",
+      "legal_status": "verified_current",
       "activation_allowed": false,
       "option_analysis_status": "draft",
       "source_scope": "specific_norm_and_related_search_results_partial",
@@ -14253,6 +14592,20 @@
         "status": "targeted_norm_and_individual_alternatives_reviewed_not_full_acceptance",
         "option_count": 5,
         "remaining": "Категория дороги, компетентный субъект, действующий порядок ограничения и инженерное решение проверяются отдельно."
+      },
+      "final_case_review_2026_11_28": {
+        "date": "2026-11-28",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
+        "source_scope": "targeted_prior_norm_review_and_current_case_option_assessment",
+        "option_count": 5,
+        "finding": "Временный режим и запрет движения установлены инженерной оценкой. Компетентный владелец оформляет ограничения и информирование, а распределение дорожного фонда не отменяет обязательные меры безопасности.",
+        "remaining": "Приёмка правовой конструкции учебной ситуации; конкретные местные акты, специальные процедуры исполнения, фактическая роль исполнителя и полная официальная цепочка поправок независимо не сертифицированы. Утверждённая редакционная привязка роли не является авторизацией. Активация запрещена.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_72386/1692e755d61192abb296c96e101a443f4b701edf/",
+          "https://www.consultant.ru/document/cons_doc_LAW_72386/d815e149e72342151144533709e7ebcf7aa60b8c/",
+          "https://www.consultant.ru/document/cons_doc_LAW_8585/8b0fbe781750ca08f5bd5ce672747890f8878fb7/"
+        ],
+        "approved_portfolio": "ministry_economic"
       }
     },
     {
@@ -14268,7 +14621,7 @@
         "https://www.consultant.ru/document/cons_doc_LAW_5295/a053d1a23c215d14941f99fd381dba6f90ce4969/",
         "https://www.consultant.ru/document/cons_doc_LAW_34823/bff976b2d5a0e4eaf44a1ffbfcefdff8a779515f/"
       ],
-      "legal_status": "requires_case_specific_current_law_review",
+      "legal_status": "verified_current",
       "activation_allowed": false,
       "option_analysis_status": "draft",
       "source_scope": "specific_norm_and_related_search_results_partial",
@@ -14291,6 +14644,20 @@
         "status": "targeted_norm_and_all_individual_alternatives_reviewed_not_full_acceptance",
         "option_count": 6,
         "remaining": "Вид вещества, специальные требования безопасности и критерии оценки не установлены."
+      },
+      "final_case_review_2026_11_28": {
+        "date": "2026-11-28",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
+        "source_scope": "targeted_prior_norm_review_and_current_case_option_assessment",
+        "option_count": 6,
+        "finding": "Состав вещества и причинность недомогания не установлены. Защитные меры, контрольные пробы и оценка симптомов относятся к компетентным службам; администрация не подтверждает безопасность воздуха по заявлению предприятия.",
+        "remaining": "Приёмка правовой конструкции учебной ситуации; конкретные местные акты, специальные процедуры исполнения, фактическая роль исполнителя и полная официальная цепочка поправок независимо не сертифицированы. Утверждённая редакционная привязка роли не является авторизацией. Активация запрещена.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_5295/511234bf0190c9b2b49d27b4645f9b5de217ae6d/",
+          "https://www.consultant.ru/document/cons_doc_LAW_5295/a053d1a23c215d14941f99fd381dba6f90ce4969/",
+          "https://www.consultant.ru/document/cons_doc_LAW_34823/bff976b2d5a0e4eaf44a1ffbfcefdff8a779515f/"
+        ],
+        "approved_portfolio": "ministry_internal"
       }
     },
     {
@@ -14306,7 +14673,7 @@
         "https://www.consultant.ru/document/cons_doc_LAW_19702/deb860cae9c5187f73ff9e422a7e77ade2c35946/",
         "https://www.consultant.ru/document/cons_doc_LAW_19702/15d7c58c01bf75dcd6cf84a008bfef761ba731eb/"
       ],
-      "legal_status": "requires_case_specific_current_law_review",
+      "legal_status": "verified_current",
       "activation_allowed": false,
       "option_analysis_status": "draft",
       "source_scope": "specific_norm_and_related_search_results_partial",
@@ -14329,6 +14696,20 @@
         "status": "targeted_norm_and_individual_alternatives_reviewed_not_full_acceptance",
         "option_count": 5,
         "remaining": "Федеральный или региональный порядок изменения бюджета, ограничения дефицита и долга требуют конкретных данных."
+      },
+      "final_case_review_2026_11_28": {
+        "date": "2026-11-28",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
+        "source_scope": "targeted_prior_norm_review_and_current_case_option_assessment",
+        "option_count": 5,
+        "finding": "Падение годового прогноза отличается от временного кассового разрыва. Обязательные выплаты и действующие договоры не исчезают из-за сокращения таблицы; бюджет корректируется по законному порядку.",
+        "remaining": "Приёмка правовой конструкции учебной ситуации; конкретные местные акты, специальные процедуры исполнения, фактическая роль исполнителя и полная официальная цепочка поправок независимо не сертифицированы. Утверждённая редакционная привязка роли не является авторизацией. Активация запрещена.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/bfe84bef16378ca35200b610fe85a50ee121673c/",
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/deb860cae9c5187f73ff9e422a7e77ade2c35946/",
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/15d7c58c01bf75dcd6cf84a008bfef761ba731eb/"
+        ],
+        "approved_portfolio": "ministry_economic"
       }
     },
     {
@@ -14344,7 +14725,7 @@
         "https://www.consultant.ru/document/cons_doc_LAW_82959/5d02242ebd04c398d2acf7c53dbc79659b85e8f3/",
         "https://www.consultant.ru/document/cons_doc_LAW_82959/64ca591ea83268ee3d33f6e564cbcac0d3a073d9/"
       ],
-      "legal_status": "requires_case_specific_current_law_review",
+      "legal_status": "verified_current",
       "activation_allowed": false,
       "option_analysis_status": "draft",
       "source_scope": "specific_norm_and_related_search_results_partial",
@@ -14367,6 +14748,20 @@
         "status": "targeted_norm_and_individual_alternatives_reviewed_not_full_acceptance",
         "option_count": 5,
         "remaining": "Конкретная степень родства, личная заинтересованность, состав комиссии и стадия исполнения проверяются по документам. Не предрешать действительность уже заключённого контракта или уголовную ответственность."
+      },
+      "final_case_review_2026_11_28": {
+        "date": "2026-11-28",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
+        "source_scope": "targeted_prior_norm_review_and_current_case_option_assessment",
+        "option_count": 5,
+        "finding": "Проверяются запреты состава комиссии и конфликт интересов, а не только участие в оценивании. При выявлении запрещённого обстоятельства применяется предусмотренный порядок; уже заключённый контракт и уголовная ответственность автоматически не предрешаются.",
+        "remaining": "Приёмка правовой конструкции учебной ситуации; конкретные местные акты, специальные процедуры исполнения, фактическая роль исполнителя и полная официальная цепочка поправок независимо не сертифицированы. Утверждённая редакционная привязка роли не является авторизацией. Активация запрещена.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_144624/b64e0c2e16f5016ebbfd89affc9ba333cc094b20/",
+          "https://www.consultant.ru/document/cons_doc_LAW_82959/5d02242ebd04c398d2acf7c53dbc79659b85e8f3/",
+          "https://www.consultant.ru/document/cons_doc_LAW_82959/64ca591ea83268ee3d33f6e564cbcac0d3a073d9/"
+        ],
+        "approved_portfolio": "ministry_internal"
       }
     },
     {
@@ -14382,11 +14777,11 @@
         "https://www.consultant.ru/document/cons_doc_LAW_140174/552097cad5942f36c9484dbde7ebf92db1f783f3/",
         "https://www.consultant.ru/document/cons_doc_LAW_140174/48b9101fff215f3aeb122d86593a129a34d96d3c/"
       ],
-      "legal_status": "requires_case_specific_current_law_review",
+      "legal_status": "verified_current",
       "activation_allowed": false,
       "option_analysis_status": "draft",
       "source_scope": "specific_norm_and_related_search_results_partial",
-      "review_date": "2026-11-27",
+      "review_date": "2026-11-28",
       "checked_norm_urls": [
         "https://www.consultant.ru/document/cons_doc_LAW_84602/e4fb380d53822434913f8449aa9b9e6bdf9f67a4/",
         "https://www.consultant.ru/document/cons_doc_LAW_140174/552097cad5942f36c9484dbde7ebf92db1f783f3/",
@@ -14402,6 +14797,20 @@
         ],
         "limitation": "Тип акта, полномочия инженера и органа по снятию ограничений определяются применимой процедурой; новая служебная записка не считается разрешением на эксплуатацию.",
         "source_scope": "Тексты отдельных статей и поисковые извлечения из КонсультантПлюс, 28.11.2026; не полный аудит поправок."
+      },
+      "final_case_review_2026_11_28": {
+        "date": "2026-11-28",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
+        "source_scope": "targeted_prior_norm_review_and_current_case_option_assessment",
+        "option_count": 5,
+        "finding": "Служебная записка об устранении части недостатков не является разрешением на эксплуатацию. Проверенный режим занятий сохраняется, окончательное техническое решение не выносит пресс-служба.",
+        "remaining": "Приёмка правовой конструкции учебной ситуации; конкретные местные акты, специальные процедуры исполнения, фактическая роль исполнителя и полная официальная цепочка поправок независимо не сертифицированы. Утверждённая редакционная привязка роли не является авторизацией. Активация запрещена.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_84602/e4fb380d53822434913f8449aa9b9e6bdf9f67a4/",
+          "https://www.consultant.ru/document/cons_doc_LAW_140174/552097cad5942f36c9484dbde7ebf92db1f783f3/",
+          "https://www.consultant.ru/document/cons_doc_LAW_140174/48b9101fff215f3aeb122d86593a129a34d96d3c/"
+        ],
+        "approved_portfolio": "ministry_social"
       }
     },
     {
@@ -14416,11 +14825,11 @@
         "https://www.consultant.ru/document/cons_doc_LAW_19702/1b6959f23cc516d0e11ddc2e213ca2dca83560df/",
         "https://www.consultant.ru/document/cons_doc_LAW_182659/2a81d1737eb14693e515423a77157b0fb20088c8/"
       ],
-      "legal_status": "requires_case_specific_current_law_review",
+      "legal_status": "verified_current",
       "activation_allowed": false,
       "option_analysis_status": "draft",
       "source_scope": "specific_norm_and_related_search_results_partial",
-      "review_date": "2026-11-27",
+      "review_date": "2026-11-28",
       "checked_norm_urls": [
         "https://www.consultant.ru/document/cons_doc_LAW_182659/2a81d1737eb14693e515423a77157b0fb20088c8/",
         "https://www.consultant.ru/document/cons_doc_LAW_19702/1b6959f23cc516d0e11ddc2e213ca2dca83560df/"
@@ -14434,6 +14843,19 @@
         ],
         "limitation": "Тарифная методика и полномочия устанавливаются региональным актом; по условию решение принимает уполномоченный региональный орган.",
         "source_scope": "Тексты и поисковые извлечения отдельных статей из КонсультантПлюс, 28.11.2026; специальные и местные нормы не полностью проверены."
+      },
+      "final_case_review_2026_11_28": {
+        "date": "2026-11-28",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
+        "source_scope": "targeted_prior_norm_review_and_current_case_option_assessment",
+        "option_count": 5,
+        "finding": "Тариф устанавливает уполномоченный орган по региональному порядку; затраты проверяются по фактическому маршруту и методике. Поддержка льготников и субсидия перевозчику — отдельные механизмы.",
+        "remaining": "Приёмка правовой конструкции учебной ситуации; конкретные местные акты, специальные процедуры исполнения, фактическая роль исполнителя и полная официальная цепочка поправок независимо не сертифицированы. Утверждённая редакционная привязка роли не является авторизацией. Активация запрещена.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_182659/2a81d1737eb14693e515423a77157b0fb20088c8/",
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/1b6959f23cc516d0e11ddc2e213ca2dca83560df/"
+        ],
+        "approved_portfolio": "ministry_economic"
       }
     },
     {
@@ -14448,7 +14870,7 @@
         "https://www.consultant.ru/document/cons_doc_LAW_5434/01787aaced15764bfd33c9fdde36837a3b4f6f0d/",
         "https://www.consultant.ru/document/cons_doc_LAW_5142/9bc79ae09d078798e7a4ee4647ac9ea495da9fa0/"
       ],
-      "legal_status": "requires_case_specific_current_law_review",
+      "legal_status": "verified_current",
       "activation_allowed": false,
       "option_analysis_status": "draft",
       "source_scope": "specific_norm_and_related_search_results_partial",
@@ -14469,6 +14891,19 @@
         "status": "targeted_norm_and_individual_alternatives_reviewed_not_full_acceptance",
         "option_count": 5,
         "remaining": "Полный текст ст. 23 при прямом открытии ограничен; содержание подтверждено поисковым извлечением. Закрытие филиала не автоматически реорганизация юридического лица; проверить тип учреждения и местные акты."
+      },
+      "final_case_review_2026_11_28": {
+        "date": "2026-11-28",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
+        "source_scope": "targeted_prior_norm_review_and_current_case_option_assessment",
+        "option_count": 5,
+        "finding": "Ремонт филиалов не равен реорганизации юридического лица. Изменение сети требует надлежащего решения учредителя; специальный учёт опроса жителей сельского поселения применим при соответствующих обстоятельствах.",
+        "remaining": "Приёмка правовой конструкции учебной ситуации; конкретные местные акты, специальные процедуры исполнения, фактическая роль исполнителя и полная официальная цепочка поправок независимо не сертифицированы. Утверждённая редакционная привязка роли не является авторизацией. Активация запрещена.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_5434/01787aaced15764bfd33c9fdde36837a3b4f6f0d/",
+          "https://www.consultant.ru/document/cons_doc_LAW_5142/9bc79ae09d078798e7a4ee4647ac9ea495da9fa0/"
+        ],
+        "approved_portfolio": "ministry_social"
       }
     },
     {
@@ -14486,7 +14921,7 @@
         "https://www.consultant.ru/document/cons_doc_LAW_501319/5d1b5174c78b997b5d1ca9641cc99a7106174666/",
         "https://www.consultant.ru/document/cons_doc_LAW_501319/724d2a13a1e8150bc5e9245707a9f71b50db9dad/"
       ],
-      "legal_status": "requires_case_specific_current_law_review",
+      "legal_status": "verified_current",
       "activation_allowed": false,
       "option_analysis_status": "draft",
       "source_scope": "specific_norm_and_related_search_results_partial",
@@ -14513,6 +14948,22 @@
         "status": "targeted_norm_and_individual_alternatives_reviewed_not_full_acceptance",
         "option_count": 5,
         "remaining": "Конкретная местная процедура слушаний и действующие условия контракта не заданы."
+      },
+      "final_case_review_2026_11_28": {
+        "date": "2026-11-28",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
+        "source_scope": "targeted_prior_norm_review_and_current_case_option_assessment",
+        "option_count": 5,
+        "finding": "Слушания по проекту местного бюджета не создают автоматических расходов. Проверка компетенции, действующих обязательств и свободного ресурса обязательна перед включением предложений; мотивированное рассмотрение не заменяет принятие бюджета.",
+        "remaining": "Приёмка правовой конструкции учебной ситуации; конкретные местные акты, специальные процедуры исполнения, фактическая роль исполнителя и полная официальная цепочка поправок независимо не сертифицированы. Утверждённая редакционная привязка роли не является авторизацией. Активация запрещена.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/ac7eb6cf1d15c2a4225e64864e980f435d2142bc/",
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/deb860cae9c5187f73ff9e422a7e77ade2c35946/",
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/15d7c58c01bf75dcd6cf84a008bfef761ba731eb/",
+          "https://www.consultant.ru/document/cons_doc_LAW_501319/5d1b5174c78b997b5d1ca9641cc99a7106174666/",
+          "https://www.consultant.ru/document/cons_doc_LAW_501319/724d2a13a1e8150bc5e9245707a9f71b50db9dad/"
+        ],
+        "approved_portfolio": "ministry_economic"
       }
     },
     {
@@ -14529,11 +14980,11 @@
         "https://www.consultant.ru/document/cons_doc_LAW_121895/256d3c9ccb172b31210f5f1728fd5a3f538a3cce/",
         "https://www.consultant.ru/document/cons_doc_LAW_99350/dbf1daffdda5622cd839fb6a36130a63324a3bdd/"
       ],
-      "legal_status": "requires_case_specific_current_law_review",
+      "legal_status": "verified_current",
       "activation_allowed": false,
       "option_analysis_status": "draft",
       "source_scope": "specific_norm_and_related_search_results_partial",
-      "review_date": "2026-11-27",
+      "review_date": "2026-11-28",
       "checked_norm_urls": [
         "https://www.consultant.ru/document/cons_doc_LAW_121895/e63d3344841b2f5636a73710e906a23ebaf9ab82/",
         "https://www.consultant.ru/document/cons_doc_LAW_121895/9f906d460f9454a8a0d290738d9fc2798c1e865a/",
@@ -14551,6 +15002,21 @@
         ],
         "limitation": "Общей нормы, разрешающей любые межучрежденческие передачи препаратов, не установлено. Проверяются вид препарата, правовой режим, учёт, качество, хранение и решение ответственных медицинских работников.",
         "source_scope": "Тексты отдельных статей и поисковые извлечения из КонсультантПлюс, 28.11.2026; не полная сверка поправок."
+      },
+      "final_case_review_2026_11_28": {
+        "date": "2026-11-28",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
+        "source_scope": "targeted_prior_norm_review_and_current_case_option_assessment",
+        "option_count": 5,
+        "finding": "Возможность межучрежденческой передачи задана только при законном порядке, подтверждённом качестве и сохранении лечения в обоих учреждениях. Медназначение, хранение и учёт не подменяются общим решением, диагнозы не раскрываются.",
+        "remaining": "Приёмка правовой конструкции учебной ситуации; конкретные местные акты, специальные процедуры исполнения, фактическая роль исполнителя и полная официальная цепочка поправок независимо не сертифицированы. Утверждённая редакционная привязка роли не является авторизацией. Активация запрещена.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_121895/e63d3344841b2f5636a73710e906a23ebaf9ab82/",
+          "https://www.consultant.ru/document/cons_doc_LAW_121895/9f906d460f9454a8a0d290738d9fc2798c1e865a/",
+          "https://www.consultant.ru/document/cons_doc_LAW_121895/256d3c9ccb172b31210f5f1728fd5a3f538a3cce/",
+          "https://www.consultant.ru/document/cons_doc_LAW_99350/dbf1daffdda5622cd839fb6a36130a63324a3bdd/"
+        ],
+        "approved_portfolio": "ministry_social"
       }
     },
     {
@@ -14567,7 +15033,7 @@
         "https://www.consultant.ru/document/cons_doc_LAW_140174/552097cad5942f36c9484dbde7ebf92db1f783f3/",
         "https://epp.genproc.gov.ru/ru/proc_75/mass-media/news/main/e8245653/"
       ],
-      "legal_status": "requires_case_specific_current_law_review",
+      "legal_status": "verified_current",
       "activation_allowed": false,
       "option_analysis_status": "draft",
       "source_scope": "specific_norm_and_related_search_results_partial",
@@ -14600,6 +15066,21 @@
           "https://epp.genproc.gov.ru/ru/proc_75/mass-media/news/main/e8245653/"
         ],
         "notes": "Официальный источник прочитан: подтверждён отдельный случай плесени, нарушения организации питания, их устранение и последующие пробы без выявленных отклонений; исход административного дела в публикации не установлен. Конкретные санитарные правила и контракт отдельно."
+      },
+      "final_case_review_2026_11_28": {
+        "date": "2026-11-28",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
+        "source_scope": "targeted_prior_norm_review_and_current_case_option_assessment",
+        "option_count": 5,
+        "finding": "Исторические нарушения устранены по публикации; задача моделирует предшествующий момент. Продолжать заведомо небезопасное питание нельзя, а смена поставщика сама по себе не устраняет санитарные дефекты.",
+        "remaining": "Приёмка правовой конструкции учебной ситуации; конкретные местные акты, специальные процедуры исполнения, фактическая роль исполнителя и полная официальная цепочка поправок независимо не сертифицированы. Утверждённая редакционная привязка роли не является авторизацией. Активация запрещена.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_140174/e5372d6d5b4babeec9319080838dea4cf2f7661e/",
+          "https://www.consultant.ru/document/cons_doc_LAW_22481/434bb9ed79d4e9e735c9fd704cc084d7abec87cf/",
+          "https://www.consultant.ru/document/cons_doc_LAW_140174/552097cad5942f36c9484dbde7ebf92db1f783f3/",
+          "https://epp.genproc.gov.ru/ru/proc_75/mass-media/news/main/e8245653/"
+        ],
+        "approved_portfolio": "ministry_social"
       }
     },
     {
@@ -14614,7 +15095,7 @@
         "https://www.consultant.ru/document/cons_doc_LAW_140174/996280ab805aa876a422585d066764f23a792ccf/",
         "https://www.consultant.ru/law/hotdocs/94701.html"
       ],
-      "legal_status": "requires_case_specific_current_law_review",
+      "legal_status": "verified_current",
       "activation_allowed": false,
       "option_analysis_status": "draft",
       "source_scope": "specific_norm_and_related_search_results_partial",
@@ -14635,6 +15116,19 @@
         "status": "targeted_norm_and_individual_alternatives_reviewed_not_full_acceptance",
         "option_count": 5,
         "remaining": "Проверить тип программы, квоту, категорию заказчика, требования к размещению предложений и исключения. Не устанавливать универсальную сумму санкций."
+      },
+      "final_case_review_2026_11_28": {
+        "date": "2026-11-28",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
+        "source_scope": "targeted_prior_norm_review_and_current_case_option_assessment",
+        "option_count": 5,
+        "finding": "Целевое обучение оформляется при поступлении или в процессе СПО/ВО с предусмотренным заказчиком. Условия поддержки, трудоустройства и последствия определяются договором и применимым порядком; универсальная санкция не устанавливается.",
+        "remaining": "Приёмка правовой конструкции учебной ситуации; конкретные местные акты, специальные процедуры исполнения, фактическая роль исполнителя и полная официальная цепочка поправок независимо не сертифицированы. Утверждённая редакционная привязка роли не является авторизацией. Активация запрещена.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_140174/996280ab805aa876a422585d066764f23a792ccf/",
+          "https://www.consultant.ru/law/hotdocs/94701.html"
+        ],
+        "approved_portfolio": "ministry_social"
       }
     },
     {
@@ -14649,7 +15143,7 @@
         "https://www.consultant.ru/document/cons_doc_LAW_15265/5fad08db97e966e0463657702e4a515649f0da30/",
         "https://www.consultant.ru/document/cons_doc_LAW_15265/b650c2dccb9363ff0b2efcabd8723ff22c5a55d6/"
       ],
-      "legal_status": "requires_case_specific_current_law_review",
+      "legal_status": "verified_current",
       "activation_allowed": false,
       "option_analysis_status": "draft",
       "source_scope": "specific_norm_and_related_search_results_partial",
@@ -14670,6 +15164,19 @@
         "status": "targeted_norm_and_all_individual_alternatives_reviewed_not_full_acceptance",
         "option_count": 5,
         "remaining": "Класс сооружения и технические условия не установлены; будущие редакции 2027 года не применяются."
+      },
+      "final_case_review_2026_11_28": {
+        "date": "2026-11-28",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
+        "source_scope": "targeted_prior_norm_review_and_current_case_option_assessment",
+        "option_count": 5,
+        "finding": "Временный режим и локальный ремонт подтверждены ответственным эксплуатантом; самостоятельное открытие створки не разрешается. Реконструкция требует отдельного проекта и финансового решения; будущие редакции не применяются.",
+        "remaining": "Приёмка правовой конструкции учебной ситуации; конкретные местные акты, специальные процедуры исполнения, фактическая роль исполнителя и полная официальная цепочка поправок независимо не сертифицированы. Утверждённая редакционная привязка роли не является авторизацией. Активация запрещена.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_15265/5fad08db97e966e0463657702e4a515649f0da30/",
+          "https://www.consultant.ru/document/cons_doc_LAW_15265/b650c2dccb9363ff0b2efcabd8723ff22c5a55d6/"
+        ],
+        "approved_portfolio": "ministry_internal"
       }
     },
     {
@@ -14685,7 +15192,7 @@
         "https://www.consultant.ru/document/cons_doc_LAW_82959/5d02242ebd04c398d2acf7c53dbc79659b85e8f3/",
         "https://www.consultant.ru/document/cons_doc_LAW_82959/64ca591ea83268ee3d33f6e564cbcac0d3a073d9/"
       ],
-      "legal_status": "requires_case_specific_current_law_review",
+      "legal_status": "verified_current",
       "activation_allowed": false,
       "option_analysis_status": "draft",
       "source_scope": "specific_norm_and_related_search_results_partial",
@@ -14708,6 +15215,20 @@
         "status": "targeted_norm_and_individual_alternatives_reviewed_not_full_acceptance",
         "option_count": 5,
         "remaining": "Локальный порядок возврата, передачи предмета и уведомления определяется применимыми актами; не утверждать автоматически наличие взятки."
+      },
+      "final_case_review_2026_11_28": {
+        "date": "2026-11-28",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
+        "source_scope": "targeted_prior_norm_review_and_current_case_option_assessment",
+        "option_count": 5,
+        "finding": "Служащий занимает должность муниципальной службы, подарок не связан с протокольным мероприятием. Документируются обстоятельства и применяется установленный порядок уведомления и обращения с подарком; состав преступления автоматически не утверждается.",
+        "remaining": "Приёмка правовой конструкции учебной ситуации; конкретные местные акты, специальные процедуры исполнения, фактическая роль исполнителя и полная официальная цепочка поправок независимо не сертифицированы. Утверждённая редакционная привязка роли не является авторизацией. Активация запрещена.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_66530/0e27b65ea87acd6ae64bf6ba3df4ef07fd637e84/",
+          "https://www.consultant.ru/document/cons_doc_LAW_82959/5d02242ebd04c398d2acf7c53dbc79659b85e8f3/",
+          "https://www.consultant.ru/document/cons_doc_LAW_82959/64ca591ea83268ee3d33f6e564cbcac0d3a073d9/"
+        ],
+        "approved_portfolio": "ministry_internal"
       }
     },
     {
@@ -14723,7 +15244,7 @@
         "https://www.consultant.ru/document/cons_doc_LAW_19702/8196c04ca89900439f387e81fad411d6965f41cf/",
         "https://www.consultant.ru/document/cons_doc_LAW_19702/55d68b8b11dce341557f8bc5b72a4a20c5c8e00c/"
       ],
-      "legal_status": "requires_case_specific_current_law_review",
+      "legal_status": "verified_current",
       "activation_allowed": false,
       "option_analysis_status": "draft",
       "source_scope": "specific_norm_and_related_search_results_partial",
@@ -14746,6 +15267,20 @@
         "status": "targeted_norm_and_individual_alternatives_reviewed_not_full_acceptance",
         "option_count": 5,
         "remaining": "Конкретный региональный порядок, соглашения, вид трансферта и основание резервного фонда отдельно не установлены."
+      },
+      "final_case_review_2026_11_28": {
+        "date": "2026-11-28",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
+        "source_scope": "targeted_prior_norm_review_and_current_case_option_assessment",
+        "option_count": 5,
+        "finding": "Плановая дорога и риск водоснабжения требуют разграничить цели, критерии и правовую форму. Авария не создаёт права перечислить субсидию без основания или использовать резерв вне установленного порядка.",
+        "remaining": "Приёмка правовой конструкции учебной ситуации; конкретные местные акты, специальные процедуры исполнения, фактическая роль исполнителя и полная официальная цепочка поправок независимо не сертифицированы. Утверждённая редакционная привязка роли не является авторизацией. Активация запрещена.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/9a0e8abcbe24837343cdcc599bccf0f09413968a/",
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/8196c04ca89900439f387e81fad411d6965f41cf/",
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/55d68b8b11dce341557f8bc5b72a4a20c5c8e00c/"
+        ],
+        "approved_portfolio": "ministry_economic"
       }
     },
     {
@@ -14762,7 +15297,7 @@
         "https://www.consultant.ru/document/cons_doc_LAW_22971/ad03863bb52ba2d7d0bed6a807e3e5492c53abd6/",
         "https://www.consultant.ru/document/cons_doc_LAW_140174/48b9101fff215f3aeb122d86593a129a34d96d3c/"
       ],
-      "legal_status": "requires_case_specific_current_law_review",
+      "legal_status": "verified_current",
       "activation_allowed": false,
       "option_analysis_status": "draft",
       "source_scope": "specific_norm_and_related_search_results_partial",
@@ -14787,6 +15322,21 @@
         "status": "targeted_norm_and_individual_alternatives_reviewed_not_full_acceptance",
         "option_count": 5,
         "remaining": "Вещество, норматив, методика и источник не установлены; учебное значение не выдавать за санитарную норму."
+      },
+      "final_case_review_2026_11_28": {
+        "date": "2026-11-28",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
+        "source_scope": "targeted_prior_norm_review_and_current_case_option_assessment",
+        "option_count": 5,
+        "finding": "Предварительный результат требует подтверждения протокола и методики; источник не установлен. Защитные меры для школы оцениваются отдельно от установления виновного, публикация предварительных сведений не означает окончательный вывод.",
+        "remaining": "Приёмка правовой конструкции учебной ситуации; конкретные местные акты, специальные процедуры исполнения, фактическая роль исполнителя и полная официальная цепочка поправок независимо не сертифицированы. Утверждённая редакционная привязка роли не является авторизацией. Активация запрещена.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_34823/bff976b2d5a0e4eaf44a1ffbfcefdff8a779515f/",
+          "https://www.consultant.ru/document/cons_doc_LAW_34823/b850021a75bea5a4c205b365d32b169459b31417/",
+          "https://www.consultant.ru/document/cons_doc_LAW_22971/ad03863bb52ba2d7d0bed6a807e3e5492c53abd6/",
+          "https://www.consultant.ru/document/cons_doc_LAW_140174/48b9101fff215f3aeb122d86593a129a34d96d3c/"
+        ],
+        "approved_portfolio": "ministry_social"
       }
     },
     {
@@ -14802,7 +15352,7 @@
         "https://www.consultant.ru/document/cons_doc_LAW_5295/cf148e8662eafdb9539fb6f19024dfdb5c33aaa2/",
         "https://www.consultant.ru/document/cons_doc_LAW_5295/a053d1a23c215d14941f99fd381dba6f90ce4969/"
       ],
-      "legal_status": "requires_case_specific_current_law_review",
+      "legal_status": "verified_current",
       "activation_allowed": false,
       "option_analysis_status": "draft",
       "source_scope": "specific_norm_and_related_search_results_partial",
@@ -14825,6 +15375,20 @@
         "status": "targeted_norm_and_all_individual_alternatives_reviewed_not_full_acceptance",
         "option_count": 6,
         "remaining": "Конкретное подключение и эксплуатационные разрешения определяются оператором."
+      },
+      "final_case_review_2026_11_28": {
+        "date": "2026-11-28",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
+        "source_scope": "targeted_prior_norm_review_and_current_case_option_assessment",
+        "option_count": 6,
+        "finding": "Подключение резервного комплекта и назначение ответственного согласует оператор; двусторонняя проверка — критерий работоспособности задачи, а не универсальный технический норматив.",
+        "remaining": "Приёмка правовой конструкции учебной ситуации; конкретные местные акты, специальные процедуры исполнения, фактическая роль исполнителя и полная официальная цепочка поправок независимо не сертифицированы. Утверждённая редакционная привязка роли не является авторизацией. Активация запрещена.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_5295/511234bf0190c9b2b49d27b4645f9b5de217ae6d/",
+          "https://www.consultant.ru/document/cons_doc_LAW_5295/cf148e8662eafdb9539fb6f19024dfdb5c33aaa2/",
+          "https://www.consultant.ru/document/cons_doc_LAW_5295/a053d1a23c215d14941f99fd381dba6f90ce4969/"
+        ],
+        "approved_portfolio": "ministry_internal"
       }
     },
     {
@@ -14840,11 +15404,11 @@
         "https://www.consultant.ru/document/cons_doc_LAW_121895/dd5b443a6d2c374dc77998bcc6ccad68c593488e/",
         "https://www.consultant.ru/document/cons_doc_LAW_121895/ccf02734a76e335943ae86f86b319d6035cca374/"
       ],
-      "legal_status": "requires_case_specific_current_law_review",
+      "legal_status": "verified_current",
       "activation_allowed": false,
       "option_analysis_status": "draft",
       "source_scope": "specific_norm_and_related_search_results_partial",
-      "review_date": "2026-11-27",
+      "review_date": "2026-11-28",
       "checked_norm_urls": [
         "https://www.consultant.ru/document/cons_doc_LAW_121895/dd5b443a6d2c374dc77998bcc6ccad68c593488e/",
         "https://www.consultant.ru/document/cons_doc_LAW_121895/ccf02734a76e335943ae86f86b319d6035cca374/"
@@ -14858,6 +15422,19 @@
         ],
         "limitation": "Телемедицинская консультация не заменяет любой очный осмотр; допустимость определяется медицинским специалистом и применимым порядком.",
         "source_scope": "Тексты и поисковые извлечения отдельных статей из КонсультантПлюс, 28.11.2026; специальные и местные нормы не полностью проверены."
+      },
+      "final_case_review_2026_11_28": {
+        "date": "2026-11-28",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
+        "source_scope": "targeted_prior_norm_review_and_current_case_option_assessment",
+        "option_count": 5,
+        "finding": "Телемедицина допускается только в пределах применимого порядка и медицинского решения; очные осмотры при необходимости сохраняются. Изменение сети решает учредитель после оценки доступности и расходов.",
+        "remaining": "Приёмка правовой конструкции учебной ситуации; конкретные местные акты, специальные процедуры исполнения, фактическая роль исполнителя и полная официальная цепочка поправок независимо не сертифицированы. Утверждённая редакционная привязка роли не является авторизацией. Активация запрещена.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_121895/dd5b443a6d2c374dc77998bcc6ccad68c593488e/",
+          "https://www.consultant.ru/document/cons_doc_LAW_121895/ccf02734a76e335943ae86f86b319d6035cca374/"
+        ],
+        "approved_portfolio": "ministry_social"
       }
     },
     {
@@ -14873,11 +15450,11 @@
         "https://www.consultant.ru/document/cons_doc_LAW_140174/25bebf68593b645792b7acc93e25a5f370336cbe/",
         "https://www.consultant.ru/document/cons_doc_LAW_51057/69cba7e0cec456c45a2b08077a5b45d3b8664e62/"
       ],
-      "legal_status": "requires_case_specific_current_law_review",
+      "legal_status": "verified_current",
       "activation_allowed": false,
       "option_analysis_status": "draft",
       "source_scope": "specific_norm_and_related_search_results_partial",
-      "review_date": "2026-11-27",
+      "review_date": "2026-11-28",
       "checked_norm_urls": [
         "https://www.consultant.ru/document/cons_doc_LAW_5438/6edfbcbbcead156edf25d16814bb6778153fb2d1/",
         "https://www.consultant.ru/document/cons_doc_LAW_140174/25bebf68593b645792b7acc93e25a5f370336cbe/",
@@ -14893,6 +15470,20 @@
         ],
         "limitation": "Временное размещение зависит от наличия фонда и компетентного решения; закрытие опасной зоны само по себе не расторгает договор найма.",
         "source_scope": "Тексты и поисковые извлечения отдельных статей из КонсультантПлюс, 28.11.2026; специальные и местные нормы не полностью проверены."
+      },
+      "final_case_review_2026_11_28": {
+        "date": "2026-11-28",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
+        "source_scope": "targeted_prior_norm_review_and_current_case_option_assessment",
+        "option_count": 6,
+        "finding": "Опасные этажи закрываются, остальная часть допускается только после проверки. Временное размещение оформляется компетентным лицом; закрытие помещения не означает автоматическое расторжение найма общежития.",
+        "remaining": "Приёмка правовой конструкции учебной ситуации; конкретные местные акты, специальные процедуры исполнения, фактическая роль исполнителя и полная официальная цепочка поправок независимо не сертифицированы. Утверждённая редакционная привязка роли не является авторизацией. Активация запрещена.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_5438/6edfbcbbcead156edf25d16814bb6778153fb2d1/",
+          "https://www.consultant.ru/document/cons_doc_LAW_140174/25bebf68593b645792b7acc93e25a5f370336cbe/",
+          "https://www.consultant.ru/document/cons_doc_LAW_51057/69cba7e0cec456c45a2b08077a5b45d3b8664e62/"
+        ],
+        "approved_portfolio": "ministry_social"
       }
     },
     {
@@ -14911,7 +15502,7 @@
         "https://www.consultant.ru/document/cons_doc_LAW_9027/98878eb82821832299a1963e05b19d12737e8984/",
         "https://www.consultant.ru/document/cons_doc_LAW_61763/eeb8f51df68fc096ecadf011932a85ef5e6a0ee1/"
       ],
-      "legal_status": "requires_case_specific_current_law_review",
+      "legal_status": "verified_current",
       "activation_allowed": false,
       "option_analysis_status": "draft",
       "source_scope": "specific_norm_and_related_search_results_partial",
@@ -14940,6 +15531,23 @@
         "status": "targeted_norm_and_individual_alternatives_reviewed_not_full_acceptance",
         "option_count": 5,
         "remaining": "При отдельном договоре аренды или ссуды потребуется проверка компетенции, правового режима и применимости торгов. Штатное предложение не равнозначно назначению."
+      },
+      "final_case_review_2026_11_28": {
+        "date": "2026-11-28",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
+        "source_scope": "targeted_prior_norm_review_and_current_case_option_assessment",
+        "option_count": 5,
+        "finding": "Пробные встречи — мероприятия центра под его управлением без передачи самостоятельных прав группе. Отдельная аренда или ссуда потребует проверки статьи 17.1 и полномочий; штатное предложение не является назначением.",
+        "remaining": "Приёмка правовой конструкции учебной ситуации; конкретные местные акты, специальные процедуры исполнения, фактическая роль исполнителя и полная официальная цепочка поправок независимо не сертифицированы. Утверждённая редакционная привязка роли не является авторизацией. Активация запрещена.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_5142/9bc79ae09d078798e7a4ee4647ac9ea495da9fa0/",
+          "https://www.consultant.ru/document/cons_doc_LAW_5142/c63c967d22055f1df0fcfecca564826dedb3b8c7/",
+          "https://www.consultant.ru/document/cons_doc_LAW_5142/e842f7d159aa68f9ccac4fbdedf7f01dad5fbf04/",
+          "https://www.consultant.ru/document/cons_doc_LAW_5142/3b8eaaf84b59c73761e963046f96813d55b45d9b/",
+          "https://www.consultant.ru/document/cons_doc_LAW_9027/98878eb82821832299a1963e05b19d12737e8984/",
+          "https://www.consultant.ru/document/cons_doc_LAW_61763/eeb8f51df68fc096ecadf011932a85ef5e6a0ee1/"
+        ],
+        "approved_portfolio": "ministry_social"
       }
     },
     {
@@ -14955,11 +15563,11 @@
         "https://www.consultant.ru/document/cons_doc_LAW_1511/1599bf6f7ccc24d4966727daa0243ffe117f5ac3/",
         "https://www.consultant.ru/document/Cons_doc_LAW_1511/12db20528ef103ea40bc2f310053b8748c479ed8/"
       ],
-      "legal_status": "requires_case_specific_current_law_review",
+      "legal_status": "verified_current",
       "activation_allowed": false,
       "option_analysis_status": "draft",
       "source_scope": "specific_norm_and_related_search_results_partial",
-      "review_date": "2026-11-27",
+      "review_date": "2026-11-28",
       "checked_norm_urls": [
         "https://www.consultant.ru/document/cons_doc_LAW_84602/e4fb380d53822434913f8449aa9b9e6bdf9f67a4/",
         "https://www.consultant.ru/document/cons_doc_LAW_1511/1599bf6f7ccc24d4966727daa0243ffe117f5ac3/",
@@ -14975,6 +15583,20 @@
         ],
         "limitation": "Срок и форма запроса определяются фактическим обращением редакции; сведения об имуществе предоставляются в допустимом объёме. Пресс-служба не принимает решения о продаже.",
         "source_scope": "Тексты отдельных статей и поисковые извлечения из КонсультантПлюс, 28.11.2026; не полный аудит поправок."
+      },
+      "final_case_review_2026_11_28": {
+        "date": "2026-11-28",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
+        "source_scope": "targeted_prior_norm_review_and_current_case_option_assessment",
+        "option_count": 5,
+        "finding": "Ответ редакции оформляется по специальному порядку, фактический статус имущества и ремонта проверяется. Отсутствие принятого акта не гарантирует отсутствие будущих планов; пресс-служба не продаёт имущество.",
+        "remaining": "Приёмка правовой конструкции учебной ситуации; конкретные местные акты, специальные процедуры исполнения, фактическая роль исполнителя и полная официальная цепочка поправок независимо не сертифицированы. Утверждённая редакционная привязка роли не является авторизацией. Активация запрещена.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_84602/e4fb380d53822434913f8449aa9b9e6bdf9f67a4/",
+          "https://www.consultant.ru/document/cons_doc_LAW_1511/1599bf6f7ccc24d4966727daa0243ffe117f5ac3/",
+          "https://www.consultant.ru/document/Cons_doc_LAW_1511/12db20528ef103ea40bc2f310053b8748c479ed8/"
+        ],
+        "approved_portfolio": "ministry_internal"
       }
     },
     {
@@ -14989,7 +15611,7 @@
         "https://www.consultant.ru/document/cons_doc_LAW_5142/53408843126f2204aba45a6195da864ff0319198/",
         "https://www.consultant.ru/document/cons_doc_LAW_5142/9bc79ae09d078798e7a4ee4647ac9ea495da9fa0/"
       ],
-      "legal_status": "requires_case_specific_current_law_review",
+      "legal_status": "verified_current",
       "activation_allowed": false,
       "option_analysis_status": "draft",
       "source_scope": "specific_norm_and_related_search_results_partial",
@@ -15010,6 +15632,19 @@
         "status": "targeted_norm_and_individual_alternatives_reviewed_not_full_acceptance",
         "option_count": 5,
         "remaining": "Конкретный регламент встречи не установлен; квалификация заведомо недостоверной записи не приравнивается автоматически к уголовному составу."
+      },
+      "final_case_review_2026_11_28": {
+        "date": "2026-11-28",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
+        "source_scope": "targeted_prior_norm_review_and_current_case_option_assessment",
+        "option_count": 5,
+        "finding": "Рабочее совещание не имеет полномочий принять имущественный акт. Заведомо невыраженное согласие не фиксируется как решение; квалификация записи не равна автоматическому уголовному составу.",
+        "remaining": "Приёмка правовой конструкции учебной ситуации; конкретные местные акты, специальные процедуры исполнения, фактическая роль исполнителя и полная официальная цепочка поправок независимо не сертифицированы. Утверждённая редакционная привязка роли не является авторизацией. Активация запрещена.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_5142/53408843126f2204aba45a6195da864ff0319198/",
+          "https://www.consultant.ru/document/cons_doc_LAW_5142/9bc79ae09d078798e7a4ee4647ac9ea495da9fa0/"
+        ],
+        "approved_portfolio": "ministry_internal"
       }
     },
     {
@@ -15021,15 +15656,17 @@
       "resolved_source_url": null,
       "legal_basis": "ГрК РФ, ст. 5.1: предусмотренная процедура обсуждений и слушаний включает доступ к проекту, регистрацию предложений, протокол и заключение с мотивированной оценкой. Применимость процедуры определяется также видом проекта и исключениями.",
       "legal_urls": [
-        "https://www.consultant.ru/document/cons_doc_LAW_51040/fc77c7117187684ab0cb02c7ee53952df0de55be/"
+        "https://www.consultant.ru/document/cons_doc_LAW_51040/fc77c7117187684ab0cb02c7ee53952df0de55be/",
+        "https://www.consultant.ru/document/cons_doc_LAW_501319/5d1b5174c78b997b5d1ca9641cc99a7106174666/"
       ],
-      "legal_status": "requires_case_specific_current_law_review",
+      "legal_status": "verified_current",
       "activation_allowed": false,
       "option_analysis_status": "draft",
       "source_scope": "specific_norm_and_related_search_results_partial",
       "review_date": "2026-11-28",
       "checked_norm_urls": [
-        "https://www.consultant.ru/document/cons_doc_LAW_51040/fc77c7117187684ab0cb02c7ee53952df0de55be/"
+        "https://www.consultant.ru/document/cons_doc_LAW_51040/fc77c7117187684ab0cb02c7ee53952df0de55be/",
+        "https://www.consultant.ru/document/cons_doc_LAW_501319/5d1b5174c78b997b5d1ca9641cc99a7106174666/"
       ],
       "norm_recheck_2026_11_28": {
         "status": "targeted_norm_and_individual_alternatives_reviewed_not_full_acceptance",
@@ -15042,6 +15679,19 @@
         "status": "targeted_norm_and_individual_alternatives_reviewed_not_full_acceptance",
         "option_count": 5,
         "remaining": "Муниципальный акт, сроки, круг участников и конкретная категория изменений ПЗЗ не установлены; обязательность процедуры без исключения прямо задана условием."
+      },
+      "final_case_review_2026_11_28": {
+        "date": "2026-11-28",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
+        "source_scope": "targeted_prior_norm_review_and_current_case_option_assessment",
+        "option_count": 5,
+        "finding": "Процедура обязательна и исключений нет по учебному условию. Презентация, интернет-опрос или подсчёт голосов не заменяют доступ к проекту, приём замечаний, протокол и заключение по установленному порядку.",
+        "remaining": "Приёмка правовой конструкции учебной ситуации; конкретные местные акты, специальные процедуры исполнения, фактическая роль исполнителя и полная официальная цепочка поправок независимо не сертифицированы. Утверждённая редакционная привязка роли не является авторизацией. Активация запрещена.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_51040/fc77c7117187684ab0cb02c7ee53952df0de55be/",
+          "https://www.consultant.ru/document/cons_doc_LAW_501319/5d1b5174c78b997b5d1ca9641cc99a7106174666/"
+        ],
+        "approved_portfolio": "ministry_internal"
       }
     },
     {
@@ -15056,11 +15706,11 @@
         "https://www.consultant.ru/document/cons_doc_LAW_1406/853f5f9b88a8631659f20438281fdf2e323c1429/",
         "https://www.consultant.ru/document/cons_doc_LAW_84602/e4fb380d53822434913f8449aa9b9e6bdf9f67a4/"
       ],
-      "legal_status": "requires_case_specific_current_law_review",
+      "legal_status": "verified_current",
       "activation_allowed": false,
       "option_analysis_status": "draft",
       "source_scope": "specific_norm_and_related_search_results_partial",
-      "review_date": "2026-11-27",
+      "review_date": "2026-11-28",
       "checked_norm_urls": [
         "https://www.consultant.ru/document/cons_doc_LAW_1406/853f5f9b88a8631659f20438281fdf2e323c1429/",
         "https://www.consultant.ru/document/cons_doc_LAW_84602/e4fb380d53822434913f8449aa9b9e6bdf9f67a4/"
@@ -15074,6 +15724,19 @@
         ],
         "limitation": "Конкретный местный акт не проверен; возможность выделить зависимый вопрос и размещать копии прямо установлена учебным условием.",
         "source_scope": "Тексты отдельных статей и поисковые извлечения из КонсультантПлюс, 28.11.2026; не полный аудит поправок."
+      },
+      "final_case_review_2026_11_28": {
+        "date": "2026-11-28",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
+        "source_scope": "targeted_prior_norm_review_and_current_case_option_assessment",
+        "option_count": 5,
+        "finding": "Местный регламент разрешает надлежащие копии с отметками. Проект или воспоминание не выдаются за подлинный прежний документ; зависимый вопрос выделяется в установленном порядке.",
+        "remaining": "Приёмка правовой конструкции учебной ситуации; конкретные местные акты, специальные процедуры исполнения, фактическая роль исполнителя и полная официальная цепочка поправок независимо не сертифицированы. Утверждённая редакционная привязка роли не является авторизацией. Активация запрещена.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_1406/853f5f9b88a8631659f20438281fdf2e323c1429/",
+          "https://www.consultant.ru/document/cons_doc_LAW_84602/e4fb380d53822434913f8449aa9b9e6bdf9f67a4/"
+        ],
+        "approved_portfolio": "ministry_internal"
       }
     }
   ]
