@@ -1348,6 +1348,20 @@
         "options": 5,
         "status": "specific_text_read_and_alternatives_reviewed_under_stated_conditions_not_full_case_acceptance",
         "remaining": "Специальный акт комиссии и порядок повторной оценки остаются условиями исполнения; родство не доказывает преступление."
+      },
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_82959/5d02242ebd04c398d2acf7c53dbc79659b85e8f3/",
+        "https://www.consultant.ru/document/cons_doc_LAW_82959/64ca591ea83268ee3d33f6e564cbcac0d3a073d9/"
+      ],
+      "legal_followup_2026_11_28": {
+        "date": "2026-11-28",
+        "status": "article_text_rechecked_specific_conditions_not_full_acceptance",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_82959/5d02242ebd04c398d2acf7c53dbc79659b85e8f3/",
+          "https://www.consultant.ru/document/cons_doc_LAW_82959/64ca591ea83268ee3d33f6e564cbcac0d3a073d9/"
+        ],
+        "option_count": 5,
+        "finding": "Ст. 10–11 273-ФЗ, ред. 25.04.2026: обязанность уведомления и урегулирования относится к лицам с соответствующей обязанностью. Статус служащего и порядок замещения заданы; локальный акт комиссии не представлен."
       }
     },
     {
@@ -1712,6 +1726,18 @@
         "options": 5,
         "status": "specific_text_read_and_alternatives_reviewed_under_stated_conditions_not_full_case_acceptance",
         "remaining": "Проверка права на береговую полосу подтверждена условиями учебной истории; договор аренды, закупочный порядок и конкретный проект проверяются при исполнении."
+      },
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_60683/9a073f7358f63cc80f8bf4b9406df3978054e8dc/"
+      ],
+      "legal_followup_2026_11_28": {
+        "date": "2026-11-28",
+        "status": "article_text_rechecked_specific_conditions_not_full_acceptance",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_60683/9a073f7358f63cc80f8bf4b9406df3978054e8dc/"
+        ],
+        "option_count": 5,
+        "finding": "Ст. 6 ВК РФ, ред. 04.08.2026: общедоступность и бесплатное личное пользование с законными исключениями. Добровольные услуги отделены от прохода; конкретный договор и полномочия не представлены."
       }
     },
     {
@@ -2331,6 +2357,18 @@
         "options": 5,
         "status": "specific_text_read_and_alternatives_reviewed_under_stated_conditions_not_full_case_acceptance",
         "remaining": "Порядок возврата федеральных субсидий в конкретном случае и контрактные обязательства требуют самостоятельной проверки; 30-дневный срок для отдельных решений главного администратора не перенесён автоматически на федеральную конструкцию."
+      },
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/200d8f9e0aed34b95bc6527693824cb356109b83/"
+      ],
+      "legal_followup_2026_11_28": {
+        "date": "2026-11-28",
+        "status": "article_text_rechecked_specific_conditions_not_full_acceptance",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/200d8f9e0aed34b95bc6527693824cb356109b83/"
+        ],
+        "option_count": 5,
+        "finding": "П. 5 ст. 242 БК РФ, ред. 02.11.2026: возврат обычного целевого остатка в первые 15 рабочих дней; 30-дневная процедура для указанных администраторов не переносится автоматически на федеральную субсидию. Порядок подтверждения потребности и исполнение контракта проверяются отдельно."
       }
     },
     {
@@ -2513,7 +2551,8 @@
       "legal_basis": "БК РФ, статья 160.2-1; федеральные стандарты внутреннего финансового аудита: функциональная независимость аудита. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
       "legal_urls": [
         "https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
-        "https://www.consultant.ru/document/cons_doc_LAW_19702/6fdfc424277aebba215512c7a68a5077c68e1337/"
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/6fdfc424277aebba215512c7a68a5077c68e1337/",
+        "https://sudact.ru/law/prikaz-minfina-rossii-ot-05082020-n-160n/federalnyi-standart-vnutrennego-finansovogo-audita/prilozhenie-n-2/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
@@ -2535,6 +2574,20 @@
         "options": 5,
         "status": "specific_text_read_and_alternatives_reviewed_under_stated_conditions_not_full_case_acceptance",
         "remaining": "Сами федеральные стандарты, ведомственный акт, основания привлечения эксперта и объём проверки не проверены полностью."
+      },
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/6fdfc424277aebba215512c7a68a5077c68e1337/",
+        "https://sudact.ru/law/prikaz-minfina-rossii-ot-05082020-n-160n/federalnyi-standart-vnutrennego-finansovogo-audita/prilozhenie-n-2/"
+      ],
+      "legal_followup_2026_11_28": {
+        "date": "2026-11-28",
+        "status": "article_text_rechecked_specific_conditions_not_full_acceptance",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/6fdfc424277aebba215512c7a68a5077c68e1337/",
+          "https://sudact.ru/law/prikaz-minfina-rossii-ot-05082020-n-160n/federalnyi-standart-vnutrennego-finansovogo-audita/prilozhenie-n-2/"
+        ],
+        "option_count": 5,
+        "finding": "П. 3–5 ст. 160.2-1 БК РФ, ред. 02.11.2026; приложение 2 к стандарту 160н, ред. 04.10.2023, п. 4–8, 11–13: эксперт получает предусмотренные права и обязанности участника группы, но не руководителя; ответственность за итог сохраняется у субъекта аудита. Ведомственный акт, программа и полный стандарт выборки не представлены. Раздел принципов 196н на КонсультантПлюс недоступен."
       }
     },
     {
@@ -2824,6 +2877,20 @@
         "options": 5,
         "status": "specific_text_read_and_alternatives_reviewed_under_stated_conditions_not_full_case_acceptance",
         "remaining": "Проверены правовая природа и договорный режим кредита. Правила конкретной субсидии и основание модернизации не доказаны."
+      },
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_19671/a89f6e27872ba595439ca2902f233cd969c41b56/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19671/d742ffa792b4e20830fd93a2124bfcc027bd03d6/"
+      ],
+      "legal_followup_2026_11_28": {
+        "date": "2026-11-28",
+        "status": "article_text_rechecked_specific_conditions_not_full_acceptance",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_19671/a89f6e27872ba595439ca2902f233cd969c41b56/",
+          "https://www.consultant.ru/document/cons_doc_LAW_19671/d742ffa792b4e20830fd93a2124bfcc027bd03d6/"
+        ],
+        "option_count": 5,
+        "finding": "Ст. 66–67 НК РФ, ред. 04.08.2026, изменения с 01.10.2026: кредит меняет срок уплаты, применяется к определённым налогам, имеет основания и договорный порядок. Модернизация требует подтверждения основания; вид налога и программа субсидии не заданы."
       }
     },
     {
@@ -3017,6 +3084,20 @@
         "options": 5,
         "status": "specific_text_read_and_alternatives_reviewed_under_stated_conditions_not_full_case_acceptance",
         "remaining": "Конкретный предел долга зависит от статуса субъекта и бюджетных данных; фактический размер и выплата гарантии не рассчитаны."
+      },
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/95351b068ed8020a8891410884e60ecb81f26164/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/7b5f77362fb1983215e0525ce8a2b08de83e1dbf/"
+      ],
+      "legal_followup_2026_11_28": {
+        "date": "2026-11-28",
+        "status": "article_text_rechecked_specific_conditions_not_full_acceptance",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/95351b068ed8020a8891410884e60ecb81f26164/",
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/7b5f77362fb1983215e0525ce8a2b08de83e1dbf/"
+        ],
+        "option_count": 5,
+        "finding": "Ст. 99 и 107 БК РФ, ред. 02.11.2026: гарантии включаются в долг субъекта, пределы определяются законом о бюджете и требованиями долговой устойчивости. Возможный денежный отток не равен новому долгу; конкретные бюджетные данные отсутствуют."
       }
     },
     {
@@ -3057,7 +3138,8 @@
       "legal_basis": "Федеральный закон №44-ФЗ, статья 34, части 6 и 9: ответственность поставщика. Источники: https://pravo.gov.ru/",
       "legal_urls": [
         "https://pravo.gov.ru/",
-        "https://www.consultant.ru/document/cons_doc_LAW_144624/c5cbc4acc59ffed792a3921dbc18900d2d0f7eb1/"
+        "https://www.consultant.ru/document/cons_doc_LAW_144624/c5cbc4acc59ffed792a3921dbc18900d2d0f7eb1/",
+        "https://www.consultant.ru/document/cons_doc_LAW_301797/b1b1099a3d491e5432b9f3be6b3cb9f94b9b8598/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
@@ -3079,6 +3161,20 @@
         "options": 5,
         "status": "specific_text_read_and_alternatives_reviewed_under_stated_conditions_not_full_case_acceptance",
         "remaining": "Не определены цена контракта, объём исполнения и ставка на дату уплаты; сумму пени не выдумывать."
+      },
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_144624/c5cbc4acc59ffed792a3921dbc18900d2d0f7eb1/",
+        "https://www.consultant.ru/document/cons_doc_LAW_301797/b1b1099a3d491e5432b9f3be6b3cb9f94b9b8598/"
+      ],
+      "legal_followup_2026_11_28": {
+        "date": "2026-11-28",
+        "status": "article_text_rechecked_specific_conditions_not_full_acceptance",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_144624/c5cbc4acc59ffed792a3921dbc18900d2d0f7eb1/",
+          "https://www.consultant.ru/document/cons_doc_LAW_301797/b1b1099a3d491e5432b9f3be6b3cb9f94b9b8598/"
+        ],
+        "option_count": 5,
+        "finding": "Ч. 6–9.1 ст. 34 44-ФЗ, ред. 04.08.2026, изменения с 01.10.2026; п. 2–3 Правил ПП РФ №783, ред. 02.10.2026: требование и списание — разные процедуры. Полное исполнение и неустойка не выше 5% цены обычно требуют списания; при сумме свыше 5% до 20% предусмотрено частичное списание при соблюдении условий. Уточнено незавершение наладки и отсутствие исключений п. 2; цена не выдумана."
       }
     },
     {
@@ -3352,6 +3448,18 @@
         "options": 5,
         "status": "specific_text_read_and_alternatives_reviewed_under_stated_conditions_not_full_case_acceptance",
         "remaining": "Конкретный вид регионального норматива, налог, муниципальная структура и действующий акт не определены; специальный режим не считается полностью проверенным."
+      },
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/1e231e90031b99643b29b6eb4579016c2a06533f/"
+      ],
+      "legal_followup_2026_11_28": {
+        "date": "2026-11-28",
+        "status": "article_text_rechecked_specific_conditions_not_full_acceptance",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/1e231e90031b99643b29b6eb4579016c2a06533f/"
+        ],
+        "option_count": 5,
+        "finding": "Ст. 58 БК РФ, ред. 02.11.2026: отдельные единые нормативы устанавливаются законом субъекта, не обычным законом о бюджете или законом на ограниченный срок; дополнительные нормативы имеют отдельный режим. Налог и вид норматива не заданы."
       }
     },
     {
@@ -3508,6 +3616,18 @@
         "options": 5,
         "status": "specific_text_read_and_alternatives_reviewed_under_stated_conditions_not_full_case_acceptance",
         "remaining": "Подтверждён вывод о плательщике по условиям истории; порядок исправления и местные ставки требуют самостоятельной проверки."
+      },
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_28165/7266761567c503394be534d7d5d98b99a18b5816/"
+      ],
+      "legal_followup_2026_11_28": {
+        "date": "2026-11-28",
+        "status": "article_text_rechecked_specific_conditions_not_full_acceptance",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_28165/7266761567c503394be534d7d5d98b99a18b5816/"
+        ],
+        "option_count": 5,
+        "finding": "П. 1–2 ст. 388 НК РФ, ред. 04.08.2026, изменения с 01.10.2026: безвозмездное пользование не образует статус плательщика земельного налога. Сверка регистрации допустима; местные ставки и процедура не заданы."
       }
     },
     {
@@ -4048,6 +4168,18 @@
         "options": 5,
         "status": "specific_text_read_and_alternatives_reviewed_under_stated_conditions_not_full_case_acceptance",
         "remaining": "Применимый национальный режим, стандарты, закупочная документация и правила обучения проверяются отдельно."
+      },
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_144624/d6aec91603ff628ea274b8552ce2849e06e0aa4c/"
+      ],
+      "legal_followup_2026_11_28": {
+        "date": "2026-11-28",
+        "status": "article_text_rechecked_specific_conditions_not_full_acceptance",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_144624/d6aec91603ff628ea274b8552ce2849e06e0aa4c/"
+        ],
+        "option_count": 5,
+        "finding": "Ч. 1 ст. 33 44-ФЗ, ред. 04.08.2026, изменения с 01.10.2026: объективные характеристики и ограничения указания марки. В условии отсутствуют основания запретить эквивалент; предзакупочный тест не критерий допуска. Национальный режим и документация проверяются отдельно."
       }
     },
     {

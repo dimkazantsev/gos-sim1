@@ -1711,7 +1711,17 @@
         "checked_norm_urls": [
           "https://www.consultant.ru/document/cons_doc_LAW_82959/5d02242ebd04c398d2acf7c53dbc79659b85e8f3/",
           "https://www.consultant.ru/document/cons_doc_LAW_82959/64ca591ea83268ee3d33f6e564cbcac0d3a073d9/"
-        ]
+        ],
+        "legal_followup_2026_11_28": {
+          "date": "2026-11-28",
+          "status": "article_text_rechecked_specific_conditions_not_full_acceptance",
+          "urls": [
+            "https://www.consultant.ru/document/cons_doc_LAW_82959/5d02242ebd04c398d2acf7c53dbc79659b85e8f3/",
+            "https://www.consultant.ru/document/cons_doc_LAW_82959/64ca591ea83268ee3d33f6e564cbcac0d3a073d9/"
+          ],
+          "option_count": 5,
+          "finding": "Ст. 10–11 273-ФЗ, ред. 25.04.2026: обязанность уведомления и урегулирования относится к лицам с соответствующей обязанностью. Статус служащего и порядок замещения заданы; локальный акт комиссии не представлен."
+        }
       },
       "implementation_review": {
         "status": "draft",
@@ -4362,7 +4372,16 @@
         },
         "checked_norm_urls": [
           "https://www.consultant.ru/document/cons_doc_LAW_60683/9a073f7358f63cc80f8bf4b9406df3978054e8dc/"
-        ]
+        ],
+        "legal_followup_2026_11_28": {
+          "date": "2026-11-28",
+          "status": "article_text_rechecked_specific_conditions_not_full_acceptance",
+          "urls": [
+            "https://www.consultant.ru/document/cons_doc_LAW_60683/9a073f7358f63cc80f8bf4b9406df3978054e8dc/"
+          ],
+          "option_count": 5,
+          "finding": "Ст. 6 ВК РФ, ред. 04.08.2026: общедоступность и бесплатное личное пользование с законными исключениями. Добровольные услуги отделены от прохода; конкретный договор и полномочия не представлены."
+        }
       },
       "implementation_review": {
         "status": "draft",

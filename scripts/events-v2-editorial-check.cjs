@@ -150,6 +150,22 @@ assert.equal(collectiveReviewOptions,947,'Collective option review incomplete');
 
 const blocked=cases.filter(c=>c.verified!==true||c.editorial_status!=='approved'||c.legal_review.status!=='verified_current'||c.effect_plan.options.some(o=>typeof o.lawful!=='boolean')).length;
 console.log(JSON.stringify({cases:cases.length,options:count,individual,collective,longestCorrect:long,shortestCorrect:short,meanCorrectToOtherLength:ratio/individual,positions,unknownIndividualLawfulness:unknown,dominatedOptions:dominated,dominatedCases,activationBlocked:blocked,documentaryFull:reg.cases.filter(c=>c.source_status==='official_article_read_core_episode_confirmed').length,documentaryIndexed:reg.cases.filter(c=>c.source_status==='official_search_index_core_episode_confirmed_full_text_unavailable').length},null,2));
+// Preserve dated source-specific evidence without confusing it with legal acceptance.
+assert.ok(reg.cases.every(c=>Array.isArray(c.checked_norm_urls)&&c.checked_norm_urls.length>0),'Source register missing checked norm URL');
+let legalFollowupCount=0;
+for(const c of cases){
+ const followup=c.legal_review.legal_followup_2026_11_28;
+ if(!followup)continue;
+ const r=registerByKey.get(c.case_key);
+ assert.deepEqual(followup,r.legal_followup_2026_11_28,c.case_key+' follow-up mismatch');
+ assert.deepEqual(followup.urls,r.checked_norm_urls,c.case_key+' checked links mismatch');
+ assert.deepEqual(followup.urls,c.legal_review.checked_norm_urls,c.case_key+' catalogue links mismatch');
+ assert.equal(followup.option_count,c.effect_plan.options.length,c.case_key);
+ assert.equal(followup.status,'article_text_rechecked_specific_conditions_not_full_acceptance',c.case_key);
+ legalFollowupCount++;
+}
+assert.equal(legalFollowupCount,10);
+console.log(JSON.stringify({legalFollowupCount,registerCheckedNormCoverage:reg.cases.length},null,2));
 const registerBlocked=reg.cases.filter(c=>c.activation_allowed!==true||c.legal_status!=='verified_current').length;
 for(const c of cases){
  const source=registerByKey.get(c.case_key);
