@@ -5,6 +5,30 @@ const files=fs.readdirSync(dir).filter(p=>/^(collective-|individual-).*\.json$/.
 const cases=files.flatMap(p=>JSON.parse(fs.readFileSync(dir+'/'+p,'utf8')).cases);
 assert.equal(cases.length,330);assert.equal(new Set(cases.map(c=>c.case_key)).size,330);
 let count=0,individual=0,collective=0,long=0,short=0,unknown=0,dominated=0,dominatedCases=0,ratio=0;const positions={};
+// Match the inactive V2 collective server contract. Never treat editorial review as release permission.
+const collectiveMetricKeys=new Set(['economy','elite_support','international_standing','media_climate','security','social_stability','social_tension']);
+function checkCollectiveEffectContract(option,caseKey){
+ const metrics=option.metric_effects===undefined?{}:option.metric_effects;
+ const label=caseKey+' '+option.key;
+ assert.ok(metrics!==null&&typeof metrics==='object'&&!Array.isArray(metrics),label+' invalid metric_effects');
+ for(const [key,value] of Object.entries(metrics)){
+  assert.ok(collectiveMetricKeys.has(key),label+' prohibited direct metric '+key);
+  assert.ok(typeof value==='number'&&Number.isFinite(value)&&Math.abs(value)<=4,label+' invalid direct metric '+key);
+ }
+ if(Object.hasOwn(option,'fiscal_effect')){
+  assert.ok(option.fiscal_effect!==null&&typeof option.fiscal_effect==='object'&&!Array.isArray(option.fiscal_effect),label+' invalid fiscal_effect');
+  assert.ok(!Object.hasOwn(metrics,'economy'),label+' duplicate economy and fiscal_effect');
+ }
+}
+// Local negative fixtures, without changing the catalogue or touching the database.
+for(const [key,metrics] of [['lawfulness',{lawfulness:0}],['budget',{budget:1}],['legitimacy',{legitimacy:1}],['public_trust',{public_trust:1}],['range',{economy:5}],['type',{economy:'1'}],['array',[]],['null',null]]){
+ assert.throws(()=>checkCollectiveEffectContract({key,metric_effects:metrics},'fixture'));
+}
+assert.throws(()=>checkCollectiveEffectContract({key:'duplicate',metric_effects:{economy:0},fiscal_effect:{}},'fixture'));
+assert.throws(()=>checkCollectiveEffectContract({key:'invalid_fiscal',fiscal_effect:null},'fixture'));
+assert.doesNotThrow(()=>checkCollectiveEffectContract({key:'valid',metric_effects:{economy:-1,elite_support:2}},'fixture'));
+assert.doesNotThrow(()=>checkCollectiveEffectContract({key:'valid_fiscal',metric_effects:{elite_support:1},fiscal_effect:{}},'fixture'));
+
 for(const c of cases){
  const plan=c.effect_plan,o=plan.options,labels=c.decision_options;
  assert.equal(plan.rules_version,2,c.case_key);assert.equal(o.length,labels.length,c.case_key);assert.equal(o.length,c.original_option_count,c.case_key);assert.equal(new Set(labels).size,labels.length,c.case_key);assert.ok(labels.every(x=>typeof x==='string'&&x.trim()),c.case_key);
@@ -14,7 +38,7 @@ for(const c of cases){
   individual++;const i=Number(plan.best_option_key.split('_')[1])-1;assert.ok(i>=0&&i<o.length,c.case_key);assert.equal(o[i].lawful,true,c.case_key);unknown+=o.filter(x=>x.lawful===null).length;
   const l=labels.map(x=>x.length);long+=l[i]===Math.max(...l);short+=l[i]===Math.min(...l);ratio+=l[i]/((l.reduce((a,b)=>a+b,0)-l[i])/(l.length-1));positions[i+1]=(positions[i+1]||0)+1;
  }else{
-  collective++;assert.ok(c.mandatory_boundary,c.case_key);assert.ok(!('best_option_key' in plan),c.case_key);assert.ok(o.every(x=>x.lawful===true),c.case_key);const metricKeys=[...new Set(o.flatMap(x=>Object.keys(x.metric_effects??{})))].sort(); const v=o.map(x=>[x.trust,...metricKeys.map(k=>(k==='social_tension'?-1:1)*(x.metric_effects?.[k]??0))]);assert.ok(v.every(x=>x.every(Number.isFinite)),c.case_key);assert.ok(v.every(x=>x.every(y=>Math.abs(y)<=4)),c.case_key);
+  collective++;assert.ok(c.mandatory_boundary,c.case_key);assert.ok(!('best_option_key' in plan),c.case_key);assert.ok(o.every(x=>x.lawful===true),c.case_key);o.forEach(x=>checkCollectiveEffectContract(x,c.case_key));const metricKeys=[...new Set(o.flatMap(x=>Object.keys(x.metric_effects??{})))].sort(); const v=o.map(x=>[x.trust,...metricKeys.map(k=>(k==='social_tension'?-1:1)*(x.metric_effects?.[k]??0))]);assert.ok(v.every(x=>x.every(Number.isFinite)),c.case_key);assert.ok(v.every(x=>x.every(y=>Math.abs(y)<=4)),c.case_key);
   const d=v.filter((a,i)=>v.some((b,j)=>i!==j&&b.every((x,k)=>x>=a[k])&&b.some((x,k)=>x>a[k]))).length;dominated+=d;dominatedCases+=d>0;
  }
 }
