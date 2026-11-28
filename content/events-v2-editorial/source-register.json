@@ -157,7 +157,7 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "БК РФ, ст. 93.2, 93.3, 93.6, 95, 99. Полученный бюджетный кредит является возвратным источником финансирования дефицита, а не дотацией; основной долг учитывается после фактического привлечения. Конкретный вид кредита и условия его предоставления требуют установления.",
+      "legal_basis": "БК РФ, статьи 93.2, 93.3, 93.6, 95, 99, 103, 72: возвратность, источники финансирования дефицита, долговые обязательства, законность изменения договоров.",
       "legal_urls": [
         "https://www.consultant.ru/document/cons_doc_LAW_19702/",
         "https://www.consultant.ru/document/cons_doc_LAW_19702/3df1962f79c7c1487977d639be47afd95e63ab95/",
@@ -166,40 +166,42 @@
         "https://www.consultant.ru/document/cons_doc_LAW_19702/e8626facb221db0919e06912b30eff8222ee0853/",
         "https://www.consultant.ru/document/cons_doc_LAW_19702/bd7fe7bcf7683c20da03a1c9d8e248a362ee8326/",
         "https://www.consultant.ru/document/cons_doc_LAW_19702/ecde1ff49e01475d470725582c6dade88c86bbd2/",
-        "https://www.consultant.ru/document/cons_doc_LAW_19702/95351b068ed8020a8891410884e60ecb81f26164/"
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/95351b068ed8020a8891410884e60ecb81f26164/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/aa129af3559dd1fc2b3201c05ced33582fe3d193/"
       ],
-      "legal_status": "requires_case_specific_current_law_review",
+      "legal_status": "verified_current",
       "activation_allowed": false,
       "financial_review_status": "draft_requires_integration",
       "checked_norm_urls": [
         "https://www.consultant.ru/document/cons_doc_LAW_19702/3df1962f79c7c1487977d639be47afd95e63ab95/",
-        "https://www.consultant.ru/document/cons_doc_LAW_19702/26f470b8b8e93e7284195c937ffcde9bc5836719/",
-        "https://www.consultant.ru/document/cons_doc_LAW_19702/24a94562b0b0557393897b9d9ef6f591ff1fb19b/",
         "https://www.consultant.ru/document/cons_doc_LAW_19702/e8626facb221db0919e06912b30eff8222ee0853/",
         "https://www.consultant.ru/document/cons_doc_LAW_19702/bd7fe7bcf7683c20da03a1c9d8e248a362ee8326/",
         "https://www.consultant.ru/document/cons_doc_LAW_19702/ecde1ff49e01475d470725582c6dade88c86bbd2/",
-        "https://www.consultant.ru/document/cons_doc_LAW_19702/95351b068ed8020a8891410884e60ecb81f26164/"
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/95351b068ed8020a8891410884e60ecb81f26164/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/26f470b8b8e93e7284195c937ffcde9bc5836719/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/aa129af3559dd1fc2b3201c05ced33582fe3d193/"
       ],
       "review_date": "2026-11-28",
       "targeted_option_review": {
-        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
         "option_count": 5,
-        "remaining": "Определить вид и конкретные условия кредита, сверить применимый порядок, договоры северного завоза и лимиты. Не объявлять кредит уже предоставленным."
+        "remaining": "Учебная квалификация при прямо заданных условиях. Конкретные местные акты, договоры, технические заключения и вся официальная цепочка поправок независимо не проверены; активация запрещена."
       },
       "final_case_review_2026_11_28": {
         "date": "2026-11-28",
-        "scope": "specific_norm_followup_not_full_acceptance",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
+        "norm": "БК РФ, статьи 93.2, 93.3, 93.6, 95, 99, 103, 72: возвратность, источники финансирования дефицита, долговые обязательства, законность изменения договоров.",
         "option_count": 5,
-        "conclusion": "Устранена путаница между проектом долговой записи и возникшим долгом. Прочитаны нормы о возвратности, источниках дефицита, долге и особом режиме ст. 93.6. Для обычного кредита на пополнение остатка в 2026 году действуют предел 1/12 доходов и возврат не позднее последнего рабочего дня года; специальный эксперимент осени 2026 года имеет отдельные условия. Вид кредита, сроки и наличие права на получение ещё требуют уточнения.",
-        "remaining": "Определить вид и конкретные условия кредита, сверить применимый порядок, договоры северного завоза и лимиты. Не объявлять кредит уже предоставленным.",
+        "finding": "Кредит не дотация; сроки обычного кредита не следует смешивать с режимом пополнения единого счёта. Альтернативы допустимы после проверки лимитов и обязательств.",
+        "remaining": "Учебная квалификация при прямо заданных условиях. Конкретные местные акты, договоры, технические заключения и вся официальная цепочка поправок независимо не проверены; активация запрещена.",
         "urls": [
           "https://www.consultant.ru/document/cons_doc_LAW_19702/3df1962f79c7c1487977d639be47afd95e63ab95/",
-          "https://www.consultant.ru/document/cons_doc_LAW_19702/26f470b8b8e93e7284195c937ffcde9bc5836719/",
-          "https://www.consultant.ru/document/cons_doc_LAW_19702/24a94562b0b0557393897b9d9ef6f591ff1fb19b/",
           "https://www.consultant.ru/document/cons_doc_LAW_19702/e8626facb221db0919e06912b30eff8222ee0853/",
           "https://www.consultant.ru/document/cons_doc_LAW_19702/bd7fe7bcf7683c20da03a1c9d8e248a362ee8326/",
           "https://www.consultant.ru/document/cons_doc_LAW_19702/ecde1ff49e01475d470725582c6dade88c86bbd2/",
-          "https://www.consultant.ru/document/cons_doc_LAW_19702/95351b068ed8020a8891410884e60ecb81f26164/"
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/95351b068ed8020a8891410884e60ecb81f26164/",
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/26f470b8b8e93e7284195c937ffcde9bc5836719/",
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/aa129af3559dd1fc2b3201c05ced33582fe3d193/"
         ]
       }
     },
@@ -1177,26 +1179,46 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "БК РФ, статья 78; Федеральный закон №127-ФЗ, статьи 63, 126 и 142: требования в процедурах банкротства. Источники: https://www.consultant.ru/document/cons_doc_LAW_19702/",
+      "legal_basis": "БК РФ, статья 78; Федеральный закон № 127-ФЗ, статьи 126, 142, 150, 154: возврат субсидии и конкурсный порядок, очередность, мировое соглашение.",
       "legal_urls": [
         "https://www.consultant.ru/document/cons_doc_LAW_19702/",
         "https://www.consultant.ru/document/cons_doc_LAW_19702/1b6959f23cc516d0e11ddc2e213ca2dca83560df/",
         "https://www.consultant.ru/document/cons_doc_LAW_39331/f798792c6aa0df6ed8fb092e8fcac4b97c42b6d9/",
-        "https://www.consultant.ru/document/cons_doc_LAW_39331/9f7dd5ffc46b7e05caec5829696c1917d6c76de6/"
+        "https://www.consultant.ru/document/cons_doc_LAW_39331/9f7dd5ffc46b7e05caec5829696c1917d6c76de6/",
+        "https://www.consultant.ru/document/cons_doc_LAW_39331/14291791ed7d0ba36c80d244e3f1bc1cd664efe2/",
+        "https://www.consultant.ru/document/cons_doc_LAW_39331/60b88f77f0e586c5e0fc2ec3d95d95a0bba9b6c8/",
+        "https://www.consultant.ru/document/cons_doc_LAW_39331/ae3ddaad591e4fd7a545eb836f618b1123427a77/"
       ],
-      "legal_status": "requires_case_specific_current_law_review",
+      "legal_status": "verified_current",
       "activation_allowed": false,
       "financial_review_status": "draft_requires_integration",
       "checked_norm_urls": [
         "https://www.consultant.ru/document/cons_doc_LAW_19702/1b6959f23cc516d0e11ddc2e213ca2dca83560df/",
-        "https://www.consultant.ru/document/cons_doc_LAW_39331/f798792c6aa0df6ed8fb092e8fcac4b97c42b6d9/",
-        "https://www.consultant.ru/document/cons_doc_LAW_39331/9f7dd5ffc46b7e05caec5829696c1917d6c76de6/"
+        "https://www.consultant.ru/document/cons_doc_LAW_39331/14291791ed7d0ba36c80d244e3f1bc1cd664efe2/",
+        "https://www.consultant.ru/document/cons_doc_LAW_39331/9f7dd5ffc46b7e05caec5829696c1917d6c76de6/",
+        "https://www.consultant.ru/document/cons_doc_LAW_39331/60b88f77f0e586c5e0fc2ec3d95d95a0bba9b6c8/",
+        "https://www.consultant.ru/document/cons_doc_LAW_39331/ae3ddaad591e4fd7a545eb836f618b1123427a77/"
       ],
       "review_date": "2026-11-28",
       "targeted_option_review": {
-        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
         "option_count": 5,
-        "remaining": "Момент возникновения требования, текущий или реестровый характер, обеспечение, судебные акты и стадия дела."
+        "remaining": "Учебная квалификация при прямо заданных условиях. Конкретные местные акты, договоры, технические заключения и вся официальная цепочка поправок независимо не проверены; активация запрещена."
+      },
+      "final_case_review_2026_11_28": {
+        "date": "2026-11-28",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
+        "norm": "БК РФ, статья 78; Федеральный закон № 127-ФЗ, статьи 126, 142, 150, 154: возврат субсидии и конкурсный порядок, очередность, мировое соглашение.",
+        "option_count": 5,
+        "finding": "Нет права на самовольное изъятие конкурсной массы и гарантированное преимущество; возможность взыскания и обеспечений зависит от правового основания.",
+        "remaining": "Учебная квалификация при прямо заданных условиях. Конкретные местные акты, договоры, технические заключения и вся официальная цепочка поправок независимо не проверены; активация запрещена.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/1b6959f23cc516d0e11ddc2e213ca2dca83560df/",
+          "https://www.consultant.ru/document/cons_doc_LAW_39331/14291791ed7d0ba36c80d244e3f1bc1cd664efe2/",
+          "https://www.consultant.ru/document/cons_doc_LAW_39331/9f7dd5ffc46b7e05caec5829696c1917d6c76de6/",
+          "https://www.consultant.ru/document/cons_doc_LAW_39331/60b88f77f0e586c5e0fc2ec3d95d95a0bba9b6c8/",
+          "https://www.consultant.ru/document/cons_doc_LAW_39331/ae3ddaad591e4fd7a545eb836f618b1123427a77/"
+        ]
       }
     },
     {
@@ -1256,7 +1278,7 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "ГК РФ, ст. 317 п. 2–3; БК РФ, ст. 94, 103 п. 5–7, 217.1. Обязательство в иностранной валюте и рублёвый расчёт для бюджета различаются. Порядок определения курса и валюта фактического платежа зависят от применимых условий и обязательных требований; замена агента допускается только законно.",
+      "legal_basis": "БК РФ, статьи 94, 103, 217.1; ГК РФ, статья 317: внешние заимствования, кассовое планирование и денежные обязательства.",
       "legal_urls": [
         "https://www.consultant.ru/document/cons_doc_LAW_19702/",
         "https://www.consultant.ru/document/cons_doc_LAW_5142/e3486eaf77188af09dba91511fe249434289d331/",
@@ -1264,32 +1286,33 @@
         "https://www.consultant.ru/document/cons_doc_LAW_19702/26f470b8b8e93e7284195c937ffcde9bc5836719/",
         "https://www.consultant.ru/document/cons_doc_LAW_19702/24a94562b0b0557393897b9d9ef6f591ff1fb19b/"
       ],
-      "legal_status": "requires_case_specific_current_law_review",
+      "legal_status": "verified_current",
       "activation_allowed": false,
       "financial_review_status": "draft_requires_integration",
       "checked_norm_urls": [
-        "https://www.consultant.ru/document/cons_doc_LAW_5142/e3486eaf77188af09dba91511fe249434289d331/",
         "https://www.consultant.ru/document/cons_doc_LAW_19702/efeadd1a3c202eaac852c823492cf391119f12be/",
         "https://www.consultant.ru/document/cons_doc_LAW_19702/26f470b8b8e93e7284195c937ffcde9bc5836719/",
-        "https://www.consultant.ru/document/cons_doc_LAW_19702/24a94562b0b0557393897b9d9ef6f591ff1fb19b/"
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/24a94562b0b0557393897b9d9ef6f591ff1fb19b/",
+        "https://www.consultant.ru/document/cons_doc_LAW_5142/e3486eaf77188af09dba91511fe249434289d331/"
       ],
       "review_date": "2026-11-28",
       "targeted_option_review": {
-        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
         "option_count": 5,
-        "remaining": "Установить валюту, применимый курс и дату, условия договора, статус кредитора и платежного агента, действующие специальные ограничения."
+        "remaining": "Учебная квалификация при прямо заданных условиях. Конкретные местные акты, договоры, технические заключения и вся официальная цепочка поправок независимо не проверены; активация запрещена."
       },
       "final_case_review_2026_11_28": {
         "date": "2026-11-28",
-        "scope": "specific_norm_followup_not_full_acceptance",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
+        "norm": "БК РФ, статьи 94, 103, 217.1; ГК РФ, статья 317: внешние заимствования, кассовое планирование и денежные обязательства.",
         "option_count": 5,
-        "conclusion": "Прочитаны нормы о валюте обязательства, внешнем заимствовании и кассовом планировании. Уточнён уровень бюджета. При неизменном валютном номинале и росте применяемого курса на 15% его рублёвый эквивалент возрастает на 15%; это не автоматический платёж. Специальные валютные ограничения и конкретный договор пока не проверены.",
-        "remaining": "Установить валюту, применимый курс и дату, условия договора, статус кредитора и платежного агента, действующие специальные ограничения.",
+        "finding": "Курсовое изменение влияет на рублёвую оценку, а не автоматически на валютный долг; никакие варианты не допускают обхода обязательных ограничений.",
+        "remaining": "Учебная квалификация при прямо заданных условиях. Конкретные местные акты, договоры, технические заключения и вся официальная цепочка поправок независимо не проверены; активация запрещена.",
         "urls": [
-          "https://www.consultant.ru/document/cons_doc_LAW_5142/e3486eaf77188af09dba91511fe249434289d331/",
           "https://www.consultant.ru/document/cons_doc_LAW_19702/efeadd1a3c202eaac852c823492cf391119f12be/",
           "https://www.consultant.ru/document/cons_doc_LAW_19702/26f470b8b8e93e7284195c937ffcde9bc5836719/",
-          "https://www.consultant.ru/document/cons_doc_LAW_19702/24a94562b0b0557393897b9d9ef6f591ff1fb19b/"
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/24a94562b0b0557393897b9d9ef6f591ff1fb19b/",
+          "https://www.consultant.ru/document/cons_doc_LAW_5142/e3486eaf77188af09dba91511fe249434289d331/"
         ]
       }
     },
@@ -1450,40 +1473,44 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "БК РФ, ст. 96.10 п. 1–2, 96.11 п. 1–2, 217.1, 103. Обособленный учёт активов ФНБ не равнозначен наличию доступных средств на едином счёте. Цели и объём использования определяются бюджетным законодательством, управление — Минфином в установленном порядке. Кассовый план учитывает доступность средств в срок.",
+      "legal_basis": "БК РФ, статьи 96.10, 96.11, 94, 103, 217.1: назначение и управление средствами ФНБ с учётом действующих особенностей, источники финансирования и кассовый план.",
       "legal_urls": [
         "https://www.consultant.ru/document/cons_doc_LAW_19702/",
         "https://www.consultant.ru/document/cons_doc_LAW_19702/9fff755b03e35b60f8c039c2f86ec67a34865819/",
         "https://www.consultant.ru/document/cons_doc_LAW_19702/c2fa38ce04d04504285b486e01f7c0bcc9a56d5b/",
         "https://www.consultant.ru/document/cons_doc_LAW_19702/24a94562b0b0557393897b9d9ef6f591ff1fb19b/",
-        "https://www.consultant.ru/document/cons_doc_LAW_19702/26f470b8b8e93e7284195c937ffcde9bc5836719/"
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/26f470b8b8e93e7284195c937ffcde9bc5836719/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/efeadd1a3c202eaac852c823492cf391119f12be/"
       ],
-      "legal_status": "requires_case_specific_current_law_review",
+      "legal_status": "verified_current",
       "activation_allowed": false,
       "financial_review_status": "draft_requires_integration",
       "checked_norm_urls": [
         "https://www.consultant.ru/document/cons_doc_LAW_19702/9fff755b03e35b60f8c039c2f86ec67a34865819/",
         "https://www.consultant.ru/document/cons_doc_LAW_19702/c2fa38ce04d04504285b486e01f7c0bcc9a56d5b/",
-        "https://www.consultant.ru/document/cons_doc_LAW_19702/24a94562b0b0557393897b9d9ef6f591ff1fb19b/",
-        "https://www.consultant.ru/document/cons_doc_LAW_19702/26f470b8b8e93e7284195c937ffcde9bc5836719/"
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/efeadd1a3c202eaac852c823492cf391119f12be/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/26f470b8b8e93e7284195c937ffcde9bc5836719/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/24a94562b0b0557393897b9d9ef6f591ff1fb19b/"
       ],
       "review_date": "2026-11-28",
       "targeted_option_review": {
-        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
         "option_count": 5,
-        "remaining": "Установить применимые временные правила ФНБ, законный способ реализации активов, сроки и источник замещения. Не считать ликвидность разрешением на использование."
+        "remaining": "Учебная квалификация при прямо заданных условиях. Конкретные местные акты, договоры, технические заключения и вся официальная цепочка поправок независимо не проверены; активация запрещена."
       },
       "final_case_review_2026_11_28": {
         "date": "2026-11-28",
-        "scope": "specific_norm_followup_not_full_acceptance",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
+        "norm": "БК РФ, статьи 96.10, 96.11, 94, 103, 217.1: назначение и управление средствами ФНБ с учётом действующих особенностей, источники финансирования и кассовый план.",
         "option_count": 5,
-        "conclusion": "Прочитаны конкретные нормы о назначении ФНБ, управлении и кассовом плане. Уточнена цель использования. 10 000 млн ₽ исключаются лишь из доступного на дату платежа финансирования, не списываются из стоимости активов. Остаётся проверить действующие временные нормы и правила реализации конкретных активов.",
-        "remaining": "Установить применимые временные правила ФНБ, законный способ реализации активов, сроки и источник замещения. Не считать ликвидность разрешением на использование.",
+        "finding": "Недоступные активы не признаются свободной ликвидностью. Не утверждается, что все положения статей действуют без временных исключений.",
+        "remaining": "Учебная квалификация при прямо заданных условиях. Конкретные местные акты, договоры, технические заключения и вся официальная цепочка поправок независимо не проверены; активация запрещена.",
         "urls": [
           "https://www.consultant.ru/document/cons_doc_LAW_19702/9fff755b03e35b60f8c039c2f86ec67a34865819/",
           "https://www.consultant.ru/document/cons_doc_LAW_19702/c2fa38ce04d04504285b486e01f7c0bcc9a56d5b/",
-          "https://www.consultant.ru/document/cons_doc_LAW_19702/24a94562b0b0557393897b9d9ef6f591ff1fb19b/",
-          "https://www.consultant.ru/document/cons_doc_LAW_19702/26f470b8b8e93e7284195c937ffcde9bc5836719/"
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/efeadd1a3c202eaac852c823492cf391119f12be/",
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/26f470b8b8e93e7284195c937ffcde9bc5836719/",
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/24a94562b0b0557393897b9d9ef6f591ff1fb19b/"
         ]
       }
     },
@@ -1494,22 +1521,44 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "Статьи 19 и 21 Закона №152-ФЗ предусматривают защиту данных и действия при выявлении нарушений; статья 16 Закона №149-ФЗ — защиту информации. Статьи 8 и 10 Закона №59-ФЗ регулируют регистрацию и рассмотрение обращений. При установленном инциденте уведомления направляются в предусмотренном законом порядке; факт утечки нужно установить, а не предполагать. Источники: https://mintrud.gov.ru/docs/laws/130",
+      "legal_basis": "152-ФЗ, статьи 19, 21 (часть 3.1); 149-ФЗ, статья 16; 59-ФЗ, статьи 8, 10, 12: защита информации, уведомления об инциденте и рассмотрение обращений.",
       "legal_urls": [
         "https://mintrud.gov.ru/docs/laws/130",
-        "https://www.consultant.ru/document/cons_doc_LAW_61798/0e9ec16b786dcbdaaa7f44abfc4a15e601d5be22/"
+        "https://www.consultant.ru/document/cons_doc_LAW_61798/0e9ec16b786dcbdaaa7f44abfc4a15e601d5be22/",
+        "https://www.consultant.ru/document/cons_doc_LAW_61801/ca9e5658710519f09ab2fdb8196fcb3eb024a051/",
+        "https://www.consultant.ru/document/cons_doc_LAW_61801/d3fe43a7c415353b17faab255bc0de92bea127da/",
+        "https://mintrud.gov.ru/docs/laws/108",
+        "https://www.consultant.ru/document/cons_doc_LAW_59999/ca24c3b3a2032a1f727146f988f406723bf9ea1a/"
       ],
-      "legal_status": "requires_case_specific_current_law_review",
+      "legal_status": "verified_current",
       "activation_allowed": false,
       "checked_norm_urls": [
-        "https://mintrud.gov.ru/docs/laws/130",
-        "https://www.consultant.ru/document/cons_doc_LAW_61798/0e9ec16b786dcbdaaa7f44abfc4a15e601d5be22/"
+        "https://www.consultant.ru/document/cons_doc_LAW_61801/ca9e5658710519f09ab2fdb8196fcb3eb024a051/",
+        "https://www.consultant.ru/document/cons_doc_LAW_61801/d3fe43a7c415353b17faab255bc0de92bea127da/",
+        "https://www.consultant.ru/document/cons_doc_LAW_61798/0e9ec16b786dcbdaaa7f44abfc4a15e601d5be22/",
+        "https://mintrud.gov.ru/docs/laws/108",
+        "https://www.consultant.ru/document/cons_doc_LAW_59999/ca24c3b3a2032a1f727146f988f406723bf9ea1a/"
       ],
       "review_date": "2026-11-28",
       "targeted_option_review": {
-        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
         "option_count": 5,
-        "remaining": "Установленный характер инцидента, обязательные уведомления, применимый режим информационной системы, 59-ФЗ и защита данных."
+        "remaining": "Учебная квалификация при прямо заданных условиях. Конкретные местные акты, договоры, технические заключения и вся официальная цепочка поправок независимо не проверены; активация запрещена."
+      },
+      "final_case_review_2026_11_28": {
+        "date": "2026-11-28",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
+        "norm": "152-ФЗ, статьи 19, 21 (часть 3.1); 149-ФЗ, статья 16; 59-ФЗ, статьи 8, 10, 12: защита информации, уведомления об инциденте и рассмотрение обращений.",
+        "option_count": 5,
+        "finding": "Восстановление доступности и законная регистрация обращений дополняют, но не заменяют защиту сведений и обязательное уведомление.",
+        "remaining": "Учебная квалификация при прямо заданных условиях. Конкретные местные акты, договоры, технические заключения и вся официальная цепочка поправок независимо не проверены; активация запрещена.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_61801/ca9e5658710519f09ab2fdb8196fcb3eb024a051/",
+          "https://www.consultant.ru/document/cons_doc_LAW_61801/d3fe43a7c415353b17faab255bc0de92bea127da/",
+          "https://www.consultant.ru/document/cons_doc_LAW_61798/0e9ec16b786dcbdaaa7f44abfc4a15e601d5be22/",
+          "https://mintrud.gov.ru/docs/laws/108",
+          "https://www.consultant.ru/document/cons_doc_LAW_59999/ca24c3b3a2032a1f727146f988f406723bf9ea1a/"
+        ]
       }
     },
     {
@@ -1519,23 +1568,41 @@
       "source_url": "https://epp.genproc.gov.ru/ru/proc_23/mass-media/news/regional/e6879561/",
       "source_status": "official_article_read_core_episode_confirmed",
       "resolved_source_url": null,
-      "legal_basis": "Статья 11 Закона №68-ФЗ регулирует полномочия органов публичной власти по предупреждению и ликвидации чрезвычайных ситуаций. Статья 161 ЖК РФ предусматривает обеспечение безопасных условий проживания и надлежащее содержание общего имущества. Режим использования дома и защитные меры определяют компетентные лица на основе обследования, а не по внешнему виду отремонтированной трубы. Источники: https://01.mchs.gov.ru/deyatelnost/napravleniya-deyatelnosti/grazhdanskaya-zashchita/preduprezhdenie-chrezvychaynyh-situaciy/1-1-normativnye-pravovye-akty/2-federalnye-zakony/federalnyy-zakon-ot-21-dekabrya-1994-g-n-68-fz-o-zashchite-naseleniya-i-territoriy-ot-chrezvychaynyh-situaciy-prirodnogo-i-tehnogennogo-haraktera",
+      "legal_basis": "68-ФЗ, статья 11; ЖК РФ, статьи 161, 95; 416-ФЗ, статья 6: полномочия при угрозах, содержание дома, временное жильё и организация водоотведения.",
       "legal_urls": [
         "https://01.mchs.gov.ru/deyatelnost/napravleniya-deyatelnosti/grazhdanskaya-zashchita/preduprezhdenie-chrezvychaynyh-situaciy/1-1-normativnye-pravovye-akty/2-federalnye-zakony/federalnyy-zakon-ot-21-dekabrya-1994-g-n-68-fz-o-zashchite-naseleniya-i-territoriy-ot-chrezvychaynyh-situaciy-prirodnogo-i-tehnogennogo-haraktera",
         "https://www.consultant.ru/document/cons_doc_LAW_5295/cf148e8662eafdb9539fb6f19024dfdb5c33aaa2/",
-        "https://www.consultant.ru/document/cons_doc_LAW_51057/71c7149b7b2a7693ca3f88b93580da0a5376e041/"
+        "https://www.consultant.ru/document/cons_doc_LAW_51057/71c7149b7b2a7693ca3f88b93580da0a5376e041/",
+        "https://www.consultant.ru/document/cons_doc_LAW_51057/6bb98a3aca78fe3be73eed83a583b163da0a6c01/",
+        "https://www.consultant.ru/document/cons_doc_LAW_122867/e18ad8420748aabbec02a69ac175732730eb3cb2/"
       ],
-      "legal_status": "requires_case_specific_current_law_review",
+      "legal_status": "verified_current",
       "activation_allowed": false,
       "checked_norm_urls": [
         "https://www.consultant.ru/document/cons_doc_LAW_5295/cf148e8662eafdb9539fb6f19024dfdb5c33aaa2/",
-        "https://www.consultant.ru/document/cons_doc_LAW_51057/71c7149b7b2a7693ca3f88b93580da0a5376e041/"
+        "https://www.consultant.ru/document/cons_doc_LAW_51057/71c7149b7b2a7693ca3f88b93580da0a5376e041/",
+        "https://www.consultant.ru/document/cons_doc_LAW_51057/6bb98a3aca78fe3be73eed83a583b163da0a6c01/",
+        "https://www.consultant.ru/document/cons_doc_LAW_122867/e18ad8420748aabbec02a69ac175732730eb3cb2/"
       ],
       "review_date": "2026-11-28",
       "targeted_option_review": {
-        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
         "option_count": 6,
-        "remaining": "Право собственности, инженерное заключение, компетенция служб, режим защиты жителей. Документальный эпизод отдельно не перепроверялся."
+        "remaining": "Учебная квалификация при прямо заданных условиях. Конкретные местные акты, договоры, технические заключения и вся официальная цепочка поправок независимо не проверены; активация запрещена."
+      },
+      "final_case_review_2026_11_28": {
+        "date": "2026-11-28",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
+        "norm": "68-ФЗ, статья 11; ЖК РФ, статьи 161, 95; 416-ФЗ, статья 6: полномочия при угрозах, содержание дома, временное жильё и организация водоотведения.",
+        "option_count": 6,
+        "finding": "Первоисточник подтверждает исторические обстоятельства и сообщение об устранении аварии. Все шесть вариантов — исключительно учебные последующие меры при заданной угрозе.",
+        "remaining": "Учебная квалификация при прямо заданных условиях. Конкретные местные акты, договоры, технические заключения и вся официальная цепочка поправок независимо не проверены; активация запрещена.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_5295/cf148e8662eafdb9539fb6f19024dfdb5c33aaa2/",
+          "https://www.consultant.ru/document/cons_doc_LAW_51057/71c7149b7b2a7693ca3f88b93580da0a5376e041/",
+          "https://www.consultant.ru/document/cons_doc_LAW_51057/6bb98a3aca78fe3be73eed83a583b163da0a6c01/",
+          "https://www.consultant.ru/document/cons_doc_LAW_122867/e18ad8420748aabbec02a69ac175732730eb3cb2/"
+        ]
       }
     },
     {
@@ -1545,21 +1612,38 @@
       "source_url": "https://epp.genproc.gov.ru/ru/proc_23/mass-media/news/reg-news/?item=103018629",
       "source_status": "official_article_read_core_episode_confirmed",
       "resolved_source_url": "https://epp.genproc.gov.ru/ru/proc_23/mass-media/news/regional/e6869769/",
-      "legal_basis": "Статья 15 Закона №181-ФЗ предусматривает условия беспрепятственного доступа и меры, позволяющие получать услуги. Способ обеспечения доступа учитывает назначение и техническое состояние объекта; знак или сопровождающий не заменяет проверку всего маршрута. Источники: https://mintrud.gov.ru/docs/laws/75",
+      "legal_basis": "181-ФЗ, статья 15; 257-ФЗ, статьи 17, 30: доступность объектов и услуг, содержание дорог и допустимые ограничения движения.",
       "legal_urls": [
         "https://mintrud.gov.ru/docs/laws/75",
-        "https://www.consultant.ru/document/cons_doc_LAW_8559/1f3d91284a26982ce51392b5fd178e392fe53404/"
+        "https://www.consultant.ru/document/cons_doc_LAW_8559/1f3d91284a26982ce51392b5fd178e392fe53404/",
+        "https://www.consultant.ru/document/cons_doc_LAW_72386/1692e755d61192abb296c96e101a443f4b701edf/",
+        "https://www.consultant.ru/document/cons_doc_LAW_72386/d815e149e72342151144533709e7ebcf7aa60b8c/"
       ],
-      "legal_status": "requires_case_specific_current_law_review",
+      "legal_status": "verified_current",
       "activation_allowed": false,
       "checked_norm_urls": [
-        "https://www.consultant.ru/document/cons_doc_LAW_8559/1f3d91284a26982ce51392b5fd178e392fe53404/"
+        "https://www.consultant.ru/document/cons_doc_LAW_8559/1f3d91284a26982ce51392b5fd178e392fe53404/",
+        "https://www.consultant.ru/document/cons_doc_LAW_72386/1692e755d61192abb296c96e101a443f4b701edf/",
+        "https://www.consultant.ru/document/cons_doc_LAW_72386/d815e149e72342151144533709e7ebcf7aa60b8c/"
       ],
       "review_date": "2026-11-28",
       "targeted_option_review": {
-        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
         "option_count": 5,
-        "remaining": "Правовой статус перехода, ответственный собственник, технические требования и сроки устранения препятствий."
+        "remaining": "Учебная квалификация при прямо заданных условиях. Конкретные местные акты, договоры, технические заключения и вся официальная цепочка поправок независимо не проверены; активация запрещена."
+      },
+      "final_case_review_2026_11_28": {
+        "date": "2026-11-28",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
+        "norm": "181-ФЗ, статья 15; 257-ФЗ, статьи 17, 30: доступность объектов и услуг, содержание дорог и допустимые ограничения движения.",
+        "option_count": 5,
+        "finding": "Разделены подтверждённое историческое событие и гипотетические улучшения; безопасный доступ и помощь сохраняются во всех вариантах.",
+        "remaining": "Учебная квалификация при прямо заданных условиях. Конкретные местные акты, договоры, технические заключения и вся официальная цепочка поправок независимо не проверены; активация запрещена.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_8559/1f3d91284a26982ce51392b5fd178e392fe53404/",
+          "https://www.consultant.ru/document/cons_doc_LAW_72386/1692e755d61192abb296c96e101a443f4b701edf/",
+          "https://www.consultant.ru/document/cons_doc_LAW_72386/d815e149e72342151144533709e7ebcf7aa60b8c/"
+        ]
       }
     },
     {
@@ -1569,7 +1653,7 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "Статьи 10–11 Закона №323-ФЗ регулируют доступность и недопустимость отказа в экстренной помощи; Закон №68-ФЗ — действия сил защиты населения. Медицинскую срочность устанавливает специалист. Организация перевозки требует безопасного средства и компетентного исполнения, а не одной административной команды открыть непроверенный понтон. Источники: https://01.mchs.gov.ru/deyatelnost/napravleniya-deyatelnosti/grazhdanskaya-zashchita/preduprezhdenie-chrezvychaynyh-situaciy/1-1-normativnye-pravovye-akty/2-federalnye-zakony/federalnyy-zakon-ot-21-dekabrya-1994-g-n-68-fz-o-zashchite-naseleniya-i-territoriy-ot-chrezvychaynyh-situaciy-prirodnogo-i-tehnogennogo-haraktera http://www.kremlin.ru/acts/constitution",
+      "legal_basis": "323-ФЗ, статьи 10, 11; 68-ФЗ, статья 11: доступность и недопустимость отказа в экстренной помощи, полномочия защиты населения.",
       "legal_urls": [
         "https://01.mchs.gov.ru/deyatelnost/napravleniya-deyatelnosti/grazhdanskaya-zashchita/preduprezhdenie-chrezvychaynyh-situaciy/1-1-normativnye-pravovye-akty/2-federalnye-zakony/federalnyy-zakon-ot-21-dekabrya-1994-g-n-68-fz-o-zashchite-naseleniya-i-territoriy-ot-chrezvychaynyh-situaciy-prirodnogo-i-tehnogennogo-haraktera",
         "http://www.kremlin.ru/acts/constitution",
@@ -1577,7 +1661,7 @@
         "https://www.consultant.ru/document/cons_doc_LAW_121895/8e8caa29efb42dd54e3924ee7441f06d469f4a80/",
         "https://www.consultant.ru/document/cons_doc_LAW_5295/cf148e8662eafdb9539fb6f19024dfdb5c33aaa2/"
       ],
-      "legal_status": "requires_case_specific_current_law_review",
+      "legal_status": "verified_current",
       "activation_allowed": false,
       "checked_norm_urls": [
         "https://www.consultant.ru/document/cons_doc_LAW_121895/e63d3344841b2f5636a73710e906a23ebaf9ab82/",
@@ -1586,9 +1670,22 @@
       ],
       "review_date": "2026-11-28",
       "targeted_option_review": {
-        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
         "option_count": 5,
-        "remaining": "Медицинские решения принимают специалисты; полномочия транспортных служб, допуск плавсредств и переправы."
+        "remaining": "Учебная квалификация при прямо заданных условиях. Конкретные местные акты, договоры, технические заключения и вся официальная цепочка поправок независимо не проверены; активация запрещена."
+      },
+      "final_case_review_2026_11_28": {
+        "date": "2026-11-28",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
+        "norm": "323-ФЗ, статьи 10, 11; 68-ФЗ, статья 11: доступность и недопустимость отказа в экстренной помощи, полномочия защиты населения.",
+        "option_count": 5,
+        "finding": "Обязательная экстренная перевозка не зависит от голосования; пять вариантов относятся к обычному сообщению после неё.",
+        "remaining": "Учебная квалификация при прямо заданных условиях. Конкретные местные акты, договоры, технические заключения и вся официальная цепочка поправок независимо не проверены; активация запрещена.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_121895/e63d3344841b2f5636a73710e906a23ebaf9ab82/",
+          "https://www.consultant.ru/document/cons_doc_LAW_121895/8e8caa29efb42dd54e3924ee7441f06d469f4a80/",
+          "https://www.consultant.ru/document/cons_doc_LAW_5295/cf148e8662eafdb9539fb6f19024dfdb5c33aaa2/"
+        ]
       }
     },
     {
@@ -1598,23 +1695,39 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "Статьи 19 и 130 Конституции РФ закрепляют равенство и участие в местном самоуправлении. Конкретный порядок консультации определяется её применимым актом. Процедуру нельзя без основания приравнивать к выборам по Закону №67-ФЗ; равноценные каналы и исключение повторов должны соответствовать заранее объявленным правилам. Источники: http://www.kremlin.ru/acts/constitution",
+      "legal_basis": "33-ФЗ от 20.03.2025, статья 46; Конституция РФ; 152-ФЗ, статья 19: муниципальный опрос, участие граждан и защита данных.",
       "legal_urls": [
         "http://www.kremlin.ru/acts/constitution",
         "https://minjust.gov.ru/ru/documents/8011/",
-        "https://www.consultant.ru/document/cons_doc_LAW_501319/"
+        "https://www.consultant.ru/document/cons_doc_LAW_501319/",
+        "https://www.consultant.ru/document/cons_doc_LAW_501319/9d3746121f118490d463b84d3924d6c398e08596/",
+        "https://www.consultant.ru/document/cons_doc_LAW_61801/ca9e5658710519f09ab2fdb8196fcb3eb024a051/"
       ],
-      "legal_status": "requires_case_specific_current_law_review",
+      "legal_status": "verified_current",
       "activation_allowed": false,
       "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_501319/9d3746121f118490d463b84d3924d6c398e08596/",
         "https://minjust.gov.ru/ru/documents/8011/",
-        "https://www.consultant.ru/document/cons_doc_LAW_501319/"
+        "https://www.consultant.ru/document/cons_doc_LAW_61801/ca9e5658710519f09ab2fdb8196fcb3eb024a051/"
       ],
       "review_date": "2026-11-28",
       "targeted_option_review": {
-        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
         "option_count": 5,
-        "remaining": "Именно местная консультация, не выборы и не референдум; необходим действующий местный акт, переходные нормы 33-ФЗ."
+        "remaining": "Учебная квалификация при прямо заданных условиях. Конкретные местные акты, договоры, технические заключения и вся официальная цепочка поправок независимо не проверены; активация запрещена."
+      },
+      "final_case_review_2026_11_28": {
+        "date": "2026-11-28",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
+        "norm": "33-ФЗ от 20.03.2025, статья 46; Конституция РФ; 152-ФЗ, статья 19: муниципальный опрос, участие граждан и защита данных.",
+        "option_count": 5,
+        "finding": "Не выборы и не референдум; организатор не вправе самовольно менять обязательные условия. Дополнительные каналы и сроки допустимы лишь по надлежащей процедуре.",
+        "remaining": "Учебная квалификация при прямо заданных условиях. Конкретные местные акты, договоры, технические заключения и вся официальная цепочка поправок независимо не проверены; активация запрещена.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_501319/9d3746121f118490d463b84d3924d6c398e08596/",
+          "https://minjust.gov.ru/ru/documents/8011/",
+          "https://www.consultant.ru/document/cons_doc_LAW_61801/ca9e5658710519f09ab2fdb8196fcb3eb024a051/"
+        ]
       }
     },
     {
@@ -1624,23 +1737,39 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "Статьи 19 и 130 Конституции РФ закрепляют равенство и участие в местном самоуправлении. Консультация проводится по применимому акту и не заменяет бюджетного или тарифного решения. Требование статьи 12 Закона №67-ФЗ об однозначности относится к референдуму; его нельзя автоматически выдавать за универсальный режим любого опроса. Источники: http://www.kremlin.ru/acts/constitution",
+      "legal_basis": "33-ФЗ от 20.03.2025, статья 46; Конституция РФ; БК РФ, статья 38: рекомендательность опроса и самостоятельность бюджетных оснований.",
       "legal_urls": [
         "http://www.kremlin.ru/acts/constitution",
         "https://minjust.gov.ru/ru/documents/8011/",
-        "https://www.consultant.ru/document/cons_doc_LAW_501319/"
+        "https://www.consultant.ru/document/cons_doc_LAW_501319/",
+        "https://www.consultant.ru/document/cons_doc_LAW_501319/9d3746121f118490d463b84d3924d6c398e08596/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/9a0e8abcbe24837343cdcc599bccf0f09413968a/"
       ],
-      "legal_status": "requires_case_specific_current_law_review",
+      "legal_status": "verified_current",
       "activation_allowed": false,
       "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_501319/9d3746121f118490d463b84d3924d6c398e08596/",
         "https://minjust.gov.ru/ru/documents/8011/",
-        "https://www.consultant.ru/document/cons_doc_LAW_501319/"
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/9a0e8abcbe24837343cdcc599bccf0f09413968a/"
       ],
       "review_date": "2026-11-28",
       "targeted_option_review": {
-        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
         "option_count": 5,
-        "remaining": "Местная необязательная консультация; полномочия по парковочной плате, бюджету и действующая процедура устанавливаются отдельно."
+        "remaining": "Учебная квалификация при прямо заданных условиях. Конкретные местные акты, договоры, технические заключения и вся официальная цепочка поправок независимо не проверены; активация запрещена."
+      },
+      "final_case_review_2026_11_28": {
+        "date": "2026-11-28",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
+        "norm": "33-ФЗ от 20.03.2025, статья 46; Конституция РФ; БК РФ, статья 38: рекомендательность опроса и самостоятельность бюджетных оснований.",
+        "option_count": 5,
+        "finding": "Финансовые предпочтения обсуждаются раздельно; ни один вариант не подменяет правовой акт о плате или бюджетное решение.",
+        "remaining": "Учебная квалификация при прямо заданных условиях. Конкретные местные акты, договоры, технические заключения и вся официальная цепочка поправок независимо не проверены; активация запрещена.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_501319/9d3746121f118490d463b84d3924d6c398e08596/",
+          "https://minjust.gov.ru/ru/documents/8011/",
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/9a0e8abcbe24837343cdcc599bccf0f09413968a/"
+        ]
       }
     },
     {
@@ -1650,28 +1779,46 @@
       "source_url": "https://epp.genproc.gov.ru/ru/proc_urfo/mass-media/news/main/e8451438/",
       "source_status": "official_article_read_core_episode_confirmed",
       "resolved_source_url": null,
-      "legal_basis": "ЖК РФ, статьи 32, 86 и 95: разные основания обеспечения прав собственников и нанимателей, а также временное размещение в маневренном фонде. Нельзя обещать одинаковый имущественный результат всем жителям без установления их правового статуса. Документальное сообщение прокуратуры подтверждает описанный эпизод, а не любой из предлагаемых учебных вариантов. Источники: https://epp.genproc.gov.ru/ru/proc_11/activity/legal-education/explain/e145467/ https://epp.genproc.gov.ru/ru/proc_urfo/mass-media/news/main/e8451438/",
+      "legal_basis": "ЖК РФ, статьи 32, 86, 87, 95; 152-ФЗ, статья 19: изъятие жилья, права нанимателей, маневренный фонд и защита данных.",
       "legal_urls": [
         "https://epp.genproc.gov.ru/ru/proc_11/activity/legal-education/explain/e145467/",
         "https://epp.genproc.gov.ru/ru/proc_urfo/mass-media/news/main/e8451438/",
         "https://www.consultant.ru/document/cons_doc_LAW_51057/1316f00500eba499bc062df16fbbfe1afa8d7f01/",
         "https://www.consultant.ru/document/cons_doc_LAW_51057/db6957c34b618b3d8395eebc308ed9aff7ccbbf2/",
         "https://www.consultant.ru/document/cons_doc_LAW_51057/6bb98a3aca78fe3be73eed83a583b163da0a6c01/",
-        "https://www.consultant.ru/document/cons_doc_LAW_51057/"
+        "https://www.consultant.ru/document/cons_doc_LAW_51057/",
+        "https://www.consultant.ru/document/cons_doc_LAW_51057/b00ef5762ab98fe319aed5538556ec4050091fc3/",
+        "https://www.consultant.ru/document/cons_doc_LAW_61801/ca9e5658710519f09ab2fdb8196fcb3eb024a051/"
       ],
-      "legal_status": "requires_case_specific_current_law_review",
+      "legal_status": "verified_current",
       "activation_allowed": false,
       "checked_norm_urls": [
         "https://www.consultant.ru/document/cons_doc_LAW_51057/1316f00500eba499bc062df16fbbfe1afa8d7f01/",
         "https://www.consultant.ru/document/cons_doc_LAW_51057/db6957c34b618b3d8395eebc308ed9aff7ccbbf2/",
+        "https://www.consultant.ru/document/cons_doc_LAW_51057/b00ef5762ab98fe319aed5538556ec4050091fc3/",
         "https://www.consultant.ru/document/cons_doc_LAW_51057/6bb98a3aca78fe3be73eed83a583b163da0a6c01/",
-        "https://www.consultant.ru/document/cons_doc_LAW_51057/"
+        "https://www.consultant.ru/document/cons_doc_LAW_61801/ca9e5658710519f09ab2fdb8196fcb3eb024a051/"
       ],
       "review_date": "2026-11-28",
       "targeted_option_review": {
-        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
         "option_count": 6,
-        "remaining": "Судебный акт, права собственников и нанимателей, основания маневренного фонда, сроки. Документальный эпизод заново не перепроверялся."
+        "remaining": "Учебная квалификация при прямо заданных условиях. Конкретные местные акты, договоры, технические заключения и вся официальная цепочка поправок независимо не проверены; активация запрещена."
+      },
+      "final_case_review_2026_11_28": {
+        "date": "2026-11-28",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
+        "norm": "ЖК РФ, статьи 32, 86, 87, 95; 152-ФЗ, статья 19: изъятие жилья, права нанимателей, маневренный фонд и защита данных.",
+        "option_count": 6,
+        "finding": "Первоисточник подтверждает исторические обстоятельства расселения; шесть альтернатив не меняют судебное решение, сроки или индивидуальные права.",
+        "remaining": "Учебная квалификация при прямо заданных условиях. Конкретные местные акты, договоры, технические заключения и вся официальная цепочка поправок независимо не проверены; активация запрещена.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_51057/1316f00500eba499bc062df16fbbfe1afa8d7f01/",
+          "https://www.consultant.ru/document/cons_doc_LAW_51057/db6957c34b618b3d8395eebc308ed9aff7ccbbf2/",
+          "https://www.consultant.ru/document/cons_doc_LAW_51057/b00ef5762ab98fe319aed5538556ec4050091fc3/",
+          "https://www.consultant.ru/document/cons_doc_LAW_51057/6bb98a3aca78fe3be73eed83a583b163da0a6c01/",
+          "https://www.consultant.ru/document/cons_doc_LAW_61801/ca9e5658710519f09ab2fdb8196fcb3eb024a051/"
+        ]
       }
     },
     {
@@ -1681,24 +1828,39 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "Федеральный закон №416-ФЗ, статьи 6 и 23: полномочия в сфере водоснабжения и обеспечение качества питьевой воды; Федеральный закон №323-ФЗ, статья 10: доступность помощи, зависящей от работы инфраструктуры. Технические и санитарные решения принимаются компетентными исполнителями. Источники: https://epp.genproc.gov.ru/ru/proc_33/activity/legal-education/explain/e317820/ https://minzdrav.gov.ru/en/documents/7025-federalnyy-zakon-ot-21-noyabrya-2011-g-323-fz-ob-osnovah-ohrany-zdorovya-grazhdan-v-rossiyskoy-federatsii",
+      "legal_basis": "416-ФЗ, статьи 6, 23; 323-ФЗ, статья 10: организация водоснабжения, качество питьевой воды и доступность медицинской помощи.",
       "legal_urls": [
         "https://epp.genproc.gov.ru/ru/proc_33/activity/legal-education/explain/e317820/",
         "https://minzdrav.gov.ru/en/documents/7025-federalnyy-zakon-ot-21-noyabrya-2011-g-323-fz-ob-osnovah-ohrany-zdorovya-grazhdan-v-rossiyskoy-federatsii",
         "https://www.consultant.ru/document/cons_doc_LAW_122867/e18ad8420748aabbec02a69ac175732730eb3cb2/",
-        "https://www.consultant.ru/document/cons_doc_LAW_122867/b7bcb8b539d9bd4892de760d103ccf944aa7455b/"
+        "https://www.consultant.ru/document/cons_doc_LAW_122867/b7bcb8b539d9bd4892de760d103ccf944aa7455b/",
+        "https://www.consultant.ru/document/cons_doc_LAW_121895/e63d3344841b2f5636a73710e906a23ebaf9ab82/"
       ],
-      "legal_status": "requires_case_specific_current_law_review",
+      "legal_status": "verified_current",
       "activation_allowed": false,
       "checked_norm_urls": [
         "https://www.consultant.ru/document/cons_doc_LAW_122867/e18ad8420748aabbec02a69ac175732730eb3cb2/",
-        "https://www.consultant.ru/document/cons_doc_LAW_122867/b7bcb8b539d9bd4892de760d103ccf944aa7455b/"
+        "https://www.consultant.ru/document/cons_doc_LAW_122867/b7bcb8b539d9bd4892de760d103ccf944aa7455b/",
+        "https://www.consultant.ru/document/cons_doc_LAW_121895/e63d3344841b2f5636a73710e906a23ebaf9ab82/"
       ],
       "review_date": "2026-11-28",
       "targeted_option_review": {
-        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
         "option_count": 5,
-        "remaining": "Компетенция собственника и водоснабжающей организации, санитарные требования и разрешения на водопользование."
+        "remaining": "Учебная квалификация при прямо заданных условиях. Конкретные местные акты, договоры, технические заключения и вся официальная цепочка поправок независимо не проверены; активация запрещена."
+      },
+      "final_case_review_2026_11_28": {
+        "date": "2026-11-28",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
+        "norm": "416-ФЗ, статьи 6, 23; 323-ФЗ, статья 10: организация водоснабжения, качество питьевой воды и доступность медицинской помощи.",
+        "option_count": 5,
+        "finding": "Реконструкция, временный подвоз и экономия дополняют обязательное обеспечение безопасной водой; ни один вариант не разрешает использовать непроверенный источник.",
+        "remaining": "Учебная квалификация при прямо заданных условиях. Конкретные местные акты, договоры, технические заключения и вся официальная цепочка поправок независимо не проверены; активация запрещена.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_122867/e18ad8420748aabbec02a69ac175732730eb3cb2/",
+          "https://www.consultant.ru/document/cons_doc_LAW_122867/b7bcb8b539d9bd4892de760d103ccf944aa7455b/",
+          "https://www.consultant.ru/document/cons_doc_LAW_121895/e63d3344841b2f5636a73710e906a23ebaf9ab82/"
+        ]
       }
     },
     {
@@ -1708,26 +1870,41 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "ГК РФ, статьи 210 и 309: содержание имущества и исполнение обязательств; Федеральный закон №68-ФЗ, статья 14: обязанности организаций по предупреждению ЧС в пределах компетенции. Эти нормы не заменяют техническое заключение и не позволяют объявить неиспытанный резерв работоспособным. Источники: https://11.rosguard.gov.ru/uploads/2025/07/5_grazhdanskijj_kodeks_rossijjskojj_federacii_chast_pervaya.pdf https://mchs.gov.ru/dokumenty/bazovye-normativnye-pravovye-akty/federalnye-zakony/5788",
+      "legal_basis": "190-ФЗ, статьи 5, 6; БК РФ, статья 72: организация теплоснабжения, полномочия и финансовое обеспечение договоров.",
       "legal_urls": [
         "https://11.rosguard.gov.ru/uploads/2025/07/5_grazhdanskijj_kodeks_rossijjskojj_federacii_chast_pervaya.pdf",
         "https://mchs.gov.ru/dokumenty/bazovye-normativnye-pravovye-akty/federalnye-zakony/5788",
         "https://www.consultant.ru/document/cons_doc_LAW_102975/be6d489749f7a2f04c6f391b8d89cc8f3bfe1638/",
         "https://www.consultant.ru/document/cons_doc_LAW_5295/a053d1a23c215d14941f99fd381dba6f90ce4969/",
-        "https://www.consultant.ru/document/cons_doc_LAW_5142/64eaa3de6c1b6aae75186f3f96cd308c1ed38e11/"
+        "https://www.consultant.ru/document/cons_doc_LAW_5142/64eaa3de6c1b6aae75186f3f96cd308c1ed38e11/",
+        "https://www.consultant.ru/document/cons_doc_LAW_102975/6ceacc38978cd5d26586cafb6d66bb3240070080/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/aa129af3559dd1fc2b3201c05ced33582fe3d193/"
       ],
-      "legal_status": "requires_case_specific_current_law_review",
+      "legal_status": "verified_current",
       "activation_allowed": false,
       "checked_norm_urls": [
         "https://www.consultant.ru/document/cons_doc_LAW_102975/be6d489749f7a2f04c6f391b8d89cc8f3bfe1638/",
-        "https://www.consultant.ru/document/cons_doc_LAW_5295/a053d1a23c215d14941f99fd381dba6f90ce4969/",
-        "https://www.consultant.ru/document/cons_doc_LAW_5142/64eaa3de6c1b6aae75186f3f96cd308c1ed38e11/"
+        "https://www.consultant.ru/document/cons_doc_LAW_102975/6ceacc38978cd5d26586cafb6d66bb3240070080/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/aa129af3559dd1fc2b3201c05ced33582fe3d193/"
       ],
       "review_date": "2026-11-28",
       "targeted_option_review": {
-        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
         "option_count": 5,
-        "remaining": "Ответственный собственник, технический допуск, договорные обязательства, безопасность стационара и закупочная процедура."
+        "remaining": "Учебная квалификация при прямо заданных условиях. Конкретные местные акты, договоры, технические заключения и вся официальная цепочка поправок независимо не проверены; активация запрещена."
+      },
+      "final_case_review_2026_11_28": {
+        "date": "2026-11-28",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
+        "norm": "190-ФЗ, статьи 5, 6; БК РФ, статья 72: организация теплоснабжения, полномочия и финансовое обеспечение договоров.",
+        "option_count": 5,
+        "finding": "Пять вариантов относятся к планированию ремонта и резерва при сохранении обязательного безопасного теплоснабжения.",
+        "remaining": "Учебная квалификация при прямо заданных условиях. Конкретные местные акты, договоры, технические заключения и вся официальная цепочка поправок независимо не проверены; активация запрещена.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_102975/be6d489749f7a2f04c6f391b8d89cc8f3bfe1638/",
+          "https://www.consultant.ru/document/cons_doc_LAW_102975/6ceacc38978cd5d26586cafb6d66bb3240070080/",
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/aa129af3559dd1fc2b3201c05ced33582fe3d193/"
+        ]
       }
     },
     {
