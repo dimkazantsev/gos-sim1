@@ -1,0 +1,2705 @@
+{
+  "status": "owner_approved_coefficients_applied_to_editorial_catalogue_not_release",
+  "date": "2026-11-28",
+  "source_commit": "a3d249ed12469780ef8c775ce932a93be6e94866",
+  "source_blobs": {
+    "scope": "511ede3571ab27479af975bfb864e30565bf755e",
+    "corrections": "ab997d28804c9a82967d59ed2ef050cd452cab3f",
+    "model": "1d0c7c587378076cf5d492cccfb9509a46b09880",
+    "budget": "96439a98e49d9fcc1ec94cfe4f33c3ceefc3e8d6"
+  },
+  "policy": {
+    "local_denominator": 89,
+    "federal_denominator": 16,
+    "pre_scale_abs_limit": 4,
+    "rounding_decimals": 6
+  },
+  "summary": {
+    "collective_cases": 189,
+    "collective_options": 947,
+    "scopes": {
+      "16": 10,
+      "89": 179
+    },
+    "corrected_fields": 7,
+    "scaled_numeric_fields": 2991,
+    "direct_dominance_before": 128,
+    "direct_dominance_after": 122,
+    "direct_pairs_before": 134,
+    "direct_pairs_after": 127,
+    "affected_cases": 90,
+    "conditional_tradeoff_pairs": 127,
+    "unexplained_by_estimates_pairs": 0,
+    "approved_six_cases_remaining_pairs": 0,
+    "activation_allowed": 0
+  },
+  "projection": {
+    "before": {
+      "cases": 189,
+      "options": 947,
+      "projections": 5682,
+      "baseDominated": 128,
+      "basePairs": 134,
+      "basePairsWithRevenueAdvantageInSomeScenario": 45,
+      "basePairsWithRevenueAdvantageNeutral": 0,
+      "basePairsWithNoEconomicAdvantageInAnyScenario": 89,
+      "scenarioRanges": [
+        {
+          "key": "neutral",
+          "minRevenueDelta": -401464.7,
+          "maxRevenueDelta": 1456892.59,
+          "minBusinessDelta": -0.01206,
+          "maxBusinessDelta": 0.04124,
+          "minCollectionDelta": -0.37672,
+          "maxCollectionDelta": 0.9216,
+          "clippedOptions": 0
+        },
+        {
+          "key": "manual_56",
+          "minRevenueDelta": -207409.78,
+          "maxRevenueDelta": 761246.64,
+          "minBusinessDelta": -0.006754,
+          "maxBusinessDelta": 0.023094,
+          "minCollectionDelta": -0.386963,
+          "maxCollectionDelta": 0.72513,
+          "clippedOptions": 0
+        },
+        {
+          "key": "stress",
+          "minRevenueDelta": -273186.44,
+          "maxRevenueDelta": 957189.41,
+          "minBusinessDelta": -0.012049,
+          "maxBusinessDelta": 0.041195,
+          "minCollectionDelta": -0.4,
+          "maxCollectionDelta": 0.65,
+          "clippedOptions": 0
+        },
+        {
+          "key": "near_lower_bounds",
+          "minRevenueDelta": -27607.56,
+          "maxRevenueDelta": 30477.67,
+          "minBusinessDelta": 0,
+          "maxBusinessDelta": 0,
+          "minCollectionDelta": -0.007441,
+          "maxCollectionDelta": 0.031879,
+          "clippedOptions": 218
+        },
+        {
+          "key": "near_upper_bounds",
+          "minRevenueDelta": -462206.7,
+          "maxRevenueDelta": 272790.98,
+          "minBusinessDelta": -0.01506,
+          "maxBusinessDelta": 0.00912,
+          "minCollectionDelta": -0.002572,
+          "maxCollectionDelta": 0.001265,
+          "clippedOptions": 870
+        },
+        {
+          "key": "manual_zero",
+          "minRevenueDelta": -12581.92,
+          "maxRevenueDelta": 36295.57,
+          "minBusinessDelta": 0,
+          "maxBusinessDelta": 0,
+          "minCollectionDelta": -0.4,
+          "maxCollectionDelta": 0.65,
+          "clippedOptions": 0
+        }
+      ]
+    },
+    "after": {
+      "cases": 189,
+      "options": 947,
+      "projections": 5682,
+      "baseDominated": 122,
+      "basePairs": 127,
+      "basePairsWithRevenueAdvantageInSomeScenario": 41,
+      "basePairsWithRevenueAdvantageNeutral": 0,
+      "basePairsWithNoEconomicAdvantageInAnyScenario": 86,
+      "scenarioRanges": [
+        {
+          "key": "neutral",
+          "minRevenueDelta": -13870.58,
+          "maxRevenueDelta": 67725.9,
+          "minBusinessDelta": -0.000379,
+          "maxBusinessDelta": 0.001949,
+          "minCollectionDelta": -0.022045,
+          "maxCollectionDelta": 0.03734,
+          "clippedOptions": 0
+        },
+        {
+          "key": "manual_56",
+          "minRevenueDelta": -7458.1,
+          "maxRevenueDelta": 35135.74,
+          "minBusinessDelta": -0.000212,
+          "maxBusinessDelta": 0.001091,
+          "minCollectionDelta": -0.023345,
+          "maxCollectionDelta": 0.03466,
+          "clippedOptions": 0
+        },
+        {
+          "key": "stress",
+          "minRevenueDelta": -8736.77,
+          "maxRevenueDelta": 45305.19,
+          "minBusinessDelta": -0.000378,
+          "maxBusinessDelta": 0.001947,
+          "minCollectionDelta": -0.025,
+          "maxCollectionDelta": 0.03125,
+          "clippedOptions": 0
+        },
+        {
+          "key": "near_lower_bounds",
+          "minRevenueDelta": -1440.81,
+          "maxRevenueDelta": 1373.28,
+          "minBusinessDelta": 0,
+          "maxBusinessDelta": 0,
+          "minCollectionDelta": -0.000941,
+          "maxCollectionDelta": 0.001417,
+          "clippedOptions": 0
+        },
+        {
+          "key": "near_upper_bounds",
+          "minRevenueDelta": -18765.69,
+          "maxRevenueDelta": 46177.15,
+          "minBusinessDelta": -0.000629,
+          "maxBusinessDelta": 0.001574,
+          "minCollectionDelta": -0.000159,
+          "maxCollectionDelta": 0.000238,
+          "clippedOptions": 0
+        },
+        {
+          "key": "manual_zero",
+          "minRevenueDelta": -780.75,
+          "maxRevenueDelta": 1888.94,
+          "minBusinessDelta": 0,
+          "maxBusinessDelta": 0,
+          "minCollectionDelta": -0.025,
+          "maxCollectionDelta": 0.03125,
+          "clippedOptions": 0
+        }
+      ]
+    },
+    "baseline": [
+      {
+        "business": 1,
+        "activity": 1,
+        "collection": 0.95,
+        "fx": 80,
+        "revenue": 40283300
+      },
+      {
+        "business": 0.56,
+        "activity": 0.56,
+        "collection": 0.8972,
+        "fx": 80,
+        "revenue": 26626151.87
+      },
+      {
+        "business": 0.4457381250000001,
+        "activity": 0.4011643125000001,
+        "collection": 0.84,
+        "fx": 65.68249999999999,
+        "revenue": 18434626.1
+      },
+      {
+        "business": 0.2,
+        "activity": 0.2,
+        "collection": 0.7056053811659192,
+        "fx": 87.83999999999999,
+        "revenue": 14138926.22
+      },
+      {
+        "business": 1.99088,
+        "activity": 1.99088,
+        "collection": 0.9926979742173112,
+        "fx": 72.16,
+        "revenue": 70775918.14
+      },
+      {
+        "business": 0,
+        "activity": 0,
+        "collection": 0.8899999999999999,
+        "fx": 80,
+        "revenue": 11783726.32
+      }
+    ]
+  },
+  "cumulative_simple_bounds": {
+    "trust": {
+      "min": -1.025984,
+      "max": 6.975444
+    },
+    "elite_support": {
+      "min": -4.837796,
+      "max": 5.334988
+    },
+    "economy": {
+      "min": -2.276692,
+      "max": 5.429792
+    },
+    "media_climate": {
+      "min": -0.084972,
+      "max": 0.192416
+    },
+    "social_stability": {
+      "min": -0.66222,
+      "max": 0.632024
+    },
+    "security": {
+      "min": -0.044944,
+      "max": 0.089888
+    },
+    "international_standing": {
+      "min": 0,
+      "max": 0.125
+    }
+  },
+  "remaining_pairs": [
+    {
+      "case_key": "budget-region-2026-05-essential-services-gap",
+      "title": "Снижение доходов и обязательные выплаты",
+      "pairs": [
+        {
+          "option": "option_3",
+          "compared_to": "option_1",
+          "option_label": "Предложить ускоренный пересмотр кассового плана с временным законным источником",
+          "compared_label": "Предложить полное покрытие подтверждённого разрыва общей дотацией",
+          "resource_levels": [
+            1,
+            3
+          ],
+          "time_levels": [
+            2,
+            2
+          ],
+          "conditional_tradeoff": true
+        }
+      ]
+    },
+    {
+      "case_key": "budget-region-2026-54-cluster",
+      "title": "Инфраструктура кластера или деньги его резиденту",
+      "pairs": [
+        {
+          "option": "option_5",
+          "compared_to": "option_2",
+          "option_label": "Предложить уменьшенный первый этап с расширением при подтверждённом спросе",
+          "compared_label": "Приоритизировать участки с готовыми проектами подключения",
+          "resource_levels": [
+            2,
+            3
+          ],
+          "time_levels": [
+            3,
+            2
+          ],
+          "conditional_tradeoff": true
+        }
+      ]
+    },
+    {
+      "case_key": "budget-region-2026-59-heating-network",
+      "title": "Теплосеть перед отопительным сезоном",
+      "pairs": [
+        {
+          "option": "option_5",
+          "compared_to": "option_3",
+          "option_label": "Сочетать ограниченную замену и контроль утечек на остальных допустимых участках",
+          "compared_label": "Приоритизировать участки с максимальными потерями тепла по обследованию",
+          "resource_levels": [
+            2,
+            3
+          ],
+          "time_levels": [
+            1,
+            2
+          ],
+          "conditional_tradeoff": true
+        }
+      ]
+    },
+    {
+      "case_key": "budget-risk-2026-external",
+      "title": "Валютный платеж в двух валютах",
+      "pairs": [
+        {
+          "option": "option_3",
+          "compared_to": "option_2",
+          "option_label": "Запросить допустимый пересмотр будущего графика без изменения текущего обязательства",
+          "compared_label": "Согласовать предусмотренного договором альтернативного агента и резервный канал",
+          "resource_levels": [
+            1,
+            2
+          ],
+          "time_levels": [
+            2,
+            2
+          ],
+          "conditional_tradeoff": true
+        }
+      ]
+    },
+    {
+      "case_key": "budget-risk-2026-ofz_float",
+      "title": "Купон с чужой надбавкой",
+      "pairs": [
+        {
+          "option": "option_1",
+          "compared_to": "option_3",
+          "option_label": "Предложить увеличить резерв под переменные процентные платежи",
+          "compared_label": "Сохранить смешанную структуру будущих выпусков с ежеквартальным стресс-расчётом",
+          "resource_levels": [
+            0,
+            1
+          ],
+          "time_levels": [
+            1,
+            2
+          ],
+          "conditional_tradeoff": true
+        }
+      ]
+    },
+    {
+      "case_key": "bank-curated-serious-03",
+      "title": "Краснодар: доступность подъёмника возле больницы",
+      "pairs": [
+        {
+          "option": "option_3",
+          "compared_to": "option_5",
+          "option_label": "Согласовать безопасный альтернативный наземный маршрут с дорожными службами",
+          "compared_label": "Поэтапно устранить препятствия по результатам проверки с участием маломобильных людей",
+          "resource_levels": [
+            2,
+            2
+          ],
+          "time_levels": [
+            2,
+            3
+          ],
+          "conditional_tradeoff": true
+        },
+        {
+          "option": "option_4",
+          "compared_to": "option_2",
+          "option_label": "Организовать сопровождение по запросу и обновить указатели до капитальных работ",
+          "compared_label": "Сначала модернизировать подъёмную платформу и организовать проверяемое обслуживание",
+          "resource_levels": [
+            2,
+            3
+          ],
+          "time_levels": [
+            1,
+            2
+          ],
+          "conditional_tradeoff": true
+        }
+      ]
+    },
+    {
+      "case_key": "bank-legal-2026-001",
+      "title": "Заповедный грант",
+      "pairs": [
+        {
+          "option": "option_5",
+          "compared_to": "option_2",
+          "option_label": "Сохранить часть средств на следующий конкурс после оценки спроса",
+          "compared_label": "Предложить один крупный конкурсный проект с измеримым эффектом",
+          "resource_levels": [
+            0,
+            3
+          ],
+          "time_levels": [
+            3,
+            3
+          ],
+          "conditional_tradeoff": true
+        }
+      ]
+    },
+    {
+      "case_key": "bank-legal-2026-002",
+      "title": "Заводская льгота",
+      "pairs": [
+        {
+          "option": "option_2",
+          "compared_to": "option_4",
+          "option_label": "Предложить поддержку занятости через открытый конкурс вместо налоговой льготы",
+          "compared_label": "Разработать меру с проверяемыми обязательствами по занятости и сроком",
+          "resource_levels": [
+            3,
+            2
+          ],
+          "time_levels": [
+            2,
+            3
+          ],
+          "conditional_tradeoff": true
+        },
+        {
+          "option": "option_5",
+          "compared_to": "option_3",
+          "option_label": "Отказаться от новой меры после открытого расчёта бюджетного риска",
+          "compared_label": "Сохранить налоговый режим и улучшить общую инфраструктуру предприятий",
+          "resource_levels": [
+            0,
+            3
+          ],
+          "time_levels": [
+            0,
+            3
+          ],
+          "conditional_tradeoff": true
+        }
+      ]
+    },
+    {
+      "case_key": "bank-legal-2026-003",
+      "title": "Байкальское софинансирование",
+      "pairs": [
+        {
+          "option": "option_4",
+          "compared_to": "option_2",
+          "option_label": "Предложить дополнительное финансирование через компетентные органы",
+          "compared_label": "Согласовать этапную модернизацию с отдельными результатами",
+          "resource_levels": [
+            1,
+            3
+          ],
+          "time_levels": [
+            3,
+            3
+          ],
+          "conditional_tradeoff": true
+        }
+      ]
+    },
+    {
+      "case_key": "bank-legal-2026-005",
+      "title": "Целевой водопровод",
+      "pairs": [
+        {
+          "option": "option_1",
+          "compared_to": "option_5",
+          "option_label": "Предложить перенести благоустройство до появления свободных средств",
+          "compared_label": "Приоритизировать ремонт существующих общественных пространств вместо нового фонтана",
+          "resource_levels": [
+            0,
+            2
+          ],
+          "time_levels": [
+            3,
+            1
+          ],
+          "conditional_tradeoff": true
+        }
+      ]
+    },
+    {
+      "case_key": "bank-legal-2026-007",
+      "title": "Сезонный канат",
+      "pairs": [
+        {
+          "option": "option_3",
+          "compared_to": "option_1",
+          "option_label": "Предложить меньший первый этап развития канатной дороги",
+          "compared_label": "Предложить ограниченную компенсацию только подтверждённых затрат при допустимых условиях",
+          "resource_levels": [
+            2,
+            3
+          ],
+          "time_levels": [
+            3,
+            2
+          ],
+          "conditional_tradeoff": true
+        },
+        {
+          "option": "option_5",
+          "compared_to": "option_2",
+          "option_label": "Отказаться от гарантии доходности и рассмотреть иное финансирование",
+          "compared_label": "Предложить распределение спросового риска с концессионером по расчётной модели",
+          "resource_levels": [
+            1,
+            2
+          ],
+          "time_levels": [
+            3,
+            3
+          ],
+          "conditional_tradeoff": true
+        }
+      ]
+    },
+    {
+      "case_key": "bank-legal-2026-010",
+      "title": "Лесной доход",
+      "pairs": [
+        {
+          "option": "option_5",
+          "compared_to": "option_3",
+          "option_label": "Предложить уменьшить необязательные расходы после уточнения доходов",
+          "compared_label": "Сосредоточить средства на контроле фактических начислений и задолженности",
+          "resource_levels": [
+            0,
+            2
+          ],
+          "time_levels": [
+            1,
+            1
+          ],
+          "conditional_tradeoff": true
+        }
+      ]
+    },
+    {
+      "case_key": "bank-legal-2026-011",
+      "title": "Северный резерв",
+      "pairs": [
+        {
+          "option": "option_5",
+          "compared_to": "option_1",
+          "option_label": "Перенести необязательные расходы праздника на следующий законный период",
+          "compared_label": "Предложить меньшую программу праздника в пределах доступных средств",
+          "resource_levels": [
+            0,
+            1
+          ],
+          "time_levels": [
+            3,
+            1
+          ],
+          "conditional_tradeoff": true
+        }
+      ]
+    },
+    {
+      "case_key": "bank-legal-2026-013",
+      "title": "Спорная дотация",
+      "pairs": [
+        {
+          "option": "option_1",
+          "compared_to": "option_3",
+          "option_label": "Предложить муниципалитету добровольное согласование будущих проектов",
+          "compared_label": "Организовать контроль общих условий дотации без вмешательства в цвет объекта",
+          "resource_levels": [
+            1,
+            2
+          ],
+          "time_levels": [
+            2,
+            1
+          ],
+          "conditional_tradeoff": true
+        }
+      ]
+    },
+    {
+      "case_key": "bank-legal-2026-014",
+      "title": "Тепло на мерзлоте",
+      "pairs": [
+        {
+          "option": "option_4",
+          "compared_to": "option_3",
+          "option_label": "Предложить резервный запас материалов после оценки будущих рисков",
+          "compared_label": "Отдельно подготовить конкурентную закупку для плановой замены других труб",
+          "resource_levels": [
+            2,
+            3
+          ],
+          "time_levels": [
+            2,
+            3
+          ],
+          "conditional_tradeoff": true
+        },
+        {
+          "option": "option_5",
+          "compared_to": "option_2",
+          "option_label": "Организовать усиленный контроль состояния сети после срочного ремонта",
+          "compared_label": "Сочетать временное безопасное теплоснабжение с ремонтом по этапам",
+          "resource_levels": [
+            2,
+            2
+          ],
+          "time_levels": [
+            1,
+            3
+          ],
+          "conditional_tradeoff": true
+        }
+      ]
+    },
+    {
+      "case_key": "bank-legal-2026-016",
+      "title": "Платёж за станок",
+      "pairs": [
+        {
+          "option": "option_3",
+          "compared_to": "option_1",
+          "option_label": "Организовать консультации заявителям о допустимом сочетании мер",
+          "compared_label": "Предложить единую проверку накладных по всем программам поддержки",
+          "resource_levels": [
+            2,
+            2
+          ],
+          "time_levels": [
+            1,
+            2
+          ],
+          "conditional_tradeoff": true
+        }
+      ]
+    },
+    {
+      "case_key": "bank-legal-2026-017",
+      "title": "Дорога в долг",
+      "pairs": [
+        {
+          "option": "option_3",
+          "compared_to": "option_1",
+          "option_label": "Предложить отсрочить необязательный этап до устойчивого источника",
+          "compared_label": "Предложить меньший заём в пределах допустимого долга и этапный ремонт дороги",
+          "resource_levels": [
+            0,
+            2
+          ],
+          "time_levels": [
+            3,
+            3
+          ],
+          "conditional_tradeoff": true
+        }
+      ]
+    },
+    {
+      "case_key": "bank-legal-2026-020",
+      "title": "Кассовый разрыв",
+      "pairs": [
+        {
+          "option": "option_3",
+          "compared_to": "option_5",
+          "option_label": "Перенести только свободные незаконтрактованные мероприятия",
+          "compared_label": "Предложить резерв на будущие сезонные разрывы с сокращением новых инициатив",
+          "resource_levels": [
+            0,
+            1
+          ],
+          "time_levels": [
+            1,
+            2
+          ],
+          "conditional_tradeoff": true
+        }
+      ]
+    },
+    {
+      "case_key": "bank-legal-2026-022",
+      "title": "Агростраховой платёж",
+      "pairs": [
+        {
+          "option": "option_4",
+          "compared_to": "option_2",
+          "option_label": "Сосредоточить ресурсы на проверке действующих страховых договоров",
+          "compared_label": "Подготовить следующий отбор по опубликованным критериям после проверки полисов",
+          "resource_levels": [
+            1,
+            2
+          ],
+          "time_levels": [
+            1,
+            2
+          ],
+          "conditional_tradeoff": true
+        }
+      ]
+    },
+    {
+      "case_key": "bank-legal-2026-024",
+      "title": "Разовый доход и постоянная зарплата",
+      "pairs": [
+        {
+          "option": "option_2",
+          "compared_to": "option_1",
+          "option_label": "Создать предусмотренный законом запас ликвидности для будущих платежей",
+          "compared_label": "Предложить использовать разовое поступление на допустимый разовый проект",
+          "resource_levels": [
+            0,
+            3
+          ],
+          "time_levels": [
+            1,
+            2
+          ],
+          "conditional_tradeoff": true
+        },
+        {
+          "option": "option_3",
+          "compared_to": "option_1",
+          "option_label": "Подготовить устойчивые источники финансирования постоянных расходов",
+          "compared_label": "Предложить использовать разовое поступление на допустимый разовый проект",
+          "resource_levels": [
+            1,
+            3
+          ],
+          "time_levels": [
+            3,
+            2
+          ],
+          "conditional_tradeoff": true
+        },
+        {
+          "option": "option_4",
+          "compared_to": "option_1",
+          "option_label": "Предложить пересмотр новых необязательных постоянных обязательств",
+          "compared_label": "Предложить использовать разовое поступление на допустимый разовый проект",
+          "resource_levels": [
+            0,
+            3
+          ],
+          "time_levels": [
+            1,
+            2
+          ],
+          "conditional_tradeoff": true
+        }
+      ]
+    },
+    {
+      "case_key": "bank-legal-2026-025",
+      "title": "Портовая льгота",
+      "pairs": [
+        {
+          "option": "option_5",
+          "compared_to": "option_4",
+          "option_label": "Отказаться от новой поддержки после оценки бюджетной окупаемости",
+          "compared_label": "Сохранить налоговый режим и ускорить законные административные процедуры",
+          "resource_levels": [
+            0,
+            1
+          ],
+          "time_levels": [
+            0,
+            1
+          ],
+          "conditional_tradeoff": true
+        }
+      ]
+    },
+    {
+      "case_key": "bank-legal-2026-027",
+      "title": "Мостовой эскроу",
+      "pairs": [
+        {
+          "option": "option_1",
+          "compared_to": "option_2",
+          "option_label": "Предложить ускоренную подготовку надлежащих документов для аванса",
+          "compared_label": "Согласовать законный поэтапный график оплаты материалов",
+          "resource_levels": [
+            1,
+            1
+          ],
+          "time_levels": [
+            1,
+            2
+          ],
+          "conditional_tradeoff": true
+        },
+        {
+          "option": "option_3",
+          "compared_to": "option_4",
+          "option_label": "Организовать дополнительный контроль целевого расходования аванса",
+          "compared_label": "Предложить совместное сопровождение подрядчика и казначейства в пределах компетенции",
+          "resource_levels": [
+            2,
+            2
+          ],
+          "time_levels": [
+            1,
+            2
+          ],
+          "conditional_tradeoff": true
+        }
+      ]
+    },
+    {
+      "case_key": "bank-legal-2026-028",
+      "title": "Неподписанная субсидия",
+      "pairs": [
+        {
+          "option": "option_2",
+          "compared_to": "option_3",
+          "option_label": "Подготовить проверку допустимости поддержки уже понесённых расходов по действующим правилам",
+          "compared_label": "Предложить самостоятельный следующий этап после законного соглашения",
+          "resource_levels": [
+            2,
+            3
+          ],
+          "time_levels": [
+            1,
+            3
+          ],
+          "conditional_tradeoff": true
+        },
+        {
+          "option": "option_4",
+          "compared_to": "option_1",
+          "option_label": "Организовать консультацию получателя о рисках неподтверждённых обязательств",
+          "compared_label": "Предложить открытый отбор для будущего финансирования проекта",
+          "resource_levels": [
+            1,
+            2
+          ],
+          "time_levels": [
+            1,
+            3
+          ],
+          "conditional_tradeoff": true
+        },
+        {
+          "option": "option_5",
+          "compared_to": "option_3",
+          "option_label": "Отказаться от новой субсидии при отсутствии основания и объяснить решение",
+          "compared_label": "Предложить самостоятельный следующий этап после законного соглашения",
+          "resource_levels": [
+            0,
+            3
+          ],
+          "time_levels": [
+            0,
+            3
+          ],
+          "conditional_tradeoff": true
+        }
+      ]
+    },
+    {
+      "case_key": "bank-legal-2026-029",
+      "title": "Ненецкий знаменатель",
+      "pairs": [
+        {
+          "option": "option_3",
+          "compared_to": "option_1",
+          "option_label": "Предложить дополнительный запас до предельного долгового показателя",
+          "compared_label": "Подготовить раздельные таблицы доходов и долга по каждому бюджету",
+          "resource_levels": [
+            0,
+            1
+          ],
+          "time_levels": [
+            1,
+            1
+          ],
+          "conditional_tradeoff": true
+        }
+      ]
+    },
+    {
+      "case_key": "bank-legal-2026-030",
+      "title": "Каспийская квота",
+      "pairs": [
+        {
+          "option": "option_3",
+          "compared_to": "option_1",
+          "option_label": "Подготовить прогноз поступлений с учётом подтверждённых разрешений",
+          "compared_label": "Предложить сверку разрешений с расчётами и отчётами пользователей",
+          "resource_levels": [
+            1,
+            2
+          ],
+          "time_levels": [
+            1,
+            1
+          ],
+          "conditional_tradeoff": true
+        }
+      ]
+    },
+    {
+      "case_key": "bank-legal-2026-032",
+      "title": "Пограничный автобус",
+      "pairs": [
+        {
+          "option": "option_1",
+          "compared_to": "option_3",
+          "option_label": "Предложить перераспределение допустимых средств на востребованные выполненные маршруты",
+          "compared_label": "Организовать контроль фактических рейсов с проверяемым журналом",
+          "resource_levels": [
+            1,
+            2
+          ],
+          "time_levels": [
+            2,
+            2
+          ],
+          "conditional_tradeoff": true
+        },
+        {
+          "option": "option_5",
+          "compared_to": "option_2",
+          "option_label": "Согласовать уменьшение необязательного объёма перевозок без нарушения доступности",
+          "compared_label": "Подготовить законное изменение расписания после анализа спроса",
+          "resource_levels": [
+            0,
+            1
+          ],
+          "time_levels": [
+            1,
+            2
+          ],
+          "conditional_tradeoff": true
+        }
+      ]
+    },
+    {
+      "case_key": "bank-legal-2026-035",
+      "title": "Стальная переоценка",
+      "pairs": [
+        {
+          "option": "option_3",
+          "compared_to": "option_1",
+          "option_label": "Подготовить прогноз поступлений с учётом уточнённого расчёта",
+          "compared_label": "Организовать сверку перечня и кадастровых характеристик объекта",
+          "resource_levels": [
+            1,
+            2
+          ],
+          "time_levels": [
+            1,
+            1
+          ],
+          "conditional_tradeoff": true
+        }
+      ]
+    },
+    {
+      "case_key": "bank-legal-2026-037",
+      "title": "Текстильная отсрочка",
+      "pairs": [
+        {
+          "option": "option_5",
+          "compared_to": "option_4",
+          "option_label": "Подготовить прогноз региональных поступлений при нескольких сценариях",
+          "compared_label": "Организовать консультации о допустимых источниках оборотных средств",
+          "resource_levels": [
+            1,
+            2
+          ],
+          "time_levels": [
+            1,
+            1
+          ],
+          "conditional_tradeoff": true
+        }
+      ]
+    },
+    {
+      "case_key": "bank-legal-2026-038",
+      "title": "Байкальский ущерб",
+      "pairs": [
+        {
+          "option": "option_5",
+          "compared_to": "option_4",
+          "option_label": "Организовать оценку эффективности добровольных природоохранных расходов",
+          "compared_label": "Предложить техническую поддержку снижения воздействия на природу",
+          "resource_levels": [
+            2,
+            3
+          ],
+          "time_levels": [
+            2,
+            2
+          ],
+          "conditional_tradeoff": true
+        }
+      ]
+    },
+    {
+      "case_key": "bank-legal-2026-039",
+      "title": "Особая зона",
+      "pairs": [
+        {
+          "option": "option_1",
+          "compared_to": "option_3",
+          "option_label": "Предложить консультацию об условиях получения законного статуса резидента",
+          "compared_label": "Предложить независимую проверку исполнения условий действующими резидентами",
+          "resource_levels": [
+            1,
+            2
+          ],
+          "time_levels": [
+            1,
+            2
+          ],
+          "conditional_tradeoff": true
+        },
+        {
+          "option": "option_4",
+          "compared_to": "option_5",
+          "option_label": "Сохранить общий налоговый режим до появления подтверждённого основания",
+          "compared_label": "Подготовить оценку эффективности будущих мер инвестиционной поддержки",
+          "resource_levels": [
+            0,
+            1
+          ],
+          "time_levels": [
+            0,
+            2
+          ],
+          "conditional_tradeoff": true
+        }
+      ]
+    },
+    {
+      "case_key": "bank-legal-2026-040",
+      "title": "Кластерный конкурс",
+      "pairs": [
+        {
+          "option": "option_2",
+          "compared_to": "option_4",
+          "option_label": "Предложить открытый конкурс по ожидаемому эффекту и стоимости проекта",
+          "compared_label": "Согласовать независимую экспертизу технических предложений",
+          "resource_levels": [
+            2,
+            3
+          ],
+          "time_levels": [
+            2,
+            2
+          ],
+          "conditional_tradeoff": true
+        }
+      ]
+    },
+    {
+      "case_key": "bank-legal-2026-041",
+      "title": "Рыбный рейс",
+      "pairs": [
+        {
+          "option": "option_3",
+          "compared_to": "option_1",
+          "option_label": "Подготовить корректировку расписания по подтверждённому спросу",
+          "compared_label": "Предложить раздельный реестр выполненных продовольственных маршрутов",
+          "resource_levels": [
+            1,
+            2
+          ],
+          "time_levels": [
+            2,
+            2
+          ],
+          "conditional_tradeoff": true
+        }
+      ]
+    },
+    {
+      "case_key": "bank-legal-2026-043",
+      "title": "Лесной купон",
+      "pairs": [
+        {
+          "option": "option_3",
+          "compared_to": "option_2",
+          "option_label": "Подготовить несколько допустимых сценариев доходности для инвесторов",
+          "compared_label": "Предложить выпуск с более предсказуемым графиком погашения",
+          "resource_levels": [
+            1,
+            2
+          ],
+          "time_levels": [
+            2,
+            3
+          ],
+          "conditional_tradeoff": true
+        },
+        {
+          "option": "option_5",
+          "compared_to": "option_1",
+          "option_label": "Предложить сократить необязательную потребность в финансировании",
+          "compared_label": "Предложить меньший выпуск с запасом до предельных показателей долга",
+          "resource_levels": [
+            0,
+            2
+          ],
+          "time_levels": [
+            1,
+            2
+          ],
+          "conditional_tradeoff": true
+        }
+      ]
+    },
+    {
+      "case_key": "bank-legal-2026-044",
+      "title": "Ювелирная касса",
+      "pairs": [
+        {
+          "option": "option_3",
+          "compared_to": "option_1",
+          "option_label": "Подготовить переходный план исполнения налоговых обязанностей",
+          "compared_label": "Предложить раздельный учёт выручки с контрольной сверкой операций",
+          "resource_levels": [
+            1,
+            2
+          ],
+          "time_levels": [
+            2,
+            2
+          ],
+          "conditional_tradeoff": true
+        },
+        {
+          "option": "option_5",
+          "compared_to": "option_1",
+          "option_label": "Улучшить внутреннюю классификацию товаров для предотвращения повторных ошибок",
+          "compared_label": "Предложить раздельный учёт выручки с контрольной сверкой операций",
+          "resource_levels": [
+            2,
+            2
+          ],
+          "time_levels": [
+            1,
+            2
+          ],
+          "conditional_tradeoff": true
+        }
+      ]
+    },
+    {
+      "case_key": "bank-legal-2026-045",
+      "title": "Курганский паводок",
+      "pairs": [
+        {
+          "option": "option_4",
+          "compared_to": "option_2",
+          "option_label": "Предложить временное сопровождение заявителей до завершения проверки",
+          "compared_label": "Предложить повторный осмотр спорных адресов после обязательного обследования",
+          "resource_levels": [
+            2,
+            2
+          ],
+          "time_levels": [
+            1,
+            2
+          ],
+          "conditional_tradeoff": true
+        }
+      ]
+    },
+    {
+      "case_key": "bank-legal-2026-046",
+      "title": "Неиспользованный остаток",
+      "pairs": [
+        {
+          "option": "option_5",
+          "compared_to": "option_2",
+          "option_label": "Предложить улучшить календарь будущих закупок и контроль исполнения",
+          "compared_label": "Предложить уменьшенный самостоятельный этап при законном согласовании цели и условий",
+          "resource_levels": [
+            2,
+            2
+          ],
+          "time_levels": [
+            2,
+            3
+          ],
+          "conditional_tradeoff": true
+        }
+      ]
+    },
+    {
+      "case_key": "bank-legal-2026-048",
+      "title": "Инвестор без прибыли",
+      "pairs": [
+        {
+          "option": "option_4",
+          "compared_to": "option_3",
+          "option_label": "Предложить допустимое изменение будущих критериев после оценки программы",
+          "compared_label": "Организовать контроль фактической занятости по проверяемым сведениям",
+          "resource_levels": [
+            1,
+            2
+          ],
+          "time_levels": [
+            2,
+            1
+          ],
+          "conditional_tradeoff": true
+        },
+        {
+          "option": "option_5",
+          "compared_to": "option_2",
+          "option_label": "Сосредоточить ресурсы на исполнении действующего соглашения и предусмотренных мерах",
+          "compared_label": "Подготовить законную отдельную программу поддержки подрядчиков",
+          "resource_levels": [
+            1,
+            3
+          ],
+          "time_levels": [
+            1,
+            3
+          ],
+          "conditional_tradeoff": true
+        },
+        {
+          "option": "option_5",
+          "compared_to": "option_3",
+          "option_label": "Сосредоточить ресурсы на исполнении действующего соглашения и предусмотренных мерах",
+          "compared_label": "Организовать контроль фактической занятости по проверяемым сведениям",
+          "resource_levels": [
+            1,
+            2
+          ],
+          "time_levels": [
+            1,
+            1
+          ],
+          "conditional_tradeoff": true
+        }
+      ]
+    },
+    {
+      "case_key": "bank-legal-2026-050",
+      "title": "Кадастровое возражение",
+      "pairs": [
+        {
+          "option": "option_5",
+          "compared_to": "option_3",
+          "option_label": "Уточнить бюджетный прогноз с отдельным сценарием возможного перерасчёта",
+          "compared_label": "Подготовить законный график ликвидности до решения по стоимости",
+          "resource_levels": [
+            1,
+            1
+          ],
+          "time_levels": [
+            1,
+            2
+          ],
+          "conditional_tradeoff": true
+        }
+      ]
+    },
+    {
+      "case_key": "bank-legal-2026-051",
+      "title": "Арктический подряд",
+      "pairs": [
+        {
+          "option": "option_2",
+          "compared_to": "option_4",
+          "option_label": "Подготовить документированное изменение при подтверждённом законном основании",
+          "compared_label": "Предложить допустимое альтернативное снабжение без нарушения обязательств",
+          "resource_levels": [
+            2,
+            2
+          ],
+          "time_levels": [
+            2,
+            3
+          ],
+          "conditional_tradeoff": true
+        },
+        {
+          "option": "option_5",
+          "compared_to": "option_4",
+          "option_label": "Согласовать будущие закупочные условия с учётом сезонной логистики",
+          "compared_label": "Предложить допустимое альтернативное снабжение без нарушения обязательств",
+          "resource_levels": [
+            1,
+            2
+          ],
+          "time_levels": [
+            2,
+            3
+          ],
+          "conditional_tradeoff": true
+        }
+      ]
+    },
+    {
+      "case_key": "bank-legal-2026-053",
+      "title": "Новгородский аудит",
+      "pairs": [
+        {
+          "option": "option_3",
+          "compared_to": "option_1",
+          "option_label": "Провести выборку существенных операций в объёме, допустимом федеральными стандартами",
+          "compared_label": "Предложить наделить независимого сотрудника полномочиями аудита, если это допускают федеральные стандарты",
+          "resource_levels": [
+            0,
+            1
+          ],
+          "time_levels": [
+            1,
+            1
+          ],
+          "conditional_tradeoff": true
+        }
+      ]
+    },
+    {
+      "case_key": "bank-legal-2026-054",
+      "title": "Научный аванс",
+      "pairs": [
+        {
+          "option": "option_3",
+          "compared_to": "option_4",
+          "option_label": "Организовать независимую научную оценку достигнутых результатов",
+          "compared_label": "Предложить отдельное финансирование популяризации без подмены научного задания",
+          "resource_levels": [
+            3,
+            3
+          ],
+          "time_levels": [
+            2,
+            3
+          ],
+          "conditional_tradeoff": true
+        }
+      ]
+    },
+    {
+      "case_key": "bank-legal-2026-055",
+      "title": "Омская концессия",
+      "pairs": [
+        {
+          "option": "option_4",
+          "compared_to": "option_1",
+          "option_label": "Предложить допустимый пересмотр структуры будущих обязательств",
+          "compared_label": "Предложить единый финансовый план с раздельным учётом источников",
+          "resource_levels": [
+            0,
+            1
+          ],
+          "time_levels": [
+            2,
+            2
+          ],
+          "conditional_tradeoff": true
+        },
+        {
+          "option": "option_5",
+          "compared_to": "option_3",
+          "option_label": "Опубликовать понятное сопоставление источников и ожидаемых результатов",
+          "compared_label": "Организовать независимую сверку затрат концессионера и бюджета",
+          "resource_levels": [
+            1,
+            2
+          ],
+          "time_levels": [
+            1,
+            2
+          ],
+          "conditional_tradeoff": true
+        }
+      ]
+    },
+    {
+      "case_key": "bank-legal-2026-056",
+      "title": "Газовый расчёт",
+      "pairs": [
+        {
+          "option": "option_3",
+          "compared_to": "option_1",
+          "option_label": "Подготовить отдельные прогнозы поступлений по каждому виду сырья",
+          "compared_label": "Организовать раздельный контроль добычных объёмов и налоговых расчётов",
+          "resource_levels": [
+            1,
+            2
+          ],
+          "time_levels": [
+            1,
+            2
+          ],
+          "conditional_tradeoff": true
+        },
+        {
+          "option": "option_5",
+          "compared_to": "option_1",
+          "option_label": "Настроить контроль соответствия добычных отчётов налоговым данным",
+          "compared_label": "Организовать раздельный контроль добычных объёмов и налоговых расчётов",
+          "resource_levels": [
+            1,
+            2
+          ],
+          "time_levels": [
+            3,
+            2
+          ],
+          "conditional_tradeoff": true
+        }
+      ]
+    },
+    {
+      "case_key": "bank-legal-2026-057",
+      "title": "Орловский отбор",
+      "pairs": [
+        {
+          "option": "option_5",
+          "compared_to": "option_1",
+          "option_label": "Разъяснить заявителям порядок защиты через существующий канал обращений",
+          "compared_label": "Предложить дополнительный контроль равного рассмотрения своевременных заявок",
+          "resource_levels": [
+            0,
+            2
+          ],
+          "time_levels": [
+            1,
+            1
+          ],
+          "conditional_tradeoff": true
+        },
+        {
+          "option": "option_5",
+          "compared_to": "option_3",
+          "option_label": "Разъяснить заявителям порядок защиты через существующий канал обращений",
+          "compared_label": "Опубликовать объяснение исправленного порядка и единый календарь",
+          "resource_levels": [
+            0,
+            1
+          ],
+          "time_levels": [
+            1,
+            1
+          ],
+          "conditional_tradeoff": true
+        }
+      ]
+    },
+    {
+      "case_key": "bank-legal-2026-058",
+      "title": "Пензенский лизинг",
+      "pairs": [
+        {
+          "option": "option_4",
+          "compared_to": "option_1",
+          "option_label": "Предложить выборочную проверку сложных лизинговых графиков",
+          "compared_label": "Предложить поддержку подтверждённой платы за пользование оборудованием",
+          "resource_levels": [
+            2,
+            3
+          ],
+          "time_levels": [
+            2,
+            2
+          ],
+          "conditional_tradeoff": true
+        },
+        {
+          "option": "option_5",
+          "compared_to": "option_1",
+          "option_label": "Разработать будущую программу с прозрачным пределом возмещаемых расходов",
+          "compared_label": "Предложить поддержку подтверждённой платы за пользование оборудованием",
+          "resource_levels": [
+            1,
+            3
+          ],
+          "time_levels": [
+            2,
+            2
+          ],
+          "conditional_tradeoff": true
+        }
+      ]
+    },
+    {
+      "case_key": "bank-legal-2026-059",
+      "title": "Пермское соглашение",
+      "pairs": [
+        {
+          "option": "option_1",
+          "compared_to": "option_3",
+          "option_label": "Предложить консультации с муниципальным органом без предрешения его решения",
+          "compared_label": "Согласовать инвестиционный план с несколькими законными налоговыми сценариями",
+          "resource_levels": [
+            0,
+            1
+          ],
+          "time_levels": [
+            2,
+            2
+          ],
+          "conditional_tradeoff": true
+        },
+        {
+          "option": "option_5",
+          "compared_to": "option_3",
+          "option_label": "Отказаться от неподтверждённой гарантии с открытым объяснением рисков",
+          "compared_label": "Согласовать инвестиционный план с несколькими законными налоговыми сценариями",
+          "resource_levels": [
+            0,
+            1
+          ],
+          "time_levels": [
+            0,
+            2
+          ],
+          "conditional_tradeoff": true
+        }
+      ]
+    },
+    {
+      "case_key": "bank-legal-2026-060",
+      "title": "Псковский мост",
+      "pairs": [
+        {
+          "option": "option_3",
+          "compared_to": "option_5",
+          "option_label": "Согласовать приоритет ремонта опасных элементов по обследованию",
+          "compared_label": "Предложить совместный контроль регионального и местного исполнения соглашения",
+          "resource_levels": [
+            2,
+            2
+          ],
+          "time_levels": [
+            1,
+            2
+          ],
+          "conditional_tradeoff": true
+        },
+        {
+          "option": "option_4",
+          "compared_to": "option_2",
+          "option_label": "Подготовить временный безопасный объезд до согласования средств",
+          "compared_label": "Предложить технически самостоятельный первый этап с подтверждённым результатом",
+          "resource_levels": [
+            2,
+            2
+          ],
+          "time_levels": [
+            1,
+            3
+          ],
+          "conditional_tradeoff": true
+        }
+      ]
+    },
+    {
+      "case_key": "bank-legal-2026-061",
+      "title": "Ростовская закупка",
+      "pairs": [
+        {
+          "option": "option_1",
+          "compared_to": "option_3",
+          "option_label": "Предложить требования к срокам и качеству исполнения вместо места регистрации",
+          "compared_label": "Предложить деление на самостоятельные лоты при технической обоснованности",
+          "resource_levels": [
+            1,
+            2
+          ],
+          "time_levels": [
+            1,
+            2
+          ],
+          "conditional_tradeoff": true
+        }
+      ]
+    },
+    {
+      "case_key": "bank-legal-2026-063",
+      "title": "Самарский налоговый кредит",
+      "pairs": [
+        {
+          "option": "option_3",
+          "compared_to": "option_4",
+          "option_label": "Предложить рыночное финансирование проекта без новой бюджетной поддержки",
+          "compared_label": "Согласовать поэтапную модернизацию с оценкой ликвидности предприятия",
+          "resource_levels": [
+            0,
+            2
+          ],
+          "time_levels": [
+            2,
+            3
+          ],
+          "conditional_tradeoff": true
+        }
+      ]
+    },
+    {
+      "case_key": "bank-legal-2026-064",
+      "title": "Саратовский контракт",
+      "pairs": [
+        {
+          "option": "option_3",
+          "compared_to": "option_1",
+          "option_label": "Предложить отсрочить необязательную закупку до подтверждения будущих средств",
+          "compared_label": "Предложить закупку в пределах текущих лимитов с проверяемой поставкой",
+          "resource_levels": [
+            0,
+            2
+          ],
+          "time_levels": [
+            3,
+            1
+          ],
+          "conditional_tradeoff": true
+        },
+        {
+          "option": "option_4",
+          "compared_to": "option_1",
+          "option_label": "Согласовать временное использование имеющегося оборудования",
+          "compared_label": "Предложить закупку в пределах текущих лимитов с проверяемой поставкой",
+          "resource_levels": [
+            1,
+            2
+          ],
+          "time_levels": [
+            1,
+            1
+          ],
+          "conditional_tradeoff": true
+        }
+      ]
+    },
+    {
+      "case_key": "bank-legal-2026-065",
+      "title": "Сахалинская доля",
+      "pairs": [
+        {
+          "option": "option_4",
+          "compared_to": "option_3",
+          "option_label": "Опубликовать доступное объяснение отличий от обычного налогообложения",
+          "compared_label": "Подготовить сценарии изменения добычи и цен в пределах режима",
+          "resource_levels": [
+            1,
+            1
+          ],
+          "time_levels": [
+            1,
+            2
+          ],
+          "conditional_tradeoff": true
+        },
+        {
+          "option": "option_5",
+          "compared_to": "option_1",
+          "option_label": "Предложить консервативный бюджетный резерв на неопределённость поступлений",
+          "compared_label": "Предложить раздельный прогноз поступлений по предусмотренным элементам соглашения",
+          "resource_levels": [
+            0,
+            1
+          ],
+          "time_levels": [
+            1,
+            2
+          ],
+          "conditional_tradeoff": true
+        }
+      ]
+    },
+    {
+      "case_key": "bank-legal-2026-067",
+      "title": "Смоленское пожертвование",
+      "pairs": [
+        {
+          "option": "option_5",
+          "compared_to": "option_2",
+          "option_label": "Организовать прозрачное обсуждение условий допустимой поддержки учреждения",
+          "compared_label": "Предложить отдельный законный сбор средств на нужды учреждения",
+          "resource_levels": [
+            2,
+            2
+          ],
+          "time_levels": [
+            1,
+            2
+          ],
+          "conditional_tradeoff": true
+        }
+      ]
+    },
+    {
+      "case_key": "bank-legal-2026-068",
+      "title": "Тамбовский бюджет участия",
+      "pairs": [
+        {
+          "option": "option_4",
+          "compared_to": "option_3",
+          "option_label": "Подготовить новые расчёты стоимости и повторное обсуждение допустимых альтернатив",
+          "compared_label": "Предложить этапное выполнение первоначального проекта с отдельным графиком",
+          "resource_levels": [
+            2,
+            2
+          ],
+          "time_levels": [
+            2,
+            3
+          ],
+          "conditional_tradeoff": true
+        }
+      ]
+    },
+    {
+      "case_key": "bank-legal-2026-069",
+      "title": "Тверская гарантия",
+      "pairs": [
+        {
+          "option": "option_2",
+          "compared_to": "option_3",
+          "option_label": "Усилить контроль финансового состояния принципала в пределах соглашения",
+          "compared_label": "Подготовить сценарии долговой нагрузки при исполнении гарантии",
+          "resource_levels": [
+            2,
+            1
+          ],
+          "time_levels": [
+            1,
+            2
+          ],
+          "conditional_tradeoff": true
+        },
+        {
+          "option": "option_4",
+          "compared_to": "option_1",
+          "option_label": "Предложить ограничить новые гарантии до уточнения доступного риска",
+          "compared_label": "Рассчитать потребность в финансовом обеспечении возможного исполнения гарантии и предложить законную бюджетную меру",
+          "resource_levels": [
+            0,
+            1
+          ],
+          "time_levels": [
+            1,
+            2
+          ],
+          "conditional_tradeoff": true
+        },
+        {
+          "option": "option_4",
+          "compared_to": "option_3",
+          "option_label": "Предложить ограничить новые гарантии до уточнения доступного риска",
+          "compared_label": "Подготовить сценарии долговой нагрузки при исполнении гарантии",
+          "resource_levels": [
+            0,
+            1
+          ],
+          "time_levels": [
+            1,
+            2
+          ],
+          "conditional_tradeoff": true
+        }
+      ]
+    },
+    {
+      "case_key": "bank-legal-2026-070",
+      "title": "Томская интеллектуальная собственность",
+      "pairs": [
+        {
+          "option": "option_5",
+          "compared_to": "option_4",
+          "option_label": "Предложить независимую оценку технологии и рисков до вложения средств",
+          "compared_label": "Согласовать этапное финансирование подтверждённых результатов прототипа",
+          "resource_levels": [
+            3,
+            2
+          ],
+          "time_levels": [
+            2,
+            3
+          ],
+          "conditional_tradeoff": true
+        }
+      ]
+    },
+    {
+      "case_key": "bank-legal-2026-071",
+      "title": "Тульская неустойка",
+      "pairs": [
+        {
+          "option": "option_1",
+          "compared_to": "option_4",
+          "option_label": "Предложить поставщику добровольно исполнить уже предъявленное требование",
+          "compared_label": "Предложить улучшить контроль будущих сроков поставки и уведомлений",
+          "resource_levels": [
+            1,
+            2
+          ],
+          "time_levels": [
+            1,
+            2
+          ],
+          "conditional_tradeoff": true
+        },
+        {
+          "option": "option_5",
+          "compared_to": "option_2",
+          "option_label": "Согласовать допустимые меры устранения последствий задержки без отказа от требования о неустойке",
+          "compared_label": "Подготовить предусмотренное взыскание на случай отказа поставщика исполнить направленное требование",
+          "resource_levels": [
+            2,
+            2
+          ],
+          "time_levels": [
+            1,
+            2
+          ],
+          "conditional_tradeoff": true
+        }
+      ]
+    },
+    {
+      "case_key": "bank-legal-2026-072",
+      "title": "Тюменский знаменатель",
+      "pairs": [
+        {
+          "option": "option_5",
+          "compared_to": "option_2",
+          "option_label": "Настроить контроль исключения внутрисистемных поступлений при консолидации",
+          "compared_label": "Предложить единый формат отчёта для всех участвующих бюджетов",
+          "resource_levels": [
+            1,
+            2
+          ],
+          "time_levels": [
+            3,
+            2
+          ],
+          "conditional_tradeoff": true
+        }
+      ]
+    },
+    {
+      "case_key": "bank-legal-2026-074",
+      "title": "Челябинская реконструкция",
+      "pairs": [
+        {
+          "option": "option_1",
+          "compared_to": "option_5",
+          "option_label": "Предложить сохранить исходный объём реконструкции и отложить новый корпус",
+          "compared_label": "Подготовить альтернативный проект в пределах подтверждённых ресурсов",
+          "resource_levels": [
+            0,
+            1
+          ],
+          "time_levels": [
+            1,
+            2
+          ],
+          "conditional_tradeoff": true
+        },
+        {
+          "option": "option_4",
+          "compared_to": "option_2",
+          "option_label": "Организовать независимую оценку изменённой сметы и необходимости нового корпуса",
+          "compared_label": "Подготовить законное дополнительное финансирование обоснованного расширения",
+          "resource_levels": [
+            3,
+            3
+          ],
+          "time_levels": [
+            2,
+            3
+          ],
+          "conditional_tradeoff": true
+        }
+      ]
+    },
+    {
+      "case_key": "bank-legal-2026-075",
+      "title": "Забайкальский ваучер",
+      "pairs": [
+        {
+          "option": "option_2",
+          "compared_to": "option_5",
+          "option_label": "Организовать консультации работникам о применимом налоговом режиме",
+          "compared_label": "Согласовать будущую программу поддержки проживания с прозрачными условиями",
+          "resource_levels": [
+            2,
+            3
+          ],
+          "time_levels": [
+            1,
+            3
+          ],
+          "conditional_tradeoff": true
+        }
+      ]
+    },
+    {
+      "case_key": "bank-legal-2026-076",
+      "title": "Ярославская территория",
+      "pairs": [
+        {
+          "option": "option_5",
+          "compared_to": "option_1",
+          "option_label": "Организовать открытое обсуждение будущего благоустройства с предпринимателями",
+          "compared_label": "Предложить финансирование обслуживания улиц из допустимых местных средств",
+          "resource_levels": [
+            2,
+            3
+          ],
+          "time_levels": [
+            2,
+            2
+          ],
+          "conditional_tradeoff": true
+        }
+      ]
+    },
+    {
+      "case_key": "bank-legal-2026-077",
+      "title": "Московский торговый объект",
+      "pairs": [
+        {
+          "option": "option_3",
+          "compared_to": "option_1",
+          "option_label": "Подготовить уточнённый прогноз поступлений после исправления расчёта",
+          "compared_label": "Предложить сверку характеристик торговых объектов до расчётов",
+          "resource_levels": [
+            1,
+            2
+          ],
+          "time_levels": [
+            1,
+            1
+          ],
+          "conditional_tradeoff": true
+        },
+        {
+          "option": "option_5",
+          "compared_to": "option_1",
+          "option_label": "Настроить контроль изменений фактических характеристик торговых объектов",
+          "compared_label": "Предложить сверку характеристик торговых объектов до расчётов",
+          "resource_levels": [
+            1,
+            2
+          ],
+          "time_levels": [
+            3,
+            1
+          ],
+          "conditional_tradeoff": true
+        }
+      ]
+    },
+    {
+      "case_key": "bank-legal-2026-078",
+      "title": "Петербургский фасад",
+      "pairs": [
+        {
+          "option": "option_5",
+          "compared_to": "option_1",
+          "option_label": "Организовать дополнительное экспертное наблюдение за сохранностью объекта",
+          "compared_label": "Предложить комплексную реставрацию по согласованному проекту",
+          "resource_levels": [
+            2,
+            3
+          ],
+          "time_levels": [
+            2,
+            3
+          ],
+          "conditional_tradeoff": true
+        },
+        {
+          "option": "option_5",
+          "compared_to": "option_2",
+          "option_label": "Организовать дополнительное экспертное наблюдение за сохранностью объекта",
+          "compared_label": "Приоритизировать противоаварийные и наиболее значимые работы",
+          "resource_levels": [
+            2,
+            3
+          ],
+          "time_levels": [
+            2,
+            2
+          ],
+          "conditional_tradeoff": true
+        }
+      ]
+    },
+    {
+      "case_key": "bank-legal-2026-079",
+      "title": "Биробиджанское исполнение",
+      "pairs": [
+        {
+          "option": "option_1",
+          "compared_to": "option_4",
+          "option_label": "Организовать ускоренную проверку и оформление фактически выполненных работ",
+          "compared_label": "Подготовить контрольный график исправления недостатков без преждевременной оплаты",
+          "resource_levels": [
+            1,
+            2
+          ],
+          "time_levels": [
+            1,
+            1
+          ],
+          "conditional_tradeoff": true
+        },
+        {
+          "option": "option_5",
+          "compared_to": "option_3",
+          "option_label": "Предложить использовать имеющийся защищённый электронный документооборот для будущих работ",
+          "compared_label": "Согласовать законное документирование частичного исполнения при наличии этапов",
+          "resource_levels": [
+            0,
+            1
+          ],
+          "time_levels": [
+            3,
+            2
+          ],
+          "conditional_tradeoff": true
+        }
+      ]
+    },
+    {
+      "case_key": "bank-legal-2026-080",
+      "title": "Ненецкий норматив",
+      "pairs": [
+        {
+          "option": "option_3",
+          "compared_to": "option_1",
+          "option_label": "Подготовить консервативный план расходов по действующему нормативу без неподтверждённого увеличения дохода",
+          "compared_label": "Предложить устойчивый норматив в пределах допустимого режима с расчётом доходов",
+          "resource_levels": [
+            0,
+            1
+          ],
+          "time_levels": [
+            2,
+            2
+          ],
+          "conditional_tradeoff": true
+        },
+        {
+          "option": "option_5",
+          "compared_to": "option_2",
+          "option_label": "Опубликовать сценарные расчёты для обсуждения местными органами",
+          "compared_label": "Подготовить несколько вариантов распределения после оценки потребностей поселений",
+          "resource_levels": [
+            1,
+            1
+          ],
+          "time_levels": [
+            1,
+            2
+          ],
+          "conditional_tradeoff": true
+        }
+      ]
+    },
+    {
+      "case_key": "bank-legal-2026-081",
+      "title": "Югорское соглашение",
+      "pairs": [
+        {
+          "option": "option_3",
+          "compared_to": "option_5",
+          "option_label": "Организовать консультацию получателя и финансового органа о возможных изменениях",
+          "compared_label": "Подготовить независимую оценку исполнения первоначальных показателей",
+          "resource_levels": [
+            2,
+            3
+          ],
+          "time_levels": [
+            1,
+            2
+          ],
+          "conditional_tradeoff": true
+        }
+      ]
+    },
+    {
+      "case_key": "bank-legal-2026-083",
+      "title": "Ямальский платёж",
+      "pairs": [
+        {
+          "option": "option_1",
+          "compared_to": "option_4",
+          "option_label": "Предложить консультацию о законном исполнении соглашения при действующем аресте",
+          "compared_label": "Организовать проверку исполнения и предусмотренных условий возврата",
+          "resource_levels": [
+            1,
+            2
+          ],
+          "time_levels": [
+            1,
+            1
+          ],
+          "conditional_tradeoff": true
+        },
+        {
+          "option": "option_2",
+          "compared_to": "option_5",
+          "option_label": "Подготовить допустимое изменение получателя только при наличии основания",
+          "compared_label": "Предложить отдельный новый отбор для продолжения общественно значимого проекта",
+          "resource_levels": [
+            2,
+            3
+          ],
+          "time_levels": [
+            2,
+            3
+          ],
+          "conditional_tradeoff": true
+        }
+      ]
+    },
+    {
+      "case_key": "bank-legal-2026-084",
+      "title": "Крымский гостиничный реестр",
+      "pairs": [
+        {
+          "option": "option_3",
+          "compared_to": "option_2",
+          "option_label": "Подготовить прогноз поступлений с учётом подтверждённых объектов",
+          "compared_label": "Организовать проверку фактической деятельности и применимых налоговых обязанностей",
+          "resource_levels": [
+            1,
+            2
+          ],
+          "time_levels": [
+            1,
+            1
+          ],
+          "conditional_tradeoff": true
+        }
+      ]
+    },
+    {
+      "case_key": "bank-legal-2026-085",
+      "title": "Севастопольская земля",
+      "pairs": [
+        {
+          "option": "option_3",
+          "compared_to": "option_1",
+          "option_label": "Подготовить уточнённый прогноз земельных платежей после проверки оснований",
+          "compared_label": "Предложить сверку договоров и зарегистрированных прав на землю",
+          "resource_levels": [
+            1,
+            2
+          ],
+          "time_levels": [
+            1,
+            1
+          ],
+          "conditional_tradeoff": true
+        }
+      ]
+    },
+    {
+      "case_key": "bank-legal-2026-086",
+      "title": "Донецкая восстановительная смета",
+      "pairs": [
+        {
+          "option": "option_4",
+          "compared_to": "option_1",
+          "option_label": "Организовать независимый контроль смет и целевого расходования",
+          "compared_label": "Предложить ускоренное восстановление подтверждённых критических узлов сети",
+          "resource_levels": [
+            2,
+            3
+          ],
+          "time_levels": [
+            2,
+            2
+          ],
+          "conditional_tradeoff": true
+        },
+        {
+          "option": "option_4",
+          "compared_to": "option_3",
+          "option_label": "Организовать независимый контроль смет и целевого расходования",
+          "compared_label": "Предложить приоритет доступности воды в наиболее пострадавших населённых пунктах",
+          "resource_levels": [
+            2,
+            3
+          ],
+          "time_levels": [
+            2,
+            2
+          ],
+          "conditional_tradeoff": true
+        },
+        {
+          "option": "option_5",
+          "compared_to": "option_2",
+          "option_label": "Проверить возможность использовать имеющееся оснащение или отдельный допустимый источник без расходования целевого трансферта",
+          "compared_label": "Согласовать этапную замену труб с проверкой фактических результатов",
+          "resource_levels": [
+            1,
+            2
+          ],
+          "time_levels": [
+            1,
+            3
+          ],
+          "conditional_tradeoff": true
+        }
+      ]
+    },
+    {
+      "case_key": "bank-legal-2026-087",
+      "title": "Луганский переходный учёт",
+      "pairs": [
+        {
+          "option": "option_3",
+          "compared_to": "option_1",
+          "option_label": "Подготовить отдельные сценарии поступлений после подтверждения режима",
+          "compared_label": "Предложить сверку регистрационных сведений и периода возникновения обязанности",
+          "resource_levels": [
+            1,
+            2
+          ],
+          "time_levels": [
+            1,
+            1
+          ],
+          "conditional_tradeoff": true
+        }
+      ]
+    },
+    {
+      "case_key": "bank-legal-2026-088",
+      "title": "Херсонская субвенция",
+      "pairs": [
+        {
+          "option": "option_3",
+          "compared_to": "option_2",
+          "option_label": "Подготовить проверку исходных данных для пересмотра финансового обеспечения",
+          "compared_label": "Организовать распределение работы между уполномоченными подразделениями",
+          "resource_levels": [
+            1,
+            2
+          ],
+          "time_levels": [
+            2,
+            1
+          ],
+          "conditional_tradeoff": true
+        }
+      ]
+    },
+    {
+      "case_key": "bank-legal-2026-089",
+      "title": "Запорожская стройка",
+      "pairs": [
+        {
+          "option": "option_5",
+          "compared_to": "option_1",
+          "option_label": "Согласовать открытый график финансирования и контроля восстановительных работ",
+          "compared_label": "Предложить комплексное восстановление объекта после подтверждения прав и сметы",
+          "resource_levels": [
+            1,
+            3
+          ],
+          "time_levels": [
+            2,
+            3
+          ],
+          "conditional_tradeoff": true
+        }
+      ]
+    },
+    {
+      "case_key": "bank-legal-2026-100",
+      "title": "Неотмеченная агитация",
+      "pairs": [
+        {
+          "option": "option_3",
+          "compared_to": "option_5",
+          "option_label": "Провести консультацию с редакциями о маркировке оплаченных публикаций",
+          "compared_label": "Предложить независимый контроль соблюдения требований всеми участниками",
+          "resource_levels": [
+            2,
+            3
+          ],
+          "time_levels": [
+            1,
+            2
+          ],
+          "conditional_tradeoff": true
+        }
+      ]
+    },
+    {
+      "case_key": "bank-legal-2026-104",
+      "title": "Техническое задание под марку",
+      "pairs": [
+        {
+          "option": "option_3",
+          "compared_to": "option_5",
+          "option_label": "Сопоставить допустимые образцы по единым функциональным критериям до закупки",
+          "compared_label": "Включить в план освоения оборудования обучение сотрудников после конкурентной закупки",
+          "resource_levels": [
+            2,
+            2
+          ],
+          "time_levels": [
+            1,
+            2
+          ],
+          "conditional_tradeoff": true
+        }
+      ]
+    },
+    {
+      "case_key": "bank-legal-2026-113",
+      "title": "Испытание для беременной",
+      "pairs": [
+        {
+          "option": "option_1",
+          "compared_to": "option_3",
+          "option_label": "Организовать обычную адаптацию нового сотрудника без испытательного срока",
+          "compared_label": "Проверить другие действующие договоры на аналогичные нарушения",
+          "resource_levels": [
+            2,
+            2
+          ],
+          "time_levels": [
+            1,
+            2
+          ],
+          "conditional_tradeoff": true
+        }
+      ]
+    },
+    {
+      "case_key": "bank-legal-2026-116",
+      "title": "Публичный список диагнозов",
+      "pairs": [
+        {
+          "option": "option_3",
+          "compared_to": "option_5",
+          "option_label": "Организовать очную помощь через существующую регистратуру для пациентов без электронного доступа",
+          "compared_label": "Провести дополнительный обезличенный аудит прежних раскрытий после обязательного реагирования",
+          "resource_levels": [
+            2,
+            3
+          ],
+          "time_levels": [
+            1,
+            2
+          ],
+          "conditional_tradeoff": true
+        }
+      ]
+    },
+    {
+      "case_key": "bank-legal-2026-121",
+      "title": "Согласование мирного собрания",
+      "pairs": [
+        {
+          "option": "option_5",
+          "compared_to": "option_4",
+          "option_label": "Предложить обезличенный разбор практики обработки уведомлений",
+          "compared_label": "Организовать единый внутренний контроль сроков обработки уведомлений",
+          "resource_levels": [
+            1,
+            2
+          ],
+          "time_levels": [
+            2,
+            1
+          ],
+          "conditional_tradeoff": true
+        }
+      ]
+    },
+    {
+      "case_key": "bank-legal-2026-126",
+      "title": "Льгота за партийный билет",
+      "pairs": [
+        {
+          "option": "option_5",
+          "compared_to": "option_1",
+          "option_label": "Провести публичное обсуждение альтернатив поддержки без партийного критерия",
+          "compared_label": "Предложить адресную меру для объективно определённой категории плательщиков",
+          "resource_levels": [
+            2,
+            3
+          ],
+          "time_levels": [
+            2,
+            2
+          ],
+          "conditional_tradeoff": true
+        }
+      ]
+    },
+    {
+      "case_key": "bank-legal-2026-127",
+      "title": "Региональный запрет торговли",
+      "pairs": [
+        {
+          "option": "option_5",
+          "compared_to": "option_3",
+          "option_label": "Подготовить рекомендации о совершенствовании правил через компетентные органы",
+          "compared_label": "Предложить меры поддержки соблюдения требований вместо общего запрета",
+          "resource_levels": [
+            1,
+            3
+          ],
+          "time_levels": [
+            2,
+            2
+          ],
+          "conditional_tradeoff": true
+        }
+      ]
+    },
+    {
+      "case_key": "bank-legal-2026-128",
+      "title": "Конкурентная аренда земли",
+      "pairs": [
+        {
+          "option": "option_5",
+          "compared_to": "option_1",
+          "option_label": "Согласовать план контроля соблюдения условий после заключения договора",
+          "compared_label": "Улучшить понятность описания участка и условий его допустимого использования",
+          "resource_levels": [
+            2,
+            2
+          ],
+          "time_levels": [
+            1,
+            2
+          ],
+          "conditional_tradeoff": true
+        }
+      ]
+    },
+    {
+      "case_key": "bank-legal-2026-130",
+      "title": "Экологический платёж вместо разрешения",
+      "pairs": [
+        {
+          "option": "option_3",
+          "compared_to": "option_1",
+          "option_label": "Согласовать законные временные ограничения работы до выполнения требований",
+          "compared_label": "Предложить модернизацию наиболее загрязняющего оборудования по утверждённому плану",
+          "resource_levels": [
+            2,
+            3
+          ],
+          "time_levels": [
+            1,
+            3
+          ],
+          "conditional_tradeoff": true
+        }
+      ]
+    },
+    {
+      "case_key": "bank-legal-2026-133",
+      "title": "Обязательное примирение без согласия",
+      "pairs": [
+        {
+          "option": "option_3",
+          "compared_to": "option_1",
+          "option_label": "Подготовить раздельное юридическое разъяснение прав каждой стороне",
+          "compared_label": "Предложить новую добровольную встречу с независимым медиатором",
+          "resource_levels": [
+            2,
+            3
+          ],
+          "time_levels": [
+            1,
+            2
+          ],
+          "conditional_tradeoff": true
+        }
+      ]
+    },
+    {
+      "case_key": "bank-legal-2026-136",
+      "title": "Наследство и неподписанное обещание",
+      "pairs": [
+        {
+          "option": "option_3",
+          "compared_to": "option_1",
+          "option_label": "Согласовать добровольное обсуждение интересов наследников без предрешения прав",
+          "compared_label": "Организовать дополнительную помощь в сборе документов об имуществе и основаниях наследования",
+          "resource_levels": [
+            1,
+            2
+          ],
+          "time_levels": [
+            2,
+            1
+          ],
+          "conditional_tradeoff": true
+        },
+        {
+          "option": "option_4",
+          "compared_to": "option_1",
+          "option_label": "Подготовить перечень спорных вопросов для разрешения компетентным органом",
+          "compared_label": "Организовать дополнительную помощь в сборе документов об имуществе и основаниях наследования",
+          "resource_levels": [
+            1,
+            2
+          ],
+          "time_levels": [
+            2,
+            1
+          ],
+          "conditional_tradeoff": true
+        }
+      ]
+    },
+    {
+      "case_key": "bank-legal-2026-137",
+      "title": "Договор с несовершеннолетним",
+      "pairs": [
+        {
+          "option": "option_2",
+          "compared_to": "option_3",
+          "option_label": "Организовать консультацию о последствиях сделки и способах оспаривания",
+          "compared_label": "Провести внутреннюю проверку аналогичных продаж с рассрочкой",
+          "resource_levels": [
+            2,
+            2
+          ],
+          "time_levels": [
+            1,
+            2
+          ],
+          "conditional_tradeoff": true
+        },
+        {
+          "option": "option_5",
+          "compared_to": "option_1",
+          "option_label": "Предложить улучшить информационные материалы магазина о договорных условиях",
+          "compared_label": "Предложить урегулирование с представителем в пределах прав сторон",
+          "resource_levels": [
+            1,
+            1
+          ],
+          "time_levels": [
+            1,
+            2
+          ],
+          "conditional_tradeoff": true
+        }
+      ]
+    },
+    {
+      "case_key": "bank-legal-2026-138",
+      "title": "Благоустройство без слушаний",
+      "pairs": [
+        {
+          "option": "option_1",
+          "compared_to": "option_5",
+          "option_label": "Организовать дополнительные очные обсуждения в затронутом квартале",
+          "compared_label": "Организовать независимую систематизацию замечаний жителей и ответов",
+          "resource_levels": [
+            2,
+            3
+          ],
+          "time_levels": [
+            2,
+            2
+          ],
+          "conditional_tradeoff": true
+        }
+      ]
+    },
+    {
+      "case_key": "bank-legal-2026-139",
+      "title": "Публичное обещание компенсации",
+      "pairs": [
+        {
+          "option": "option_1",
+          "compared_to": "option_5",
+          "option_label": "Предложить адресную дополнительную меру с прозрачными критериями нуждаемости",
+          "compared_label": "Предложить этапное введение меры после принятия необходимых актов",
+          "resource_levels": [
+            3,
+            2
+          ],
+          "time_levels": [
+            2,
+            3
+          ],
+          "conditional_tradeoff": true
+        }
+      ]
+    },
+    {
+      "case_key": "bank-legal-2026-142",
+      "title": "Чужое фото в партийной программе",
+      "pairs": [
+        {
+          "option": "option_1",
+          "compared_to": "option_5",
+          "option_label": "Предложить приобрести необходимую лицензию на выбранную фотографию",
+          "compared_label": "Отложить тираж до независимой проверки прав на все элементы оформления",
+          "resource_levels": [
+            2,
+            2
+          ],
+          "time_levels": [
+            1,
+            2
+          ],
+          "conditional_tradeoff": true
+        }
+      ]
+    },
+    {
+      "case_key": "bank-legal-2026-146",
+      "title": "Лишняя справка для услуги",
+      "pairs": [
+        {
+          "option": "option_2",
+          "compared_to": "option_4",
+          "option_label": "Организовать немедленную помощь через существующих сотрудников при сбое обмена",
+          "compared_label": "Провести выборочный контроль отказов в приёме заявлений",
+          "resource_levels": [
+            2,
+            2
+          ],
+          "time_levels": [
+            0,
+            1
+          ],
+          "conditional_tradeoff": true
+        }
+      ]
+    },
+    {
+      "case_key": "bank-legal-2026-148",
+      "title": "Государственная помощь без контроля",
+      "pairs": [
+        {
+          "option": "option_4",
+          "compared_to": "option_2",
+          "option_label": "Подготовить контрольный перечень данных до заключения новых соглашений",
+          "compared_label": "Организовать единый календарь отчётности по аналогичным субсидиям",
+          "resource_levels": [
+            1,
+            2
+          ],
+          "time_levels": [
+            1,
+            2
+          ],
+          "conditional_tradeoff": true
+        }
+      ]
+    },
+    {
+      "case_key": "bank-legal-2026-150",
+      "title": "Вознаграждение за обязательную услугу",
+      "pairs": [
+        {
+          "option": "option_1",
+          "compared_to": "option_5",
+          "option_label": "Организовать дополнительное обучение служащих правилам предотвращения конфликта",
+          "compared_label": "Улучшить безопасный канал уведомления о склонении к нарушениям",
+          "resource_levels": [
+            2,
+            2
+          ],
+          "time_levels": [
+            1,
+            2
+          ],
+          "conditional_tradeoff": true
+        }
+      ]
+    }
+  ],
+  "unexplained_by_estimates": [],
+  "limitations": "Условные оценки ресурсов и сроков не утверждены как игровые механизмы. Проекция синтетическая, не кассовые поступления и не production. Остаточное прямое доминирование остаётся блокером допуска. Юридические статусы не изменены."
+}
