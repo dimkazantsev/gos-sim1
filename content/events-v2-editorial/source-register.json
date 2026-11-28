@@ -1514,23 +1514,44 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "БК РФ, статьи 161 и 219: принятие обязательств казённым учреждением в пределах доведённых лимитов. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
+      "legal_basis": "БК РФ, п. 3 и 5 ст. 161, п. 3 ст. 219, ст. 41; 44-ФЗ, ст. 8; 273-ФЗ от 29.12.2012, ч. 6 ст. 28: обязательства казённого учреждения ограничены доступными ЛБО; доходы от платной деятельности включаются в бюджет, требования безопасности и закупок обязательны.",
       "legal_urls": [
         "https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
         "https://www.consultant.ru/document/cons_doc_LAW_19702/58dfb94af2d30178f6bfdd70fad25ec5a89377cd/",
-        "https://www.consultant.ru/document/cons_doc_LAW_19702/15d7c58c01bf75dcd6cf84a008bfef761ba731eb/"
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/15d7c58c01bf75dcd6cf84a008bfef761ba731eb/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/c5a5b77bd2e9718ef6faf32c062d3faeff632d8f/",
+        "https://www.consultant.ru/document/cons_doc_LAW_144624/0c4ec341947f98654432292ddfd7066e3200d7fd/",
+        "https://www.consultant.ru/document/cons_doc_LAW_140174/552097cad5942f36c9484dbde7ebf92db1f783f3/"
       ],
-      "legal_status": "requires_case_specific_current_law_review",
+      "legal_status": "verified_current",
       "activation_allowed": false,
       "checked_norm_urls": [
         "https://www.consultant.ru/document/cons_doc_LAW_19702/58dfb94af2d30178f6bfdd70fad25ec5a89377cd/",
-        "https://www.consultant.ru/document/cons_doc_LAW_19702/15d7c58c01bf75dcd6cf84a008bfef761ba731eb/"
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/15d7c58c01bf75dcd6cf84a008bfef761ba731eb/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/c5a5b77bd2e9718ef6faf32c062d3faeff632d8f/",
+        "https://www.consultant.ru/document/cons_doc_LAW_144624/0c4ec341947f98654432292ddfd7066e3200d7fd/",
+        "https://www.consultant.ru/document/cons_doc_LAW_140174/552097cad5942f36c9484dbde7ebf92db1f783f3/"
       ],
       "review_date": "2026-11-28",
       "targeted_option_review": {
-        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
         "option_count": 5,
-        "remaining": "Состояние уже принятого обязательства, решение распорядителя, требования безопасности и отсутствие применимого исключения из общего правила ЛБО."
+        "remaining": "Оценка относится к явно заданным учебным обстоятельствам, не к реальному бюджетному или закупочному решению. Все пять вариантов — предложения уполномоченному органу; отдельные условия исполнения, финансирование и специальные исключения проверяются при реализации. Полная независимая сверка официальной цепочки поправок не проведена."
+      },
+      "final_case_review_2026_11_28": {
+        "date": "2026-11-28",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
+        "norm": "БК РФ, п. 3 и 5 ст. 161, п. 3 ст. 219, ст. 41; 44-ФЗ, ст. 8; 273-ФЗ от 29.12.2012, ч. 6 ст. 28: обязательства казённого учреждения ограничены доступными ЛБО; доходы от платной деятельности включаются в бюджет, требования безопасности и закупок обязательны.",
+        "option_count": 5,
+        "finding": "Уточнена стадия договора, остаток ЛБО и обязательное безопасное обучение. Разница 1,2 млн ₽ не покрывается обещанием будущих поступлений. Все меры остаются предложениями; разделение работ не означает обход конкурентной закупки.",
+        "remaining": "Оценка относится к явно заданным учебным обстоятельствам, не к реальному бюджетному или закупочному решению. Все пять вариантов — предложения уполномоченному органу; отдельные условия исполнения, финансирование и специальные исключения проверяются при реализации. Полная независимая сверка официальной цепочки поправок не проведена.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/58dfb94af2d30178f6bfdd70fad25ec5a89377cd/",
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/15d7c58c01bf75dcd6cf84a008bfef761ba731eb/",
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/c5a5b77bd2e9718ef6faf32c062d3faeff632d8f/",
+          "https://www.consultant.ru/document/cons_doc_LAW_144624/0c4ec341947f98654432292ddfd7066e3200d7fd/",
+          "https://www.consultant.ru/document/cons_doc_LAW_140174/552097cad5942f36c9484dbde7ebf92db1f783f3/"
+        ]
       }
     },
     {
@@ -1727,23 +1748,38 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "БК РФ, статьи 6 и 138: нецелевой характер дотации на выравнивание и её правовой режим. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
+      "legal_basis": "БК РФ, ст. 6, 136, 138: дотация на выравнивание не имеет установленного направления использования, но общие законные ограничения и условия трансфертов обязательны. Цвет покрытия сам по себе не образует основания возврата при заданных условиях.",
       "legal_urls": [
         "https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
         "https://www.consultant.ru/document/cons_doc_LAW_19702/055a71948dbf2a4fc2478437cd89cd864ee8e6e5/",
-        "https://www.consultant.ru/document/cons_doc_LAW_19702/958d77bbceed0d6b2ee32ddbb1a6fb2572b4ab9f/"
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/958d77bbceed0d6b2ee32ddbb1a6fb2572b4ab9f/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/0fb55fd4f1a32378f69c2bcc0c058b518c2dee20/"
       ],
-      "legal_status": "requires_case_specific_current_law_review",
+      "legal_status": "verified_current",
       "activation_allowed": false,
       "checked_norm_urls": [
         "https://www.consultant.ru/document/cons_doc_LAW_19702/055a71948dbf2a4fc2478437cd89cd864ee8e6e5/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/0fb55fd4f1a32378f69c2bcc0c058b518c2dee20/",
         "https://www.consultant.ru/document/cons_doc_LAW_19702/958d77bbceed0d6b2ee32ddbb1a6fb2572b4ab9f/"
       ],
       "review_date": "2026-11-28",
       "targeted_option_review": {
-        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
         "option_count": 5,
-        "remaining": "Региональный порядок дотации, применимые общие условия межбюджетных трансфертов, правовые основания требования возврата."
+        "remaining": "Оценка относится к явно заданным учебным обстоятельствам, не к реальному бюджетному или закупочному решению. Все пять вариантов — предложения уполномоченному органу; отдельные условия исполнения, финансирование и специальные исключения проверяются при реализации. Полная независимая сверка официальной цепочки поправок не проведена."
+      },
+      "final_case_review_2026_11_28": {
+        "date": "2026-11-28",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
+        "norm": "БК РФ, ст. 6, 136, 138: дотация на выравнивание не имеет установленного направления использования, но общие законные ограничения и условия трансфертов обязательны. Цвет покрытия сам по себе не образует основания возврата при заданных условиях.",
+        "option_count": 5,
+        "finding": "Разграничены дотация и целевая субсидия, сохранён контроль общих условий; отдельная будущая программа и консультации не меняют условия ранее предоставленной дотации.",
+        "remaining": "Оценка относится к явно заданным учебным обстоятельствам, не к реальному бюджетному или закупочному решению. Все пять вариантов — предложения уполномоченному органу; отдельные условия исполнения, финансирование и специальные исключения проверяются при реализации. Полная независимая сверка официальной цепочки поправок не проведена.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/055a71948dbf2a4fc2478437cd89cd864ee8e6e5/",
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/0fb55fd4f1a32378f69c2bcc0c058b518c2dee20/",
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/958d77bbceed0d6b2ee32ddbb1a6fb2572b4ab9f/"
+        ]
       }
     },
     {
@@ -2243,13 +2279,14 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "БК РФ, статьи 6 и 107: границы бюджетных показателей и ограничения государственного долга субъекта РФ. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
+      "legal_basis": "БК РФ, ст. 6, 14, 107: аналитический свод нескольких бюджетов не заменяет доходную базу отдельного субъекта для расчёта долговых ограничений. Конкретные ограничения зависят от статуса и показателей бюджета.",
       "legal_urls": [
         "https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
         "https://www.consultant.ru/document/cons_doc_LAW_19702/055a71948dbf2a4fc2478437cd89cd864ee8e6e5/",
-        "https://www.consultant.ru/document/cons_doc_LAW_19702/7b5f77362fb1983215e0525ce8a2b08de83e1dbf/"
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/7b5f77362fb1983215e0525ce8a2b08de83e1dbf/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/bb41379ccfcd791a488b9d89da16a1fdffce5155/"
       ],
-      "legal_status": "requires_case_specific_current_law_review",
+      "legal_status": "verified_current",
       "activation_allowed": false,
       "legal_evidence": [
         {
@@ -2262,13 +2299,27 @@
       ],
       "checked_norm_urls": [
         "https://www.consultant.ru/document/cons_doc_LAW_19702/055a71948dbf2a4fc2478437cd89cd864ee8e6e5/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/bb41379ccfcd791a488b9d89da16a1fdffce5155/",
         "https://www.consultant.ru/document/cons_doc_LAW_19702/7b5f77362fb1983215e0525ce8a2b08de83e1dbf/"
       ],
       "review_date": "2026-11-28",
       "targeted_option_review": {
-        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
         "option_count": 5,
-        "remaining": "Состав конкретного бюджета, соглашения между субъектами при применимости, исключения из доходной базы ст. 107 и специальные правила 2026 года."
+        "remaining": "Оценка относится к явно заданным учебным обстоятельствам, не к реальному бюджетному или закупочному решению. Все пять вариантов — предложения уполномоченному органу; отдельные условия исполнения, финансирование и специальные исключения проверяются при реализации. Полная независимая сверка официальной цепочки поправок не проведена."
+      },
+      "final_case_review_2026_11_28": {
+        "date": "2026-11-28",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
+        "norm": "БК РФ, ст. 6, 14, 107: аналитический свод нескольких бюджетов не заменяет доходную базу отдельного субъекта для расчёта долговых ограничений. Конкретные ограничения зависят от статуса и показателей бюджета.",
+        "option_count": 5,
+        "finding": "Исключено сложение пересекающихся бюджетных рядов; запас до предела — дополнительная осторожность, а не изменение установленного законом предела. Числовой предел не утверждается.",
+        "remaining": "Оценка относится к явно заданным учебным обстоятельствам, не к реальному бюджетному или закупочному решению. Все пять вариантов — предложения уполномоченному органу; отдельные условия исполнения, финансирование и специальные исключения проверяются при реализации. Полная независимая сверка официальной цепочки поправок не проведена.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/055a71948dbf2a4fc2478437cd89cd864ee8e6e5/",
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/bb41379ccfcd791a488b9d89da16a1fdffce5155/",
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/7b5f77362fb1983215e0525ce8a2b08de83e1dbf/"
+        ]
       }
     },
     {
@@ -2902,12 +2953,14 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "БК РФ, статья 37: достоверность прогнозирования доходов и расходов бюджета. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
+      "legal_basis": "БК РФ, ст. 6, 33, 37: расчёт доходов и расходов должен основываться на реалистичном прогнозе. Ожидаемое налоговое поступление не тождественно источнику финансирования дефицита. Неопределённые предпосылки раскрываются в сценариях.",
       "legal_urls": [
         "https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
-        "https://www.consultant.ru/document/cons_doc_LAW_19702/73147d61f1183d32e517768da079cfdf28cca0a9/"
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/73147d61f1183d32e517768da079cfdf28cca0a9/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/055a71948dbf2a4fc2478437cd89cd864ee8e6e5/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/bfe84bef16378ca35200b610fe85a50ee121673c/"
       ],
-      "legal_status": "requires_case_specific_current_law_review",
+      "legal_status": "verified_current",
       "activation_allowed": false,
       "legal_evidence": [
         {
@@ -2919,13 +2972,28 @@
         }
       ],
       "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/055a71948dbf2a4fc2478437cd89cd864ee8e6e5/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/bfe84bef16378ca35200b610fe85a50ee121673c/",
         "https://www.consultant.ru/document/cons_doc_LAW_19702/73147d61f1183d32e517768da079cfdf28cca0a9/"
       ],
       "review_date": "2026-11-28",
       "targeted_option_review": {
-        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
         "option_count": 5,
-        "remaining": "Статус лицензии, налоги и нормативы зачисления, производственный прогноз; доходы от добычи не тождественны источникам финансирования дефицита."
+        "remaining": "Оценка относится к явно заданным учебным обстоятельствам, не к реальному бюджетному или закупочному решению. Все пять вариантов — предложения уполномоченному органу; отдельные условия исполнения, финансирование и специальные исключения проверяются при реализации. Полная независимая сверка официальной цепочки поправок не проведена."
+      },
+      "final_case_review_2026_11_28": {
+        "date": "2026-11-28",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
+        "norm": "БК РФ, ст. 6, 33, 37: расчёт доходов и расходов должен основываться на реалистичном прогнозе. Ожидаемое налоговое поступление не тождественно источнику финансирования дефицита. Неопределённые предпосылки раскрываются в сценариях.",
+        "option_count": 5,
+        "finding": "Оценка только достоверности прогноза; не утверждается право на недропользование, размер налога или норматив зачисления. Сохранены все возникшие обязательства.",
+        "remaining": "Оценка относится к явно заданным учебным обстоятельствам, не к реальному бюджетному или закупочному решению. Все пять вариантов — предложения уполномоченному органу; отдельные условия исполнения, финансирование и специальные исключения проверяются при реализации. Полная независимая сверка официальной цепочки поправок не проведена.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/055a71948dbf2a4fc2478437cd89cd864ee8e6e5/",
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/bfe84bef16378ca35200b610fe85a50ee121673c/",
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/73147d61f1183d32e517768da079cfdf28cca0a9/"
+        ]
       }
     },
     {
@@ -3472,12 +3540,15 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "БК РФ, статья 72: государственные контракты и многолетние обязательства. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
+      "legal_basis": "БК РФ, ст. 72, п. 5 ст. 161, п. 3 ст. 219; 44-ФЗ, ст. 8: обязательства обеспечиваются лимитами, а выход за срок действия ЛБО возможен только при законном основании; новый год сам по себе не запрещает контракт.",
       "legal_urls": [
         "https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
-        "https://www.consultant.ru/document/cons_doc_LAW_19702/aa129af3559dd1fc2b3201c05ced33582fe3d193/"
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/aa129af3559dd1fc2b3201c05ced33582fe3d193/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/58dfb94af2d30178f6bfdd70fad25ec5a89377cd/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/15d7c58c01bf75dcd6cf84a008bfef761ba731eb/",
+        "https://www.consultant.ru/document/cons_doc_LAW_144624/0c4ec341947f98654432292ddfd7066e3200d7fd/"
       ],
-      "legal_status": "requires_case_specific_current_law_review",
+      "legal_status": "verified_current",
       "activation_allowed": false,
       "legal_evidence": [
         {
@@ -3489,13 +3560,30 @@
         }
       ],
       "checked_norm_urls": [
-        "https://www.consultant.ru/document/cons_doc_LAW_19702/aa129af3559dd1fc2b3201c05ced33582fe3d193/"
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/aa129af3559dd1fc2b3201c05ced33582fe3d193/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/58dfb94af2d30178f6bfdd70fad25ec5a89377cd/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/15d7c58c01bf75dcd6cf84a008bfef761ba731eb/",
+        "https://www.consultant.ru/document/cons_doc_LAW_144624/0c4ec341947f98654432292ddfd7066e3200d7fd/"
       ],
       "review_date": "2026-11-28",
       "targeted_option_review": {
-        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
         "option_count": 5,
-        "remaining": "Тип заказчика, предмет договора, период лимитов, условия многолетнего решения, специальные основания."
+        "remaining": "Оценка относится к явно заданным учебным обстоятельствам, не к реальному бюджетному или закупочному решению. Все пять вариантов — предложения уполномоченному органу; отдельные условия исполнения, финансирование и специальные исключения проверяются при реализации. Полная независимая сверка официальной цепочки поправок не проведена."
+      },
+      "final_case_review_2026_11_28": {
+        "date": "2026-11-28",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
+        "norm": "БК РФ, ст. 72, п. 5 ст. 161, п. 3 ст. 219; 44-ФЗ, ст. 8: обязательства обеспечиваются лимитами, а выход за срок действия ЛБО возможен только при законном основании; новый год сам по себе не запрещает контракт.",
+        "option_count": 5,
+        "finding": "Уточнено отличие календарного года от срока ЛБО. Вариант многолетнего решения — подготовка законного основания, а не уже полученное разрешение.",
+        "remaining": "Оценка относится к явно заданным учебным обстоятельствам, не к реальному бюджетному или закупочному решению. Все пять вариантов — предложения уполномоченному органу; отдельные условия исполнения, финансирование и специальные исключения проверяются при реализации. Полная независимая сверка официальной цепочки поправок не проведена.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/aa129af3559dd1fc2b3201c05ced33582fe3d193/",
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/58dfb94af2d30178f6bfdd70fad25ec5a89377cd/",
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/15d7c58c01bf75dcd6cf84a008bfef761ba731eb/",
+          "https://www.consultant.ru/document/cons_doc_LAW_144624/0c4ec341947f98654432292ddfd7066e3200d7fd/"
+        ]
       }
     },
     {
@@ -4002,13 +4090,13 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "БК РФ, статья 219: подтверждение денежного обязательства и санкционирование оплаты. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
+      "legal_basis": "БК РФ, п. 4 ст. 219; 44-ФЗ, ч. 1, 3, 7–8, 13 ст. 94: постоплата зависит от надлежащего подтверждения денежного обязательства и приёмки; обязательная экспертиза, подписанный документ или мотивированный отказ и применимый порядок ЕИС сохраняются.",
       "legal_urls": [
         "https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
         "https://www.consultant.ru/document/cons_doc_LAW_19702/15d7c58c01bf75dcd6cf84a008bfef761ba731eb/",
         "https://www.consultant.ru/document/cons_doc_LAW_144624/17c58c1903f7b6212924ba9ce701489655e9a8e0/"
       ],
-      "legal_status": "requires_case_specific_current_law_review",
+      "legal_status": "verified_current",
       "activation_allowed": false,
       "checked_norm_urls": [
         "https://www.consultant.ru/document/cons_doc_LAW_19702/15d7c58c01bf75dcd6cf84a008bfef761ba731eb/",
@@ -4016,9 +4104,21 @@
       ],
       "review_date": "2026-11-28",
       "targeted_option_review": {
-        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
         "option_count": 5,
-        "remaining": "Предмет и стадия контракта, порядок приёмки, документы денежного обязательства, сроки и обязательность ЕИС."
+        "remaining": "Оценка относится к явно заданным учебным обстоятельствам, не к реальному бюджетному или закупочному решению. Все пять вариантов — предложения уполномоченному органу; отдельные условия исполнения, финансирование и специальные исключения проверяются при реализации. Полная независимая сверка официальной цепочки поправок не проведена."
+      },
+      "final_case_review_2026_11_28": {
+        "date": "2026-11-28",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
+        "norm": "БК РФ, п. 4 ст. 219; 44-ФЗ, ч. 1, 3, 7–8, 13 ст. 94: постоплата зависит от надлежащего подтверждения денежного обязательства и приёмки; обязательная экспертиза, подписанный документ или мотивированный отказ и применимый порядок ЕИС сохраняются.",
+        "option_count": 5,
+        "finding": "Уточнены вид контракта и отсутствие аванса; частичная оплата только за предусмотренный и принятый этап, внутренняя система не заменяет обязательную электронную приёмку.",
+        "remaining": "Оценка относится к явно заданным учебным обстоятельствам, не к реальному бюджетному или закупочному решению. Все пять вариантов — предложения уполномоченному органу; отдельные условия исполнения, финансирование и специальные исключения проверяются при реализации. Полная независимая сверка официальной цепочки поправок не проведена.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/15d7c58c01bf75dcd6cf84a008bfef761ba731eb/",
+          "https://www.consultant.ru/document/cons_doc_LAW_144624/17c58c1903f7b6212924ba9ce701489655e9a8e0/"
+        ]
       }
     },
     {
