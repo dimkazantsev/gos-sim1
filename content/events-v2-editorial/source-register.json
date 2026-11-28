@@ -59,40 +59,45 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "БК РФ, ст. 131 п. 11; ст. 217. Запрос дотации для сбалансированности не равен решению о её распределении. Бюджетные изменения принимаются уполномоченными органами в надлежащем порядке.",
+      "legal_basis": "БК РФ, п. 11 ст. 131, ст. 217, 217.1 и 219; постановление Правительства РФ от 13.04.2010 №231, п. 1–3 и 6: дотация для сбалансированности возможна при недостатке собственных доходов по установленной процедуре, но не гарантирована; кассовый план и бюджетное решение не отменяют обязательств.",
       "legal_urls": [
         "https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
         "https://www.consultant.ru/document/cons_doc_LAW_19702/73147d61f1183d32e517768da079cfdf28cca0a9/",
         "https://www.consultant.ru/document/cons_doc_LAW_19702/42df670934cd2c8f62a9ef153b2826b4d39b3ff4/",
         "https://www.consultant.ru/document/cons_doc_LAW_19702/24a94562b0b0557393897b9d9ef6f591ff1fb19b/",
-        "https://www.consultant.ru/document/cons_doc_LAW_19702/cf2863695f409dd40e50baa388ab6ae07175b29e/"
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/cf2863695f409dd40e50baa388ab6ae07175b29e/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/15d7c58c01bf75dcd6cf84a008bfef761ba731eb/",
+        "https://base.garant.ru/12174959/"
       ],
-      "legal_status": "requires_case_specific_current_law_review",
+      "legal_status": "verified_current",
       "activation_allowed": false,
       "financial_review_status": "draft_requires_integration",
       "checked_norm_urls": [
-        "https://www.consultant.ru/document/cons_doc_LAW_19702/73147d61f1183d32e517768da079cfdf28cca0a9/",
         "https://www.consultant.ru/document/cons_doc_LAW_19702/42df670934cd2c8f62a9ef153b2826b4d39b3ff4/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/cf2863695f409dd40e50baa388ab6ae07175b29e/",
         "https://www.consultant.ru/document/cons_doc_LAW_19702/24a94562b0b0557393897b9d9ef6f591ff1fb19b/",
-        "https://www.consultant.ru/document/cons_doc_LAW_19702/cf2863695f409dd40e50baa388ab6ae07175b29e/"
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/15d7c58c01bf75dcd6cf84a008bfef761ba731eb/",
+        "https://base.garant.ru/12174959/"
       ],
       "review_date": "2026-11-28",
       "targeted_option_review": {
-        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
         "option_count": 5,
-        "remaining": "Проверить конкретное основание предоставления дотации и разрешённый кассовый источник; реальные суммы не заявляются."
+        "remaining": "Вывод относится к явно заданным вымышленным учебным условиям и предложениям компетентному органу. Конкретный региональный акт, реальные обстоятельства и полный официальный ряд поправок независимо не подтверждены. Отдельные условия исполнения и бюджетные решения требуют проверки при реализации. Активация запрещена."
       },
       "final_case_review_2026_11_28": {
         "date": "2026-11-28",
-        "scope": "specific_norm_followup_not_full_acceptance",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
+        "norm": "БК РФ, п. 11 ст. 131, ст. 217, 217.1 и 219; постановление Правительства РФ от 13.04.2010 №231, п. 1–3 и 6: дотация для сбалансированности возможна при недостатке собственных доходов по установленной процедуре, но не гарантирована; кассовый план и бюджетное решение не отменяют обязательств.",
         "option_count": 5,
-        "conclusion": "Установлен конкретный вид запрашиваемой дотации. Проверен п. 11 ст. 131 и порядок изменения росписи по ст. 217; право на конкретные 420 млн ₽ не подтверждено. Требуется сверка применимого порядка распределения и допустимого источника кассового разрыва.",
-        "remaining": "Проверить конкретное основание предоставления дотации и разрешённый кассовый источник; реальные суммы не заявляются.",
+        "finding": "Подтверждена возможность запроса дотации при недостатке собственных доходов; объём не выводится из одной сметы. Отсутствует основание считать помощь выделенной либо переносить обязательные выплаты.",
+        "remaining": "Вывод относится к явно заданным вымышленным учебным условиям и предложениям компетентному органу. Конкретный региональный акт, реальные обстоятельства и полный официальный ряд поправок независимо не подтверждены. Отдельные условия исполнения и бюджетные решения требуют проверки при реализации. Активация запрещена.",
         "urls": [
-          "https://www.consultant.ru/document/cons_doc_LAW_19702/73147d61f1183d32e517768da079cfdf28cca0a9/",
           "https://www.consultant.ru/document/cons_doc_LAW_19702/42df670934cd2c8f62a9ef153b2826b4d39b3ff4/",
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/cf2863695f409dd40e50baa388ab6ae07175b29e/",
           "https://www.consultant.ru/document/cons_doc_LAW_19702/24a94562b0b0557393897b9d9ef6f591ff1fb19b/",
-          "https://www.consultant.ru/document/cons_doc_LAW_19702/cf2863695f409dd40e50baa388ab6ae07175b29e/"
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/15d7c58c01bf75dcd6cf84a008bfef761ba731eb/",
+          "https://base.garant.ru/12174959/"
         ]
       }
     },
@@ -245,36 +250,40 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "БК РФ, ст. 133: субвенция финансирует расходные обязательства при исполнении переданного полномочия; применимая методика и порядок определяются для конкретной субвенции. Правила доступа к персональным данным требуют самостоятельного основания.",
+      "legal_basis": "БК РФ, п. 1 ст. 133; Закон №152-ФЗ, ст. 5, 6 и 19: расчёт субвенции основывается на применимой методике; точность, достаточность и законность обработки данных обязательны, а межведомственный обмен требует правового основания и защиты.",
       "legal_urls": [
         "https://www.consultant.ru/document/cons_doc_LAW_19702/",
         "https://www.consultant.ru/document/cons_doc_LAW_19702/6288b672abcacbdfce848217bd5f3b6dcfa76913/",
         "https://www.consultant.ru/document/cons_doc_LAW_61801/96fbc469f91f57235cc842a85e0516a99f23dc85/",
-        "https://www.consultant.ru/document/cons_doc_LAW_61801/ca9e5658710519f09ab2fdb8196fcb3eb024a051/"
+        "https://www.consultant.ru/document/cons_doc_LAW_61801/ca9e5658710519f09ab2fdb8196fcb3eb024a051/",
+        "https://www.consultant.ru/document/cons_doc_LAW_61801/315f051396c88f1e4f827ba3f2ae313d999a1873/"
       ],
-      "legal_status": "requires_case_specific_current_law_review",
+      "legal_status": "verified_current",
       "activation_allowed": false,
       "financial_review_status": "draft_requires_integration",
       "checked_norm_urls": [
         "https://www.consultant.ru/document/cons_doc_LAW_19702/6288b672abcacbdfce848217bd5f3b6dcfa76913/",
         "https://www.consultant.ru/document/cons_doc_LAW_61801/96fbc469f91f57235cc842a85e0516a99f23dc85/",
+        "https://www.consultant.ru/document/cons_doc_LAW_61801/315f051396c88f1e4f827ba3f2ae313d999a1873/",
         "https://www.consultant.ru/document/cons_doc_LAW_61801/ca9e5658710519f09ab2fdb8196fcb3eb024a051/"
       ],
       "review_date": "2026-11-28",
       "targeted_option_review": {
-        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
         "option_count": 5,
-        "remaining": "Установить конкретное полномочие, методику и правовое основание доступа к сведениям."
+        "remaining": "Вывод относится к явно заданным вымышленным учебным условиям и предложениям компетентному органу. Конкретный региональный акт, реальные обстоятельства и полный официальный ряд поправок независимо не подтверждены. Отдельные условия исполнения и бюджетные решения требуют проверки при реализации. Активация запрещена."
       },
       "final_case_review_2026_11_28": {
         "date": "2026-11-28",
-        "scope": "specific_norm_followup_not_full_acceptance",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
+        "norm": "БК РФ, п. 1 ст. 133; Закон №152-ФЗ, ст. 5, 6 и 19: расчёт субвенции основывается на применимой методике; точность, достаточность и законность обработки данных обязательны, а межведомственный обмен требует правового основания и защиты.",
         "option_count": 5,
-        "conclusion": "Устранено смешение обращений и уникальных правомочных получателей. Статья 133 найдена в актуальной редакции; поисковое извлечение подтверждает отдельный порядок каждой субвенции. Конкретное переданное полномочие и доступ к данным ещё не установлены.",
-        "remaining": "Установить конкретное полномочие, методику и правовое основание доступа к сведениям.",
+        "finding": "Из расчётного реестра исключаются 240 лишних повторных записей и добавляются 60 подтверждённых получателей; чистое изменение −180 единиц расчёта. Стоимость не вычисляется без размера норматива. Меры контроля не меняют право на услугу.",
+        "remaining": "Вывод относится к явно заданным вымышленным учебным условиям и предложениям компетентному органу. Конкретный региональный акт, реальные обстоятельства и полный официальный ряд поправок независимо не подтверждены. Отдельные условия исполнения и бюджетные решения требуют проверки при реализации. Активация запрещена.",
         "urls": [
           "https://www.consultant.ru/document/cons_doc_LAW_19702/6288b672abcacbdfce848217bd5f3b6dcfa76913/",
           "https://www.consultant.ru/document/cons_doc_LAW_61801/96fbc469f91f57235cc842a85e0516a99f23dc85/",
+          "https://www.consultant.ru/document/cons_doc_LAW_61801/315f051396c88f1e4f827ba3f2ae313d999a1873/",
           "https://www.consultant.ru/document/cons_doc_LAW_61801/ca9e5658710519f09ab2fdb8196fcb3eb024a051/"
         ]
       }
@@ -286,37 +295,45 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "БК РФ, ст. 38, ст. 81 п. 4–6: решение об использовании регионального резервного фонда и порядок его использования относятся к высшему исполнительному органу субъекта. Применимый региональный порядок подлежит отдельной проверке.",
+      "legal_basis": "БК РФ, ст. 38, п. 4–6 ст. 81, ст. 219; Закон №68-ФЗ, ст. 11; Закон №44-ФЗ, ст. 8: резерв используется по решению высшего исполнительного органа и в соответствии с его порядком; неотложные работы отделяются от обычных инвестиций; финансирование и закупки не возникают из заявки автоматически.",
       "legal_urls": [
         "https://www.consultant.ru/document/cons_doc_LAW_19702/",
         "https://www.consultant.ru/document/cons_doc_LAW_19702/55d68b8b11dce341557f8bc5b72a4a20c5c8e00c/",
         "https://www.consultant.ru/document/cons_doc_LAW_19702/9a0e8abcbe24837343cdcc599bccf0f09413968a/",
-        "https://base.garant.ru/415262957/"
+        "https://base.garant.ru/415262957/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/15d7c58c01bf75dcd6cf84a008bfef761ba731eb/",
+        "https://www.consultant.ru/document/cons_doc_LAW_5295/cf148e8662eafdb9539fb6f19024dfdb5c33aaa2/",
+        "https://www.consultant.ru/document/cons_doc_LAW_144624/0c4ec341947f98654432292ddfd7066e3200d7fd/"
       ],
-      "legal_status": "requires_case_specific_current_law_review",
+      "legal_status": "verified_current",
       "activation_allowed": false,
       "financial_review_status": "draft_requires_integration",
       "checked_norm_urls": [
-        "https://www.consultant.ru/document/cons_doc_LAW_19702/55d68b8b11dce341557f8bc5b72a4a20c5c8e00c/",
         "https://www.consultant.ru/document/cons_doc_LAW_19702/9a0e8abcbe24837343cdcc599bccf0f09413968a/",
-        "https://base.garant.ru/415262957/"
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/55d68b8b11dce341557f8bc5b72a4a20c5c8e00c/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/15d7c58c01bf75dcd6cf84a008bfef761ba731eb/",
+        "https://www.consultant.ru/document/cons_doc_LAW_5295/cf148e8662eafdb9539fb6f19024dfdb5c33aaa2/",
+        "https://www.consultant.ru/document/cons_doc_LAW_144624/0c4ec341947f98654432292ddfd7066e3200d7fd/"
       ],
       "review_date": "2026-11-28",
       "targeted_option_review": {
-        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
         "option_count": 5,
-        "remaining": "Прочитать консолидированное Положение от 07.03.2008 № 46-па с последними поправками; установить режим ЧС и условия временной помощи бизнесу."
+        "remaining": "Вывод относится к явно заданным вымышленным учебным условиям и предложениям компетентному органу. Конкретный региональный акт, реальные обстоятельства и полный официальный ряд поправок независимо не подтверждены. Отдельные условия исполнения и бюджетные решения требуют проверки при реализации. Активация запрещена."
       },
       "final_case_review_2026_11_28": {
         "date": "2026-11-28",
-        "scope": "specific_norm_followup_not_full_acceptance",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
+        "norm": "БК РФ, ст. 38, п. 4–6 ст. 81, ст. 219; Закон №68-ФЗ, ст. 11; Закон №44-ФЗ, ст. 8: резерв используется по решению высшего исполнительного органа и в соответствии с его порядком; неотложные работы отделяются от обычных инвестиций; финансирование и закупки не возникают из заявки автоматически.",
         "option_count": 5,
-        "conclusion": "Уточнён владелец регионального резервного фонда; прочитаны ст. 38 и 81. Найдены сведения о поправках к областному порядку от 11.11.2026 № 831-пп, но полная страница вернула 403. Не заявляется проверка актуальной региональной процедуры.",
-        "remaining": "Прочитать консолидированное Положение от 07.03.2008 № 46-па с последними поправками; установить режим ЧС и условия временной помощи бизнесу.",
+        "finding": "Статья 81 допускает также иные мероприятия, установленные порядком фонда, но они прямо исключены для туристического центра условиями истории. 600 млн ₽ остаются запросом. Не применяется новый количественный норматив п. 4.1 без отдельной проверки периода.",
+        "remaining": "Вывод относится к явно заданным вымышленным учебным условиям и предложениям компетентному органу. Конкретный региональный акт, реальные обстоятельства и полный официальный ряд поправок независимо не подтверждены. Отдельные условия исполнения и бюджетные решения требуют проверки при реализации. Активация запрещена.",
         "urls": [
-          "https://www.consultant.ru/document/cons_doc_LAW_19702/55d68b8b11dce341557f8bc5b72a4a20c5c8e00c/",
           "https://www.consultant.ru/document/cons_doc_LAW_19702/9a0e8abcbe24837343cdcc599bccf0f09413968a/",
-          "https://base.garant.ru/415262957/"
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/55d68b8b11dce341557f8bc5b72a4a20c5c8e00c/",
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/15d7c58c01bf75dcd6cf84a008bfef761ba731eb/",
+          "https://www.consultant.ru/document/cons_doc_LAW_5295/cf148e8662eafdb9539fb6f19024dfdb5c33aaa2/",
+          "https://www.consultant.ru/document/cons_doc_LAW_144624/0c4ec341947f98654432292ddfd7066e3200d7fd/"
         ]
       }
     },
@@ -539,40 +556,51 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "БК РФ, ст. 38, 132, 78. Федеральная межбюджетная субсидия предназначена бюджету субъекта РФ; отдельная субсидия коммерческой организации требует самостоятельного бюджетного и нормативного основания. Конкретные направления и условия софинансирования определяются применимыми актами и соглашением.",
+      "legal_basis": "БК РФ, ст. 38, п. 3 ст. 132, ст. 78, 78.5, 219; Закон №135-ФЗ, ст. 15; Закон №44-ФЗ, ст. 8: межбюджетная субсидия и субсидия производителю имеют разные основания; соблюдаются цель, показатели, полномочия, конкуренция и процедура отбора.",
       "legal_urls": [
         "https://www.consultant.ru/document/cons_doc_LAW_19702/",
         "https://www.consultant.ru/document/cons_doc_LAW_19702/0859896f05c16d5719eafdf624507adf8887f0c7/",
         "https://www.consultant.ru/document/cons_doc_LAW_19702/1b6959f23cc516d0e11ddc2e213ca2dca83560df/",
         "https://www.consultant.ru/document/cons_doc_LAW_19702/ac6c532ee1f365c6e1ff222f22b3f10587918494/",
-        "https://www.consultant.ru/document/cons_doc_LAW_19702/9a0e8abcbe24837343cdcc599bccf0f09413968a/"
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/9a0e8abcbe24837343cdcc599bccf0f09413968a/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/cc1a194570930b60765fa0b326aae1fd5a41d5bc/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/15d7c58c01bf75dcd6cf84a008bfef761ba731eb/",
+        "https://www.consultant.ru/document/cons_doc_LAW_61763/871fb1003dab1dd3ef350f8f7f0f0d10ea20b5c6/",
+        "https://www.consultant.ru/document/cons_doc_LAW_144624/0c4ec341947f98654432292ddfd7066e3200d7fd/"
       ],
-      "legal_status": "requires_case_specific_current_law_review",
+      "legal_status": "verified_current",
       "activation_allowed": false,
       "financial_review_status": "draft_requires_integration",
       "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/9a0e8abcbe24837343cdcc599bccf0f09413968a/",
         "https://www.consultant.ru/document/cons_doc_LAW_19702/0859896f05c16d5719eafdf624507adf8887f0c7/",
         "https://www.consultant.ru/document/cons_doc_LAW_19702/1b6959f23cc516d0e11ddc2e213ca2dca83560df/",
-        "https://www.consultant.ru/document/cons_doc_LAW_19702/ac6c532ee1f365c6e1ff222f22b3f10587918494/",
-        "https://www.consultant.ru/document/cons_doc_LAW_19702/9a0e8abcbe24837343cdcc599bccf0f09413968a/"
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/cc1a194570930b60765fa0b326aae1fd5a41d5bc/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/15d7c58c01bf75dcd6cf84a008bfef761ba731eb/",
+        "https://www.consultant.ru/document/cons_doc_LAW_61763/871fb1003dab1dd3ef350f8f7f0f0d10ea20b5c6/",
+        "https://www.consultant.ru/document/cons_doc_LAW_144624/0c4ec341947f98654432292ddfd7066e3200d7fd/"
       ],
       "review_date": "2026-11-28",
       "targeted_option_review": {
-        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
         "option_count": 5,
-        "remaining": "Установить условия конкретной федеральной субсидии, форму собственности сети и самостоятельный механизм поддержки компаний."
+        "remaining": "Вывод относится к явно заданным вымышленным учебным условиям и предложениям компетентному органу. Конкретный региональный акт, реальные обстоятельства и полный официальный ряд поправок независимо не подтверждены. Отдельные условия исполнения и бюджетные решения требуют проверки при реализации. Активация запрещена."
       },
       "final_case_review_2026_11_28": {
         "date": "2026-11-28",
-        "scope": "specific_norm_followup_not_full_acceptance",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
+        "norm": "БК РФ, ст. 38, п. 3 ст. 132, ст. 78, 78.5, 219; Закон №135-ФЗ, ст. 15; Закон №44-ФЗ, ст. 8: межбюджетная субсидия и субсидия производителю имеют разные основания; соблюдаются цель, показатели, полномочия, конкуренция и процедура отбора.",
         "option_count": 5,
-        "conclusion": "Разграничены получатели двух видов субсидий. Найдены актуальные ст. 132 и 78, прочитаны поисковые извлечения; конкретная программа кластера, права собственника сети, отдельный отбор и допустимость транспортных подходов пока не проверены.",
-        "remaining": "Установить условия конкретной федеральной субсидии, форму собственности сети и самостоятельный механизм поддержки компаний.",
+        "finding": "Общая условная смета — 2 200 млн ₽; запрос не означает утверждения. Исключено прямое перечисление межбюджетного трансферта компании. Конкурс предусмотрен для отдельной меры, а не как универсальное требование во всех случаях ст. 78.5.",
+        "remaining": "Вывод относится к явно заданным вымышленным учебным условиям и предложениям компетентному органу. Конкретный региональный акт, реальные обстоятельства и полный официальный ряд поправок независимо не подтверждены. Отдельные условия исполнения и бюджетные решения требуют проверки при реализации. Активация запрещена.",
         "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/9a0e8abcbe24837343cdcc599bccf0f09413968a/",
           "https://www.consultant.ru/document/cons_doc_LAW_19702/0859896f05c16d5719eafdf624507adf8887f0c7/",
           "https://www.consultant.ru/document/cons_doc_LAW_19702/1b6959f23cc516d0e11ddc2e213ca2dca83560df/",
-          "https://www.consultant.ru/document/cons_doc_LAW_19702/ac6c532ee1f365c6e1ff222f22b3f10587918494/",
-          "https://www.consultant.ru/document/cons_doc_LAW_19702/9a0e8abcbe24837343cdcc599bccf0f09413968a/"
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/cc1a194570930b60765fa0b326aae1fd5a41d5bc/",
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/15d7c58c01bf75dcd6cf84a008bfef761ba731eb/",
+          "https://www.consultant.ru/document/cons_doc_LAW_61763/871fb1003dab1dd3ef350f8f7f0f0d10ea20b5c6/",
+          "https://www.consultant.ru/document/cons_doc_LAW_144624/0c4ec341947f98654432292ddfd7066e3200d7fd/"
         ]
       }
     },
@@ -1752,21 +1780,47 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "БК РФ, статья 81: резервные фонды исполнительных органов предназначены для непредвиденных расходов. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
+      "legal_basis": "БК РФ, п. 4–6 ст. 81, ст. 38, 41, 217, 219; Закон №44-ФЗ, ст. 8: резерв предназначен для непредвиденных расходов и других предусмотренных установленным порядком мероприятий; для планового праздника основания из резерва в данной задаче нет.",
       "legal_urls": [
         "https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
-        "https://www.consultant.ru/document/cons_doc_LAW_19702/55d68b8b11dce341557f8bc5b72a4a20c5c8e00c/"
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/55d68b8b11dce341557f8bc5b72a4a20c5c8e00c/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/9a0e8abcbe24837343cdcc599bccf0f09413968a/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/c5a5b77bd2e9718ef6faf32c062d3faeff632d8f/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/cf2863695f409dd40e50baa388ab6ae07175b29e/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/15d7c58c01bf75dcd6cf84a008bfef761ba731eb/",
+        "https://www.consultant.ru/document/cons_doc_LAW_144624/0c4ec341947f98654432292ddfd7066e3200d7fd/"
       ],
-      "legal_status": "requires_case_specific_current_law_review",
+      "legal_status": "verified_current",
       "activation_allowed": false,
       "checked_norm_urls": [
-        "https://www.consultant.ru/document/cons_doc_LAW_19702/55d68b8b11dce341557f8bc5b72a4a20c5c8e00c/"
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/55d68b8b11dce341557f8bc5b72a4a20c5c8e00c/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/9a0e8abcbe24837343cdcc599bccf0f09413968a/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/c5a5b77bd2e9718ef6faf32c062d3faeff632d8f/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/cf2863695f409dd40e50baa388ab6ae07175b29e/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/15d7c58c01bf75dcd6cf84a008bfef761ba731eb/",
+        "https://www.consultant.ru/document/cons_doc_LAW_144624/0c4ec341947f98654432292ddfd7066e3200d7fd/"
       ],
       "review_date": "2026-11-28",
       "targeted_option_review": {
-        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
         "option_count": 5,
-        "remaining": "Действующее положение о резервном фонде, бюджетная классификация, закупки и конкретные источники финансирования. Статья 81 допускает также иные мероприятия, предусмотренные порядком фонда."
+        "remaining": "Вывод относится к явно заданным вымышленным учебным условиям и предложениям компетентному органу. Конкретный региональный акт, реальные обстоятельства и полный официальный ряд поправок независимо не подтверждены. Отдельные условия исполнения и бюджетные решения требуют проверки при реализации. Активация запрещена."
+      },
+      "final_case_review_2026_11_28": {
+        "date": "2026-11-28",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
+        "norm": "БК РФ, п. 4–6 ст. 81, ст. 38, 41, 217, 219; Закон №44-ФЗ, ст. 8: резерв предназначен для непредвиденных расходов и других предусмотренных установленным порядком мероприятий; для планового праздника основания из резерва в данной задаче нет.",
+        "option_count": 5,
+        "finding": "Запрет основан на условиях данного фонда, а не на универсальном запрете любой плановой траты из резерва. Уменьшение формата, софинансирование и перенос расходов не создают бюджетного разрешения сами по себе.",
+        "remaining": "Вывод относится к явно заданным вымышленным учебным условиям и предложениям компетентному органу. Конкретный региональный акт, реальные обстоятельства и полный официальный ряд поправок независимо не подтверждены. Отдельные условия исполнения и бюджетные решения требуют проверки при реализации. Активация запрещена.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/55d68b8b11dce341557f8bc5b72a4a20c5c8e00c/",
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/9a0e8abcbe24837343cdcc599bccf0f09413968a/",
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/c5a5b77bd2e9718ef6faf32c062d3faeff632d8f/",
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/cf2863695f409dd40e50baa388ab6ae07175b29e/",
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/15d7c58c01bf75dcd6cf84a008bfef761ba731eb/",
+          "https://www.consultant.ru/document/cons_doc_LAW_144624/0c4ec341947f98654432292ddfd7066e3200d7fd/"
+        ]
       }
     },
     {
@@ -4503,23 +4557,45 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "Конституция РФ, статья 132, часть 2; БК РФ, статья 140: обеспечение переданных муниципалитету полномочий. Источники: https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
+      "legal_basis": "Конституция РФ, ч. 2 ст. 132; БК РФ, п. 2.1, 3 и 6 ст. 140; Закон №33-ФЗ, ст. 33, 34 и 71: наделение муниципалитета государственными полномочиями осуществляется законом с необходимым финансовым и материальным обеспечением, распределение субвенции — по установленной методике.",
       "legal_urls": [
         "https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
         "https://www.consultant.ru/document/cons_doc_LAW_19702/aba5757994f1d3d2f17a4f4262fb9519d2de5238/",
-        "https://www.consultant.ru/document/cons_doc_LAW_19702/4ce55543bc62fa4c4587fa50514b56aa0121a671/"
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/4ce55543bc62fa4c4587fa50514b56aa0121a671/",
+        "https://minjust.gov.ru/ru/documents/8011/",
+        "https://www.consultant.ru/document/cons_doc_LAW_501319/e46b2c9eca58d3afa1e973e2e8a7c188f390cdb2/",
+        "https://www.consultant.ru/document/cons_doc_LAW_501319/d76059a3a15193b837145d02058cd732dc0c4565/",
+        "https://www.consultant.ru/document/cons_doc_LAW_501319/dd0cc50f64bf03b4782e314160b5110439809cab/"
       ],
-      "legal_status": "requires_case_specific_current_law_review",
+      "legal_status": "verified_current",
       "activation_allowed": false,
       "checked_norm_urls": [
+        "https://minjust.gov.ru/ru/documents/8011/",
         "https://www.consultant.ru/document/cons_doc_LAW_19702/aba5757994f1d3d2f17a4f4262fb9519d2de5238/",
-        "https://www.consultant.ru/document/cons_doc_LAW_19702/4ce55543bc62fa4c4587fa50514b56aa0121a671/"
+        "https://www.consultant.ru/document/cons_doc_LAW_501319/e46b2c9eca58d3afa1e973e2e8a7c188f390cdb2/",
+        "https://www.consultant.ru/document/cons_doc_LAW_501319/d76059a3a15193b837145d02058cd732dc0c4565/",
+        "https://www.consultant.ru/document/cons_doc_LAW_501319/dd0cc50f64bf03b4782e314160b5110439809cab/"
       ],
       "review_date": "2026-11-28",
       "targeted_option_review": {
-        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
         "option_count": 5,
-        "remaining": "Закон о передаче полномочия, методика распределения субвенций, изменённый объём функций и компетенция органов."
+        "remaining": "Вывод относится к явно заданным вымышленным учебным условиям и предложениям компетентному органу. Конкретный региональный акт, реальные обстоятельства и полный официальный ряд поправок независимо не подтверждены. Отдельные условия исполнения и бюджетные решения требуют проверки при реализации. Активация запрещена."
+      },
+      "final_case_review_2026_11_28": {
+        "date": "2026-11-28",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
+        "norm": "Конституция РФ, ч. 2 ст. 132; БК РФ, п. 2.1, 3 и 6 ст. 140; Закон №33-ФЗ, ст. 33, 34 и 71: наделение муниципалитета государственными полномочиями осуществляется законом с необходимым финансовым и материальным обеспечением, распределение субвенции — по установленной методике.",
+        "option_count": 5,
+        "finding": "Разграничены проект закона, действующее полномочие и распределение средств. Само увеличение обращений не изменяет норматив; законопроект и расчёт должны пройти применимую процедуру, действующие услуги сохраняются.",
+        "remaining": "Вывод относится к явно заданным вымышленным учебным условиям и предложениям компетентному органу. Конкретный региональный акт, реальные обстоятельства и полный официальный ряд поправок независимо не подтверждены. Отдельные условия исполнения и бюджетные решения требуют проверки при реализации. Активация запрещена.",
+        "urls": [
+          "https://minjust.gov.ru/ru/documents/8011/",
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/aba5757994f1d3d2f17a4f4262fb9519d2de5238/",
+          "https://www.consultant.ru/document/cons_doc_LAW_501319/e46b2c9eca58d3afa1e973e2e8a7c188f390cdb2/",
+          "https://www.consultant.ru/document/cons_doc_LAW_501319/d76059a3a15193b837145d02058cd732dc0c4565/",
+          "https://www.consultant.ru/document/cons_doc_LAW_501319/dd0cc50f64bf03b4782e314160b5110439809cab/"
+        ]
       }
     },
     {
