@@ -823,21 +823,47 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "ГК РФ, статьи 309, 384 и 819: исполнение кредитного обязательства и возможный переход требования. Источники: https://www.cbr.ru/faq/bank_s/otzyv_licenzii/",
+      "legal_basis": "ГК РФ, ст. 309, 819 п. 1; БК РФ, ст. 98 п. 2 и 4, ст. 103 п. 2–4, ст. 113. Отзыв лицензии сам по себе не прекращает кредитное обязательство. В заданной стадии используются подтверждённые официальные реквизиты, по разъяснению Банка России от 18.03.2024. Основной долг и расходы на его обслуживание учитываются раздельно; изменение графика или рефинансирование требуют законного основания и полномочий.",
       "legal_urls": [
-        "https://www.cbr.ru/faq/bank_s/otzyv_licenzii/"
+        "https://www.cbr.ru/faq/bank_s/otzyv_licenzii/",
+        "https://www.consultant.ru/document/cons_doc_LAW_5142/1cd43e51fbd4129343b325971a466ec5cd32a425/",
+        "https://www.consultant.ru/document/cons_doc_LAW_9027/76156d366a8356c87144b936b364bb5c5e87b2e3/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/38148a11e3245e4f3fb082a24d3ac017f5165d91/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/26f470b8b8e93e7284195c937ffcde9bc5836719/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/0e26fe4a0d34ab55b656204a4c01de16f0ee6ac7/"
       ],
-      "legal_status": "requires_case_specific_current_law_review",
+      "legal_status": "verified_current",
       "activation_allowed": false,
       "financial_review_status": "draft_requires_integration",
       "checked_norm_urls": [
-        "https://www.cbr.ru/faq/bank_s/otzyv_licenzii/"
+        "https://www.cbr.ru/faq/bank_s/otzyv_licenzii/",
+        "https://www.consultant.ru/document/cons_doc_LAW_5142/1cd43e51fbd4129343b325971a466ec5cd32a425/",
+        "https://www.consultant.ru/document/cons_doc_LAW_9027/76156d366a8356c87144b936b364bb5c5e87b2e3/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/38148a11e3245e4f3fb082a24d3ac017f5165d91/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/26f470b8b8e93e7284195c937ffcde9bc5836719/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/0e26fe4a0d34ab55b656204a4c01de16f0ee6ac7/"
       ],
       "review_date": "2026-11-28",
       "targeted_option_review": {
-        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
         "option_count": 5,
-        "remaining": "Договор, стадия ликвидации банка, официальный получатель платежа и применимые долговые ограничения."
+        "remaining": "Проверка относится к прямо заданным вымышленным условиям и рекомендациям, не к правомерности конкретной реальной сделки или платёжного распоряжения. Прочитаны доступные тексты применимых статей; независимая сверка полной официальной цепочки поправок не выполнена."
+      },
+      "source_scope": "case_specific_current_norms_and_all_alternatives_reviewed_under_stated_facts",
+      "final_case_review_2026_11_28": {
+        "date": "2026-11-28",
+        "scope": "case_specific_legal_acceptance_under_explicit_educational_facts",
+        "option_count": 5,
+        "conclusion": "Определены заёмщик, валюта, стадия после отзыва лицензии и источник реквизитов. Прочитаны конкретные нормы ГК и БК РФ, разъяснение Банка России. Варианты 1–5 — проверка и резервирование платежа, переговоры без самовольной смены графика, оценка рефинансирования, публичное объяснение без раскрытия охраняемых сведений, перенос свободных расходов по законной процедуре.",
+        "remaining": "Проверка относится к прямо заданным вымышленным условиям и рекомендациям, не к правомерности конкретной реальной сделки или платёжного распоряжения. Прочитаны доступные тексты применимых статей; независимая сверка полной официальной цепочки поправок не выполнена.",
+        "urls": [
+          "https://www.cbr.ru/faq/bank_s/otzyv_licenzii/",
+          "https://www.consultant.ru/document/cons_doc_LAW_5142/1cd43e51fbd4129343b325971a466ec5cd32a425/",
+          "https://www.consultant.ru/document/cons_doc_LAW_9027/76156d366a8356c87144b936b364bb5c5e87b2e3/",
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/38148a11e3245e4f3fb082a24d3ac017f5165d91/",
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/26f470b8b8e93e7284195c937ffcde9bc5836719/",
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/0e26fe4a0d34ab55b656204a4c01de16f0ee6ac7/"
+        ]
       }
     },
     {
@@ -847,24 +873,41 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "ГК РФ, статья 317: валюта денежных обязательств; БК РФ, статьи 37 и 94: достоверность расчётов и финансирование дефицита. Источники: https://www.consultant.ru/document/cons_doc_LAW_19702/",
+      "legal_basis": "ГК РФ, ст. 317 п. 2–3; БК РФ, ст. 94, 103 п. 5–7, 217.1. Обязательство в иностранной валюте и рублёвый расчёт для бюджета различаются. Порядок определения курса и валюта фактического платежа зависят от применимых условий и обязательных требований; замена агента допускается только законно.",
       "legal_urls": [
         "https://www.consultant.ru/document/cons_doc_LAW_19702/",
         "https://www.consultant.ru/document/cons_doc_LAW_5142/e3486eaf77188af09dba91511fe249434289d331/",
-        "https://www.consultant.ru/document/cons_doc_LAW_19702/efeadd1a3c202eaac852c823492cf391119f12be/"
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/efeadd1a3c202eaac852c823492cf391119f12be/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/26f470b8b8e93e7284195c937ffcde9bc5836719/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/24a94562b0b0557393897b9d9ef6f591ff1fb19b/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
       "financial_review_status": "draft_requires_integration",
       "checked_norm_urls": [
         "https://www.consultant.ru/document/cons_doc_LAW_5142/e3486eaf77188af09dba91511fe249434289d331/",
-        "https://www.consultant.ru/document/cons_doc_LAW_19702/efeadd1a3c202eaac852c823492cf391119f12be/"
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/efeadd1a3c202eaac852c823492cf391119f12be/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/26f470b8b8e93e7284195c937ffcde9bc5836719/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/24a94562b0b0557393897b9d9ef6f591ff1fb19b/"
       ],
       "review_date": "2026-11-28",
       "targeted_option_review": {
         "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
         "option_count": 5,
-        "remaining": "Валюта и условия договора, применимый курс, валютные и иные обязательные ограничения, полномочия платёжного агента."
+        "remaining": "Установить валюту, применимый курс и дату, условия договора, статус кредитора и платежного агента, действующие специальные ограничения."
+      },
+      "final_case_review_2026_11_28": {
+        "date": "2026-11-28",
+        "scope": "specific_norm_followup_not_full_acceptance",
+        "option_count": 5,
+        "conclusion": "Прочитаны нормы о валюте обязательства, внешнем заимствовании и кассовом планировании. Уточнён уровень бюджета. При неизменном валютном номинале и росте применяемого курса на 15% его рублёвый эквивалент возрастает на 15%; это не автоматический платёж. Специальные валютные ограничения и конкретный договор пока не проверены.",
+        "remaining": "Установить валюту, применимый курс и дату, условия договора, статус кредитора и платежного агента, действующие специальные ограничения.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_5142/e3486eaf77188af09dba91511fe249434289d331/",
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/efeadd1a3c202eaac852c823492cf391119f12be/",
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/26f470b8b8e93e7284195c937ffcde9bc5836719/",
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/24a94562b0b0557393897b9d9ef6f591ff1fb19b/"
+        ]
       }
     },
     {
@@ -874,26 +917,51 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "БК РФ, статьи 37, 94 и 103; условия соответствующего выпуска государственных ценных бумаг. Источники: https://www.consultant.ru/document/cons_doc_LAW_19702/",
+      "legal_basis": "БК РФ, ст. 94 п. 1, 103 п. 2–4, 110, 113 п. 1–3, 121.6 п. 1, 121.7, 217.1. Реальное поступление от заимствований отражается среди источников финансирования дефицита, а не по сумме заявок или плану. Условия и решение о выпуске определяются эмитентом, кассовый план ведёт Федеральное казначейство. В заданном упрощённом примере отсутствуют погашения, дисконт, премия и НКД; поэтому 380 млн ₽ — неполученная часть планового чистого привлечения.",
       "legal_urls": [
         "https://www.consultant.ru/document/cons_doc_LAW_19702/",
         "https://www.consultant.ru/document/cons_doc_LAW_19702/efeadd1a3c202eaac852c823492cf391119f12be/",
         "https://www.consultant.ru/document/cons_doc_LAW_19702/26f470b8b8e93e7284195c937ffcde9bc5836719/",
-        "https://www.consultant.ru/document/cons_doc_LAW_19702/2f15c3a6fbc358c0851312de4c637a0f4e92e641/"
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/2f15c3a6fbc358c0851312de4c637a0f4e92e641/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/96af24de8ce17f700b92485eb7b1c363c66b2ea0/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/0e26fe4a0d34ab55b656204a4c01de16f0ee6ac7/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/10c33f204ac790954795cbe31c913820cb19d010/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/24a94562b0b0557393897b9d9ef6f591ff1fb19b/"
       ],
-      "legal_status": "requires_case_specific_current_law_review",
+      "legal_status": "verified_current",
       "activation_allowed": false,
       "financial_review_status": "draft_requires_integration",
       "checked_norm_urls": [
         "https://www.consultant.ru/document/cons_doc_LAW_19702/efeadd1a3c202eaac852c823492cf391119f12be/",
         "https://www.consultant.ru/document/cons_doc_LAW_19702/26f470b8b8e93e7284195c937ffcde9bc5836719/",
-        "https://www.consultant.ru/document/cons_doc_LAW_19702/2f15c3a6fbc358c0851312de4c637a0f4e92e641/"
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/2f15c3a6fbc358c0851312de4c637a0f4e92e641/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/96af24de8ce17f700b92485eb7b1c363c66b2ea0/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/0e26fe4a0d34ab55b656204a4c01de16f0ee6ac7/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/10c33f204ac790954795cbe31c913820cb19d010/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/24a94562b0b0557393897b9d9ef6f591ff1fb19b/"
       ],
       "review_date": "2026-11-28",
       "targeted_option_review": {
-        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
         "option_count": 5,
-        "remaining": "Программа заимствований, условия выпуска, полномочия эмитента, фактические поступления и сроки платежей."
+        "remaining": "Проверка относится к прямо заданным вымышленным условиям и рекомендациям, не к правомерности конкретной реальной сделки или платёжного распоряжения. Прочитаны доступные тексты применимых статей; независимая сверка полной официальной цепочки поправок не выполнена."
+      },
+      "source_scope": "case_specific_current_norms_and_all_alternatives_reviewed_under_stated_facts",
+      "final_case_review_2026_11_28": {
+        "date": "2026-11-28",
+        "scope": "case_specific_legal_acceptance_under_explicit_educational_facts",
+        "option_count": 5,
+        "conclusion": "Разграничены заявки, завершённые расчёты, фактический источник финансирования и номинальный долг. Прочитаны применимые положения БК РФ (ред. 02.11.2026). Варианты 1–5 проверены как предложения о повторном размещении, использовании доступного остатка, другом разрешённом источнике, переносе свободных расходов и этапности будущих размещений; не как самостоятельная эмиссия или неисполнение обязательств.",
+        "remaining": "Проверка относится к прямо заданным вымышленным условиям и рекомендациям, не к правомерности конкретной реальной сделки или платёжного распоряжения. Прочитаны доступные тексты применимых статей; независимая сверка полной официальной цепочки поправок не выполнена.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/efeadd1a3c202eaac852c823492cf391119f12be/",
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/26f470b8b8e93e7284195c937ffcde9bc5836719/",
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/2f15c3a6fbc358c0851312de4c637a0f4e92e641/",
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/96af24de8ce17f700b92485eb7b1c363c66b2ea0/",
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/0e26fe4a0d34ab55b656204a4c01de16f0ee6ac7/",
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/10c33f204ac790954795cbe31c913820cb19d010/",
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/24a94562b0b0557393897b9d9ef6f591ff1fb19b/"
+        ]
       }
     },
     {
@@ -903,24 +971,48 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "ГК РФ, статья 309; БК РФ, статья 103; условия конкретного выпуска государственных облигаций. Источники: https://www.consultant.ru/document/cons_doc_LAW_19702/",
+      "legal_basis": "БК РФ, ст. 103 п. 2–4, 110, 113 п. 2, 121.6 п. 1 подп. 6, 121.7; ГК РФ, ст. 309. Размер дохода или порядок его определения устанавливается условиями эмиссии. Купон рассчитывается по предусмотренной формуле; агент не может односторонне включить неподтверждённую комиссию в купон. Возможная самостоятельная оплата услуг агента требует отдельного договорного основания. Будущие выпуски и бюджетные решения не изменяют действующие обязательства.",
       "legal_urls": [
         "https://www.consultant.ru/document/cons_doc_LAW_19702/",
         "https://www.consultant.ru/document/cons_doc_LAW_19702/26f470b8b8e93e7284195c937ffcde9bc5836719/",
-        "https://www.consultant.ru/document/cons_doc_LAW_19702/2f15c3a6fbc358c0851312de4c637a0f4e92e641/"
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/2f15c3a6fbc358c0851312de4c637a0f4e92e641/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/96af24de8ce17f700b92485eb7b1c363c66b2ea0/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/0e26fe4a0d34ab55b656204a4c01de16f0ee6ac7/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/10c33f204ac790954795cbe31c913820cb19d010/",
+        "https://www.consultant.ru/document/cons_doc_LAW_5142/1cd43e51fbd4129343b325971a466ec5cd32a425/"
       ],
-      "legal_status": "requires_case_specific_current_law_review",
+      "legal_status": "verified_current",
       "activation_allowed": false,
       "financial_review_status": "draft_requires_integration",
       "checked_norm_urls": [
         "https://www.consultant.ru/document/cons_doc_LAW_19702/26f470b8b8e93e7284195c937ffcde9bc5836719/",
-        "https://www.consultant.ru/document/cons_doc_LAW_19702/2f15c3a6fbc358c0851312de4c637a0f4e92e641/"
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/2f15c3a6fbc358c0851312de4c637a0f4e92e641/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/96af24de8ce17f700b92485eb7b1c363c66b2ea0/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/0e26fe4a0d34ab55b656204a4c01de16f0ee6ac7/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/10c33f204ac790954795cbe31c913820cb19d010/",
+        "https://www.consultant.ru/document/cons_doc_LAW_5142/1cd43e51fbd4129343b325971a466ec5cd32a425/"
       ],
       "review_date": "2026-11-28",
       "targeted_option_review": {
-        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
         "option_count": 5,
-        "remaining": "Формула купона в задаче условная, не утверждается как формула конкретной реальной ОФЗ; проверяются условия выпуска."
+        "remaining": "Проверка относится к прямо заданным вымышленным условиям и рекомендациям, не к правомерности конкретной реальной сделки или платёжного распоряжения. Прочитаны доступные тексты применимых статей; независимая сверка полной официальной цепочки поправок не выполнена."
+      },
+      "source_scope": "case_specific_current_norms_and_all_alternatives_reviewed_under_stated_facts",
+      "final_case_review_2026_11_28": {
+        "date": "2026-11-28",
+        "scope": "case_specific_legal_acceptance_under_explicit_educational_facts",
+        "option_count": 5,
+        "conclusion": "Формула привязана только к вымышленному выпуску, а не к реальным ОФЗ. Прочитаны ст. 121.6 и 121.7 БК РФ, ст. 309 ГК РФ и нормы о долговом обслуживании. Варианты 1–5 — прогнозирование, структура будущих выпусков, стресс-расчёт, сверка ведомостей, законное сокращение будущей потребности в займах. Текущий купон не меняется.",
+        "remaining": "Проверка относится к прямо заданным вымышленным условиям и рекомендациям, не к правомерности конкретной реальной сделки или платёжного распоряжения. Прочитаны доступные тексты применимых статей; независимая сверка полной официальной цепочки поправок не выполнена.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/26f470b8b8e93e7284195c937ffcde9bc5836719/",
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/2f15c3a6fbc358c0851312de4c637a0f4e92e641/",
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/96af24de8ce17f700b92485eb7b1c363c66b2ea0/",
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/0e26fe4a0d34ab55b656204a4c01de16f0ee6ac7/",
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/10c33f204ac790954795cbe31c913820cb19d010/",
+          "https://www.consultant.ru/document/cons_doc_LAW_5142/1cd43e51fbd4129343b325971a466ec5cd32a425/"
+        ]
       }
     },
     {
@@ -930,24 +1022,42 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "БК РФ, статьи 41–42 и 94; Федеральный закон №208-ФЗ, статья 42: источники финансирования и право на дивиденды. Источники: https://www.consultant.ru/document/cons_doc_LAW_19702/",
+      "legal_basis": "БК РФ, ст. 42 и 94 п. 1; Федеральный закон от 26.12.1995 №208-ФЗ, ст. 42 п. 5 и 7. Продажа федерального пакета является источником финансирования дефицита; дивиденды от принадлежащих РФ акций относятся к доходам от имущества. Право на объявленный дивиденд определяется на установленную дату; в заданных условиях переход акций состоялся раньше, и отдельное право продавца отсутствует. Исправление прогноза не создаёт нового платежа.",
       "legal_urls": [
         "https://www.consultant.ru/document/cons_doc_LAW_19702/",
         "https://www.consultant.ru/document/cons_doc_LAW_19702/efeadd1a3c202eaac852c823492cf391119f12be/",
-        "https://www.consultant.ru/document/cons_doc_LAW_8743/9f4fbb73c39e25049b6c7c98bbbec1b66f83a9f2/"
+        "https://www.consultant.ru/document/cons_doc_LAW_8743/9f4fbb73c39e25049b6c7c98bbbec1b66f83a9f2/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/3ffde9ca61a2ae91dbe5d65eb45c934a39e147dc/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/24a94562b0b0557393897b9d9ef6f591ff1fb19b/"
       ],
-      "legal_status": "requires_case_specific_current_law_review",
+      "legal_status": "verified_current",
       "activation_allowed": false,
       "financial_review_status": "draft_requires_integration",
       "checked_norm_urls": [
         "https://www.consultant.ru/document/cons_doc_LAW_19702/efeadd1a3c202eaac852c823492cf391119f12be/",
-        "https://www.consultant.ru/document/cons_doc_LAW_8743/9f4fbb73c39e25049b6c7c98bbbec1b66f83a9f2/"
+        "https://www.consultant.ru/document/cons_doc_LAW_8743/9f4fbb73c39e25049b6c7c98bbbec1b66f83a9f2/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/3ffde9ca61a2ae91dbe5d65eb45c934a39e147dc/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/24a94562b0b0557393897b9d9ef6f591ff1fb19b/"
       ],
       "review_date": "2026-11-28",
       "targeted_option_review": {
-        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
         "option_count": 5,
-        "remaining": "Дата определения получателей дивидендов, условия сделки и применимая бюджетная классификация."
+        "remaining": "Проверка относится к прямо заданным вымышленным условиям и рекомендациям, не к правомерности конкретной реальной сделки или платёжного распоряжения. Прочитаны доступные тексты применимых статей; независимая сверка полной официальной цепочки поправок не выполнена."
+      },
+      "source_scope": "case_specific_current_norms_and_all_alternatives_reviewed_under_stated_facts",
+      "final_case_review_2026_11_28": {
+        "date": "2026-11-28",
+        "scope": "case_specific_legal_acceptance_under_explicit_educational_facts",
+        "option_count": 5,
+        "conclusion": "Уточнена федеральная собственность и правовая форма общества. Прочитаны ст. 42 и 94 БК РФ и п. 5, 7 ст. 42 закона №208-ФЗ. Варианты 1–5 допустимы как предложения о расходах, управлении оставшимися активами, финансировании, планировании запаса ликвидности и раскрытии корректировки. Запас не означает автоматического учреждения резервного фонда или расходования средств.",
+        "remaining": "Проверка относится к прямо заданным вымышленным условиям и рекомендациям, не к правомерности конкретной реальной сделки или платёжного распоряжения. Прочитаны доступные тексты применимых статей; независимая сверка полной официальной цепочки поправок не выполнена.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/efeadd1a3c202eaac852c823492cf391119f12be/",
+          "https://www.consultant.ru/document/cons_doc_LAW_8743/9f4fbb73c39e25049b6c7c98bbbec1b66f83a9f2/",
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/3ffde9ca61a2ae91dbe5d65eb45c934a39e147dc/",
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/24a94562b0b0557393897b9d9ef6f591ff1fb19b/"
+        ]
       }
     },
     {
@@ -957,12 +1067,13 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "БК РФ, статьи 96.10–96.11 и 217.1: ФНБ и кассовое планирование. Источники: https://www.consultant.ru/document/cons_doc_LAW_19702/",
+      "legal_basis": "БК РФ, ст. 96.10 п. 1–2, 96.11 п. 1–2, 217.1, 103. Обособленный учёт активов ФНБ не равнозначен наличию доступных средств на едином счёте. Цели и объём использования определяются бюджетным законодательством, управление — Минфином в установленном порядке. Кассовый план учитывает доступность средств в срок.",
       "legal_urls": [
         "https://www.consultant.ru/document/cons_doc_LAW_19702/",
         "https://www.consultant.ru/document/cons_doc_LAW_19702/9fff755b03e35b60f8c039c2f86ec67a34865819/",
         "https://www.consultant.ru/document/cons_doc_LAW_19702/c2fa38ce04d04504285b486e01f7c0bcc9a56d5b/",
-        "https://www.consultant.ru/document/cons_doc_LAW_19702/24a94562b0b0557393897b9d9ef6f591ff1fb19b/"
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/24a94562b0b0557393897b9d9ef6f591ff1fb19b/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/26f470b8b8e93e7284195c937ffcde9bc5836719/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
@@ -970,13 +1081,27 @@
       "checked_norm_urls": [
         "https://www.consultant.ru/document/cons_doc_LAW_19702/9fff755b03e35b60f8c039c2f86ec67a34865819/",
         "https://www.consultant.ru/document/cons_doc_LAW_19702/c2fa38ce04d04504285b486e01f7c0bcc9a56d5b/",
-        "https://www.consultant.ru/document/cons_doc_LAW_19702/24a94562b0b0557393897b9d9ef6f591ff1fb19b/"
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/24a94562b0b0557393897b9d9ef6f591ff1fb19b/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/26f470b8b8e93e7284195c937ffcde9bc5836719/"
       ],
       "review_date": "2026-11-28",
       "targeted_option_review": {
         "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
         "option_count": 5,
-        "remaining": "Применимые временные бюджетные нормы, разрешённая цель использования ФНБ, сроки ликвидации активов и кассовый план."
+        "remaining": "Установить применимые временные правила ФНБ, законный способ реализации активов, сроки и источник замещения. Не считать ликвидность разрешением на использование."
+      },
+      "final_case_review_2026_11_28": {
+        "date": "2026-11-28",
+        "scope": "specific_norm_followup_not_full_acceptance",
+        "option_count": 5,
+        "conclusion": "Прочитаны конкретные нормы о назначении ФНБ, управлении и кассовом плане. Уточнена цель использования. 10 000 млн ₽ исключаются лишь из доступного на дату платежа финансирования, не списываются из стоимости активов. Остаётся проверить действующие временные нормы и правила реализации конкретных активов.",
+        "remaining": "Установить применимые временные правила ФНБ, законный способ реализации активов, сроки и источник замещения. Не считать ликвидность разрешением на использование.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/9fff755b03e35b60f8c039c2f86ec67a34865819/",
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/c2fa38ce04d04504285b486e01f7c0bcc9a56d5b/",
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/24a94562b0b0557393897b9d9ef6f591ff1fb19b/",
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/26f470b8b8e93e7284195c937ffcde9bc5836719/"
+        ]
       }
     },
     {
