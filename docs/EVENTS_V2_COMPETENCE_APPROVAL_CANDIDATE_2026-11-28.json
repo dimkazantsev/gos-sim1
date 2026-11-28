@@ -49,7 +49,15 @@
       "legacy_no_match": false,
       "review_requirement": "verify_scope_active_office_and_territory",
       "activation_allowed": false,
-      "owner_approved": true
+      "owner_approved": true,
+      "runtime_review": {
+        "status": "verified_current",
+        "date": "2026-11-28",
+        "tested_commit": "d47a3ea66f75d7979faf13841da9b6b50b0c7df6",
+        "ci_run": "https://github.com/dimkazantsev/gos-sim1/actions/runs/46147375081",
+        "scope": "isolated_actual_sql_portfolio_and_stage_rules_plus_production_read_only_route_metadata",
+        "limitation": "Синтетические должности; диапазон этапов в тестовой базе 4–15. Метаданные всех 141 рабочих маршрутов и 20 ранних ключей совпали. Не проверяет доступность конкретного игрока в каждый момент, hosted Auth/PostgREST/Realtime или правовой допуск; активация запрещена."
+      }
     },
     {
       "case_key": "bank-budget-health",
@@ -76,7 +84,15 @@
       "legacy_no_match": false,
       "review_requirement": "verify_scope_active_office_and_territory",
       "activation_allowed": false,
-      "owner_approved": true
+      "owner_approved": true,
+      "runtime_review": {
+        "status": "verified_current",
+        "date": "2026-11-28",
+        "tested_commit": "d47a3ea66f75d7979faf13841da9b6b50b0c7df6",
+        "ci_run": "https://github.com/dimkazantsev/gos-sim1/actions/runs/46147375081",
+        "scope": "isolated_actual_sql_portfolio_and_stage_rules_plus_production_read_only_route_metadata",
+        "limitation": "Синтетические должности; диапазон этапов в тестовой базе 4–15. Метаданные всех 141 рабочих маршрутов и 20 ранних ключей совпали. Не проверяет доступность конкретного игрока в каждый момент, hosted Auth/PostgREST/Realtime или правовой допуск; активация запрещена."
+      }
     },
     {
       "case_key": "bank-budget-school",
@@ -101,7 +117,15 @@
       "legacy_no_match": false,
       "review_requirement": "verify_scope_active_office_and_territory",
       "activation_allowed": false,
-      "owner_approved": true
+      "owner_approved": true,
+      "runtime_review": {
+        "status": "verified_current",
+        "date": "2026-11-28",
+        "tested_commit": "d47a3ea66f75d7979faf13841da9b6b50b0c7df6",
+        "ci_run": "https://github.com/dimkazantsev/gos-sim1/actions/runs/46147375081",
+        "scope": "isolated_actual_sql_portfolio_and_stage_rules_plus_production_read_only_route_metadata",
+        "limitation": "Синтетические должности; диапазон этапов в тестовой базе 4–15. Метаданные всех 141 рабочих маршрутов и 20 ранних ключей совпали. Не проверяет доступность конкретного игрока в каждый момент, hosted Auth/PostgREST/Realtime или правовой допуск; активация запрещена."
+      }
     },
     {
       "case_key": "bank-bus",
@@ -124,7 +148,15 @@
       "legacy_no_match": true,
       "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
       "activation_allowed": false,
-      "owner_approved": true
+      "owner_approved": true,
+      "runtime_review": {
+        "status": "verified_current",
+        "date": "2026-11-28",
+        "tested_commit": "d47a3ea66f75d7979faf13841da9b6b50b0c7df6",
+        "ci_run": "https://github.com/dimkazantsev/gos-sim1/actions/runs/46147375081",
+        "scope": "isolated_actual_sql_portfolio_and_stage_rules_plus_production_read_only_route_metadata",
+        "limitation": "Синтетические должности; диапазон этапов в тестовой базе 4–15. Метаданные всех 141 рабочих маршрутов и 20 ранних ключей совпали. Не проверяет доступность конкретного игрока в каждый момент, hosted Auth/PostgREST/Realtime или правовой допуск; активация запрещена."
+      }
     },
     {
       "case_key": "bank-cat-mayor",
@@ -147,7 +179,15 @@
       "legacy_no_match": true,
       "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
       "activation_allowed": false,
-      "owner_approved": true
+      "owner_approved": true,
+      "runtime_review": {
+        "status": "verified_current",
+        "date": "2026-11-28",
+        "tested_commit": "d47a3ea66f75d7979faf13841da9b6b50b0c7df6",
+        "ci_run": "https://github.com/dimkazantsev/gos-sim1/actions/runs/46147375081",
+        "scope": "isolated_actual_sql_portfolio_and_stage_rules_plus_production_read_only_route_metadata",
+        "limitation": "Синтетические должности; диапазон этапов в тестовой базе 4–15. Метаданные всех 141 рабочих маршрутов и 20 ранних ключей совпали. Не проверяет доступность конкретного игрока в каждый момент, hosted Auth/PostgREST/Realtime или правовой допуск; активация запрещена."
+      }
     },
     {
       "case_key": "bank-ceremony",
@@ -175,7 +215,15 @@
       "legacy_no_match": true,
       "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
       "activation_allowed": false,
-      "owner_approved": true
+      "owner_approved": true,
+      "runtime_review": {
+        "status": "verified_current",
+        "date": "2026-11-28",
+        "tested_commit": "d47a3ea66f75d7979faf13841da9b6b50b0c7df6",
+        "ci_run": "https://github.com/dimkazantsev/gos-sim1/actions/runs/46147375081",
+        "scope": "isolated_actual_sql_portfolio_and_stage_rules_plus_production_read_only_route_metadata",
+        "limitation": "Синтетические должности; диапазон этапов в тестовой базе 4–15. Метаданные всех 141 рабочих маршрутов и 20 ранних ключей совпали. Не проверяет доступность конкретного игрока в каждый момент, hosted Auth/PostgREST/Realtime или правовой допуск; активация запрещена."
+      }
     },
     {
       "case_key": "bank-curated-light-01",
@@ -198,7 +246,15 @@
       "legacy_no_match": true,
       "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
       "activation_allowed": false,
-      "owner_approved": true
+      "owner_approved": true,
+      "runtime_review": {
+        "status": "verified_current",
+        "date": "2026-11-28",
+        "tested_commit": "d47a3ea66f75d7979faf13841da9b6b50b0c7df6",
+        "ci_run": "https://github.com/dimkazantsev/gos-sim1/actions/runs/46147375081",
+        "scope": "isolated_actual_sql_portfolio_and_stage_rules_plus_production_read_only_route_metadata",
+        "limitation": "Синтетические должности; диапазон этапов в тестовой базе 4–15. Метаданные всех 141 рабочих маршрутов и 20 ранних ключей совпали. Не проверяет доступность конкретного игрока в каждый момент, hosted Auth/PostgREST/Realtime или правовой допуск; активация запрещена."
+      }
     },
     {
       "case_key": "bank-curated-light-02",
@@ -221,7 +277,15 @@
       "legacy_no_match": true,
       "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
       "activation_allowed": false,
-      "owner_approved": true
+      "owner_approved": true,
+      "runtime_review": {
+        "status": "verified_current",
+        "date": "2026-11-28",
+        "tested_commit": "d47a3ea66f75d7979faf13841da9b6b50b0c7df6",
+        "ci_run": "https://github.com/dimkazantsev/gos-sim1/actions/runs/46147375081",
+        "scope": "isolated_actual_sql_portfolio_and_stage_rules_plus_production_read_only_route_metadata",
+        "limitation": "Синтетические должности; диапазон этапов в тестовой базе 4–15. Метаданные всех 141 рабочих маршрутов и 20 ранних ключей совпали. Не проверяет доступность конкретного игрока в каждый момент, hosted Auth/PostgREST/Realtime или правовой допуск; активация запрещена."
+      }
     },
     {
       "case_key": "bank-curated-light-03",
@@ -244,7 +308,15 @@
       "legacy_no_match": true,
       "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
       "activation_allowed": false,
-      "owner_approved": true
+      "owner_approved": true,
+      "runtime_review": {
+        "status": "verified_current",
+        "date": "2026-11-28",
+        "tested_commit": "d47a3ea66f75d7979faf13841da9b6b50b0c7df6",
+        "ci_run": "https://github.com/dimkazantsev/gos-sim1/actions/runs/46147375081",
+        "scope": "isolated_actual_sql_portfolio_and_stage_rules_plus_production_read_only_route_metadata",
+        "limitation": "Синтетические должности; диапазон этапов в тестовой базе 4–15. Метаданные всех 141 рабочих маршрутов и 20 ранних ключей совпали. Не проверяет доступность конкретного игрока в каждый момент, hosted Auth/PostgREST/Realtime или правовой допуск; активация запрещена."
+      }
     },
     {
       "case_key": "bank-curated-light-04",
@@ -272,7 +344,15 @@
       "legacy_no_match": true,
       "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
       "activation_allowed": false,
-      "owner_approved": true
+      "owner_approved": true,
+      "runtime_review": {
+        "status": "verified_current",
+        "date": "2026-11-28",
+        "tested_commit": "d47a3ea66f75d7979faf13841da9b6b50b0c7df6",
+        "ci_run": "https://github.com/dimkazantsev/gos-sim1/actions/runs/46147375081",
+        "scope": "isolated_actual_sql_portfolio_and_stage_rules_plus_production_read_only_route_metadata",
+        "limitation": "Синтетические должности; диапазон этапов в тестовой базе 4–15. Метаданные всех 141 рабочих маршрутов и 20 ранних ключей совпали. Не проверяет доступность конкретного игрока в каждый момент, hosted Auth/PostgREST/Realtime или правовой допуск; активация запрещена."
+      }
     },
     {
       "case_key": "bank-curated-light-05",
@@ -295,7 +375,15 @@
       "legacy_no_match": true,
       "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
       "activation_allowed": false,
-      "owner_approved": true
+      "owner_approved": true,
+      "runtime_review": {
+        "status": "verified_current",
+        "date": "2026-11-28",
+        "tested_commit": "d47a3ea66f75d7979faf13841da9b6b50b0c7df6",
+        "ci_run": "https://github.com/dimkazantsev/gos-sim1/actions/runs/46147375081",
+        "scope": "isolated_actual_sql_portfolio_and_stage_rules_plus_production_read_only_route_metadata",
+        "limitation": "Синтетические должности; диапазон этапов в тестовой базе 4–15. Метаданные всех 141 рабочих маршрутов и 20 ранних ключей совпали. Не проверяет доступность конкретного игрока в каждый момент, hosted Auth/PostgREST/Realtime или правовой допуск; активация запрещена."
+      }
     },
     {
       "case_key": "bank-curated-light-06",
@@ -318,7 +406,15 @@
       "legacy_no_match": true,
       "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
       "activation_allowed": false,
-      "owner_approved": true
+      "owner_approved": true,
+      "runtime_review": {
+        "status": "verified_current",
+        "date": "2026-11-28",
+        "tested_commit": "d47a3ea66f75d7979faf13841da9b6b50b0c7df6",
+        "ci_run": "https://github.com/dimkazantsev/gos-sim1/actions/runs/46147375081",
+        "scope": "isolated_actual_sql_portfolio_and_stage_rules_plus_production_read_only_route_metadata",
+        "limitation": "Синтетические должности; диапазон этапов в тестовой базе 4–15. Метаданные всех 141 рабочих маршрутов и 20 ранних ключей совпали. Не проверяет доступность конкретного игрока в каждый момент, hosted Auth/PostgREST/Realtime или правовой допуск; активация запрещена."
+      }
     },
     {
       "case_key": "bank-curated-light-07",
@@ -341,7 +437,15 @@
       "legacy_no_match": true,
       "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
       "activation_allowed": false,
-      "owner_approved": true
+      "owner_approved": true,
+      "runtime_review": {
+        "status": "verified_current",
+        "date": "2026-11-28",
+        "tested_commit": "d47a3ea66f75d7979faf13841da9b6b50b0c7df6",
+        "ci_run": "https://github.com/dimkazantsev/gos-sim1/actions/runs/46147375081",
+        "scope": "isolated_actual_sql_portfolio_and_stage_rules_plus_production_read_only_route_metadata",
+        "limitation": "Синтетические должности; диапазон этапов в тестовой базе 4–15. Метаданные всех 141 рабочих маршрутов и 20 ранних ключей совпали. Не проверяет доступность конкретного игрока в каждый момент, hosted Auth/PostgREST/Realtime или правовой допуск; активация запрещена."
+      }
     },
     {
       "case_key": "bank-curated-light-08",
@@ -364,7 +468,15 @@
       "legacy_no_match": true,
       "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
       "activation_allowed": false,
-      "owner_approved": true
+      "owner_approved": true,
+      "runtime_review": {
+        "status": "verified_current",
+        "date": "2026-11-28",
+        "tested_commit": "d47a3ea66f75d7979faf13841da9b6b50b0c7df6",
+        "ci_run": "https://github.com/dimkazantsev/gos-sim1/actions/runs/46147375081",
+        "scope": "isolated_actual_sql_portfolio_and_stage_rules_plus_production_read_only_route_metadata",
+        "limitation": "Синтетические должности; диапазон этапов в тестовой базе 4–15. Метаданные всех 141 рабочих маршрутов и 20 ранних ключей совпали. Не проверяет доступность конкретного игрока в каждый момент, hosted Auth/PostgREST/Realtime или правовой допуск; активация запрещена."
+      }
     },
     {
       "case_key": "bank-curated-light-09",
@@ -387,7 +499,15 @@
       "legacy_no_match": true,
       "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
       "activation_allowed": false,
-      "owner_approved": true
+      "owner_approved": true,
+      "runtime_review": {
+        "status": "verified_current",
+        "date": "2026-11-28",
+        "tested_commit": "d47a3ea66f75d7979faf13841da9b6b50b0c7df6",
+        "ci_run": "https://github.com/dimkazantsev/gos-sim1/actions/runs/46147375081",
+        "scope": "isolated_actual_sql_portfolio_and_stage_rules_plus_production_read_only_route_metadata",
+        "limitation": "Синтетические должности; диапазон этапов в тестовой базе 4–15. Метаданные всех 141 рабочих маршрутов и 20 ранних ключей совпали. Не проверяет доступность конкретного игрока в каждый момент, hosted Auth/PostgREST/Realtime или правовой допуск; активация запрещена."
+      }
     },
     {
       "case_key": "bank-curated-light-10",
@@ -415,7 +535,15 @@
       "legacy_no_match": true,
       "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
       "activation_allowed": false,
-      "owner_approved": true
+      "owner_approved": true,
+      "runtime_review": {
+        "status": "verified_current",
+        "date": "2026-11-28",
+        "tested_commit": "d47a3ea66f75d7979faf13841da9b6b50b0c7df6",
+        "ci_run": "https://github.com/dimkazantsev/gos-sim1/actions/runs/46147375081",
+        "scope": "isolated_actual_sql_portfolio_and_stage_rules_plus_production_read_only_route_metadata",
+        "limitation": "Синтетические должности; диапазон этапов в тестовой базе 4–15. Метаданные всех 141 рабочих маршрутов и 20 ранних ключей совпали. Не проверяет доступность конкретного игрока в каждый момент, hosted Auth/PostgREST/Realtime или правовой допуск; активация запрещена."
+      }
     },
     {
       "case_key": "bank-curated-light-11",
@@ -443,7 +571,15 @@
       "legacy_no_match": true,
       "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
       "activation_allowed": false,
-      "owner_approved": true
+      "owner_approved": true,
+      "runtime_review": {
+        "status": "verified_current",
+        "date": "2026-11-28",
+        "tested_commit": "d47a3ea66f75d7979faf13841da9b6b50b0c7df6",
+        "ci_run": "https://github.com/dimkazantsev/gos-sim1/actions/runs/46147375081",
+        "scope": "isolated_actual_sql_portfolio_and_stage_rules_plus_production_read_only_route_metadata",
+        "limitation": "Синтетические должности; диапазон этапов в тестовой базе 4–15. Метаданные всех 141 рабочих маршрутов и 20 ранних ключей совпали. Не проверяет доступность конкретного игрока в каждый момент, hosted Auth/PostgREST/Realtime или правовой допуск; активация запрещена."
+      }
     },
     {
       "case_key": "bank-curated-light-12",
@@ -466,7 +602,15 @@
       "legacy_no_match": true,
       "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
       "activation_allowed": false,
-      "owner_approved": true
+      "owner_approved": true,
+      "runtime_review": {
+        "status": "verified_current",
+        "date": "2026-11-28",
+        "tested_commit": "d47a3ea66f75d7979faf13841da9b6b50b0c7df6",
+        "ci_run": "https://github.com/dimkazantsev/gos-sim1/actions/runs/46147375081",
+        "scope": "isolated_actual_sql_portfolio_and_stage_rules_plus_production_read_only_route_metadata",
+        "limitation": "Синтетические должности; диапазон этапов в тестовой базе 4–15. Метаданные всех 141 рабочих маршрутов и 20 ранних ключей совпали. Не проверяет доступность конкретного игрока в каждый момент, hosted Auth/PostgREST/Realtime или правовой допуск; активация запрещена."
+      }
     },
     {
       "case_key": "bank-curated-light-13",
@@ -489,7 +633,15 @@
       "legacy_no_match": true,
       "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
       "activation_allowed": false,
-      "owner_approved": true
+      "owner_approved": true,
+      "runtime_review": {
+        "status": "verified_current",
+        "date": "2026-11-28",
+        "tested_commit": "d47a3ea66f75d7979faf13841da9b6b50b0c7df6",
+        "ci_run": "https://github.com/dimkazantsev/gos-sim1/actions/runs/46147375081",
+        "scope": "isolated_actual_sql_portfolio_and_stage_rules_plus_production_read_only_route_metadata",
+        "limitation": "Синтетические должности; диапазон этапов в тестовой базе 4–15. Метаданные всех 141 рабочих маршрутов и 20 ранних ключей совпали. Не проверяет доступность конкретного игрока в каждый момент, hosted Auth/PostgREST/Realtime или правовой допуск; активация запрещена."
+      }
     },
     {
       "case_key": "bank-curated-light-14",
@@ -512,7 +664,15 @@
       "legacy_no_match": true,
       "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
       "activation_allowed": false,
-      "owner_approved": true
+      "owner_approved": true,
+      "runtime_review": {
+        "status": "verified_current",
+        "date": "2026-11-28",
+        "tested_commit": "d47a3ea66f75d7979faf13841da9b6b50b0c7df6",
+        "ci_run": "https://github.com/dimkazantsev/gos-sim1/actions/runs/46147375081",
+        "scope": "isolated_actual_sql_portfolio_and_stage_rules_plus_production_read_only_route_metadata",
+        "limitation": "Синтетические должности; диапазон этапов в тестовой базе 4–15. Метаданные всех 141 рабочих маршрутов и 20 ранних ключей совпали. Не проверяет доступность конкретного игрока в каждый момент, hosted Auth/PostgREST/Realtime или правовой допуск; активация запрещена."
+      }
     },
     {
       "case_key": "bank-curated-serious-04",
@@ -541,7 +701,15 @@
       "legacy_no_match": true,
       "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
       "activation_allowed": false,
-      "owner_approved": true
+      "owner_approved": true,
+      "runtime_review": {
+        "status": "verified_current",
+        "date": "2026-11-28",
+        "tested_commit": "d47a3ea66f75d7979faf13841da9b6b50b0c7df6",
+        "ci_run": "https://github.com/dimkazantsev/gos-sim1/actions/runs/46147375081",
+        "scope": "isolated_actual_sql_portfolio_and_stage_rules_plus_production_read_only_route_metadata",
+        "limitation": "Синтетические должности; диапазон этапов в тестовой базе 4–15. Метаданные всех 141 рабочих маршрутов и 20 ранних ключей совпали. Не проверяет доступность конкретного игрока в каждый момент, hosted Auth/PostgREST/Realtime или правовой допуск; активация запрещена."
+      }
     },
     {
       "case_key": "bank-curated-serious-05",
@@ -570,7 +738,15 @@
       "legacy_no_match": true,
       "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
       "activation_allowed": false,
-      "owner_approved": true
+      "owner_approved": true,
+      "runtime_review": {
+        "status": "verified_current",
+        "date": "2026-11-28",
+        "tested_commit": "d47a3ea66f75d7979faf13841da9b6b50b0c7df6",
+        "ci_run": "https://github.com/dimkazantsev/gos-sim1/actions/runs/46147375081",
+        "scope": "isolated_actual_sql_portfolio_and_stage_rules_plus_production_read_only_route_metadata",
+        "limitation": "Синтетические должности; диапазон этапов в тестовой базе 4–15. Метаданные всех 141 рабочих маршрутов и 20 ранних ключей совпали. Не проверяет доступность конкретного игрока в каждый момент, hosted Auth/PostgREST/Realtime или правовой допуск; активация запрещена."
+      }
     },
     {
       "case_key": "bank-curated-serious-06",
@@ -594,7 +770,15 @@
       "legacy_no_match": true,
       "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
       "activation_allowed": false,
-      "owner_approved": true
+      "owner_approved": true,
+      "runtime_review": {
+        "status": "verified_current",
+        "date": "2026-11-28",
+        "tested_commit": "d47a3ea66f75d7979faf13841da9b6b50b0c7df6",
+        "ci_run": "https://github.com/dimkazantsev/gos-sim1/actions/runs/46147375081",
+        "scope": "isolated_actual_sql_portfolio_and_stage_rules_plus_production_read_only_route_metadata",
+        "limitation": "Синтетические должности; диапазон этапов в тестовой базе 4–15. Метаданные всех 141 рабочих маршрутов и 20 ранних ключей совпали. Не проверяет доступность конкретного игрока в каждый момент, hosted Auth/PostgREST/Realtime или правовой допуск; активация запрещена."
+      }
     },
     {
       "case_key": "bank-curated-serious-07",
@@ -623,7 +807,15 @@
       "legacy_no_match": true,
       "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
       "activation_allowed": false,
-      "owner_approved": true
+      "owner_approved": true,
+      "runtime_review": {
+        "status": "verified_current",
+        "date": "2026-11-28",
+        "tested_commit": "d47a3ea66f75d7979faf13841da9b6b50b0c7df6",
+        "ci_run": "https://github.com/dimkazantsev/gos-sim1/actions/runs/46147375081",
+        "scope": "isolated_actual_sql_portfolio_and_stage_rules_plus_production_read_only_route_metadata",
+        "limitation": "Синтетические должности; диапазон этапов в тестовой базе 4–15. Метаданные всех 141 рабочих маршрутов и 20 ранних ключей совпали. Не проверяет доступность конкретного игрока в каждый момент, hosted Auth/PostgREST/Realtime или правовой допуск; активация запрещена."
+      }
     },
     {
       "case_key": "bank-curated-serious-08",
@@ -647,7 +839,15 @@
       "legacy_no_match": true,
       "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
       "activation_allowed": false,
-      "owner_approved": true
+      "owner_approved": true,
+      "runtime_review": {
+        "status": "verified_current",
+        "date": "2026-11-28",
+        "tested_commit": "d47a3ea66f75d7979faf13841da9b6b50b0c7df6",
+        "ci_run": "https://github.com/dimkazantsev/gos-sim1/actions/runs/46147375081",
+        "scope": "isolated_actual_sql_portfolio_and_stage_rules_plus_production_read_only_route_metadata",
+        "limitation": "Синтетические должности; диапазон этапов в тестовой базе 4–15. Метаданные всех 141 рабочих маршрутов и 20 ранних ключей совпали. Не проверяет доступность конкретного игрока в каждый момент, hosted Auth/PostgREST/Realtime или правовой допуск; активация запрещена."
+      }
     },
     {
       "case_key": "bank-curated-serious-09",
@@ -670,7 +870,15 @@
       "legacy_no_match": true,
       "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
       "activation_allowed": false,
-      "owner_approved": true
+      "owner_approved": true,
+      "runtime_review": {
+        "status": "verified_current",
+        "date": "2026-11-28",
+        "tested_commit": "d47a3ea66f75d7979faf13841da9b6b50b0c7df6",
+        "ci_run": "https://github.com/dimkazantsev/gos-sim1/actions/runs/46147375081",
+        "scope": "isolated_actual_sql_portfolio_and_stage_rules_plus_production_read_only_route_metadata",
+        "limitation": "Синтетические должности; диапазон этапов в тестовой базе 4–15. Метаданные всех 141 рабочих маршрутов и 20 ранних ключей совпали. Не проверяет доступность конкретного игрока в каждый момент, hosted Auth/PostgREST/Realtime или правовой допуск; активация запрещена."
+      }
     },
     {
       "case_key": "bank-curated-serious-10",
@@ -696,7 +904,15 @@
       "legacy_no_match": false,
       "review_requirement": "verify_scope_active_office_and_territory",
       "activation_allowed": false,
-      "owner_approved": true
+      "owner_approved": true,
+      "runtime_review": {
+        "status": "verified_current",
+        "date": "2026-11-28",
+        "tested_commit": "d47a3ea66f75d7979faf13841da9b6b50b0c7df6",
+        "ci_run": "https://github.com/dimkazantsev/gos-sim1/actions/runs/46147375081",
+        "scope": "isolated_actual_sql_portfolio_and_stage_rules_plus_production_read_only_route_metadata",
+        "limitation": "Синтетические должности; диапазон этапов в тестовой базе 4–15. Метаданные всех 141 рабочих маршрутов и 20 ранних ключей совпали. Не проверяет доступность конкретного игрока в каждый момент, hosted Auth/PostgREST/Realtime или правовой допуск; активация запрещена."
+      }
     },
     {
       "case_key": "bank-curated-serious-11",
@@ -722,7 +938,15 @@
       "legacy_no_match": false,
       "review_requirement": "verify_scope_active_office_and_territory",
       "activation_allowed": false,
-      "owner_approved": true
+      "owner_approved": true,
+      "runtime_review": {
+        "status": "verified_current",
+        "date": "2026-11-28",
+        "tested_commit": "d47a3ea66f75d7979faf13841da9b6b50b0c7df6",
+        "ci_run": "https://github.com/dimkazantsev/gos-sim1/actions/runs/46147375081",
+        "scope": "isolated_actual_sql_portfolio_and_stage_rules_plus_production_read_only_route_metadata",
+        "limitation": "Синтетические должности; диапазон этапов в тестовой базе 4–15. Метаданные всех 141 рабочих маршрутов и 20 ранних ключей совпали. Не проверяет доступность конкретного игрока в каждый момент, hosted Auth/PostgREST/Realtime или правовой допуск; активация запрещена."
+      }
     },
     {
       "case_key": "bank-curated-serious-12",
@@ -750,7 +974,15 @@
       "legacy_no_match": false,
       "review_requirement": "verify_scope_active_office_and_territory",
       "activation_allowed": false,
-      "owner_approved": true
+      "owner_approved": true,
+      "runtime_review": {
+        "status": "verified_current",
+        "date": "2026-11-28",
+        "tested_commit": "d47a3ea66f75d7979faf13841da9b6b50b0c7df6",
+        "ci_run": "https://github.com/dimkazantsev/gos-sim1/actions/runs/46147375081",
+        "scope": "isolated_actual_sql_portfolio_and_stage_rules_plus_production_read_only_route_metadata",
+        "limitation": "Синтетические должности; диапазон этапов в тестовой базе 4–15. Метаданные всех 141 рабочих маршрутов и 20 ранних ключей совпали. Не проверяет доступность конкретного игрока в каждый момент, hosted Auth/PostgREST/Realtime или правовой допуск; активация запрещена."
+      }
     },
     {
       "case_key": "bank-curated-serious-13",
@@ -779,7 +1011,15 @@
       "legacy_no_match": true,
       "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
       "activation_allowed": false,
-      "owner_approved": true
+      "owner_approved": true,
+      "runtime_review": {
+        "status": "verified_current",
+        "date": "2026-11-28",
+        "tested_commit": "d47a3ea66f75d7979faf13841da9b6b50b0c7df6",
+        "ci_run": "https://github.com/dimkazantsev/gos-sim1/actions/runs/46147375081",
+        "scope": "isolated_actual_sql_portfolio_and_stage_rules_plus_production_read_only_route_metadata",
+        "limitation": "Синтетические должности; диапазон этапов в тестовой базе 4–15. Метаданные всех 141 рабочих маршрутов и 20 ранних ключей совпали. Не проверяет доступность конкретного игрока в каждый момент, hosted Auth/PostgREST/Realtime или правовой допуск; активация запрещена."
+      }
     },
     {
       "case_key": "bank-curated-serious-14",
@@ -808,7 +1048,15 @@
       "legacy_no_match": true,
       "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
       "activation_allowed": false,
-      "owner_approved": true
+      "owner_approved": true,
+      "runtime_review": {
+        "status": "verified_current",
+        "date": "2026-11-28",
+        "tested_commit": "d47a3ea66f75d7979faf13841da9b6b50b0c7df6",
+        "ci_run": "https://github.com/dimkazantsev/gos-sim1/actions/runs/46147375081",
+        "scope": "isolated_actual_sql_portfolio_and_stage_rules_plus_production_read_only_route_metadata",
+        "limitation": "Синтетические должности; диапазон этапов в тестовой базе 4–15. Метаданные всех 141 рабочих маршрутов и 20 ранних ключей совпали. Не проверяет доступность конкретного игрока в каждый момент, hosted Auth/PostgREST/Realtime или правовой допуск; активация запрещена."
+      }
     },
     {
       "case_key": "bank-curated-serious-15",
@@ -834,7 +1082,15 @@
       "legacy_no_match": false,
       "review_requirement": "verify_scope_active_office_and_territory",
       "activation_allowed": false,
-      "owner_approved": true
+      "owner_approved": true,
+      "runtime_review": {
+        "status": "verified_current",
+        "date": "2026-11-28",
+        "tested_commit": "d47a3ea66f75d7979faf13841da9b6b50b0c7df6",
+        "ci_run": "https://github.com/dimkazantsev/gos-sim1/actions/runs/46147375081",
+        "scope": "isolated_actual_sql_portfolio_and_stage_rules_plus_production_read_only_route_metadata",
+        "limitation": "Синтетические должности; диапазон этапов в тестовой базе 4–15. Метаданные всех 141 рабочих маршрутов и 20 ранних ключей совпали. Не проверяет доступность конкретного игрока в каждый момент, hosted Auth/PostgREST/Realtime или правовой допуск; активация запрещена."
+      }
     },
     {
       "case_key": "bank-curated-serious-16",
@@ -857,7 +1113,15 @@
       "legacy_no_match": true,
       "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
       "activation_allowed": false,
-      "owner_approved": true
+      "owner_approved": true,
+      "runtime_review": {
+        "status": "verified_current",
+        "date": "2026-11-28",
+        "tested_commit": "d47a3ea66f75d7979faf13841da9b6b50b0c7df6",
+        "ci_run": "https://github.com/dimkazantsev/gos-sim1/actions/runs/46147375081",
+        "scope": "isolated_actual_sql_portfolio_and_stage_rules_plus_production_read_only_route_metadata",
+        "limitation": "Синтетические должности; диапазон этапов в тестовой базе 4–15. Метаданные всех 141 рабочих маршрутов и 20 ранних ключей совпали. Не проверяет доступность конкретного игрока в каждый момент, hosted Auth/PostgREST/Realtime или правовой допуск; активация запрещена."
+      }
     },
     {
       "case_key": "bank-curated-serious-17",
@@ -881,7 +1145,15 @@
       "legacy_no_match": true,
       "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
       "activation_allowed": false,
-      "owner_approved": true
+      "owner_approved": true,
+      "runtime_review": {
+        "status": "verified_current",
+        "date": "2026-11-28",
+        "tested_commit": "d47a3ea66f75d7979faf13841da9b6b50b0c7df6",
+        "ci_run": "https://github.com/dimkazantsev/gos-sim1/actions/runs/46147375081",
+        "scope": "isolated_actual_sql_portfolio_and_stage_rules_plus_production_read_only_route_metadata",
+        "limitation": "Синтетические должности; диапазон этапов в тестовой базе 4–15. Метаданные всех 141 рабочих маршрутов и 20 ранних ключей совпали. Не проверяет доступность конкретного игрока в каждый момент, hosted Auth/PostgREST/Realtime или правовой допуск; активация запрещена."
+      }
     },
     {
       "case_key": "bank-curated-serious-18",
@@ -903,7 +1175,15 @@
       "legacy_no_match": true,
       "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
       "activation_allowed": false,
-      "owner_approved": true
+      "owner_approved": true,
+      "runtime_review": {
+        "status": "verified_current",
+        "date": "2026-11-28",
+        "tested_commit": "d47a3ea66f75d7979faf13841da9b6b50b0c7df6",
+        "ci_run": "https://github.com/dimkazantsev/gos-sim1/actions/runs/46147375081",
+        "scope": "isolated_actual_sql_portfolio_and_stage_rules_plus_production_read_only_route_metadata",
+        "limitation": "Синтетические должности; диапазон этапов в тестовой базе 4–15. Метаданные всех 141 рабочих маршрутов и 20 ранних ключей совпали. Не проверяет доступность конкретного игрока в каждый момент, hosted Auth/PostgREST/Realtime или правовой допуск; активация запрещена."
+      }
     },
     {
       "case_key": "bank-curated-serious-19",
@@ -936,7 +1216,15 @@
       "legacy_no_match": true,
       "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
       "activation_allowed": false,
-      "owner_approved": true
+      "owner_approved": true,
+      "runtime_review": {
+        "status": "verified_current",
+        "date": "2026-11-28",
+        "tested_commit": "d47a3ea66f75d7979faf13841da9b6b50b0c7df6",
+        "ci_run": "https://github.com/dimkazantsev/gos-sim1/actions/runs/46147375081",
+        "scope": "isolated_actual_sql_portfolio_and_stage_rules_plus_production_read_only_route_metadata",
+        "limitation": "Синтетические должности; диапазон этапов в тестовой базе 4–15. Метаданные всех 141 рабочих маршрутов и 20 ранних ключей совпали. Не проверяет доступность конкретного игрока в каждый момент, hosted Auth/PostgREST/Realtime или правовой допуск; активация запрещена."
+      }
     },
     {
       "case_key": "bank-curated-serious-20",
@@ -959,7 +1247,15 @@
       "legacy_no_match": true,
       "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
       "activation_allowed": false,
-      "owner_approved": true
+      "owner_approved": true,
+      "runtime_review": {
+        "status": "verified_current",
+        "date": "2026-11-28",
+        "tested_commit": "d47a3ea66f75d7979faf13841da9b6b50b0c7df6",
+        "ci_run": "https://github.com/dimkazantsev/gos-sim1/actions/runs/46147375081",
+        "scope": "isolated_actual_sql_portfolio_and_stage_rules_plus_production_read_only_route_metadata",
+        "limitation": "Синтетические должности; диапазон этапов в тестовой базе 4–15. Метаданные всех 141 рабочих маршрутов и 20 ранних ключей совпали. Не проверяет доступность конкретного игрока в каждый момент, hosted Auth/PostgREST/Realtime или правовой допуск; активация запрещена."
+      }
     },
     {
       "case_key": "bank-curated-serious-21",
@@ -988,7 +1284,15 @@
       "legacy_no_match": true,
       "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
       "activation_allowed": false,
-      "owner_approved": true
+      "owner_approved": true,
+      "runtime_review": {
+        "status": "verified_current",
+        "date": "2026-11-28",
+        "tested_commit": "d47a3ea66f75d7979faf13841da9b6b50b0c7df6",
+        "ci_run": "https://github.com/dimkazantsev/gos-sim1/actions/runs/46147375081",
+        "scope": "isolated_actual_sql_portfolio_and_stage_rules_plus_production_read_only_route_metadata",
+        "limitation": "Синтетические должности; диапазон этапов в тестовой базе 4–15. Метаданные всех 141 рабочих маршрутов и 20 ранних ключей совпали. Не проверяет доступность конкретного игрока в каждый момент, hosted Auth/PostgREST/Realtime или правовой допуск; активация запрещена."
+      }
     },
     {
       "case_key": "bank-curated-serious-22",
@@ -1011,7 +1315,15 @@
       "legacy_no_match": true,
       "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
       "activation_allowed": false,
-      "owner_approved": true
+      "owner_approved": true,
+      "runtime_review": {
+        "status": "verified_current",
+        "date": "2026-11-28",
+        "tested_commit": "d47a3ea66f75d7979faf13841da9b6b50b0c7df6",
+        "ci_run": "https://github.com/dimkazantsev/gos-sim1/actions/runs/46147375081",
+        "scope": "isolated_actual_sql_portfolio_and_stage_rules_plus_production_read_only_route_metadata",
+        "limitation": "Синтетические должности; диапазон этапов в тестовой базе 4–15. Метаданные всех 141 рабочих маршрутов и 20 ранних ключей совпали. Не проверяет доступность конкретного игрока в каждый момент, hosted Auth/PostgREST/Realtime или правовой допуск; активация запрещена."
+      }
     },
     {
       "case_key": "bank-curated-serious-23",
@@ -1033,7 +1345,15 @@
       "legacy_no_match": true,
       "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
       "activation_allowed": false,
-      "owner_approved": true
+      "owner_approved": true,
+      "runtime_review": {
+        "status": "verified_current",
+        "date": "2026-11-28",
+        "tested_commit": "d47a3ea66f75d7979faf13841da9b6b50b0c7df6",
+        "ci_run": "https://github.com/dimkazantsev/gos-sim1/actions/runs/46147375081",
+        "scope": "isolated_actual_sql_portfolio_and_stage_rules_plus_production_read_only_route_metadata",
+        "limitation": "Синтетические должности; диапазон этапов в тестовой базе 4–15. Метаданные всех 141 рабочих маршрутов и 20 ранних ключей совпали. Не проверяет доступность конкретного игрока в каждый момент, hosted Auth/PostgREST/Realtime или правовой допуск; активация запрещена."
+      }
     },
     {
       "case_key": "bank-curated-serious-24",
@@ -1059,7 +1379,15 @@
       "legacy_no_match": false,
       "review_requirement": "verify_scope_active_office_and_territory",
       "activation_allowed": false,
-      "owner_approved": true
+      "owner_approved": true,
+      "runtime_review": {
+        "status": "verified_current",
+        "date": "2026-11-28",
+        "tested_commit": "d47a3ea66f75d7979faf13841da9b6b50b0c7df6",
+        "ci_run": "https://github.com/dimkazantsev/gos-sim1/actions/runs/46147375081",
+        "scope": "isolated_actual_sql_portfolio_and_stage_rules_plus_production_read_only_route_metadata",
+        "limitation": "Синтетические должности; диапазон этапов в тестовой базе 4–15. Метаданные всех 141 рабочих маршрутов и 20 ранних ключей совпали. Не проверяет доступность конкретного игрока в каждый момент, hosted Auth/PostgREST/Realtime или правовой допуск; активация запрещена."
+      }
     },
     {
       "case_key": "bank-curated-v2-02",
@@ -1080,7 +1408,15 @@
       "legacy_no_match": true,
       "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
       "activation_allowed": false,
-      "owner_approved": true
+      "owner_approved": true,
+      "runtime_review": {
+        "status": "verified_current",
+        "date": "2026-11-28",
+        "tested_commit": "d47a3ea66f75d7979faf13841da9b6b50b0c7df6",
+        "ci_run": "https://github.com/dimkazantsev/gos-sim1/actions/runs/46147375081",
+        "scope": "isolated_actual_sql_portfolio_and_stage_rules_plus_production_read_only_route_metadata",
+        "limitation": "Синтетические должности; диапазон этапов в тестовой базе 4–15. Метаданные всех 141 рабочих маршрутов и 20 ранних ключей совпали. Не проверяет доступность конкретного игрока в каждый момент, hosted Auth/PostgREST/Realtime или правовой допуск; активация запрещена."
+      }
     },
     {
       "case_key": "bank-curated-v2-03",
@@ -1102,7 +1438,15 @@
       "legacy_no_match": true,
       "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
       "activation_allowed": false,
-      "owner_approved": true
+      "owner_approved": true,
+      "runtime_review": {
+        "status": "verified_current",
+        "date": "2026-11-28",
+        "tested_commit": "d47a3ea66f75d7979faf13841da9b6b50b0c7df6",
+        "ci_run": "https://github.com/dimkazantsev/gos-sim1/actions/runs/46147375081",
+        "scope": "isolated_actual_sql_portfolio_and_stage_rules_plus_production_read_only_route_metadata",
+        "limitation": "Синтетические должности; диапазон этапов в тестовой базе 4–15. Метаданные всех 141 рабочих маршрутов и 20 ранних ключей совпали. Не проверяет доступность конкретного игрока в каждый момент, hosted Auth/PostgREST/Realtime или правовой допуск; активация запрещена."
+      }
     },
     {
       "case_key": "bank-curated-v2-04",
@@ -1126,7 +1470,15 @@
       "legacy_no_match": false,
       "review_requirement": "verify_scope_active_office_and_territory",
       "activation_allowed": false,
-      "owner_approved": true
+      "owner_approved": true,
+      "runtime_review": {
+        "status": "verified_current",
+        "date": "2026-11-28",
+        "tested_commit": "d47a3ea66f75d7979faf13841da9b6b50b0c7df6",
+        "ci_run": "https://github.com/dimkazantsev/gos-sim1/actions/runs/46147375081",
+        "scope": "isolated_actual_sql_portfolio_and_stage_rules_plus_production_read_only_route_metadata",
+        "limitation": "Синтетические должности; диапазон этапов в тестовой базе 4–15. Метаданные всех 141 рабочих маршрутов и 20 ранних ключей совпали. Не проверяет доступность конкретного игрока в каждый момент, hosted Auth/PostgREST/Realtime или правовой допуск; активация запрещена."
+      }
     },
     {
       "case_key": "bank-curated-v2-05",
@@ -1148,7 +1500,15 @@
       "legacy_no_match": true,
       "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
       "activation_allowed": false,
-      "owner_approved": true
+      "owner_approved": true,
+      "runtime_review": {
+        "status": "verified_current",
+        "date": "2026-11-28",
+        "tested_commit": "d47a3ea66f75d7979faf13841da9b6b50b0c7df6",
+        "ci_run": "https://github.com/dimkazantsev/gos-sim1/actions/runs/46147375081",
+        "scope": "isolated_actual_sql_portfolio_and_stage_rules_plus_production_read_only_route_metadata",
+        "limitation": "Синтетические должности; диапазон этапов в тестовой базе 4–15. Метаданные всех 141 рабочих маршрутов и 20 ранних ключей совпали. Не проверяет доступность конкретного игрока в каждый момент, hosted Auth/PostgREST/Realtime или правовой допуск; активация запрещена."
+      }
     },
     {
       "case_key": "bank-curated-v2-06",
@@ -1176,7 +1536,15 @@
       "legacy_no_match": true,
       "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
       "activation_allowed": false,
-      "owner_approved": true
+      "owner_approved": true,
+      "runtime_review": {
+        "status": "verified_current",
+        "date": "2026-11-28",
+        "tested_commit": "d47a3ea66f75d7979faf13841da9b6b50b0c7df6",
+        "ci_run": "https://github.com/dimkazantsev/gos-sim1/actions/runs/46147375081",
+        "scope": "isolated_actual_sql_portfolio_and_stage_rules_plus_production_read_only_route_metadata",
+        "limitation": "Синтетические должности; диапазон этапов в тестовой базе 4–15. Метаданные всех 141 рабочих маршрутов и 20 ранних ключей совпали. Не проверяет доступность конкретного игрока в каждый момент, hosted Auth/PostgREST/Realtime или правовой допуск; активация запрещена."
+      }
     },
     {
       "case_key": "bank-curated-v2-07",
@@ -1203,7 +1571,15 @@
       "legacy_no_match": true,
       "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
       "activation_allowed": false,
-      "owner_approved": true
+      "owner_approved": true,
+      "runtime_review": {
+        "status": "verified_current",
+        "date": "2026-11-28",
+        "tested_commit": "d47a3ea66f75d7979faf13841da9b6b50b0c7df6",
+        "ci_run": "https://github.com/dimkazantsev/gos-sim1/actions/runs/46147375081",
+        "scope": "isolated_actual_sql_portfolio_and_stage_rules_plus_production_read_only_route_metadata",
+        "limitation": "Синтетические должности; диапазон этапов в тестовой базе 4–15. Метаданные всех 141 рабочих маршрутов и 20 ранних ключей совпали. Не проверяет доступность конкретного игрока в каждый момент, hosted Auth/PostgREST/Realtime или правовой допуск; активация запрещена."
+      }
     },
     {
       "case_key": "bank-curated-v2-08",
@@ -1230,7 +1606,15 @@
       "legacy_no_match": true,
       "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
       "activation_allowed": false,
-      "owner_approved": true
+      "owner_approved": true,
+      "runtime_review": {
+        "status": "verified_current",
+        "date": "2026-11-28",
+        "tested_commit": "d47a3ea66f75d7979faf13841da9b6b50b0c7df6",
+        "ci_run": "https://github.com/dimkazantsev/gos-sim1/actions/runs/46147375081",
+        "scope": "isolated_actual_sql_portfolio_and_stage_rules_plus_production_read_only_route_metadata",
+        "limitation": "Синтетические должности; диапазон этапов в тестовой базе 4–15. Метаданные всех 141 рабочих маршрутов и 20 ранних ключей совпали. Не проверяет доступность конкретного игрока в каждый момент, hosted Auth/PostgREST/Realtime или правовой допуск; активация запрещена."
+      }
     },
     {
       "case_key": "bank-curated-v2-09",
@@ -1254,7 +1638,15 @@
       "legacy_no_match": false,
       "review_requirement": "verify_scope_active_office_and_territory",
       "activation_allowed": false,
-      "owner_approved": true
+      "owner_approved": true,
+      "runtime_review": {
+        "status": "verified_current",
+        "date": "2026-11-28",
+        "tested_commit": "d47a3ea66f75d7979faf13841da9b6b50b0c7df6",
+        "ci_run": "https://github.com/dimkazantsev/gos-sim1/actions/runs/46147375081",
+        "scope": "isolated_actual_sql_portfolio_and_stage_rules_plus_production_read_only_route_metadata",
+        "limitation": "Синтетические должности; диапазон этапов в тестовой базе 4–15. Метаданные всех 141 рабочих маршрутов и 20 ранних ключей совпали. Не проверяет доступность конкретного игрока в каждый момент, hosted Auth/PostgREST/Realtime или правовой допуск; активация запрещена."
+      }
     },
     {
       "case_key": "bank-curated-v2-10",
@@ -1277,7 +1669,15 @@
       "legacy_no_match": true,
       "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
       "activation_allowed": false,
-      "owner_approved": true
+      "owner_approved": true,
+      "runtime_review": {
+        "status": "verified_current",
+        "date": "2026-11-28",
+        "tested_commit": "d47a3ea66f75d7979faf13841da9b6b50b0c7df6",
+        "ci_run": "https://github.com/dimkazantsev/gos-sim1/actions/runs/46147375081",
+        "scope": "isolated_actual_sql_portfolio_and_stage_rules_plus_production_read_only_route_metadata",
+        "limitation": "Синтетические должности; диапазон этапов в тестовой базе 4–15. Метаданные всех 141 рабочих маршрутов и 20 ранних ключей совпали. Не проверяет доступность конкретного игрока в каждый момент, hosted Auth/PostgREST/Realtime или правовой допуск; активация запрещена."
+      }
     },
     {
       "case_key": "bank-curated-v2-11",
@@ -1304,7 +1704,15 @@
       "legacy_no_match": true,
       "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
       "activation_allowed": false,
-      "owner_approved": true
+      "owner_approved": true,
+      "runtime_review": {
+        "status": "verified_current",
+        "date": "2026-11-28",
+        "tested_commit": "d47a3ea66f75d7979faf13841da9b6b50b0c7df6",
+        "ci_run": "https://github.com/dimkazantsev/gos-sim1/actions/runs/46147375081",
+        "scope": "isolated_actual_sql_portfolio_and_stage_rules_plus_production_read_only_route_metadata",
+        "limitation": "Синтетические должности; диапазон этапов в тестовой базе 4–15. Метаданные всех 141 рабочих маршрутов и 20 ранних ключей совпали. Не проверяет доступность конкретного игрока в каждый момент, hosted Auth/PostgREST/Realtime или правовой допуск; активация запрещена."
+      }
     },
     {
       "case_key": "bank-curated-v2-12",
@@ -1326,7 +1734,15 @@
       "legacy_no_match": true,
       "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
       "activation_allowed": false,
-      "owner_approved": true
+      "owner_approved": true,
+      "runtime_review": {
+        "status": "verified_current",
+        "date": "2026-11-28",
+        "tested_commit": "d47a3ea66f75d7979faf13841da9b6b50b0c7df6",
+        "ci_run": "https://github.com/dimkazantsev/gos-sim1/actions/runs/46147375081",
+        "scope": "isolated_actual_sql_portfolio_and_stage_rules_plus_production_read_only_route_metadata",
+        "limitation": "Синтетические должности; диапазон этапов в тестовой базе 4–15. Метаданные всех 141 рабочих маршрутов и 20 ранних ключей совпали. Не проверяет доступность конкретного игрока в каждый момент, hosted Auth/PostgREST/Realtime или правовой допуск; активация запрещена."
+      }
     },
     {
       "case_key": "bank-curated-v2-13",
@@ -1354,7 +1770,15 @@
       "legacy_no_match": true,
       "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
       "activation_allowed": false,
-      "owner_approved": true
+      "owner_approved": true,
+      "runtime_review": {
+        "status": "verified_current",
+        "date": "2026-11-28",
+        "tested_commit": "d47a3ea66f75d7979faf13841da9b6b50b0c7df6",
+        "ci_run": "https://github.com/dimkazantsev/gos-sim1/actions/runs/46147375081",
+        "scope": "isolated_actual_sql_portfolio_and_stage_rules_plus_production_read_only_route_metadata",
+        "limitation": "Синтетические должности; диапазон этапов в тестовой базе 4–15. Метаданные всех 141 рабочих маршрутов и 20 ранних ключей совпали. Не проверяет доступность конкретного игрока в каждый момент, hosted Auth/PostgREST/Realtime или правовой допуск; активация запрещена."
+      }
     },
     {
       "case_key": "bank-curated-v2-15",
@@ -1378,7 +1802,15 @@
       "legacy_no_match": false,
       "review_requirement": "verify_scope_active_office_and_territory",
       "activation_allowed": false,
-      "owner_approved": true
+      "owner_approved": true,
+      "runtime_review": {
+        "status": "verified_current",
+        "date": "2026-11-28",
+        "tested_commit": "d47a3ea66f75d7979faf13841da9b6b50b0c7df6",
+        "ci_run": "https://github.com/dimkazantsev/gos-sim1/actions/runs/46147375081",
+        "scope": "isolated_actual_sql_portfolio_and_stage_rules_plus_production_read_only_route_metadata",
+        "limitation": "Синтетические должности; диапазон этапов в тестовой базе 4–15. Метаданные всех 141 рабочих маршрутов и 20 ранних ключей совпали. Не проверяет доступность конкретного игрока в каждый момент, hosted Auth/PostgREST/Realtime или правовой допуск; активация запрещена."
+      }
     },
     {
       "case_key": "bank-curated-v2-16",
@@ -1400,7 +1832,15 @@
       "legacy_no_match": true,
       "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
       "activation_allowed": false,
-      "owner_approved": true
+      "owner_approved": true,
+      "runtime_review": {
+        "status": "verified_current",
+        "date": "2026-11-28",
+        "tested_commit": "d47a3ea66f75d7979faf13841da9b6b50b0c7df6",
+        "ci_run": "https://github.com/dimkazantsev/gos-sim1/actions/runs/46147375081",
+        "scope": "isolated_actual_sql_portfolio_and_stage_rules_plus_production_read_only_route_metadata",
+        "limitation": "Синтетические должности; диапазон этапов в тестовой базе 4–15. Метаданные всех 141 рабочих маршрутов и 20 ранних ключей совпали. Не проверяет доступность конкретного игрока в каждый момент, hosted Auth/PostgREST/Realtime или правовой допуск; активация запрещена."
+      }
     },
     {
       "case_key": "bank-curated-v2-17",
@@ -1428,7 +1868,15 @@
       "legacy_no_match": true,
       "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
       "activation_allowed": false,
-      "owner_approved": true
+      "owner_approved": true,
+      "runtime_review": {
+        "status": "verified_current",
+        "date": "2026-11-28",
+        "tested_commit": "d47a3ea66f75d7979faf13841da9b6b50b0c7df6",
+        "ci_run": "https://github.com/dimkazantsev/gos-sim1/actions/runs/46147375081",
+        "scope": "isolated_actual_sql_portfolio_and_stage_rules_plus_production_read_only_route_metadata",
+        "limitation": "Синтетические должности; диапазон этапов в тестовой базе 4–15. Метаданные всех 141 рабочих маршрутов и 20 ранних ключей совпали. Не проверяет доступность конкретного игрока в каждый момент, hosted Auth/PostgREST/Realtime или правовой допуск; активация запрещена."
+      }
     },
     {
       "case_key": "bank-curated-v2-18",
@@ -1461,7 +1909,15 @@
       "legacy_no_match": false,
       "review_requirement": "verify_scope_active_office_and_territory",
       "activation_allowed": false,
-      "owner_approved": true
+      "owner_approved": true,
+      "runtime_review": {
+        "status": "verified_current",
+        "date": "2026-11-28",
+        "tested_commit": "d47a3ea66f75d7979faf13841da9b6b50b0c7df6",
+        "ci_run": "https://github.com/dimkazantsev/gos-sim1/actions/runs/46147375081",
+        "scope": "isolated_actual_sql_portfolio_and_stage_rules_plus_production_read_only_route_metadata",
+        "limitation": "Синтетические должности; диапазон этапов в тестовой базе 4–15. Метаданные всех 141 рабочих маршрутов и 20 ранних ключей совпали. Не проверяет доступность конкретного игрока в каждый момент, hosted Auth/PostgREST/Realtime или правовой допуск; активация запрещена."
+      }
     },
     {
       "case_key": "bank-curated-v2-19",
@@ -1488,7 +1944,15 @@
       "legacy_no_match": true,
       "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
       "activation_allowed": false,
-      "owner_approved": true
+      "owner_approved": true,
+      "runtime_review": {
+        "status": "verified_current",
+        "date": "2026-11-28",
+        "tested_commit": "d47a3ea66f75d7979faf13841da9b6b50b0c7df6",
+        "ci_run": "https://github.com/dimkazantsev/gos-sim1/actions/runs/46147375081",
+        "scope": "isolated_actual_sql_portfolio_and_stage_rules_plus_production_read_only_route_metadata",
+        "limitation": "Синтетические должности; диапазон этапов в тестовой базе 4–15. Метаданные всех 141 рабочих маршрутов и 20 ранних ключей совпали. Не проверяет доступность конкретного игрока в каждый момент, hosted Auth/PostgREST/Realtime или правовой допуск; активация запрещена."
+      }
     },
     {
       "case_key": "bank-curated-v2-20",
@@ -1519,7 +1983,15 @@
       "legacy_no_match": true,
       "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
       "activation_allowed": false,
-      "owner_approved": true
+      "owner_approved": true,
+      "runtime_review": {
+        "status": "verified_current",
+        "date": "2026-11-28",
+        "tested_commit": "d47a3ea66f75d7979faf13841da9b6b50b0c7df6",
+        "ci_run": "https://github.com/dimkazantsev/gos-sim1/actions/runs/46147375081",
+        "scope": "isolated_actual_sql_portfolio_and_stage_rules_plus_production_read_only_route_metadata",
+        "limitation": "Синтетические должности; диапазон этапов в тестовой базе 4–15. Метаданные всех 141 рабочих маршрутов и 20 ранних ключей совпали. Не проверяет доступность конкретного игрока в каждый момент, hosted Auth/PostgREST/Realtime или правовой допуск; активация запрещена."
+      }
     },
     {
       "case_key": "bank-curated-v2-21",
@@ -1546,7 +2018,15 @@
       "legacy_no_match": true,
       "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
       "activation_allowed": false,
-      "owner_approved": true
+      "owner_approved": true,
+      "runtime_review": {
+        "status": "verified_current",
+        "date": "2026-11-28",
+        "tested_commit": "d47a3ea66f75d7979faf13841da9b6b50b0c7df6",
+        "ci_run": "https://github.com/dimkazantsev/gos-sim1/actions/runs/46147375081",
+        "scope": "isolated_actual_sql_portfolio_and_stage_rules_plus_production_read_only_route_metadata",
+        "limitation": "Синтетические должности; диапазон этапов в тестовой базе 4–15. Метаданные всех 141 рабочих маршрутов и 20 ранних ключей совпали. Не проверяет доступность конкретного игрока в каждый момент, hosted Auth/PostgREST/Realtime или правовой допуск; активация запрещена."
+      }
     },
     {
       "case_key": "bank-curated-v2-22",
@@ -1568,7 +2048,15 @@
       "legacy_no_match": true,
       "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
       "activation_allowed": false,
-      "owner_approved": true
+      "owner_approved": true,
+      "runtime_review": {
+        "status": "verified_current",
+        "date": "2026-11-28",
+        "tested_commit": "d47a3ea66f75d7979faf13841da9b6b50b0c7df6",
+        "ci_run": "https://github.com/dimkazantsev/gos-sim1/actions/runs/46147375081",
+        "scope": "isolated_actual_sql_portfolio_and_stage_rules_plus_production_read_only_route_metadata",
+        "limitation": "Синтетические должности; диапазон этапов в тестовой базе 4–15. Метаданные всех 141 рабочих маршрутов и 20 ранних ключей совпали. Не проверяет доступность конкретного игрока в каждый момент, hosted Auth/PostgREST/Realtime или правовой допуск; активация запрещена."
+      }
     },
     {
       "case_key": "bank-curated-v2-23",
@@ -1589,7 +2077,15 @@
       "legacy_no_match": true,
       "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
       "activation_allowed": false,
-      "owner_approved": true
+      "owner_approved": true,
+      "runtime_review": {
+        "status": "verified_current",
+        "date": "2026-11-28",
+        "tested_commit": "d47a3ea66f75d7979faf13841da9b6b50b0c7df6",
+        "ci_run": "https://github.com/dimkazantsev/gos-sim1/actions/runs/46147375081",
+        "scope": "isolated_actual_sql_portfolio_and_stage_rules_plus_production_read_only_route_metadata",
+        "limitation": "Синтетические должности; диапазон этапов в тестовой базе 4–15. Метаданные всех 141 рабочих маршрутов и 20 ранних ключей совпали. Не проверяет доступность конкретного игрока в каждый момент, hosted Auth/PostgREST/Realtime или правовой допуск; активация запрещена."
+      }
     },
     {
       "case_key": "bank-curated-v2-24",
@@ -1616,7 +2112,15 @@
       "legacy_no_match": true,
       "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
       "activation_allowed": false,
-      "owner_approved": true
+      "owner_approved": true,
+      "runtime_review": {
+        "status": "verified_current",
+        "date": "2026-11-28",
+        "tested_commit": "d47a3ea66f75d7979faf13841da9b6b50b0c7df6",
+        "ci_run": "https://github.com/dimkazantsev/gos-sim1/actions/runs/46147375081",
+        "scope": "isolated_actual_sql_portfolio_and_stage_rules_plus_production_read_only_route_metadata",
+        "limitation": "Синтетические должности; диапазон этапов в тестовой базе 4–15. Метаданные всех 141 рабочих маршрутов и 20 ранних ключей совпали. Не проверяет доступность конкретного игрока в каждый момент, hosted Auth/PostgREST/Realtime или правовой допуск; активация запрещена."
+      }
     },
     {
       "case_key": "bank-curated-v2-25",
@@ -1638,7 +2142,15 @@
       "legacy_no_match": true,
       "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
       "activation_allowed": false,
-      "owner_approved": true
+      "owner_approved": true,
+      "runtime_review": {
+        "status": "verified_current",
+        "date": "2026-11-28",
+        "tested_commit": "d47a3ea66f75d7979faf13841da9b6b50b0c7df6",
+        "ci_run": "https://github.com/dimkazantsev/gos-sim1/actions/runs/46147375081",
+        "scope": "isolated_actual_sql_portfolio_and_stage_rules_plus_production_read_only_route_metadata",
+        "limitation": "Синтетические должности; диапазон этапов в тестовой базе 4–15. Метаданные всех 141 рабочих маршрутов и 20 ранних ключей совпали. Не проверяет доступность конкретного игрока в каждый момент, hosted Auth/PostgREST/Realtime или правовой допуск; активация запрещена."
+      }
     },
     {
       "case_key": "bank-curated-v2-26",
@@ -1660,7 +2172,15 @@
       "legacy_no_match": true,
       "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
       "activation_allowed": false,
-      "owner_approved": true
+      "owner_approved": true,
+      "runtime_review": {
+        "status": "verified_current",
+        "date": "2026-11-28",
+        "tested_commit": "d47a3ea66f75d7979faf13841da9b6b50b0c7df6",
+        "ci_run": "https://github.com/dimkazantsev/gos-sim1/actions/runs/46147375081",
+        "scope": "isolated_actual_sql_portfolio_and_stage_rules_plus_production_read_only_route_metadata",
+        "limitation": "Синтетические должности; диапазон этапов в тестовой базе 4–15. Метаданные всех 141 рабочих маршрутов и 20 ранних ключей совпали. Не проверяет доступность конкретного игрока в каждый момент, hosted Auth/PostgREST/Realtime или правовой допуск; активация запрещена."
+      }
     },
     {
       "case_key": "bank-curated-v2-28",
@@ -1681,7 +2201,15 @@
       "legacy_no_match": true,
       "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
       "activation_allowed": false,
-      "owner_approved": true
+      "owner_approved": true,
+      "runtime_review": {
+        "status": "verified_current",
+        "date": "2026-11-28",
+        "tested_commit": "d47a3ea66f75d7979faf13841da9b6b50b0c7df6",
+        "ci_run": "https://github.com/dimkazantsev/gos-sim1/actions/runs/46147375081",
+        "scope": "isolated_actual_sql_portfolio_and_stage_rules_plus_production_read_only_route_metadata",
+        "limitation": "Синтетические должности; диапазон этапов в тестовой базе 4–15. Метаданные всех 141 рабочих маршрутов и 20 ранних ключей совпали. Не проверяет доступность конкретного игрока в каждый момент, hosted Auth/PostgREST/Realtime или правовой допуск; активация запрещена."
+      }
     },
     {
       "case_key": "bank-curated-v2-29",
@@ -1712,7 +2240,15 @@
       "legacy_no_match": true,
       "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
       "activation_allowed": false,
-      "owner_approved": true
+      "owner_approved": true,
+      "runtime_review": {
+        "status": "verified_current",
+        "date": "2026-11-28",
+        "tested_commit": "d47a3ea66f75d7979faf13841da9b6b50b0c7df6",
+        "ci_run": "https://github.com/dimkazantsev/gos-sim1/actions/runs/46147375081",
+        "scope": "isolated_actual_sql_portfolio_and_stage_rules_plus_production_read_only_route_metadata",
+        "limitation": "Синтетические должности; диапазон этапов в тестовой базе 4–15. Метаданные всех 141 рабочих маршрутов и 20 ранних ключей совпали. Не проверяет доступность конкретного игрока в каждый момент, hosted Auth/PostgREST/Realtime или правовой допуск; активация запрещена."
+      }
     },
     {
       "case_key": "bank-curated-v2-30",
@@ -1734,7 +2270,15 @@
       "legacy_no_match": true,
       "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
       "activation_allowed": false,
-      "owner_approved": true
+      "owner_approved": true,
+      "runtime_review": {
+        "status": "verified_current",
+        "date": "2026-11-28",
+        "tested_commit": "d47a3ea66f75d7979faf13841da9b6b50b0c7df6",
+        "ci_run": "https://github.com/dimkazantsev/gos-sim1/actions/runs/46147375081",
+        "scope": "isolated_actual_sql_portfolio_and_stage_rules_plus_production_read_only_route_metadata",
+        "limitation": "Синтетические должности; диапазон этапов в тестовой базе 4–15. Метаданные всех 141 рабочих маршрутов и 20 ранних ключей совпали. Не проверяет доступность конкретного игрока в каждый момент, hosted Auth/PostgREST/Realtime или правовой допуск; активация запрещена."
+      }
     },
     {
       "case_key": "bank-curated-v2-31",
@@ -1756,7 +2300,15 @@
       "legacy_no_match": true,
       "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
       "activation_allowed": false,
-      "owner_approved": true
+      "owner_approved": true,
+      "runtime_review": {
+        "status": "verified_current",
+        "date": "2026-11-28",
+        "tested_commit": "d47a3ea66f75d7979faf13841da9b6b50b0c7df6",
+        "ci_run": "https://github.com/dimkazantsev/gos-sim1/actions/runs/46147375081",
+        "scope": "isolated_actual_sql_portfolio_and_stage_rules_plus_production_read_only_route_metadata",
+        "limitation": "Синтетические должности; диапазон этапов в тестовой базе 4–15. Метаданные всех 141 рабочих маршрутов и 20 ранних ключей совпали. Не проверяет доступность конкретного игрока в каждый момент, hosted Auth/PostgREST/Realtime или правовой допуск; активация запрещена."
+      }
     },
     {
       "case_key": "bank-curated-v2-32",
@@ -1783,7 +2335,15 @@
       "legacy_no_match": true,
       "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
       "activation_allowed": false,
-      "owner_approved": true
+      "owner_approved": true,
+      "runtime_review": {
+        "status": "verified_current",
+        "date": "2026-11-28",
+        "tested_commit": "d47a3ea66f75d7979faf13841da9b6b50b0c7df6",
+        "ci_run": "https://github.com/dimkazantsev/gos-sim1/actions/runs/46147375081",
+        "scope": "isolated_actual_sql_portfolio_and_stage_rules_plus_production_read_only_route_metadata",
+        "limitation": "Синтетические должности; диапазон этапов в тестовой базе 4–15. Метаданные всех 141 рабочих маршрутов и 20 ранних ключей совпали. Не проверяет доступность конкретного игрока в каждый момент, hosted Auth/PostgREST/Realtime или правовой допуск; активация запрещена."
+      }
     },
     {
       "case_key": "bank-curated-v2-33",
@@ -1810,7 +2370,15 @@
       "legacy_no_match": true,
       "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
       "activation_allowed": false,
-      "owner_approved": true
+      "owner_approved": true,
+      "runtime_review": {
+        "status": "verified_current",
+        "date": "2026-11-28",
+        "tested_commit": "d47a3ea66f75d7979faf13841da9b6b50b0c7df6",
+        "ci_run": "https://github.com/dimkazantsev/gos-sim1/actions/runs/46147375081",
+        "scope": "isolated_actual_sql_portfolio_and_stage_rules_plus_production_read_only_route_metadata",
+        "limitation": "Синтетические должности; диапазон этапов в тестовой базе 4–15. Метаданные всех 141 рабочих маршрутов и 20 ранних ключей совпали. Не проверяет доступность конкретного игрока в каждый момент, hosted Auth/PostgREST/Realtime или правовой допуск; активация запрещена."
+      }
     },
     {
       "case_key": "bank-curated-v2-34",
@@ -1832,7 +2400,15 @@
       "legacy_no_match": true,
       "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
       "activation_allowed": false,
-      "owner_approved": true
+      "owner_approved": true,
+      "runtime_review": {
+        "status": "verified_current",
+        "date": "2026-11-28",
+        "tested_commit": "d47a3ea66f75d7979faf13841da9b6b50b0c7df6",
+        "ci_run": "https://github.com/dimkazantsev/gos-sim1/actions/runs/46147375081",
+        "scope": "isolated_actual_sql_portfolio_and_stage_rules_plus_production_read_only_route_metadata",
+        "limitation": "Синтетические должности; диапазон этапов в тестовой базе 4–15. Метаданные всех 141 рабочих маршрутов и 20 ранних ключей совпали. Не проверяет доступность конкретного игрока в каждый момент, hosted Auth/PostgREST/Realtime или правовой допуск; активация запрещена."
+      }
     },
     {
       "case_key": "bank-curated-v2-35",
@@ -1854,7 +2430,15 @@
       "legacy_no_match": true,
       "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
       "activation_allowed": false,
-      "owner_approved": true
+      "owner_approved": true,
+      "runtime_review": {
+        "status": "verified_current",
+        "date": "2026-11-28",
+        "tested_commit": "d47a3ea66f75d7979faf13841da9b6b50b0c7df6",
+        "ci_run": "https://github.com/dimkazantsev/gos-sim1/actions/runs/46147375081",
+        "scope": "isolated_actual_sql_portfolio_and_stage_rules_plus_production_read_only_route_metadata",
+        "limitation": "Синтетические должности; диапазон этапов в тестовой базе 4–15. Метаданные всех 141 рабочих маршрутов и 20 ранних ключей совпали. Не проверяет доступность конкретного игрока в каждый момент, hosted Auth/PostgREST/Realtime или правовой допуск; активация запрещена."
+      }
     },
     {
       "case_key": "bank-curated-v2-36",
@@ -1881,7 +2465,15 @@
       "legacy_no_match": true,
       "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
       "activation_allowed": false,
-      "owner_approved": true
+      "owner_approved": true,
+      "runtime_review": {
+        "status": "verified_current",
+        "date": "2026-11-28",
+        "tested_commit": "d47a3ea66f75d7979faf13841da9b6b50b0c7df6",
+        "ci_run": "https://github.com/dimkazantsev/gos-sim1/actions/runs/46147375081",
+        "scope": "isolated_actual_sql_portfolio_and_stage_rules_plus_production_read_only_route_metadata",
+        "limitation": "Синтетические должности; диапазон этапов в тестовой базе 4–15. Метаданные всех 141 рабочих маршрутов и 20 ранних ключей совпали. Не проверяет доступность конкретного игрока в каждый момент, hosted Auth/PostgREST/Realtime или правовой допуск; активация запрещена."
+      }
     },
     {
       "case_key": "bank-curated-v2-37",
@@ -1903,7 +2495,15 @@
       "legacy_no_match": true,
       "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
       "activation_allowed": false,
-      "owner_approved": true
+      "owner_approved": true,
+      "runtime_review": {
+        "status": "verified_current",
+        "date": "2026-11-28",
+        "tested_commit": "d47a3ea66f75d7979faf13841da9b6b50b0c7df6",
+        "ci_run": "https://github.com/dimkazantsev/gos-sim1/actions/runs/46147375081",
+        "scope": "isolated_actual_sql_portfolio_and_stage_rules_plus_production_read_only_route_metadata",
+        "limitation": "Синтетические должности; диапазон этапов в тестовой базе 4–15. Метаданные всех 141 рабочих маршрутов и 20 ранних ключей совпали. Не проверяет доступность конкретного игрока в каждый момент, hosted Auth/PostgREST/Realtime или правовой допуск; активация запрещена."
+      }
     },
     {
       "case_key": "bank-curated-v2-38",
@@ -1930,7 +2530,15 @@
       "legacy_no_match": true,
       "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
       "activation_allowed": false,
-      "owner_approved": true
+      "owner_approved": true,
+      "runtime_review": {
+        "status": "verified_current",
+        "date": "2026-11-28",
+        "tested_commit": "d47a3ea66f75d7979faf13841da9b6b50b0c7df6",
+        "ci_run": "https://github.com/dimkazantsev/gos-sim1/actions/runs/46147375081",
+        "scope": "isolated_actual_sql_portfolio_and_stage_rules_plus_production_read_only_route_metadata",
+        "limitation": "Синтетические должности; диапазон этапов в тестовой базе 4–15. Метаданные всех 141 рабочих маршрутов и 20 ранних ключей совпали. Не проверяет доступность конкретного игрока в каждый момент, hosted Auth/PostgREST/Realtime или правовой допуск; активация запрещена."
+      }
     },
     {
       "case_key": "bank-curated-v2-39",
@@ -1957,7 +2565,15 @@
       "legacy_no_match": true,
       "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
       "activation_allowed": false,
-      "owner_approved": true
+      "owner_approved": true,
+      "runtime_review": {
+        "status": "verified_current",
+        "date": "2026-11-28",
+        "tested_commit": "d47a3ea66f75d7979faf13841da9b6b50b0c7df6",
+        "ci_run": "https://github.com/dimkazantsev/gos-sim1/actions/runs/46147375081",
+        "scope": "isolated_actual_sql_portfolio_and_stage_rules_plus_production_read_only_route_metadata",
+        "limitation": "Синтетические должности; диапазон этапов в тестовой базе 4–15. Метаданные всех 141 рабочих маршрутов и 20 ранних ключей совпали. Не проверяет доступность конкретного игрока в каждый момент, hosted Auth/PostgREST/Realtime или правовой допуск; активация запрещена."
+      }
     },
     {
       "case_key": "bank-curated-v2-40",
@@ -1984,7 +2600,15 @@
       "legacy_no_match": true,
       "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
       "activation_allowed": false,
-      "owner_approved": true
+      "owner_approved": true,
+      "runtime_review": {
+        "status": "verified_current",
+        "date": "2026-11-28",
+        "tested_commit": "d47a3ea66f75d7979faf13841da9b6b50b0c7df6",
+        "ci_run": "https://github.com/dimkazantsev/gos-sim1/actions/runs/46147375081",
+        "scope": "isolated_actual_sql_portfolio_and_stage_rules_plus_production_read_only_route_metadata",
+        "limitation": "Синтетические должности; диапазон этапов в тестовой базе 4–15. Метаданные всех 141 рабочих маршрутов и 20 ранних ключей совпали. Не проверяет доступность конкретного игрока в каждый момент, hosted Auth/PostgREST/Realtime или правовой допуск; активация запрещена."
+      }
     },
     {
       "case_key": "bank-curated-v2-41",
@@ -2006,7 +2630,15 @@
       "legacy_no_match": true,
       "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
       "activation_allowed": false,
-      "owner_approved": true
+      "owner_approved": true,
+      "runtime_review": {
+        "status": "verified_current",
+        "date": "2026-11-28",
+        "tested_commit": "d47a3ea66f75d7979faf13841da9b6b50b0c7df6",
+        "ci_run": "https://github.com/dimkazantsev/gos-sim1/actions/runs/46147375081",
+        "scope": "isolated_actual_sql_portfolio_and_stage_rules_plus_production_read_only_route_metadata",
+        "limitation": "Синтетические должности; диапазон этапов в тестовой базе 4–15. Метаданные всех 141 рабочих маршрутов и 20 ранних ключей совпали. Не проверяет доступность конкретного игрока в каждый момент, hosted Auth/PostgREST/Realtime или правовой допуск; активация запрещена."
+      }
     },
     {
       "case_key": "bank-curated-v2-42",
@@ -2028,7 +2660,15 @@
       "legacy_no_match": true,
       "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
       "activation_allowed": false,
-      "owner_approved": true
+      "owner_approved": true,
+      "runtime_review": {
+        "status": "verified_current",
+        "date": "2026-11-28",
+        "tested_commit": "d47a3ea66f75d7979faf13841da9b6b50b0c7df6",
+        "ci_run": "https://github.com/dimkazantsev/gos-sim1/actions/runs/46147375081",
+        "scope": "isolated_actual_sql_portfolio_and_stage_rules_plus_production_read_only_route_metadata",
+        "limitation": "Синтетические должности; диапазон этапов в тестовой базе 4–15. Метаданные всех 141 рабочих маршрутов и 20 ранних ключей совпали. Не проверяет доступность конкретного игрока в каждый момент, hosted Auth/PostgREST/Realtime или правовой допуск; активация запрещена."
+      }
     },
     {
       "case_key": "bank-curated-v2-43",
@@ -2050,7 +2690,15 @@
       "legacy_no_match": true,
       "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
       "activation_allowed": false,
-      "owner_approved": true
+      "owner_approved": true,
+      "runtime_review": {
+        "status": "verified_current",
+        "date": "2026-11-28",
+        "tested_commit": "d47a3ea66f75d7979faf13841da9b6b50b0c7df6",
+        "ci_run": "https://github.com/dimkazantsev/gos-sim1/actions/runs/46147375081",
+        "scope": "isolated_actual_sql_portfolio_and_stage_rules_plus_production_read_only_route_metadata",
+        "limitation": "Синтетические должности; диапазон этапов в тестовой базе 4–15. Метаданные всех 141 рабочих маршрутов и 20 ранних ключей совпали. Не проверяет доступность конкретного игрока в каждый момент, hosted Auth/PostgREST/Realtime или правовой допуск; активация запрещена."
+      }
     },
     {
       "case_key": "bank-curated-v2-44",
@@ -2077,7 +2725,15 @@
       "legacy_no_match": true,
       "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
       "activation_allowed": false,
-      "owner_approved": true
+      "owner_approved": true,
+      "runtime_review": {
+        "status": "verified_current",
+        "date": "2026-11-28",
+        "tested_commit": "d47a3ea66f75d7979faf13841da9b6b50b0c7df6",
+        "ci_run": "https://github.com/dimkazantsev/gos-sim1/actions/runs/46147375081",
+        "scope": "isolated_actual_sql_portfolio_and_stage_rules_plus_production_read_only_route_metadata",
+        "limitation": "Синтетические должности; диапазон этапов в тестовой базе 4–15. Метаданные всех 141 рабочих маршрутов и 20 ранних ключей совпали. Не проверяет доступность конкретного игрока в каждый момент, hosted Auth/PostgREST/Realtime или правовой допуск; активация запрещена."
+      }
     },
     {
       "case_key": "bank-curated-v2-45",
@@ -2104,7 +2760,15 @@
       "legacy_no_match": true,
       "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
       "activation_allowed": false,
-      "owner_approved": true
+      "owner_approved": true,
+      "runtime_review": {
+        "status": "verified_current",
+        "date": "2026-11-28",
+        "tested_commit": "d47a3ea66f75d7979faf13841da9b6b50b0c7df6",
+        "ci_run": "https://github.com/dimkazantsev/gos-sim1/actions/runs/46147375081",
+        "scope": "isolated_actual_sql_portfolio_and_stage_rules_plus_production_read_only_route_metadata",
+        "limitation": "Синтетические должности; диапазон этапов в тестовой базе 4–15. Метаданные всех 141 рабочих маршрутов и 20 ранних ключей совпали. Не проверяет доступность конкретного игрока в каждый момент, hosted Auth/PostgREST/Realtime или правовой допуск; активация запрещена."
+      }
     },
     {
       "case_key": "bank-curated-v2-46",
@@ -2131,7 +2795,15 @@
       "legacy_no_match": true,
       "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
       "activation_allowed": false,
-      "owner_approved": true
+      "owner_approved": true,
+      "runtime_review": {
+        "status": "verified_current",
+        "date": "2026-11-28",
+        "tested_commit": "d47a3ea66f75d7979faf13841da9b6b50b0c7df6",
+        "ci_run": "https://github.com/dimkazantsev/gos-sim1/actions/runs/46147375081",
+        "scope": "isolated_actual_sql_portfolio_and_stage_rules_plus_production_read_only_route_metadata",
+        "limitation": "Синтетические должности; диапазон этапов в тестовой базе 4–15. Метаданные всех 141 рабочих маршрутов и 20 ранних ключей совпали. Не проверяет доступность конкретного игрока в каждый момент, hosted Auth/PostgREST/Realtime или правовой допуск; активация запрещена."
+      }
     },
     {
       "case_key": "bank-curated-v2-47",
@@ -2153,7 +2825,15 @@
       "legacy_no_match": true,
       "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
       "activation_allowed": false,
-      "owner_approved": true
+      "owner_approved": true,
+      "runtime_review": {
+        "status": "verified_current",
+        "date": "2026-11-28",
+        "tested_commit": "d47a3ea66f75d7979faf13841da9b6b50b0c7df6",
+        "ci_run": "https://github.com/dimkazantsev/gos-sim1/actions/runs/46147375081",
+        "scope": "isolated_actual_sql_portfolio_and_stage_rules_plus_production_read_only_route_metadata",
+        "limitation": "Синтетические должности; диапазон этапов в тестовой базе 4–15. Метаданные всех 141 рабочих маршрутов и 20 ранних ключей совпали. Не проверяет доступность конкретного игрока в каждый момент, hosted Auth/PostgREST/Realtime или правовой допуск; активация запрещена."
+      }
     },
     {
       "case_key": "bank-curated-v2-48",
@@ -2175,7 +2855,15 @@
       "legacy_no_match": true,
       "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
       "activation_allowed": false,
-      "owner_approved": true
+      "owner_approved": true,
+      "runtime_review": {
+        "status": "verified_current",
+        "date": "2026-11-28",
+        "tested_commit": "d47a3ea66f75d7979faf13841da9b6b50b0c7df6",
+        "ci_run": "https://github.com/dimkazantsev/gos-sim1/actions/runs/46147375081",
+        "scope": "isolated_actual_sql_portfolio_and_stage_rules_plus_production_read_only_route_metadata",
+        "limitation": "Синтетические должности; диапазон этапов в тестовой базе 4–15. Метаданные всех 141 рабочих маршрутов и 20 ранних ключей совпали. Не проверяет доступность конкретного игрока в каждый момент, hosted Auth/PostgREST/Realtime или правовой допуск; активация запрещена."
+      }
     },
     {
       "case_key": "bank-curated-v2-49",
@@ -2202,7 +2890,15 @@
       "legacy_no_match": true,
       "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
       "activation_allowed": false,
-      "owner_approved": true
+      "owner_approved": true,
+      "runtime_review": {
+        "status": "verified_current",
+        "date": "2026-11-28",
+        "tested_commit": "d47a3ea66f75d7979faf13841da9b6b50b0c7df6",
+        "ci_run": "https://github.com/dimkazantsev/gos-sim1/actions/runs/46147375081",
+        "scope": "isolated_actual_sql_portfolio_and_stage_rules_plus_production_read_only_route_metadata",
+        "limitation": "Синтетические должности; диапазон этапов в тестовой базе 4–15. Метаданные всех 141 рабочих маршрутов и 20 ранних ключей совпали. Не проверяет доступность конкретного игрока в каждый момент, hosted Auth/PostgREST/Realtime или правовой допуск; активация запрещена."
+      }
     },
     {
       "case_key": "bank-curated-v2-50",
@@ -2224,7 +2920,15 @@
       "legacy_no_match": true,
       "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
       "activation_allowed": false,
-      "owner_approved": true
+      "owner_approved": true,
+      "runtime_review": {
+        "status": "verified_current",
+        "date": "2026-11-28",
+        "tested_commit": "d47a3ea66f75d7979faf13841da9b6b50b0c7df6",
+        "ci_run": "https://github.com/dimkazantsev/gos-sim1/actions/runs/46147375081",
+        "scope": "isolated_actual_sql_portfolio_and_stage_rules_plus_production_read_only_route_metadata",
+        "limitation": "Синтетические должности; диапазон этапов в тестовой базе 4–15. Метаданные всех 141 рабочих маршрутов и 20 ранних ключей совпали. Не проверяет доступность конкретного игрока в каждый момент, hosted Auth/PostgREST/Realtime или правовой допуск; активация запрещена."
+      }
     },
     {
       "case_key": "bank-environment",
@@ -2254,7 +2958,15 @@
       "legacy_no_match": false,
       "review_requirement": "verify_scope_active_office_and_territory",
       "activation_allowed": false,
-      "owner_approved": true
+      "owner_approved": true,
+      "runtime_review": {
+        "status": "verified_current",
+        "date": "2026-11-28",
+        "tested_commit": "d47a3ea66f75d7979faf13841da9b6b50b0c7df6",
+        "ci_run": "https://github.com/dimkazantsev/gos-sim1/actions/runs/46147375081",
+        "scope": "isolated_actual_sql_portfolio_and_stage_rules_plus_production_read_only_route_metadata",
+        "limitation": "Синтетические должности; диапазон этапов в тестовой базе 4–15. Метаданные всех 141 рабочих маршрутов и 20 ранних ключей совпали. Не проверяет доступность конкретного игрока в каждый момент, hosted Auth/PostgREST/Realtime или правовой допуск; активация запрещена."
+      }
     },
     {
       "case_key": "bank-expanded-light-01-01",
@@ -2277,7 +2989,15 @@
       "legacy_no_match": true,
       "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
       "activation_allowed": false,
-      "owner_approved": true
+      "owner_approved": true,
+      "runtime_review": {
+        "status": "verified_current",
+        "date": "2026-11-28",
+        "tested_commit": "d47a3ea66f75d7979faf13841da9b6b50b0c7df6",
+        "ci_run": "https://github.com/dimkazantsev/gos-sim1/actions/runs/46147375081",
+        "scope": "isolated_actual_sql_portfolio_and_stage_rules_plus_production_read_only_route_metadata",
+        "limitation": "Синтетические должности; диапазон этапов в тестовой базе 4–15. Метаданные всех 141 рабочих маршрутов и 20 ранних ключей совпали. Не проверяет доступность конкретного игрока в каждый момент, hosted Auth/PostgREST/Realtime или правовой допуск; активация запрещена."
+      }
     },
     {
       "case_key": "bank-expanded-light-02-01",
@@ -2300,7 +3020,15 @@
       "legacy_no_match": true,
       "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
       "activation_allowed": false,
-      "owner_approved": true
+      "owner_approved": true,
+      "runtime_review": {
+        "status": "verified_current",
+        "date": "2026-11-28",
+        "tested_commit": "d47a3ea66f75d7979faf13841da9b6b50b0c7df6",
+        "ci_run": "https://github.com/dimkazantsev/gos-sim1/actions/runs/46147375081",
+        "scope": "isolated_actual_sql_portfolio_and_stage_rules_plus_production_read_only_route_metadata",
+        "limitation": "Синтетические должности; диапазон этапов в тестовой базе 4–15. Метаданные всех 141 рабочих маршрутов и 20 ранних ключей совпали. Не проверяет доступность конкретного игрока в каждый момент, hosted Auth/PostgREST/Realtime или правовой допуск; активация запрещена."
+      }
     },
     {
       "case_key": "bank-expanded-light-03-01",
@@ -2328,7 +3056,15 @@
       "legacy_no_match": true,
       "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
       "activation_allowed": false,
-      "owner_approved": true
+      "owner_approved": true,
+      "runtime_review": {
+        "status": "verified_current",
+        "date": "2026-11-28",
+        "tested_commit": "d47a3ea66f75d7979faf13841da9b6b50b0c7df6",
+        "ci_run": "https://github.com/dimkazantsev/gos-sim1/actions/runs/46147375081",
+        "scope": "isolated_actual_sql_portfolio_and_stage_rules_plus_production_read_only_route_metadata",
+        "limitation": "Синтетические должности; диапазон этапов в тестовой базе 4–15. Метаданные всех 141 рабочих маршрутов и 20 ранних ключей совпали. Не проверяет доступность конкретного игрока в каждый момент, hosted Auth/PostgREST/Realtime или правовой допуск; активация запрещена."
+      }
     },
     {
       "case_key": "bank-expanded-light-04-01",
@@ -2351,7 +3087,15 @@
       "legacy_no_match": true,
       "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
       "activation_allowed": false,
-      "owner_approved": true
+      "owner_approved": true,
+      "runtime_review": {
+        "status": "verified_current",
+        "date": "2026-11-28",
+        "tested_commit": "d47a3ea66f75d7979faf13841da9b6b50b0c7df6",
+        "ci_run": "https://github.com/dimkazantsev/gos-sim1/actions/runs/46147375081",
+        "scope": "isolated_actual_sql_portfolio_and_stage_rules_plus_production_read_only_route_metadata",
+        "limitation": "Синтетические должности; диапазон этапов в тестовой базе 4–15. Метаданные всех 141 рабочих маршрутов и 20 ранних ключей совпали. Не проверяет доступность конкретного игрока в каждый момент, hosted Auth/PostgREST/Realtime или правовой допуск; активация запрещена."
+      }
     },
     {
       "case_key": "bank-expanded-light-05-01",
@@ -2374,7 +3118,15 @@
       "legacy_no_match": true,
       "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
       "activation_allowed": false,
-      "owner_approved": true
+      "owner_approved": true,
+      "runtime_review": {
+        "status": "verified_current",
+        "date": "2026-11-28",
+        "tested_commit": "d47a3ea66f75d7979faf13841da9b6b50b0c7df6",
+        "ci_run": "https://github.com/dimkazantsev/gos-sim1/actions/runs/46147375081",
+        "scope": "isolated_actual_sql_portfolio_and_stage_rules_plus_production_read_only_route_metadata",
+        "limitation": "Синтетические должности; диапазон этапов в тестовой базе 4–15. Метаданные всех 141 рабочих маршрутов и 20 ранних ключей совпали. Не проверяет доступность конкретного игрока в каждый момент, hosted Auth/PostgREST/Realtime или правовой допуск; активация запрещена."
+      }
     },
     {
       "case_key": "bank-expanded-light-06-01",
@@ -2397,7 +3149,15 @@
       "legacy_no_match": true,
       "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
       "activation_allowed": false,
-      "owner_approved": true
+      "owner_approved": true,
+      "runtime_review": {
+        "status": "verified_current",
+        "date": "2026-11-28",
+        "tested_commit": "d47a3ea66f75d7979faf13841da9b6b50b0c7df6",
+        "ci_run": "https://github.com/dimkazantsev/gos-sim1/actions/runs/46147375081",
+        "scope": "isolated_actual_sql_portfolio_and_stage_rules_plus_production_read_only_route_metadata",
+        "limitation": "Синтетические должности; диапазон этапов в тестовой базе 4–15. Метаданные всех 141 рабочих маршрутов и 20 ранних ключей совпали. Не проверяет доступность конкретного игрока в каждый момент, hosted Auth/PostgREST/Realtime или правовой допуск; активация запрещена."
+      }
     },
     {
       "case_key": "bank-expanded-light-07-01",
@@ -2420,7 +3180,15 @@
       "legacy_no_match": true,
       "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
       "activation_allowed": false,
-      "owner_approved": true
+      "owner_approved": true,
+      "runtime_review": {
+        "status": "verified_current",
+        "date": "2026-11-28",
+        "tested_commit": "d47a3ea66f75d7979faf13841da9b6b50b0c7df6",
+        "ci_run": "https://github.com/dimkazantsev/gos-sim1/actions/runs/46147375081",
+        "scope": "isolated_actual_sql_portfolio_and_stage_rules_plus_production_read_only_route_metadata",
+        "limitation": "Синтетические должности; диапазон этапов в тестовой базе 4–15. Метаданные всех 141 рабочих маршрутов и 20 ранних ключей совпали. Не проверяет доступность конкретного игрока в каждый момент, hosted Auth/PostgREST/Realtime или правовой допуск; активация запрещена."
+      }
     },
     {
       "case_key": "bank-expanded-light-08-01",
@@ -2443,7 +3211,15 @@
       "legacy_no_match": true,
       "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
       "activation_allowed": false,
-      "owner_approved": true
+      "owner_approved": true,
+      "runtime_review": {
+        "status": "verified_current",
+        "date": "2026-11-28",
+        "tested_commit": "d47a3ea66f75d7979faf13841da9b6b50b0c7df6",
+        "ci_run": "https://github.com/dimkazantsev/gos-sim1/actions/runs/46147375081",
+        "scope": "isolated_actual_sql_portfolio_and_stage_rules_plus_production_read_only_route_metadata",
+        "limitation": "Синтетические должности; диапазон этапов в тестовой базе 4–15. Метаданные всех 141 рабочих маршрутов и 20 ранних ключей совпали. Не проверяет доступность конкретного игрока в каждый момент, hosted Auth/PostgREST/Realtime или правовой допуск; активация запрещена."
+      }
     },
     {
       "case_key": "bank-expanded-light-09-01",
@@ -2466,7 +3242,15 @@
       "legacy_no_match": true,
       "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
       "activation_allowed": false,
-      "owner_approved": true
+      "owner_approved": true,
+      "runtime_review": {
+        "status": "verified_current",
+        "date": "2026-11-28",
+        "tested_commit": "d47a3ea66f75d7979faf13841da9b6b50b0c7df6",
+        "ci_run": "https://github.com/dimkazantsev/gos-sim1/actions/runs/46147375081",
+        "scope": "isolated_actual_sql_portfolio_and_stage_rules_plus_production_read_only_route_metadata",
+        "limitation": "Синтетические должности; диапазон этапов в тестовой базе 4–15. Метаданные всех 141 рабочих маршрутов и 20 ранних ключей совпали. Не проверяет доступность конкретного игрока в каждый момент, hosted Auth/PostgREST/Realtime или правовой допуск; активация запрещена."
+      }
     },
     {
       "case_key": "bank-expanded-light-10-01",
@@ -2494,7 +3278,15 @@
       "legacy_no_match": true,
       "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
       "activation_allowed": false,
-      "owner_approved": true
+      "owner_approved": true,
+      "runtime_review": {
+        "status": "verified_current",
+        "date": "2026-11-28",
+        "tested_commit": "d47a3ea66f75d7979faf13841da9b6b50b0c7df6",
+        "ci_run": "https://github.com/dimkazantsev/gos-sim1/actions/runs/46147375081",
+        "scope": "isolated_actual_sql_portfolio_and_stage_rules_plus_production_read_only_route_metadata",
+        "limitation": "Синтетические должности; диапазон этапов в тестовой базе 4–15. Метаданные всех 141 рабочих маршрутов и 20 ранних ключей совпали. Не проверяет доступность конкретного игрока в каждый момент, hosted Auth/PostgREST/Realtime или правовой допуск; активация запрещена."
+      }
     },
     {
       "case_key": "bank-expanded-light-11-01",
@@ -2517,7 +3309,15 @@
       "legacy_no_match": true,
       "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
       "activation_allowed": false,
-      "owner_approved": true
+      "owner_approved": true,
+      "runtime_review": {
+        "status": "verified_current",
+        "date": "2026-11-28",
+        "tested_commit": "d47a3ea66f75d7979faf13841da9b6b50b0c7df6",
+        "ci_run": "https://github.com/dimkazantsev/gos-sim1/actions/runs/46147375081",
+        "scope": "isolated_actual_sql_portfolio_and_stage_rules_plus_production_read_only_route_metadata",
+        "limitation": "Синтетические должности; диапазон этапов в тестовой базе 4–15. Метаданные всех 141 рабочих маршрутов и 20 ранних ключей совпали. Не проверяет доступность конкретного игрока в каждый момент, hosted Auth/PostgREST/Realtime или правовой допуск; активация запрещена."
+      }
     },
     {
       "case_key": "bank-expanded-light-12-01",
@@ -2540,7 +3340,15 @@
       "legacy_no_match": true,
       "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
       "activation_allowed": false,
-      "owner_approved": true
+      "owner_approved": true,
+      "runtime_review": {
+        "status": "verified_current",
+        "date": "2026-11-28",
+        "tested_commit": "d47a3ea66f75d7979faf13841da9b6b50b0c7df6",
+        "ci_run": "https://github.com/dimkazantsev/gos-sim1/actions/runs/46147375081",
+        "scope": "isolated_actual_sql_portfolio_and_stage_rules_plus_production_read_only_route_metadata",
+        "limitation": "Синтетические должности; диапазон этапов в тестовой базе 4–15. Метаданные всех 141 рабочих маршрутов и 20 ранних ключей совпали. Не проверяет доступность конкретного игрока в каждый момент, hosted Auth/PostgREST/Realtime или правовой допуск; активация запрещена."
+      }
     },
     {
       "case_key": "bank-expanded-light-13-01",
@@ -2568,7 +3376,15 @@
       "legacy_no_match": true,
       "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
       "activation_allowed": false,
-      "owner_approved": true
+      "owner_approved": true,
+      "runtime_review": {
+        "status": "verified_current",
+        "date": "2026-11-28",
+        "tested_commit": "d47a3ea66f75d7979faf13841da9b6b50b0c7df6",
+        "ci_run": "https://github.com/dimkazantsev/gos-sim1/actions/runs/46147375081",
+        "scope": "isolated_actual_sql_portfolio_and_stage_rules_plus_production_read_only_route_metadata",
+        "limitation": "Синтетические должности; диапазон этапов в тестовой базе 4–15. Метаданные всех 141 рабочих маршрутов и 20 ранних ключей совпали. Не проверяет доступность конкретного игрока в каждый момент, hosted Auth/PostgREST/Realtime или правовой допуск; активация запрещена."
+      }
     },
     {
       "case_key": "bank-expanded-light-14-01",
@@ -2591,7 +3407,15 @@
       "legacy_no_match": true,
       "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
       "activation_allowed": false,
-      "owner_approved": true
+      "owner_approved": true,
+      "runtime_review": {
+        "status": "verified_current",
+        "date": "2026-11-28",
+        "tested_commit": "d47a3ea66f75d7979faf13841da9b6b50b0c7df6",
+        "ci_run": "https://github.com/dimkazantsev/gos-sim1/actions/runs/46147375081",
+        "scope": "isolated_actual_sql_portfolio_and_stage_rules_plus_production_read_only_route_metadata",
+        "limitation": "Синтетические должности; диапазон этапов в тестовой базе 4–15. Метаданные всех 141 рабочих маршрутов и 20 ранних ключей совпали. Не проверяет доступность конкретного игрока в каждый момент, hosted Auth/PostgREST/Realtime или правовой допуск; активация запрещена."
+      }
     },
     {
       "case_key": "bank-expanded-light-15-01",
@@ -2619,7 +3443,15 @@
       "legacy_no_match": true,
       "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
       "activation_allowed": false,
-      "owner_approved": true
+      "owner_approved": true,
+      "runtime_review": {
+        "status": "verified_current",
+        "date": "2026-11-28",
+        "tested_commit": "d47a3ea66f75d7979faf13841da9b6b50b0c7df6",
+        "ci_run": "https://github.com/dimkazantsev/gos-sim1/actions/runs/46147375081",
+        "scope": "isolated_actual_sql_portfolio_and_stage_rules_plus_production_read_only_route_metadata",
+        "limitation": "Синтетические должности; диапазон этапов в тестовой базе 4–15. Метаданные всех 141 рабочих маршрутов и 20 ранних ключей совпали. Не проверяет доступность конкретного игрока в каждый момент, hosted Auth/PostgREST/Realtime или правовой допуск; активация запрещена."
+      }
     },
     {
       "case_key": "bank-expanded-light-16-01",
@@ -2647,7 +3479,15 @@
       "legacy_no_match": true,
       "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
       "activation_allowed": false,
-      "owner_approved": true
+      "owner_approved": true,
+      "runtime_review": {
+        "status": "verified_current",
+        "date": "2026-11-28",
+        "tested_commit": "d47a3ea66f75d7979faf13841da9b6b50b0c7df6",
+        "ci_run": "https://github.com/dimkazantsev/gos-sim1/actions/runs/46147375081",
+        "scope": "isolated_actual_sql_portfolio_and_stage_rules_plus_production_read_only_route_metadata",
+        "limitation": "Синтетические должности; диапазон этапов в тестовой базе 4–15. Метаданные всех 141 рабочих маршрутов и 20 ранних ключей совпали. Не проверяет доступность конкретного игрока в каждый момент, hosted Auth/PostgREST/Realtime или правовой допуск; активация запрещена."
+      }
     },
     {
       "case_key": "bank-expanded-light-17-01",
@@ -2679,7 +3519,15 @@
       "legacy_no_match": true,
       "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
       "activation_allowed": false,
-      "owner_approved": true
+      "owner_approved": true,
+      "runtime_review": {
+        "status": "verified_current",
+        "date": "2026-11-28",
+        "tested_commit": "d47a3ea66f75d7979faf13841da9b6b50b0c7df6",
+        "ci_run": "https://github.com/dimkazantsev/gos-sim1/actions/runs/46147375081",
+        "scope": "isolated_actual_sql_portfolio_and_stage_rules_plus_production_read_only_route_metadata",
+        "limitation": "Синтетические должности; диапазон этапов в тестовой базе 4–15. Метаданные всех 141 рабочих маршрутов и 20 ранних ключей совпали. Не проверяет доступность конкретного игрока в каждый момент, hosted Auth/PostgREST/Realtime или правовой допуск; активация запрещена."
+      }
     },
     {
       "case_key": "bank-expanded-light-18-01",
@@ -2707,7 +3555,15 @@
       "legacy_no_match": true,
       "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
       "activation_allowed": false,
-      "owner_approved": true
+      "owner_approved": true,
+      "runtime_review": {
+        "status": "verified_current",
+        "date": "2026-11-28",
+        "tested_commit": "d47a3ea66f75d7979faf13841da9b6b50b0c7df6",
+        "ci_run": "https://github.com/dimkazantsev/gos-sim1/actions/runs/46147375081",
+        "scope": "isolated_actual_sql_portfolio_and_stage_rules_plus_production_read_only_route_metadata",
+        "limitation": "Синтетические должности; диапазон этапов в тестовой базе 4–15. Метаданные всех 141 рабочих маршрутов и 20 ранних ключей совпали. Не проверяет доступность конкретного игрока в каждый момент, hosted Auth/PostgREST/Realtime или правовой допуск; активация запрещена."
+      }
     },
     {
       "case_key": "bank-expanded-light-19-01",
@@ -2730,7 +3586,15 @@
       "legacy_no_match": true,
       "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
       "activation_allowed": false,
-      "owner_approved": true
+      "owner_approved": true,
+      "runtime_review": {
+        "status": "verified_current",
+        "date": "2026-11-28",
+        "tested_commit": "d47a3ea66f75d7979faf13841da9b6b50b0c7df6",
+        "ci_run": "https://github.com/dimkazantsev/gos-sim1/actions/runs/46147375081",
+        "scope": "isolated_actual_sql_portfolio_and_stage_rules_plus_production_read_only_route_metadata",
+        "limitation": "Синтетические должности; диапазон этапов в тестовой базе 4–15. Метаданные всех 141 рабочих маршрутов и 20 ранних ключей совпали. Не проверяет доступность конкретного игрока в каждый момент, hosted Auth/PostgREST/Realtime или правовой допуск; активация запрещена."
+      }
     },
     {
       "case_key": "bank-expanded-light-20-01",
@@ -2756,7 +3620,15 @@
       "legacy_no_match": false,
       "review_requirement": "verify_scope_active_office_and_territory",
       "activation_allowed": false,
-      "owner_approved": true
+      "owner_approved": true,
+      "runtime_review": {
+        "status": "verified_current",
+        "date": "2026-11-28",
+        "tested_commit": "d47a3ea66f75d7979faf13841da9b6b50b0c7df6",
+        "ci_run": "https://github.com/dimkazantsev/gos-sim1/actions/runs/46147375081",
+        "scope": "isolated_actual_sql_portfolio_and_stage_rules_plus_production_read_only_route_metadata",
+        "limitation": "Синтетические должности; диапазон этапов в тестовой базе 4–15. Метаданные всех 141 рабочих маршрутов и 20 ранних ключей совпали. Не проверяет доступность конкретного игрока в каждый момент, hosted Auth/PostgREST/Realtime или правовой допуск; активация запрещена."
+      }
     },
     {
       "case_key": "bank-expanded-serious-04-01",
@@ -2783,7 +3655,15 @@
       "legacy_no_match": false,
       "review_requirement": "verify_scope_active_office_and_territory",
       "activation_allowed": false,
-      "owner_approved": true
+      "owner_approved": true,
+      "runtime_review": {
+        "status": "verified_current",
+        "date": "2026-11-28",
+        "tested_commit": "d47a3ea66f75d7979faf13841da9b6b50b0c7df6",
+        "ci_run": "https://github.com/dimkazantsev/gos-sim1/actions/runs/46147375081",
+        "scope": "isolated_actual_sql_portfolio_and_stage_rules_plus_production_read_only_route_metadata",
+        "limitation": "Синтетические должности; диапазон этапов в тестовой базе 4–15. Метаданные всех 141 рабочих маршрутов и 20 ранних ключей совпали. Не проверяет доступность конкретного игрока в каждый момент, hosted Auth/PostgREST/Realtime или правовой допуск; активация запрещена."
+      }
     },
     {
       "case_key": "bank-expanded-serious-05-01",
@@ -2813,7 +3693,15 @@
       "legacy_no_match": false,
       "review_requirement": "verify_scope_active_office_and_territory",
       "activation_allowed": false,
-      "owner_approved": true
+      "owner_approved": true,
+      "runtime_review": {
+        "status": "verified_current",
+        "date": "2026-11-28",
+        "tested_commit": "d47a3ea66f75d7979faf13841da9b6b50b0c7df6",
+        "ci_run": "https://github.com/dimkazantsev/gos-sim1/actions/runs/46147375081",
+        "scope": "isolated_actual_sql_portfolio_and_stage_rules_plus_production_read_only_route_metadata",
+        "limitation": "Синтетические должности; диапазон этапов в тестовой базе 4–15. Метаданные всех 141 рабочих маршрутов и 20 ранних ключей совпали. Не проверяет доступность конкретного игрока в каждый момент, hosted Auth/PostgREST/Realtime или правовой допуск; активация запрещена."
+      }
     },
     {
       "case_key": "bank-expanded-serious-06-01",
@@ -2836,7 +3724,15 @@
       "legacy_no_match": true,
       "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
       "activation_allowed": false,
-      "owner_approved": true
+      "owner_approved": true,
+      "runtime_review": {
+        "status": "verified_current",
+        "date": "2026-11-28",
+        "tested_commit": "d47a3ea66f75d7979faf13841da9b6b50b0c7df6",
+        "ci_run": "https://github.com/dimkazantsev/gos-sim1/actions/runs/46147375081",
+        "scope": "isolated_actual_sql_portfolio_and_stage_rules_plus_production_read_only_route_metadata",
+        "limitation": "Синтетические должности; диапазон этапов в тестовой базе 4–15. Метаданные всех 141 рабочих маршрутов и 20 ранних ключей совпали. Не проверяет доступность конкретного игрока в каждый момент, hosted Auth/PostgREST/Realtime или правовой допуск; активация запрещена."
+      }
     },
     {
       "case_key": "bank-expanded-serious-07-01",
@@ -2867,7 +3763,15 @@
       "legacy_no_match": false,
       "review_requirement": "verify_scope_active_office_and_territory",
       "activation_allowed": false,
-      "owner_approved": true
+      "owner_approved": true,
+      "runtime_review": {
+        "status": "verified_current",
+        "date": "2026-11-28",
+        "tested_commit": "d47a3ea66f75d7979faf13841da9b6b50b0c7df6",
+        "ci_run": "https://github.com/dimkazantsev/gos-sim1/actions/runs/46147375081",
+        "scope": "isolated_actual_sql_portfolio_and_stage_rules_plus_production_read_only_route_metadata",
+        "limitation": "Синтетические должности; диапазон этапов в тестовой базе 4–15. Метаданные всех 141 рабочих маршрутов и 20 ранних ключей совпали. Не проверяет доступность конкретного игрока в каждый момент, hosted Auth/PostgREST/Realtime или правовой допуск; активация запрещена."
+      }
     },
     {
       "case_key": "bank-expanded-serious-08-01",
@@ -2897,7 +3801,15 @@
       "legacy_no_match": false,
       "review_requirement": "verify_scope_active_office_and_territory",
       "activation_allowed": false,
-      "owner_approved": true
+      "owner_approved": true,
+      "runtime_review": {
+        "status": "verified_current",
+        "date": "2026-11-28",
+        "tested_commit": "d47a3ea66f75d7979faf13841da9b6b50b0c7df6",
+        "ci_run": "https://github.com/dimkazantsev/gos-sim1/actions/runs/46147375081",
+        "scope": "isolated_actual_sql_portfolio_and_stage_rules_plus_production_read_only_route_metadata",
+        "limitation": "Синтетические должности; диапазон этапов в тестовой базе 4–15. Метаданные всех 141 рабочих маршрутов и 20 ранних ключей совпали. Не проверяет доступность конкретного игрока в каждый момент, hosted Auth/PostgREST/Realtime или правовой допуск; активация запрещена."
+      }
     },
     {
       "case_key": "bank-expanded-serious-09-01",
@@ -2929,7 +3841,15 @@
       "legacy_no_match": false,
       "review_requirement": "verify_scope_active_office_and_territory",
       "activation_allowed": false,
-      "owner_approved": true
+      "owner_approved": true,
+      "runtime_review": {
+        "status": "verified_current",
+        "date": "2026-11-28",
+        "tested_commit": "d47a3ea66f75d7979faf13841da9b6b50b0c7df6",
+        "ci_run": "https://github.com/dimkazantsev/gos-sim1/actions/runs/46147375081",
+        "scope": "isolated_actual_sql_portfolio_and_stage_rules_plus_production_read_only_route_metadata",
+        "limitation": "Синтетические должности; диапазон этапов в тестовой базе 4–15. Метаданные всех 141 рабочих маршрутов и 20 ранних ключей совпали. Не проверяет доступность конкретного игрока в каждый момент, hosted Auth/PostgREST/Realtime или правовой допуск; активация запрещена."
+      }
     },
     {
       "case_key": "bank-expanded-serious-10-01",
@@ -2959,7 +3879,15 @@
       "legacy_no_match": false,
       "review_requirement": "verify_scope_active_office_and_territory",
       "activation_allowed": false,
-      "owner_approved": true
+      "owner_approved": true,
+      "runtime_review": {
+        "status": "verified_current",
+        "date": "2026-11-28",
+        "tested_commit": "d47a3ea66f75d7979faf13841da9b6b50b0c7df6",
+        "ci_run": "https://github.com/dimkazantsev/gos-sim1/actions/runs/46147375081",
+        "scope": "isolated_actual_sql_portfolio_and_stage_rules_plus_production_read_only_route_metadata",
+        "limitation": "Синтетические должности; диапазон этапов в тестовой базе 4–15. Метаданные всех 141 рабочих маршрутов и 20 ранних ключей совпали. Не проверяет доступность конкретного игрока в каждый момент, hosted Auth/PostgREST/Realtime или правовой допуск; активация запрещена."
+      }
     },
     {
       "case_key": "bank-expanded-serious-11-01",
@@ -2986,7 +3914,15 @@
       "legacy_no_match": false,
       "review_requirement": "verify_scope_active_office_and_territory",
       "activation_allowed": false,
-      "owner_approved": true
+      "owner_approved": true,
+      "runtime_review": {
+        "status": "verified_current",
+        "date": "2026-11-28",
+        "tested_commit": "d47a3ea66f75d7979faf13841da9b6b50b0c7df6",
+        "ci_run": "https://github.com/dimkazantsev/gos-sim1/actions/runs/46147375081",
+        "scope": "isolated_actual_sql_portfolio_and_stage_rules_plus_production_read_only_route_metadata",
+        "limitation": "Синтетические должности; диапазон этапов в тестовой базе 4–15. Метаданные всех 141 рабочих маршрутов и 20 ранних ключей совпали. Не проверяет доступность конкретного игрока в каждый момент, hosted Auth/PostgREST/Realtime или правовой допуск; активация запрещена."
+      }
     },
     {
       "case_key": "bank-expanded-serious-12-01",
@@ -3013,7 +3949,15 @@
       "legacy_no_match": false,
       "review_requirement": "verify_scope_active_office_and_territory",
       "activation_allowed": false,
-      "owner_approved": true
+      "owner_approved": true,
+      "runtime_review": {
+        "status": "verified_current",
+        "date": "2026-11-28",
+        "tested_commit": "d47a3ea66f75d7979faf13841da9b6b50b0c7df6",
+        "ci_run": "https://github.com/dimkazantsev/gos-sim1/actions/runs/46147375081",
+        "scope": "isolated_actual_sql_portfolio_and_stage_rules_plus_production_read_only_route_metadata",
+        "limitation": "Синтетические должности; диапазон этапов в тестовой базе 4–15. Метаданные всех 141 рабочих маршрутов и 20 ранних ключей совпали. Не проверяет доступность конкретного игрока в каждый момент, hosted Auth/PostgREST/Realtime или правовой допуск; активация запрещена."
+      }
     },
     {
       "case_key": "bank-expanded-serious-13-01",
@@ -3040,7 +3984,15 @@
       "legacy_no_match": false,
       "review_requirement": "verify_scope_active_office_and_territory",
       "activation_allowed": false,
-      "owner_approved": true
+      "owner_approved": true,
+      "runtime_review": {
+        "status": "verified_current",
+        "date": "2026-11-28",
+        "tested_commit": "d47a3ea66f75d7979faf13841da9b6b50b0c7df6",
+        "ci_run": "https://github.com/dimkazantsev/gos-sim1/actions/runs/46147375081",
+        "scope": "isolated_actual_sql_portfolio_and_stage_rules_plus_production_read_only_route_metadata",
+        "limitation": "Синтетические должности; диапазон этапов в тестовой базе 4–15. Метаданные всех 141 рабочих маршрутов и 20 ранних ключей совпали. Не проверяет доступность конкретного игрока в каждый момент, hosted Auth/PostgREST/Realtime или правовой допуск; активация запрещена."
+      }
     },
     {
       "case_key": "bank-expanded-serious-14-01",
@@ -3066,7 +4018,15 @@
       "legacy_no_match": false,
       "review_requirement": "verify_scope_active_office_and_territory",
       "activation_allowed": false,
-      "owner_approved": true
+      "owner_approved": true,
+      "runtime_review": {
+        "status": "verified_current",
+        "date": "2026-11-28",
+        "tested_commit": "d47a3ea66f75d7979faf13841da9b6b50b0c7df6",
+        "ci_run": "https://github.com/dimkazantsev/gos-sim1/actions/runs/46147375081",
+        "scope": "isolated_actual_sql_portfolio_and_stage_rules_plus_production_read_only_route_metadata",
+        "limitation": "Синтетические должности; диапазон этапов в тестовой базе 4–15. Метаданные всех 141 рабочих маршрутов и 20 ранних ключей совпали. Не проверяет доступность конкретного игрока в каждый момент, hosted Auth/PostgREST/Realtime или правовой допуск; активация запрещена."
+      }
     },
     {
       "case_key": "bank-expanded-serious-15-01",
@@ -3093,7 +4053,15 @@
       "legacy_no_match": false,
       "review_requirement": "verify_scope_active_office_and_territory",
       "activation_allowed": false,
-      "owner_approved": true
+      "owner_approved": true,
+      "runtime_review": {
+        "status": "verified_current",
+        "date": "2026-11-28",
+        "tested_commit": "d47a3ea66f75d7979faf13841da9b6b50b0c7df6",
+        "ci_run": "https://github.com/dimkazantsev/gos-sim1/actions/runs/46147375081",
+        "scope": "isolated_actual_sql_portfolio_and_stage_rules_plus_production_read_only_route_metadata",
+        "limitation": "Синтетические должности; диапазон этапов в тестовой базе 4–15. Метаданные всех 141 рабочих маршрутов и 20 ранних ключей совпали. Не проверяет доступность конкретного игрока в каждый момент, hosted Auth/PostgREST/Realtime или правовой допуск; активация запрещена."
+      }
     },
     {
       "case_key": "bank-expanded-serious-16-01",
@@ -3118,7 +4086,15 @@
       "legacy_no_match": false,
       "review_requirement": "verify_scope_active_office_and_territory",
       "activation_allowed": false,
-      "owner_approved": true
+      "owner_approved": true,
+      "runtime_review": {
+        "status": "verified_current",
+        "date": "2026-11-28",
+        "tested_commit": "d47a3ea66f75d7979faf13841da9b6b50b0c7df6",
+        "ci_run": "https://github.com/dimkazantsev/gos-sim1/actions/runs/46147375081",
+        "scope": "isolated_actual_sql_portfolio_and_stage_rules_plus_production_read_only_route_metadata",
+        "limitation": "Синтетические должности; диапазон этапов в тестовой базе 4–15. Метаданные всех 141 рабочих маршрутов и 20 ранних ключей совпали. Не проверяет доступность конкретного игрока в каждый момент, hosted Auth/PostgREST/Realtime или правовой допуск; активация запрещена."
+      }
     },
     {
       "case_key": "bank-expanded-serious-17-01",
@@ -3143,7 +4119,15 @@
       "legacy_no_match": false,
       "review_requirement": "verify_scope_active_office_and_territory",
       "activation_allowed": false,
-      "owner_approved": true
+      "owner_approved": true,
+      "runtime_review": {
+        "status": "verified_current",
+        "date": "2026-11-28",
+        "tested_commit": "d47a3ea66f75d7979faf13841da9b6b50b0c7df6",
+        "ci_run": "https://github.com/dimkazantsev/gos-sim1/actions/runs/46147375081",
+        "scope": "isolated_actual_sql_portfolio_and_stage_rules_plus_production_read_only_route_metadata",
+        "limitation": "Синтетические должности; диапазон этапов в тестовой базе 4–15. Метаданные всех 141 рабочих маршрутов и 20 ранних ключей совпали. Не проверяет доступность конкретного игрока в каждый момент, hosted Auth/PostgREST/Realtime или правовой допуск; активация запрещена."
+      }
     },
     {
       "case_key": "bank-expanded-serious-18-01",
@@ -3170,7 +4154,15 @@
       "legacy_no_match": false,
       "review_requirement": "verify_scope_active_office_and_territory",
       "activation_allowed": false,
-      "owner_approved": true
+      "owner_approved": true,
+      "runtime_review": {
+        "status": "verified_current",
+        "date": "2026-11-28",
+        "tested_commit": "d47a3ea66f75d7979faf13841da9b6b50b0c7df6",
+        "ci_run": "https://github.com/dimkazantsev/gos-sim1/actions/runs/46147375081",
+        "scope": "isolated_actual_sql_portfolio_and_stage_rules_plus_production_read_only_route_metadata",
+        "limitation": "Синтетические должности; диапазон этапов в тестовой базе 4–15. Метаданные всех 141 рабочих маршрутов и 20 ранних ключей совпали. Не проверяет доступность конкретного игрока в каждый момент, hosted Auth/PostgREST/Realtime или правовой допуск; активация запрещена."
+      }
     },
     {
       "case_key": "bank-expanded-serious-19-01",
@@ -3195,7 +4187,15 @@
       "legacy_no_match": false,
       "review_requirement": "verify_scope_active_office_and_territory",
       "activation_allowed": false,
-      "owner_approved": true
+      "owner_approved": true,
+      "runtime_review": {
+        "status": "verified_current",
+        "date": "2026-11-28",
+        "tested_commit": "d47a3ea66f75d7979faf13841da9b6b50b0c7df6",
+        "ci_run": "https://github.com/dimkazantsev/gos-sim1/actions/runs/46147375081",
+        "scope": "isolated_actual_sql_portfolio_and_stage_rules_plus_production_read_only_route_metadata",
+        "limitation": "Синтетические должности; диапазон этапов в тестовой базе 4–15. Метаданные всех 141 рабочих маршрутов и 20 ранних ключей совпали. Не проверяет доступность конкретного игрока в каждый момент, hosted Auth/PostgREST/Realtime или правовой допуск; активация запрещена."
+      }
     },
     {
       "case_key": "bank-expanded-serious-20-01",
@@ -3222,7 +4222,15 @@
       "legacy_no_match": false,
       "review_requirement": "verify_scope_active_office_and_territory",
       "activation_allowed": false,
-      "owner_approved": true
+      "owner_approved": true,
+      "runtime_review": {
+        "status": "verified_current",
+        "date": "2026-11-28",
+        "tested_commit": "d47a3ea66f75d7979faf13841da9b6b50b0c7df6",
+        "ci_run": "https://github.com/dimkazantsev/gos-sim1/actions/runs/46147375081",
+        "scope": "isolated_actual_sql_portfolio_and_stage_rules_plus_production_read_only_route_metadata",
+        "limitation": "Синтетические должности; диапазон этапов в тестовой базе 4–15. Метаданные всех 141 рабочих маршрутов и 20 ранних ключей совпали. Не проверяет доступность конкретного игрока в каждый момент, hosted Auth/PostgREST/Realtime или правовой допуск; активация запрещена."
+      }
     },
     {
       "case_key": "bank-expanded-serious-21-01",
@@ -3249,7 +4257,15 @@
       "legacy_no_match": false,
       "review_requirement": "verify_scope_active_office_and_territory",
       "activation_allowed": false,
-      "owner_approved": true
+      "owner_approved": true,
+      "runtime_review": {
+        "status": "verified_current",
+        "date": "2026-11-28",
+        "tested_commit": "d47a3ea66f75d7979faf13841da9b6b50b0c7df6",
+        "ci_run": "https://github.com/dimkazantsev/gos-sim1/actions/runs/46147375081",
+        "scope": "isolated_actual_sql_portfolio_and_stage_rules_plus_production_read_only_route_metadata",
+        "limitation": "Синтетические должности; диапазон этапов в тестовой базе 4–15. Метаданные всех 141 рабочих маршрутов и 20 ранних ключей совпали. Не проверяет доступность конкретного игрока в каждый момент, hosted Auth/PostgREST/Realtime или правовой допуск; активация запрещена."
+      }
     },
     {
       "case_key": "bank-expanded-serious-22-01",
@@ -3274,7 +4290,15 @@
       "legacy_no_match": false,
       "review_requirement": "verify_scope_active_office_and_territory",
       "activation_allowed": false,
-      "owner_approved": true
+      "owner_approved": true,
+      "runtime_review": {
+        "status": "verified_current",
+        "date": "2026-11-28",
+        "tested_commit": "d47a3ea66f75d7979faf13841da9b6b50b0c7df6",
+        "ci_run": "https://github.com/dimkazantsev/gos-sim1/actions/runs/46147375081",
+        "scope": "isolated_actual_sql_portfolio_and_stage_rules_plus_production_read_only_route_metadata",
+        "limitation": "Синтетические должности; диапазон этапов в тестовой базе 4–15. Метаданные всех 141 рабочих маршрутов и 20 ранних ключей совпали. Не проверяет доступность конкретного игрока в каждый момент, hosted Auth/PostgREST/Realtime или правовой допуск; активация запрещена."
+      }
     },
     {
       "case_key": "bank-expanded-serious-23-01",
@@ -3301,7 +4325,15 @@
       "legacy_no_match": false,
       "review_requirement": "verify_scope_active_office_and_territory",
       "activation_allowed": false,
-      "owner_approved": true
+      "owner_approved": true,
+      "runtime_review": {
+        "status": "verified_current",
+        "date": "2026-11-28",
+        "tested_commit": "d47a3ea66f75d7979faf13841da9b6b50b0c7df6",
+        "ci_run": "https://github.com/dimkazantsev/gos-sim1/actions/runs/46147375081",
+        "scope": "isolated_actual_sql_portfolio_and_stage_rules_plus_production_read_only_route_metadata",
+        "limitation": "Синтетические должности; диапазон этапов в тестовой базе 4–15. Метаданные всех 141 рабочих маршрутов и 20 ранних ключей совпали. Не проверяет доступность конкретного игрока в каждый момент, hosted Auth/PostgREST/Realtime или правовой допуск; активация запрещена."
+      }
     },
     {
       "case_key": "bank-expanded-serious-24-01",
@@ -3332,7 +4364,15 @@
       "legacy_no_match": false,
       "review_requirement": "verify_scope_active_office_and_territory",
       "activation_allowed": false,
-      "owner_approved": true
+      "owner_approved": true,
+      "runtime_review": {
+        "status": "verified_current",
+        "date": "2026-11-28",
+        "tested_commit": "d47a3ea66f75d7979faf13841da9b6b50b0c7df6",
+        "ci_run": "https://github.com/dimkazantsev/gos-sim1/actions/runs/46147375081",
+        "scope": "isolated_actual_sql_portfolio_and_stage_rules_plus_production_read_only_route_metadata",
+        "limitation": "Синтетические должности; диапазон этапов в тестовой базе 4–15. Метаданные всех 141 рабочих маршрутов и 20 ранних ключей совпали. Не проверяет доступность конкретного игрока в каждый момент, hosted Auth/PostgREST/Realtime или правовой допуск; активация запрещена."
+      }
     },
     {
       "case_key": "bank-expanded-serious-25-01",
@@ -3357,7 +4397,15 @@
       "legacy_no_match": false,
       "review_requirement": "verify_scope_active_office_and_territory",
       "activation_allowed": false,
-      "owner_approved": true
+      "owner_approved": true,
+      "runtime_review": {
+        "status": "verified_current",
+        "date": "2026-11-28",
+        "tested_commit": "d47a3ea66f75d7979faf13841da9b6b50b0c7df6",
+        "ci_run": "https://github.com/dimkazantsev/gos-sim1/actions/runs/46147375081",
+        "scope": "isolated_actual_sql_portfolio_and_stage_rules_plus_production_read_only_route_metadata",
+        "limitation": "Синтетические должности; диапазон этапов в тестовой базе 4–15. Метаданные всех 141 рабочих маршрутов и 20 ранних ключей совпали. Не проверяет доступность конкретного игрока в каждый момент, hosted Auth/PostgREST/Realtime или правовой допуск; активация запрещена."
+      }
     },
     {
       "case_key": "bank-expanded-serious-26-01",
@@ -3384,7 +4432,15 @@
       "legacy_no_match": false,
       "review_requirement": "verify_scope_active_office_and_territory",
       "activation_allowed": false,
-      "owner_approved": true
+      "owner_approved": true,
+      "runtime_review": {
+        "status": "verified_current",
+        "date": "2026-11-28",
+        "tested_commit": "d47a3ea66f75d7979faf13841da9b6b50b0c7df6",
+        "ci_run": "https://github.com/dimkazantsev/gos-sim1/actions/runs/46147375081",
+        "scope": "isolated_actual_sql_portfolio_and_stage_rules_plus_production_read_only_route_metadata",
+        "limitation": "Синтетические должности; диапазон этапов в тестовой базе 4–15. Метаданные всех 141 рабочих маршрутов и 20 ранних ключей совпали. Не проверяет доступность конкретного игрока в каждый момент, hosted Auth/PostgREST/Realtime или правовой допуск; активация запрещена."
+      }
     },
     {
       "case_key": "bank-expanded-serious-27-01",
@@ -3415,7 +4471,15 @@
       "legacy_no_match": false,
       "review_requirement": "verify_scope_active_office_and_territory",
       "activation_allowed": false,
-      "owner_approved": true
+      "owner_approved": true,
+      "runtime_review": {
+        "status": "verified_current",
+        "date": "2026-11-28",
+        "tested_commit": "d47a3ea66f75d7979faf13841da9b6b50b0c7df6",
+        "ci_run": "https://github.com/dimkazantsev/gos-sim1/actions/runs/46147375081",
+        "scope": "isolated_actual_sql_portfolio_and_stage_rules_plus_production_read_only_route_metadata",
+        "limitation": "Синтетические должности; диапазон этапов в тестовой базе 4–15. Метаданные всех 141 рабочих маршрутов и 20 ранних ключей совпали. Не проверяет доступность конкретного игрока в каждый момент, hosted Auth/PostgREST/Realtime или правовой допуск; активация запрещена."
+      }
     },
     {
       "case_key": "bank-expanded-serious-28-01",
@@ -3441,7 +4505,15 @@
       "legacy_no_match": false,
       "review_requirement": "verify_scope_active_office_and_territory",
       "activation_allowed": false,
-      "owner_approved": true
+      "owner_approved": true,
+      "runtime_review": {
+        "status": "verified_current",
+        "date": "2026-11-28",
+        "tested_commit": "d47a3ea66f75d7979faf13841da9b6b50b0c7df6",
+        "ci_run": "https://github.com/dimkazantsev/gos-sim1/actions/runs/46147375081",
+        "scope": "isolated_actual_sql_portfolio_and_stage_rules_plus_production_read_only_route_metadata",
+        "limitation": "Синтетические должности; диапазон этапов в тестовой базе 4–15. Метаданные всех 141 рабочих маршрутов и 20 ранних ключей совпали. Не проверяет доступность конкретного игрока в каждый момент, hosted Auth/PostgREST/Realtime или правовой допуск; активация запрещена."
+      }
     },
     {
       "case_key": "bank-expanded-serious-29-01",
@@ -3468,7 +4540,15 @@
       "legacy_no_match": false,
       "review_requirement": "verify_scope_active_office_and_territory",
       "activation_allowed": false,
-      "owner_approved": true
+      "owner_approved": true,
+      "runtime_review": {
+        "status": "verified_current",
+        "date": "2026-11-28",
+        "tested_commit": "d47a3ea66f75d7979faf13841da9b6b50b0c7df6",
+        "ci_run": "https://github.com/dimkazantsev/gos-sim1/actions/runs/46147375081",
+        "scope": "isolated_actual_sql_portfolio_and_stage_rules_plus_production_read_only_route_metadata",
+        "limitation": "Синтетические должности; диапазон этапов в тестовой базе 4–15. Метаданные всех 141 рабочих маршрутов и 20 ранних ключей совпали. Не проверяет доступность конкретного игрока в каждый момент, hosted Auth/PostgREST/Realtime или правовой допуск; активация запрещена."
+      }
     },
     {
       "case_key": "bank-expanded-serious-30-01",
@@ -3493,7 +4573,15 @@
       "legacy_no_match": false,
       "review_requirement": "verify_scope_active_office_and_territory",
       "activation_allowed": false,
-      "owner_approved": true
+      "owner_approved": true,
+      "runtime_review": {
+        "status": "verified_current",
+        "date": "2026-11-28",
+        "tested_commit": "d47a3ea66f75d7979faf13841da9b6b50b0c7df6",
+        "ci_run": "https://github.com/dimkazantsev/gos-sim1/actions/runs/46147375081",
+        "scope": "isolated_actual_sql_portfolio_and_stage_rules_plus_production_read_only_route_metadata",
+        "limitation": "Синтетические должности; диапазон этапов в тестовой базе 4–15. Метаданные всех 141 рабочих маршрутов и 20 ранних ключей совпали. Не проверяет доступность конкретного игрока в каждый момент, hosted Auth/PostgREST/Realtime или правовой допуск; активация запрещена."
+      }
     },
     {
       "case_key": "bank-library",
@@ -3516,7 +4604,15 @@
       "legacy_no_match": true,
       "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
       "activation_allowed": false,
-      "owner_approved": true
+      "owner_approved": true,
+      "runtime_review": {
+        "status": "verified_current",
+        "date": "2026-11-28",
+        "tested_commit": "d47a3ea66f75d7979faf13841da9b6b50b0c7df6",
+        "ci_run": "https://github.com/dimkazantsev/gos-sim1/actions/runs/46147375081",
+        "scope": "isolated_actual_sql_portfolio_and_stage_rules_plus_production_read_only_route_metadata",
+        "limitation": "Синтетические должности; диапазон этапов в тестовой базе 4–15. Метаданные всех 141 рабочих маршрутов и 20 ранних ключей совпали. Не проверяет доступность конкретного игрока в каждый момент, hosted Auth/PostgREST/Realtime или правовой допуск; активация запрещена."
+      }
     },
     {
       "case_key": "bank-media-rumour",
@@ -3539,7 +4635,15 @@
       "legacy_no_match": true,
       "review_requirement": "replace_only_after_owner_confirms_exact_game_authorization",
       "activation_allowed": false,
-      "owner_approved": true
+      "owner_approved": true,
+      "runtime_review": {
+        "status": "verified_current",
+        "date": "2026-11-28",
+        "tested_commit": "d47a3ea66f75d7979faf13841da9b6b50b0c7df6",
+        "ci_run": "https://github.com/dimkazantsev/gos-sim1/actions/runs/46147375081",
+        "scope": "isolated_actual_sql_portfolio_and_stage_rules_plus_production_read_only_route_metadata",
+        "limitation": "Синтетические должности; диапазон этапов в тестовой базе 4–15. Метаданные всех 141 рабочих маршрутов и 20 ранних ключей совпали. Не проверяет доступность конкретного игрока в каждый момент, hosted Auth/PostgREST/Realtime или правовой допуск; активация запрещена."
+      }
     },
     {
       "case_key": "bank-meeting",
@@ -3565,7 +4669,15 @@
       "legacy_no_match": false,
       "review_requirement": "verify_scope_active_office_and_territory",
       "activation_allowed": false,
-      "owner_approved": true
+      "owner_approved": true,
+      "runtime_review": {
+        "status": "verified_current",
+        "date": "2026-11-28",
+        "tested_commit": "d47a3ea66f75d7979faf13841da9b6b50b0c7df6",
+        "ci_run": "https://github.com/dimkazantsev/gos-sim1/actions/runs/46147375081",
+        "scope": "isolated_actual_sql_portfolio_and_stage_rules_plus_production_read_only_route_metadata",
+        "limitation": "Синтетические должности; диапазон этапов в тестовой базе 4–15. Метаданные всех 141 рабочих маршрутов и 20 ранних ключей совпали. Не проверяет доступность конкретного игрока в каждый момент, hosted Auth/PostgREST/Realtime или правовой допуск; активация запрещена."
+      }
     },
     {
       "case_key": "bank-public-hearing",
@@ -3590,7 +4702,15 @@
       "legacy_no_match": false,
       "review_requirement": "verify_scope_active_office_and_territory",
       "activation_allowed": false,
-      "owner_approved": true
+      "owner_approved": true,
+      "runtime_review": {
+        "status": "verified_current",
+        "date": "2026-11-28",
+        "tested_commit": "d47a3ea66f75d7979faf13841da9b6b50b0c7df6",
+        "ci_run": "https://github.com/dimkazantsev/gos-sim1/actions/runs/46147375081",
+        "scope": "isolated_actual_sql_portfolio_and_stage_rules_plus_production_read_only_route_metadata",
+        "limitation": "Синтетические должности; диапазон этапов в тестовой базе 4–15. Метаданные всех 141 рабочих маршрутов и 20 ранних ключей совпали. Не проверяет доступность конкретного игрока в каждый момент, hosted Auth/PostgREST/Realtime или правовой допуск; активация запрещена."
+      }
     },
     {
       "case_key": "bank-records",
@@ -3627,7 +4747,15 @@
       "legacy_no_match": false,
       "review_requirement": "verify_scope_active_office_and_territory",
       "activation_allowed": false,
-      "owner_approved": true
+      "owner_approved": true,
+      "runtime_review": {
+        "status": "verified_current",
+        "date": "2026-11-28",
+        "tested_commit": "d47a3ea66f75d7979faf13841da9b6b50b0c7df6",
+        "ci_run": "https://github.com/dimkazantsev/gos-sim1/actions/runs/46147375081",
+        "scope": "isolated_actual_sql_portfolio_and_stage_rules_plus_production_read_only_route_metadata",
+        "limitation": "Синтетические должности; диапазон этапов в тестовой базе 4–15. Метаданные всех 141 рабочих маршрутов и 20 ранних ключей совпали. Не проверяет доступность конкретного игрока в каждый момент, hosted Auth/PostgREST/Realtime или правовой допуск; активация запрещена."
+      }
     }
   ],
   "owner_approval": {
