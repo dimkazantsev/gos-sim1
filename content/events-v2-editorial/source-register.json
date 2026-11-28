@@ -5372,21 +5372,37 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "Конституция РФ, ст. 46–47: согласие ответчика не может вводиться вместо установленных процессуальных требований. Вид судопроизводства не уточнён, поэтому конкретный процессуальный срок и способ реагирования не утверждаются.",
+      "legal_basis": "Конституция РФ, ст. 46–47; ГПК РФ, ст. 3, 133: заинтересованное лицо вправе обратиться за судебной защитой; вопрос принятия надлежаще поданного иска решает судья. Согласие ответчика не является дополнительным условием. Организационные меры не подменяют суд.",
       "legal_urls": [
-        "https://minjust.gov.ru/ru/documents/8011/"
+        "https://minjust.gov.ru/ru/documents/8011/",
+        "https://www.consultant.ru/document/cons_doc_LAW_39570/b43175df1cc9fb378da2f5c80627b56edb45c6fb/",
+        "https://www.consultant.ru/document/cons_doc_LAW_39570/904c75bbaa60bc5dcdc604bfec327654b1b7ac14/"
       ],
-      "legal_status": "requires_case_specific_current_law_review",
+      "legal_status": "verified_current",
       "activation_allowed": false,
       "review_date": "2026-11-28",
-      "source_scope": "previous_constitution_text_and_case_specific_reasoning",
+      "source_scope": "case_specific_current_norms_and_all_alternatives_reviewed_under_stated_facts",
       "checked_norm_urls": [
-        "https://minjust.gov.ru/ru/documents/8011/"
+        "https://minjust.gov.ru/ru/documents/8011/",
+        "https://www.consultant.ru/document/cons_doc_LAW_39570/b43175df1cc9fb378da2f5c80627b56edb45c6fb/",
+        "https://www.consultant.ru/document/cons_doc_LAW_39570/904c75bbaa60bc5dcdc604bfec327654b1b7ac14/"
       ],
       "targeted_option_review": {
-        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
         "option_count": 5,
-        "remaining": "Вид судопроизводства не задан. Только суд решает процессуальные вопросы; административный орган и голосующие не распоряжаются принятием дела."
+        "remaining": "Правовая граница и пять вариантов проверены для прямо заданных учебных обстоятельств; конкретное исполнение и процедуры за пределами задания не сертифицированы."
+      },
+      "final_case_review_2026_11_28": {
+        "date": "2026-11-28",
+        "scope": "case_specific_legal_acceptance_under_explicit_educational_facts",
+        "option_count": 5,
+        "conclusion": "Конкретизировано гражданское судопроизводство по частному договорному спору. Ст. 3 и 133 ГПК в редакции 04.08.2026 (с 01.09.2026) и ст. 46–47 Конституции подтверждают доступ к суду. Все пять мер организационные или добровольные; не дают канцелярии или игрокам полномочия судьи.",
+        "remaining": "Правовая граница и пять вариантов проверены для прямо заданных учебных обстоятельств; конкретное исполнение и процедуры за пределами задания не сертифицированы.",
+        "urls": [
+          "https://minjust.gov.ru/ru/documents/8011/",
+          "https://www.consultant.ru/document/cons_doc_LAW_39570/b43175df1cc9fb378da2f5c80627b56edb45c6fb/",
+          "https://www.consultant.ru/document/cons_doc_LAW_39570/904c75bbaa60bc5dcdc604bfec327654b1b7ac14/"
+        ]
       }
     },
     {
@@ -5396,25 +5412,40 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "КоАП РФ, ст. 25.1, 26.2, 26.11: решение требует фактических данных о конкретном эпизоде и оценки доказательств; анонимный неконкретный пересказ не доказывает состав. Доступ к материалам и возможность объяснений обеспечиваются независимо от выбора дополнительных мер.",
+      "legal_basis": "КоАП РФ, ст. 1.5, 25.1, 26.2, 26.11: вина устанавливается в законном производстве, доказательства оцениваются в совокупности, незаконно полученные сведения не используются; неустранимые сомнения толкуются в пользу лица. В данном эпизоде неконкретный пересказ не доказывает событие и вину. Доступ к материалам и объяснения обеспечиваются независимо от выбора.",
       "legal_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_34661/c4e643d138637f4eafb763d628fc44ef99c71a15/",
         "https://www.consultant.ru/document/cons_doc_LAW_34661/747b7ded7acccf4fbd94a98fe212713ae1845601/",
-        "https://www.consultant.ru/document/cons_doc_LAW_34661/0147088a5497571bd1de83d7a7f6ce9ea7504a22/",
-        "https://www.consultant.ru/document/cons_doc_LAW_34661/46a9b456fc041022585b2d13cda9d666fc11ffd4/"
+        "https://www.consultant.ru/document/cons_doc_LAW_34661/46a9b456fc041022585b2d13cda9d666fc11ffd4/",
+        "https://www.consultant.ru/document/cons_doc_LAW_34661/0147088a5497571bd1de83d7a7f6ce9ea7504a22/"
       ],
-      "legal_status": "requires_case_specific_current_law_review",
+      "legal_status": "verified_current",
       "activation_allowed": false,
       "review_date": "2026-11-28",
-      "source_scope": "specific_norm_and_related_search_results_partial",
+      "source_scope": "case_specific_current_norms_and_all_alternatives_reviewed_under_stated_facts",
       "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_34661/c4e643d138637f4eafb763d628fc44ef99c71a15/",
         "https://www.consultant.ru/document/cons_doc_LAW_34661/747b7ded7acccf4fbd94a98fe212713ae1845601/",
         "https://www.consultant.ru/document/cons_doc_LAW_34661/46a9b456fc041022585b2d13cda9d666fc11ffd4/",
         "https://www.consultant.ru/document/cons_doc_LAW_34661/0147088a5497571bd1de83d7a7f6ce9ea7504a22/"
       ],
       "targeted_option_review": {
-        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
         "option_count": 5,
-        "remaining": "Сроки, процессуальный статус материалов и полномочия конкретной комиссии требуют отдельной проверки; не возобновлять прекращённое дело произвольно."
+        "remaining": "Правовая граница и пять вариантов проверены для прямо заданных учебных обстоятельств; конкретное исполнение и процедуры за пределами задания не сертифицированы."
+      },
+      "final_case_review_2026_11_28": {
+        "date": "2026-11-28",
+        "scope": "case_specific_legal_acceptance_under_explicit_educational_facts",
+        "option_count": 5,
+        "conclusion": "Ст. 1.5, 25.1, 26.2, 26.11 КоАП проверены по доступной редакции 04.08.2026 с изменениями, действующими с 03.11.2026. Устранено утверждение об обязательной проверке любого анонимного сообщения. Компетенция и законное возбуждение дела заданы; пять мер не подменяют процессуальное решение и не допускают произвольного повторного производства.",
+        "remaining": "Правовая граница и пять вариантов проверены для прямо заданных учебных обстоятельств; конкретное исполнение и процедуры за пределами задания не сертифицированы.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_34661/c4e643d138637f4eafb763d628fc44ef99c71a15/",
+          "https://www.consultant.ru/document/cons_doc_LAW_34661/747b7ded7acccf4fbd94a98fe212713ae1845601/",
+          "https://www.consultant.ru/document/cons_doc_LAW_34661/46a9b456fc041022585b2d13cda9d666fc11ffd4/",
+          "https://www.consultant.ru/document/cons_doc_LAW_34661/0147088a5497571bd1de83d7a7f6ce9ea7504a22/"
+        ]
       }
     },
     {
@@ -5470,21 +5501,37 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "ГПК РФ, ст. 112: пропущенный срок восстанавливает суд при признании причин уважительными. Заявление сопровождается соответствующим процессуальным действием. Для апелляционных, кассационных и надзорных жалоб предусмотрены специальные правила; болезнь не гарантирует восстановление.",
+      "legal_basis": "ГПК РФ, ст. 109 ч. 2, 112 ч. 1–5, 231: при пропуске срока подачи замечаний на протокол надлежаще поданное заявление о восстановлении с одновременной подачей замечаний рассматривает судья. Уважительность причины оценивает суд, госпитализация не предрешает исход. Особый порядок восстановления сроков обжалования здесь не применяется.",
       "legal_urls": [
-        "https://www.consultant.ru/document/cons_doc_LAW_39570/abaac973fe4a701d09359875f02b25d806b40b80/"
+        "https://www.consultant.ru/document/cons_doc_LAW_39570/92c0c4341cf6b1cbad13613f2912da0c48a13586/",
+        "https://www.consultant.ru/document/cons_doc_LAW_39570/abaac973fe4a701d09359875f02b25d806b40b80/",
+        "https://www.consultant.ru/document/cons_doc_LAW_39570/f005d0016767a739115a890d9b85e10d8716491c/"
       ],
-      "legal_status": "requires_case_specific_current_law_review",
+      "legal_status": "verified_current",
       "activation_allowed": false,
       "review_date": "2026-11-28",
-      "source_scope": "specific_norm_and_related_search_results_partial",
+      "source_scope": "case_specific_current_norms_and_all_alternatives_reviewed_under_stated_facts",
       "checked_norm_urls": [
-        "https://www.consultant.ru/document/cons_doc_LAW_39570/abaac973fe4a701d09359875f02b25d806b40b80/"
+        "https://www.consultant.ru/document/cons_doc_LAW_39570/92c0c4341cf6b1cbad13613f2912da0c48a13586/",
+        "https://www.consultant.ru/document/cons_doc_LAW_39570/abaac973fe4a701d09359875f02b25d806b40b80/",
+        "https://www.consultant.ru/document/cons_doc_LAW_39570/f005d0016767a739115a890d9b85e10d8716491c/"
       ],
       "targeted_option_review": {
-        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
         "option_count": 5,
-        "remaining": "Конкретный пропущенный срок и специальные правила обжалования требуют уточнения; только суд решает вопрос восстановления."
+        "remaining": "Правовая граница и пять вариантов проверены для прямо заданных учебных обстоятельств; конкретное исполнение и процедуры за пределами задания не сертифицированы."
+      },
+      "final_case_review_2026_11_28": {
+        "date": "2026-11-28",
+        "scope": "case_specific_legal_acceptance_under_explicit_educational_facts",
+        "option_count": 5,
+        "conclusion": "Указан конкретный срок, установленный ст. 231 ГПК, а не срок апелляции или кассации. Ст. 112 ч. 1–5 в действующей редакции подтверждает рассмотрение судьёй и возможность, но не гарантию восстановления. Пять мер не влияют на решение судьи.",
+        "remaining": "Правовая граница и пять вариантов проверены для прямо заданных учебных обстоятельств; конкретное исполнение и процедуры за пределами задания не сертифицированы.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_39570/92c0c4341cf6b1cbad13613f2912da0c48a13586/",
+          "https://www.consultant.ru/document/cons_doc_LAW_39570/abaac973fe4a701d09359875f02b25d806b40b80/",
+          "https://www.consultant.ru/document/cons_doc_LAW_39570/f005d0016767a739115a890d9b85e10d8716491c/"
+        ]
       }
     },
     {
@@ -5518,21 +5565,40 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "ГК РФ, ст. 1118, 1124, 1141: наследование и распоряжения на случай смерти имеют предусмотренные законом основания и форму. Обычная переписка о намерении не заменяет надлежащее распоряжение. Нотариус проверяет документы, основания и права других наследников; исключительные формы и споры оцениваются отдельно.",
+      "legal_basis": "ГК РФ, ст. 1111, 1118, 1124, 1141: наследование по завещанию, наследственному договору или закону. Обычная электронная переписка о намерении передать квартиру не является завещанием; отсутствие подтверждённого распоряжения не исключает наследования по закону. Нотариус устанавливает основания и круг наследников, спор о праве разрешает суд.",
       "legal_urls": [
-        "https://www.consultant.ru/document/cons_doc_LAW_34154/2ad1d69cdff4393596b883329fe105f3da638c44/"
+        "https://www.consultant.ru/document/cons_doc_LAW_34154/c5c9cb4577cedbb0c71df4d8813245fe7565592f/",
+        "https://www.consultant.ru/document/cons_doc_LAW_34154/59c3c1cbccef09776d08dbedb898ee2efe101204/",
+        "https://www.consultant.ru/document/cons_doc_LAW_34154/2ad1d69cdff4393596b883329fe105f3da638c44/",
+        "https://www.consultant.ru/document/cons_doc_LAW_34154/fccb811aaff0a78d6f1f77517a72c0063a807a7e/"
       ],
-      "legal_status": "requires_case_specific_current_law_review",
+      "legal_status": "verified_current",
       "activation_allowed": false,
       "review_date": "2026-11-28",
-      "source_scope": "specific_norm_and_related_search_results_partial",
+      "source_scope": "case_specific_current_norms_and_all_alternatives_reviewed_under_stated_facts",
       "checked_norm_urls": [
-        "https://www.consultant.ru/document/cons_doc_LAW_34154/2ad1d69cdff4393596b883329fe105f3da638c44/"
+        "https://www.consultant.ru/document/cons_doc_LAW_34154/c5c9cb4577cedbb0c71df4d8813245fe7565592f/",
+        "https://www.consultant.ru/document/cons_doc_LAW_34154/59c3c1cbccef09776d08dbedb898ee2efe101204/",
+        "https://www.consultant.ru/document/cons_doc_LAW_34154/2ad1d69cdff4393596b883329fe105f3da638c44/",
+        "https://www.consultant.ru/document/cons_doc_LAW_34154/fccb811aaff0a78d6f1f77517a72c0063a807a7e/"
       ],
       "targeted_option_review": {
-        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
         "option_count": 5,
-        "remaining": "Проверяются все основания наследования, состав имущества, наследники, сроки и специальные формы; не определять доли без документов."
+        "remaining": "Правовая граница и пять вариантов проверены для прямо заданных учебных обстоятельств; конкретное исполнение и процедуры за пределами задания не сертифицированы."
+      },
+      "final_case_review_2026_11_28": {
+        "date": "2026-11-28",
+        "scope": "case_specific_legal_acceptance_under_explicit_educational_facts",
+        "option_count": 5,
+        "conclusion": "Ст. 1111, 1118, 1124 и 1141 ГК подтверждают основания наследования и форму завещания. Обычная электронная переписка не заменяет завещание или наследственный договор. Все пять мер помогают подготовить дело без предрешения наследственных долей, соблюдая права участников и нотариальную тайну.",
+        "remaining": "Правовая граница и пять вариантов проверены для прямо заданных учебных обстоятельств; конкретное исполнение и процедуры за пределами задания не сертифицированы.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_34154/c5c9cb4577cedbb0c71df4d8813245fe7565592f/",
+          "https://www.consultant.ru/document/cons_doc_LAW_34154/59c3c1cbccef09776d08dbedb898ee2efe101204/",
+          "https://www.consultant.ru/document/cons_doc_LAW_34154/2ad1d69cdff4393596b883329fe105f3da638c44/",
+          "https://www.consultant.ru/document/cons_doc_LAW_34154/fccb811aaff0a78d6f1f77517a72c0063a807a7e/"
+        ]
       }
     },
     {
@@ -5579,23 +5645,34 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "ГрК РФ, ст. 5.1, 28: публичная процедура проводится для предусмотренных проектов генеральных планов и изменений, с исключениями по федеральному и региональному законодательству. В истории исключения отсутствуют; неформальный опрос не заменяет обязательные процедуры. Дополнительные обсуждения не подменяют установленный порядок.",
+      "legal_basis": "ГрК РФ, ст. 5.1 и 28 ч. 3–3.3, 8: при отсутствии применимых исключений проект изменения генерального плана проходит установленную процедуру общественных обсуждений или публичных слушаний; неформальный опрос подписчиков её не заменяет. Конкретные сроки и организация определяются применимыми нормами; дополнительные материалы и встречи не заменяют обязательных стадий.",
       "legal_urls": [
         "https://www.consultant.ru/document/cons_doc_LAW_51040/40be0591480e0c82ab63b09e45359cbe40abc562/",
         "https://www.consultant.ru/document/cons_doc_LAW_51040/fc77c7117187684ab0cb02c7ee53952df0de55be/"
       ],
-      "legal_status": "requires_case_specific_current_law_review",
+      "legal_status": "verified_current",
       "activation_allowed": false,
       "review_date": "2026-11-28",
-      "source_scope": "specific_norm_and_related_search_results_partial",
+      "source_scope": "case_specific_current_norms_and_all_alternatives_reviewed_under_stated_facts",
       "checked_norm_urls": [
         "https://www.consultant.ru/document/cons_doc_LAW_51040/40be0591480e0c82ab63b09e45359cbe40abc562/",
         "https://www.consultant.ru/document/cons_doc_LAW_51040/fc77c7117187684ab0cb02c7ee53952df0de55be/"
       ],
       "targeted_option_review": {
-        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
         "option_count": 5,
-        "remaining": "Местный порядок, границы обсуждения, обязательные стадии, состав документов и конкретные исключения проверяются отдельно."
+        "remaining": "Правовая граница и пять вариантов проверены для прямо заданных учебных обстоятельств; конкретное исполнение и процедуры за пределами задания не сертифицированы."
+      },
+      "final_case_review_2026_11_28": {
+        "date": "2026-11-28",
+        "scope": "case_specific_legal_acceptance_under_explicit_educational_facts",
+        "option_count": 5,
+        "conclusion": "Ст. 5.1 и 28 ГрК проверены по редакции 04.08.2026 (с 01.09.2026). Уточнено отсутствие федеральных временных и региональных исключений. Все пять дополнительных мер допустимы сверх обязательной публичной процедуры, без присвоения полномочий организатора или утверждающего органа.",
+        "remaining": "Правовая граница и пять вариантов проверены для прямо заданных учебных обстоятельств; конкретное исполнение и процедуры за пределами задания не сертифицированы.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_51040/40be0591480e0c82ab63b09e45359cbe40abc562/",
+          "https://www.consultant.ru/document/cons_doc_LAW_51040/fc77c7117187684ab0cb02c7ee53952df0de55be/"
+        ]
       }
     },
     {
@@ -5605,26 +5682,37 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "БК РФ, ст. 83, 219; 59-ФЗ, ст. 10: новое расходное обязательство требует законного основания и соблюдения бюджетной процедуры; заявления рассматриваются по существу. 240 × 20 тыс. = 4,8 млн рублей только по уже поступившим заявлениям, не общая смета выплаты всем жителям. Публичное обещание не является основанием перечисления.",
+      "legal_basis": "БК РФ, ст. 83, 219; 59-ФЗ, ст. 10: новая региональная мера требует правового основания, бюджетных ассигнований и законного исполнения расходов. В учебном случае специальное исключение из общего бюджетного порядка отсутствует. Обращения рассматриваются по существу; 240 × 20 000 = 4 800 000 руб. — сумма только по поступившим обращениям, не общая смета.",
       "legal_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/deb860cae9c5187f73ff9e422a7e77ade2c35946/",
         "https://www.consultant.ru/document/cons_doc_LAW_19702/15d7c58c01bf75dcd6cf84a008bfef761ba731eb/",
-        "https://pravo.gov.ru/proxy/ips/?docbody=&nd=102054721",
-        "https://www.consultant.ru/document/cons_doc_LAW_59999/ca24c3b3a2032a1f727146f988f406723bf9ea1a/",
-        "https://www.consultant.ru/document/cons_doc_LAW_19702/deb860cae9c5187f73ff9e422a7e77ade2c35946/"
+        "https://www.consultant.ru/document/cons_doc_LAW_59999/ca24c3b3a2032a1f727146f988f406723bf9ea1a/"
       ],
-      "legal_status": "requires_case_specific_current_law_review",
+      "legal_status": "verified_current",
       "activation_allowed": false,
       "review_date": "2026-11-28",
-      "source_scope": "specific_norm_and_related_search_results_partial",
+      "source_scope": "case_specific_current_norms_and_all_alternatives_reviewed_under_stated_facts",
       "checked_norm_urls": [
         "https://www.consultant.ru/document/cons_doc_LAW_19702/deb860cae9c5187f73ff9e422a7e77ade2c35946/",
         "https://www.consultant.ru/document/cons_doc_LAW_19702/15d7c58c01bf75dcd6cf84a008bfef761ba731eb/",
         "https://www.consultant.ru/document/cons_doc_LAW_59999/ca24c3b3a2032a1f727146f988f406723bf9ea1a/"
       ],
       "targeted_option_review": {
-        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
         "option_count": 5,
-        "remaining": "Нужны уполномоченный орган, правовой акт, круг получателей, общий объём, источники и лимиты; не делать автоматических проводок по обещанию."
+        "remaining": "Правовая граница и пять вариантов проверены для прямо заданных учебных обстоятельств; конкретное исполнение и процедуры за пределами задания не сертифицированы."
+      },
+      "final_case_review_2026_11_28": {
+        "date": "2026-11-28",
+        "scope": "case_specific_legal_acceptance_under_explicit_educational_facts",
+        "option_count": 5,
+        "conclusion": "БК РФ в редакции 02.11.2026 и ст. 10 №59-ФЗ проверены. Уточнены региональный уровень и надлежаще поданные обращения; исключение из общего порядка бюджетного обеспечения не применяется. Пять концепций допустимы только как предложения, не автоматические выплаты. Расчёт 4,8 млн руб. проверен и не считается полной сметой.",
+        "remaining": "Правовая граница и пять вариантов проверены для прямо заданных учебных обстоятельств; конкретное исполнение и процедуры за пределами задания не сертифицированы.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/deb860cae9c5187f73ff9e422a7e77ade2c35946/",
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/15d7c58c01bf75dcd6cf84a008bfef761ba731eb/",
+          "https://www.consultant.ru/document/cons_doc_LAW_59999/ca24c3b3a2032a1f727146f988f406723bf9ea1a/"
+        ]
       }
     },
     {
