@@ -103,6 +103,40 @@ const [game,other,sender,expert,wrong,archived,outsider,teacher]=[1,2,10,11,12,1
  for(const u of [sender,expert,wrong])assert.equal(await collectiveCount(u),3,'All participants receive one signal per distinct case, independent of majority and round');
  assert.equal(await collectiveCount(teacher),0);assert.equal(await collectiveCount(sender,8),0);assert.equal(await collectiveCount(sender,7,other),0);
  assert.equal((await rows("SELECT has_function_privilege('authenticated','private.event_v2_collective_participation(uuid,uuid,integer,timestamptz,timestamptz)','EXECUTE') AS ok"))[0].ok,false);
+ // Full owner-approved catalogue routing, using synthetic people and a separate
+ // fixture game. One set-based assertion query, no production requests.
+ const {payload}=require('./events-v2-catalog-integration-check.cjs');
+ const routes=payload.filter(x=>x.audience==='single');
+ assert.equal(routes.length,141);
+ const routeGame=uid(3000), profiles=['social','economic','defence','foreign','internal'];
+ const people=profiles.flatMap((p,i)=>['committee','ministry'].map((kind,j)=>({profile:p,kind,user:uid(3100+i*2+j),unit:uid(3200+i*2+j)})));
+ const data=routes.map((c,i)=>({id:uid(3300+i),key:c.case_key,plan:c.effect_plan}));
+ assert.equal(data.filter(c=>c.plan.competence.committee_before_9).length,20);
+ await query("INSERT INTO game_members(game_id,user_id,kind,role_title) SELECT $1,x.user_id,'student','Тест' FROM jsonb_to_recordset($2::jsonb) x(user_id uuid)",[routeGame,JSON.stringify(people.map(p=>({user_id:p.user})))]);
+ for(const p of people){
+  await query("INSERT INTO institution_units VALUES($1,$2,$3,$4,$5)",[p.unit,routeGame,p.kind,p.profile,p.user]);
+  await query("INSERT INTO institution_assignments VALUES($1,$2,$3,$4,'head')",[routeGame,p.unit,p.kind,p.user]);
+  if(p.kind==='committee')await query("INSERT INTO party_member_mandates VALUES($1,$2,1)",[routeGame,p.user]);
+  else{
+   const title='Тестовый профиль '+p.profile;
+   await query("INSERT INTO government_nominations VALUES($1,9,$2,'appointed',$3,$4)",[routeGame,'ministry_'+p.profile,p.user,title]);
+   await query("INSERT INTO game_office_assignments VALUES($1,$2,$3,'active')",[routeGame,p.user,title]);
+  }
+ }
+ await query("INSERT INTO event_cases(id,game_id,audience,status,effect_plan,decision_options,title,case_key) SELECT x.id,$1,'single','ready',x.plan,'[]'::jsonb,x.key,x.key FROM jsonb_to_recordset($2::jsonb) x(id uuid,key text,plan jsonb)",[routeGame,JSON.stringify(data)]);
+ await query("INSERT INTO event_case_routing SELECT $1,c.id,4,15,'individual',NULL FROM event_cases c WHERE c.game_id=$1",[routeGame]);
+ const checks=await rows(`WITH people AS (
+  SELECT * FROM jsonb_to_recordset($2::jsonb) x(user_id uuid,profile text,kind text)
+ ), stages AS (SELECT unnest(ARRAY[3,4,8,9,15,16]) AS stage_no)
+ SELECT c.case_key,p.profile,p.kind,s.stage_no,
+  private.event_v2_competent_at_stage(c.id,p.user_id,s.stage_no) AS actual,
+  ((c.effect_plan->'competence'->'portfolio_keys') ? p.profile AND
+    ((p.kind='committee' AND s.stage_no BETWEEN 4 AND 8 AND c.effect_plan->'competence'->'committee_before_9'='true'::jsonb)
+     OR (p.kind='ministry' AND s.stage_no BETWEEN 9 AND 15))) AS expected
+ FROM event_cases c CROSS JOIN people p CROSS JOIN stages s WHERE c.game_id=$1`,[routeGame,JSON.stringify(people.map(p=>({user_id:p.user,profile:p.profile,kind:p.kind})))]);
+ assert.equal(checks.length,141*10*6);
+ for(const row of checks)assert.equal(row.actual,row.expected,JSON.stringify(row));
+ console.log(JSON.stringify({test:'catalogue competence',cases:routes.length,profiles:profiles.length,comparisons:checks.length,fixtureStageRange:'4–15',result:'PASS'}));
  // 100 distinct simulated identities, actual SQL handler, sequential on one
  // embedded PostgreSQL connection. This is a correctness test, not concurrency.
  const largeGame=uid(900),largeCase=uid(901),largeTeacher=uid(902),voters=Array.from({length:100},(_,i)=>uid(1000+i));
