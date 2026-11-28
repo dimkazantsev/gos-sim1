@@ -5415,16 +5415,30 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "ГК РФ, ст. 309; БК РФ, ст. 34: исполнение договора по его условиям и эффективность расходов. Закон не устанавливает обязательный церемониальный жест. Дополнительную закупку нельзя оформлять распоряжением неуполномоченной ведущей; необходимость и законное основание должны быть проверены до обязательства.",
+      "legal_basis": "ГК РФ, ст. 309: исполнение по условиям договора; БК РФ, ст. 34: экономность и результативность в пределах бюджетных полномочий. Необходимость специального инструмента не вытекает из этих норм.",
       "legal_urls": [
-        "https://www.consultant.ru/document/cons_doc_LAW_19702/9d0dc5bffbe52f6f95e97813e0ef420708952b4e/"
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/9d0dc5bffbe52f6f95e97813e0ef420708952b4e/",
+        "https://www.consultant.ru/document/cons_doc_LAW_5142/1cd43e51fbd4129343b325971a466ec5cd32a425/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
-      "checked_norm_urls": [],
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_5142/1cd43e51fbd4129343b325971a466ec5cd32a425/",
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/9d0dc5bffbe52f6f95e97813e0ef420708952b4e/"
+      ],
       "option_analysis_status": "draft",
       "source_scope": "specific_norm_and_related_search_results_partial",
-      "review_date": "2026-11-27"
+      "review_date": "2026-11-27",
+      "norm_recheck_2026_11_28": {
+        "status": "targeted_norm_and_all_individual_alternatives_reviewed_not_full_acceptance",
+        "basis": "ГК РФ, ст. 309: исполнение по условиям договора; БК РФ, ст. 34: экономность и результативность в пределах бюджетных полномочий. Необходимость специального инструмента не вытекает из этих норм.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_5142/1cd43e51fbd4129343b325971a466ec5cd32a425/",
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/9d0dc5bffbe52f6f95e97813e0ef420708952b4e/"
+        ],
+        "limitation": "Содержание договора и полномочия организатора заданы учебным условием; применение 44-ФЗ к конкретному заказчику не установлено.",
+        "source_scope": "Тексты отдельных статей и поисковые извлечения из КонсультантПлюс, 28.11.2026; не полная сверка поправок."
+      }
     },
     {
       "case_key": "bank-curated-light-01",
@@ -5561,17 +5575,30 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "БК РФ, ст. 34; 44-ФЗ, ст. 33: эффективность расходования и обоснование характеристик закупки. Испытание прототипа — управленческий инструмент, не универсальная юридическая обязанность. В истории фактически обозначены препятствия для уборки и доступа к люкам; обязательные технические требования проверяются до утверждения проекта.",
+      "legal_basis": "БК РФ, ст. 34: экономность и результативность; 44-ФЗ, ст. 33: описание объекта закупки и его характеристики. Испытание модуля и оценка расходов содержания — управленческий способ проверить пригодность, а не универсальная обязанность изготовить прототип.",
       "legal_urls": [
         "https://www.consultant.ru/document/cons_doc_LAW_19702/9d0dc5bffbe52f6f95e97813e0ef420708952b4e/",
         "https://www.consultant.ru/document/cons_doc_LAW_144624/d6aec91603ff628ea274b8552ce2849e06e0aa4c/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
-      "checked_norm_urls": [],
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_19702/9d0dc5bffbe52f6f95e97813e0ef420708952b4e/",
+        "https://www.consultant.ru/document/cons_doc_LAW_144624/d6aec91603ff628ea274b8552ce2849e06e0aa4c/"
+      ],
       "option_analysis_status": "draft",
       "source_scope": "specific_norm_and_related_search_results_partial",
-      "review_date": "2026-11-27"
+      "review_date": "2026-11-27",
+      "norm_recheck_2026_11_28": {
+        "status": "targeted_norm_and_all_individual_alternatives_reviewed_not_full_acceptance",
+        "basis": "БК РФ, ст. 34: экономность и результативность; 44-ФЗ, ст. 33: описание объекта закупки и его характеристики. Испытание модуля и оценка расходов содержания — управленческий способ проверить пригодность, а не универсальная обязанность изготовить прототип.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_19702/9d0dc5bffbe52f6f95e97813e0ef420708952b4e/",
+          "https://www.consultant.ru/document/cons_doc_LAW_144624/d6aec91603ff628ea274b8552ce2849e06e0aa4c/"
+        ],
+        "limitation": "Местные требования к проездам, доступу к коммуникациям и содержанию не проверены. До закупки проверяются применимые обязательные ограничения.",
+        "source_scope": "Тексты отдельных статей и поисковые извлечения из КонсультантПлюс, 28.11.2026; не полная сверка поправок."
+      }
     },
     {
       "case_key": "bank-curated-light-06",
@@ -5725,18 +5752,30 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "Статья 94 Закона № 44-ФЗ требует проверки результата на соответствие контракту и оформления приёмки либо мотивированного отказа. Пункт 6 статьи 1259 ГК РФ исключает официальные символы из объектов авторского права, но это не отменяет иных правил их использования. Источники: https://mintrud.gov.ru/docs/laws/116 https://www.consultant.ru/document/cons_doc_LAW_64629/",
+      "legal_basis": "44-ФЗ, ст. 94 ч. 3, 7, 8: экспертиза соответствия и оформление приёмки либо мотивированного отказа; несоответствие может не препятствовать приёмке только при соблюдении условий ч. 8, включая его устранение. ГК РФ, ст. 1259 п. 6 подп. 2: официальные символы не являются объектами авторского права; правила их использования сохраняются.",
       "legal_urls": [
-        "https://www.consultant.ru/document/cons_doc_LAW_144624/17c58c1903f7b6212924ba9ce701489655e9a8e0/"
+        "https://www.consultant.ru/document/cons_doc_LAW_144624/17c58c1903f7b6212924ba9ce701489655e9a8e0/",
+        "https://www.consultant.ru/document/cons_doc_LAW_64629/be05678dc42ddc67aae5be9ba9beebd367fb9a3f/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
       "checked_norm_urls": [
-        "https://www.consultant.ru/document/cons_doc_LAW_144624/17c58c1903f7b6212924ba9ce701489655e9a8e0/"
+        "https://www.consultant.ru/document/cons_doc_LAW_144624/17c58c1903f7b6212924ba9ce701489655e9a8e0/",
+        "https://www.consultant.ru/document/cons_doc_LAW_64629/be05678dc42ddc67aae5be9ba9beebd367fb9a3f/"
       ],
       "option_analysis_status": "draft",
       "source_scope": "specific_norm_and_related_search_results_partial",
-      "review_date": "2026-11-27"
+      "review_date": "2026-11-27",
+      "norm_recheck_2026_11_28": {
+        "status": "targeted_norm_and_all_individual_alternatives_reviewed_not_full_acceptance",
+        "basis": "44-ФЗ, ст. 94 ч. 3, 7, 8: экспертиза соответствия и оформление приёмки либо мотивированного отказа; несоответствие может не препятствовать приёмке только при соблюдении условий ч. 8, включая его устранение. ГК РФ, ст. 1259 п. 6 подп. 2: официальные символы не являются объектами авторского права; правила их использования сохраняются.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_144624/17c58c1903f7b6212924ba9ce701489655e9a8e0/",
+          "https://www.consultant.ru/document/cons_doc_LAW_64629/be05678dc42ddc67aae5be9ba9beebd367fb9a3f/"
+        ],
+        "limitation": "В задании применяется 44-ФЗ, дефект не устранён, обязательное изображение задано контрактом. Местные правила герба, право собственности на брак и возможность его отчуждения проверяются отдельно.",
+        "source_scope": "Тексты отдельных статей и поисковые извлечения из КонсультантПлюс, 28.11.2026; не полная сверка поправок."
+      }
     },
     {
       "case_key": "bank-curated-light-11",
@@ -5815,18 +5854,33 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "Статьи 33 и 94 Закона № 44-ФЗ связывают описание и приёмку объекта с установленными требованиями контракта. Консультационный опрос не подменяет технические требования, полномочия заказчика или процедуру изменения контракта. Источники: https://mintrud.gov.ru/docs/laws/116",
+      "legal_basis": "44-ФЗ, ст. 33, 94, 95 ч. 1: объект и приёмка связаны с согласованными характеристиками; существенные условия изменяются только по предусмотренному законом основанию. Опрос не является таким основанием.",
       "legal_urls": [
-        "https://www.consultant.ru/document/cons_doc_LAW_144624/17c58c1903f7b6212924ba9ce701489655e9a8e0/"
+        "https://www.consultant.ru/document/cons_doc_LAW_144624/17c58c1903f7b6212924ba9ce701489655e9a8e0/",
+        "https://www.consultant.ru/document/cons_doc_LAW_144624/d6aec91603ff628ea274b8552ce2849e06e0aa4c/",
+        "https://www.consultant.ru/document/cons_doc_LAW_144624/f4823c3311874efd0ecdfa668c9705968edbc47c/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
       "checked_norm_urls": [
-        "https://www.consultant.ru/document/cons_doc_LAW_144624/17c58c1903f7b6212924ba9ce701489655e9a8e0/"
+        "https://www.consultant.ru/document/cons_doc_LAW_144624/17c58c1903f7b6212924ba9ce701489655e9a8e0/",
+        "https://www.consultant.ru/document/cons_doc_LAW_144624/d6aec91603ff628ea274b8552ce2849e06e0aa4c/",
+        "https://www.consultant.ru/document/cons_doc_LAW_144624/f4823c3311874efd0ecdfa668c9705968edbc47c/"
       ],
       "option_analysis_status": "draft",
       "source_scope": "specific_norm_and_related_search_results_partial",
-      "review_date": "2026-11-27"
+      "review_date": "2026-11-27",
+      "norm_recheck_2026_11_28": {
+        "status": "targeted_norm_and_all_individual_alternatives_reviewed_not_full_acceptance",
+        "basis": "44-ФЗ, ст. 33, 94, 95 ч. 1: объект и приёмка связаны с согласованными характеристиками; существенные условия изменяются только по предусмотренному законом основанию. Опрос не является таким основанием.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_144624/d6aec91603ff628ea274b8552ce2849e06e0aa4c/",
+          "https://www.consultant.ru/document/cons_doc_LAW_144624/17c58c1903f7b6212924ba9ce701489655e9a8e0/",
+          "https://www.consultant.ru/document/cons_doc_LAW_144624/f4823c3311874efd0ecdfa668c9705968edbc47c/"
+        ],
+        "limitation": "Разрешённый выбор оттенка и неизменность системы защиты заданы контрактом в учебной ситуации; технические нормы и проектная документация отдельно не проверены.",
+        "source_scope": "Тексты отдельных статей и поисковые извлечения из КонсультантПлюс, 28.11.2026; не полная сверка поправок."
+      }
     },
     {
       "case_key": "bank-curated-light-14",
@@ -5980,7 +6034,7 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "Статья 11 Закона №135-ФЗ запрещает картельные соглашения, а статьи 23 и 25 определяют полномочия антимонопольного органа и предоставление информации. Статья 8 Закона №44-ФЗ закрепляет принцип обеспечения конкуренции. Совпадение цен является поводом исследовать доказательства, а не самостоятельным окончательным выводом о картеле. Источники: https://mintrud.gov.ru/docs/laws/116",
+      "legal_basis": "135-ФЗ, ст. 11 ч. 1: запрет картельных соглашений; ст. 25 ч. 1, 3: обязанность представить документы по мотивированному требованию ФАС в срок и с соблюдением режима охраняемой информации. Совпадение цен и файлов — признаки для проверки, не готовое доказательство соглашения.",
       "legal_urls": [
         "https://www.consultant.ru/document/cons_doc_LAW_61763/75fad2ba0bd186dad16ff04a2efe55ae3f9ff7e6/",
         "https://www.consultant.ru/document/cons_doc_LAW_61763/dd1cb1470320c15ddb30d1033ae07c96f53aa1c3/",
@@ -5994,7 +6048,17 @@
         "https://www.consultant.ru/document/cons_doc_LAW_61763/dd1cb1470320c15ddb30d1033ae07c96f53aa1c3/"
       ],
       "source_scope": "specific_norm_and_related_search_results_partial",
-      "review_date": "2026-11-27"
+      "review_date": "2026-11-27",
+      "norm_recheck_2026_11_28": {
+        "status": "targeted_norm_and_all_individual_alternatives_reviewed_not_full_acceptance",
+        "basis": "135-ФЗ, ст. 11 ч. 1: запрет картельных соглашений; ст. 25 ч. 1, 3: обязанность представить документы по мотивированному требованию ФАС в срок и с соблюдением режима охраняемой информации. Совпадение цен и файлов — признаки для проверки, не готовое доказательство соглашения.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_61763/75fad2ba0bd186dad16ff04a2efe55ae3f9ff7e6/",
+          "https://www.consultant.ru/document/cons_doc_LAW_61763/dd1cb1470320c15ddb30d1033ae07c96f53aa1c3/"
+        ],
+        "limitation": "В учебном условии требование мотивировано и охватывает оригиналы. Правомерность исключения участника, приостановления закупки и конкретное решение ФАС требуют самостоятельного основания.",
+        "source_scope": "Тексты отдельных статей и поисковые извлечения из КонсультантПлюс, 28.11.2026; не полная сверка поправок."
+      }
     },
     {
       "case_key": "bank-curated-serious-10",
@@ -6951,7 +7015,7 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "Статья 17.1 Закона №135-ФЗ регулирует особенности заключения договоров в отношении публичного имущества и предусмотренные исключения. Статьи 209 и 621 ГК РФ применяются с учётом специальных правил. Социальная ценность учитывается через законный инструмент, а не создаёт универсального права на бесконкурсное продление. Источники: http://www.kremlin.ru/acts/constitution",
+      "legal_basis": "135-ФЗ, ст. 17.1 ч. 9–11: при выполнении условий предусмотрено заключение договора на новый срок без торгов с надлежащим арендатором, включая условия цены и срока; основания отказа ограничены законом. Общественная полезность и более высокая предложенная плата не заменяют проверку этих условий.",
       "legal_urls": [
         "https://www.consultant.ru/document/cons_doc_LAW_61763/eeb8f51df68fc096ecadf011932a85ef5e6a0ee1/"
       ],
@@ -6959,7 +7023,19 @@
       "activation_allowed": false,
       "option_analysis_status": "draft",
       "source_scope": "specific_norm_and_related_search_results_partial",
-      "review_date": "2026-11-27"
+      "review_date": "2026-11-27",
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_61763/eeb8f51df68fc096ecadf011932a85ef5e6a0ee1/"
+      ],
+      "norm_recheck_2026_11_28": {
+        "status": "targeted_norm_and_all_individual_alternatives_reviewed_not_full_acceptance",
+        "basis": "135-ФЗ, ст. 17.1 ч. 9–11: при выполнении условий предусмотрено заключение договора на новый срок без торгов с надлежащим арендатором, включая условия цены и срока; основания отказа ограничены законом. Общественная полезность и более высокая предложенная плата не заменяют проверку этих условий.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_61763/eeb8f51df68fc096ecadf011932a85ef5e6a0ee1/"
+        ],
+        "limitation": "Нужны первоначальное основание договора, ограничения срока, исполнение, задолженность, оценка платы и применимость исключений. Не утверждается, что торги обязательны всегда.",
+        "source_scope": "Тексты отдельных статей и поисковые извлечения из КонсультантПлюс, 28.11.2026; не полная сверка поправок."
+      }
     },
     {
       "case_key": "bank-curated-v2-19",
@@ -6968,15 +7044,33 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "Статья 94 Закона №44-ФЗ предусматривает проверку исполнения и приёмку результатов; статья 309 ГК РФ — надлежащее исполнение обязательств. Возможность отдельного этапа и его оплаты определяется контрактом. Технический сигнал в одной точке не подтверждает установленный охват всех адресатов. Источники: https://mintrud.gov.ru/docs/laws/116",
+      "legal_basis": "44-ФЗ, ст. 94 ч. 3, 7, 8, ст. 95 ч. 1; ГК РФ, ст. 309: фактическое исполнение и отдельный этап подтверждаются по условиям контракта, устранённое непрепятствующее несоответствие отличается от неисполненного объёма. Рабочую точку можно использовать отдельно, если это допустимо, не приравнивая запуск к полной приёмке.",
       "legal_urls": [
-        "https://www.consultant.ru/document/cons_doc_LAW_144624/17c58c1903f7b6212924ba9ce701489655e9a8e0/"
+        "https://www.consultant.ru/document/cons_doc_LAW_144624/17c58c1903f7b6212924ba9ce701489655e9a8e0/",
+        "https://www.consultant.ru/document/cons_doc_LAW_144624/f4823c3311874efd0ecdfa668c9705968edbc47c/",
+        "https://www.consultant.ru/document/cons_doc_LAW_5142/1cd43e51fbd4129343b325971a466ec5cd32a425/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
       "option_analysis_status": "draft",
       "source_scope": "specific_norm_and_related_search_results_partial",
-      "review_date": "2026-11-27"
+      "review_date": "2026-11-27",
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_144624/17c58c1903f7b6212924ba9ce701489655e9a8e0/",
+        "https://www.consultant.ru/document/cons_doc_LAW_144624/f4823c3311874efd0ecdfa668c9705968edbc47c/",
+        "https://www.consultant.ru/document/cons_doc_LAW_5142/1cd43e51fbd4129343b325971a466ec5cd32a425/"
+      ],
+      "norm_recheck_2026_11_28": {
+        "status": "targeted_norm_and_all_individual_alternatives_reviewed_not_full_acceptance",
+        "basis": "44-ФЗ, ст. 94 ч. 3, 7, 8, ст. 95 ч. 1; ГК РФ, ст. 309: фактическое исполнение и отдельный этап подтверждаются по условиям контракта, устранённое непрепятствующее несоответствие отличается от неисполненного объёма. Рабочую точку можно использовать отдельно, если это допустимо, не приравнивая запуск к полной приёмке.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_144624/17c58c1903f7b6212924ba9ce701489655e9a8e0/",
+          "https://www.consultant.ru/document/cons_doc_LAW_144624/f4823c3311874efd0ecdfa668c9705968edbc47c/",
+          "https://www.consultant.ru/document/cons_doc_LAW_5142/1cd43e51fbd4129343b325971a466ec5cd32a425/"
+        ],
+        "limitation": "Отдельная оплата возможна только при предусмотренном основании; в условии полный охват обязателен, разрешён лишь отдельный запуск. Законные основания изменения существенных условий не заданы.",
+        "source_scope": "Тексты отдельных статей и поисковые извлечения из КонсультантПлюс, 28.11.2026; не полная сверка поправок."
+      }
     },
     {
       "case_key": "bank-curated-v2-20",
@@ -7081,15 +7175,30 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "Статья 17 Закона №257-ФЗ регулирует содержание автомобильных дорог; статья 95 Закона №44-ФЗ — изменение контракта в предусмотренных случаях. Защитные меры и дальнейшее включение объекта организуются компетентным владельцем. Ошибка перечня не отменяет обязанностей содержания, но не является универсальным основанием свободно менять договор. Источники: https://mintrud.gov.ru/docs/laws/116 https://mintrans.gov.ru/storage/app/media/epd/0811201.pdf",
+      "legal_basis": "257-ФЗ, ст. 17: содержание автомобильной дороги обеспечивает сохранность и безопасность движения; 44-ФЗ, ст. 95 ч. 1: изменение существенных условий допустимо на предусмотренном основании. Временная защита не является разрешением оплатить работы вне договора.",
       "legal_urls": [
-        "https://www.consultant.ru/document/cons_doc_LAW_144624/f4823c3311874efd0ecdfa668c9705968edbc47c/"
+        "https://www.consultant.ru/document/cons_doc_LAW_144624/f4823c3311874efd0ecdfa668c9705968edbc47c/",
+        "https://www.consultant.ru/document/cons_doc_LAW_72386/1692e755d61192abb296c96e101a443f4b701edf/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
       "option_analysis_status": "draft",
       "source_scope": "specific_norm_and_related_search_results_partial",
-      "review_date": "2026-11-27"
+      "review_date": "2026-11-27",
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_72386/1692e755d61192abb296c96e101a443f4b701edf/",
+        "https://www.consultant.ru/document/cons_doc_LAW_144624/f4823c3311874efd0ecdfa668c9705968edbc47c/"
+      ],
+      "norm_recheck_2026_11_28": {
+        "status": "targeted_norm_and_all_individual_alternatives_reviewed_not_full_acceptance",
+        "basis": "257-ФЗ, ст. 17: содержание автомобильной дороги обеспечивает сохранность и безопасность движения; 44-ФЗ, ст. 95 ч. 1: изменение существенных условий допустимо на предусмотренном основании. Временная защита не является разрешением оплатить работы вне договора.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_72386/1692e755d61192abb296c96e101a443f4b701edf/",
+          "https://www.consultant.ru/document/cons_doc_LAW_144624/f4823c3311874efd0ecdfa668c9705968edbc47c/"
+        ],
+        "limitation": "В учебном условии дорожка включена в публичное содержание; точный владелец, категория дороги, технические требования и основание дополнительной закупки проверяются отдельно.",
+        "source_scope": "Тексты отдельных статей и поисковые извлечения из КонсультантПлюс, 28.11.2026; не полная сверка поправок."
+      }
     },
     {
       "case_key": "bank-curated-v2-24",
@@ -7098,16 +7207,31 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "Статья 94 Закона №44-ФЗ регулирует приёмку результата исполнения контракта; Закон №78-ФЗ о библиотечном деле — права пользователей на библиотечное обслуживание. Временное использование транспорта требует надлежащего согласования и соблюдения безопасности. Оно не подтверждает поставку отсутствующего автобуса. Источники: https://mintrud.gov.ru/docs/laws/116 http://www.kremlin.ru/acts/constitution",
+      "legal_basis": "44-ФЗ, ст. 94 ч. 3, 7, 8, ст. 95: приёмка подтверждает согласованный результат; отсутствующий автобус нельзя считать поставленным. Временный выезд согласуется самостоятельно без отмены иных обязательств.",
       "legal_urls": [
         "https://www.consultant.ru/document/cons_doc_LAW_144624/17c58c1903f7b6212924ba9ce701489655e9a8e0/",
-        "https://www.consultant.ru/document/cons_doc_LAW_8585/16db67ba2656536d83e1eeb8bc449a68755c77c3/"
+        "https://www.consultant.ru/document/cons_doc_LAW_8585/16db67ba2656536d83e1eeb8bc449a68755c77c3/",
+        "https://www.consultant.ru/document/cons_doc_LAW_144624/f4823c3311874efd0ecdfa668c9705968edbc47c/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
       "option_analysis_status": "draft",
       "source_scope": "specific_norm_and_related_search_results_partial",
-      "review_date": "2026-11-27"
+      "review_date": "2026-11-27",
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_144624/17c58c1903f7b6212924ba9ce701489655e9a8e0/",
+        "https://www.consultant.ru/document/cons_doc_LAW_144624/f4823c3311874efd0ecdfa668c9705968edbc47c/"
+      ],
+      "norm_recheck_2026_11_28": {
+        "status": "targeted_norm_and_all_individual_alternatives_reviewed_not_full_acceptance",
+        "basis": "44-ФЗ, ст. 94 ч. 3, 7, 8, ст. 95: приёмка подтверждает согласованный результат; отсутствующий автобус нельзя считать поставленным. Временный выезд согласуется самостоятельно без отмены иных обязательств.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_144624/17c58c1903f7b6212924ba9ce701489655e9a8e0/",
+          "https://www.consultant.ru/document/cons_doc_LAW_144624/f4823c3311874efd0ecdfa668c9705968edbc47c/"
+        ],
+        "limitation": "Применимость 44-ФЗ и отсутствие отдельной полной приёмки заданы учебным условием. Правила перевозки, допуска транспорта и полномочия владельца проверяются отдельно.",
+        "source_scope": "Тексты отдельных статей и поисковые извлечения из КонсультантПлюс, 28.11.2026; не полная сверка поправок."
+      }
     },
     {
       "case_key": "bank-curated-v2-25",
@@ -7641,15 +7765,30 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "ГК РФ, статьи 721 и 723: согласованное качество результата и защита заказчика при недостатках. Изменение размещения панели и подтверждение зарядки требуют оформления; приёмка сиденья не доказывает работу разъёмов. Источники: https://minjust.gov.ru/ru/pages/grazhdanskij-kodeks/ https://zpp.rospotrebnadzor.ru/adjudications/federal/66RS0052-01-2019-000514-19",
+      "legal_basis": "ГК РФ, ст. 721, 723: качество результата определяется договором и обязательными требованиями; при недостатках заказчик вправе предъявлять требования в установленных пределах. Работоспособность зарядных устройств проверяется отдельно от удобства сиденья.",
       "legal_urls": [
-        "https://www.consultant.ru/document/cons_doc_LAW_9027/0f3422f73df7bee03d56085359c80be8d2981ead/"
+        "https://www.consultant.ru/document/cons_doc_LAW_9027/0f3422f73df7bee03d56085359c80be8d2981ead/",
+        "https://www.consultant.ru/document/cons_doc_LAW_9027/e3c9f494588eba84349f9aaf8082c329384eb340/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
       "option_analysis_status": "draft",
       "source_scope": "specific_norm_and_related_search_results_partial",
-      "review_date": "2026-11-27"
+      "review_date": "2026-11-27",
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_9027/e3c9f494588eba84349f9aaf8082c329384eb340/",
+        "https://www.consultant.ru/document/cons_doc_LAW_9027/0f3422f73df7bee03d56085359c80be8d2981ead/"
+      ],
+      "norm_recheck_2026_11_28": {
+        "status": "targeted_norm_and_all_individual_alternatives_reviewed_not_full_acceptance",
+        "basis": "ГК РФ, ст. 721, 723: качество результата определяется договором и обязательными требованиями; при недостатках заказчик вправе предъявлять требования в установленных пределах. Работоспособность зарядных устройств проверяется отдельно от удобства сиденья.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_9027/e3c9f494588eba84349f9aaf8082c329384eb340/",
+          "https://www.consultant.ru/document/cons_doc_LAW_9027/0f3422f73df7bee03d56085359c80be8d2981ead/"
+        ],
+        "limitation": "Вид договора, сроки требований, применимость специальной закупочной процедуры и разрешения на размещение кабеля не установлены. Нельзя автоматически исправлять подписанный акт задним числом.",
+        "source_scope": "Тексты отдельных статей и поисковые извлечения из КонсультантПлюс, 28.11.2026; не полная сверка поправок."
+      }
     },
     {
       "case_key": "bank-curated-v2-42",
@@ -8003,15 +8142,33 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "ГК РФ, статья 723: права заказчика при недостатках результата работ; статьи 309 и 310: надлежащее исполнение обязательства и пределы его одностороннего изменения. Конкретный срок требования определяется применимым договором и законом. Источники: https://zpp.rospotrebnadzor.ru/adjudications/federal/66RS0052-01-2019-000514-19 https://11.rosguard.gov.ru/uploads/2025/07/5_grazhdanskijj_kodeks_rossijjskojj_federacii_chast_pervaya.pdf",
+      "legal_basis": "ГК РФ, ст. 309, 721, 723: соблюдение согласованного макета и допустимые требования заказчика при ненадлежащем результате. Исправление временной навигации не прекращает гарантийное требование.",
       "legal_urls": [
-        "https://www.consultant.ru/document/cons_doc_LAW_9027/0f3422f73df7bee03d56085359c80be8d2981ead/"
+        "https://www.consultant.ru/document/cons_doc_LAW_9027/0f3422f73df7bee03d56085359c80be8d2981ead/",
+        "https://www.consultant.ru/document/cons_doc_LAW_5142/1cd43e51fbd4129343b325971a466ec5cd32a425/",
+        "https://www.consultant.ru/document/cons_doc_LAW_9027/e3c9f494588eba84349f9aaf8082c329384eb340/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
       "option_analysis_status": "draft",
       "source_scope": "specific_norm_and_related_search_results_partial",
-      "review_date": "2026-11-27"
+      "review_date": "2026-11-27",
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_5142/1cd43e51fbd4129343b325971a466ec5cd32a425/",
+        "https://www.consultant.ru/document/cons_doc_LAW_9027/e3c9f494588eba84349f9aaf8082c329384eb340/",
+        "https://www.consultant.ru/document/cons_doc_LAW_9027/0f3422f73df7bee03d56085359c80be8d2981ead/"
+      ],
+      "norm_recheck_2026_11_28": {
+        "status": "targeted_norm_and_all_individual_alternatives_reviewed_not_full_acceptance",
+        "basis": "ГК РФ, ст. 309, 721, 723: соблюдение согласованного макета и допустимые требования заказчика при ненадлежащем результате. Исправление временной навигации не прекращает гарантийное требование.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_5142/1cd43e51fbd4129343b325971a466ec5cd32a425/",
+          "https://www.consultant.ru/document/cons_doc_LAW_9027/e3c9f494588eba84349f9aaf8082c329384eb340/",
+          "https://www.consultant.ru/document/cons_doc_LAW_9027/0f3422f73df7bee03d56085359c80be8d2981ead/"
+        ],
+        "limitation": "Конкретный гарантийный срок и порядок исправления определяются договором, права на размещение временного указателя заданы ситуацией.",
+        "source_scope": "Тексты отдельных статей и поисковые извлечения из КонсультантПлюс, 28.11.2026; не полная сверка поправок."
+      }
     },
     {
       "case_key": "bank-expanded-light-02-01",
@@ -8755,15 +8912,30 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "Федеральный закон №89-ФЗ, статья 9: лицензирование предусмотренной деятельности с отходами I–IV классов; Федеральный закон №44-ФЗ, статьи 8 и 33: конкуренция и описание объекта закупки. Вид операции и отходов устанавливается по документам, а не предполагается для любого мусора. Источники: https://rpn.gov.ru/upload/iblock/147/8abso9nzoq227ne0le7m86kw65vgtu2h/Federalnyy-zakon-ot-24-iyunya-1998-g-N-89-FZ-Ob-otkhodakh-proizvodstva-i-potrebleni-v-red-ot-25.12.2023.pdf https://mintrud.gov.ru/docs/laws/116",
+      "legal_basis": "89-ФЗ, ст. 9: лицензирование указанных видов деятельности с отходами I–IV классов; 44-ФЗ, ст. 33: описание объекта закупки с учётом применимых требований. Не всякое действие с любыми отходами лицензируется; проверяется конкретная операция, класс и требования к месту.",
       "legal_urls": [
-        "https://www.consultant.ru/document/cons_doc_LAW_19109/10e97ceca3641d079e24a11ce860fcd1746a38dd/"
+        "https://www.consultant.ru/document/cons_doc_LAW_19109/10e97ceca3641d079e24a11ce860fcd1746a38dd/",
+        "https://www.consultant.ru/document/cons_doc_LAW_144624/d6aec91603ff628ea274b8552ce2849e06e0aa4c/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
       "option_analysis_status": "draft",
       "source_scope": "specific_norm_and_related_search_results_partial",
-      "review_date": "2026-11-27"
+      "review_date": "2026-11-27",
+      "checked_norm_urls": [
+        "https://www.consultant.ru/document/cons_doc_LAW_19109/10e97ceca3641d079e24a11ce860fcd1746a38dd/",
+        "https://www.consultant.ru/document/cons_doc_LAW_144624/d6aec91603ff628ea274b8552ce2849e06e0aa4c/"
+      ],
+      "norm_recheck_2026_11_28": {
+        "status": "targeted_norm_and_all_individual_alternatives_reviewed_not_full_acceptance",
+        "basis": "89-ФЗ, ст. 9: лицензирование указанных видов деятельности с отходами I–IV классов; 44-ФЗ, ст. 33: описание объекта закупки с учётом применимых требований. Не всякое действие с любыми отходами лицензируется; проверяется конкретная операция, класс и требования к месту.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_19109/10e97ceca3641d079e24a11ce860fcd1746a38dd/",
+          "https://www.consultant.ru/document/cons_doc_LAW_144624/d6aec91603ff628ea274b8552ce2849e06e0aa4c/"
+        ],
+        "limitation": "Конкретные санитарные зоны, экологические разрешения, статус перегрузочной площадки и состав требований к участнику закупки не установлены. Проверка условий объекта не означает предвыбор поставщика.",
+        "source_scope": "Тексты отдельных статей и поисковые извлечения из КонсультантПлюс, 28.11.2026; не полная сверка поправок."
+      }
     },
     {
       "case_key": "bank-expanded-serious-09-01",
