@@ -1,0 +1,295 @@
+{
+  "status": "proposal_only_not_applied_requires_owner_approval",
+  "date": "2026-11-28",
+  "source_commit": "d8e4d8fb30bae5e15623e2e4749511a5dcf93e05",
+  "packages": [
+    {
+      "file": "EVENTS_V2_REMAINING_BALANCE_PROPOSAL_A_2026-11-28.json",
+      "blob": "3f93974f123f31f2c4535d2ede3f25baa8485d58",
+      "cases": 15,
+      "changed_fields": 19
+    },
+    {
+      "file": "EVENTS_V2_REMAINING_BALANCE_PROPOSAL_B_2026-11-28.json",
+      "blob": "61b487b8bd840c4ee4a217058f8968212ce09821",
+      "cases": 20,
+      "changed_fields": 30
+    },
+    {
+      "file": "EVENTS_V2_REMAINING_BALANCE_PROPOSAL_C_2026-11-28.json",
+      "blob": "8d8db4cc20a5c2f3c5c8cbbcdfeae9b5792a62b8",
+      "cases": 20,
+      "changed_fields": 32
+    },
+    {
+      "file": "EVENTS_V2_REMAINING_BALANCE_PROPOSAL_D_2026-11-28.json",
+      "blob": "15e7eeba53da75f243922c9c35a5e24c1aed22b6",
+      "cases": 18,
+      "changed_fields": 25
+    },
+    {
+      "file": "EVENTS_V2_REMAINING_BALANCE_PROPOSAL_E_2026-11-28.json",
+      "blob": "8e448904510c865b4477abdd1bb4b948d6a82e83",
+      "cases": 17,
+      "changed_fields": 19
+    }
+  ],
+  "summary": {
+    "collective_cases": 189,
+    "options": 947,
+    "changed_cases": 90,
+    "changed_fields": 125,
+    "changes_by_metric": {
+      "elite_support": 65,
+      "trust": 29,
+      "social_stability": 9,
+      "economy": 17,
+      "media_climate": 4,
+      "security": 1
+    },
+    "new_fields_on_options": 14,
+    "dominated_options_before": 122,
+    "dominated_options_after": 0,
+    "dominance_pairs_before": 127,
+    "dominance_pairs_after": 0,
+    "equal_vector_pairs_before": 1,
+    "equal_vector_pairs_after": 1,
+    "scenario_projections": 5682,
+    "errors": 0
+  },
+  "new_fields_on_options": [
+    {
+      "case_key": "bank-legal-2026-013",
+      "option": "option_1",
+      "metric": "social_stability"
+    },
+    {
+      "case_key": "bank-legal-2026-038",
+      "option": "option_5",
+      "metric": "media_climate"
+    },
+    {
+      "case_key": "bank-legal-2026-041",
+      "option": "option_3",
+      "metric": "social_stability"
+    },
+    {
+      "case_key": "bank-legal-2026-043",
+      "option": "option_3",
+      "metric": "media_climate"
+    },
+    {
+      "case_key": "bank-legal-2026-045",
+      "option": "option_4",
+      "metric": "social_stability"
+    },
+    {
+      "case_key": "bank-legal-2026-060",
+      "option": "option_3",
+      "metric": "security"
+    },
+    {
+      "case_key": "bank-legal-2026-060",
+      "option": "option_4",
+      "metric": "social_stability"
+    },
+    {
+      "case_key": "bank-legal-2026-068",
+      "option": "option_4",
+      "metric": "media_climate"
+    },
+    {
+      "case_key": "bank-legal-2026-071",
+      "option": "option_5",
+      "metric": "social_stability"
+    },
+    {
+      "case_key": "bank-legal-2026-116",
+      "option": "option_3",
+      "metric": "social_stability"
+    },
+    {
+      "case_key": "bank-legal-2026-126",
+      "option": "option_5",
+      "metric": "media_climate"
+    },
+    {
+      "case_key": "bank-legal-2026-136",
+      "option": "option_3",
+      "metric": "social_stability"
+    },
+    {
+      "case_key": "bank-legal-2026-138",
+      "option": "option_1",
+      "metric": "social_stability"
+    },
+    {
+      "case_key": "bank-legal-2026-139",
+      "option": "option_1",
+      "metric": "social_stability"
+    }
+  ],
+  "equal_vectors_after": [
+    {
+      "case_key": "bank-legal-2026-047",
+      "pair": [
+        "option_3",
+        "option_5"
+      ]
+    }
+  ],
+  "projection": {
+    "before": {
+      "cases": 189,
+      "options": 947,
+      "projections": 5682,
+      "baseDominated": 122,
+      "basePairs": 127,
+      "basePairsWithRevenueAdvantageInSomeScenario": 41,
+      "basePairsWithRevenueAdvantageNeutral": 0,
+      "basePairsWithNoEconomicAdvantageInAnyScenario": 86,
+      "scenarioRanges": [
+        {
+          "key": "neutral",
+          "minRevenueDelta": -13870.58,
+          "maxRevenueDelta": 67725.9,
+          "minBusinessDelta": -0.000379,
+          "maxBusinessDelta": 0.001949,
+          "minCollectionDelta": -0.022045,
+          "maxCollectionDelta": 0.03734,
+          "clippedOptions": 0
+        },
+        {
+          "key": "manual_56",
+          "minRevenueDelta": -7458.1,
+          "maxRevenueDelta": 35135.74,
+          "minBusinessDelta": -0.000212,
+          "maxBusinessDelta": 0.001091,
+          "minCollectionDelta": -0.023345,
+          "maxCollectionDelta": 0.03466,
+          "clippedOptions": 0
+        },
+        {
+          "key": "stress",
+          "minRevenueDelta": -8736.77,
+          "maxRevenueDelta": 45305.19,
+          "minBusinessDelta": -0.000378,
+          "maxBusinessDelta": 0.001947,
+          "minCollectionDelta": -0.025,
+          "maxCollectionDelta": 0.03125,
+          "clippedOptions": 0
+        },
+        {
+          "key": "near_lower_bounds",
+          "minRevenueDelta": -1440.81,
+          "maxRevenueDelta": 1373.28,
+          "minBusinessDelta": 0,
+          "maxBusinessDelta": 0,
+          "minCollectionDelta": -0.000941,
+          "maxCollectionDelta": 0.001417,
+          "clippedOptions": 0
+        },
+        {
+          "key": "near_upper_bounds",
+          "minRevenueDelta": -18765.69,
+          "maxRevenueDelta": 46177.15,
+          "minBusinessDelta": -0.000629,
+          "maxBusinessDelta": 0.001574,
+          "minCollectionDelta": -0.000159,
+          "maxCollectionDelta": 0.000238,
+          "clippedOptions": 0
+        },
+        {
+          "key": "manual_zero",
+          "minRevenueDelta": -780.75,
+          "maxRevenueDelta": 1888.94,
+          "minBusinessDelta": 0,
+          "maxBusinessDelta": 0,
+          "minCollectionDelta": -0.025,
+          "maxCollectionDelta": 0.03125,
+          "clippedOptions": 0
+        }
+      ]
+    },
+    "after": {
+      "cases": 189,
+      "options": 947,
+      "projections": 5682,
+      "baseDominated": 0,
+      "basePairs": 0,
+      "basePairsWithRevenueAdvantageInSomeScenario": 0,
+      "basePairsWithRevenueAdvantageNeutral": 0,
+      "basePairsWithNoEconomicAdvantageInAnyScenario": 0,
+      "scenarioRanges": [
+        {
+          "key": "neutral",
+          "minRevenueDelta": -13870.58,
+          "maxRevenueDelta": 67725.9,
+          "minBusinessDelta": -0.000379,
+          "maxBusinessDelta": 0.001949,
+          "minCollectionDelta": -0.022045,
+          "maxCollectionDelta": 0.03734,
+          "clippedOptions": 0
+        },
+        {
+          "key": "manual_56",
+          "minRevenueDelta": -7458.1,
+          "maxRevenueDelta": 35135.74,
+          "minBusinessDelta": -0.000212,
+          "maxBusinessDelta": 0.001091,
+          "minCollectionDelta": -0.023345,
+          "maxCollectionDelta": 0.03466,
+          "clippedOptions": 0
+        },
+        {
+          "key": "stress",
+          "minRevenueDelta": -8736.77,
+          "maxRevenueDelta": 45305.19,
+          "minBusinessDelta": -0.000378,
+          "maxBusinessDelta": 0.001947,
+          "minCollectionDelta": -0.025,
+          "maxCollectionDelta": 0.03125,
+          "clippedOptions": 0
+        },
+        {
+          "key": "near_lower_bounds",
+          "minRevenueDelta": -1440.81,
+          "maxRevenueDelta": 1373.28,
+          "minBusinessDelta": 0,
+          "maxBusinessDelta": 0,
+          "minCollectionDelta": -0.000941,
+          "maxCollectionDelta": 0.001417,
+          "clippedOptions": 0
+        },
+        {
+          "key": "near_upper_bounds",
+          "minRevenueDelta": -18765.69,
+          "maxRevenueDelta": 46177.15,
+          "minBusinessDelta": -0.000629,
+          "maxBusinessDelta": 0.001574,
+          "minCollectionDelta": -0.000159,
+          "maxCollectionDelta": 0.000238,
+          "clippedOptions": 0
+        },
+        {
+          "key": "manual_zero",
+          "minRevenueDelta": -780.75,
+          "maxRevenueDelta": 1888.94,
+          "minBusinessDelta": 0,
+          "maxBusinessDelta": 0,
+          "minCollectionDelta": -0.025,
+          "maxCollectionDelta": 0.03125,
+          "clippedOptions": 0
+        }
+      ]
+    }
+  },
+  "limitations": [
+    "Коэффициенты условные, не статистические прогнозы и не установленные правовые последствия.",
+    "Предложения не внесены в каталог; утверждённые 7 исправлений, 1/89, 1/16 и ±4 сохранены.",
+    "Новые поля на отдельных вариантах используют только существующие показатели, новых глобальных показателей нет.",
+    "Уточнения публичности проверки для вариантов 038, 078, 086 должны быть отражены в редакции при приёмке, без добавления обязательной публичности закрытых данных.",
+    "Расчёт в памяти по текущей экономической модели, не испытание 100 игроков и не проверка production.",
+    "Правовая приёмка и активация не выполнены."
+  ]
+}
