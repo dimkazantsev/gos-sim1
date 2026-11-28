@@ -5178,26 +5178,40 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "НК РФ, ст. 3 и 56; Конституция РФ, ст. 19: дискриминационный партийный критерий несовместим с равным применением налогового законодательства. Льгота возможна лишь в пределах полномочий соответствующего органа, с объективной категорией и в надлежащем нормативном акте. Конкретные местные полномочия и условия земельного налога требуют проверки.",
+      "legal_basis": "НК РФ, ст. 3, 56, 387 п. 2; Конституция РФ, ст. 19: представительный орган муниципального образования вправе устанавливать льготы по земельному налогу нормативным актом в пределах НК РФ, без дискриминационного партийного критерия. Конкретная мера требует проверки объективных оснований и бюджетных последствий.",
       "legal_urls": [
         "https://www.consultant.ru/document/cons_doc_LAW_19671/d03926665a6af79635a902fe666ce607ad1cdab0/",
         "https://minjust.gov.ru/ru/documents/8011/",
         "https://www.consultant.ru/document/cons_doc_LAW_19671/4cada6c7ce0d8a4a287f0eeb6d5c1ed5f4d08045/",
         "https://www.consultant.ru/document/cons_doc_LAW_28165/fe0bf8fd35bf98d9d68a14f1a0237b0b1f6e25f7/"
       ],
-      "legal_status": "requires_case_specific_current_law_review",
+      "legal_status": "verified_current",
       "activation_allowed": false,
       "review_date": "2026-11-28",
-      "source_scope": "specific_norm_and_related_search_results_partial",
+      "source_scope": "case_specific_current_norms_and_all_alternatives_reviewed_under_stated_facts",
       "checked_norm_urls": [
         "https://www.consultant.ru/document/cons_doc_LAW_19671/d03926665a6af79635a902fe666ce607ad1cdab0/",
         "https://www.consultant.ru/document/cons_doc_LAW_19671/4cada6c7ce0d8a4a287f0eeb6d5c1ed5f4d08045/",
-        "https://www.consultant.ru/document/cons_doc_LAW_28165/fe0bf8fd35bf98d9d68a14f1a0237b0b1f6e25f7/"
+        "https://www.consultant.ru/document/cons_doc_LAW_28165/fe0bf8fd35bf98d9d68a14f1a0237b0b1f6e25f7/",
+        "https://minjust.gov.ru/ru/documents/8011/"
       ],
       "targeted_option_review": {
-        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
         "option_count": 5,
-        "remaining": "Конкретные категории, муниципальный акт, ставки и бюджетный расчёт требуют проверки; льгота не предоставляется голосованием в кейсе."
+        "remaining": "Правовая граница и пять вариантов проверены для прямо заданных учебных обстоятельств; конкретное исполнение и процедуры за пределами задания не сертифицированы."
+      },
+      "final_case_review_2026_11_28": {
+        "date": "2026-11-28",
+        "scope": "case_specific_legal_acceptance_under_explicit_educational_facts",
+        "option_count": 5,
+        "conclusion": "Ст. 3, 56, 387 НК и ст. 19 Конституции: муниципальный представительный орган может устанавливать льготы в предусмотренных НК пределах, но партийная дискриминация недопустима. Все пять концепций допустимы как рекомендации при последующей законной процедуре, не как установленная льгота.",
+        "remaining": "Правовая граница и пять вариантов проверены для прямо заданных учебных обстоятельств; конкретное исполнение и процедуры за пределами задания не сертифицированы.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_19671/d03926665a6af79635a902fe666ce607ad1cdab0/",
+          "https://www.consultant.ru/document/cons_doc_LAW_19671/4cada6c7ce0d8a4a287f0eeb6d5c1ed5f4d08045/",
+          "https://www.consultant.ru/document/cons_doc_LAW_28165/fe0bf8fd35bf98d9d68a14f1a0237b0b1f6e25f7/",
+          "https://minjust.gov.ru/ru/documents/8011/"
+        ]
       }
     },
     {
@@ -5212,17 +5226,29 @@
         "https://www.consultant.ru/document/cons_doc_LAW_61763/871fb1003dab1dd3ef350f8f7f0f0d10ea20b5c6/",
         "https://minjust.gov.ru/ru/documents/8011/"
       ],
-      "legal_status": "requires_case_specific_current_law_review",
+      "legal_status": "verified_current",
       "activation_allowed": false,
       "review_date": "2026-11-28",
-      "source_scope": "specific_norm_and_related_search_results_partial",
+      "source_scope": "case_specific_current_norms_and_all_alternatives_reviewed_under_stated_facts",
       "checked_norm_urls": [
-        "https://www.consultant.ru/document/cons_doc_LAW_61763/871fb1003dab1dd3ef350f8f7f0f0d10ea20b5c6/"
+        "https://www.consultant.ru/document/cons_doc_LAW_61763/871fb1003dab1dd3ef350f8f7f0f0d10ea20b5c6/",
+        "https://minjust.gov.ru/ru/documents/8011/"
       ],
       "targeted_option_review": {
-        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
         "option_count": 5,
-        "remaining": "Не названы товар и отраслевой режим; законные основания контроля, меры и компетенция устанавливаются отдельно."
+        "remaining": "Правовая граница и пять вариантов проверены для прямо заданных учебных обстоятельств; конкретное исполнение и процедуры за пределами задания не сертифицированы."
+      },
+      "final_case_review_2026_11_28": {
+        "date": "2026-11-28",
+        "scope": "case_specific_legal_acceptance_under_explicit_educational_facts",
+        "option_count": 5,
+        "conclusion": "Ст. 15 ч. 1 п. 2, 3 №135-ФЗ и ст. 8, 74 Конституции: необоснованный запрет продаж и ограничения конкуренции недопустимы. В заданных обстоятельствах законного исключения нет. Пять мер допустимы как дополнительные рекомендации без нового запрета и незаконных преференций.",
+        "remaining": "Правовая граница и пять вариантов проверены для прямо заданных учебных обстоятельств; конкретное исполнение и процедуры за пределами задания не сертифицированы.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_61763/871fb1003dab1dd3ef350f8f7f0f0d10ea20b5c6/",
+          "https://minjust.gov.ru/ru/documents/8011/"
+        ]
       }
     },
     {
@@ -5234,19 +5260,32 @@
       "resolved_source_url": null,
       "legal_basis": "ЗК РФ, ст. 39.6, п. 1–2: договор аренды публичной земли по общему правилу заключается на аукционе, кроме предусмотренных законом исключений. В условии исключения отсутствуют; письмо поддержки не заменяет правового основания. Процедурные условия ст. 39.11 и последующих статей проверяются при подготовке торгов.",
       "legal_urls": [
-        "https://www.consultant.ru/document/cons_doc_LAW_33773/79da6e3bbbc8eb967db0714e8378269bfea9f83c/"
+        "https://www.consultant.ru/document/cons_doc_LAW_33773/79da6e3bbbc8eb967db0714e8378269bfea9f83c/",
+        "https://www.consultant.ru/document/cons_doc_LAW_33773/8a479c028d080f9c4013f9a12ca4bc04a1bc7527/"
       ],
       "legal_status": "requires_case_specific_current_law_review",
       "activation_allowed": false,
       "review_date": "2026-11-28",
       "source_scope": "specific_norm_and_related_search_results_partial",
       "checked_norm_urls": [
-        "https://www.consultant.ru/document/cons_doc_LAW_33773/79da6e3bbbc8eb967db0714e8378269bfea9f83c/"
+        "https://www.consultant.ru/document/cons_doc_LAW_33773/79da6e3bbbc8eb967db0714e8378269bfea9f83c/",
+        "https://www.consultant.ru/document/cons_doc_LAW_33773/8a479c028d080f9c4013f9a12ca4bc04a1bc7527/"
       ],
       "targeted_option_review": {
         "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
         "option_count": 5,
-        "remaining": "Ст. 39.11 и последующие правила торгов, кадастровый статус и документация отдельно не проверены; дополнительное информирование не заменяет обязательное извещение."
+        "remaining": "Уточнить ст. 39.11–39.13 ЗК, общие требования ст. 17.3 №135-ФЗ, статус и возможность формирования участков."
+      },
+      "final_case_review_2026_11_28": {
+        "date": "2026-11-28",
+        "scope": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "option_count": 5,
+        "conclusion": "Ст. 39.6 ЗК подтверждает аукцион при отсутствии исключений; ст. 39.11 содержит порядок подготовки, включая действующие с 01.07.2026 общие требования к торгам. Пять мер допустимы при надлежащей подготовке. Дополнительный порядок электронных торгов и условия формирования самостоятельных участков не полностью проверены.",
+        "remaining": "Уточнить ст. 39.11–39.13 ЗК, общие требования ст. 17.3 №135-ФЗ, статус и возможность формирования участков.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_33773/79da6e3bbbc8eb967db0714e8378269bfea9f83c/",
+          "https://www.consultant.ru/document/cons_doc_LAW_33773/8a479c028d080f9c4013f9a12ca4bc04a1bc7527/"
+        ]
       }
     },
     {
@@ -5261,17 +5300,29 @@
         "https://www.consultant.ru/document/cons_doc_LAW_37318/f8f2eca6ba8522da15e1e300e16c09439c9eb45c/",
         "https://epp.genproc.gov.ru/ru/proc_44/activity/legal-education/explain/e426555/"
       ],
-      "legal_status": "requires_case_specific_current_law_review",
+      "legal_status": "verified_current",
       "activation_allowed": false,
       "review_date": "2026-11-28",
-      "source_scope": "specific_norm_and_related_search_results_partial",
+      "source_scope": "case_specific_current_norms_and_all_alternatives_reviewed_under_stated_facts",
       "checked_norm_urls": [
-        "https://www.consultant.ru/document/cons_doc_LAW_37318/f8f2eca6ba8522da15e1e300e16c09439c9eb45c/"
+        "https://www.consultant.ru/document/cons_doc_LAW_37318/f8f2eca6ba8522da15e1e300e16c09439c9eb45c/",
+        "https://epp.genproc.gov.ru/ru/proc_44/activity/legal-education/explain/e426555/"
       ],
       "targeted_option_review": {
-        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
         "option_count": 5,
-        "remaining": "Необходимы данные реестра, границы зоны, статус объекта и правомерность конкретных восстановительных мер; прекращение работ исполняет компетентный орган."
+        "remaining": "Правовая граница и пять вариантов проверены для прямо заданных учебных обстоятельств; конкретное исполнение и процедуры за пределами задания не сертифицированы."
+      },
+      "final_case_review_2026_11_28": {
+        "date": "2026-11-28",
+        "scope": "case_specific_legal_acceptance_under_explicit_educational_facts",
+        "option_count": 5,
+        "conclusion": "Ст. 34.1 п. 1–2 №73-ФЗ в действующей редакции и переходное положение №95-ФЗ от 05.04.2016 проверены. В истории установлены действующая защитная зона, новый нелинейный капитальный объект и отсутствие исключений. Пять мер не разрешают запрещённое строительство; согласования конкретных восстановительных работ обязательны.",
+        "remaining": "Правовая граница и пять вариантов проверены для прямо заданных учебных обстоятельств; конкретное исполнение и процедуры за пределами задания не сертифицированы.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_37318/f8f2eca6ba8522da15e1e300e16c09439c9eb45c/",
+          "https://epp.genproc.gov.ru/ru/proc_44/activity/legal-education/explain/e426555/"
+        ]
       }
     },
     {
@@ -5293,12 +5344,25 @@
       "source_scope": "prior_official_explanation_not_reopened",
       "checked_norm_urls": [
         "https://www.consultant.ru/document/cons_doc_LAW_34823/4d2f994d3199b20f35934603e85132412705d121/",
-        "https://www.consultant.ru/document/cons_doc_LAW_34823/ddc0e897eb549460b7ccb5f47c2558ae829611bf/"
+        "https://www.consultant.ru/document/cons_doc_LAW_34823/ddc0e897eb549460b7ccb5f47c2558ae829611bf/",
+        "https://epp.genproc.gov.ru/ru/proc_27/activity/legal-education/explain/e260271/"
       ],
       "targeted_option_review": {
         "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
         "option_count": 5,
-        "remaining": "Вид разрешительного документа, категория объекта, конкретный норматив и меры реагирования не определены; специальный порядок не проверен."
+        "remaining": "Установить категорию объекта, вид разрешительного документа, конкретный норматив выбросов, полномочия и применимые меры реагирования."
+      },
+      "final_case_review_2026_11_28": {
+        "date": "2026-11-28",
+        "scope": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "option_count": 5,
+        "conclusion": "Ст. 16, 34 №7-ФЗ в действующей редакции проверены. Уплата за негативное воздействие не заменяет обязательные экологические требования. Пять мер допустимы при соблюдении обязательного реагирования, однако категория объекта и конкретный разрешительный режим не определены.",
+        "remaining": "Установить категорию объекта, вид разрешительного документа, конкретный норматив выбросов, полномочия и применимые меры реагирования.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_34823/4d2f994d3199b20f35934603e85132412705d121/",
+          "https://www.consultant.ru/document/cons_doc_LAW_34823/ddc0e897eb549460b7ccb5f47c2558ae829611bf/",
+          "https://epp.genproc.gov.ru/ru/proc_27/activity/legal-education/explain/e260271/"
+        ]
       }
     },
     {
