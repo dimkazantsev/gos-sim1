@@ -3835,21 +3835,34 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "Конституция РФ, ст. 15, ч. 3. Официальное опубликование и наступление установленной даты действия обязательны; до этого действует прежняя норма. Конкретный региональный порядок публикации и перехода отдельно не проверен.",
+      "legal_basis": "Конституция РФ, ч. 3 ст. 15; №414-ФЗ, ч. 7 ст. 13: неопубликованный закон не применяется; в заданной истории действует общий срок вступления в силу регионального закона — по истечении десяти дней после официального опубликования. Иной порядок прямо исключён. Преждевременное требование устраняется по компетенции; дополнительные меры не вводят обязанность раньше срока.",
       "legal_urls": [
-        "https://minjust.gov.ru/ru/documents/8011/"
+        "https://minjust.gov.ru/ru/documents/8011/",
+        "https://www.consultant.ru/document/cons_doc_LAW_404070/a5e9db8a17cf3b1decd6c68ac75951e8e02c4f52/"
       ],
-      "legal_status": "requires_case_specific_current_law_review",
+      "legal_status": "verified_current",
       "activation_allowed": false,
       "review_date": "2026-11-28",
-      "source_scope": "specific_norm_checked_partial",
+      "source_scope": "case_specific_current_norms_and_all_alternatives_reviewed_under_stated_facts",
       "checked_norm_urls": [
-        "https://minjust.gov.ru/ru/documents/8011/"
+        "https://minjust.gov.ru/ru/documents/8011/",
+        "https://www.consultant.ru/document/cons_doc_LAW_404070/a5e9db8a17cf3b1decd6c68ac75951e8e02c4f52/"
       ],
       "targeted_option_review": {
-        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
         "option_count": 5,
-        "remaining": "Конкретный регион и его правила опубликования не названы; календарь и переходные меры не изменяют установленную законом дату."
+        "remaining": "Проверено для прямо заданных учебных обстоятельств. Реальное индивидуальное исполнение не сертифицировано; доступны справочные редакции и официальный текст Конституции, не полная независимая сверка цепочки поправок."
+      },
+      "final_case_review_2026_11_28": {
+        "date": "2026-11-28",
+        "scope": "case_specific_legal_acceptance_under_explicit_educational_facts",
+        "option_count": 5,
+        "conclusion": "Официальный текст Конституции и ч. 7 ст. 13 №414-ФЗ (ред. 26.06.2026) подтверждают правовую границу. Факт отсутствия публикации задан для всех предусмотренных региональных источников; конкретный субъект не требуется для ответа о невозможности применения. Пять мер — информирование о старых требованиях, календарь, обучение, законные подготовительные действия и оценка затрат — допустимы без преждевременного возложения новой обязанности.",
+        "remaining": "Проверено для прямо заданных учебных обстоятельств. Реальное индивидуальное исполнение не сертифицировано; доступны справочные редакции и официальный текст Конституции, не полная независимая сверка цепочки поправок.",
+        "urls": [
+          "https://minjust.gov.ru/ru/documents/8011/",
+          "https://www.consultant.ru/document/cons_doc_LAW_404070/a5e9db8a17cf3b1decd6c68ac75951e8e02c4f52/"
+        ]
       }
     },
     {
@@ -4553,36 +4566,41 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "Закон №2300-1, ст. 18, п. 5–6: товар принимается, при необходимости проверяется качество; при споре о причинах проводится экспертиза первоначально за счёт продавца. Возмещение расходов потребителем зависит от результата. Сроки связаны с выбранным требованием; в задаче заявлен ремонт.",
+      "legal_basis": "Закон РФ №2300-1, ст. 18 п. 5–6, ст. 20; Единые правила защиты прав потребителей, утверждённые Декретом ВГС Союзного государства №6 от 06.12.2024, ст. 19 п. 4–5 и ст. 21: продавец обязан принять товар и при споре первоначально оплатить экспертизу, известить покупателя о её месте и времени письменно, обеспечить право присутствия и оспаривания. Возмещение расходов потребителем возможно при установленной ответственности потребителя; ремонт в пределах применимого срока не зависит от упаковки.",
       "legal_urls": [
         "https://www.consultant.ru/document/cons_doc_LAW_305/76ae101b731ecc22467fd9f1f14cb9e2b8799026/",
         "https://zpp.rospotrebnadzor.ru/news/federal/576544",
-        "https://www.consultant.ru/document/Cons_doc_LAW_305/c771be122fddbc6e3087cbf43aa39a85a960a296/"
+        "https://www.consultant.ru/document/Cons_doc_LAW_305/c771be122fddbc6e3087cbf43aa39a85a960a296/",
+        "https://www.consultant.ru/document/cons_doc_LAW_305/c771be122fddbc6e3087cbf43aa39a85a960a296/",
+        "https://www.consultant.ru/document/cons_doc_LAW_496218/bf0be0d7744989c8b88c8eef80a31e1d6348d898/",
+        "https://www.consultant.ru/document/cons_doc_LAW_496218/c3a5d1d8aa10ba0c007f45e044d28243fee6e06a/"
       ],
-      "legal_status": "requires_case_specific_current_law_review",
+      "legal_status": "verified_current",
       "activation_allowed": false,
       "review_date": "2026-11-28",
-      "source_scope": "specific_norm_and_related_search_results_partial",
+      "source_scope": "case_specific_current_norms_and_all_alternatives_reviewed_under_stated_facts",
       "checked_norm_urls": [
         "https://www.consultant.ru/document/cons_doc_LAW_305/76ae101b731ecc22467fd9f1f14cb9e2b8799026/",
-        "https://zpp.rospotrebnadzor.ru/news/federal/576544",
-        "https://www.consultant.ru/document/Cons_doc_LAW_305/c771be122fddbc6e3087cbf43aa39a85a960a296/"
+        "https://www.consultant.ru/document/cons_doc_LAW_305/c771be122fddbc6e3087cbf43aa39a85a960a296/",
+        "https://www.consultant.ru/document/cons_doc_LAW_496218/bf0be0d7744989c8b88c8eef80a31e1d6348d898/",
+        "https://www.consultant.ru/document/cons_doc_LAW_496218/c3a5d1d8aa10ba0c007f45e044d28243fee6e06a/"
       ],
       "targeted_option_review": {
-        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
         "option_count": 5,
-        "remaining": "Уточнить применимость специальных норм защиты потребителей и союзного регулирования к выбранной дате, сроку гарантии и заявленному требованию. Не устанавливать автоматически возврат цены."
+        "remaining": "Проверено для прямо заданных учебных обстоятельств. Реальное индивидуальное исполнение не сертифицировано; доступны справочные редакции и официальный текст Конституции, не полная независимая сверка цепочки поправок."
       },
       "final_case_review_2026_11_28": {
         "date": "2026-11-28",
-        "scope": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "scope": "case_specific_legal_acceptance_under_explicit_educational_facts",
         "option_count": 5,
-        "conclusion": "Ст. 18 и 20 Закона №2300-1 проверены: при споре о причинах недостатка экспертиза первоначально за счёт обязанного лица; при письменном согласовании срока ремонта действует предел 45 дней. Все пять мер не заменяют обязательные действия. Дополнительная проверка специальных правил, включая применимость союзного регулирования, не завершена.",
-        "remaining": "Уточнить применимость специальных норм защиты потребителей и союзного регулирования к выбранной дате, сроку гарантии и заявленному требованию. Не устанавливать автоматически возврат цены.",
+        "conclusion": "Проверены ст. 18, 20 Закона №2300-1 в редакции с изменениями 27.10.2026 и ст. 19, 21 Единых правил Союзного государства. Заданы гарантия, личная цель покупки, российская розница и спор о причине. Пять мер допустимы сверх обязательного принятия товара и экспертизы; графики и работа нескольких экспертов не увеличивают законный срок, добровольное урегулирование не ограничивает права. Безусловный возврат цены технически сложного товара не утверждается.",
+        "remaining": "Проверено для прямо заданных учебных обстоятельств. Реальное индивидуальное исполнение не сертифицировано; доступны справочные редакции и официальный текст Конституции, не полная независимая сверка цепочки поправок.",
         "urls": [
           "https://www.consultant.ru/document/cons_doc_LAW_305/76ae101b731ecc22467fd9f1f14cb9e2b8799026/",
-          "https://zpp.rospotrebnadzor.ru/news/federal/576544",
-          "https://www.consultant.ru/document/Cons_doc_LAW_305/c771be122fddbc6e3087cbf43aa39a85a960a296/"
+          "https://www.consultant.ru/document/cons_doc_LAW_305/c771be122fddbc6e3087cbf43aa39a85a960a296/",
+          "https://www.consultant.ru/document/cons_doc_LAW_496218/bf0be0d7744989c8b88c8eef80a31e1d6348d898/",
+          "https://www.consultant.ru/document/cons_doc_LAW_496218/c3a5d1d8aa10ba0c007f45e044d28243fee6e06a/"
         ]
       }
     },
@@ -4633,32 +4651,38 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "ТК РФ, ст. 81, ч. 6: увольнение по сокращению во время болезни недопустимо при заданных обстоятельствах. Наличие подходящих вакансий и соблюдение прочих гарантий проверяются отдельно. Голосованием нельзя разрешить запрещённое увольнение.",
+      "legal_basis": "ТК РФ, ч. 3 и 6 ст. 81, ст. 178–180: сокращение в период временной нетрудоспособности недопустимо при отсутствии ликвидации; после больничного законность увольнения не возникает автоматически. Проверяются вакансии, преимущественное право, предупреждение и предусмотренные выплаты, а также иные применимые гарантии. Пять дополнительных организационных мер не заменяют эти обязанности.",
       "legal_urls": [
         "https://www.consultant.ru/document/cons_doc_LAW_34683/6a7ba42d8fda3a1ba186a9eb5c806921998ae7d1/",
-        "https://www.consultant.ru/document/cons_doc_LAW_34683/6887e2fd9f9775c467fb9cc45fbc5874a04174cc/"
+        "https://www.consultant.ru/document/cons_doc_LAW_34683/6887e2fd9f9775c467fb9cc45fbc5874a04174cc/",
+        "https://www.consultant.ru/document/cons_doc_LAW_34683/0526867a7eace3f1f88798592ed0bdf3589f0528/",
+        "https://www.consultant.ru/document/cons_doc_LAW_34683/ddaeeb833c24609e3474ce13536b0796bc85ee57/"
       ],
-      "legal_status": "requires_case_specific_current_law_review",
+      "legal_status": "verified_current",
       "activation_allowed": false,
       "review_date": "2026-11-28",
-      "source_scope": "specific_norm_and_related_search_results_partial",
+      "source_scope": "case_specific_current_norms_and_all_alternatives_reviewed_under_stated_facts",
       "checked_norm_urls": [
         "https://www.consultant.ru/document/cons_doc_LAW_34683/6a7ba42d8fda3a1ba186a9eb5c806921998ae7d1/",
+        "https://www.consultant.ru/document/cons_doc_LAW_34683/0526867a7eace3f1f88798592ed0bdf3589f0528/",
+        "https://www.consultant.ru/document/cons_doc_LAW_34683/ddaeeb833c24609e3474ce13536b0796bc85ee57/",
         "https://www.consultant.ru/document/cons_doc_LAW_34683/6887e2fd9f9775c467fb9cc45fbc5874a04174cc/"
       ],
       "targeted_option_review": {
-        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
         "option_count": 5,
-        "remaining": "Проверить применимые ст. 178–179 ТК, гарантии конкретного работника, сроки, вакансии и выплаты. Дата увольнения сама по себе не подтверждает законность дальнейшего сокращения."
+        "remaining": "Проверено для прямо заданных учебных обстоятельств. Реальное индивидуальное исполнение не сертифицировано; доступны справочные редакции и официальный текст Конституции, не полная независимая сверка цепочки поправок."
       },
       "final_case_review_2026_11_28": {
         "date": "2026-11-28",
-        "scope": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "scope": "case_specific_legal_acceptance_under_explicit_educational_facts",
         "option_count": 5,
-        "conclusion": "Ч. 6 ст. 81 ТК запрещает увольнение по сокращению в период болезни; ст. 180 предусматривает предложение вакансий и гарантии предупреждения. Все пять мер условно допустимы сверх обязательных гарантий. Полная проверка дальнейшей процедуры сокращения не завершена.",
-        "remaining": "Проверить применимые ст. 178–179 ТК, гарантии конкретного работника, сроки, вакансии и выплаты. Дата увольнения сама по себе не подтверждает законность дальнейшего сокращения.",
+        "conclusion": "Проверены ст. 81, 178–180 ТК в редакции 25.05.2026; изменения перечня преимущественного права учтены через отсылку к действующей статье 179 без фиксации неполного перечня. Пять мер — перенос, дополнительное обучение, поэтапное изменение штата, проверка документов, консультации — не допускают увольнение в период болезни и не заменяют проверку гарантий. Суммы выплат и право на последующее увольнение не предрешены.",
+        "remaining": "Проверено для прямо заданных учебных обстоятельств. Реальное индивидуальное исполнение не сертифицировано; доступны справочные редакции и официальный текст Конституции, не полная независимая сверка цепочки поправок.",
         "urls": [
           "https://www.consultant.ru/document/cons_doc_LAW_34683/6a7ba42d8fda3a1ba186a9eb5c806921998ae7d1/",
+          "https://www.consultant.ru/document/cons_doc_LAW_34683/0526867a7eace3f1f88798592ed0bdf3589f0528/",
+          "https://www.consultant.ru/document/cons_doc_LAW_34683/ddaeeb833c24609e3474ce13536b0796bc85ee57/",
           "https://www.consultant.ru/document/cons_doc_LAW_34683/6887e2fd9f9775c467fb9cc45fbc5874a04174cc/"
         ]
       }
@@ -5560,21 +5584,40 @@
       "source_url": null,
       "source_status": "no_documentary_url",
       "resolved_source_url": null,
-      "legal_basis": "127-ФЗ, ст. 61.3, 134: предпочтение кредитору может быть основанием оспаривания сделки при соблюдении установленных условий; очерёдность зависит от применимой процедуры. Стадия банкротства в истории ещё не установлена, поэтому нельзя автоматически применять правила конкурсного производства или объявлять сделку недействительной.",
+      "legal_basis": "№127-ФЗ, ст. 9 п. 1–2, ст. 30, 61.3, 61.4: при установленном обстоятельстве руководитель обязан направить заявление в арбитражный суд без неоправданного промедления и не позднее месяца с его возникновения, внести обязательные сведения в реестр в установленный срок и действовать в интересах кредиторов. Планируемый платёж создаёт риск предпочтения; оспаривание уже совершённой сделки требует судебной процедуры и соблюдения условий о периоде. Правила конкурсной очередности не применяются механически до введения процедуры.",
       "legal_urls": [
-        "https://www.consultant.ru/document/cons_doc_LAW_39331/22f46f165baa4e483d8a0c74fe52a2cea2f43d9e/"
+        "https://www.consultant.ru/document/cons_doc_LAW_39331/22f46f165baa4e483d8a0c74fe52a2cea2f43d9e/",
+        "https://www.consultant.ru/document/cons_doc_LAW_39331/cfb43de72e4d3236bd4ec4c638a54c76d6447ae7/",
+        "https://www.consultant.ru/document/cons_doc_LAW_39331/aedad2b60bb4c7364ae38fdb0dc257d1bca0b6b0/",
+        "https://www.consultant.ru/document/cons_doc_LAW_39331/f45e837e9d482ce1bee28093f7eeed3a4637f67e/"
       ],
-      "legal_status": "requires_case_specific_current_law_review",
+      "legal_status": "verified_current",
       "activation_allowed": false,
       "review_date": "2026-11-28",
-      "source_scope": "specific_norm_and_related_search_results_partial",
+      "source_scope": "case_specific_current_norms_and_all_alternatives_reviewed_under_stated_facts",
       "checked_norm_urls": [
-        "https://www.consultant.ru/document/cons_doc_LAW_39331/22f46f165baa4e483d8a0c74fe52a2cea2f43d9e/"
+        "https://www.consultant.ru/document/cons_doc_LAW_39331/cfb43de72e4d3236bd4ec4c638a54c76d6447ae7/",
+        "https://www.consultant.ru/document/cons_doc_LAW_39331/aedad2b60bb4c7364ae38fdb0dc257d1bca0b6b0/",
+        "https://www.consultant.ru/document/cons_doc_LAW_39331/22f46f165baa4e483d8a0c74fe52a2cea2f43d9e/",
+        "https://www.consultant.ru/document/cons_doc_LAW_39331/f45e837e9d482ce1bee28093f7eeed3a4637f67e/"
       ],
       "targeted_option_review": {
-        "status": "targeted_norm_and_alternatives_review_not_full_acceptance",
+        "status": "case_specific_legal_acceptance_under_explicit_educational_facts",
         "option_count": 5,
-        "remaining": "Не установлены стадия дела, даты сделок и требования, основания оспаривания, признаки обязанности подать заявление о банкротстве и конкретная очерёдность."
+        "remaining": "Проверено для прямо заданных учебных обстоятельств. Реальное индивидуальное исполнение не сертифицировано; доступны справочные редакции и официальный текст Конституции, не полная независимая сверка цепочки поправок."
+      },
+      "final_case_review_2026_11_28": {
+        "date": "2026-11-28",
+        "scope": "case_specific_legal_acceptance_under_explicit_educational_facts",
+        "option_count": 5,
+        "conclusion": "Проверена действующая редакция №127-ФЗ от 04.08.2026, будущие поправки с 27.07.2027 не применялись. Установлены стадия до подачи заявления, признаки обязанности обращения и отсутствие исключений. Все пять мер допустимы как дополнительная оценка, добровольные переговоры, внутренний контроль, надлежащее информирование и анализ причин; не отсрочивают обязанность подачи заявления или раскрытия сведений. Невыполненный платёж не объявляется недействительной сделкой.",
+        "remaining": "Проверено для прямо заданных учебных обстоятельств. Реальное индивидуальное исполнение не сертифицировано; доступны справочные редакции и официальный текст Конституции, не полная независимая сверка цепочки поправок.",
+        "urls": [
+          "https://www.consultant.ru/document/cons_doc_LAW_39331/cfb43de72e4d3236bd4ec4c638a54c76d6447ae7/",
+          "https://www.consultant.ru/document/cons_doc_LAW_39331/aedad2b60bb4c7364ae38fdb0dc257d1bca0b6b0/",
+          "https://www.consultant.ru/document/cons_doc_LAW_39331/22f46f165baa4e483d8a0c74fe52a2cea2f43d9e/",
+          "https://www.consultant.ru/document/cons_doc_LAW_39331/f45e837e9d482ce1bee28093f7eeed3a4637f67e/"
+        ]
       }
     },
     {
