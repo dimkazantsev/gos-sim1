@@ -3,12 +3,49 @@
 ALTER TABLE public.event_collaboration_invites ADD COLUMN transfer_stage_no integer CHECK (transfer_stage_no BETWEEN 1 AND 16), ADD COLUMN transfer_errors integer NOT NULL DEFAULT 0 CHECK (transfer_errors BETWEEN 0 AND 2);
 CREATE UNIQUE INDEX event_v2_one_accepted_transfer ON public.event_collaboration_invites(case_id) WHERE transfer_stage_no IS NOT NULL;
 CREATE INDEX event_v2_transfer_credit ON public.event_collaboration_invites(game_id,inviter_id,transfer_stage_no,responded_at) WHERE transfer_stage_no IS NOT NULL AND status='accepted';
+-- Owner-approved portfolio routing. The original assignment stage fixes the
+-- procedure, not the latest global stage. Committee review is not an executive appointment.
+CREATE OR REPLACE FUNCTION private.event_v2_competent_at_stage(p_case uuid,p_user uuid,p_stage integer)
+RETURNS boolean LANGUAGE sql STABLE SECURITY DEFINER SET search_path TO '' AS $f$
+ SELECT EXISTS(
+  SELECT 1 FROM public.event_cases c
+  JOIN public.game_members m ON m.game_id=c.game_id AND m.user_id=p_user
+   AND m.kind='student' AND m.roster_archived_at IS NULL
+  JOIN public.event_case_routing r ON r.game_id=c.game_id AND r.case_id=c.id
+  WHERE c.id=p_case AND c.audience='single' AND c.effect_plan->>'rules_version'='2'
+   AND p_stage BETWEEN r.earliest_stage AND r.latest_stage
+   AND private.role_is_available(c.game_id,p_user)
+   AND CASE
+    WHEN r.region_code IS NOT NULL THEN private.event_party_controls_region(c.id,p_user)
+    WHEN r.destination<>'individual' THEN false
+    ELSE EXISTS(
+     SELECT 1 FROM public.institution_units u
+     JOIN public.institution_assignments a ON a.game_id=u.game_id AND a.unit_id=u.id AND a.unit_kind=u.unit_kind AND a.user_id=p_user
+     WHERE u.game_id=c.game_id AND u.unit_key IN ('social','economic','defence','foreign','internal')
+      AND (c.effect_plan->'competence'->'portfolio_keys') ? u.unit_key
+      AND a.assignment_role IN ('head','member')
+      AND ((p_stage BETWEEN 4 AND 8 AND c.effect_plan->'competence'->'committee_before_9'='true'::jsonb
+        AND u.unit_kind='committee'
+        AND (a.assignment_role<>'head' OR u.head_user_id=p_user)
+        AND EXISTS(SELECT 1 FROM public.party_member_mandates pm WHERE pm.game_id=c.game_id AND pm.user_id=p_user AND pm.effective_mandates>0))
+       OR (p_stage>=9 AND u.unit_kind='ministry'
+        AND (a.assignment_role<>'head' OR u.head_user_id=p_user)
+        AND EXISTS(SELECT 1 FROM public.government_nominations n
+         JOIN public.game_office_assignments o ON o.game_id=n.game_id AND o.user_id=n.candidate_user_id AND o.role_title=n.office_title AND o.status='active'
+         WHERE n.game_id=c.game_id AND n.stage_no=9 AND n.office_key='ministry_'||u.unit_key AND n.status='appointed' AND n.candidate_user_id=u.head_user_id
+          AND private.role_is_available(n.game_id,n.candidate_user_id)
+          AND EXISTS(SELECT 1 FROM public.game_members hm WHERE hm.game_id=n.game_id AND hm.user_id=n.candidate_user_id AND hm.kind='student' AND hm.roster_archived_at IS NULL))))
+    )
+   END
+ );
+$f$;
+REVOKE ALL ON FUNCTION private.event_v2_competent_at_stage(uuid,uuid,integer) FROM PUBLIC,anon,authenticated;
 CREATE OR REPLACE FUNCTION private.event_v2_competent(p_case uuid,p_user uuid) RETURNS boolean
 LANGUAGE sql STABLE SECURITY DEFINER SET search_path TO '' AS $f$
- SELECT EXISTS(SELECT 1 FROM public.event_cases c JOIN public.game_members m ON m.game_id=c.game_id AND m.user_id=p_user AND m.kind='student' AND m.roster_archived_at IS NULL
- WHERE c.id=p_case AND c.audience='single' AND c.effect_plan->>'rules_version'='2' AND
- EXISTS(SELECT 1 FROM jsonb_array_elements(c.effect_plan->'options') o WHERE o->>'key'=c.effect_plan->>'best_option_key' AND coalesce((o->>'lawful')::boolean,false)
- AND (private.event_role_matches(m.role_title,o->'authorized_roles') OR private.event_party_controls_region(c.id,p_user))));
+ SELECT coalesce((SELECT private.event_v2_competent_at_stage(p_case,p_user,a.stage_no)
+  FROM public.event_assignments a JOIN public.event_cases c ON c.id=a.case_id AND c.game_id=a.game_id
+  WHERE a.case_id=p_case AND c.audience='single' AND c.effect_plan->>'rules_version'='2'
+  AND (SELECT count(*) FROM public.event_assignments x WHERE x.case_id=a.case_id)=1),false);
 $f$;
 REVOKE ALL ON FUNCTION private.event_v2_competent(uuid,uuid) FROM PUBLIC,anon,authenticated;
 
@@ -65,6 +102,7 @@ begin
  if p_recipient=auth.uid() or exists(select 1 from public.event_assignments where case_id=p_case and recipient_id=p_recipient) or not exists(select 1 from public.game_members where game_id=c.game_id and user_id=p_recipient and kind='student' and roster_archived_at is null) then raise exception 'Выберите другого участника текущей игры';end if;
  if (c.audience IN ('group','all') AND c.effect_plan->>'rules_version'='2') then raise exception 'Состав коллективного голосования уже определён';
  elsif (c.audience='single' AND c.effect_plan->>'rules_version'='2') then
+  if not private.role_is_available(c.game_id,auth.uid()) then raise exception 'Полномочия участника приостановлены';end if;
   if (select coalesce(sum(transfer_errors),0) from public.event_collaboration_invites where case_id=c.id and inviter_id=auth.uid())>=2 then raise exception 'Две ошибочные передачи: обратитесь к преподавателю';end if;
   if not exists(select 1 from public.event_assignments where case_id=c.id and recipient_id=auth.uid() and status='pending' and stage_no is not null)
    or (select count(*) from public.event_assignments where case_id=c.id)<>1
@@ -104,6 +142,7 @@ begin
     or exists(select 1 from public.event_case_outcomes where case_id=c.id)
     then raise exception 'Передача ситуации недоступна';end if;
    if not exists(select 1 from public.game_members where game_id=c.game_id and user_id=i.inviter_id and kind='student' and roster_archived_at is null)
+    or not private.role_is_available(c.game_id,i.inviter_id)
     or private.event_v2_competent(c.id,i.inviter_id)
     or not private.event_v2_competent(c.id,auth.uid()) then
      update public.event_collaboration_invites set status='declined',responded_at=now(),transfer_errors=transfer_errors+1 where id=p_id;
@@ -159,14 +198,19 @@ begin
   select ea.stage_no into v_stage from public.event_assignments ea
    where ea.id=d.assignment_id and ea.game_id=c.game_id;
   o:=c.effect_plan->'options'->(substring(d.choice from 8)::int-1);
+  IF c.audience='single' AND c.effect_plan->>'rules_version'='2' THEN
+   ok:=private.event_v2_competent(c.id,d.actor_id);
+   qualified:=CASE WHEN ok THEN ARRAY[d.actor_id] ELSE '{}'::uuid[] END;
+  ELSE
   select array_agg(distinct x.actor_id) into qualified from public.event_decisions x where x.case_id=c.id and x.choice=d.choice and (private.event_role_matches(x.role_snapshot,o->'authorized_roles') OR private.event_party_controls_region(c.id,x.actor_id)) and (x.actor_id=d.actor_id or exists(select 1 from public.event_collaboration_invites i where i.case_id=c.id and i.inviter_id=d.actor_id and i.recipient_id=x.actor_id and i.status='accepted'));
-  ok:=case when (c.audience='single' AND c.effect_plan->>'rules_version'='2') then private.event_v2_competent(c.id,d.actor_id) AND (private.event_role_matches(d.role_snapshot,o->'authorized_roles') OR private.event_party_controls_region(c.id,d.actor_id)) else coalesce(cardinality(qualified),0)>0 end;
+   ok:=coalesce(cardinality(qualified),0)>0;
+  END IF;
   lawful:=coalesce((o->>'lawful')::boolean,false);
   -- Unattributed legacy assignments are not guessed into another stage;
   -- case resolution, trust and legal effects continue normally.
   if v_stage is not null then
   insert into public.event_authority_evidence(decision_id,case_id,game_id,actor_id,stage_no,authority_ok,lawful,strategy_point,role_snapshot,legal_basis,coalition_ids,delegated_ok,best_option)
-  values(d.id,c.id,c.game_id,d.actor_id,v_stage,ok,lawful,ok and lawful and coalesce((o->>'protects_role_interest')::boolean,false),d.role_snapshot,coalesce(o->>'legal_basis','Правовая разметка варианта отсутствует'),coalesce(qualified,'{}'),not (private.event_role_matches(d.role_snapshot,o->'authorized_roles') OR private.event_party_controls_region(c.id,d.actor_id)) and ok,(case when (c.audience='single' AND c.effect_plan->>'rules_version'='2') then d.choice=c.effect_plan->>'best_option_key' else coalesce(o->>'public_interest','')='beneficial' end) and lawful and d.choice=new.winner) on conflict do nothing;
+  values(d.id,c.id,c.game_id,d.actor_id,v_stage,ok,lawful,ok and lawful and coalesce((o->>'protects_role_interest')::boolean,false),d.role_snapshot,coalesce(o->>'legal_basis','Правовая разметка варианта отсутствует'),coalesce(qualified,'{}'),(case when c.audience='single' AND c.effect_plan->>'rules_version'='2' then false else not (private.event_role_matches(d.role_snapshot,o->'authorized_roles') OR private.event_party_controls_region(c.id,d.actor_id)) and ok end),(case when (c.audience='single' AND c.effect_plan->>'rules_version'='2') then d.choice=c.effect_plan->>'best_option_key' else coalesce(o->>'public_interest','')='beneficial' end) and lawful and d.choice=new.winner) on conflict do nothing;
   end if;
   if d.choice=new.winner and (not ok or not lawful) then violations:=violations+1;end if;
  end loop;

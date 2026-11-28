@@ -2,6 +2,8 @@
 const assert=require('node:assert/strict'),fs=require('node:fs');
 const {PGlite}=require('@electric-sql/pglite');
 const dir='content/events-v2-editorial';
+const earlyCommitteeKeys=new Set(["bank-curated-serious-11","bank-curated-v2-04","bank-expanded-light-20-01","bank-expanded-serious-16-01","bank-expanded-serious-17-01","bank-meeting","bank-curated-serious-15","bank-curated-v2-09","bank-expanded-serious-25-01","bank-expanded-serious-12-01","bank-expanded-serious-19-01","bank-expanded-serious-23-01","bank-curated-light-09","bank-curated-serious-10","bank-curated-v2-21","bank-expanded-light-04-01","bank-expanded-light-06-01","bank-expanded-serious-04-01","bank-expanded-serious-11-01","bank-expanded-serious-21-01"]);
+const portfolios=new Set(['social','economic','defence','foreign','internal']);
 const allowed=new Set(['key','trust','lawful','public_interest','authorized_roles','description','legal_basis','news','protects_role_interest','metric_effects','fiscal_effect']);
 function compile(cases,registry,matrix){
  const r=new Map(registry.map(c=>[c.case_key,c])),m=new Map(matrix.map(c=>[c.case_key,c]));
@@ -24,6 +26,9 @@ function compile(cases,registry,matrix){
    assert.ok(route?.owner_approved&&route.best_option===c.effect_plan.best_option_key,c.case_key);
    assert.ok(options.find(o=>o.key===route.best_option)?.lawful,c.case_key);
    effect_plan.best_option_key=route.best_option;
+   const portfolio_keys=[...new Set([route.primary,...route.secondary].map(x=>x.office_key.replace(/^ministry_/,'')))];
+   assert.ok(portfolio_keys.length&&portfolio_keys.every(x=>portfolios.has(x)),c.case_key);
+   effect_plan.competence={portfolio_keys,committee_before_9:earlyCommitteeKeys.has(c.case_key)};
   }else{assert.ok(!Object.hasOwn(c.effect_plan,'best_option_key'));assert.ok(options.every(o=>o.lawful));}
   return {case_key:c.case_key,title:c.title,category:c.category,audience:c.audience,situation:c.original_situation,
    decision_options:c.decision_options,effect_plan,source_url:c.source_url??null,source_note:c.source_note??null,
@@ -39,6 +44,8 @@ const cases=fs.readdirSync(dir).filter(n=>/^(collective-|individual-).*\.json$/.
 const register=JSON.parse(fs.readFileSync(dir+'/source-register.json','utf8')).cases;
 const matrix=JSON.parse(fs.readFileSync('docs/EVENTS_V2_COMPETENCE_APPROVAL_CANDIDATE_2026-11-28.json','utf8')).cases;
 const payload=compile(cases,register,matrix);
+assert.equal(payload.filter(c=>c.effect_plan.competence?.committee_before_9).length,20);
+assert.equal(payload.filter(c=>c.effect_plan.competence).length,141);
 const blocked=payload.filter(c=>!(c.verified&&c.editorial_status==='approved'&&c.legal_status==='verified_current'&&c.activation_allowed&&c.competence_allowed)).length;
 console.log(JSON.stringify({catalogueCases:payload.length,options:1660,blocked,editorialBytes:Buffer.byteLength(JSON.stringify(cases)),candidateBytes:Buffer.byteLength(JSON.stringify(payload))}));
 if(process.argv.includes('--release'))assertReleaseReady(payload);

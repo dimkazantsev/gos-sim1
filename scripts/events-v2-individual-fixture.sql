@@ -33,3 +33,13 @@ ALTER TABLE political_posts ALTER COLUMN id SET DEFAULT gen_random_uuid(),ADD CO
 CREATE TABLE games(id uuid PRIMARY KEY,owner_id uuid);
 CREATE TABLE event_auto_settings(game_id uuid,trust_per_20 numeric,backlog_penalty numeric);
 CREATE FUNCTION private.is_game_teacher(g uuid) RETURNS boolean LANGUAGE sql AS $$SELECT EXISTS(SELECT 1 FROM public.game_members WHERE game_id=g AND user_id=auth.uid() AND kind='teacher')$$;
+
+-- V2 exact institutional authority; fixture contains no real user data.
+CREATE TABLE public.event_case_routing(game_id uuid,case_id uuid,earliest_stage int,latest_stage int,destination text,region_code text,PRIMARY KEY(game_id,case_id));
+CREATE TABLE public.institution_units(id uuid PRIMARY KEY,game_id uuid,unit_kind text,unit_key text,head_user_id uuid);
+CREATE TABLE public.institution_assignments(game_id uuid,unit_id uuid,unit_kind text,user_id uuid,assignment_role text);
+CREATE TABLE public.party_member_mandates(game_id uuid,user_id uuid,effective_mandates int);
+CREATE TABLE public.government_nominations(game_id uuid,stage_no int,office_key text,status text,candidate_user_id uuid,office_title text);
+CREATE TABLE public.game_office_assignments(game_id uuid,user_id uuid,role_title text,status text);
+CREATE TABLE public.fixture_suspended(game_id uuid,user_id uuid);
+CREATE FUNCTION private.role_is_available(g uuid,u uuid) RETURNS boolean LANGUAGE sql STABLE AS $$SELECT NOT EXISTS(SELECT 1 FROM public.fixture_suspended WHERE game_id=g AND user_id=u)$$;
